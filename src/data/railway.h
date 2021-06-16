@@ -105,6 +105,24 @@ public:
      */
     void adjustMileToZero();
 
+    /*
+     * Line.isDownGap()
+     * 但注意车站匹配条件变了
+     * 如果有至少一个不存在，暂定直接返回true
+     */
+    bool isDownGap(const StationName& s1,const StationName& s2)const;
+
+    bool isDownGap(const std::shared_ptr<RailStation>& s1,
+                   const std::shared_ptr<RailStation>& s2)const;
+
+    /*
+     * Line.gapBetween()
+     * 如果不存在，抛错
+     */
+    double mileBetween(const StationName& s1,const StationName& s2)const;
+
+    //2021.06.16  line.py: 370
+
 private:
     /*
      * 维护nameMap和fieldMap

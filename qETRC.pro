@@ -19,7 +19,8 @@ HEADERS += \
     src/data/railstation.h \
     src/data/railway.h \
     src/data/stationname.h \
-    src/mainwindow.h
+    src/mainwindow.h \
+    src/util/qeexceptions.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

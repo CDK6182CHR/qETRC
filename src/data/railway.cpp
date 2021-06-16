@@ -1,4 +1,6 @@
 ﻿#include "railway.h"
+#include "../util/qeexceptions.h"
+#include <cmath>
 
 
 void RailInfoNote::fromJson(const QJsonObject &obj)
@@ -212,6 +214,38 @@ void Railway::adjustMileToZero()
             }
         }
     }
+}
+
+bool Railway::isDownGap(const StationName& s1,const StationName& s2) const
+{
+    const auto& t1=stationByGeneralName(s1),
+            t2=stationByGeneralName(s2);
+    if(!t1 || ! t2)
+        return true;
+    return t1->mile <= t2->mile;
+}
+
+bool Railway::isDownGap(const std::shared_ptr<RailStation> &s1,
+                        const std::shared_ptr<RailStation> &s2) const
+{
+    return s1->mile<=s2->mile;
+}
+
+double Railway::mileBetween(const StationName &s1,
+                            const StationName &s2) const
+{
+    const auto& t1=stationByGeneralName(s1),
+            t2=stationByGeneralName(s2);
+    if(!t1)
+        throw StationNotInRailException(s1);
+    if(!t2)
+        throw StationNotInRailException(s2);
+    if (!isDownGap(t1,t2)){
+        if(t1->counter.has_value()&&t2->counter.has_value()){
+            return std::abs(t1->counter.value()-t2->counter.value());
+        }
+    }
+    return std::abs(t1->mile-t2->mile);
 }
 
 void Railway::addMapInfo(const std::shared_ptr<RailStation> &st)
