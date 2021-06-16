@@ -14,6 +14,7 @@ struct RailInfoNote{
     QString author,version,note;
     RailInfoNote()=default;
     void fromJson(const QJsonObject& obj);
+    QJsonObject toJson()const;
 };
 
 class Railway
@@ -49,6 +50,88 @@ public:
 
     void fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;
+
+    void appendStation(const StationName& name, double mile,
+                    int level=4,
+                    std::optional<double> counter=std::nullopt,
+                    PassedDirection direction=PassedDirection::BothVia);
+    void insertStation(int index,
+                    const StationName& name, double mile,
+                    int level=4,
+                    std::optional<double> counter=std::nullopt,
+                    PassedDirection direction=PassedDirection::BothVia);
+
+    /*
+     * Line.stationDictByName 的严格模式
+     * 即不允许域解析符
+     */
+    std::shared_ptr<RailStation> stationByName(const StationName& name);
+
+    const std::shared_ptr<RailStation>
+        stationByName(const StationName& name)const;
+
+    /*
+     * 2021.06.16新增
+     * 仅允许以下两种情况：严格匹配，或者非Bare匹配到Bare类型
+     */
+    std::shared_ptr<RailStation> stationByGeneralName(const StationName& name);
+
+    const std::shared_ptr<RailStation>
+        stationByGeneralName(const StationName& name)const;
+
+    /*
+     * Line.stationInLine 的严格模式
+     */
+    bool containsStation(const StationName& name)const;
+
+    /*
+     * 注意条件与stationByGeneralName一致
+     */
+    bool containsGeneralStation(const StationName& name)const;
+
+    /*
+     * 与pyETRC不同：暂定不存在的站返回-1
+     */
+    int stationIndex(const StationName& name)const;
+
+    /*
+     * Line.delStation
+     * 线性算法
+     */
+    void removeStation(const StationName& name);
+
+    /*
+     * Line.adjustLichengTo0
+     */
+    void adjustMileToZero();
+
+private:
+    /*
+     * 维护nameMap和fieldMap
+     */
+    void addMapInfo(const std::shared_ptr<RailStation>& st);
+
+    /*
+     * 删除车站时维护数据
+     */
+    void removeMapInfo(const StationName& name);
+
+    /*
+     * 启用和禁用numberMap
+     * 用于初始化时快速找下标
+     */
+    void enableNumberMap();
+    void disableNumberMap();
+
+    //暴力线性算法
+    int stationIndexBrute(const StationName& name)const;
+
+    /*
+     * Line.nameMapToLine()
+     * 将站名映射到本线
+     */
+    StationName localName(const StationName& name)const;
+
 };
 
 #endif // RAILWAY_H

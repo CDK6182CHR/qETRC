@@ -33,7 +33,8 @@ public:
     RailStation(const StationName& name_,
                 double mile_,
                 int level_=4,
-                std::optional<double> counter_=std::nullopt
+                std::optional<double> counter_=std::nullopt,
+                PassedDirection direction_=PassedDirection::BothVia
                 );
     RailStation(const QJsonObject& obj);
 

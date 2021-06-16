@@ -4,16 +4,18 @@
 RailStation::RailStation(const StationName &name_,
                          double mile_,
                          int level_,
-                         std::optional<double> counter_):
+                         std::optional<double> counter_,
+                         PassedDirection direction_):
     name(name_),mile(mile_),level(level_),counter(counter_),
-    y_value(-1),show(true),passenger(true),freight(true),
+    y_value(-1),direction(direction_),
+    show(true),passenger(true),freight(true),
     tracks(QObject::tr(""))
 {
 }
 
 RailStation::RailStation(const QJsonObject &obj)
 {
-    loadJson(obj);
+    fromJson(obj);
 }
 
 void RailStation::fromJson(const QJsonObject &obj)

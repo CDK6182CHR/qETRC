@@ -6,6 +6,7 @@
 #define STATIONNAME_H
 
 #include <QString>
+#include <QHash>
 
 class StationName
 {
@@ -39,6 +40,18 @@ public:
      */
     bool operator==(const StationName& name)const;
 
+    /*
+     * 是否为仅有站名没有场名的类型
+     */
+    inline bool isBare()const{
+        return _field.isEmpty();
+    }
+
 };
+
+inline uint qHash(const StationName& sn, uint seed)
+{
+    return qHash(sn.station(),seed) ^ qHash(sn.field(),seed);
+}
 
 #endif // STATIONNAME_H
