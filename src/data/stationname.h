@@ -47,6 +47,24 @@ public:
         return _field.isEmpty();
     }
 
+    inline bool empty()const {
+        return _station.isEmpty() && _field.isEmpty();
+    }
+
+    inline operator bool()const {
+        return !empty();
+    }
+
+    inline bool equalOrContains(const StationName& another)const{
+        return (station()==another.station()) &&
+                (field()==another.field() || isBare());
+    }
+
+    inline bool equalOrBelongsTo(const StationName& another)const{
+        return (station()==another.station()) &&
+                (field()==another.field() || another.isBare());
+    }
+
 };
 
 inline uint qHash(const StationName& sn, uint seed)

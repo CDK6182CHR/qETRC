@@ -9,7 +9,7 @@ RailStation::RailStation(const StationName &name_,
     name(name_),mile(mile_),level(level_),counter(counter_),
     y_value(-1),direction(direction_),
     show(true),passenger(true),freight(true),
-    tracks(QObject::tr(""))
+    tracks()
 {
 }
 
@@ -33,7 +33,11 @@ void RailStation::fromJson(const QJsonObject &obj)
     show=obj.value("show").toBool(true);
     passenger=obj.value("passenger").toBool(true);
     freight=obj.value("freight").toBool(true);
-    tracks=obj.value("tracks").toString("");
+    const QJsonArray& ar = obj.value("tracks").toArray();
+    tracks.clear();
+    for (const auto& p : ar) {
+        tracks.append(p.toString());
+    }
 }
 
 QJsonObject RailStation::toJson() const
@@ -51,7 +55,11 @@ QJsonObject RailStation::toJson() const
     obj.insert("show",show);
     obj.insert("passenger",passenger);
     obj.insert("freight",freight);
-    obj.insert("tracks",tracks);
+    QJsonArray ar;
+    for (const auto& p : tracks) {
+        ar.append(QJsonValue(p));
+    }
+    obj.insert("tracks", ar);
     return obj;
 }
 

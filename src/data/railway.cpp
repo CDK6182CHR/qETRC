@@ -1,6 +1,8 @@
 ﻿#include "railway.h"
 #include "../util/qeexceptions.h"
 #include <cmath>
+#include <algorithm>
+#include <QPair>
 
 
 void RailInfoNote::fromJson(const QJsonObject &obj)
@@ -20,9 +22,25 @@ QJsonObject RailInfoNote::toJson() const
 }
 
 
-Railway::Railway(const QJsonObject &obj)
+Railway::Railway(const QString& name):
+    _name(name), numberMapEnabled(false)
+{
+}
+
+Railway::Railway(const QJsonObject &obj):
+    numberMapEnabled(false)
 {
     fromJson(obj);
+}
+
+void Railway::moveStationInfo(Railway&& another)
+{
+    _name = std::move(another._name);
+    _stations = std::move(another._stations);
+    nameMap = std::move(another.nameMap);
+    fieldMap = std::move(another.fieldMap);
+    numberMapEnabled = another.numberMapEnabled;
+    numberMap = std::move(another.numberMap);
 }
 
 void Railway::fromJson(const QJsonObject &obj)
@@ -124,23 +142,24 @@ const std::shared_ptr<RailStation> Railway::stationByName(const StationName &nam
 }
 
 std::shared_ptr<RailStation>
-Railway::stationByGeneralName(const StationName &name)
+    Railway::stationByGeneralName(const StationName &name)
 {
     const QList<StationName>& t=fieldMap.value(name.station());
     for(const auto& p:t){
-        if(p.isBare() || p.operator==(name)){
-            return stationByName(name);
+        if(p.equalOrContains(name)){
+            return stationByName(p);
         }
     }
     return std::shared_ptr<RailStation>(nullptr);
 }
 
-const std::shared_ptr<RailStation> Railway::stationByGeneralName(const StationName &name) const
+const std::shared_ptr<RailStation>
+    Railway::stationByGeneralName(const StationName &name) const
 {
     const QList<StationName>& t=fieldMap.value(name.station());
     for(const auto& p:t){
-        if(p.isBare() || p.operator==(name)){
-            return stationByName(name);
+        if(p.equalOrContains(name)){
+            return stationByName(p);
         }
     }
     return std::shared_ptr<RailStation>(nullptr);
@@ -248,6 +267,183 @@ double Railway::mileBetween(const StationName &s1,
     return std::abs(t1->mile-t2->mile);
 }
 
+bool Railway::isSplitted() const
+{
+    for (const auto& p : _stations) {
+        if (p->direction == PassedDirection::DownVia ||
+            p->direction == PassedDirection::UpVia)
+            return true;
+    }
+    return false;
+}
+
+
+void Railway::changeStationName(const StationName& oldname, 
+    const StationName& newname)
+{
+    auto p = stationByName(oldname);
+    p->name = newname;
+    //todo: 更新标尺天窗中站名
+
+    //更新映射表
+    removeMapInfo(oldname);
+    addMapInfo(p);
+}
+
+double Railway::counterLength() const
+{
+    if (_stations.empty())
+        return 0;
+    const auto& last = _stations.last();
+    return last->counter.has_value() ? 
+        last->counter.value() : last->mile;
+}
+
+void Railway::reverse()
+{
+    double length = railLength(), ctlen = counterLength();
+    for (auto p : _stations) {
+        p->mile = length - p->mile;
+        if (p->counter.has_value()) {
+            p->counter = ctlen - p->counter.value();
+        }
+        else {
+            p->counter = p->mile;
+        }
+        std::swap(p->counter.value(), p->mile);
+        switch (p->direction) {
+        case PassedDirection::DownVia:
+            p->direction = PassedDirection::UpVia; break;
+        case PassedDirection::UpVia:
+            p->direction = PassedDirection::DownVia; break;
+        default:break;
+        }
+    }
+    std::reverse(_stations.begin(), _stations.end());
+}
+
+QList<QPair<StationName,StationName>> Railway::adjIntervals(bool down) const
+{
+    QList<QPair<StationName,StationName>> res;
+    res.reserve(stationCount());   //预留空间
+
+    if (empty()) return res;
+
+    if (down) {
+        auto p = _stations.cbegin();
+        StationName last = (*p)->name;
+        for (++p; p != _stations.cend(); ++p) {
+            auto& q = *p;
+            if (!q->isDownVia())
+                continue;
+            res.append(qMakePair(last, q->name));
+            last = q->name;
+        }
+    }
+    else {  //not down
+        auto p = _stations.crbegin();
+        StationName last = (*p)->name;
+        for (++p; p != _stations.crend(); ++p) {
+            auto& q = *p;
+            if (!q->isUpVia())continue;
+            res.append(qMakePair(last,q->name));
+            last = q->name;
+        }
+    }
+    return res;
+}
+
+void Railway::mergeCounter(const Railway& another)
+{
+    //注意插入会导致迭代器失效，因此不可用迭代器
+    int i = 0;
+    int j = another.stationCount() - 1;
+    while (true) {
+        if (i >= stationCount() || j < 0)
+            break;
+        const auto& si = _stations[i];
+        const auto& sj = another.stations().at(j);
+        if (si->name == sj->name) {
+            si->direction = PassedDirection::BothVia;
+            si->counter = another.railLength() - sj->mile;
+            i++; j--;
+        }
+        else {
+            if (!containsStation(sj->name)) {
+                //上行单向站，插入处理
+                double m = another.railLength() - sj->mile;
+                insertStation(i, sj->name, m, sj->level, 
+                    m, PassedDirection::UpVia);
+                i++; j--;
+            }
+            else {
+                //下行单向站
+                i++;
+            }
+        }
+    }
+    //[对里程]的修正：使得零点和正里程一样
+    if (empty())return;
+    if (!_stations.at(0)->isUpVia()) {
+        int i = 0;
+        while (i < stationCount() && !_stations.at(i)->isUpVia())
+            i++;
+        if (i < stationCount()) {
+            double m0 = _stations.at(i)->mile;
+            for (int j = i; j < stationCount(); j++) {
+                if (_stations.at(j)->counter.has_value()) {
+                    _stations.at(j)->counter.value() += m0;
+                }
+            }
+        }
+    }
+}
+
+Railway Railway::slice(int start, int end) const
+{
+    Railway rail;
+    rail._stations.reserve(end - start);
+    for (int i = start; i < end; i++) {
+        rail._stations.append(_stations.at(i));
+    }
+    // todo ruler
+    rail.setMapInfo();
+    return rail;
+}
+
+void Railway::jointWith(const Railway& another, bool former, bool reverse)
+{
+    if (reverse) {
+        this->reverse();
+    }
+    if (former) {
+        //对方在前
+        double len = another.railLength();
+        for (auto& p : _stations) {
+            p->mile += len;
+        }
+        for (auto p = another.stations().crbegin();
+            p != another.stations().crend(); p++) {
+            if (!containsStation((*p)->name)) {
+                insertStation(0, **p);
+            }
+        }
+    }
+    else {  //not former
+        double length = railLength();
+        double ctlen = counterLength();
+        for (const auto& t : another.stations()) {
+            appendStation(*t);
+            auto& last = stations().last();
+            last->mile += length;
+            if (last->counter.has_value())
+                last->counter.value() += ctlen;
+        }
+    }
+
+    //todo: 标尺天窗...
+}
+
 void Railway::addMapInfo(const std::shared_ptr<RailStation> &st)
 {
     //nameMap  直接添加
@@ -268,6 +464,19 @@ void Railway::removeMapInfo(const StationName &name)
     }else{
         QList<StationName>& lst=t.value();
         lst.removeAll(name);
+    }
+}
+
+void Railway::setMapInfo()
+{
+    nameMap.clear();
+    fieldMap.clear();
+    nameMap.reserve(stationCount());
+    fieldMap.reserve(stationCount());
+
+    for (const auto& p : _stations) {
+        nameMap.insert(p->name, p);
+        fieldMap[p->name.station()].append(p->name);
     }
 }
 
@@ -305,6 +514,23 @@ StationName Railway::localName(const StationName &name) const
         return t->name;
     else
         return name;
+}
+
+void Railway::insertStation(int i, const RailStation& station)
+{
+    auto&& t = std::make_shared<RailStation>(station);    //copy constructed!!
+    if (i == -1)
+        _stations.append(t);
+    else
+        _stations.insert(i, t);
+    addMapInfo(t);
+}
+
+void Railway::appendStation(const RailStation& station)
+{
+    auto&& t = std::make_shared<RailStation>(station);    //copy constructed!!
+    _stations.append(t);
+    addMapInfo(t);
 }
 
 

@@ -5,9 +5,7 @@
 #ifndef RAILSTATION_H
 #define RAILSTATION_H
 #include <optional>
-#include <QString>
-#include <QObject>
-#include <QJsonObject>
+#include <QtCore>
 
 #include "stationname.h"
 
@@ -29,7 +27,7 @@ public:
     PassedDirection direction;
     bool show;
     bool passenger,freight;
-    QString tracks;
+    QList<QString> tracks;
     RailStation(const StationName& name_,
                 double mile_,
                 int level_=4,
@@ -42,6 +40,20 @@ public:
     QJsonObject toJson()const;
 
     QString counterStr()const;
+
+    inline bool isDownVia()const {
+        return direction == PassedDirection::DownVia ||
+            direction == PassedDirection::BothVia;
+    }
+
+    inline bool isUpVia()const {
+        return direction == PassedDirection::UpVia ||
+            direction == PassedDirection::BothVia;
+    }
+
+    inline bool isDirectionVia(bool down)const {
+        return down ? isDownVia() : isUpVia();
+    }
 };
 
 #endif // RAILSTATION_H
