@@ -254,6 +254,7 @@ public:
     /// <summary>
     /// Line.slice()
     /// [start, end) 的切片
+    /// 注意  这是浅拷贝
     /// </summary>
     Railway slice(int start, int end)const;
 

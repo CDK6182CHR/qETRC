@@ -8,6 +8,7 @@
 #include <QtCore>
 
 #include "stationname.h"
+#include "railinterval.h"
 
 enum class PassedDirection {
     NoVia=0b00,
@@ -18,6 +19,11 @@ enum class PassedDirection {
 
 class RailStation
 {
+    friend class Railway;
+    //前后区间指针，暂定由Railway类负责维护
+    //todo: 详细维护算法
+    std::shared_ptr<RailInterval> downPrev, downNext;
+    std::shared_ptr<RailInterval> upPrev, upNext;
 public:
     StationName name;
     double mile;
