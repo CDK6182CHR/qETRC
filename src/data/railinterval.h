@@ -5,9 +5,10 @@
 #include <memory>
 #include <QList>
 
-#include "rulernode.h"
+
 
 class RailStation;
+class RulerNode;
 
 class RailInterval:
 	std::enable_shared_from_this<RailInterval>
@@ -80,5 +81,21 @@ public:
     }
 
     inline bool isDown()const{return down;}
+
+    template <typename Node>
+    inline std::shared_ptr<const Node> getDataAt(int i)const;
+
+    template <typename Node>
+    inline std::shared_ptr<Node> getDataAt(int i);
+
+    template <>
+    inline std::shared_ptr<const RulerNode> getDataAt(int i)const{
+        return _rulerNodes.at(i);
+    }
+
+    template <>
+    inline std::shared_ptr<RulerNode> getDataAt(int i){
+        return _rulerNodes[i];
+    }
 
 };

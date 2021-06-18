@@ -62,8 +62,10 @@ QJsonObject Ruler::toJson() const
 
 std::shared_ptr<RulerNode> Ruler::getNode(const StationName &from, const StationName &to)
 {
-    auto t=_railway.findInterval(from,to);
-    if(t)
+    auto t = _railway.findInterval(from, to);
+    if (!t && !_different)
+        t = _railway.findInterval(to, from);
+    if (t)
         return t->rulerNodeAt(_index);
     else
         return std::shared_ptr<RulerNode>();

@@ -191,6 +191,8 @@
     <QtMoc Include="src\mainwindow.h">
     </QtMoc>
     <ClInclude Include="src\data\railinterval.h" />
+    <ClInclude Include="src\data\railintervaldata.hpp" />
+    <ClInclude Include="src\data\railintervalnode.hpp" />
     <ClInclude Include="src\data\ruler.h" />
     <ClInclude Include="src\data\rulernode.h" />
     <ClInclude Include="src\util\qeexceptions.h" />

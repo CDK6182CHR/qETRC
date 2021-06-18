@@ -13,7 +13,7 @@
 #include <utility>
 
 #include "railstation.h"
-#include "ruler.h"
+//#include "ruler.h"
 #include "railinterval.h"
 
 
@@ -23,6 +23,8 @@ struct RailInfoNote{
     void fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;
 };
+
+class Ruler;
 
 class Railway
 {

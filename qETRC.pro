@@ -9,6 +9,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    src/data/forbid.cpp \
     src/data/railstation.cpp \
     src/data/railinterval.cpp \
     src/data/railway.cpp \
@@ -19,6 +20,9 @@ SOURCES += \
     src/mainwindow.cpp
 
 HEADERS += \
+    src/data/forbid.h \
+    src/data/railintervaldata.hpp \
+    src/data/railintervalnode.hpp \
     src/data/railstation.h \
     src/data/railinterval.h \
     src/data/railway.h \
