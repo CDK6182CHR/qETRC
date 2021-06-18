@@ -1,5 +1,9 @@
 ﻿/*
  * 原pyETRC中Line类
+ * 注意：与区间相关时，
+ * prev, next指运行方向；
+ * left, right指列表方向 （列表先后顺序）；
+ * up, down指行别。
  */
 #ifndef RAILWAY_H
 #define RAILWAY_H
@@ -130,6 +134,8 @@ public:
      * 线性算法
      */
     void removeStation(const StationName& name);
+
+    void removeStation(int index);
 
     /*
      * Line.adjustLichengTo0
@@ -265,6 +271,16 @@ public:
     /// </summary>
     void jointWith(const Railway& another, bool former, bool reverse);
 
+    /// <summary>
+    /// 第一个下行区间
+    /// first, last皆按运行方向
+    /// </summary>
+    /// <returns></returns>
+    std::shared_ptr<RailInterval> firstDownInterval()const;
+
+    std::shared_ptr<RailInterval> firstUpInterval()const;
+
+
 private:
     /*
      * 维护nameMap和fieldMap
@@ -301,6 +317,46 @@ private:
     void insertStation(int i, const RailStation& station);
 
     void appendStation(const RailStation& station);
+
+    void appendStation(RailStation&& station);
+
+    /// <summary>
+    /// 为缀加的车站添加区间信息
+    /// 调用之前，车站已经添加好
+    /// 这种比较需要心力开销的地方，就不考虑智能指针复制代价，当成裸指针用
+    /// </summary>
+    void appendInterval(std::shared_ptr<RailStation> st);
+
+    /// <summary>
+    /// 为缀加的车站添加区间信息
+    /// 已知调用之前，车站已经添加好，并且下标为index
+    /// 需要涉及打断区间操作
+    /// </summary>
+    void insertInterval(int index, std::shared_ptr<RailStation> st);
+
+    /// <summary>
+    /// 删除车站后，清除相应的区间信息
+    /// 先调用本函数，再执行车站删除
+    /// </summary>
+    void removeInterval(int index);
+
+    /// <summary>
+    /// 寻找前一个通过指定方向的车站下标
+    /// 如果不存在，返回-1
+    /// previous是指：上行方向
+    /// 带index的需要时再实现
+    /// </summary>
+    /// <param name="cur">当前下标</param>
+    /// <param name="down">行别</param>
+    int leftDirStationIndex(int cur, bool down)const;
+
+    std::shared_ptr<RailStation>
+        leftDirStation(int cur, bool down)const;
+
+    int rightDirStationIndex(int cur, bool down)const;
+
+    std::shared_ptr<RailStation>
+        rightDirStation(int cur, bool down)const;
 
 };
 

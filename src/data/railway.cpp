@@ -3,7 +3,9 @@
 #include <cmath>
 #include <algorithm>
 #include <QPair>
+#include <memory>
 
+#include "railinterval.h"
 
 void RailInfoNote::fromJson(const QJsonObject &obj)
 {
@@ -49,7 +51,7 @@ void Railway::fromJson(const QJsonObject &obj)
     _notes.fromJson(obj.value("notes").toObject());
     const QJsonArray& ar=obj.value("stations").toArray();
     for(auto t=ar.cbegin();t!=ar.cend();t++){
-        _stations.append(std::make_shared<RailStation>(t->toObject()));
+        appendStation(RailStation(t->toObject()));
     }
 
     /*
@@ -118,6 +120,7 @@ void Railway::appendStation(const StationName &name, double mile, int level, std
                 name,mile,level,counter,direction);
     _stations.append(t);
     addMapInfo(t);
+    appendInterval(t);
 }
 
 void Railway::insertStation(int index, const StationName &name, double mile,
@@ -129,6 +132,7 @@ void Railway::insertStation(int index, const StationName &name, double mile,
     else
         _stations.insert(index, t);
     addMapInfo(t);
+    insertInterval(index, t);
 }
 
 std::shared_ptr<RailStation> Railway::stationByName(const StationName &name)
@@ -199,22 +203,34 @@ void Railway::removeStation(const StationName &name)
 {
     if(numberMapEnabled){
         if(numberMap.contains(name)){
-            int i=numberMap.value(name);
+            int i = numberMap.value(name);
             _stations.removeAt(i);
             numberMap.remove(name);
+            removeInterval(i);
             removeMapInfo(name);
             return;
         }
     }
     //QList.remove应当是线性算法，可能还不如直接手写来得快
-    for(int i=0;i<_stations.count();i++){
-        const auto& t=_stations[i];
-        if(t->name == name){
+    for (int i = 0; i < _stations.count(); i++) {
+        const auto& t = _stations[i];
+        if (t->name == name) {
+            removeInterval(i);
             removeMapInfo(name);
             _stations.removeAt(i);
             break;
         }
     }
+}
+
+void Railway::removeStation(int index)
+{
+    const auto& name = _stations.at(index)->name;
+    removeInterval(index);
+    _stations.removeAt(index);
+    if(numberMapEnabled)
+        numberMap.remove(name);
+    removeMapInfo(name);
 }
 
 void Railway::adjustMileToZero()
@@ -444,6 +460,27 @@ void Railway::jointWith(const Railway& another, bool former, bool reverse)
     //todo: 标尺天窗...
 }
 
+std::shared_ptr<RailInterval> Railway::firstDownInterval() const
+{
+    for (int i = 0; i < stationCount(); i++) {
+        const auto& t = _stations.at(i);
+        if (t->isDownVia())
+            return t->downNext;
+    }
+    return std::shared_ptr<RailInterval>();
+}
+
+std::shared_ptr<RailInterval> Railway::firstUpInterval() const
+{
+    for (int i = stationCount() - 1; i >= 0; i--) {
+        const auto& t = _stations.at(i);
+        if (t->isUpVia()) {
+            return t->upNext;
+        }
+    }
+    return std::shared_ptr<RailInterval>();
+}
+
 void Railway::addMapInfo(const std::shared_ptr<RailStation> &st)
 {
     //nameMap  直接添加
@@ -524,6 +561,7 @@ void Railway::insertStation(int i, const RailStation& station)
     else
         _stations.insert(i, t);
     addMapInfo(t);
+    insertInterval(i, t);
 }
 
 void Railway::appendStation(const RailStation& station)
@@ -531,6 +569,114 @@ void Railway::appendStation(const RailStation& station)
     auto&& t = std::make_shared<RailStation>(station);    //copy constructed!!
     _stations.append(t);
     addMapInfo(t);
+    appendInterval(t);
+}
+
+void Railway::appendStation(RailStation&& station)
+{
+    auto&& t = std::make_shared<RailStation>(std::forward<RailStation>(station));    //move constructed!!
+    _stations.append(t);
+    addMapInfo(t);
+    appendInterval(t);
+}
+
+void Railway::appendInterval(std::shared_ptr<RailStation> st)
+{
+    int n = stationCount() - 1;
+    if (st->isDownVia()) {
+        //添加下行区间
+        auto pr = leftDirStation(n, true);
+        if (pr) {
+            std::make_shared<RailInterval>(true, pr, st);
+        }
+    }
+    if (st->isUpVia()) {
+        //添加上行区间
+        auto pr = leftDirStation(n, false);
+        if (pr) {
+            std::make_shared<RailInterval>(false, st, pr);
+        }
+    }
+}
+
+void Railway::insertInterval(int index, std::shared_ptr<RailStation> st)
+{
+    if (st->isDownVia()) {
+        auto pr = leftDirStation(index, true),
+            nx = rightDirStation(index, true);
+        if (pr) {
+            //前区间数据，相当于在append
+            std::make_shared<RailInterval>(true, pr, st);
+        }
+        else {
+            //后区间
+            std::make_shared<RailInterval>(true, st, nx);
+        }
+    }
+    if(st->isUpVia()) {   //上行方向
+        auto pr = leftDirStation(index, false),
+            nx = rightDirStation(index, false);
+        if (pr) {
+            std::make_shared<RailInterval>(false, st, pr);
+        }
+        if (nx) {
+            std::make_shared<RailInterval>(false, nx, st);
+        }
+    }
+}
+
+void Railway::removeInterval(int index)
+{
+    auto st = _stations.at(index);
+    if (st->isDownVia()) {
+        auto pr = leftDirStation(index, true),
+            nx = rightDirStation(index, false);
+        if (pr && nx) {
+            //区间合并
+            auto it1 = st->downPrev, it2 = st->downNext;
+            it1->mergeWith(*it2);
+        }
+        else if (pr) {
+            //只有前区间，应当删除
+            pr->downNext.reset();
+        }
+        else if (nx) {
+            nx->downPrev.reset();
+        }
+    }
+    if (st->isUpVia()) {
+        auto pr = leftDirStation(index, false),
+            nx = rightDirStation(index, false);
+        if (pr && nx) {
+            auto it1 = st->upPrev, it2 = st->upNext;
+            it1->mergeWith(*it2);
+        }
+        else if (pr) {
+            pr->upPrev.reset();
+        }
+        else if (nx) {
+            nx->upNext.reset();
+        }
+    }
+}
+
+std::shared_ptr<RailStation> Railway::leftDirStation(int cur, bool down) const
+{
+    for (int i = cur - 1; i >= 0; i--) {
+        if (_stations.at(i)->isDirectionVia(down))
+            return _stations.at(i);
+    }
+    return std::shared_ptr<RailStation>();
+}
+
+std::shared_ptr<RailStation> Railway::rightDirStation(int cur, bool down) const
+{
+    for (int i = cur + 1; i < stationCount(); i++) {
+        if (_stations.at(i)->isDirectionVia(down)) {
+            return _stations.at(i);
+        }
+    }
+    return std::shared_ptr<RailStation>();
 }
 
 

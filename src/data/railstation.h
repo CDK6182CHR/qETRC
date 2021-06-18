@@ -20,6 +20,7 @@ enum class PassedDirection {
 class RailStation
 {
     friend class Railway;
+    friend class RailInterval;
     //前后区间指针，暂定由Railway类负责维护
     //todo: 详细维护算法
     std::shared_ptr<RailInterval> downPrev, downNext;
@@ -41,6 +42,14 @@ public:
                 PassedDirection direction_=PassedDirection::BothVia
                 );
     RailStation(const QJsonObject& obj);
+
+    /// <summary>
+    /// 注意：shared_ptr的默认复制语义是不正确的
+    /// 重新实现为：构造空shared_ptr
+    /// </summary>
+    RailStation(const RailStation&);
+
+    RailStation(RailStation&& rs) = default;
 
     void fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;

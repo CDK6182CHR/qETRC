@@ -18,6 +18,15 @@ RailStation::RailStation(const QJsonObject &obj)
     fromJson(obj);
 }
 
+RailStation::RailStation(const RailStation& rs):
+    name(rs.name),mile(rs.mile),level(rs.level),counter(rs.counter),
+    y_value(rs.y_value),direction(rs.direction),
+    show(rs.show),passenger(rs.passenger),freight(rs.freight),
+    tracks(rs.tracks)
+{
+    //shared_ptr直接用默认构造
+}
+
 void RailStation::fromJson(const QJsonObject &obj)
 {
     name=StationName::fromSingleLiteral(obj.value("zhanming").toString());
