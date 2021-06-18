@@ -12,14 +12,21 @@ RailInterval::RailInterval(bool down_,
 	std::shared_ptr<RailStation> from_, std::shared_ptr<RailStation> to_):
 	from(from_),to(to_),down(down_)
 {
-	if (down) {
-		from->downNext = shared_from_this();
-		to->downPrev = shared_from_this();
-	}
-	else {
-		from->upNext = shared_from_this();
-		to->upPrev = shared_from_this();
-	}
+}
+
+std::shared_ptr<RailInterval>
+    RailInterval::construct(bool down, std::shared_ptr<RailStation> from,
+                            std::shared_ptr<RailStation> to)
+{
+    std::shared_ptr<RailInterval> t(new RailInterval(down,from,to));
+    if(down){
+        from->downNext=t;
+        to->downPrev=t;
+    }else{
+        from->upNext=t;
+        to->upPrev=t;
+    }
+    return t;
 }
 
 std::shared_ptr<RailInterval> RailInterval::prevInterval()const
@@ -47,6 +54,24 @@ RailInterval RailInterval::mergeWith(const RailInterval& next) const
 	assert(down == next.down);
 
 	RailInterval it(down, from, next.to);
-	//todo: 标尺等数据处理
-	return it;
+    for(int i=0;i<_rulerNodes.count();i++){
+        auto p=it._rulerNodes[i];
+        const auto p1=_rulerNodes.at(i);
+        const auto p2=next._rulerNodes.at(i);
+        p->start=p1->start;
+        p->stop=p2->stop;
+        p->interval=p1->interval+p2->interval;
+    }
+    return it;
+}
+
+double RailInterval::mile() const
+{
+    if(!from||!to)
+        return 0;
+    if(down){
+        return to->mile-from->mile;
+    }else{
+        return from->counterMile()-to->counterMile();
+    }
 }

@@ -5,6 +5,8 @@
 #include <memory>
 #include <QList>
 
+#include "rulernode.h"
+
 class RailStation;
 
 class RailInterval:
@@ -14,14 +16,22 @@ class RailInterval:
 	//注意一律按照有向边约定
 	std::shared_ptr<RailStation> from, to;
 	bool down;
-public:
+
+    QList<std::shared_ptr<RulerNode>> _rulerNodes;
+
 	RailInterval(bool down_);
 
-	/// <summary>
-	/// 自动为RailStation添加指针
-	/// </summary>
-	RailInterval(bool down_, std::shared_ptr<RailStation> from_,
-		std::shared_ptr<RailStation> to_);
+    /// <summary>
+    /// 注意不能为RailStation添加指针
+    /// </summary>
+    RailInterval(bool down_, std::shared_ptr<RailStation> from_,
+        std::shared_ptr<RailStation> to_);
+
+    static std::shared_ptr<RailInterval> construct(bool down,
+                                                   std::shared_ptr<RailStation> from,
+                                                   std::shared_ptr<RailStation> to);
+
+public:
 
 	//这些需要时再写
 	RailInterval(const RailInterval&) = delete;
@@ -58,5 +68,17 @@ public:
 	/// <param name="next">下一区间（按行别定义的，运行方向）</param>
 	/// <returns>新的对象</returns>
 	RailInterval mergeWith(const RailInterval& next)const;
+
+    double mile()const;
+
+    inline std::shared_ptr<const RulerNode> rulerNodeAt(int i)const{
+        return _rulerNodes.at(i);
+    }
+
+    inline std::shared_ptr<RulerNode> rulerNodeAt(int i){
+        return _rulerNodes.at(i);
+    }
+
+    inline bool isDown()const{return down;}
 
 };

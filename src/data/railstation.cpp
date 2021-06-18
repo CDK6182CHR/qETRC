@@ -47,6 +47,7 @@ void RailStation::fromJson(const QJsonObject &obj)
     for (const auto& p : ar) {
         tracks.append(p.toString());
     }
+    direction=static_cast<PassedDirection>(obj.value("direction").toInt(3));
 }
 
 QJsonObject RailStation::toJson() const
@@ -78,4 +79,18 @@ QString RailStation::counterStr() const
         return QString::number(counter.value(),'f',3);
     }
     else return " ";
+}
+
+std::shared_ptr<RailStation> RailStation::downAdjacent()
+{
+    if(!downNext)
+        return std::shared_ptr<RailStation>();
+    return downNext->toStation();
+}
+
+std::shared_ptr<RailStation> RailStation::upAdjacent()
+{
+    if(!upNext)
+        return std::shared_ptr<RailStation>();
+    return upNext->toStation();
 }

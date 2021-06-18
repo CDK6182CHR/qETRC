@@ -7,6 +7,7 @@
 
 #include <QString>
 #include <QHash>
+#include <QDebug>
 
 class StationName
 {
@@ -70,6 +71,12 @@ public:
 inline uint qHash(const StationName& sn, uint seed)
 {
     return qHash(sn.station(),seed) ^ qHash(sn.field(),seed);
+}
+
+inline QDebug operator<<(QDebug debug, const StationName& s){
+    QDebugStateSaver saver(debug);
+    debug.nospace() << s.toSingleLiteral();
+    return debug;
 }
 
 #endif // STATIONNAME_H

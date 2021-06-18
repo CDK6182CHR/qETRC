@@ -10,14 +10,20 @@ CONFIG += c++17
 
 SOURCES += \
     src/data/railstation.cpp \
+    src/data/railinterval.cpp \
     src/data/railway.cpp \
+    src/data/ruler.cpp \
+    src/data/rulernode.cpp \
     src/data/stationname.cpp \
     src/main.cpp \
     src/mainwindow.cpp
 
 HEADERS += \
     src/data/railstation.h \
+    src/data/railinterval.h \
     src/data/railway.h \
+    src/data/ruler.h \
+    src/data/rulernode.h \
     src/data/stationname.h \
     src/mainwindow.h \
     src/util/qeexceptions.h

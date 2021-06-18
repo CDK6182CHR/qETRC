@@ -9,6 +9,7 @@
 
 #include "stationname.h"
 #include "railinterval.h"
+#include <memory>
 
 enum class PassedDirection {
     NoVia=0b00,
@@ -56,6 +57,10 @@ public:
 
     QString counterStr()const;
 
+    inline double counterMile()const{
+        return counter.value_or(mile);
+    }
+
     inline bool isDownVia()const {
         return direction == PassedDirection::DownVia ||
             direction == PassedDirection::BothVia;
@@ -69,6 +74,12 @@ public:
     inline bool isDirectionVia(bool down)const {
         return down ? isDownVia() : isUpVia();
     }
+
+    std::shared_ptr<RailStation> downAdjacent();
+    std::shared_ptr<RailStation> upAdjacent();
+
+    inline bool hasDownAdjacent()const{return downNext.get();}
+    inline bool hasUpAdjacent()const{return upNext.get();}
 };
 
 #endif // RAILSTATION_H

@@ -13,6 +13,8 @@
 #include <utility>
 
 #include "railstation.h"
+#include "ruler.h"
+#include "railinterval.h"
 
 
 struct RailInfoNote{
@@ -33,6 +35,11 @@ class Railway
      * 注意不能随便给this指针，必要时修改类定义
      */
     QList<std::shared_ptr<RailStation>> _stations;
+
+    /*
+     * 注意这里相当于只是保存了头结点
+     */
+    QList<Ruler> _rulers;
 
     //还没有实现好的数据结构
     //self.rulers = []  # type:List[Ruler]
@@ -191,10 +198,6 @@ public:
     /// </summary>
     void removeRuler();
 
-    void addRuler();
-
-    void addEmptyRuler();
-
     /// <summary>
     /// Line.changeStationNameUpdateMap
     /// 但所做的事情更多一些
@@ -219,11 +222,11 @@ public:
 
     inline bool empty()const { return _stations.empty(); }
 
-    inline const StationName& firstStationName()const {
+    inline StationName firstStationName()const {
         return empty() ? StationName() : _stations.first()->name;
     }
 
-    inline const StationName& lastStationName()const {
+    inline StationName lastStationName()const {
         return empty() ? StationName() : _stations.last()->name;
     }
 
@@ -279,6 +282,37 @@ public:
     std::shared_ptr<RailInterval> firstDownInterval()const;
 
     std::shared_ptr<RailInterval> firstUpInterval()const;
+
+    inline const QString& name()const{
+        return _name;
+    }
+
+    void showStations()const;
+
+    void showIntervals()const;
+
+    /*
+     * Line.addEmptyRuler()
+     * 最标准的添加标尺方法
+     */
+    Ruler& addEmptyRuler(const QString& name,bool different);
+
+    /*
+     * 替代Ruler的构造函数
+     * 目前兼容pyETRC 3.3的文件，构造效率比较低
+     */
+    Ruler& addRuler(const QJsonObject& obj);
+
+    /*
+     * 寻找相邻区间
+     * 注意 不考虑跨区间，因此是常数复杂度
+     * 精确查找。
+     */
+    std::shared_ptr<RailInterval> findInterval(const StationName& from,
+                                               const StationName& to);
+
+    inline const Ruler& getRuler(int i)const{return _rulers[i];}
+    inline Ruler& getRuler(int i){return _rulers[i];}
 
 
 private:
@@ -357,6 +391,16 @@ private:
 
     std::shared_ptr<RailStation>
         rightDirStation(int cur, bool down)const;
+
+    /*
+     * 添加一个区间，代替RailInterval的构造函数。
+     * 注意shared_from_this不能再构造函数中调用。
+     */
+    std::shared_ptr<RailInterval> addInterval(bool down,
+            std::shared_ptr<RailStation> from,
+            std::shared_ptr<RailStation> to);
+
+
 
 };
 

@@ -179,6 +179,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\data\railinterval.cpp" />
+    <ClCompile Include="src\data\ruler.cpp" />
+    <ClCompile Include="src\data\rulernode.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mainwindow.cpp" />
     <ClCompile Include="src\data\railstation.cpp" />
@@ -189,6 +191,8 @@
     <QtMoc Include="src\mainwindow.h">
     </QtMoc>
     <ClInclude Include="src\data\railinterval.h" />
+    <ClInclude Include="src\data\ruler.h" />
+    <ClInclude Include="src\data\rulernode.h" />
     <ClInclude Include="src\util\qeexceptions.h" />
     <ClInclude Include="src\data\railstation.h" />
     <ClInclude Include="src\data\railway.h" />
