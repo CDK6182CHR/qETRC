@@ -7,16 +7,16 @@ CONFIG += c++17
 
 TEMPLATE = app
 
-INCLUDEPATH += ../../src/data
+INCLUDEPATH += ../../src
 
 SOURCES +=  tst_railtest.cpp \
-    ../../src/data/railway.cpp \
-    ../../src/data/railstation.cpp \
-    ../../src/data/railinterval.cpp \
-    ../../src/data/stationname.cpp \
-    ../../src/data/ruler.cpp \
-    ../../src/data/rulernode.cpp \
+    ../../src/data/rail/railstation.cpp \
+    ../../src/data/rail/stationname.cpp \
+    ../../src/data/rail/railway.cpp \
+    ../../src/data/rail/railinterval.cpp \
+    ../../src/data/rail/rulernode.cpp \
+    ../../src/data/rail/ruler.cpp \
+    ../../src/data/rail/forbid.cpp \
 
-HEADERS += railway.h
 
 QMAKE_CXXFLAGS += /utf-8

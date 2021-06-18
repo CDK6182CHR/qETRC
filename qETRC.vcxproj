@@ -178,27 +178,30 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\data\railinterval.cpp" />
-    <ClCompile Include="src\data\ruler.cpp" />
-    <ClCompile Include="src\data\rulernode.cpp" />
+    <ClCompile Include="src\data\rail\forbid.cpp" />
+    <ClCompile Include="src\data\rail\railinterval.cpp" />
+    <ClCompile Include="src\data\rail\railstation.cpp" />
+    <ClCompile Include="src\data\rail\railway.cpp" />
+    <ClCompile Include="src\data\rail\ruler.cpp" />
+    <ClCompile Include="src\data\rail\rulernode.cpp" />
+    <ClCompile Include="src\data\rail\stationname.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mainwindow.cpp" />
-    <ClCompile Include="src\data\railstation.cpp" />
-    <ClCompile Include="src\data\railway.cpp" />
-    <ClCompile Include="src\data\stationname.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\mainwindow.h">
     </QtMoc>
-    <ClInclude Include="src\data\railinterval.h" />
-    <ClInclude Include="src\data\railintervaldata.hpp" />
-    <ClInclude Include="src\data\railintervalnode.hpp" />
-    <ClInclude Include="src\data\ruler.h" />
-    <ClInclude Include="src\data\rulernode.h" />
+    <ClInclude Include="src\data\rail\forbid.h" />
+    <ClInclude Include="src\data\rail\rail.h" />
+    <ClInclude Include="src\data\rail\railinterval.h" />
+    <ClInclude Include="src\data\rail\railintervaldata.hpp" />
+    <ClInclude Include="src\data\rail\railintervalnode.hpp" />
+    <ClInclude Include="src\data\rail\railstation.h" />
+    <ClInclude Include="src\data\rail\railway.h" />
+    <ClInclude Include="src\data\rail\ruler.h" />
+    <ClInclude Include="src\data\rail\rulernode.h" />
+    <ClInclude Include="src\data\rail\stationname.h" />
     <ClInclude Include="src\util\qeexceptions.h" />
-    <ClInclude Include="src\data\railstation.h" />
-    <ClInclude Include="src\data\railway.h" />
-    <ClInclude Include="src\data\stationname.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">

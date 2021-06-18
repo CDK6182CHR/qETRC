@@ -25,6 +25,7 @@ struct RailInfoNote{
 };
 
 class Ruler;
+class Forbid;
 
 class Railway
 {
@@ -41,7 +42,8 @@ class Railway
     /*
      * 注意这里相当于只是保存了头结点
      */
-    QList<Ruler> _rulers;
+    QList<std::shared_ptr<Ruler>> _rulers;
+    QList<std::shared_ptr<Forbid>> _forbids;
 
     //还没有实现好的数据结构
     //self.rulers = []  # type:List[Ruler]
@@ -313,8 +315,10 @@ public:
     std::shared_ptr<RailInterval> findInterval(const StationName& from,
                                                const StationName& to);
 
-    inline const Ruler& getRuler(int i)const{return _rulers[i];}
-    inline Ruler& getRuler(int i){return _rulers[i];}
+    inline const Ruler& getRuler(int i)const{return *_rulers[i];}
+    inline Ruler& getRuler(int i){return *_rulers[i];}
+    inline const Forbid& getForbid(int i)const{return *_forbids[i];}
+    inline Forbid& getForbid(int i){return *_forbids[i];}
 
 
 private:
@@ -401,6 +405,13 @@ private:
     std::shared_ptr<RailInterval> addInterval(bool down,
             std::shared_ptr<RailStation> from,
             std::shared_ptr<RailStation> to);
+
+    Forbid& addEmptyForbid(bool different=true);
+
+    /*
+     * 如果不存在，就进来一个空的obj，这样也能构造空的Forbid出来
+     */
+    Forbid& addForbid(const QJsonObject& obj);
 
 
 

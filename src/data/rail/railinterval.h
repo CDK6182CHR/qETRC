@@ -4,11 +4,12 @@
 #pragma once
 #include <memory>
 #include <QList>
-
+#include <QDebug>
 
 
 class RailStation;
 class RulerNode;
+class ForbidNode;
 
 class RailInterval:
 	std::enable_shared_from_this<RailInterval>
@@ -19,6 +20,7 @@ class RailInterval:
 	bool down;
 
     QList<std::shared_ptr<RulerNode>> _rulerNodes;
+    QList<std::shared_ptr<ForbidNode>> _forbidNodes;
 
 	RailInterval(bool down_);
 
@@ -57,9 +59,9 @@ public:
 	/// 前、后区间，通过车站的信息进行索引
 	/// 按照运行方向定义
 	/// </summary>
-	std::shared_ptr<RailInterval> prevInterval()const;
+    std::shared_ptr<RailInterval> prevInterval()const;
 
-	std::shared_ptr<RailInterval> nextInterval()const;
+    std::shared_ptr<RailInterval> nextInterval()const;
 
 	/// <summary>
 	/// 合并两连续区间的数据
@@ -82,6 +84,7 @@ public:
 
     inline bool isDown()const{return down;}
 
+
     template <typename Node>
     inline std::shared_ptr<const Node> getDataAt(int i)const;
 
@@ -98,4 +101,16 @@ public:
         return _rulerNodes[i];
     }
 
+    template <>
+    inline std::shared_ptr<const ForbidNode> getDataAt(int i)const{
+        return _forbidNodes.at(i);
+    }
+
+    template <>
+    inline std::shared_ptr<ForbidNode> getDataAt(int i){
+        return _forbidNodes[i];
+    }
+
 };
+
+QDebug operator<<(QDebug debug, const RailInterval& s);

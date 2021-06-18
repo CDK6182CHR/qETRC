@@ -8,27 +8,30 @@ CONFIG += c++17
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+INCLUDEPATH += src
+
 SOURCES += \
-    src/data/forbid.cpp \
-    src/data/railstation.cpp \
-    src/data/railinterval.cpp \
-    src/data/railway.cpp \
-    src/data/ruler.cpp \
-    src/data/rulernode.cpp \
-    src/data/stationname.cpp \
+    src/data/rail/forbid.cpp \
+    src/data/rail/railinterval.cpp \
+    src/data/rail/railstation.cpp \
+    src/data/rail/railway.cpp \
+    src/data/rail/ruler.cpp \
+    src/data/rail/rulernode.cpp \
+    src/data/rail/stationname.cpp \
     src/main.cpp \
     src/mainwindow.cpp
 
 HEADERS += \
-    src/data/forbid.h \
-    src/data/railintervaldata.hpp \
-    src/data/railintervalnode.hpp \
-    src/data/railstation.h \
-    src/data/railinterval.h \
-    src/data/railway.h \
-    src/data/ruler.h \
-    src/data/rulernode.h \
-    src/data/stationname.h \
+    src/data/rail/forbid.h \
+    src/data/rail/rail.h \
+    src/data/rail/railinterval.h \
+    src/data/rail/railintervaldata.hpp \
+    src/data/rail/railintervalnode.hpp \
+    src/data/rail/railstation.h \
+    src/data/rail/railway.h \
+    src/data/rail/ruler.h \
+    src/data/rail/rulernode.h \
+    src/data/rail/stationname.h \
     src/mainwindow.h \
     src/util/qeexceptions.h
 

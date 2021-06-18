@@ -10,11 +10,12 @@ class Railway;
 
 template <typename _Node, typename _Data>
 class RailIntervalData{
-    static_assert (std::is_base_of_v<RailIntervalNode<_Node,_Data>,_Node>,
-    "Invalid type argument");
-    static_assert (std::is_base_of_v<RailIntervalData<_Node,_Data>,_Data >,
-    "Invalid Data type");
+//    static_assert (std::is_base_of_v<RailIntervalNode<_Node,_Data>,_Node>,
+//    "Invalid type argument");
+//    static_assert (std::is_base_of_v<RailIntervalData<_Node,_Data>,_Data >,
+//    "Invalid Data type");
 
+protected:
     Railway& _railway;
     bool _different;
     int _index;

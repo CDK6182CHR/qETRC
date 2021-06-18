@@ -6,8 +6,6 @@
 #include <type_traits>
 #include <memory>
 
-#include "railinterval.h"
-#include "stationname.h"
 #include "railstation.h"
 
 template <typename _Node, typename _Data>
@@ -15,10 +13,10 @@ class RailIntervalData;
 
 template <typename _Node, typename _Data>
 class RailIntervalNode{
-    static_assert (std::is_base_of_v<RailIntervalNode<_Node,_Data>,_Node>,
-    "Invalid type argument");
-    static_assert (std::is_base_of_v<RailIntervalData<_Node,_Data>,_Data >,
-    "Invalid Data type");
+//    static_assert (std::is_base_of_v<RailIntervalNode<_Node,_Data>,_Node>,
+//    "Invalid type argument");
+//    static_assert (std::is_base_of_v<RailIntervalData<_Node,_Data>,_Data >,
+//    "Invalid Data type");
 
     using NodeType=_Node;
     using DataType=_Data;

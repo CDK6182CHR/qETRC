@@ -1,5 +1,7 @@
 ﻿#include "railinterval.h"
 #include "railstation.h"
+#include "ruler.h"
+#include "rulernode.h"
 
 #include <cassert>
 
@@ -45,7 +47,7 @@ std::shared_ptr<RailInterval> RailInterval::nextInterval() const
 {
 	if(!to)
 		return std::shared_ptr<RailInterval>();
-	return down ? to->downNext : to->upNext;
+    return down ? to->downNext : to->upNext;
 }
 
 RailInterval RailInterval::mergeWith(const RailInterval& next) const
@@ -74,4 +76,11 @@ double RailInterval::mile() const
     }else{
         return from->counterMile()-to->counterMile();
     }
+}
+
+QDebug operator<<(QDebug debug, const RailInterval& s)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace() << s.fromStation()->name<<"->"<<s.toStation()->name;
+    return debug;
 }

@@ -1,13 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#include <QtTest>
 
-#include <QtTest>
-#include <QDebug>
-#include <QtCore>
-using Qt::endl;
-
-#include "railway.h"
-#include "stationname.h"
-
+#include "../../src/data/rail/rail.h"
 
 class RailTest : public QObject
 {
@@ -19,8 +12,8 @@ public:
 
 private slots:
     void test_case1();
-
     void test_case2();
+    void test_case3();
 
 };
 
@@ -59,6 +52,7 @@ void RailTest::test_case1()
 
 void RailTest::test_case2()
 {
+    return;
     auto t=QString(R"(D:\Python\train_graph\source\陇海线西局段.json)");
     QFile f(t);
     f.open(QFile::ReadOnly);
@@ -71,6 +65,20 @@ void RailTest::test_case2()
     railway.showIntervals();
     railway.getRuler(0).show();
 
+    f.close();
+}
+
+void RailTest::test_case3()
+{
+    auto t=QString(R"(D:\Python\train_graph\source\京局410\京广线京石段.json)");
+    QFile f(t);
+    f.open(QFile::ReadOnly);
+    auto contents=f.readAll();
+    QJsonDocument doc=QJsonDocument::fromJson(contents);
+    QJsonObject obj=doc.object().value("line").toObject();
+    Railway railway(obj);
+
+    railway.getForbid(0).show();
     f.close();
 }
 
