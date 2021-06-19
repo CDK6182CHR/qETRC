@@ -30,6 +30,9 @@ class Ruler:
     Ruler(Railway& railway, const QString& name, bool different, int index);
 public:
 
+    inline const QString& name()const { return _name; }
+    inline void setName(const QString& name) { _name = name; }
+
     QJsonObject toJson()const;
 
     void show()const;

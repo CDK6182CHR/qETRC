@@ -140,7 +140,7 @@ std::shared_ptr<RailStation> Railway::stationByName(const StationName& name)
 	return nameMap.value(name);
 }
 
-const std::shared_ptr<RailStation> Railway::stationByName(const StationName& name) const
+const std::shared_ptr<const RailStation> Railway::stationByName(const StationName& name) const
 {
 	return nameMap.value(name);
 }
@@ -148,6 +148,9 @@ const std::shared_ptr<RailStation> Railway::stationByName(const StationName& nam
 std::shared_ptr<RailStation>
 Railway::stationByGeneralName(const StationName& name)
 {
+	auto p = stationByName(name);
+	if (p) 
+		return p;
 	const QList<StationName>& t = fieldMap.value(name.station());
 	for (const auto& p : t) {
 		if (p.equalOrContains(name)) {
@@ -157,9 +160,12 @@ Railway::stationByGeneralName(const StationName& name)
 	return std::shared_ptr<RailStation>(nullptr);
 }
 
-const std::shared_ptr<RailStation>
+const std::shared_ptr<const RailStation>
 Railway::stationByGeneralName(const StationName& name) const
 {
+	auto p = stationByName(name);
+	if (p)
+		return p;
 	const QList<StationName>& t = fieldMap.value(name.station());
 	for (const auto& p : t) {
 		if (p.equalOrContains(name)) {
@@ -251,19 +257,25 @@ void Railway::adjustMileToZero()
 	}
 }
 
-bool Railway::isDownGap(const StationName& s1, const StationName& s2) const
+Direction Railway::gapDirection(const StationName& s1, const StationName& s2) const
 {
 	const auto& t1 = stationByGeneralName(s1),
 		t2 = stationByGeneralName(s2);
 	if (!t1 || !t2)
-		return true;
-	return t1->mile <= t2->mile;
+		return Direction::Undefined;
+	return t1->mile <= t2->mile ? Direction::Down : Direction::Up;
 }
 
-bool Railway::isDownGap(const std::shared_ptr<RailStation>& s1,
-	const std::shared_ptr<RailStation>& s2) const
+Direction Railway::gapDirection(const std::shared_ptr<const RailStation>& s1,
+	const std::shared_ptr<const RailStation>& s2) const
 {
-	return s1->mile <= s2->mile;
+	return s1->mile <= s2->mile ? Direction::Down : Direction::Up;
+}
+
+Direction Railway::gapDirectionByIndex(const StationName& s1, const StationName& s2) const
+{
+	int i1 = stationIndex(s1), i2 = stationIndex(s2);
+	return i1 <= i2 ? Direction::Down : Direction::Up;
 }
 
 double Railway::mileBetween(const StationName& s1,
@@ -271,11 +283,10 @@ double Railway::mileBetween(const StationName& s1,
 {
 	const auto& t1 = stationByGeneralName(s1),
 		t2 = stationByGeneralName(s2);
-	if (!t1)
-		throw StationNotInRailException(s1);
-	if (!t2)
-		throw StationNotInRailException(s2);
-	if (!isDownGap(t1, t2)) {
+	if (!t1 || !t2) {
+		return -1;
+	}
+	if (gapDirection(t1, t2) == Direction::Up) {
 		if (t1->counter.has_value() && t2->counter.has_value()) {
 			return std::abs(t1->counter.value() - t2->counter.value());
 		}
@@ -293,6 +304,50 @@ bool Railway::isSplitted() const
 	return false;
 }
 
+std::shared_ptr<Ruler> Railway::rulerByName(const QString& name)
+{
+	for (auto p = _rulers.begin(); p != _rulers.end(); ++p) {
+		if ((*p)->name() == name)
+			return *p;
+	}
+	return std::shared_ptr<Ruler>();
+}
+
+bool Railway::rulerNameExisted(const QString& name, std::shared_ptr<const Ruler> ignore) const
+{
+	for (const auto& p : _rulers) {
+		if (p->name() == name && p != ignore) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+void Railway::removeRuler(std::shared_ptr<Ruler> ruler)
+{
+	int index = ruler->index();
+	//首先从头结点里面抹掉
+	_rulers.removeAt(index);
+	//改后面的序号
+	for (int i = index; i < _rulers.size(); i++) {
+		_rulers[i]->_index--;
+	}
+	//遍历interval  只需要删掉结点元素
+	auto p = firstDownInterval();
+	for (; p; p = nextIntervalCirc(p)) {
+		p->_rulerNodes.removeAt(index);
+	}
+}
+
+void Railway::clearRulers()
+{
+	//先去清理结点数据，免得Ruler对象被析构引起引用的危险
+	for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
+		p->_rulerNodes.clear();
+	}
+	_rulers.clear();
+}
 
 void Railway::changeStationName(const StationName& oldname,
 	const StationName& newname)
@@ -317,7 +372,8 @@ double Railway::counterLength() const
 void Railway::reverse()
 {
 	double length = railLength(), ctlen = counterLength();
-	for (auto p : _stations) {
+    for (auto q=_stations.begin();q!=_stations.end();++q) {
+        auto p=*q;
 		p->mile = length - p->mile;
 		if (p->counter.has_value()) {
 			p->counter = ctlen - p->counter.value();
@@ -333,6 +389,15 @@ void Railway::reverse()
 			p->direction = PassedDirection::DownVia; break;
 		default:break;
 		}
+        std::swap(p->downNext,p->upNext);
+        std::swap(p->downPrev,p->upPrev);
+        //翻转每个interval内部保存的方向
+        if(p->downNext){
+            p->downNext->dir=DirFunc::reverse(p->downNext->dir);
+        }
+        if(p->upNext){
+            p->upNext->dir=DirFunc::reverse(p->upNext->dir);
+        }
 	}
 	std::reverse(_stations.begin(), _stations.end());
 }
@@ -557,6 +622,74 @@ std::shared_ptr<RailInterval> Railway::findInterval(const StationName& from, con
 	return std::shared_ptr<RailInterval>();
 }
 
+std::shared_ptr<RailInterval> Railway::findGeneralInterval(const StationName& from, const StationName& to)
+{
+	auto t = stationByGeneralName(from);
+	//首先精确查找to
+	if (t->hasDownAdjacent() && t->downAdjacent()->name == to)
+		return t->downNext;
+	else if (t->hasUpAdjacent() && t->upAdjacent()->name == to)
+		return t->upNext;
+
+	if (t->hasDownAdjacent() && t->downAdjacent()->name.equalOrContains(to))
+		return t->downNext;
+	else if (t->hasUpAdjacent() && t->upAdjacent()->name.equalOrContains(to))
+		return t->upNext;
+	return std::shared_ptr<RailInterval>();
+}
+
+QList<std::shared_ptr<RailInterval>> 
+	Railway::multiIntervalPath(const StationName& from, const StationName& to)
+{
+	using ret_t = QList<std::shared_ptr<RailInterval>>;
+	//如果是近邻区间，直接解决问题
+	auto p = findGeneralInterval(from, to);
+	if (p) {
+		return ret_t{p};
+	}
+
+	auto s1 = stationByGeneralName(from), s2 = stationByGeneralName(to);
+	if (!s1 || !s2)
+		return ret_t();
+
+	Direction dir;
+	if (numberMapEnabled) {
+		dir = gapDirectionByIndex(from, to);
+	}
+	else {
+		dir = gapDirection(s1, s2);
+	}
+	//不启用时：通过里程判定上下行，原则上应该八九不离十
+	//但如果很不幸方向是错的，那么就是遍历完一遍之后，再来一遍
+	//首先：假定这个方向是对的
+	ret_t res;
+	auto it = s1->dirNextInterval(dir);
+	for (; it && it->toStation() != s2; it = it->nextInterval()) {
+		res.append(it);
+	}
+	if (it || numberMapEnabled) {
+		//到最后it没有跑到空指针，说明找到了
+		//如果是用index索引的，那么肯定不会错，不用考虑另一方向
+		return res;
+	}
+	//到这里：方向是不对的，很不幸，只能重来
+	qDebug() << "Railway::multiIntervalPath: WARNING: direction seems to be wrong. " <<
+		from << "->" << to << Qt::endl;
+	res.clear();
+	dir = DirFunc::reverse(dir);
+	it = s1->dirNextInterval(dir);
+	for (; it && it->toStation() != s2; it = it->nextInterval()) {
+		res.append(it);
+	}
+	if (it) {
+		//到最后it没有跑到空指针，说明找到了
+		return res;
+	}
+	else {
+		return ret_t();
+	}
+}
+
 void Railway::addMapInfo(const std::shared_ptr<RailStation>& st)
 {
 	//nameMap  直接添加
@@ -662,16 +795,16 @@ void Railway::appendInterval(std::shared_ptr<RailStation> st)
 	int n = stationCount() - 1;
 	if (st->isDownVia()) {
 		//添加下行区间
-		auto pr = leftDirStation(n, true);
+		auto pr = leftDirStation(n, Direction::Down);
 		if (pr) {
-			addInterval(true, pr, st);
+            addInterval(Direction::Down, pr, st);
 		}
 	}
 	if (st->isUpVia()) {
 		//添加上行区间
-		auto pr = leftDirStation(n, false);
+		auto pr = leftDirStation(n, Direction::Up);
 		if (pr) {
-			addInterval(false, st, pr);
+            addInterval(Direction::Up, st, pr);
 		}
 	}
 }
@@ -679,25 +812,25 @@ void Railway::appendInterval(std::shared_ptr<RailStation> st)
 void Railway::insertInterval(int index, std::shared_ptr<RailStation> st)
 {
 	if (st->isDownVia()) {
-		auto pr = leftDirStation(index, true),
-			nx = rightDirStation(index, true);
+		auto pr = leftDirStation(index, Direction::Down),
+			nx = rightDirStation(index, Direction::Up);
 		if (pr) {
 			//前区间数据，相当于在append
-			addInterval(true, pr, st);
+            addInterval(Direction::Down, pr, st);
 		}
 		else {
 			//后区间
-			addInterval(true, st, nx);
+            addInterval(Direction::Down, st, nx);
 		}
 	}
 	if (st->isUpVia()) {   //上行方向
-		auto pr = leftDirStation(index, false),
-			nx = rightDirStation(index, false);
+		auto pr = leftDirStation(index, Direction::Up),
+			nx = rightDirStation(index, Direction::Up);
 		if (pr) {
-			addInterval(false, st, pr);
+            addInterval(Direction::Up, st, pr);
 		}
 		if (nx) {
-			addInterval(false, nx, st);
+            addInterval(Direction::Up, nx, st);
 		}
 	}
 }
@@ -706,8 +839,8 @@ void Railway::removeInterval(int index)
 {
 	auto st = _stations.at(index);
 	if (st->isDownVia()) {
-		auto pr = leftDirStation(index, true),
-			nx = rightDirStation(index, false);
+		auto pr = leftDirStation(index, Direction::Down),
+			nx = rightDirStation(index, Direction::Down);
 		if (pr && nx) {
 			//区间合并
 			auto it1 = st->downPrev, it2 = st->downNext;
@@ -722,8 +855,8 @@ void Railway::removeInterval(int index)
 		}
 	}
 	if (st->isUpVia()) {
-		auto pr = leftDirStation(index, false),
-			nx = rightDirStation(index, false);
+		auto pr = leftDirStation(index, Direction::Up),
+			nx = rightDirStation(index, Direction::Up);
 		if (pr && nx) {
 			auto it1 = st->upPrev, it2 = st->upNext;
 			it1->mergeWith(*it2);
@@ -737,28 +870,28 @@ void Railway::removeInterval(int index)
 	}
 }
 
-std::shared_ptr<RailStation> Railway::leftDirStation(int cur, bool down) const
+std::shared_ptr<RailStation> Railway::leftDirStation(int cur, Direction dir) const
 {
 	for (int i = cur - 1; i >= 0; i--) {
-		if (_stations.at(i)->isDirectionVia(down))
+		if (_stations.at(i)->isDirectionVia(dir))
 			return _stations.at(i);
 	}
 	return std::shared_ptr<RailStation>();
 }
 
-std::shared_ptr<RailStation> Railway::rightDirStation(int cur, bool down) const
+std::shared_ptr<RailStation> Railway::rightDirStation(int cur, Direction dir) const
 {
 	for (int i = cur + 1; i < stationCount(); i++) {
-		if (_stations.at(i)->isDirectionVia(down)) {
+		if (_stations.at(i)->isDirectionVia(dir)) {
 			return _stations.at(i);
 		}
 	}
 	return std::shared_ptr<RailStation>();
 }
 
-std::shared_ptr<RailInterval> Railway::addInterval(bool down, std::shared_ptr<RailStation> from, std::shared_ptr<RailStation> to)
+std::shared_ptr<RailInterval> Railway::addInterval(Direction dir, std::shared_ptr<RailStation> from, std::shared_ptr<RailStation> to)
 {
-	auto t = RailInterval::construct(down, from, to);
+    auto t = RailInterval::construct(dir, from, to);
 	t->_rulerNodes.reserve(_rulers.count());
 	for (int i = 0; i < _rulers.count(); i++) {
         t->_rulerNodes.append(std::make_shared<RulerNode>(*_rulers[i], *t));
@@ -772,7 +905,7 @@ std::shared_ptr<RailInterval> Railway::addInterval(bool down, std::shared_ptr<Ra
 Forbid &Railway::addEmptyForbid(bool different)
 {
     int n=_forbids.count();
-    auto forbid=std::shared_ptr<Forbid>(new Forbid(*this,different,n));
+	auto forbid = std::shared_ptr<Forbid>(new Forbid(*this, different, n));
     _forbids.append(forbid);
     auto p=firstDownInterval();
     for(;p;p=p->nextInterval()){
@@ -807,5 +940,15 @@ Forbid &Railway::addForbid(const QJsonObject &obj)
     forbid.upShow=obj.value("upShow").toBool();
     return forbid;
 }
+
+std::shared_ptr<RailInterval> Railway::nextIntervalCirc(std::shared_ptr<RailInterval> railint)
+{
+	auto t = railint->nextInterval();
+	if (!t && t->isDown()) {
+		return firstUpInterval();
+	}
+	return t;
+}
+
 
 

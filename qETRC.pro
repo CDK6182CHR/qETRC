@@ -11,6 +11,7 @@ CONFIG += c++17
 INCLUDEPATH += src
 
 SOURCES += \
+    src/data/common/stationname.cpp \
     src/data/rail/forbid.cpp \
     src/data/rail/railinterval.cpp \
     src/data/rail/railstation.cpp \
@@ -18,10 +19,16 @@ SOURCES += \
     src/data/rail/ruler.cpp \
     src/data/rail/rulernode.cpp \
     src/data/rail/stationname.cpp \
+    src/data/train/train.cpp \
+    src/data/train/trainname.cpp \
+    src/data/train/trainstation.cpp \
+    src/data/train/traintype.cpp \
     src/main.cpp \
     src/mainwindow.cpp
 
 HEADERS += \
+    src/data/common/direction.h \
+    src/data/common/stationname.h \
     src/data/rail/forbid.h \
     src/data/rail/rail.h \
     src/data/rail/railinterval.h \
@@ -32,6 +39,10 @@ HEADERS += \
     src/data/rail/ruler.h \
     src/data/rail/rulernode.h \
     src/data/rail/stationname.h \
+    src/data/train/train.h \
+    src/data/train/trainname.h \
+    src/data/train/trainstation.h \
+    src/data/train/traintype.h \
     src/mainwindow.h \
     src/util/qeexceptions.h
 

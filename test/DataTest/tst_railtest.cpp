@@ -1,6 +1,10 @@
 ﻿#include <QtTest>
+#include <QtCore>
+#include <initializer_list>
+
 
 #include "../../src/data/rail/rail.h"
+#include "data/train/trainname.h"
 
 class RailTest : public QObject
 {
@@ -14,6 +18,9 @@ private slots:
     void test_case1();
     void test_case2();
     void test_case3();
+
+    //车次
+    void test_case4();
 
 };
 
@@ -29,7 +36,6 @@ RailTest::~RailTest()
 
 void RailTest::test_case1()
 {
-    return;
     qDebug()<<"test begins...."<<Qt::endl;
     Railway railway(QObject::tr("宝成线"));
     qDebug()<<"name: "<<railway.name()<<Qt::endl;
@@ -44,10 +50,10 @@ void RailTest::test_case1()
     railway.showStations();
     railway.showIntervals();
 
-    railway.addEmptyRuler(QObject::tr("特快"),true);
-    railway.addEmptyRuler(QObject::tr("快速"),true);
-    railway.getRuler(0).show();
-    railway.getRuler(1).show();
+    qDebug()<<"REVERSE"<<Qt::endl;
+    railway.reverse();
+    railway.showStations();
+    railway.showIntervals();
 }
 
 void RailTest::test_case2()
@@ -65,11 +71,17 @@ void RailTest::test_case2()
     railway.showIntervals();
     railway.getRuler(0).show();
 
+    qDebug()<<"REVERSED..."<<Qt::endl;
+    railway.reverse();
+    railway.showStations();
+    railway.showIntervals();
+
     f.close();
 }
 
 void RailTest::test_case3()
 {
+    return;
     auto t=QString(R"(D:\Python\train_graph\source\京局410\京广线京石段.json)");
     QFile f(t);
     f.open(QFile::ReadOnly);
@@ -80,6 +92,16 @@ void RailTest::test_case3()
 
     railway.getForbid(0).show();
     f.close();
+}
+
+void RailTest::test_case4()
+{
+    QStringList s;
+    s<<"Z218/5"<<" K1139/40"<<"3256/7A"<<"57418/5 (加油)";
+    for(auto t:s){
+        TrainName n(t);
+        n.show();
+    }
 }
 
 QTEST_APPLESS_MAIN(RailTest)

@@ -4,7 +4,7 @@
 #include <QException>
 #include <QString>
 
-#include "data/rail/stationname.h"
+#include "data/common/stationname.h"
 
 class StationNotInRailException:
         public QException

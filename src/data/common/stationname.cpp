@@ -1,6 +1,8 @@
 ﻿#include "stationname.h"
 #include <QtCore>
 
+const StationName& StationName::nullName=StationName::fromSingleLiteral("");
+
 StationName::StationName(const QString &station, const QString &field):
     _station(station),_field(field)
 {

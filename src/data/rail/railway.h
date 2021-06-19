@@ -5,8 +5,7 @@
  * left, right指列表方向 （列表先后顺序）；
  * up, down指行别。
  */
-#ifndef RAILWAY_H
-#define RAILWAY_H
+#pragma once
 
 #include <QtCore>
 #include <memory>
@@ -105,16 +104,18 @@ public:
      */
     std::shared_ptr<RailStation> stationByName(const StationName& name);
 
-    const std::shared_ptr<RailStation>
+    const std::shared_ptr<const RailStation>
         stationByName(const StationName& name)const;
 
     /*
      * 2021.06.16新增
      * 仅允许以下两种情况：严格匹配，或者非Bare匹配到Bare类型
+     * 注意总是优先返回严格匹配的
+     * （实际上只可能有两种解）
      */
     std::shared_ptr<RailStation> stationByGeneralName(const StationName& name);
 
-    const std::shared_ptr<RailStation>
+    const std::shared_ptr<const RailStation>
         stationByGeneralName(const StationName& name)const;
 
     inline std::shared_ptr<RailStation> stationByIndex(int i) {
@@ -157,15 +158,23 @@ public:
      * Line.isDownGap()
      * 但注意车站匹配条件变了
      * 如果有至少一个不存在，暂定直接返回true
+     * 注意这里根据里程判定，实际上不是很严格
+     * 如果有车站不存在，返回Undefined
      */
-    bool isDownGap(const StationName& s1,const StationName& s2)const;
+    Direction gapDirection(const StationName& s1,const StationName& s2)const;
 
-    bool isDownGap(const std::shared_ptr<RailStation>& s1,
-                   const std::shared_ptr<RailStation>& s2)const;
+    Direction gapDirection(const std::shared_ptr<const RailStation>& s1,
+                   const std::shared_ptr<const RailStation>& s2)const;
+
+    /* 
+     * 按照index判定的严格版本，但在没有启用numberMap时代价很大
+     */
+    Direction gapDirectionByIndex(const StationName& s1, const StationName& s2)const;
+
 
     /*
      * Line.gapBetween()
-     * 如果不存在，抛错
+     * 如果不存在，返回-1
      */
     double mileBetween(const StationName& s1,const StationName& s2)const;
 
@@ -178,6 +187,7 @@ public:
     /*
      * Line.resetRulers()
      * 设置标尺的上下行分设等信息
+     * 好像没用？需要时实现
      */
     void updateRulers();
 
@@ -190,17 +200,25 @@ public:
         return _stations;
     }
 
-    bool rulerNameExisted(const QString& name)const;
+    std::shared_ptr<Ruler> rulerByName(const QString& name);
+
+    bool rulerNameExisted(const QString& name, 
+        std::shared_ptr<const Ruler> ignore=nullptr)const;
 
     /// <summary>
     /// 签名形式未确定
     /// </summary>
     bool isNewRuler()const;
 
-    /// <summary>
-    /// 签名未确定
-    /// </summary>
-    void removeRuler();
+    /* 
+     * Line.delRuler()
+     */
+    void removeRuler(std::shared_ptr<Ruler> ruler);
+
+    /*
+     * 一个个删除Ruler效率比较低，因此做一个一次性清空的
+     */
+    void clearRulers();
 
     /// <summary>
     /// Line.changeStationNameUpdateMap
@@ -315,6 +333,21 @@ public:
     std::shared_ptr<RailInterval> findInterval(const StationName& from,
                                                const StationName& to);
 
+    /*
+     * 支持域解析符条件下查找区间，不考虑跨区间
+     */
+    std::shared_ptr<RailInterval> findGeneralInterval(const StationName& from,
+                                                      const StationName& to);
+
+    /*
+     * 原Ruler.getInfo()中allow_multi模式
+     * 返回路径中的Interval顺序表
+     * 允许域解析符匹配
+     * 如果有一个不存在，返回空表
+     */
+    QList<std::shared_ptr<RailInterval>> multiIntervalPath(const StationName& from,
+        const StationName& to);
+
     inline const Ruler& getRuler(int i)const{return *_rulers[i];}
     inline Ruler& getRuler(int i){return *_rulers[i];}
     inline const Forbid& getForbid(int i)const{return *_forbids[i];}
@@ -391,18 +424,18 @@ private:
     int leftDirStationIndex(int cur, bool down)const;
 
     std::shared_ptr<RailStation>
-        leftDirStation(int cur, bool down)const;
+        leftDirStation(int cur, Direction dir)const;
 
     int rightDirStationIndex(int cur, bool down)const;
 
     std::shared_ptr<RailStation>
-        rightDirStation(int cur, bool down)const;
+        rightDirStation(int cur, Direction dir)const;
 
     /*
      * 添加一个区间，代替RailInterval的构造函数。
      * 注意shared_from_this不能再构造函数中调用。
      */
-    std::shared_ptr<RailInterval> addInterval(bool down,
+    std::shared_ptr<RailInterval> addInterval(Direction dir,
             std::shared_ptr<RailStation> from,
             std::shared_ptr<RailStation> to);
 
@@ -413,8 +446,12 @@ private:
      */
     Forbid& addForbid(const QJsonObject& obj);
 
-
+    /*
+     * 和RailInterval::nextInterval()差不多
+     * 但额外支持一次性解决上行的
+     */
+    std::shared_ptr<RailInterval> nextIntervalCirc(std::shared_ptr<RailInterval> railint);
 
 };
 
-#endif // RAILWAY_H
+

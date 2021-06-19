@@ -78,7 +78,7 @@
   </ImportGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;release;\include;.\src\data;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;./src;release;\include;.\src\data;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -130,7 +130,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;debug;\include;.\src\data;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;./src;debug;\include;.\src\data;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -178,19 +178,23 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\data\common\stationname.cpp" />
     <ClCompile Include="src\data\rail\forbid.cpp" />
     <ClCompile Include="src\data\rail\railinterval.cpp" />
     <ClCompile Include="src\data\rail\railstation.cpp" />
     <ClCompile Include="src\data\rail\railway.cpp" />
     <ClCompile Include="src\data\rail\ruler.cpp" />
     <ClCompile Include="src\data\rail\rulernode.cpp" />
-    <ClCompile Include="src\data\rail\stationname.cpp" />
+    <ClCompile Include="src\data\train\trainname.cpp" />
+    <ClCompile Include="src\data\train\trainstation.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mainwindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\mainwindow.h">
     </QtMoc>
+    <ClInclude Include="src\data\common\direction.h" />
+    <ClInclude Include="src\data\common\stationname.h" />
     <ClInclude Include="src\data\rail\forbid.h" />
     <ClInclude Include="src\data\rail\rail.h" />
     <ClInclude Include="src\data\rail\railinterval.h" />
@@ -200,7 +204,8 @@
     <ClInclude Include="src\data\rail\railway.h" />
     <ClInclude Include="src\data\rail\ruler.h" />
     <ClInclude Include="src\data\rail\rulernode.h" />
-    <ClInclude Include="src\data\rail\stationname.h" />
+    <ClInclude Include="src\data\train\trainname.h" />
+    <ClInclude Include="src\data\train\trainstation.h" />
     <ClInclude Include="src\util\qeexceptions.h" />
   </ItemGroup>
   <ItemGroup>

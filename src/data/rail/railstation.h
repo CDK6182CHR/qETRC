@@ -7,7 +7,7 @@
 #include <optional>
 #include <QtCore>
 
-#include "stationname.h"
+#include "data/common/stationname.h"
 #include "railinterval.h"
 #include <memory>
 
@@ -71,8 +71,13 @@ public:
             direction == PassedDirection::BothVia;
     }
 
-    inline bool isDirectionVia(bool down)const {
-        return down ? isDownVia() : isUpVia();
+    inline constexpr bool isDirectionVia(Direction dir)const {
+        switch (dir) {
+        case Direction::Down:return isDownVia();
+        case Direction::Up:return isUpVia();
+        default:
+            return false;
+        }
     }
 
     std::shared_ptr<RailStation> downAdjacent();
@@ -80,6 +85,17 @@ public:
 
     inline bool hasDownAdjacent()const{return downNext.get();}
     inline bool hasUpAdjacent()const{return upNext.get();}
+
+    inline std::shared_ptr<RailInterval> dirNextInterval(Direction dir) {
+        switch (dir) {
+        case Direction::Down:
+            return downNext;
+        case Direction::Up:
+            return upNext;
+        default:
+            return nullptr;
+        }
+    }
 };
 
 #endif // RAILSTATION_H

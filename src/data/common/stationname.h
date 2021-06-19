@@ -8,11 +8,13 @@
 #include <QString>
 #include <QHash>
 #include <QDebug>
+#include <stdint.h>
 
 class StationName
 {
     QString _station, _field;
 public:
+    static const StationName& nullName;
     explicit StationName(const QString& station="",const QString& field="");
 
     StationName(const StationName&)=default;

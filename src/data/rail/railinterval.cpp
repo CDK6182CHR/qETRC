@@ -5,23 +5,23 @@
 
 #include <cassert>
 
-RailInterval::RailInterval(bool down_):
-	down(down_)
+RailInterval::RailInterval(Direction dir_):
+    dir(dir_)
 {
 }
 
-RailInterval::RailInterval(bool down_, 
+RailInterval::RailInterval(Direction dir_,
 	std::shared_ptr<RailStation> from_, std::shared_ptr<RailStation> to_):
-	from(from_),to(to_),down(down_)
+    from(from_),to(to_),dir(dir_)
 {
 }
 
 std::shared_ptr<RailInterval>
-    RailInterval::construct(bool down, std::shared_ptr<RailStation> from,
+    RailInterval::construct(Direction dir, std::shared_ptr<RailStation> from,
                             std::shared_ptr<RailStation> to)
 {
-    std::shared_ptr<RailInterval> t(new RailInterval(down,from,to));
-    if(down){
+    std::shared_ptr<RailInterval> t(new RailInterval(dir,from,to));
+    if(dir==Direction::Down){
         from->downNext=t;
         to->downPrev=t;
     }else{
@@ -35,7 +35,7 @@ std::shared_ptr<RailInterval> RailInterval::prevInterval()const
 {
 	if (!from)
 		return std::shared_ptr<RailInterval>();
-	if (down) {
+    if (dir==Direction::Down) {
 		return from->downPrev;
 	}
 	else {
@@ -47,15 +47,15 @@ std::shared_ptr<RailInterval> RailInterval::nextInterval() const
 {
 	if(!to)
 		return std::shared_ptr<RailInterval>();
-    return down ? to->downNext : to->upNext;
+    return isDown() ? to->downNext : to->upNext;
 }
 
 RailInterval RailInterval::mergeWith(const RailInterval& next) const
 {
 	assert(to == next.from);
-	assert(down == next.down);
+    assert(dir == next.dir);
 
-	RailInterval it(down, from, next.to);
+    RailInterval it(dir, from, next.to);
     for(int i=0;i<_rulerNodes.count();i++){
         auto p=it._rulerNodes[i];
         const auto p1=_rulerNodes.at(i);
@@ -71,7 +71,7 @@ double RailInterval::mile() const
 {
     if(!from||!to)
         return 0;
-    if(down){
+    if(isDown()){
         return to->mile-from->mile;
     }else{
         return from->counterMile()-to->counterMile();

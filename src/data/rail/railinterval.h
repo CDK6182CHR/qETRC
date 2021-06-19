@@ -6,6 +6,8 @@
 #include <QList>
 #include <QDebug>
 
+#include "data/common/direction.h"
+
 
 class RailStation;
 class RulerNode;
@@ -17,20 +19,20 @@ class RailInterval:
 	friend class Railway;
 	//注意一律按照有向边约定
 	std::shared_ptr<RailStation> from, to;
-	bool down;
+    Direction dir;
 
     QList<std::shared_ptr<RulerNode>> _rulerNodes;
     QList<std::shared_ptr<ForbidNode>> _forbidNodes;
 
-	RailInterval(bool down_);
+    RailInterval(Direction dir_);
 
     /// <summary>
     /// 注意不能为RailStation添加指针
     /// </summary>
-    RailInterval(bool down_, std::shared_ptr<RailStation> from_,
+    RailInterval(Direction dir_, std::shared_ptr<RailStation> from_,
         std::shared_ptr<RailStation> to_);
 
-    static std::shared_ptr<RailInterval> construct(bool down,
+    static std::shared_ptr<RailInterval> construct(Direction dir,
                                                    std::shared_ptr<RailStation> from,
                                                    std::shared_ptr<RailStation> to);
 
@@ -82,7 +84,7 @@ public:
         return _rulerNodes.at(i);
     }
 
-    inline bool isDown()const{return down;}
+    inline bool isDown()const{return dir==Direction::Down;}
 
 
     template <typename Node>
