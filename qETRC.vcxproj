@@ -185,6 +185,7 @@
     <ClCompile Include="src\data\rail\railway.cpp" />
     <ClCompile Include="src\data\rail\ruler.cpp" />
     <ClCompile Include="src\data\rail\rulernode.cpp" />
+    <ClCompile Include="src\data\train\train.cpp" />
     <ClCompile Include="src\data\train\trainname.cpp" />
     <ClCompile Include="src\data\train\trainstation.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -204,6 +205,7 @@
     <ClInclude Include="src\data\rail\railway.h" />
     <ClInclude Include="src\data\rail\ruler.h" />
     <ClInclude Include="src\data\rail\rulernode.h" />
+    <ClInclude Include="src\data\train\train.h" />
     <ClInclude Include="src\data\train\trainname.h" />
     <ClInclude Include="src\data\train\trainstation.h" />
     <ClInclude Include="src\util\qeexceptions.h" />

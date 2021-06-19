@@ -9,6 +9,35 @@ TrainStation::TrainStation(const StationName& name_,
 {
 }
 
+TrainStation::TrainStation(const QJsonObject &obj)
+{
+    fromJson(obj);
+}
+
+void TrainStation::fromJson(const QJsonObject &obj)
+{
+    name=StationName::fromSingleLiteral(obj.value("zhanming").toString());
+    arrive=QTime::fromString(obj.value("ddsj").toString(),"hh:mm:ss");
+    if(!arrive.isValid()){
+        arrive=QTime::fromString(obj.value("ddsj").toString(),"hh:mm");
+    }
+    depart=QTime::fromString(obj.value("cfsj").toString(),"hh:mm:ss");
+    if(!depart.isValid()){
+        depart=QTime::fromString(obj.value("cfsj").toString(),"hh:mm");
+    }
+    note=obj.value("note").toString();
+}
+
+QJsonObject TrainStation::toJson() const
+{
+    return QJsonObject{
+        {"zhanming",name.toSingleLiteral()},
+        {"ddsj",arrive.toString("hh:mm:ss")},
+        {"cfsj",depart.toString("hh:mm:ss")},
+        {"note",note}
+    };
+}
+
 int TrainStation::stopSec() const
 {
 	int s = arrive.secsTo(depart);

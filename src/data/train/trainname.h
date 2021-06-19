@@ -4,6 +4,7 @@
 #pragma once
 
 #include <QString>
+#include <QJsonArray>
 #include "data/common/direction.h"
 
 class TrainName
@@ -17,6 +18,9 @@ public:
     TrainName(TrainName&& )=default;
     TrainName& operator=(const TrainName&)=default;
     TrainName& operator=(TrainName&&)=default;
+
+    void fromJson(const QJsonArray& ar);
+    QJsonArray toJson()const;
 
     /*
      * 返回字头

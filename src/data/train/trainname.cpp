@@ -8,6 +8,18 @@ TrainName::TrainName(const QString& full):
     parseFullName();
 }
 
+void TrainName::fromJson(const QJsonArray &ar)
+{
+    _full=ar.at(0).toString();
+    _down=ar.at(1).toString();
+    _up=ar.at(2).toString();
+}
+
+QJsonArray TrainName::toJson() const
+{
+    return QJsonArray{_full,_down,_up};
+}
+
 TrainName::TrainName(const QString& full, const QString& down, const QString& up):
     _full(full),_down(down),_up(up)
 {

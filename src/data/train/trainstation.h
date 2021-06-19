@@ -28,6 +28,10 @@ public:
     TrainStation(const StationName& name_, const QTime& arrive_,
         const QTime& depart_, bool business_ = true,
         const QString& track_ = "", const QString& note_="");
+    explicit TrainStation(const QJsonObject& obj);
+
+    void fromJson(const QJsonObject& obj);
+    QJsonObject toJson()const;
 
     inline bool isStopped()const {
         return arrive == depart;
