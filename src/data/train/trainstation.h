@@ -48,6 +48,9 @@ public:
     inline void bindToRailStation(std::weak_ptr<RailStation> st) {
         _railStation = st;
     }
+    inline void unbindToRailStation(){
+        _railStation.reset();
+    }
 
     inline bool isBoundToRail()const {
         return !_railStation.expired();

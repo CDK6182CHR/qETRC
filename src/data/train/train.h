@@ -55,7 +55,7 @@ public:
           const StationName& starting=StationName::nullName,
           const StationName& terminal=StationName::nullName,
           TrainPassenger passenger=TrainPassenger::Auto);
-    Train(const QJsonObject& obj);
+    explicit Train(const QJsonObject& obj);
 
     /*
      * 使用std::list时，默认的copy和move都是正确的
@@ -82,7 +82,8 @@ public:
     inline void setPassenger(TrainPassenger t){_passenger=t;}
     inline void setIsShow(bool s){_show=s;}
 
-    inline ConstStationPtr nullStation()const { return _timetable.end(); }
+    inline ConstStationPtr nullStation()const { return _timetable.cend(); }
+    inline StationPtr nullStation(){return _timetable.end();}
 
     const std::list<TrainStation>& timetable()const{return _timetable;}
     std::list<TrainStation>& timetable(){return _timetable;}
@@ -118,11 +119,17 @@ public:
      * qETRC新增核心函数
      * 将车次绑定到线路
      */
-    void bindToRailway(const Railway& railway);
+    void bindToRailway(std::shared_ptr<Railway> railway);
+
+    void unbindToRailway();
 
     /*
+     * Train.stationDown()
      * 判定局部上下行性质
      * 这个实现比较困难，现在不一定能做
+     *
+     * 注意: 参考pyETRC的实现，先向左查再向右查，
+     * 即行别优先定义为[到达行别]
      */
     Direction stationDirection(const StationName& station);
 
@@ -137,6 +144,8 @@ public:
      * 签名未确定
      */
     void jointTrain();
+
+    void show()const;
 
 };
 

@@ -5,6 +5,7 @@
 
 #include "../../src/data/rail/rail.h"
 #include "data/train/trainname.h"
+#include "data/train/train.h"
 
 class RailTest : public QObject
 {
@@ -21,6 +22,9 @@ private slots:
 
     //车次
     void test_case4();
+
+    //车次读取
+    void test_case5();
 
 };
 
@@ -102,6 +106,24 @@ void RailTest::test_case4()
         TrainName n(t);
         n.show();
     }
+}
+
+void RailTest::test_case5()
+{
+    auto t=QString(R"(D:\Python\train_graph\source\成贵客专线D20200701.pyetgr)");
+    QFile f(t);
+    f.open(QFile::ReadOnly);
+    auto contents=f.readAll();
+    QJsonDocument doc=QJsonDocument::fromJson(contents);
+    QJsonObject obj=doc.object().value("trains").toArray().at(36).toObject();
+
+    QJsonObject obj1=doc.object().value("line").toObject();
+    auto railway=std::make_shared<Railway>(obj1);
+
+    Train train(obj);
+
+    train.bindToRailway(railway);
+    train.show();
 }
 
 QTEST_APPLESS_MAIN(RailTest)

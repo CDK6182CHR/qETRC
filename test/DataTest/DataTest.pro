@@ -18,6 +18,8 @@ SOURCES +=  tst_railtest.cpp \
     ../../src/data/rail/ruler.cpp \
     ../../src/data/rail/forbid.cpp \
     ../../src/data/train/trainname.cpp \
+    ../../src/data/train/trainstation.cpp \
+    ../../src/data/train/train.cpp \
 
 
 QMAKE_CXXFLAGS += /utf-8
