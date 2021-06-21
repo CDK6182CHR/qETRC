@@ -179,6 +179,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\data\common\stationname.cpp" />
+    <ClCompile Include="src\data\diagram\config.cpp" />
     <ClCompile Include="src\data\rail\forbid.cpp" />
     <ClCompile Include="src\data\rail\railinterval.cpp" />
     <ClCompile Include="src\data\rail\railstation.cpp" />
@@ -196,6 +197,7 @@
     </QtMoc>
     <ClInclude Include="src\data\common\direction.h" />
     <ClInclude Include="src\data\common\stationname.h" />
+    <ClInclude Include="src\data\diagram\config.h" />
     <ClInclude Include="src\data\rail\forbid.h" />
     <ClInclude Include="src\data\rail\rail.h" />
     <ClInclude Include="src\data\rail\railinterval.h" />

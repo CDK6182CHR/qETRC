@@ -46,6 +46,11 @@ int TrainStation::stopSec() const
 	return s;
 }
 
+bool TrainStation::nameEqual(const TrainStation& t1, const TrainStation& t2)
+{
+    return t1.name == t2.name;
+}
+
 QDebug operator<<(QDebug debug, const TrainStation& ts)
 {
     debug << ts.name << " " <<

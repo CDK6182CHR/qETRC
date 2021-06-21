@@ -1,6 +1,7 @@
 ﻿#include <QtTest>
 #include <QtCore>
 #include <initializer_list>
+#include <tuple>
 
 
 #include "../../src/data/rail/rail.h"
@@ -25,6 +26,8 @@ private slots:
 
     //车次读取
     void test_case5();
+
+    void test_case6();
 
 };
 
@@ -124,6 +127,63 @@ void RailTest::test_case5()
 
     train.bindToRailway(railway);
     train.show();
+}
+
+void RailTest::test_case6()
+{
+    //车次拼接
+    Train t1(TrainName("K454/1"));
+    Train t2(TrainName("K454/1"));
+    Train t3(TrainName("K451/4"));
+    std::initializer_list<std::tuple<QString,QString,QString>> i1{
+        {"绵阳","01:04","01:06"},
+        {"皂角铺","01:20","01:20"},
+        {"罗江","01:30","01:30"}
+    };
+    std::initializer_list<std::tuple<QString,QString,QString>> i2{
+        {"皂角铺","01:20","01:20"},
+        {"罗江","01:30","01:30"},
+        {"德阳","01:40","01:50"}
+    };
+    std::initializer_list<std::tuple<QString,QString,QString>> i3{
+        {"德阳","01:40","01:50"},
+        {"广汉","02:00","02:04"}
+    };
+    for(const auto& t:i1){
+        t1.appendStation(StationName::fromSingleLiteral(std::get<0>(t)),
+                         QTime::fromString(std::get<1>(t),"hh:mm"),
+                         QTime::fromString(std::get<2>(t),"hh:mm"));
+    }
+    for(const auto& t:i2){
+        t2.appendStation(StationName::fromSingleLiteral(std::get<0>(t)),
+                         QTime::fromString(std::get<1>(t),"hh:mm"),
+                         QTime::fromString(std::get<2>(t),"hh:mm"));
+    }
+    for(const auto& t:i3){
+        t3.appendStation(StationName::fromSingleLiteral(std::get<0>(t)),
+                         QTime::fromString(std::get<1>(t),"hh:mm"),
+                         QTime::fromString(std::get<2>(t),"hh:mm"));
+    }
+    Train t4(t1);
+    Train t5(t1);
+    Train t6(t2);
+    Train t7(t1);
+    qDebug()<<"Test 1: joint with cover"<<Qt::endl;
+    t1.jointTrain(std::move(t2),false);
+    t1.show();
+    qDebug()<<"Test 2: joint with no cover"<<Qt::endl;
+    t4.jointTrain(std::move(t3),false);
+    t4.show();
+    qDebug()<<"Test 3: reverse joint with cover"<<Qt::endl;
+    t6.jointTrain(std::move(t5),true);
+    t6.show();
+    qDebug()<<"Test 4: joint with this covered by another"<<Qt::endl;
+    t7.show();
+    t1.show();
+    qDebug()<<"AFTER"<<Qt::endl;
+    t7.jointTrain(std::move(t1), false);
+    t7.show();
+
 }
 
 QTEST_APPLESS_MAIN(RailTest)

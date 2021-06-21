@@ -13,9 +13,13 @@
 #include "data/common/stationname.h"
 #include "data/rail/railstation.h"
 
+/*
+ * 注：目前支持在（绑定到相同线路的）不同车次间移动时不出问题。
+ * jointTrain()方法依赖这一特性
+ */
 class TrainStation
 {
-    /*
+    /**
      * 新增 绑定到线路的车站
      */
     std::weak_ptr<RailStation> _railStation;
@@ -57,6 +61,8 @@ public:
     }
     
     int stopSec()const;
+
+    static bool nameEqual(const TrainStation& t1, const TrainStation& t2);
 };
 
 QDebug operator<<(QDebug debug, const TrainStation& ts);
