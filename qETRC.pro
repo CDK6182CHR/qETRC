@@ -13,6 +13,7 @@ INCLUDEPATH += src
 SOURCES += \
     src/data/common/stationname.cpp \
     src/data/diagram/config.cpp \
+    src/data/diagram/trainadapter.cpp \
     src/data/diagram/trainline.cpp \
     src/data/rail/forbid.cpp \
     src/data/rail/railinterval.cpp \
@@ -32,6 +33,7 @@ HEADERS += \
     src/data/common/direction.h \
     src/data/common/stationname.h \
     src/data/diagram/config.h \
+    src/data/diagram/trainadapter.h \
     src/data/diagram/trainline.h \
     src/data/rail/forbid.h \
     src/data/rail/rail.h \

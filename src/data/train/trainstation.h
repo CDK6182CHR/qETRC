@@ -19,10 +19,6 @@
  */
 class TrainStation
 {
-    /**
-     * 新增 绑定到线路的车站
-     */
-    std::weak_ptr<RailStation> _railStation;
 public:
     StationName name;
     QTime arrive,depart;
@@ -39,25 +35,6 @@ public:
 
     inline bool isStopped()const {
         return arrive == depart;
-    }
-
-    inline std::weak_ptr<const RailStation> boundRailStation()const {
-        return _railStation;
-    }
-
-    inline std::weak_ptr<RailStation> boundRailStation() {
-        return _railStation;
-    }
-
-    inline void bindToRailStation(std::weak_ptr<RailStation> st) {
-        _railStation = st;
-    }
-    inline void unbindToRailStation(){
-        _railStation.reset();
-    }
-
-    inline bool isBoundToRail()const {
-        return !_railStation.expired();
     }
     
     int stopSec()const;

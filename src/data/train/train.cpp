@@ -32,13 +32,13 @@ void Train::fromJson(const QJsonObject &obj)
     _passenger=static_cast<TrainPassenger>(obj.value("passenger").toInt());
     const QJsonArray& artable=obj.value("timetable").toArray();
     _autoLines = obj.value("autoItem").toBool(true);
-    if (!_autoLines) {
-        _lines.clear();
-        const QJsonArray& aritems = obj.value("itemInfo").toArray();
-        for (auto p = aritems.begin(); p != aritems.end(); ++p) {
-            _lines.append(std::make_shared<TrainLine>(p->toObject(), *this));
-        }
-    }
+    //if (!_autoLines) {
+    //    _lines.clear();
+    //    const QJsonArray& aritems = obj.value("itemInfo").toArray();
+    //    for (auto p = aritems.begin(); p != aritems.end(); ++p) {
+    //        _lines.append(std::make_shared<TrainLine>(p->toObject(), *this));
+    //    }
+    //}
     //todo: UI, circuit, item
     for (auto p=artable.cbegin();p!=artable.cend();++p){
         _timetable.emplace_back(p->toObject());
@@ -64,11 +64,11 @@ QJsonObject Train::toJson() const
     };
     
     if (!_autoLines) {
-        QJsonArray items;
-        for (auto p = _lines.begin(); p != _lines.end(); ++p) {
-            items.append((*p)->toJson());
-        }
-        obj.insert("itemInfo", items);
+        //QJsonArray items;
+        //for (auto p = _lines.begin(); p != _lines.end(); ++p) {
+        //    items.append((*p)->toJson());
+        //}
+        //obj.insert("itemInfo", items);
     }
     return obj;
 }
@@ -153,6 +153,7 @@ QList<Train::StationPtr> Train::findAllGeneralStations(const StationName &name)
     return res;
 }
 
+#if 0
 void Train::bindToRailway(std::shared_ptr<Railway> railway)
 {
     if (_boundRail.lock() == railway)
@@ -286,6 +287,7 @@ Direction Train::stationDirection(ConstStationPtr station)
     }
     return Direction::Undefined;
 }
+#endif
 
 Train Train::translation(TrainName name, int sec)
 {
@@ -298,6 +300,7 @@ Train Train::translation(TrainName name, int sec)
     return train;
 }
 
+#if 0
 void Train::removeNonLocal()
 {
     if (!isBoundToRailway())
@@ -314,6 +317,7 @@ void Train::removeNonLocal()
         }
     }
 }
+#endif
 
 void Train::jointTrain(Train&& train, bool former)
 {

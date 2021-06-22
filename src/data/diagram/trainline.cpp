@@ -2,6 +2,8 @@
 #include "data/common/stationname.h"
 #include "data/train/train.h"
 
+//I/O部分暂不实现
+#if 0
 TrainLine::TrainLine(const QJsonObject& obj, Train& train)
 {
 	fromJson(obj, train);
@@ -37,3 +39,4 @@ QJsonObject TrainLine::toJson() const
 		{"end",end->name.toSingleLiteral()}
 	};
 }
+#endif

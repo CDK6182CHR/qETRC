@@ -1,0 +1,3 @@
+﻿#include "trainadapter.h"
+
+

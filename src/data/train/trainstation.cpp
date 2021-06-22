@@ -55,9 +55,6 @@ QDebug operator<<(QDebug debug, const TrainStation& ts)
 {
     debug << ts.name << " " <<
              ts.arrive.toString("hh:mm:ss") << " " << ts.depart.toString("hh:mm:ss");
-    if (ts.isBoundToRail()){
-        debug << "; bound to: " << ts.boundRailStation().lock()->name;
-    }
 	debug << Qt::endl;
 	return debug;
 }

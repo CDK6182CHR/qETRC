@@ -22,6 +22,9 @@ class TrainUIConfig{
 
 /**
  * pyETRC.train.Train
+ * 2021.06.22逻辑修订：要求这里仅包含于线路无关的操作
+ * 也就是说这里的一切操作都要是在没有Railway情况下合法的
+ * 与Railway相关的操作，在新建类TrainAdapter中完成
  */
 class Train
 {
@@ -41,14 +44,6 @@ class Train
      * 涉及到删除操作时，要特别小心
      */
     std::list<TrainStation> _timetable;
-
-    std::weak_ptr<Railway> _boundRail;
-
-    /**
-     * 运行线数据描述以及对象指针
-     * 对数据结构似乎没有特殊要求，暂定QList<shared_ptr>的结构
-     */
-    QList<std::shared_ptr<TrainLine>> _lines;
 
     /**
      * Train.autoItems  是否采用自动运行线管理
@@ -147,17 +142,17 @@ public:
      * 将车次绑定到线路
      * 注意：如果已经绑定到同一条线路，不做任何事
      */
-    void bindToRailway(std::shared_ptr<Railway> railway);
+    //void bindToRailway(std::shared_ptr<Railway> railway);
 
     /**
      * 适用于线路可能发生变化时，
      * 即使已经绑定到同一条线路，也会撤销再重来
      */
-    void updateBoundRailway(std::shared_ptr < Railway> railway);
+    //void updateBoundRailway(std::shared_ptr < Railway> railway);
 
-    void unbindToRailway();
+    //void unbindToRailway();
 
-    inline bool isBoundToRailway()const { return !_boundRail.expired(); }
+    //inline bool isBoundToRailway()const { return !_boundRail.expired(); }
 
     /**
      * @brief autoLines 自动设置运行线数据
@@ -165,14 +160,14 @@ public:
      * @param railway 绑定到的线路
      * @param config 配置信息
      */
-    void autoLines(std::shared_ptr<Railway> railway, const Config& config);
+    //void autoLines(std::shared_ptr<Railway> railway, const Config& config);
 
     /**
      * 车次运行线信息表
      * Train.itemInfo()
      */
-    auto& lines(){return _lines;}
-    auto& lines()const{return _lines;}
+    //auto& lines(){return _lines;}
+    //auto& lines()const{return _lines;}
 
     /**
      * 时刻表中前一个（不包含当前）成功绑定到线路的车站。
@@ -213,7 +208,7 @@ public:
      * Train.delNonLocal()
      * 删除非本线车站 
      */
-    void removeNonLocal();
+    //void removeNonLocal();
 
     /**
      * 注意：右值引用，移动语义
