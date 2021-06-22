@@ -29,5 +29,9 @@ namespace DirFunc {
 	inline constexpr bool isValid(Direction d) {
 		return d != Direction::Undefined;
 	}
+
+	inline constexpr Direction fromIsDown(bool isDown) {
+		return isDown ? Direction::Down:Direction::Up;
+	}
 }
 

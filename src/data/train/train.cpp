@@ -2,6 +2,7 @@
 #include <QDebug>
 
 #include "data/rail/rail.h"
+#include "data/diagram/trainline.h"
 
 
 Train::Train(const TrainName &trainName,
@@ -9,7 +10,7 @@ Train::Train(const TrainName &trainName,
              const StationName &terminal,
              TrainPassenger passenger):
     _trainName(trainName),_starting(starting),_terminal(terminal),
-    _passenger(passenger),_show(true)
+    _passenger(passenger),_show(true),_autoLines(true)
 {
 
 }
@@ -30,6 +31,14 @@ void Train::fromJson(const QJsonObject &obj)
     _show=obj.value("shown").toBool();
     _passenger=static_cast<TrainPassenger>(obj.value("passenger").toInt());
     const QJsonArray& artable=obj.value("timetable").toArray();
+    _autoLines = obj.value("autoItem").toBool(true);
+    if (!_autoLines) {
+        _lines.clear();
+        const QJsonArray& aritems = obj.value("itemInfo").toArray();
+        for (auto p = aritems.begin(); p != aritems.end(); ++p) {
+            _lines.append(std::make_shared<TrainLine>(p->toObject(), *this));
+        }
+    }
     //todo: UI, circuit, item
     for (auto p=artable.cbegin();p!=artable.cend();++p){
         _timetable.emplace_back(p->toObject());
@@ -42,15 +51,26 @@ QJsonObject Train::toJson() const
     for(const auto& p:_timetable){
         ar.append(p.toJson());
     }
-    return QJsonObject{
+    
+    QJsonObject obj{
         {"checi",_trainName.toJson()},
         {"type",_type},
         {"sfz",_starting.toSingleLiteral()},
         {"zdz",_terminal.toSingleLiteral()},
         {"shown",_show},
         {"passenger",static_cast<int>(_passenger)},
-        {"timetable",ar}
+        {"timetable",ar},
+        {"autoItem",_autoLines}
     };
+    
+    if (!_autoLines) {
+        QJsonArray items;
+        for (auto p = _lines.begin(); p != _lines.end(); ++p) {
+            items.append((*p)->toJson());
+        }
+        obj.insert("itemInfo", items);
+    }
+    return obj;
 }
 
 void Train::appendStation(const StationName &name,

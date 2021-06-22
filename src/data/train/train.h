@@ -7,6 +7,7 @@
 #include "trainname.h"
 #include "trainstation.h"
 #include "data/diagram/trainline.h"
+#include "data/diagram/config.h"
 
 enum class TrainPassenger:
         std::int8_t{
@@ -48,6 +49,11 @@ class Train
      * 对数据结构似乎没有特殊要求，暂定QList<shared_ptr>的结构
      */
     QList<std::shared_ptr<TrainLine>> _lines;
+
+    /**
+     * Train.autoItems  是否采用自动运行线管理
+     */
+    bool _autoLines;
 
     //QtWidgets.QGraphicsViewPathItem pathItem;
     //QtWidgets.QGraphicsViewItem labelItem;
@@ -143,7 +149,7 @@ public:
      */
     void bindToRailway(std::shared_ptr<Railway> railway);
 
-    /*
+    /**
      * 适用于线路可能发生变化时，
      * 即使已经绑定到同一条线路，也会撤销再重来
      */
@@ -152,6 +158,21 @@ public:
     void unbindToRailway();
 
     inline bool isBoundToRailway()const { return !_boundRail.expired(); }
+
+    /**
+     * @brief autoLines 自动设置运行线数据
+     * 承担了pyETRC中TrainItem::setItem()中划分Item的工作
+     * @param railway 绑定到的线路
+     * @param config 配置信息
+     */
+    void autoLines(std::shared_ptr<Railway> railway, const Config& config);
+
+    /**
+     * 车次运行线信息表
+     * Train.itemInfo()
+     */
+    auto& lines(){return _lines;}
+    auto& lines()const{return _lines;}
 
     /**
      * 时刻表中前一个（不包含当前）成功绑定到线路的车站。
