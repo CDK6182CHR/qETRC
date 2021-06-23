@@ -1,5 +1,4 @@
 QT += testlib
-QT -= gui
 
 CONFIG += qt console warn_on depend_includepath testcase
 CONFIG -= app_bundle
@@ -20,6 +19,8 @@ SOURCES +=  tst_railtest.cpp \
     ../../src/data/train/trainname.cpp \
     ../../src/data/train/trainstation.cpp \
     ../../src/data/train/train.cpp \
+    ../../src/data/diagram/trainadapter.cpp \
+    ../../src/data/diagram/trainline.cpp \
 
 
 QMAKE_CXXFLAGS += /utf-8

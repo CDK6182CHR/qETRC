@@ -55,6 +55,5 @@ QDebug operator<<(QDebug debug, const TrainStation& ts)
 {
     debug << ts.name << " " <<
              ts.arrive.toString("hh:mm:ss") << " " << ts.depart.toString("hh:mm:ss");
-	debug << Qt::endl;
 	return debug;
 }

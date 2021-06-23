@@ -16,6 +16,9 @@ class Train;
 struct AdapterStation{
     std::list<TrainStation>::iterator trainStation;
     std::weak_ptr<RailStation> railStation;
+    AdapterStation(std::list<TrainStation>::iterator trainStation_,
+        std::weak_ptr<RailStation> railStation_):
+        trainStation(trainStation_),railStation(railStation_){}
 };
 
 /**
@@ -34,7 +37,25 @@ struct TrainLine
 
     //根据需要写构造函数！
 
-    TrainLine() = delete;
+    /**
+     * 构造空的运行线，默认显示Item和双标签
+     */
+    TrainLine();
+    TrainLine(const TrainLine&) = default;
+    TrainLine(TrainLine&&) = default;
+
+    inline void addStation(std::list<TrainStation>::iterator trainStation,
+        std::weak_ptr<RailStation> rs) {
+        stations.emplace_back(trainStation, rs);
+    }
+
+    inline void pop_back() {
+        stations.pop_back();
+    }
+
+    inline auto count()const { return stations.size(); }
+
+    void print()const;
 
     /*
      * 暂定不维护Train指针或引用。

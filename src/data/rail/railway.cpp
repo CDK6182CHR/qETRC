@@ -278,6 +278,31 @@ Direction Railway::gapDirectionByIndex(const StationName& s1, const StationName&
 	return i1 <= i2 ? Direction::Down : Direction::Up;
 }
 
+int Railway::stationsBetween(std::shared_ptr<const RailStation> s1, 
+	std::shared_ptr<const RailStation> s2) const
+{
+	Direction dir = gapDirection(s1, s2);
+	//先正向找
+	int cnt = 0;
+	auto s = s1->dirAdjacent(dir);
+	for (; s && s != s2; s = s->dirAdjacent(dir)) {
+		cnt++;
+	}
+	if (s) {
+		//找到了目标站
+		return cnt;
+	}
+	//没找到，方向出了问题
+	qDebug() << "Railway::stationBetween: WARNING: invalid direction encountered " << s1->name << "->"
+		<< s2->name << Qt::endl;
+	cnt = 0;
+	dir = DirFunc::reverse(dir);
+	s = s1->dirAdjacent(dir);
+	for (; s && s != s2; s = s->dirAdjacent(dir))
+		cnt++;
+	return cnt;
+}
+
 double Railway::mileBetween(const StationName& s1,
 	const StationName& s2) const
 {

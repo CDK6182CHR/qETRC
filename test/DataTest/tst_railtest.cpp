@@ -7,6 +7,7 @@
 #include "../../src/data/rail/rail.h"
 #include "data/train/trainname.h"
 #include "data/train/train.h"
+#include "data/diagram/trainadapter.h"
 
 class RailTest : public QObject
 {
@@ -24,10 +25,15 @@ private slots:
     //车次
     void test_case4();
 
-    //车次读取
+    //车次绑定基本
     void test_case5();
 
     void test_case6();
+
+    /*
+     * 测试带有折返的车次绑定
+     */
+    void test_case7();
 
 };
 
@@ -113,24 +119,29 @@ void RailTest::test_case4()
 
 void RailTest::test_case5()
 {
+    return;
     auto t=QString(R"(D:\Python\train_graph\source\成贵客专线D20200701.pyetgr)");
     QFile f(t);
     f.open(QFile::ReadOnly);
     auto contents=f.readAll();
     QJsonDocument doc=QJsonDocument::fromJson(contents);
-    QJsonObject obj=doc.object().value("trains").toArray().at(36).toObject();
+    QJsonObject obj=doc.object().value("trains").toArray().at(54).toObject();
 
     QJsonObject obj1=doc.object().value("line").toObject();
     auto railway=std::make_shared<Railway>(obj1);
 
-    Train train(obj);
+    auto train=std::make_shared<Train>(obj);
 
-    train.bindToRailway(railway);
-    train.show();
+    Config config;
+
+    TrainAdapter adp(train,railway,config);
+    adp.print();
+
 }
 
 void RailTest::test_case6()
 {
+    return;
     //车次拼接
     Train t1(TrainName("K454/1"));
     Train t2(TrainName("K454/1"));
@@ -184,6 +195,27 @@ void RailTest::test_case6()
     t7.jointTrain(std::move(t1), false);
     t7.show();
 
+}
+
+void RailTest::test_case7()
+{
+    auto t=QString(R"(D:\Python\train_graph\source\京沪线上局段20191230.pyetgr)");
+    QFile f(t);
+    f.open(QFile::ReadOnly);
+    auto contents=f.readAll();
+    QJsonDocument doc=QJsonDocument::fromJson(contents);
+    QJsonObject obj=doc.object().value("trains").toArray().at(799).toObject();
+
+    QJsonObject obj1=doc.object().value("line").toObject();
+    auto railway=std::make_shared<Railway>(obj1);
+
+    auto train=std::make_shared<Train>(obj);
+
+    Config config;
+    config.max_passed_stations = 0;
+
+    TrainAdapter adp(train,railway,config);
+    adp.print();
 }
 
 QTEST_APPLESS_MAIN(RailTest)

@@ -173,7 +173,6 @@ void Train::bindToRailway(std::shared_ptr<Railway> railway)
             //非空指针表示搜索成功。现在考虑是否绑定
             //目前唯一阻止绑定的事由是经由方向不对
             //原则上，这是不大可能发生的事情；因此只有显示知道行别不对时，才拒绝绑定
-            p->bindToRailStation(railst);
             if (locDir==Direction::Undefined ||
                     railst->isDirectionVia(locDir)){
                 //成功绑定到车站
@@ -380,7 +379,7 @@ void Train::show() const
 {
     _trainName.show();
     for(const auto& p:_timetable){
-        qDebug()<<p;
+        qDebug() << p << Qt::endl;
     }
 }
 

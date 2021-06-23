@@ -37,6 +37,8 @@ public:
     TrainAdapter(std::shared_ptr<Train> train, std::weak_ptr<Railway> railway,
                  const Config& config);
 
+    void print()const;
+
 private:
 
     /**
@@ -44,8 +46,7 @@ private:
      * 自动生成运行线数据  包括原来的bindToRail()功能
      * 2021.6.22  TODO here
      */
-    void autoLines(std::shared_ptr<Train> train,std::weak_ptr<Railway> railway,
-                   const Config& config);
+    void autoLines(const Config& config);
 };
 
 

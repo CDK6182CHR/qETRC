@@ -136,12 +136,12 @@ public:
      */
     bool containsGeneralStation(const StationName& name)const;
 
-    /*
+    /**
      * 与pyETRC不同：暂定不存在的站返回-1
      */
     int stationIndex(const StationName& name)const;
 
-    /*
+    /**
      * Line.delStation
      * 线性算法
      */
@@ -149,12 +149,12 @@ public:
 
     void removeStation(int index);
 
-    /*
+    /**
      * Line.adjustLichengTo0
      */
     void adjustMileToZero();
 
-    /*
+    /**
      * Line.isDownGap()
      * 但注意车站匹配条件变了
      * 如果有至少一个不存在，暂定直接返回true
@@ -166,10 +166,20 @@ public:
     Direction gapDirection(const std::shared_ptr<const RailStation>& s1,
                    const std::shared_ptr<const RailStation>& s2)const;
 
-    /* 
+    /** 
      * 按照index判定的严格版本，但在没有启用numberMap时代价很大
      */
     Direction gapDirectionByIndex(const StationName& s1, const StationName& s2)const;
+
+    /**
+     * 返回两站之间跨越的站数。
+     * s1, s2都属于本线。调用gapDirection()判定行别，然后优先按照行别找
+     * 注意这里是按照interval找
+     * 极端情况：如果因为里程等原因导致算出来的行别不对，算法仍然正确结束，
+     * 但会把另外一边遍历完 （线性复杂度）。
+     */
+    int stationsBetween(std::shared_ptr<const RailStation> s1,
+        std::shared_ptr<const RailStation> s2)const;
 
 
     /*

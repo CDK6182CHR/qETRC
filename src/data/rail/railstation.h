@@ -83,6 +83,29 @@ public:
     std::shared_ptr<RailStation> downAdjacent();
     std::shared_ptr<RailStation> upAdjacent();
 
+    std::shared_ptr<RailStation> dirAdjacent(Direction dir) {
+        switch (dir) {
+        case Direction::Down: return downAdjacent();
+        case Direction::Up: return upAdjacent();
+        default:return nullptr;
+        }
+    }
+
+    std::shared_ptr<const RailStation> dirAdjacent(Direction dir)const {
+        return const_cast<RailStation*>(this)->dirAdjacent(dir);
+    }
+
+    std::shared_ptr<const RailStation> downAdjacent()const {
+        return const_cast<RailStation*>(this)->downAdjacent();
+    }
+    std::shared_ptr<const RailStation> upAdjacent()const {
+        return const_cast<RailStation*>(this)->upAdjacent();
+    }
+
+    bool isAdjacentWith(const std::shared_ptr<const RailStation>& another) const {
+        return downAdjacent() == another || upAdjacent() == another;
+    }
+
     inline bool hasDownAdjacent()const{return downNext.get();}
     inline bool hasUpAdjacent()const{return upNext.get();}
 
