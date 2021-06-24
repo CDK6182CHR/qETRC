@@ -79,7 +79,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;./src;release;\include;.\src\data;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 /utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
       <DebugInformationFormat>None</DebugInformationFormat>
@@ -108,7 +108,7 @@
       <LinkIncremental>false</LinkIncremental>
       <OutputFile>$(OutDir)\qETRC.exe</OutputFile>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </Link>
     <Midl>
@@ -131,7 +131,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;./src;debug;\include;.\src\data;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 /utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -157,7 +157,7 @@
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
       <OutputFile>$(OutDir)\qETRC.exe</OutputFile>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </Link>
     <Midl>
@@ -180,6 +180,7 @@
   <ItemGroup>
     <ClCompile Include="src\data\common\stationname.cpp" />
     <ClCompile Include="src\data\diagram\config.cpp" />
+    <ClCompile Include="src\data\diagram\diagram.cpp" />
     <ClCompile Include="src\data\diagram\trainadapter.cpp" />
     <ClCompile Include="src\data\diagram\trainline.cpp" />
     <ClCompile Include="src\data\rail\forbid.cpp" />
@@ -192,6 +193,7 @@
     <ClCompile Include="src\data\train\traincollection.cpp" />
     <ClCompile Include="src\data\train\trainname.cpp" />
     <ClCompile Include="src\data\train\trainstation.cpp" />
+    <ClCompile Include="src\kernel\diagramwidget.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mainwindow.cpp" />
   </ItemGroup>
@@ -201,6 +203,7 @@
     <ClInclude Include="src\data\common\direction.h" />
     <ClInclude Include="src\data\common\stationname.h" />
     <ClInclude Include="src\data\diagram\config.h" />
+    <ClInclude Include="src\data\diagram\diagram.h" />
     <ClInclude Include="src\data\diagram\trainadapter.h" />
     <ClInclude Include="src\data\diagram\trainline.h" />
     <ClInclude Include="src\data\rail\forbid.h" />
@@ -216,6 +219,7 @@
     <ClInclude Include="src\data\train\traincollection.h" />
     <ClInclude Include="src\data\train\trainname.h" />
     <ClInclude Include="src\data\train\trainstation.h" />
+    <QtMoc Include="src\kernel\diagramwidget.h" />
     <ClInclude Include="src\util\qeexceptions.h" />
   </ItemGroup>
   <ItemGroup>

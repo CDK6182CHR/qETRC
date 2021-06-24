@@ -38,7 +38,6 @@ void RailStation::fromJson(const QJsonObject &obj)
     }else{
         counter=c.toDouble();
     }
-    y_value=obj.value("y_value").toDouble(-1);
     show=obj.value("show").toBool(true);
     passenger=obj.value("passenger").toBool(true);
     freight=obj.value("freight").toBool(true);
@@ -61,7 +60,6 @@ QJsonObject RailStation::toJson() const
     }else{
         obj.insert("connter",QJsonValue(QJsonValue::Null));
     }
-    obj.insert("y_value",y_value);
     obj.insert("show",show);
     obj.insert("passenger",passenger);
     obj.insert("freight",freight);

@@ -10,6 +10,7 @@
 #include "ruler.h"
 #include "rulernode.h"
 #include "forbid.h"
+#include "data/diagram/config.h"
 
 void RailInfoNote::fromJson(const QJsonObject& obj)
 {
@@ -68,6 +69,8 @@ void Railway::fromJson(const QJsonObject& obj)
     addForbid(objfor);
     const QJsonObject& objfor2=obj.value("forbid2").toObject();
     addForbid(objfor2);
+
+	_ordinate = rulerByName(obj.value("ordinate").toString());
 }
 
 QJsonObject Railway::toJson() const
@@ -95,6 +98,12 @@ QJsonObject Railway::toJson() const
     if(_forbids.size()>=2){
         obj.insert("forbid2",_forbids[1]->toJson());
     }
+
+	//排图标尺 新版
+	if (_ordinate)
+		obj.insert("ordinate", _ordinate->name());
+	else
+		obj.insert("ordinate", QJsonValue(QJsonValue::Null));
 
 	return obj;
 
@@ -329,6 +338,8 @@ bool Railway::isSplitted() const
 
 std::shared_ptr<Ruler> Railway::rulerByName(const QString& name)
 {
+	if (name.isEmpty() || name.isNull())
+		return nullptr;
 	for (auto p = _rulers.begin(); p != _rulers.end(); ++p) {
 		if ((*p)->name() == name)
 			return *p;
@@ -713,6 +724,53 @@ QList<std::shared_ptr<RailInterval>>
 	}
 }
 
+double Railway::calStationYValue(const Config& config)
+{
+	if(!ordinate())
+		return calStationYValueByMile(config);
+	//标尺排图
+	clearYValues();
+	auto ruler = ordinate();
+	double y = 0;
+	auto p = ruler->firstDownNode();
+	p->railInterval().fromStation()->y_value = y;  //第一站
+	//下行
+	for (; p; p = p->nextNode()) {
+		if (p->isNull()) {
+			qDebug() << "Railway::calStationYValue: WARNING: "
+				<< "Ruler [" << ruler->name() << "] not complate, cannot be used as"
+				<< "ordinate ruler. Interval: " << p->railInterval() << Qt::endl;
+			resetOrdinate();
+			return calStationYValueByMile(config);
+		}
+		y += p->interval / config.seconds_per_pix_y;
+		p->railInterval().toStation()->y_value = y;
+	}
+	_diagramHeight = y;
+	//上行，仅补缺漏
+	//这里利用了最后一站必定是双向的条件！
+	for (p = ruler->firstUpNode(); p; p = p->nextNode()) {
+		auto toStation = p->railInterval().toStation();
+		if (!toStation->y_value.has_value()) {
+			if (p->isNull()) {
+				qDebug() << "Railway::calStationYValue: WARNING: "
+					<< "Ruler [" << ruler->name() << "] not complate, cannot be used as"
+					<< "ordinate ruler. Interval: " << p->railInterval() << Qt::endl;
+				resetOrdinate();
+				return calStationYValueByMile(config);
+			}
+			auto rboth = rightBothStation(toStation), lboth = leftBothStation(toStation);
+
+			int upLeft = ruler->totalInterval(toStation, lboth, Direction::Up);
+			int upRight = ruler->totalInterval(rboth, toStation, Direction::Up);
+			double toty = rboth->y_value.value() - lboth->y_value.value();
+			y = rboth->y_value.value() - toty * upRight / (upLeft + upRight);
+			toStation->y_value = y;
+		}
+	}
+	return _diagramHeight;
+}
+
 void Railway::addMapInfo(const std::shared_ptr<RailStation>& st)
 {
 	//nameMap  直接添加
@@ -912,6 +970,30 @@ std::shared_ptr<RailStation> Railway::rightDirStation(int cur, Direction dir) co
 	return std::shared_ptr<RailStation>();
 }
 
+std::shared_ptr<RailStation> Railway::leftBothStation(std::shared_ptr<RailStation> st)
+{
+	auto p = st->upNext;
+	for (; p; p = p->nextInterval()) {
+		if (p->toStation()->direction == PassedDirection::BothVia)
+			return p->toStation();
+	}
+	qDebug() << "Railway::leftBothStation: WARNING: Unexpected null value." <<
+		st->name << Qt::endl;
+	return nullptr;
+}
+
+std::shared_ptr<RailStation> Railway::rightBothStation(std::shared_ptr<RailStation> st)
+{
+	auto p = st->upPrev;
+	for (; p; p = p->prevInterval()) {
+		if (p->fromStation()->direction == PassedDirection::BothVia)
+			return p->fromStation();
+	}
+	qDebug() << "Railway::rightBothStation: WARNING: Unexpected null value. " <<
+		st->name << Qt::endl;
+	return nullptr;
+}
+
 std::shared_ptr<RailInterval> Railway::addInterval(Direction dir, std::shared_ptr<RailStation> from, std::shared_ptr<RailStation> to)
 {
     auto t = RailInterval::construct(dir, from, to);
@@ -967,10 +1049,27 @@ Forbid &Railway::addForbid(const QJsonObject &obj)
 std::shared_ptr<RailInterval> Railway::nextIntervalCirc(std::shared_ptr<RailInterval> railint)
 {
 	auto t = railint->nextInterval();
-	if (!t && t->isDown()) {
+	if (!t && railint->isDown()) {
 		return firstUpInterval();
 	}
 	return t;
+}
+
+double Railway::calStationYValueByMile(const Config& config)
+{
+	for (auto& p : _stations) {
+		p->y_value = p->mile * config.pixels_per_km;
+	}
+	if (!_stations.empty())
+		_diagramHeight = _stations.last()->y_value.value();
+	return _diagramHeight;
+}
+
+void Railway::clearYValues()
+{
+	for (auto& p : _stations) {
+		p->y_value = std::nullopt;
+	}
 }
 
 

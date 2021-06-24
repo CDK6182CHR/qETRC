@@ -25,6 +25,7 @@ public:
     bool business;    //是否办理业务
     QString track;
     QString note;
+    
     TrainStation(const StationName& name_, const QTime& arrive_,
         const QTime& depart_, bool business_ = true,
         const QString& track_ = "", const QString& note_="");

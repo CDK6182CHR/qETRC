@@ -5,6 +5,7 @@
 #include "railintervaldata.hpp"
 
 #include <QJsonObject>
+#include <QString>
 
 class Ruler;
 class RailInterval;
@@ -25,6 +26,14 @@ public:
 
     void fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;
+
+    /**
+     * 区间通通时分的字符串表示。
+     * 如果没数据，返回NA
+     */
+    QString intervalString()const;
+
+    inline bool isNull()const { return interval == 0 && start == 0 && stop == 0; }
 };
 
 #endif // RULERNODE_H

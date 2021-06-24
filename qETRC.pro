@@ -13,6 +13,7 @@ INCLUDEPATH += src
 SOURCES += \
     src/data/common/stationname.cpp \
     src/data/diagram/config.cpp \
+    src/data/diagram/diagram.cpp \
     src/data/diagram/trainadapter.cpp \
     src/data/diagram/trainline.cpp \
     src/data/rail/forbid.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
     src/data/train/trainname.cpp \
     src/data/train/trainstation.cpp \
     src/data/train/traintype.cpp \
+    src/kernel/diagramwidget.cpp \
     src/main.cpp \
     src/mainwindow.cpp
 
@@ -34,6 +36,7 @@ HEADERS += \
     src/data/common/direction.h \
     src/data/common/stationname.h \
     src/data/diagram/config.h \
+    src/data/diagram/diagram.h \
     src/data/diagram/trainadapter.h \
     src/data/diagram/trainline.h \
     src/data/rail/forbid.h \
@@ -51,6 +54,7 @@ HEADERS += \
     src/data/train/trainname.h \
     src/data/train/trainstation.h \
     src/data/train/traintype.h \
+    src/kernel/diagramwidget.h \
     src/mainwindow.h \
     src/util/qeexceptions.h
 
@@ -58,3 +62,5 @@ HEADERS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+QMAKE_CXXFLAGS += /utf-8

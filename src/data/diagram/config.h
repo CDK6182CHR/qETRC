@@ -15,10 +15,25 @@ struct MarginConfig {
         right_white = 10,
         left = 275,
         up = 90,
+        down = 90,
         right = 150,
         label_width = 80,
         mile_label_width = 40,
         ruler_label_width = 80;
+
+    //这两项从pyETRC.GraphicsWidget中来
+    int
+        title_row_height = 40,
+        first_row_append = 15;
+
+    /**
+     * @brief gap_between_railways
+     * 新增，相邻两线路之间的高度差
+     */
+    int gap_between_railways = 150;
+
+    void fromJson(const QJsonObject& obj);
+    QJsonObject toJson()const;
 };
 
 /**
@@ -55,6 +70,8 @@ struct Config
     int table_row_height = 30;
     int link_line_height = 10;
 
+    bool auto_paint = true;
+
     /**
      * 是否显示停点数字。
      * 0-一律不；1-选中车次显示；2-全部
@@ -70,6 +87,9 @@ struct Config
     int base_label_height = 15;
     int step_label_height = 20;
 
+    double default_grid_width = 1.0;
+    double bold_grid_width = 2.5;
+
     /**
      * 原end_label_checi
      * 结束标签是否显示车次。
@@ -80,12 +100,9 @@ struct Config
 
     MarginConfig margins{};
 
-    /**
-     * @brief ordinate 排图标尺
-     * 程序内总是采用标尺对象指针；I/O时特殊处理成字符串。
-     */
-    std::weak_ptr<Ruler> ordinate;
-    QSet<QString> notShowTypes;
+    //排图标尺，现在改为Railway的性质
+    //std::weak_ptr<Ruler> ordinate;
+    QSet<QString> not_show_types;
 
     void fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;

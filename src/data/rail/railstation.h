@@ -31,7 +31,12 @@ public:
     double mile;
     int level;
     std::optional<double> counter;
-    double y_value;
+
+    /**
+     * 车站位置的纵坐标（像素），此数据不写入文件。
+     * 采用相对位置，即本线第一个站为0.
+     */
+    std::optional<double> y_value;
     PassedDirection direction;
     bool show;
     bool passenger,freight;

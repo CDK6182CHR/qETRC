@@ -208,6 +208,12 @@ std::shared_ptr<TrainAdapter> Train::updateBoundRailway(Railway& railway, const 
             }
         }
     }
+    //没找到，则创建
+    auto p = std::make_shared<TrainAdapter>(*this, railway, config);
+    if (!p->isNull()) {
+        _adapters.append(p);
+        return p;
+    }
     return nullptr;
 }
 

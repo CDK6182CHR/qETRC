@@ -32,4 +32,12 @@ QJsonObject RulerNode::toJson() const
     });
 }
 
+QString RulerNode::intervalString() const
+{
+    if (isNull()) 
+        return "NA";
+    else 
+        return QString::asprintf("%d:%02d", interval / 60, interval % 60);
+}
+
 

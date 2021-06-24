@@ -25,12 +25,13 @@ struct RailInfoNote{
 
 class Ruler;
 class Forbid;
+struct Config;
 
 class Railway
 {
     QString _name;
 
-    /*
+    /**
      * 注意：暂定采用shared_ptr实现，
      * 这是为了方便使用HashMap。
      * 注意复制语义。
@@ -38,11 +39,17 @@ class Railway
      */
     QList<std::shared_ptr<RailStation>> _stations;
 
-    /*
+    /**
      * 注意这里相当于只是保存了头结点
      */
     QList<std::shared_ptr<Ruler>> _rulers;
     QList<std::shared_ptr<Forbid>> _forbids;
+
+    /**
+     * @brief _ordinate  排图标尺指针
+     * 注意排图标尺现在改为Railway的性质，用以支持多条线路平铺。
+     */
+    std::shared_ptr<Ruler> _ordinate;
 
     //还没有实现好的数据结构
     //self.rulers = []  # type:List[Ruler]
@@ -58,6 +65,8 @@ class Railway
     QHash<QString, QList<StationName>> fieldMap;
     QHash<StationName, int> numberMap;
     bool numberMapEnabled;
+
+    double _diagramHeight=-1;
 
 public:
     Railway(const QString& name="");
@@ -363,6 +372,34 @@ public:
     inline const Forbid& getForbid(int i)const{return *_forbids[i];}
     inline Forbid& getForbid(int i){return *_forbids[i];}
 
+    inline std::shared_ptr<Ruler> ordinate(){return _ordinate;}
+    inline void setOrdinate(std::shared_ptr<Ruler> ord){_ordinate=ord;}
+    inline void resetOrdinate(){_ordinate=nullptr;}
+    inline void setOrdinate(const QString& rulerName){
+        setOrdinate(rulerByName(rulerName));
+    }
+
+    /**
+     * @brief 计算每个站的y坐标
+     * 如果是标尺排图，返回标尺排图的高度；如果是里程排图，返回里程对应的高度。
+     * 如果标尺不完备，reset。注意同时还要保证所有不铺画的站的yValue无效 （-1）
+     * @param config  用于计算的配置表
+     * @return 运行图总高度 （不包括上下坐标轴那些）
+     */
+    double calStationYValue(const Config& config);
+
+    /**
+     * @brief diagramHeight
+     * 单纯返回图高度。需保证已经调用过calStationYValue()。
+     */
+    double diagramHeight()const { return _diagramHeight; }
+
+    /*
+     * 和RailInterval::nextInterval()差不多
+     * 但额外支持一次性解决上行的
+     */
+    std::shared_ptr<RailInterval> nextIntervalCirc(std::shared_ptr<RailInterval> railint);
+
 
 private:
     /*
@@ -426,20 +463,25 @@ private:
     /// <summary>
     /// 寻找前一个通过指定方向的车站下标
     /// 如果不存在，返回-1
-    /// previous是指：上行方向
-    /// 带index的需要时再实现
     /// </summary>
     /// <param name="cur">当前下标</param>
-    /// <param name="down">行别</param>
-    int leftDirStationIndex(int cur, bool down)const;
-
+    /// <param name="dir">行别</param>
     std::shared_ptr<RailStation>
         leftDirStation(int cur, Direction dir)const;
 
-    int rightDirStationIndex(int cur, bool down)const;
-
     std::shared_ptr<RailStation>
         rightDirStation(int cur, Direction dir)const;
+
+    /**
+     * @brief leftBothStation 上一个双向通过的站。一定存在。
+     * 用于标尺排图找上行。
+     * 已知 所给车站是上行经过的！！
+     */
+    std::shared_ptr<RailStation>
+        leftBothStation(std::shared_ptr<RailStation>);
+
+    std::shared_ptr<RailStation>
+        rightBothStation(std::shared_ptr<RailStation>);
 
     /*
      * 添加一个区间，代替RailInterval的构造函数。
@@ -456,11 +498,16 @@ private:
      */
     Forbid& addForbid(const QJsonObject& obj);
 
-    /*
-     * 和RailInterval::nextInterval()差不多
-     * 但额外支持一次性解决上行的
+    /**
+     * @brief calStationYValueByMile  强制按里程计算每个站的坐标。
      */
-    std::shared_ptr<RailInterval> nextIntervalCirc(std::shared_ptr<RailInterval> railint);
+    double calStationYValueByMile(const Config& config);
+
+    /**
+     * @brief clearYValues  清除所有y坐标数据
+     * 在标尺排图之前调用，保证所有的yValue数据都是最新
+     */
+    void clearYValues();
 
 };
 

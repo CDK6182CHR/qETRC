@@ -78,6 +78,25 @@ double RailInterval::mile() const
     }
 }
 
+std::shared_ptr<RulerNode> RailInterval::getRulerNode(std::shared_ptr<Ruler> ruler)
+{
+    return rulerNodeAt(ruler->index());
+}
+
+std::shared_ptr<RulerNode> RailInterval::getRulerNode(const Ruler& ruler)
+{
+    return rulerNodeAt(ruler.index());
+}
+
+std::shared_ptr<RailInterval> RailInterval::inverseInterval()
+{
+    if (from->direction == PassedDirection::BothVia &&
+        to->direction == PassedDirection::BothVia) {
+        return to->dirNextInterval(DirFunc::reverse(dir));
+    }
+    return nullptr;
+}
+
 QDebug operator<<(QDebug debug, const RailInterval& s)
 {
     QDebugStateSaver saver(debug);

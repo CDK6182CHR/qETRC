@@ -12,6 +12,7 @@
 class RailStation;
 class RulerNode;
 class ForbidNode;
+class Ruler;
 
 class RailInterval:
 	std::enable_shared_from_this<RailInterval>
@@ -84,7 +85,19 @@ public:
         return _rulerNodes.at(i);
     }
 
+    std::shared_ptr<RulerNode> getRulerNode(std::shared_ptr<Ruler> ruler);
+    std::shared_ptr<RulerNode> getRulerNode(const Ruler& ruler);
+
     inline bool isDown()const{return dir==Direction::Down;}
+
+    /**
+     * @brief inverseInterval  当前区间的反向区间
+     * 当且仅当当前区间的发站、到站皆为双向时，才有意义。
+     * 否则返回空
+     */
+    std::shared_ptr<RailInterval> inverseInterval();
+
+    inline Direction direction()const { return dir; }
 
 
     template <typename Node>
