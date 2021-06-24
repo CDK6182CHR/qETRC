@@ -3,6 +3,7 @@
 
 #include "data/rail/rail.h"
 #include "data/diagram/trainline.h"
+#include "data/diagram/trainadapter.h"
 
 
 Train::Train(const TrainName &trainName,
@@ -18,6 +19,27 @@ Train::Train(const TrainName &trainName,
 Train::Train(const QJsonObject &obj)
 {
     fromJson(obj);
+}
+
+Train::Train(const Train& another):
+    _trainName(another._trainName),_starting(another._starting),_terminal(another._terminal),
+    _type(another._type),_ui(another._ui),
+    _passenger(another._passenger),_show(another._show),
+    _timetable(another._timetable),
+    _autoLines(another._autoLines)
+{
+    //TrainAdapter not copied
+}
+
+Train::Train(Train&& another) noexcept:
+    _trainName(std::move(another._trainName)), _starting(std::move(another._starting)),
+    _terminal(std::move(another._terminal)),
+    _type(std::move(another._type)), _ui(std::move(another._ui)),
+    _passenger(another._passenger), _show(another._show),
+    _timetable(std::move(another._timetable)),
+    _autoLines(another._autoLines)
+{
+    //TrainAdapter not moved
 }
 
 void Train::fromJson(const QJsonObject &obj)
@@ -152,6 +174,55 @@ QList<Train::StationPtr> Train::findAllGeneralStations(const StationName &name)
     }
     return res;
 }
+
+std::shared_ptr<TrainAdapter> Train::bindToRailway(Railway& railway, const Config& config)
+{
+    //2021.06.24 新的实现 基于Adapter
+    for (auto p = _adapters.begin(); p != _adapters.end(); ++p) {
+        if (&((*p)->railway()) == &railway)
+            return *p;
+    }
+    auto adp = std::make_shared<TrainAdapter>(*this, railway, config);
+    if (!adp->isNull()) {
+        _adapters.append(adp);
+        return adp;
+    }
+    return nullptr;
+}
+
+
+std::shared_ptr<TrainAdapter> Train::updateBoundRailway(Railway& railway, const Config& config)
+{
+    //2021.06.24  基于Adapter新的实现
+    for (auto p = _adapters.begin(); p != _adapters.end(); ++p) {
+        if (&((*p)->railway()) == &railway) {
+            TrainAdapter adp(*this, railway, config);
+            if (!adp.isNull()) {
+                //原位替代原有对象
+                (*p)->operator=(std::move(adp));
+                return *p;
+            }
+            else {
+                _adapters.erase(p);
+                return nullptr;
+            }
+        }
+    }
+    return nullptr;
+}
+
+void Train::unbindToRailway(const Railway& railway)
+{
+    for (auto p = _adapters.begin(); p != _adapters.end(); ++p) {
+        if (&((*p)->railway()) == &railway) {
+            _adapters.erase(p);
+            return;
+        }
+    }
+}
+
+
+
 
 #if 0
 void Train::bindToRailway(std::shared_ptr<Railway> railway)

@@ -8,6 +8,7 @@
 #include "data/train/trainname.h"
 #include "data/train/train.h"
 #include "data/diagram/trainadapter.h"
+#include "data/train/traincollection.h"
 
 class RailTest : public QObject
 {
@@ -128,9 +129,8 @@ void RailTest::test_case5()
     QJsonObject obj=doc.object().value("trains").toArray().at(54).toObject();
 
     QJsonObject obj1=doc.object().value("line").toObject();
-    auto railway=std::make_shared<Railway>(obj1);
-
-    auto train=std::make_shared<Train>(obj);
+    Railway railway(obj1);
+    Train train(obj);
 
     Config config;
 
@@ -206,15 +206,16 @@ void RailTest::test_case7()
     QJsonDocument doc=QJsonDocument::fromJson(contents);
     QJsonObject obj=doc.object().value("trains").toArray().at(799).toObject();
 
-    QJsonObject obj1=doc.object().value("line").toObject();
-    auto railway=std::make_shared<Railway>(obj1);
+    TrainCollection tc(doc.object());
 
-    auto train=std::make_shared<Train>(obj);
+    QJsonObject obj1=doc.object().value("line").toObject();
+    Railway railway(obj1);
+    auto p=tc.findFullName(TrainName("K1158/5"));
 
     Config config;
     config.max_passed_stations = 0;
 
-    TrainAdapter adp(train,railway,config);
+    TrainAdapter adp(*p,railway,config);
     adp.print();
 }
 

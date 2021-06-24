@@ -58,8 +58,6 @@ void Railway::fromJson(const QJsonObject& obj)
 		appendStation(RailStation(t->toObject()));
 	}
 
-	showStations();
-
 	//this part for Rulers
 	const QJsonArray& arrulers = obj.value("rulers").toArray();
 	for (auto t = arrulers.begin(); t != arrulers.end(); t++) {

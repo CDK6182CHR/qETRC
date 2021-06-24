@@ -5,6 +5,7 @@
 
 #include <QString>
 #include <QJsonArray>
+#include <QHash>
 #include "data/common/direction.h"
 
 class TrainName
@@ -21,6 +22,11 @@ public:
 
     void fromJson(const QJsonArray& ar);
     QJsonArray toJson()const;
+
+    inline bool operator==(const TrainName& another)const{
+        return _full==another._full && _down==another._down
+                && _up == another._up;
+    }
 
     /*
      * 返回字头
@@ -44,7 +50,7 @@ public:
         default:return "";
         }
     }
-    inline const QString& dirOrFull(Direction dir)const{
+    inline QString dirOrFull(Direction dir)const{
         decltype(auto) t=dirName(dir);
         if(t.isEmpty())
             return _full;
@@ -71,5 +77,11 @@ private:
         return dir == Direction::Down ? _down : _up;
     }
 };
+
+inline uint qHash(const TrainName& tn, uint seed)
+{
+    return qHash(tn.full(),seed) ^ qHash(tn.down(),seed) ^
+            qHash(tn.up(),seed);
+}
 
 

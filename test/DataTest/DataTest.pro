@@ -19,6 +19,7 @@ SOURCES +=  tst_railtest.cpp \
     ../../src/data/train/trainname.cpp \
     ../../src/data/train/trainstation.cpp \
     ../../src/data/train/train.cpp \
+    ../../src/data/train/traincollection.cpp \
     ../../src/data/diagram/trainadapter.cpp \
     ../../src/data/diagram/trainline.cpp \
 

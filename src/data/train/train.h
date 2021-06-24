@@ -20,6 +20,8 @@ class TrainUIConfig{
 
 };
 
+class TrainAdapter;
+
 /**
  * pyETRC.train.Train
  * 2021.06.22逻辑修订：要求这里仅包含于线路无关的操作
@@ -50,8 +52,12 @@ class Train
      */
     bool _autoLines;
 
-    //QtWidgets.QGraphicsViewPathItem pathItem;
-    //QtWidgets.QGraphicsViewItem labelItem;
+    /**
+     * @brief _adapters 绑定到线路的指针
+     * Train对象持有TrainAdapter的所有权。暂定这些信息不写入JSON
+     * 注意：仅考虑数量很少的情况，因此一切查找皆为线性
+     */
+    QList<std::shared_ptr<TrainAdapter>> _adapters;
 
     //todo: 交路，随机访问Map表等
 
@@ -66,12 +72,16 @@ public:
     explicit Train(const QJsonObject& obj);
 
     /**
-     * 使用std::list时，默认的copy和move都是正确的
+     * std::list 默认的copy和move都是正确的
+     * 但Adapter的复制行为是不对的，因此必须重写
+     * 暂定都不复制（移动）Adapter部分
      */
-    Train(const Train&)=default;
-    Train(Train&&)=default;
-    Train& operator=(const Train&)=default;
-    Train& operator=(Train&&)=default;
+    Train(const Train& another);
+    Train(Train&& another) noexcept;
+
+    //需要时再实现
+    Train& operator=(const Train&) = delete;
+    Train& operator=(Train&&)noexcept = delete;
 
     void fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;
@@ -96,6 +106,9 @@ public:
 
     const std::list<TrainStation>& timetable()const{return _timetable;}
     std::list<TrainStation>& timetable(){return _timetable;}
+
+    auto& adapters() { return _adapters; }
+    const auto& adapters()const { return _adapters; }
 
     void appendStation(const StationName& name,
                        const QTime& arrive,
@@ -141,16 +154,21 @@ public:
      * qETRC新增核心函数
      * 将车次绑定到线路
      * 注意：如果已经绑定到同一条线路，不做任何事
+     * （在这里调用TrainAdapter构造函数）
      */
-    //void bindToRailway(std::shared_ptr<Railway> railway);
+    std::shared_ptr<TrainAdapter> bindToRailway(Railway& railway, const Config& config);
 
     /**
      * 适用于线路可能发生变化时，
-     * 即使已经绑定到同一条线路，也会撤销再重来
+     * 即使已经绑定到同一条线路，也会撤销再重来 （转移构造）
      */
-    //void updateBoundRailway(std::shared_ptr < Railway> railway);
+    std::shared_ptr<TrainAdapter> updateBoundRailway(Railway& railway, const Config& config);
 
-    //void unbindToRailway();
+    /**
+     * @brief unbindToRailway
+     * 撤销与所选线路的绑定，删除绑定对象。基于地址判定。
+     */
+    void unbindToRailway(const Railway& railway);
 
     //inline bool isBoundToRailway()const { return !_boundRail.expired(); }
 
@@ -161,13 +179,6 @@ public:
      * @param config 配置信息
      */
     //void autoLines(std::shared_ptr<Railway> railway, const Config& config);
-
-    /**
-     * 车次运行线信息表
-     * Train.itemInfo()
-     */
-    //auto& lines(){return _lines;}
-    //auto& lines()const{return _lines;}
 
     /**
      * 时刻表中前一个（不包含当前）成功绑定到线路的车站。

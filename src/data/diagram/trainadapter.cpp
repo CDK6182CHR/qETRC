@@ -1,16 +1,26 @@
 ﻿#include "trainadapter.h"
+#include <cassert>
 
-TrainAdapter::TrainAdapter(std::shared_ptr<Train> train, 
-	std::weak_ptr<Railway> railway, const Config& config):
-	_train(train),_railway(railway)
+TrainAdapter::TrainAdapter(Train& train,
+    Railway& railway, const Config& config):
+    _railway(railway),_train(train)
 {
 	autoLines(config);
 }
 
+
+TrainAdapter& TrainAdapter::operator=(TrainAdapter&& another)
+{
+	assert(&_railway == &(another._railway));
+	assert(&_train == &(another._train));
+	_lines = std::move(another._lines);
+	return *this;
+}
+
 void TrainAdapter::print() const
 {
-	qDebug() << "TrainAdapter: " << _train->trainName().full() << " @ " <<
-		_railway.lock()->name() << ", lines: " << _lines.size() << Qt::endl;
+    qDebug() << "TrainAdapter: " << _train.trainName().full() << " @ " <<
+        _railway.name() << ", lines: " << _lines.size() << Qt::endl;
 	for (const auto& p : _lines) {
 		p->print();
 	}
@@ -19,10 +29,10 @@ void TrainAdapter::print() const
 void TrainAdapter::autoLines(const Config& config)
 {
 	//命名规则：前缀r表示rail，t表示train
-	auto& table = _train->timetable();
-	std::shared_ptr<Railway> rail = _railway.lock();
+    auto& table = _train.timetable();
+    auto& rail = _railway;    //alis
 	//上一个绑定到的车站
-	auto tlast = _train->nullStation();
+    auto tlast = _train.nullStation();
 	std::shared_ptr<RailStation> rlast{};
 	Direction locdir = Direction::Undefined;    //当前站前区间的行别
 	std::shared_ptr<TrainLine> line = std::make_shared<TrainLine>();  //当前运行线。初始空
@@ -31,7 +41,7 @@ void TrainAdapter::autoLines(const Config& config)
 	int tpass = 0;    //在train但不在rail中的站数
 
 	for (auto tcur = table.begin(); tcur != table.end(); ++tcur) {
-		std::shared_ptr rcur = rail->stationByGeneralName(tcur->name);
+        std::shared_ptr rcur = rail.stationByGeneralName(tcur->name);
 		bool bound = false;   //本站是否成功绑定
 		if (rcur) {
 			if (!loccnt) {
@@ -40,7 +50,7 @@ void TrainAdapter::autoLines(const Config& config)
 				bound = true;
 			}
 			else {  // !rlast  此前已经有过绑定
-				if (rail->stationsBetween(rlast, rcur) + tpass >
+                if (rail.stationsBetween(rlast, rcur) + tpass >
 					config.max_passed_stations) {
 					//跨越区间数量超限，截断运行线
 					if (loccnt >= 2) {  
@@ -62,7 +72,7 @@ void TrainAdapter::autoLines(const Config& config)
 					bound = true;
 				}
 				else {  //不是跨越区间数截断的情况
-					Direction dir1 = rail->gapDirection(rlast, rcur);
+                    Direction dir1 = rail.gapDirection(rlast, rcur);
 					if (DirFunc::isValid(locdir) && DirFunc::isValid(dir1) &&
 						locdir != dir1 && rcur->isDirectionVia(dir1)) {  //行别变化
 						//注意新一段运行线要包含上一段的最后一个
