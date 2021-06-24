@@ -19,6 +19,9 @@ void MarginConfig::fromJson(const QJsonObject& obj)
     FROM_OBJ(label_width, Int);
     FROM_OBJ(mile_label_width, Int);
     FROM_OBJ(ruler_label_width, Int);
+    FROM_OBJ(title_row_height, Int);
+    FROM_OBJ(first_row_append, Int);
+    FROM_OBJ(gap_between_railways, Int);
 }
 
 

@@ -57,15 +57,17 @@ private:
      * @brief pyETRC.GraphicsWidget._initHLines()
      * 绘制水平线
      */
-    void setHLines(std::shared_ptr<Railway> rail, double start_y, 
-        double width);
+    void setHLines(std::shared_ptr<Railway> rail, double start_y,
+        double width, QList<QGraphicsItem*>& leftItems, QList<QGraphicsItem*>& rightItems);
 
     /**
      * @brief pyETRC.GraphicsWidget._initVLines()
-     * 绘制垂直线
+     * 绘制上下的标题 时间轴
      */
-    void setVLines(std::shared_ptr<Railway> rail, double start_y, 
-        double width, int hour_count);
+    void setVLines(double start_y,
+        double width, int hour_count, const QList<QPair<double, double>> railYRanges);
+
+    double minitesToPixels(int minutes)const;
 
     /**
      * @brief 绘制所给列车在所给线路的运行图
@@ -114,6 +116,11 @@ private:
     QGraphicsSimpleTextItem*
         alignedTextItem(const QString& text, const QFont& baseFont, double label_width,
             double start_x, double center_y, bool use_stretch = true);
+
+    //def _addTimeAxisMark(self, value: int, gridColor: QtGui.QColor,
+    //    font : QtGui.QFont, x : int)
+    QGraphicsSimpleTextItem*
+        addTimeAxisMark(int value, const QFont& font, int x);
 
 signals:
     void showNewStatus(QString);

@@ -3,6 +3,9 @@
 #include <Qt>
 #include <QGraphicsScene>
 #include <QScrollbar>
+#include <QList>
+#include <QPair>
+#include <cmath>
 
 DiagramWidget::DiagramWidget(Diagram &diagram, QWidget* parent):
     QGraphicsView(parent),_diagram(diagram)
@@ -51,12 +54,22 @@ void DiagramWidget::paintGraph()
 
     double ystart = margins.up;
 
+    QList<QPair<double, double>> railYRanges;   //每条线路的时间线纵坐标起止点
+    QList<QGraphicsItem*> leftItems, rightItems;
+
     for (auto p : _diagram.railways()) {
-        setHLines(p, ystart, width);
-        setVLines(p, ystart, width, hour_count);
+        setHLines(p, ystart, width, leftItems, rightItems);
         scene()->addRect(margins.left, ystart, width, p->diagramHeight(), gridColor);
+        railYRanges.append(qMakePair(ystart, ystart + p->diagramHeight()));
         ystart += p->diagramHeight() + margins.gap_between_railways;
     }
+
+    setVLines(ystart, width, hour_count, railYRanges);
+
+    marginItems.left = scene()->createItemGroup(leftItems);
+    marginItems.left->setZValue(15);
+    marginItems.right = scene()->createItemGroup(rightItems);
+    marginItems.right->setZValue(15);
 
     //todo: labelSpan
     
@@ -72,12 +85,15 @@ void DiagramWidget::paintGraph()
     connect(horizontalScrollBar(), SIGNAL(valueChanged(int)),
         this, SLOT(updateDistanceAxis()));
 
+    updateTimeAxis();
+    updateDistanceAxis();
+    emit showNewStatus(QObject::tr("运行图铺画完毕"));
+
 }
 
-void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, double width)
+void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, double width,
+    QList<QGraphicsItem*>& leftItems, QList<QGraphicsItem*>& rightItems)
 {
-    QList<QGraphicsItem*> leftItems, rightItems;
-
     const Config& cfg = _diagram.config();
     const auto& margins = cfg.margins;
     const QColor& textColor = cfg.text_color;
@@ -100,7 +116,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
 
     auto* rectRight = scene()->addRect(
         scene()->width() - margins.label_width - margins.right_white,
-        margins.up - margins.title_row_height - margins.first_row_append,
+        start_y - margins.title_row_height - margins.first_row_append,
         margins.label_width,
         height + 2 * margins.first_row_append + margins.title_row_height
     );
@@ -272,16 +288,107 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
         margins.left_white + margins.ruler_label_width / 2.0,
         start_y + height, margins.left_white + margins.ruler_label_width, start_y + height,defaultPen
     ));
-
-    marginItems.left = scene()->createItemGroup(leftItems);
-    marginItems.left->setZValue(15);
-    marginItems.right = scene()->createItemGroup(rightItems);
-    marginItems.right->setZValue(15);
 }
 
-void DiagramWidget::setVLines(std::shared_ptr<Railway> rail, double start_y, double width, int hour_count)
+void DiagramWidget::setVLines(double start_y, double width, int hour_count, 
+    const QList<QPair<double, double>> railYRanges)
 {
-    //todo...
+    int gap = config().minutes_per_vertical_line;
+    double gap_px = minitesToPixels(gap);
+    int minute_thres = config().minute_mark_gap_pix;
+    int minute_marks_gap = std::max(int(minute_thres / gap_px), 1);  //每隔多少竖线标注一次分钟
+    int vlines = 60 / gap;   //每小时纵线数量+1
+    int mark_count = vlines / minute_marks_gap;    //int div
+    int centerj = vlines / 2;   //中心那条线的j下标。与它除minute_marks_gap同余的是要标注的
+
+    int line_count = gap * hour_count;    //小区间总数
+    QPen
+        pen_hour(config().grid_color, config().bold_grid_width),
+        pen_half(config().grid_color, config().default_grid_width, Qt::DashLine),
+        pen_other(config().grid_color, config().default_grid_width);
+
+    QList<QGraphicsItem*> topItems, bottomItems;
+
+    QColor color(Qt::white);
+    color.setAlpha(200);
+
+    topItems.append(scene()->addRect(
+        margins().left - 15, 0,
+        width + margins().left + 30, 35, QPen(Qt::transparent), color
+    ));
+    topItems.append(scene()->addLine(
+        margins().left - 15, 35, width + margins().left + 15, 35, QPen(config().grid_color, 2)
+    ));
+
+    bottomItems.append(scene()->addRect(
+        margins().left - 15, scene()->height() - 35,
+        width + margins().left + 30, 35, QPen(Qt::transparent), color
+    ));
+    bottomItems.append(scene()->addLine(
+        margins().left - 15, scene()->height() - 35,
+        width + margins().left + 15, scene()->height() - 35, QPen(config().grid_color, 2)
+    ));
+
+    QFont font;
+    font.setPixelSize(25);
+    font.setBold(true);
+
+    QFont fontmin;
+    fontmin.setPixelSize(15);
+    fontmin.setBold(true);
+
+    for (int i = 0; i < hour_count + 1; i++) {
+        double x = margins().left + i * 3600 / config().seconds_per_pix;
+        int hour = (i + config().start_hour) % 24;
+        auto* textItem1 = addTimeAxisMark(hour, font, x);
+        textItem1->setY(30 - textItem1->boundingRect().height());
+        topItems.append(textItem1);
+
+        auto* textItem2 = addTimeAxisMark(hour, font, x);
+        textItem2->setY(scene()->height() - 30);
+        bottomItems.append(textItem2);
+
+        if (i == hour_count)
+            break;
+
+        //小时线
+        if (i) {
+            for (const auto& t : railYRanges) {
+                scene()->addLine(x, t.first, x, t.second, pen_hour);
+            }
+        }
+        //分钟线
+        for (int j = 1; j < vlines; j++) {
+            x += gap * 60 / config().seconds_per_pix;
+            double minu = j * gap;
+            for (const auto& t : railYRanges) {
+                auto* line = scene()->addLine(x, t.first, x, t.second);
+                if (minu == 30)
+                    line->setPen(pen_half);
+                else
+                    line->setPen(pen_other);
+            }
+            if (j % minute_marks_gap == centerj % minute_marks_gap) {
+                //标记分钟数
+                textItem1 = addTimeAxisMark(int(std::round(minu)), fontmin, x);
+                textItem1->setY(30 - textItem1->boundingRect().height());
+                topItems.append(textItem1);
+                textItem2 = addTimeAxisMark(int(std::round(minu)), fontmin, x);
+                textItem2->setY(scene()->height() - 30);
+                bottomItems.append(textItem2);
+            }
+        }
+    }
+    marginItems.top = scene()->createItemGroup(topItems);
+    marginItems.top->setZValue(15);
+    marginItems.bottom = scene()->createItemGroup(bottomItems);
+    marginItems.bottom->setZValue(15);
+}
+
+
+double DiagramWidget::minitesToPixels(int minutes) const
+{
+    return minutes * 60.0 / config().seconds_per_pix;
 }
 
 
@@ -387,10 +494,24 @@ QGraphicsSimpleTextItem* DiagramWidget::alignedTextItem(const QString& text,
     return textItem;
 }
 
+QGraphicsSimpleTextItem* DiagramWidget::addTimeAxisMark(int value, const QFont& font, int x)
+{
+    auto* item = scene()->addSimpleText(QString::number(value), font);
+    item->setX(x - item->boundingRect().width() / 2);
+    item->setBrush(config().grid_color);
+    return item;
+}
+
 
 void DiagramWidget::updateTimeAxis()
 {
-    //todo...
+    QPoint p(0, 0);
+    auto ps = mapToScene(p);
+    marginItems.top->setY(ps.y());
+    nowItem->setY(ps.y());
+    QPoint p1(0, height());
+    auto ps1 = mapToScene(p1);
+    marginItems.bottom->setY(ps1.y() - scene()->height() - 27);
 }
 
 void DiagramWidget::updateDistanceAxis()
@@ -402,16 +523,4 @@ void DiagramWidget::updateDistanceAxis()
     QPoint p2(width(), 0);
     auto sp2 = mapToScene(p2);
     marginItems.right->setX(sp2.x() - scene()->width() - 20);
-    /*
-        point = QtCore.QPoint(0, 0)
-        scenepoint = self.mapToScene(point)
-        self.marginItemGroups["left"].setX(scenepoint.x())
-        try:
-            self.nowItem.setX(scenepoint.x())
-            point = QtCore.QPoint(self.width(), 0)
-            scenepoint = self.mapToScene(point)
-            self.marginItemGroups["right"].setX(scenepoint.x() - self.scene.width() - 20)
-        except RuntimeError:
-            pass
-    */
 }
