@@ -471,3 +471,10 @@ void Train::intervalExchange(Train& train2, StationPtr start1, StationPtr end1,
     _timetable.splice(end1, table2, start2, end2);
     table2.splice(end2, tmp);
 }
+
+void Train::clearItems()
+{
+    for (auto p : _adapters) {
+        p->clearItems();
+    }
+}

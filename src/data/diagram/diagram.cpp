@@ -4,6 +4,14 @@
 #include <QFile>
 #include <QJsonObject>
 
+void Diagram::addRailway(std::shared_ptr<Railway> rail)
+{
+    _railways.append(rail);
+    for (auto p : trains()) {
+        p->bindToRailway(*rail, _config);
+    }
+}
+
 std::shared_ptr<Railway> Diagram::railwayByName(const QString &name)
 {
     for(const auto& p:_railways){
@@ -59,7 +67,7 @@ void Diagram::fromJson(const QString& filename)
 void Diagram::fromJson(const QJsonObject& obj)
 {
     //车次和Config直接转发即可
-    _trainCollection.fromJson(obj.value("trains").toObject());
+    _trainCollection.fromJson(obj);
     //todo: 默认值的处理
     _config.fromJson(obj.value("config").toObject());
     _note = obj.value("markdown").toString();

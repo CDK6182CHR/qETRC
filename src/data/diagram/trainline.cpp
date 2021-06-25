@@ -1,6 +1,7 @@
 ﻿#include "trainline.h"
 #include "data/common/stationname.h"
 #include "data/train/train.h"
+#include "trainadapter.h"
 
 #include <QDebug>
 
@@ -43,17 +44,22 @@ QJsonObject TrainLine::toJson() const
 }
 #endif
 
-TrainLine::TrainLine() :
-	dir(Direction::Undefined), show(true), startLabel(true), endLabel(true)
+TrainLine::TrainLine(TrainAdapter& adapter):
+	_adapter(adapter), _dir(Direction::Undefined), _show(true), _startLabel(true), _endLabel(true)
 {
 }
 
 void TrainLine::print() const
 {
-	qDebug() << "TrainLine  labels (" << startLabel << ", " << endLabel << ")" << Qt::endl;
-	for (const auto& p : stations) {
+	qDebug() << "TrainLine  labels (" << _startLabel << ", " << _endLabel << ")" << Qt::endl;
+	for (const auto& p : _stations) {
 		qDebug() << *p.trainStation << " -> " << p.railStation.lock()->name << Qt::endl;
 	}
+}
+
+Train& TrainLine::train()
+{
+	return _adapter.train();
 }
 
 

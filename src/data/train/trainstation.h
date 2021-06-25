@@ -35,7 +35,7 @@ public:
     QJsonObject toJson()const;
 
     inline bool isStopped()const {
-        return arrive == depart;
+        return arrive != depart;
     }
     
     int stopSec()const;

@@ -29,6 +29,7 @@ SOURCES += \
     src/data/train/trainstation.cpp \
     src/data/train/traintype.cpp \
     src/kernel/diagramwidget.cpp \
+    src/kernel/trainitem.cpp \
     src/main.cpp \
     src/mainwindow.cpp
 
@@ -55,6 +56,7 @@ HEADERS += \
     src/data/train/trainstation.h \
     src/data/train/traintype.h \
     src/kernel/diagramwidget.h \
+    src/kernel/trainitem.h \
     src/mainwindow.h \
     src/util/qeexceptions.h
 

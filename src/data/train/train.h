@@ -253,6 +253,12 @@ public:
      */
     void detectPassStation();
 
+    /**
+     * @brief clearItems
+     * 清除附属的TrainAdapter下的所有运行线指针
+     */
+    void clearItems();
+
 };
 
 

@@ -61,9 +61,11 @@ public:
     inline const QString& note()const { return _note; }
     inline void setNote(const QString& n) { _note = n; }
 
-    inline void addRailway(std::shared_ptr<Railway> rail){
-        _railways.append(rail);
-    }
+    /**
+     * @brief addRailway 添加线路
+     * 同时将所有车次绑定到新线路
+     */
+    void addRailway(std::shared_ptr<Railway> rail);
 
     std::shared_ptr<Railway> railwayByName(const QString& name);
     inline std::shared_ptr<const Railway>
@@ -83,6 +85,8 @@ public:
      * @param t  更新的车次，与所有线路重新绑定
      */
     void updateTrain(std::shared_ptr<Train> t);
+
+    auto& trains() { return _trainCollection.trains(); }
 
 private:
     void bindAllTrains();

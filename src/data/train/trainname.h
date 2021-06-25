@@ -43,15 +43,15 @@ public:
     inline const QString& full()const{return _full;}
     inline const QString& down()const{return _down;}
     inline const QString& up()const{return _up;}
-    inline QString dirName(Direction dir)const{
-        switch (dir) {
+    inline QString dirName(Direction _dir)const{
+        switch (_dir) {
         case Direction::Down:return down();
         case Direction::Up:return up();
         default:return "";
         }
     }
-    inline QString dirOrFull(Direction dir)const{
-        decltype(auto) t=dirName(dir);
+    inline QString dirOrFull(Direction _dir)const{
+        decltype(auto) t=dirName(_dir);
         if(t.isEmpty())
             return _full;
         else return t;
@@ -73,8 +73,8 @@ private:
     /*
      * 注意这个版本不考虑Undefined
      */
-    inline QString& dirNameValid(Direction dir) {
-        return dir == Direction::Down ? _down : _up;
+    inline QString& dirNameValid(Direction _dir) {
+        return _dir == Direction::Down ? _down : _up;
     }
 };
 

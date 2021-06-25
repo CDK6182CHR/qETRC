@@ -6,22 +6,22 @@
 #include <cassert>
 
 RailInterval::RailInterval(Direction dir_):
-    dir(dir_)
+    _dir(dir_)
 {
 }
 
 RailInterval::RailInterval(Direction dir_,
 	std::shared_ptr<RailStation> from_, std::shared_ptr<RailStation> to_):
-    from(from_),to(to_),dir(dir_)
+    from(from_),to(to_),_dir(dir_)
 {
 }
 
 std::shared_ptr<RailInterval>
-    RailInterval::construct(Direction dir, std::shared_ptr<RailStation> from,
+    RailInterval::construct(Direction _dir, std::shared_ptr<RailStation> from,
                             std::shared_ptr<RailStation> to)
 {
-    std::shared_ptr<RailInterval> t(new RailInterval(dir,from,to));
-    if(dir==Direction::Down){
+    std::shared_ptr<RailInterval> t(new RailInterval(_dir,from,to));
+    if(_dir==Direction::Down){
         from->downNext=t;
         to->downPrev=t;
     }else{
@@ -35,7 +35,7 @@ std::shared_ptr<RailInterval> RailInterval::prevInterval()const
 {
 	if (!from)
 		return std::shared_ptr<RailInterval>();
-    if (dir==Direction::Down) {
+    if (_dir==Direction::Down) {
 		return from->downPrev;
 	}
 	else {
@@ -53,9 +53,9 @@ std::shared_ptr<RailInterval> RailInterval::nextInterval() const
 RailInterval RailInterval::mergeWith(const RailInterval& next) const
 {
 	assert(to == next.from);
-    assert(dir == next.dir);
+    assert(_dir == next._dir);
 
-    RailInterval it(dir, from, next.to);
+    RailInterval it(_dir, from, next.to);
     for(int i=0;i<_rulerNodes.count();i++){
         auto p=it._rulerNodes[i];
         const auto p1=_rulerNodes.at(i);
@@ -92,7 +92,7 @@ std::shared_ptr<RailInterval> RailInterval::inverseInterval()
 {
     if (from->direction == PassedDirection::BothVia &&
         to->direction == PassedDirection::BothVia) {
-        return to->dirNextInterval(DirFunc::reverse(dir));
+        return to->dirNextInterval(DirFunc::reverse(_dir));
     }
     return nullptr;
 }

@@ -1,23 +1,51 @@
-﻿/*
- * 原pyETRC项目的LineStation类
- * 原pyETRC中直接用dict做的，这里都采用struct的模式简单实现
- */
-#ifndef RAILSTATION_H
-#define RAILSTATION_H
+﻿#pragma once
+
 #include <optional>
+#include <map>
 #include <QtCore>
 
 #include "data/common/stationname.h"
 #include "railinterval.h"
 #include <memory>
 
+/**
+ * @brief The PassedDirection enum
+ * 车站通过情况（单向站情况）
+ */
 enum class PassedDirection {
-    NoVia=0b00,
-    DownVia=0b01,
-    UpVia=0b10,
-    BothVia=0b11
+    NoVia = 0b00,
+    DownVia = 0b01,
+    UpVia = 0b10,
+    BothVia = 0b11
 };
 
+/**
+ * @brief The LabelPositionInfo struct
+ * 图形界面的部分的数据，为了方便，也写在RailStation中。
+ * 车次标签占位信息。参考点的横坐标是放在key中的。
+ */
+struct LabelPositionInfo {
+    /**
+     * @brief height  标签高度
+     */
+    double height;
+
+    /**
+     * @brief left  参考点左侧的宽度
+     */
+    double left;
+
+    /**
+     * @brief right  参考点右侧的宽度
+     */
+    double right;
+};
+
+
+/**
+ * 原pyETRC项目的LineStation类
+ * 原pyETRC中直接用dict做的，这里都采用struct的模式简单实现
+ */
 class RailStation
 {
     friend class Railway;
@@ -26,6 +54,7 @@ class RailStation
     //todo: 详细维护算法
     std::shared_ptr<RailInterval> downPrev, downNext;
     std::shared_ptr<RailInterval> upPrev, upNext;
+    std::multimap<double, LabelPositionInfo> _overLabels, _belowLabels;
 public:
     StationName name;
     double mile;
@@ -38,7 +67,7 @@ public:
      */
     std::optional<double> y_value;
     PassedDirection direction;
-    bool show;
+    bool _show;
     bool passenger,freight;
     QList<QString> tracks;
     RailStation(const StationName& name_,
@@ -76,8 +105,8 @@ public:
             direction == PassedDirection::BothVia;
     }
 
-    inline constexpr bool isDirectionVia(Direction dir)const {
-        switch (dir) {
+    inline constexpr bool isDirectionVia(Direction _dir)const {
+        switch (_dir) {
         case Direction::Down:return isDownVia();
         case Direction::Up:return isUpVia();
         default:
@@ -88,16 +117,16 @@ public:
     std::shared_ptr<RailStation> downAdjacent();
     std::shared_ptr<RailStation> upAdjacent();
 
-    std::shared_ptr<RailStation> dirAdjacent(Direction dir) {
-        switch (dir) {
+    std::shared_ptr<RailStation> dirAdjacent(Direction _dir) {
+        switch (_dir) {
         case Direction::Down: return downAdjacent();
         case Direction::Up: return upAdjacent();
         default:return nullptr;
         }
     }
 
-    std::shared_ptr<const RailStation> dirAdjacent(Direction dir)const {
-        return const_cast<RailStation*>(this)->dirAdjacent(dir);
+    std::shared_ptr<const RailStation> dirAdjacent(Direction _dir)const {
+        return const_cast<RailStation*>(this)->dirAdjacent(_dir);
     }
 
     std::shared_ptr<const RailStation> downAdjacent()const {
@@ -114,8 +143,8 @@ public:
     inline bool hasDownAdjacent()const{return downNext.get();}
     inline bool hasUpAdjacent()const{return upNext.get();}
 
-    inline std::shared_ptr<RailInterval> dirNextInterval(Direction dir) {
-        switch (dir) {
+    inline std::shared_ptr<RailInterval> dirNextInterval(Direction _dir) {
+        switch (_dir) {
         case Direction::Down:
             return downNext;
         case Direction::Up:
@@ -124,6 +153,19 @@ public:
             return nullptr;
         }
     }
+
+    /**
+     * @brief clearLabelInfo 清空标签信息
+     */
+    void clearLabelInfo();
+
+    inline auto overNullLabel() { return _overLabels.end(); }
+    inline auto belowNullLabel() { return _belowLabels.end(); }
+    inline auto startingNullLabel(Direction dir) {
+        return dir == Direction::Down ? overNullLabel() : belowNullLabel();
+    }
+    inline auto terminalNullLabel(Direction dir) {
+        return dir == Direction::Down ? belowNullLabel() : overNullLabel();
+    }
 };
 
-#endif // RAILSTATION_H

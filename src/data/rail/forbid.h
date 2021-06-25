@@ -43,5 +43,5 @@ public:
 
     QJsonObject toJson()const;
 
-    void show()const;
+    void _show()const;
 };

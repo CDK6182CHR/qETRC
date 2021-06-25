@@ -1,4 +1,6 @@
 ﻿#include "diagramwidget.h"
+#include "data/diagram/trainadapter.h"
+#include "trainitem.h"
 #include <QPainter>
 #include <Qt>
 #include <QGraphicsScene>
@@ -58,6 +60,7 @@ void DiagramWidget::paintGraph()
     QList<QGraphicsItem*> leftItems, rightItems;
 
     for (auto p : _diagram.railways()) {
+        p->setStartYValue(ystart);
         setHLines(p, ystart, width, leftItems, rightItems);
         scene()->addRect(margins.left, ystart, width, p->diagramHeight(), gridColor);
         railYRanges.append(qMakePair(ystart, ystart + p->diagramHeight()));
@@ -208,7 +211,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
 
     //铺画车站。以前已经完成了绑定，这里只需要简单地把所有有y坐标的全画出来就好
     for (auto p : rail->stations()) {
-        if (p->y_value.has_value() && p->show) {
+        if (p->y_value.has_value() && p->_show) {
             const auto& pen = p->level <= cfg.bold_line_level ?
                 boldPen : defaultPen;
             double h = start_y + p->y_value.value();
@@ -236,7 +239,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
         double x = margins.left_white;
         if (!p->isDown()) x += margins.ruler_label_width / 2.0;
         double y = p->toStation()->y_value.value() + start_y;
-        if (p->toStation()->show)
+        if (p->toStation()->_show)
             leftItems.append(scene()->addLine(
                 x, y, x + margins.ruler_label_width / 2.0, y, defaultPen
             ));
@@ -263,7 +266,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
         else {
             cummile += p->mile();
         }
-        if (p->toStation()->show) {
+        if (p->toStation()->_show) {
             const QString& text = ruler ?
                 cumvalid ? QString::asprintf("%d:%02d", cuminterval / 60, cuminterval % 60) : "NA" :
                 QString::number(cummile, 'f', 1);
@@ -396,7 +399,24 @@ double DiagramWidget::minitesToPixels(int minutes) const
 
 void DiagramWidget::paintTrain(std::shared_ptr<Train> train)
 {
-    //todo...
+    train->clearItems();
+    if (!train->isShow())
+        return;
+    for (auto adp : train->adapters()) {
+        for (auto line : adp->lines()) {
+            if (line->isNull()) {
+                //这个是不应该的
+                qDebug() << "DiagramWidget::paintTrain: WARNING: " <<
+                    "Unexpected null TrainLine! " << train->trainName().full() << Qt::endl;
+            }
+            else {
+                auto* item = new TrainItem(*line, adp->railway(), _diagram);
+                line->setItem(item);
+                item->setZValue(5);
+                scene()->addItem(item);
+            }
+        }
+    }
 }
 
 QGraphicsSimpleTextItem* DiagramWidget::addLeftTableText(const char* str, 

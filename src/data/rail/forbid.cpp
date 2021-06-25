@@ -22,7 +22,7 @@ QJsonObject Forbid::toJson() const
     return obj;
 }
 
-void Forbid::show() const
+void Forbid::_show() const
 {
     qDebug()<<"Forbid index "<<index()<<Qt::endl;
     for (auto p=firstDownNode();p ;p=p->nextNodeCirc() ) {

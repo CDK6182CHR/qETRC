@@ -66,7 +66,8 @@ class Railway
     QHash<StationName, int> numberMap;
     bool numberMapEnabled;
 
-    double _diagramHeight=-1;
+    double _diagramHeight = -1;
+    double _startYValue = -1;   //起始y坐标
 
 public:
     Railway(const QString& name="");
@@ -394,6 +395,9 @@ public:
      */
     double diagramHeight()const { return _diagramHeight; }
 
+    double startYValue()const { return _startYValue; }
+    void setStartYValue(int y) { _startYValue = y; }
+
     /*
      * 和RailInterval::nextInterval()差不多
      * 但额外支持一次性解决上行的
@@ -467,10 +471,10 @@ private:
     /// <param name="cur">当前下标</param>
     /// <param name="dir">行别</param>
     std::shared_ptr<RailStation>
-        leftDirStation(int cur, Direction dir)const;
+        leftDirStation(int cur, Direction _dir)const;
 
     std::shared_ptr<RailStation>
-        rightDirStation(int cur, Direction dir)const;
+        rightDirStation(int cur, Direction _dir)const;
 
     /**
      * @brief leftBothStation 上一个双向通过的站。一定存在。
@@ -487,7 +491,7 @@ private:
      * 添加一个区间，代替RailInterval的构造函数。
      * 注意shared_from_this不能再构造函数中调用。
      */
-    std::shared_ptr<RailInterval> addInterval(Direction dir,
+    std::shared_ptr<RailInterval> addInterval(Direction _dir,
             std::shared_ptr<RailStation> from,
             std::shared_ptr<RailStation> to);
 
@@ -506,6 +510,7 @@ private:
     /**
      * @brief clearYValues  清除所有y坐标数据
      * 在标尺排图之前调用，保证所有的yValue数据都是最新
+     * 同时清除标签占位信息
      */
     void clearYValues();
 

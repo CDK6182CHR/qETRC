@@ -28,7 +28,7 @@ QJsonObject Ruler::toJson() const
     return obj;
 }
 
-void Ruler::show() const
+void Ruler::_show() const
 {
     qDebug()<<"Ruler "<<_name<<", diff: "<<different()<<  Qt::endl;
     auto p=firstDownNode();
@@ -39,9 +39,9 @@ void Ruler::show() const
 }
 
 int Ruler::totalInterval(std::shared_ptr<RailStation> from, 
-    std::shared_ptr<RailStation> to, Direction dir) const
+    std::shared_ptr<RailStation> to, Direction _dir) const
 {
-    auto p = from->dirNextInterval(dir);
+    auto p = from->dirNextInterval(_dir);
     auto node = p->rulerNodeAt(_index);
     int res = node->interval;
     for (; p; p = p->nextInterval()) {

@@ -8,7 +8,7 @@ RailStation::RailStation(const StationName &name_,
                          PassedDirection direction_):
     name(name_),mile(mile_),level(level_),counter(counter_),
     y_value(-1),direction(direction_),
-    show(true),passenger(true),freight(true),
+    _show(true),passenger(true),freight(true),
     tracks()
 {
 }
@@ -21,7 +21,7 @@ RailStation::RailStation(const QJsonObject &obj)
 RailStation::RailStation(const RailStation& rs):
     name(rs.name),mile(rs.mile),level(rs.level),counter(rs.counter),
     y_value(rs.y_value),direction(rs.direction),
-    show(rs.show),passenger(rs.passenger),freight(rs.freight),
+    _show(rs._show),passenger(rs.passenger),freight(rs.freight),
     tracks(rs.tracks)
 {
     //shared_ptr直接用默认构造
@@ -38,7 +38,7 @@ void RailStation::fromJson(const QJsonObject &obj)
     }else{
         counter=c.toDouble();
     }
-    show=obj.value("show").toBool(true);
+    _show=obj.value("show").toBool(true);
     passenger=obj.value("passenger").toBool(true);
     freight=obj.value("freight").toBool(true);
     const QJsonArray& ar = obj.value("tracks").toArray();
@@ -60,7 +60,7 @@ QJsonObject RailStation::toJson() const
     }else{
         obj.insert("connter",QJsonValue(QJsonValue::Null));
     }
-    obj.insert("show",show);
+    obj.insert("show",_show);
     obj.insert("passenger",passenger);
     obj.insert("freight",freight);
     QJsonArray ar;
@@ -91,4 +91,10 @@ std::shared_ptr<RailStation> RailStation::upAdjacent()
     if(!upNext)
         return std::shared_ptr<RailStation>();
     return upNext->toStation();
+}
+
+void RailStation::clearLabelInfo()
+{
+    _belowLabels.clear();
+    _overLabels.clear();
 }

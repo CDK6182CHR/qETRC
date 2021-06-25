@@ -61,8 +61,10 @@ void Config::fromJson(const QJsonObject& obj)
 
     FROM_OBJ(default_grid_width, Double);
     FROM_OBJ(bold_grid_width, Double);
+    FROM_OBJ(valid_width, Int);
 
     FROM_OBJ(auto_paint, Bool);
+    FROM_OBJ_NAME(show_full_train_name, showFullCheci, Bool);
 
     FROM_OBJ_NAME(end_label_name, end_label_checi, Bool);
 
@@ -73,5 +75,12 @@ void Config::fromJson(const QJsonObject& obj)
     for (const auto& p : artypes) {
         not_show_types.insert(p.toString());
     }
+}
+
+double Config::diagramWidth() const
+{
+    int he = end_hour;
+    if (he <= start_hour)he += 24;
+    return (he - start_hour) * 3600.0 / seconds_per_pix;
 }
 

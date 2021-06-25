@@ -35,7 +35,7 @@ public:
 
     QJsonObject toJson()const;
 
-    void show()const;
+    void _show()const;
 
     /**
      * @brief totalInterval  区间总通通时分
@@ -46,7 +46,7 @@ public:
      */
     int totalInterval(std::shared_ptr<RailStation> from,
                       std::shared_ptr<RailStation> to,
-                      Direction dir)const;
+                      Direction _dir)const;
 
 
 };

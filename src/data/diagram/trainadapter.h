@@ -60,6 +60,12 @@ public:
     inline auto& lines() { return _lines; }
     inline const auto& lines()const { return _lines; }
 
+    /**
+     * @brief clearItems
+     * 清除所附的所有运行线指针
+     */
+    void clearItems();
+
 private:
 
     /**

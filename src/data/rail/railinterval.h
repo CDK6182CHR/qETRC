@@ -20,12 +20,12 @@ class RailInterval:
 	friend class Railway;
 	//注意一律按照有向边约定
 	std::shared_ptr<RailStation> from, to;
-    Direction dir;
+    Direction _dir;
 
     QList<std::shared_ptr<RulerNode>> _rulerNodes;
     QList<std::shared_ptr<ForbidNode>> _forbidNodes;
 
-    RailInterval(Direction dir_);
+    explicit RailInterval(Direction dir_);
 
     /// <summary>
     /// 注意不能为RailStation添加指针
@@ -33,7 +33,7 @@ class RailInterval:
     RailInterval(Direction dir_, std::shared_ptr<RailStation> from_,
         std::shared_ptr<RailStation> to_);
 
-    static std::shared_ptr<RailInterval> construct(Direction dir,
+    static std::shared_ptr<RailInterval> construct(Direction _dir,
                                                    std::shared_ptr<RailStation> from,
                                                    std::shared_ptr<RailStation> to);
 
@@ -88,7 +88,7 @@ public:
     std::shared_ptr<RulerNode> getRulerNode(std::shared_ptr<Ruler> ruler);
     std::shared_ptr<RulerNode> getRulerNode(const Ruler& ruler);
 
-    inline bool isDown()const{return dir==Direction::Down;}
+    inline bool isDown()const{return _dir==Direction::Down;}
 
     /**
      * @brief inverseInterval  当前区间的反向区间
@@ -97,7 +97,7 @@ public:
      */
     std::shared_ptr<RailInterval> inverseInterval();
 
-    inline Direction direction()const { return dir; }
+    inline Direction direction()const { return _dir; }
 
 
     template <typename Node>

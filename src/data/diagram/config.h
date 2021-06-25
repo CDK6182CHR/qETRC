@@ -71,6 +71,7 @@ struct Config
     int link_line_height = 10;
 
     bool auto_paint = true;
+    bool show_full_train_name = false;
 
     /**
      * 是否显示停点数字。
@@ -91,6 +92,11 @@ struct Config
     double bold_grid_width = 2.5;
 
     /**
+     * 有效选择宽度
+     */
+    int valid_width = 3;
+
+    /**
      * 原end_label_checi
      * 结束标签是否显示车次。
      */
@@ -106,5 +112,11 @@ struct Config
 
     void fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;
+
+    double diagramWidth()const;
+
+    inline double fullWidth()const {
+        return 24 * 3600.0 / seconds_per_pix;
+    }
 
 };

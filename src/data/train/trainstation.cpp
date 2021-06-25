@@ -41,8 +41,8 @@ QJsonObject TrainStation::toJson() const
 int TrainStation::stopSec() const
 {
 	int s = arrive.secsTo(depart);
-	if (s < 0)
-		s += 38400;
+    if (s < 0)
+        s += 24 * 3600;
 	return s;
 }
 

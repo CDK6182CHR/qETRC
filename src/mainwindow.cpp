@@ -6,8 +6,10 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    auto s = QString(R"(D:\Python\train_graph\sample.pyetgr)");
+    //auto s = QString(R"(D:\Python\train_graph\sample.pyetgr)");
+    auto s = QString(R"(D:\Python\train_graph\source\京沪线上局段20191230.pyetgr)");
     _diagram.fromJson(s);
+    qDebug() << "trains count: " << _diagram.trainCollection().trains().size() << Qt::endl;
 
     auto t = QString(R"(D:\Python\train_graph\source\符夹线.json)");
     Diagram d2(t);

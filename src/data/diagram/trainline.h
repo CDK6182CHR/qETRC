@@ -21,41 +21,78 @@ struct AdapterStation{
         trainStation(trainStation_),railStation(railStation_){}
 };
 
+class TrainItem;
+class TrainAdapter;
+
 /**
- * @brief TrainLine  车次运行线的数据描述  按照struct组织
+ * @brief TrainLine  车次运行线的数据描述  按照class组织
  * 由TrainAdapter管理
  * 扩展原Train中Item的描述类
  * 2021.06.22  增加绑定序列类
+ * 原则上只允许TrainAdapter修改；外面的类只读。
  */
-struct TrainLine
+class TrainLine
 {
-    std::list<AdapterStation> stations;
-    Direction dir;
-    bool show;
-    bool startLabel, endLabel;
-    //todo: 可能需要指向Item的指针
+    friend class TrainAdapter;
+    TrainAdapter& _adapter;
+    std::list<AdapterStation> _stations;
+    Direction _dir;
+    bool _show;
+    bool _startLabel, _endLabel;
+    TrainItem* _item;
 
-    //根据需要写构造函数！
-
+public:
     /**
      * 构造空的运行线，默认显示Item和双标签
      */
-    TrainLine();
+    TrainLine(TrainAdapter& adapter);
     TrainLine(const TrainLine&) = default;
     TrainLine(TrainLine&&) = default;
 
     inline void addStation(std::list<TrainStation>::iterator trainStation,
         std::weak_ptr<RailStation> rs) {
-        stations.emplace_back(trainStation, rs);
+        _stations.emplace_back(trainStation, rs);
     }
 
     inline void pop_back() {
-        stations.pop_back();
+        _stations.pop_back();
     }
 
-    inline auto count()const { return stations.size(); }
+    inline auto count()const { return _stations.size(); }
 
     void print()const;
+
+    inline bool show()const { return _show; }
+
+    inline Direction dir()const { return _dir; }
+    inline bool startLabel()const { return _startLabel; }
+    inline bool endLabel()const { return _endLabel; }
+    auto& stations() { return _stations; }
+    auto& adapter() { return _adapter; }
+    Train& train();
+
+    TrainItem* item() { return _item; }
+    void setItem(TrainItem* item) { _item = item; }
+
+    inline const StationName& firstStationName()const { return _stations.front().trainStation->name; }
+    inline const StationName& lastStationName()const { return _stations.back().trainStation->name; }
+
+    inline std::shared_ptr<RailStation>
+        firstRailStation(){
+        return _stations.front().railStation.lock();
+    }
+
+    inline auto firstTrainStation() {
+        return _stations.front().trainStation;
+    }
+
+    inline std::shared_ptr<RailStation>
+        lastRailStation(){
+        return _stations.back().railStation.lock();
+    }
+
+    inline bool isNull()const { return _stations.empty(); }
+
 
     /*
      * 暂定不维护Train指针或引用。
