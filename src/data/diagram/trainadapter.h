@@ -66,6 +66,10 @@ public:
      */
     void clearItems();
 
+    void highlightItems();
+
+    void unhighlightItems();
+
 private:
 
     /**

@@ -478,3 +478,17 @@ void Train::clearItems()
         p->clearItems();
     }
 }
+
+void Train::highlightItems()
+{
+    for (auto adp : _adapters) {
+        adp->highlightItems();
+    }
+}
+
+void Train::unhighlightItems()
+{
+    for (auto adp : _adapters) {
+        adp->unhighlightItems();
+    }
+}

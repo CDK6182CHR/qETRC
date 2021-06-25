@@ -1,6 +1,8 @@
 ﻿#include "trainadapter.h"
 #include <cassert>
 
+#include "kernel/trainitem.h"
+
 TrainAdapter::TrainAdapter(Train& train,
     Railway& railway, const Config& config):
     _railway(railway),_train(train)
@@ -30,6 +32,22 @@ void TrainAdapter::clearItems()
 {
 	for (auto& p : _lines) {
 		p->setItem(nullptr);
+	}
+}
+
+void TrainAdapter::highlightItems()
+{
+	for (auto p : _lines) {
+		if (p->item())
+			p->item()->highlight();
+	}
+}
+
+void TrainAdapter::unhighlightItems()
+{
+	for (auto p : _lines) {
+		if (p->item())
+			p->item()->unhighlight();
 	}
 }
 

@@ -61,6 +61,7 @@ class TrainItem : public QGraphicsItem
     double startLabelHeight = -1, endLabelHeight = -1;
 
 public:
+    enum { Type = UserType + 1 };
     TrainItem(TrainLine& line, Railway& railway, Diagram& diagram,
         QGraphicsItem* parent = nullptr);
 
@@ -69,9 +70,15 @@ public:
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
         QWidget* widget = nullptr)override;
 
+    inline int type()const override { return Type; }
+
+    Train& train();
+
+    void highlight();
+    void unhighlight();
 
 private:
-    Train& train();
+    
     const Config& config()const { return _diagram.config(); }
     const auto& margins()const { return _diagram.config().margins; }
 
@@ -82,7 +89,7 @@ private:
      * 绘制运行线主体部分  完全重写
      * 注意：合并主体和span的创建过程！
      */
-    void setPathItem();
+    void setPathItem(const QString& trainName);
 
     void setStartItem(const QString& text, const QPen& pen);
 
@@ -99,10 +106,11 @@ private:
     /**
      * @brief 出图操作  运行线右越界
      * 铺画越界边界，以及越界标签。注意所给参数都是直接算出的  i.e.正值
+     * 返回跨界点纵坐标
      */
-    void getOutGraph(double xin, double yin, double xout, double yout, QPainterPath& path);
+    double getOutGraph(double xin, double yin, double xout, double yout, QPainterPath& path);
 
-    void getInGraph(double xout, double yout, double xin, double yin, QPainterPath& path);
+    double getInGraph(double xout, double yout, double xin, double yin, QPainterPath& path);
 
     /**
      * @brief 封装查询列车绘制图形的方法
@@ -115,6 +123,16 @@ private:
     double determineStartLabelHeight();
 
     double determineEndLabelHeight();
+
+    /**
+     * 构造QFont对象，使所得的item宽度不大于指定宽度
+     * 同时item已经被stretch过了
+     */
+    void setStretchedFont(QFont& base, QGraphicsSimpleTextItem* item, double width);
+
+    void addTimeMarks();
+
+    void hideTimeMarks();
 };
 
 

@@ -7,6 +7,7 @@
 #include <QScrollbar>
 #include <QList>
 #include <QPair>
+#include <QMouseEvent>
 #include <cmath>
 
 DiagramWidget::DiagramWidget(Diagram &diagram, QWidget* parent):
@@ -31,8 +32,9 @@ void DiagramWidget::autoPaintGraph()
 
 void DiagramWidget::paintGraph()
 {
+    updating = true;
     scene()->clear();
-    _selectedTrain.reset();
+    _selectedTrain = nullptr;
     emit showNewStatus(QString("正在铺画运行图"));
 
     const Config& cfg = _diagram.config();
@@ -91,7 +93,30 @@ void DiagramWidget::paintGraph()
     updateTimeAxis();
     updateDistanceAxis();
     emit showNewStatus(QObject::tr("运行图铺画完毕"));
+    updating = false;
+}
 
+void DiagramWidget::mousePressEvent(QMouseEvent* e)
+{
+    if (updating)
+        return;
+    if (e->button() == Qt::LeftButton) {
+        auto pos = mapToScene(e->pos());
+        unselectTrain();
+
+        auto* item = scene()->itemAt(pos, transform());
+        if (!item)
+            return;
+        while (item->parentItem())
+            item = item->parentItem();
+        if (item->type() == TrainItem::Type) {
+            selectTrain(qgraphicsitem_cast<TrainItem*>(item));
+        }
+    }
+    else if (e->button() == Qt::RightButton) {
+        //todo: context menu
+    }
+    QGraphicsView::mousePressEvent(e);
 }
 
 void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, double width,
@@ -395,8 +420,6 @@ double DiagramWidget::minitesToPixels(int minutes) const
 }
 
 
-
-
 void DiagramWidget::paintTrain(std::shared_ptr<Train> train)
 {
     train->clearItems();
@@ -520,6 +543,32 @@ QGraphicsSimpleTextItem* DiagramWidget::addTimeAxisMark(int value, const QFont& 
     item->setX(x - item->boundingRect().width() / 2);
     item->setBrush(config().grid_color);
     return item;
+}
+
+void DiagramWidget::selectTrain(TrainItem* item)
+{
+    if (updating)
+        return;
+    if (!item)
+        return;
+    _selectedTrain = &(item->train());
+    _selectedTrain->highlightItems();
+
+    nowItem->setText(_selectedTrain->trainName().full());
+
+    //todo: ensure visible ?
+    //todo: emit?
+}
+
+void DiagramWidget::unselectTrain()
+{
+    if (updating)
+        return;
+    if (_selectedTrain) {
+        _selectedTrain->unhighlightItems();
+        _selectedTrain = nullptr;
+        nowItem->setText(" ");
+    }
 }
 
 

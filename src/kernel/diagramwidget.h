@@ -20,13 +20,20 @@ class DiagramWidget : public QGraphicsView
      * 类似单例
      */
     Diagram& _diagram;
-    std::shared_ptr<Train> _selectedTrain{};
+
+    /**
+     * @brief _selectedTrain  当前选中的列车对象
+     * 用裸指针似乎不太好。但实现的结构确实拿不到shared_ptr
+     */
+    Train* _selectedTrain = nullptr;
 
     struct {
         QGraphicsItemGroup* left, * right, * top, * bottom;
     } marginItems;
     //显示当前车次的Item
     QGraphicsSimpleTextItem* nowItem;
+
+    bool updating = false;
 
 public:
     DiagramWidget(Diagram& diagram, QWidget* parent = nullptr);
@@ -44,14 +51,12 @@ public:
     void paintGraph();
 
     auto selectedTrain() { return _selectedTrain; }
-    void setSelectedTrain(std::shared_ptr<Train> train) { _selectedTrain = train; }
+    void setSelectedTrain(Train* train) { _selectedTrain = train; }
+
+protected:
+    void mousePressEvent(QMouseEvent* e)override;
 
 private:
-    /**
-     * @brief setAxes
-     * 绘制坐标轴
-     */
-    void setAxes();
 
     /**
      * @brief pyETRC.GraphicsWidget._initHLines()
@@ -121,6 +126,10 @@ private:
     //    font : QtGui.QFont, x : int)
     QGraphicsSimpleTextItem*
         addTimeAxisMark(int value, const QFont& font, int x);
+
+    void selectTrain(TrainItem* item);
+
+    void unselectTrain();
 
 signals:
     void showNewStatus(QString);

@@ -5,6 +5,7 @@
 #include <QPainterPath>
 #include <QPointF>
 #include <QPen>
+#include <QGraphicsScene>
 
 TrainItem::TrainItem(TrainLine& line,
     Railway& railway, Diagram& diagram, QGraphicsItem* parent):
@@ -37,12 +38,121 @@ Train& TrainItem::train()
     return _line.train();
 }
 
+void TrainItem::highlight()
+{
+    if (_isHighlighted)
+        return;
+    auto* path = pathItem;
+    if (!path)
+        return;
+
+    //运行线加粗显示
+    QPen pen = path->pen();
+    pen.setWidth(pen.width() + 1);
+    path->setPen(pen);
+    path->setZValue(1);
+
+    QPen rectPen(pen.color());
+    QBrush brush(pen.color());
+    rectPen.setWidth(0.5);
+    pen.setWidth(2);
+    if (startLabelText) {
+        //起点标签
+        startRect = new QGraphicsRectItem(startLabelText->boundingRect(), this);
+        startRect->setPos(startLabelText->pos());
+        startRect->setZValue(0.5);
+        startRect->setPen(rectPen);
+        startRect->setBrush(brush);
+        startLabelText->setZValue(1);
+        startLabelText->setBrush(Qt::white);
+    }
+    if (endLabelText) {
+        endRect = new QGraphicsRectItem(endLabelText->boundingRect(), this);
+        endRect->setPos(endLabelText->pos());
+        endRect->setZValue(0.5);
+        endRect->setPen(rectPen);
+        endRect->setBrush(brush);
+        endLabelText->setZValue(1);
+        endLabelText->setBrush(Qt::white);
+    }
+
+    //跨界点
+    if (!spanItems.empty()) {
+        QFont font = spanItems.at(0)->font();
+        font.setUnderline(true);
+        for (auto p : spanItems) {
+            p->setFont(font);
+        }
+    }
+
+    //显示详细停点
+    if (config().show_time_mark == 1) {
+        if (!markLabels.empty()) {
+            //优化：如果已经搞过，不再重复
+            for (auto p : markLabels)
+                p->setVisible(true);
+        }
+        else
+            addTimeMarks();
+    }
+    _isHighlighted = true;
+}
+
+void TrainItem::unhighlight()
+{
+    if (!_isHighlighted)
+        return;
+    auto* path = pathItem;
+    if (!path)
+        return;
+
+    //取消运行线加粗
+    QPen pen = path->pen();
+    pen.setWidth(pen.width() - 1);
+    path->setPen(pen);
+    path->setZValue(0);
+
+    if (startLabelText) {
+        //pen.setWidth(1);
+        //startLabelItem->setPen(pen);
+        startLabelItem->setZValue(0);
+        startLabelText->setZValue(0);
+        startLabelText->setBrush(pen.color());
+        startLabelText->scene()->removeItem(startRect);
+        startRect = nullptr;
+    }
+    if (endLabelText) {
+        //pen.setWidth(1);
+        //endLabelItem->setPen(pen);
+        endLabelItem->setZValue(0);
+        endLabelText->setZValue(0);
+        endLabelText->setBrush(pen.color());
+        endLabelText->scene()->removeItem(endRect);
+        endRect = nullptr;
+    }
+
+    if (!spanItems.empty()) {
+        QFont font = spanItems.at(0)->font();
+        font.setUnderline(false);
+        for (auto p : spanItems) {
+            p->setFont(font);
+        }
+    }
+    setZValue(5);
+
+    if (config().show_time_mark == 1)
+        hideTimeMarks();
+
+    //todo: link
+    _isHighlighted = false;
+}
+
 void TrainItem::setLine()
 {
-    setPathItem();
-
     const QString& trainName = config().show_full_train_name ?
         train().trainName().full() : train().trainName().dirOrFull(_line.dir());
+
+    setPathItem(trainName);
 
     QPen labelPen = trainPen();
     labelPen.setWidthF(0.5);
@@ -55,7 +165,7 @@ void TrainItem::setLine()
     }
 }
 
-void TrainItem::setPathItem()
+void TrainItem::setPathItem(const QString& trainName)
 {
     //和图幅有关的数值
     double start_x = margins().left;
@@ -70,6 +180,8 @@ void TrainItem::setPathItem()
     bool mark = (config().show_time_mark == 2);
 
     QPainterPath path;
+
+    QList<double> spanLeft, spanRight;   //跨界点纵坐标
 
     for (auto p = _line.stations().begin(); p != _line.stations().end(); ++p) {
         auto ts = p->trainStation;
@@ -96,10 +208,10 @@ void TrainItem::setPathItem()
                     //横坐标数值减小，表明出现左入图情况（跨界）
                     if (inlast) {
                         //上一个点在界内，就还要补充右出图的情况
-                        getOutGraph(xlast, ylast, xarr, ycur, path);
+                        spanRight.append(getOutGraph(xlast, ylast, xarr, ycur, path));
                     }
                     //现在：左入图操作
-                    getInGraph(xlast, ylast, xarr, ycur, path);
+                    spanLeft.append(getInGraph(xlast, ylast, xarr, ycur, path));
                     path.lineTo(parr);
                 }
                 else {
@@ -113,7 +225,7 @@ void TrainItem::setPathItem()
             }
             if (inlast) {
                 //补充右出图情况
-                getOutGraph(xlast, ylast, xarr, ycur, path);
+                spanRight.append(getOutGraph(xlast, ylast, xarr, ycur, path));
             }
         }
 
@@ -127,10 +239,10 @@ void TrainItem::setPathItem()
                     //站内越界
                     if (xarr <= width) {
                         //到达点也在界内，先补充右出界
-                        getOutGraph(xarr, ycur, xdep, ycur, path);
+                        spanRight.append(getOutGraph(xarr, ycur, xdep, ycur, path));
                     }
                     //左入界
-                    getInGraph(xarr, ycur, xdep, ycur, path);
+                    spanLeft.append(getInGraph(xarr, ycur, xdep, ycur, path));
                 }
                 if (config().show_line_in_station)
                     path.lineTo(pdep);
@@ -151,8 +263,41 @@ void TrainItem::setPathItem()
     if (endInRange) {
         endPoint = path.currentPosition();
     }
-
     QPen pen = trainPen();
+
+    //跨界点标记
+    QFont font;
+    bool calculated = false;
+    double span_width = margins().right - margins().label_width;
+    double sw = -1, sh = -1;    //item宽度
+    for (auto p : spanLeft) {
+        auto* item = setStartEndLabelText(trainName, pen.color());
+        if (!calculated) {
+            setStretchedFont(font, item, width);
+            const auto& t = item->boundingRect();
+            sw = t.width(); sh = t.height();
+            calculated = true;
+        }
+        else
+            item->setFont(font);
+        item->setPos(start_x - sw, p - sh / 2 + start_y);
+        spanItems.append(item);
+    }
+    for (auto p : spanRight) {
+        auto* item = setStartEndLabelText(trainName, pen.color());
+        if (!calculated) {
+            setStretchedFont(font, item, width);
+            const auto& t = item->boundingRect();
+            sw = t.width(); sh = t.height();
+            calculated = true;
+        }
+        else
+            item->setFont(font);
+        item->setPos(start_x + width, p - sh / 2 + start_y);
+        spanItems.append(item);
+    }
+
+   
     QPainterPathStroker stroker;
     stroker.setWidth(0.5);
     auto outpath = stroker.createStroke(path);
@@ -209,8 +354,8 @@ void TrainItem::setStartItem(const QString& text,const QPen& pen)
         }
     }
     QPainterPath label2 = QPainterPathStroker().createStroke(label);
-    endLabelItem = new QGraphicsPathItem(label2,this);
-    endLabelItem->setPen(pen);
+    startLabelItem = new QGraphicsPathItem(label2,this);
+    startLabelItem->setPen(pen);
 }
 
 void TrainItem::setEndItem(const QString& text, const QPen& pen)
@@ -296,7 +441,7 @@ double TrainItem::calXFromStart(const QTime& time) const
     return sec / config().seconds_per_pix;
 }
 
-void TrainItem::getOutGraph(double xin, double yin, double xout, double yout, 
+double TrainItem::getOutGraph(double xin, double yin, double xout, double yout, 
     QPainterPath& path)
 {
     double fullwidth = config().fullWidth();
@@ -307,20 +452,20 @@ void TrainItem::getOutGraph(double xin, double yin, double xout, double yout,
     double yp = yin + (width - xin) * (yout - yin) / (xright - xin);
     QPointF pout(start_x + width, start_y + yp);
     path.lineTo(pout);
-    //todo 右越界标签
+    return yp;
 }
 
-void TrainItem::getInGraph(double xout, double yout, double xin, double yin, QPainterPath& path)
+double TrainItem::getInGraph(double xout, double yout, double xin, double yin, QPainterPath& path)
 {
     double fullwidth = config().fullWidth();
     double width = config().diagramWidth();
     double start_x = margins().left;
     double start_y = _railway.startYValue();
     double xleft = xout - fullwidth;
-    double yp = yout - xout * (yin - yout) / (xin - xout);  //入图点纵坐标
+    double yp = yout - xleft * (yin - yout) / (xin - xleft);  //入图点纵坐标
     QPointF pin(start_x, yp + start_y);
     path.moveTo(pin);
-    //todo 左越界标签
+    return yp;
 }
 
 QPen TrainItem::trainPen() const
@@ -341,4 +486,24 @@ double TrainItem::determineStartLabelHeight()
 double TrainItem::determineEndLabelHeight()
 {
     return config().end_label_height;
+}
+
+void TrainItem::setStretchedFont(QFont& font, QGraphicsSimpleTextItem* item, double width)
+{
+    const auto& t = item->boundingRect();
+    double w = t.width();
+    if (w > width) {
+        int stretch = 100 * width / w;
+        font.setStretch(stretch);
+        item->setFont(font);
+    }
+}
+
+void TrainItem::addTimeMarks()
+{
+    //todo...
+}
+
+void TrainItem::hideTimeMarks()
+{
 }
