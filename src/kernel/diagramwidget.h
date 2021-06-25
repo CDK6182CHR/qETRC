@@ -54,7 +54,9 @@ public:
     void setSelectedTrain(Train* train) { _selectedTrain = train; }
 
 protected:
-    void mousePressEvent(QMouseEvent* e)override;
+    virtual void mousePressEvent(QMouseEvent* e)override;
+
+    virtual void resizeEvent(QResizeEvent* e)override;
 
 private:
 
@@ -69,8 +71,7 @@ private:
      * @brief pyETRC.GraphicsWidget._initVLines()
      * 绘制上下的标题 时间轴
      */
-    void setVLines(double start_y,
-        double width, int hour_count, const QList<QPair<double, double>> railYRanges);
+    void setVLines(double width, int hour_count, const QList<QPair<double, double>> railYRanges);
 
     double minitesToPixels(int minutes)const;
 

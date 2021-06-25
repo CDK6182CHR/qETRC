@@ -39,6 +39,9 @@ struct LabelPositionInfo {
      * @brief right  参考点右侧的宽度
      */
     double right;
+
+    LabelPositionInfo(double height_,double left_,double right_):
+        height(height_),left(left_),right(right_){}
 };
 
 
@@ -167,5 +170,7 @@ public:
     inline auto terminalNullLabel(Direction dir) {
         return dir == Direction::Down ? belowNullLabel() : overNullLabel();
     }
+    inline auto& overLabels() { return _overLabels; }
+    inline auto& belowLabels() { return _belowLabels; }
 };
 

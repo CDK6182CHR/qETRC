@@ -94,7 +94,6 @@ void TrainAdapter::autoLines(const Config& config)
 					config.max_passed_stations) {
 					//跨越区间数量超限，截断运行线
 					if (loccnt >= 2) {  
-						line->_dir = locdir;
 						_lines.append(line);
 					}
 					else {

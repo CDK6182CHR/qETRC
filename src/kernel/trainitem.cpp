@@ -11,12 +11,14 @@ TrainItem::TrainItem(TrainLine& line,
     Railway& railway, Diagram& diagram, QGraphicsItem* parent):
     QGraphicsItem(parent),
     _line(line),_railway(railway),_diagram(diagram),
-    startTime(config().start_hour,0,0)
+    startTime(diagram.config().start_hour,0,0),
+    start_x(diagram.config().margins.left),start_y(railway.startYValue())
 {
     _startAtThis = train().isStartingStation(_line.firstStationName());
     _endAtThis = train().isTerminalStation(_line.lastStationName());
     startLabelInfo = _line.firstRailStation()->startingNullLabel(_line.dir());
     endLabelInfo = _line.lastRailStation()->terminalNullLabel(_line.dir());
+    pen = trainPen();
 
     setLine();
 }
@@ -24,7 +26,7 @@ TrainItem::TrainItem(TrainLine& line,
 QRectF TrainItem::boundingRect() const
 {
     if (pathItem)
-        return pathItem->boundingRect();
+        return _bounding;
     else
         return QRectF();
 }
@@ -147,6 +149,11 @@ void TrainItem::unhighlight()
     _isHighlighted = false;
 }
 
+bool TrainItem::contains(const QPointF& f) const
+{
+    return false;
+}
+
 void TrainItem::setLine()
 {
     const QString& trainName = config().show_full_train_name ?
@@ -183,6 +190,8 @@ void TrainItem::setPathItem(const QString& trainName)
 
     QList<double> spanLeft, spanRight;   //跨界点纵坐标
 
+    auto lastIter = _line.stations().end(); --lastIter;
+
     for (auto p = _line.stations().begin(); p != _line.stations().end(); ++p) {
         auto ts = p->trainStation;
         auto rs = p->railStation.lock();
@@ -218,6 +227,11 @@ void TrainItem::setPathItem(const QString& trainName)
                     path.lineTo(parr);
                 }
             }
+            if (mark && ts->isStopped()) {
+                if (_line.startLabel() || p != _line.stations().begin()) {
+                    markArriveTime(xarr, ycur, ts->arrive);
+                }
+            }
         }
         else {  //xarr > width  在图外
             if (!started) {
@@ -248,8 +262,23 @@ void TrainItem::setPathItem(const QString& trainName)
                     path.lineTo(pdep);
                 else
                     path.moveTo(pdep);
-                //todo: mark
-                
+            }
+            else {
+                //界外
+                if (xarr <= width) {
+                    spanRight.append(getOutGraph(xarr, ycur, xdep, ycur, path));
+                }
+            }
+        }
+        //标记时刻 无论有没有停点，都要标注开点，除非是折返车的最后一站
+        if (mark && xdep <= width) {
+            if (p == lastIter) {
+                if (_line.endLabel() && !ts->isStopped()) {
+                    markArriveTime(xdep, ycur, ts->depart);
+                }
+            }
+            else{
+                markDepartTime(xdep, ycur, ts->depart);
             }
         }
 
@@ -264,6 +293,21 @@ void TrainItem::setPathItem(const QString& trainName)
         endPoint = path.currentPosition();
     }
     QPen pen = trainPen();
+
+    QPainterPathStroker stroker;
+    stroker.setWidth(0.5);
+    auto outpath = stroker.createStroke(path);
+    pathItem = new QGraphicsPathItem(outpath, this);
+    pathItem->setPen(pen);
+    if (config().valid_width > 1) {
+        QPen expen(Qt::transparent, pen.width() * config().valid_width);
+        expandItem = new QGraphicsPathItem(outpath, this);
+        expandItem->setPen(expen);
+        _bounding = expandItem->boundingRect();
+    }
+    else {
+        _bounding = pathItem->boundingRect();
+    }
 
     //跨界点标记
     QFont font;
@@ -282,6 +326,7 @@ void TrainItem::setPathItem(const QString& trainName)
             item->setFont(font);
         item->setPos(start_x - sw, p - sh / 2 + start_y);
         spanItems.append(item);
+        _bounding |= item->boundingRect();
     }
     for (auto p : spanRight) {
         auto* item = setStartEndLabelText(trainName, pen.color());
@@ -295,19 +340,11 @@ void TrainItem::setPathItem(const QString& trainName)
             item->setFont(font);
         item->setPos(start_x + width, p - sh / 2 + start_y);
         spanItems.append(item);
+        _bounding |= item->boundingRect();
     }
 
    
-    QPainterPathStroker stroker;
-    stroker.setWidth(0.5);
-    auto outpath = stroker.createStroke(path);
-    pathItem = new QGraphicsPathItem(outpath, this);
-    pathItem->setPen(pen);
-    if (config().valid_width > 1) {
-        QPen expen(Qt::transparent, pen.width() * config().valid_width);
-        expandItem = new QGraphicsPathItem(outpath, this);
-        expandItem->setPen(expen);
-    }
+    
     //todo  self.addLinkLine()
 }
 
@@ -356,6 +393,8 @@ void TrainItem::setStartItem(const QString& text,const QPen& pen)
     QPainterPath label2 = QPainterPathStroker().createStroke(label);
     startLabelItem = new QGraphicsPathItem(label2,this);
     startLabelItem->setPen(pen);
+    _bounding |= startLabelItem->boundingRect();
+    _bounding |= startLabelText->boundingRect();
 }
 
 void TrainItem::setEndItem(const QString& text, const QPen& pen)
@@ -418,6 +457,8 @@ void TrainItem::setEndItem(const QString& text, const QPen& pen)
     QPainterPath label2 = QPainterPathStroker().createStroke(label);
     endLabelItem = new QGraphicsPathItem(label2, this);
     endLabelItem->setPen(pen);
+    _bounding |= endLabelItem->boundingRect();
+    _bounding |= endLabelText->boundingRect();
 }
 
 QGraphicsSimpleTextItem* TrainItem::setStartEndLabelText(const QString& text, const QColor& color)
@@ -458,7 +499,6 @@ double TrainItem::getOutGraph(double xin, double yin, double xout, double yout,
 double TrainItem::getInGraph(double xout, double yout, double xin, double yin, QPainterPath& path)
 {
     double fullwidth = config().fullWidth();
-    double width = config().diagramWidth();
     double start_x = margins().left;
     double start_y = _railway.startYValue();
     double xleft = xout - fullwidth;
@@ -480,12 +520,68 @@ QColor TrainItem::trainColor() const
 
 double TrainItem::determineStartLabelHeight()
 {
-    return config().start_label_height;
+    if(!config().avoid_cover)
+        return config().start_label_height;
+    double x = startPoint.x();    //既然调用了这个，那endPoint就一定有效
+    double w = startLabelText->boundingRect().width();
+    int wl, wr;
+    if (_startAtThis) {
+        wl = wr = w / 2;
+    }
+    else {
+        wl = w; wr = 0;
+    }
+    auto rst = _line.firstRailStation();
+    if (_line.dir() == Direction::Down) {
+        return determineLabelHeight(rst->overLabels(), x, wl, wr);
+    }
+    else {
+        return determineLabelHeight(rst->belowLabels(), x, wl, wr);
+    }
 }
 
 double TrainItem::determineEndLabelHeight()
 {
-    return config().end_label_height;
+    if (!config().avoid_cover)
+        return config().end_label_height;
+    else if (!config().end_label_name)
+        return config().base_label_height;
+    double x = endPoint.x();    //既然调用了这个，那endPoint就一定有效
+    double w = endLabelText->boundingRect().width();
+    int wl, wr;
+    if (_endAtThis) {
+        wl = wr = w / 2;
+    }
+    else {
+        wl = 0; wr = w;
+    }
+    auto rst = _line.lastRailStation();
+    if (_line.dir() == Direction::Down) {
+        return determineLabelHeight(rst->belowLabels(), x, wl, wr);
+    }
+    else {
+        return determineLabelHeight(rst->overLabels(), x, wl, wr);
+    }
+}
+
+double TrainItem::determineLabelHeight(std::multimap<double, LabelPositionInfo>& spans,
+    double xcenter, double left, double right)
+{
+    double start = xcenter - MAX_COVER_WIDTH;
+    auto p = spans.lower_bound(start);
+    QSet<double> occupied;   //已经占据了的高度表
+    for (; p != spans.end() && p->first <= xcenter + MAX_COVER_WIDTH; ++p) {
+        const auto& info = p->second;
+        if (std::max(xcenter - left, p->first - info.left) <=
+            std::min(xcenter + right, p->first + info.right)) {
+            occupied.insert(info.height);
+        }
+    }
+    double h = config().base_label_height;
+    while (occupied.contains(h))
+        h += config().step_label_height;
+    spans.insert({ xcenter,{h,left,right} });
+    return h;
 }
 
 void TrainItem::setStretchedFont(QFont& font, QGraphicsSimpleTextItem* item, double width)
@@ -501,9 +597,68 @@ void TrainItem::setStretchedFont(QFont& font, QGraphicsSimpleTextItem* item, dou
 
 void TrainItem::addTimeMarks()
 {
-    //todo...
+    auto lastIter = _line.stations().end(); --lastIter;
+    for (auto p = _line.stations().begin(); p != _line.stations().end(); ++p) {
+        auto ts = p->trainStation;
+        auto rs = p->railStation.lock();
+        double ycur = rs->y_value.value();
+        double xarr = calXFromStart(ts->arrive), xdep = calXFromStart(ts->depart);
+
+        //标注到点
+        if (ts->isStopped() || p == lastIter) {
+            if (_line.startLabel() || p != _line.stations().begin()) {
+                markArriveTime(xarr, ycur, ts->arrive);
+            }
+        }
+
+        //标注开点
+        if (ts->isStopped() || p != lastIter) {
+            if (_line.endLabel()) {
+                markDepartTime(xdep, ycur, ts->depart);
+            }
+        }
+    }
 }
 
 void TrainItem::hideTimeMarks()
 {
+    for (auto p : markLabels) {
+        p->setVisible(false);
+    }
+}
+
+void TrainItem::markArriveTime(double x, double y, const QTime& tm)
+{
+    //到达时刻：下行标右上，下行标右下
+    int m = tm.minute();
+    if (tm.second() >= 30)m++;
+    auto* item = new QGraphicsSimpleTextItem(QString::number(m % 10), this);
+    item->setBrush(pen.color());
+    const auto& t = item->boundingRect();
+    double w = t.width(), h = t.height();
+    if (_line.dir() == Direction::Down) {
+        item->setPos(x + start_x, y - h + start_y);
+    }
+    else {
+        item->setPos(x + start_x, y + start_y);
+    }
+    markLabels.append(item);
+}
+
+void TrainItem::markDepartTime(double x, double y, const QTime& tm)
+{
+    //出发时刻 下行标左下，上行标左上
+    int m = tm.minute();
+    if (tm.second() >= 30)m++;
+    auto* item = new QGraphicsSimpleTextItem(QString::number(m % 10), this);
+    item->setBrush(pen.color());
+    const auto& t = item->boundingRect();
+    double w = t.width(), h = t.height();
+    if (_line.dir() == Direction::Down) {
+        item->setPos(x - w + start_x, y + start_y);
+    }
+    else {
+        item->setPos(x - w + start_x, y - h + start_y);
+    }
+    markLabels.append(item);
 }

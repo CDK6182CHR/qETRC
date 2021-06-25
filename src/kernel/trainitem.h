@@ -2,6 +2,7 @@
 
 #include <QGraphicsItem>
 #include <QWidget>
+#include <QPen>
 
 #include "data/diagram/diagram.h"
 #include "data/rail/railstation.h"
@@ -32,6 +33,8 @@ class TrainItem : public QGraphicsItem
     QPointF startPoint, endPoint;
     QTime startTime;
 
+    QRectF _bounding;
+
     /**
      * @brief linkItem1
      * 采用交路连线时的连线对象。最多两个（考虑跨日）
@@ -60,6 +63,15 @@ class TrainItem : public QGraphicsItem
     double spanItemWidth = -1, spanItemHeight = -1;
     double startLabelHeight = -1, endLabelHeight = -1;
 
+    QPen pen;
+
+    const double start_x, start_y;
+
+    /**
+     * 进行标签高度判定时，最大的检测宽度的一半
+     */
+    static constexpr double MAX_COVER_WIDTH = 200;
+
 public:
     enum { Type = UserType + 1 };
     TrainItem(TrainLine& line, Railway& railway, Diagram& diagram,
@@ -76,6 +88,8 @@ public:
 
     void highlight();
     void unhighlight();
+
+    virtual bool contains(const QPointF& f)const override;
 
 private:
     
@@ -120,9 +134,19 @@ private:
 
     QColor trainColor()const;
 
+    /**
+     * @brief 确定标签高度，以避免重叠
+     * 同时维护数据
+     */
     double determineStartLabelHeight();
 
     double determineEndLabelHeight();
+
+    /**
+     * 上下行判定标签高度的统一操作
+     */
+    double determineLabelHeight(std::multimap<double, LabelPositionInfo>& spans,
+        double xcenter, double left, double right);
 
     /**
      * 构造QFont对象，使所得的item宽度不大于指定宽度
@@ -133,6 +157,15 @@ private:
     void addTimeMarks();
 
     void hideTimeMarks();
+
+    /**
+     * 详细停点的标记，分为到、开两种情况，一共四个位置，由行别进一步细分
+     * 特别说明对折返的处理：无终止标签的最后一站只标记到点，无起始标签的第一站只标记开点
+     * 如果折返站没有停点，行为未定义 （标出来的结果是不对的）
+     */
+    void markArriveTime(double x, double y, const QTime& tm);
+
+    void markDepartTime(double x, double y, const QTime& tm);
 };
 
 

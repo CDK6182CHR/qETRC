@@ -69,7 +69,7 @@ void DiagramWidget::paintGraph()
         ystart += p->diagramHeight() + margins.gap_between_railways;
     }
 
-    setVLines(ystart, width, hour_count, railYRanges);
+    setVLines(width, hour_count, railYRanges);
 
     marginItems.left = scene()->createItemGroup(leftItems);
     marginItems.left->setZValue(15);
@@ -119,6 +119,15 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
     QGraphicsView::mousePressEvent(e);
 }
 
+void DiagramWidget::resizeEvent(QResizeEvent* e)
+{
+    QGraphicsView::resizeEvent(e);
+    if (!updating) {
+        updateDistanceAxis();
+        updateTimeAxis();
+    }
+}
+
 void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, double width,
     QList<QGraphicsItem*>& leftItems, QList<QGraphicsItem*>& rightItems)
 {
@@ -130,7 +139,6 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     double label_start_x = margins.mile_label_width + margins.ruler_label_width;
 
     double height = rail->diagramHeight();   //注意这只是当前线路的高度
-    double totheight = height + margins.up + margins.down;
 
     auto* rectLeft = scene()->addRect(0,
         start_y - margins.title_row_height - margins.first_row_append,
@@ -196,7 +204,9 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     );
     leftItems.append(line);
 
-    nowItem = scene()->addSimpleText(" ");
+    QFont nowFont;
+    nowFont.setPointSize(12);
+    nowItem = scene()->addSimpleText(" ", nowFont);
     nowItem->setBrush(textColor);
     nowItem->setZValue(16);
 
@@ -318,7 +328,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     ));
 }
 
-void DiagramWidget::setVLines(double start_y, double width, int hour_count, 
+void DiagramWidget::setVLines(double width, int hour_count, 
     const QList<QPair<double, double>> railYRanges)
 {
     int gap = config().minutes_per_vertical_line;
