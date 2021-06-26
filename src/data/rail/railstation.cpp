@@ -1,5 +1,6 @@
 ﻿#include "railstation.h"
-
+#include "data/common/stationname.h"
+#include <QDebug>
 
 RailStation::RailStation(const StationName &name_,
                          double mile_,
@@ -97,4 +98,9 @@ void RailStation::clearLabelInfo()
 {
     _belowLabels.clear();
     _overLabels.clear();
+}
+
+RailStation::~RailStation()
+{
+    qDebug()<<"~RailStation: "<<name.toSingleLiteral() <<Qt::endl;
 }

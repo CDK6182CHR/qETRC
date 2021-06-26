@@ -1053,7 +1053,12 @@ std::shared_ptr<RailInterval> Railway::nextIntervalCirc(std::shared_ptr<RailInte
 	if (!t && railint->isDown()) {
 		return firstUpInterval();
 	}
-	return t;
+    return t;
+}
+
+Railway::~Railway()
+{
+    qDebug()<<"~Railway"<<_name<<Qt::endl;
 }
 
 double Railway::calStationYValueByMile(const Config& config)

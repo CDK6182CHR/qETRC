@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "data/common/common_header.h"
 #include <memory>
 #include <QList>
 #include <QJsonObject>
@@ -87,6 +88,8 @@ public:
     void updateTrain(std::shared_ptr<Train> t);
 
     auto& trains() { return _trainCollection.trains(); }
+
+    ~Diagram();
 
 private:
     void bindAllTrains();

@@ -1,15 +1,17 @@
-﻿/*
- * QETRC新增类
- * 对站名的封装，主要是为了解决域解析符问题
- */
-#ifndef STATIONNAME_H
-#define STATIONNAME_H
+﻿
+#pragma once
+
+#include "common_header.h"
 
 #include <QString>
 #include <QHash>
 #include <QDebug>
 #include <stdint.h>
 
+/**
+ * QETRC新增类
+ * 对站名的封装，主要是为了解决域解析符问题
+ */
 class StationName
 {
     QString _station, _field;
@@ -81,4 +83,4 @@ inline QDebug operator<<(QDebug debug, const StationName& s){
     return debug;
 }
 
-#endif // STATIONNAME_H
+

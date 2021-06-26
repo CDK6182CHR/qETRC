@@ -201,6 +201,7 @@
   <ItemGroup>
     <QtMoc Include="src\mainwindow.h">
     </QtMoc>
+    <ClInclude Include="src\data\common\common_header.h" />
     <ClInclude Include="src\data\common\direction.h" />
     <ClInclude Include="src\data\common\stationname.h" />
     <ClInclude Include="src\data\diagram\config.h" />

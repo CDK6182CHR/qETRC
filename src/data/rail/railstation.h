@@ -172,5 +172,7 @@ public:
     }
     inline auto& overLabels() { return _overLabels; }
     inline auto& belowLabels() { return _belowLabels; }
+
+    ~RailStation();
 };
 
