@@ -193,6 +193,7 @@
     <ClCompile Include="src\data\train\traincollection.cpp" />
     <ClCompile Include="src\data\train\trainname.cpp" />
     <ClCompile Include="src\data\train\trainstation.cpp" />
+    <ClCompile Include="src\data\train\traintype.cpp" />
     <ClCompile Include="src\kernel\diagramwidget.cpp" />
     <ClCompile Include="src\kernel\trainitem.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="src\data\train\trainname.h" />
     <ClInclude Include="src\data\train\trainstation.h" />
     <QtMoc Include="src\kernel\diagramwidget.h" />
+    <ClInclude Include="src\data\train\traintype.h" />
     <ClInclude Include="src\kernel\trainitem.h" />
     <ClInclude Include="src\util\qeexceptions.h" />
   </ItemGroup>
