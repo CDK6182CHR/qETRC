@@ -11,7 +11,7 @@ RailInterval::RailInterval(Direction dir_):
 }
 
 RailInterval::RailInterval(Direction dir_,
-	std::shared_ptr<RailStation> from_, std::shared_ptr<RailStation> to_):
+	std::weak_ptr<RailStation> from_, std::weak_ptr<RailStation> to_):
     from(from_),to(to_),_dir(dir_)
 {
 }
@@ -33,26 +33,26 @@ std::shared_ptr<RailInterval>
 
 std::shared_ptr<RailInterval> RailInterval::prevInterval()const
 {
-	if (!from)
+	if (!fromStation())
 		return std::shared_ptr<RailInterval>();
     if (_dir==Direction::Down) {
-		return from->downPrev;
+		return fromStation()->downPrev;
 	}
 	else {
-		return from->upPrev;
+		return fromStation()->upPrev;
 	}
 }
 
 std::shared_ptr<RailInterval> RailInterval::nextInterval() const
 {
-	if(!to)
+	if(!toStation())
 		return std::shared_ptr<RailInterval>();
-    return isDown() ? to->downNext : to->upNext;
+    return isDown() ? toStation()->downNext : toStation()->upNext;
 }
 
 RailInterval RailInterval::mergeWith(const RailInterval& next) const
 {
-	assert(to == next.from);
+	assert(toStation() == next.fromStation());
     assert(_dir == next._dir);
 
     RailInterval it(_dir, from, next.to);
@@ -69,12 +69,12 @@ RailInterval RailInterval::mergeWith(const RailInterval& next) const
 
 double RailInterval::mile() const
 {
-    if(!from||!to)
+    if(!fromStation()||!toStation())
         return 0;
     if(isDown()){
-        return to->mile-from->mile;
+        return toStation()->mile - fromStation()->mile;
     }else{
-        return from->counterMile()-to->counterMile();
+        return fromStation()->counterMile() - toStation()->counterMile();
     }
 }
 
@@ -90,9 +90,9 @@ std::shared_ptr<RulerNode> RailInterval::getRulerNode(const Ruler& ruler)
 
 std::shared_ptr<RailInterval> RailInterval::inverseInterval()
 {
-    if (from->direction == PassedDirection::BothVia &&
-        to->direction == PassedDirection::BothVia) {
-        return to->dirNextInterval(DirFunc::reverse(_dir));
+    if (fromStation()->direction == PassedDirection::BothVia &&
+        toStation()->direction == PassedDirection::BothVia) {
+        return toStation()->dirNextInterval(DirFunc::reverse(_dir));
     }
     return nullptr;
 }

@@ -121,6 +121,7 @@ void TrainItem::unhighlight()
         startLabelText->setZValue(0);
         startLabelText->setBrush(pen.color());
         startLabelText->scene()->removeItem(startRect);
+        delete startRect;
         startRect = nullptr;
     }
     if (endLabelText) {
@@ -130,6 +131,7 @@ void TrainItem::unhighlight()
         endLabelText->setZValue(0);
         endLabelText->setBrush(pen.color());
         endLabelText->scene()->removeItem(endRect);
+        delete endRect;
         endRect = nullptr;
     }
 
@@ -152,6 +154,46 @@ void TrainItem::unhighlight()
 bool TrainItem::contains(const QPointF& f) const
 {
     return false;
+}
+
+#define DELETE_SUB(_item) \
+if(_item){\
+    delete _item;\
+    _item=nullptr; \
+}
+
+TrainItem::~TrainItem() noexcept
+{
+    DELETE_SUB(pathItem);
+    DELETE_SUB(expandItem);
+    DELETE_SUB(startLabelItem);
+    DELETE_SUB(startLabelText);
+    DELETE_SUB(endLabelItem);
+    DELETE_SUB(endLabelText);
+    DELETE_SUB(startRect);
+    DELETE_SUB(endRect);
+    DELETE_SUB(linkItem1);
+    DELETE_SUB(linkItem2);
+
+    for (auto p : spanItems) {
+        delete p;
+    }
+    spanItems.clear();
+
+    for (auto p : markLabels)
+        delete p;
+    markLabels.clear();
+
+    auto& sl = _line.firstRailStation()->startingLabels(_line.dir());
+    auto& se = _line.lastRailStation()->terminalLabels(_line.dir());
+    if (startLabelInfo != sl.end()) {
+        sl.erase(startLabelInfo);
+        startLabelInfo = sl.end();
+    }
+    if (endLabelInfo != se.end()) {
+        se.erase(endLabelInfo);
+        endLabelInfo = se.end();
+    }
 }
 
 void TrainItem::setLine()
@@ -533,11 +575,12 @@ double TrainItem::determineStartLabelHeight()
     }
     auto rst = _line.firstRailStation();
     if (_line.dir() == Direction::Down) {
-        return determineLabelHeight(rst->overLabels(), x, wl, wr);
+        startLabelInfo = determineLabelHeight(rst->overLabels(), x, wl, wr);
     }
     else {
-        return determineLabelHeight(rst->belowLabels(), x, wl, wr);
+        startLabelInfo = determineLabelHeight(rst->belowLabels(), x, wl, wr);
     }
+    return startLabelInfo->second.height;
 }
 
 double TrainItem::determineEndLabelHeight()
@@ -557,14 +600,16 @@ double TrainItem::determineEndLabelHeight()
     }
     auto rst = _line.lastRailStation();
     if (_line.dir() == Direction::Down) {
-        return determineLabelHeight(rst->belowLabels(), x, wl, wr);
+        endLabelInfo = determineLabelHeight(rst->belowLabels(), x, wl, wr);
     }
     else {
-        return determineLabelHeight(rst->overLabels(), x, wl, wr);
+        endLabelInfo = determineLabelHeight(rst->overLabels(), x, wl, wr);
     }
+    return endLabelInfo->second.height;
 }
 
-double TrainItem::determineLabelHeight(std::multimap<double, LabelPositionInfo>& spans,
+std::multimap<double, LabelPositionInfo>::iterator
+TrainItem::determineLabelHeight(std::multimap<double, LabelPositionInfo>& spans,
     double xcenter, double left, double right)
 {
     double start = xcenter - MAX_COVER_WIDTH;
@@ -580,8 +625,7 @@ double TrainItem::determineLabelHeight(std::multimap<double, LabelPositionInfo>&
     double h = config().base_label_height;
     while (occupied.contains(h))
         h += config().step_label_height;
-    spans.insert({ xcenter,{h,left,right} });
-    return h;
+    return spans.insert({ xcenter,{h,left,right} });
 }
 
 void TrainItem::setStretchedFont(QFont& font, QGraphicsSimpleTextItem* item, double width)

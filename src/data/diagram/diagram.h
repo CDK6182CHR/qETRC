@@ -89,8 +89,6 @@ public:
 
     auto& trains() { return _trainCollection.trains(); }
 
-    ~Diagram();
-
 private:
     void bindAllTrains();
 };

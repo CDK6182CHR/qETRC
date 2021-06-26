@@ -172,7 +172,11 @@ public:
     }
     inline auto& overLabels() { return _overLabels; }
     inline auto& belowLabels() { return _belowLabels; }
-
-    ~RailStation();
+    inline auto& startingLabels(Direction dir) {
+        return dir == Direction::Down ? _overLabels : _belowLabels;
+    }
+    inline auto& terminalLabels(Direction dir) {
+        return dir == Direction::Down ? _belowLabels : _overLabels;
+    }
 };
 

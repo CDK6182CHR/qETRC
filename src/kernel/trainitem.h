@@ -91,6 +91,8 @@ public:
 
     virtual bool contains(const QPointF& f)const override;
 
+    ~TrainItem()noexcept;
+
 private:
     
     const Config& config()const { return _diagram.config(); }
@@ -145,7 +147,8 @@ private:
     /**
      * 上下行判定标签高度的统一操作
      */
-    double determineLabelHeight(std::multimap<double, LabelPositionInfo>& spans,
+    std::multimap<double,LabelPositionInfo>::iterator
+        determineLabelHeight(std::multimap<double, LabelPositionInfo>& spans,
         double xcenter, double left, double right);
 
     /**

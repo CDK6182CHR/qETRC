@@ -35,11 +35,6 @@ void Diagram::updateTrain(std::shared_ptr<Train> t)
     }
 }
 
-Diagram::~Diagram()
-{
-    qDebug()<<"~Diagram"<<Qt::endl;
-}
-
 void Diagram::bindAllTrains()
 {
     for (auto p : _railways) {

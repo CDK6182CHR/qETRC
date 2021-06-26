@@ -19,7 +19,7 @@ class RailInterval:
 {
 	friend class Railway;
 	//注意一律按照有向边约定
-	std::shared_ptr<RailStation> from, to;
+	std::weak_ptr<RailStation> from, to;
     Direction _dir;
 
     QList<std::shared_ptr<RulerNode>> _rulerNodes;
@@ -30,8 +30,8 @@ class RailInterval:
     /// <summary>
     /// 注意不能为RailStation添加指针
     /// </summary>
-    RailInterval(Direction dir_, std::shared_ptr<RailStation> from_,
-        std::shared_ptr<RailStation> to_);
+    RailInterval(Direction dir_, std::weak_ptr<RailStation> from_,
+        std::weak_ptr<RailStation> to_);
 
     static std::shared_ptr<RailInterval> construct(Direction _dir,
                                                    std::shared_ptr<RailStation> from,
@@ -46,16 +46,16 @@ public:
 	RailInterval& operator=(RailInterval&&) = default;
 
 	inline std::shared_ptr<RailStation> fromStation() {
-		return from;
+		return from.lock();
 	}
 	inline const std::shared_ptr<RailStation> fromStation()const {
-		return from;
+		return from.lock();
 	}
 	inline std::shared_ptr<RailStation> toStation() {
-		return to;
+		return to.lock();
 	}
 	inline const std::shared_ptr<RailStation> toStation()const {
-		return to;
+		return to.lock();
 	}
 
 	/// <summary>

@@ -6,15 +6,10 @@
 
 int main(int argc, char *argv[])
 {
-//    QApplication a(argc, argv);
-//    MainWindow w;
-//    w.show();
-//    return a.exec();
-    auto s = QString(R"(D:\Python\train_graph\source\合九线.json)");
-    //auto s = QString(R"(D:\Python\train_graph\source\京沪线上局段20191230.pyetgr)");
-    {Diagram _diagram;
-    _diagram.fromJson(s);
-    qDebug()<<"Before end"<<Qt::endl;
+    {QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
     }
 }
 

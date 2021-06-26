@@ -99,8 +99,3 @@ void RailStation::clearLabelInfo()
     _belowLabels.clear();
     _overLabels.clear();
 }
-
-RailStation::~RailStation()
-{
-    qDebug()<<"~RailStation: "<<name.toSingleLiteral() <<Qt::endl;
-}

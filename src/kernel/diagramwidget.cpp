@@ -24,6 +24,15 @@ DiagramWidget::DiagramWidget(Diagram &diagram, QWidget* parent):
     setMouseTracking(true);
 }
 
+DiagramWidget::~DiagramWidget() noexcept
+{
+    if (scene()) {
+        auto* s = scene();
+        setScene(nullptr);
+        delete s;
+    }
+}
+
 void DiagramWidget::autoPaintGraph()
 {
     if (_diagram.config().auto_paint)

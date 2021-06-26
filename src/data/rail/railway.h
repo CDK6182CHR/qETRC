@@ -404,8 +404,6 @@ public:
      */
     std::shared_ptr<RailInterval> nextIntervalCirc(std::shared_ptr<RailInterval> railint);
 
-    ~Railway();
-
 private:
     /*
      * 维护nameMap和fieldMap

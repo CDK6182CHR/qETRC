@@ -37,6 +37,7 @@ class DiagramWidget : public QGraphicsView
 
 public:
     DiagramWidget(Diagram& diagram, QWidget* parent = nullptr);
+    ~DiagramWidget()noexcept;
 
     /**
      * @brief autoPaintGraph
