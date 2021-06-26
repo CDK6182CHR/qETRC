@@ -35,6 +35,8 @@ class DiagramWidget : public QGraphicsView
 
     bool updating = false;
 
+    QTime startTime;
+
 public:
     DiagramWidget(Diagram& diagram, QWidget* parent = nullptr);
     ~DiagramWidget()noexcept;
@@ -54,8 +56,12 @@ public:
     auto selectedTrain() { return _selectedTrain; }
     void setSelectedTrain(Train* train) { _selectedTrain = train; }
 
+    bool toPdf(const QString& filename, const QString& title);
+
 protected:
     virtual void mousePressEvent(QMouseEvent* e)override;
+
+    virtual void mouseDoubleClickEvent(QMouseEvent* e)override;
 
     virtual void resizeEvent(QResizeEvent* e)override;
 
@@ -132,6 +138,26 @@ private:
     void selectTrain(TrainItem* item);
 
     void unselectTrain();
+
+    /**
+     * pyETRC.GrpahicsWidget._resetForbidShow()
+     * 铺画时，直接重新画所有标尺
+     */
+    void showAllForbids();
+
+    /**
+     * @brief pyETRC.GraphicsWidget.show_forbid()  绘制指定方向的指定天窗
+     * 暂定private，对外接口等写到时再设计
+     */
+    void showForbid(std::shared_ptr<Forbid> forbid, Direction dir);
+
+    void removeForbid(std::shared_ptr<Forbid> forbid, Direction dir);
+
+    void addForbidNode(std::shared_ptr<Forbid> forbid, std::shared_ptr<ForbidNode> node,
+        const QBrush& brush, const QPen& pen);
+
+    double calXFromStart(const QTime& time)const;
+
 
 signals:
     void showNewStatus(QString);

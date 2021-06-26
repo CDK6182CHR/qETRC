@@ -9,22 +9,7 @@
 #include <QColor>
 #include <QPen>
 
-/**
- * @brief The TrainUI struct  pyETRC.data.train.UI dict
- * 列车铺画的运行线样式设定，作为Train或者TrainType的成员，以shared_ptr形式
- * 具体来说，如果Train采用默认，那么直接和TrainType里面的share；
- * 如果Train采用手工构造，则Train自己管理一个对象
- */
-struct TrainUI {
-    QColor color{0,128,0};
-    double lineWidth{1.0};
-    Qt::PenStyle lineStyle{Qt::SolidLine};
-    QPen toQPen()const;
-    static TrainUI defaultUI;
-
-    TrainUI()=default;
-    TrainUI(const TrainUI&)=default;
-};
+#include "data/train/trainname.h"
 
 
 
@@ -36,12 +21,19 @@ struct TrainUI {
 class TrainType
 {
     QString _name;
-    const std::shared_ptr<TrainUI> _ui;
+    const std::shared_ptr<QPen> _pen;
+    bool _passenger;
 public:
-    TrainType(const QString& name, std::shared_ptr<TrainUI> ui);
+    TrainType(const QString& name, const QPen& pen, bool passenger=false) :
+        _name(name), _pen(std::make_shared<QPen>(pen)),_passenger(passenger){}
 
-    std::shared_ptr<TrainUI> ui(){return _ui;}
-    std::shared_ptr<const TrainUI> ui()const{return _ui;}
+    std::shared_ptr<QPen> pen(){return _pen;}
+    std::shared_ptr<const QPen> pen()const{return _pen;}
+
+    bool isPassenger()const { return _passenger; }
+    void setIsPassenger(bool p) { _passenger = p; }
+
+    const QString& name()const { return _name; }
 };
 
 
@@ -64,24 +56,39 @@ class TypeManager{
      */
     QList<QPair<QRegExp,std::shared_ptr<TrainType>>> _regs;
 
-public:
-    TypeManager()=default;
-    TypeManager(const TypeManager&)=delete;
-    TypeManager(TypeManager&&)=delete;
-    TypeManager& operator=(const TypeManager&)=delete;
-    TypeManager& operator=(TypeManager&&)=delete;
+    static QPen defaultPen;
+    static std::shared_ptr<TrainType> defaultType;
 
-    void fronJson(const QJsonObject& obj);
+public:
+    //todo: copy assign, for default assign
+    TypeManager() {
+        //TODO: 临时版本：采用默认
+        initDefaultTypes();
+    }
+    TypeManager(const TypeManager&)=delete;
+    TypeManager(TypeManager&&)=default;
+    TypeManager& operator=(const TypeManager&)=delete;
+    TypeManager& operator=(TypeManager&&)=default;
+
+    void readForDefault(const QJsonObject& obj);
+    void readForDiagram(const QJsonObject& obj, const TypeManager& defaultManager);
+    
     QJsonObject toJson()const;
 
     /**
-     * @brief 原位构造新的类型
+     * @brief 添加新的类型
      */
-    std::shared_ptr<TrainType> emplaceType(const QString& name,
-                                           const QRegExp& reg,
-                                           std::shared_ptr<TrainUI> ui);
+    std::shared_ptr<TrainType> addType(const QString& name,
+                                           const QPen& pen);
 
-    std::shared_ptr<const TrainType> fromRegex(const QRegExp& reg)const;
+    void appendRegex(const QRegExp& reg, const QString& name);
+
+    /**
+     * 用来读pyETRC的配置数据，同时写进是否客车的数据
+     */
+    void appendRegex(const QRegExp& reg, const QString& name, bool passenger);
+
+    std::shared_ptr<const TrainType> fromRegex(const TrainName& name)const;
 
     /**
      * @brief findOrCreate
@@ -89,6 +96,11 @@ public:
      * 创建新的UI时，复制默认的。
      */
     std::shared_ptr<TrainType> findOrCreate(const QString& name);
+
+private:
+    void fromJson(const QJsonObject& obj);
+
+    void initDefaultTypes();
 };
 
 

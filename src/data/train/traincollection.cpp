@@ -12,7 +12,7 @@ void TrainCollection::fromJson(const QJsonObject& obj)
 	_trains.clear();
 	const QJsonArray& artrains = obj.value("trains").toArray();
 	for (const auto& p : artrains) {
-		_trains.append(std::make_shared<Train>(p.toObject()));
+		_trains.append(std::make_shared<Train>(p.toObject(), _manager));
 	}
 	//todo 交路 类型系统
     resetMapInfo();

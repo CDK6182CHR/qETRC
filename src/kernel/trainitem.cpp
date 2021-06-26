@@ -40,6 +40,11 @@ Train& TrainItem::train()
     return _line.train();
 }
 
+const Train& TrainItem::train() const
+{
+    return _line.train();
+}
+
 void TrainItem::highlight()
 {
     if (_isHighlighted)
@@ -204,7 +209,7 @@ void TrainItem::setLine()
     setPathItem(trainName);
 
     QPen labelPen = trainPen();
-    labelPen.setWidthF(0.5);
+    labelPen.setWidth(1);
     if (_line.startLabel() && startInRange) {
         setStartItem(trainName, labelPen);
     }
@@ -432,8 +437,7 @@ void TrainItem::setStartItem(const QString& text,const QPen& pen)
             startLabelText->setPos(x0 - w, y0 + height);
         }
     }
-    QPainterPath label2 = QPainterPathStroker().createStroke(label);
-    startLabelItem = new QGraphicsPathItem(label2,this);
+    startLabelItem = new QGraphicsPathItem(label, this);
     startLabelItem->setPen(pen);
     _bounding |= startLabelItem->boundingRect();
     _bounding |= startLabelText->boundingRect();
@@ -496,8 +500,7 @@ void TrainItem::setEndItem(const QString& text, const QPen& pen)
             endLabelText->setPos(x0, y0 - h);
         }
     }
-    QPainterPath label2 = QPainterPathStroker().createStroke(label);
-    endLabelItem = new QGraphicsPathItem(label2, this);
+    endLabelItem = new QGraphicsPathItem(label, this);
     endLabelItem->setPen(pen);
     _bounding |= endLabelItem->boundingRect();
     _bounding |= endLabelText->boundingRect();
@@ -552,7 +555,7 @@ double TrainItem::getInGraph(double xout, double yout, double xin, double yin, Q
 
 QPen TrainItem::trainPen() const
 {
-    return QPen(Qt::red, 1.5);
+    return *(train().pen());
 }
 
 QColor TrainItem::trainColor() const

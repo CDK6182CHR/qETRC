@@ -12,6 +12,18 @@ void Diagram::addRailway(std::shared_ptr<Railway> rail)
     }
 }
 
+void Diagram::addTrains(const TrainCollection& coll)
+{
+    //复制语义
+    for (auto p : coll.trains()) {
+        if (!_trainCollection.trainNameExisted(p->trainName())) {
+            auto t = std::make_shared<Train>(*p);
+            _trainCollection.trains().append(t);
+            updateTrain(t);
+        }
+    }
+}
+
 std::shared_ptr<Railway> Diagram::railwayByName(const QString &name)
 {
     for(const auto& p:_railways){
@@ -44,15 +56,6 @@ void Diagram::bindAllTrains()
     }
 }
 
-Diagram::Diagram(const QJsonObject& obj)
-{
-    fromJson(obj);
-}
-
-Diagram::Diagram(const QString& filename)
-{
-    fromJson(filename);
-}
 
 void Diagram::fromJson(const QString& filename)
 {

@@ -35,7 +35,7 @@ public:
 
     QJsonObject toJson()const;
 
-    void _show()const;
+    void show()const;
 
     /**
      * @brief totalInterval  区间总通通时分

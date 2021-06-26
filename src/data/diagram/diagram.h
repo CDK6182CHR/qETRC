@@ -7,6 +7,7 @@
 #include <QString>
 #include "config.h"
 #include "data/train/traincollection.h"
+#include "data/train/traintype.h"
 
 
 class Train;
@@ -26,10 +27,9 @@ class Diagram
     Config _config, _defaultConfig;
     QString _filename;
     QString _version, _note;
+    TypeManager _defaultManager;
 public:
-    Diagram()=default;
-    Diagram(const QJsonObject& obj);
-    Diagram(const QString& filename);
+    Diagram() = default;
 
     //拷贝和移动暂时禁用，需要时再考虑
     Diagram(const Diagram&)=delete;
@@ -67,6 +67,13 @@ public:
      * 同时将所有车次绑定到新线路
      */
     void addRailway(std::shared_ptr<Railway> rail);
+
+    /**
+     * 添加Collection中的所有列车到本运行图的列车集合中
+     * 同时完成与线路的绑定
+     * 注意，复制语义
+     */
+    void addTrains(const TrainCollection& coll);
 
     std::shared_ptr<Railway> railwayByName(const QString& name);
     inline std::shared_ptr<const Railway>

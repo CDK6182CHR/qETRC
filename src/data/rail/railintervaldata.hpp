@@ -65,7 +65,19 @@ public:
         }
     }
 
-    /*
+    inline std::shared_ptr<_Node> firstDirNode(Direction dir) {
+        switch (dir) {
+        case Direction::Down:return firstDownNode();
+        case Direction::Up:return firstUpNode();
+        default:return nullptr;
+        }
+    }
+
+    inline std::shared_ptr<const _Node> firstDirNode(Direction dir)const {
+        return const_cast<RailIntervalData*>(this)->firstDirNode(dir);
+    }
+
+    /**
      * 仅考虑近邻区间，获取数据
      */
     inline std::shared_ptr<_Node>
@@ -91,5 +103,8 @@ public:
         else
             return std::shared_ptr<_Node>();
     }
+
+    inline auto& railway() { return _railway; }
+    inline const auto& railway()const { return _railway; }
 
 };

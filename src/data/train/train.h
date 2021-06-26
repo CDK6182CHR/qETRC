@@ -16,11 +16,10 @@ enum class TrainPassenger:
     True=2
 };
 
-class TrainUIConfig{
-
-};
-
 class TrainAdapter;
+
+class TrainType;
+class TypeManager;
 
 /**
  * pyETRC.train.Train
@@ -32,8 +31,13 @@ class Train
 {
     TrainName _trainName;
     StationName _starting,_terminal;
-    QString _type;
-    TrainUIConfig _ui;
+
+    /**
+     * @brief _type  类型指针
+     * 整个运行过程中，应当保证非空
+     */
+    std::shared_ptr<TrainType> _type;
+    std::shared_ptr<QPen> _pen;
     TrainPassenger _passenger;
     bool _show;
 
@@ -69,7 +73,7 @@ public:
           const StationName& starting=StationName::nullName,
           const StationName& terminal=StationName::nullName,
           TrainPassenger passenger=TrainPassenger::Auto);
-    explicit Train(const QJsonObject& obj);
+    explicit Train(const QJsonObject& obj, TypeManager& manager);
 
     /**
      * std::list 默认的copy和move都是正确的
@@ -83,22 +87,34 @@ public:
     Train& operator=(const Train&) = delete;
     Train& operator=(Train&&)noexcept = delete;
 
-    void fromJson(const QJsonObject& obj);
+    void fromJson(const QJsonObject& obj, TypeManager& manager);
     QJsonObject toJson()const;
 
     inline const TrainName& trainName()const{return _trainName;}
     inline const StationName& starting()const{return _starting;}
     inline const StationName& terminal()const{return _terminal;}
-    inline const QString& type()const{return _type;}
+    inline auto type()const{return _type;}
     inline TrainPassenger passenger()const{return _passenger;}
     inline bool isShow()const{return _show;}
 
     inline void setTrainName(const TrainName& n){_trainName=n;}
     inline void setStarting(const StationName& s){_starting=s;}
     inline void setTerminal(const StationName& s){_terminal=s;}
-    inline void setType(const QString& t){_type=t;}
+    inline void setType(std::shared_ptr<TrainType> t){_type=t;}
     inline void setPassenger(TrainPassenger t){_passenger=t;}
     inline void setIsShow(bool s){_show=s;}
+
+    /**
+     * 根据类型名，设定类型。
+     * 设计用于读入数据时。
+     */
+    void setType(const QString& _typeName, TypeManager& manager);
+
+    /**
+     * @brief pen
+     * 返回非空指针。如果_pen为空（采用默认设置），返回类型默认值
+     */
+    std::shared_ptr<QPen> pen()const;
 
     inline ConstStationPtr nullStation()const { return _timetable.cend(); }
     inline StationPtr nullStation(){return _timetable.end();}

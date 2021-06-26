@@ -9,9 +9,11 @@
 #include <QPair>
 #include <QMouseEvent>
 #include <cmath>
+#include <QPrinter>
+#include <QMessageBox>
 
 DiagramWidget::DiagramWidget(Diagram &diagram, QWidget* parent):
-    QGraphicsView(parent),_diagram(diagram)
+    QGraphicsView(parent),_diagram(diagram),startTime(diagram.config().start_hour,0,0)
 {
     //todo: menu...
     setRenderHint(QPainter::Antialiasing, true);
@@ -92,7 +94,7 @@ void DiagramWidget::paintGraph()
         paintTrain(p);
     }
 
-    //todo: 天窗显示
+    showAllForbids();
     
     connect(verticalScrollBar(), SIGNAL(valueChanged(int)),
         this, SLOT(updateTimeAxis()));
@@ -103,6 +105,60 @@ void DiagramWidget::paintGraph()
     updateDistanceAxis();
     emit showNewStatus(QObject::tr("运行图铺画完毕"));
     updating = false;
+}
+
+bool DiagramWidget::toPdf(const QString& filename, const QString& title)
+{
+    marginItems.left->setX(0);
+    marginItems.right->setX(0);
+    marginItems.top->setY(0);
+    marginItems.bottom->setY(0);
+    nowItem->setPos(0, 0);
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(filename);
+    constexpr double note_apdx = 80;
+
+    QSize size(scene()->width(), scene()->height() + 200);
+    QPageSize pageSize(size);
+    printer.setPageSize(pageSize);
+
+    QPainter painter;
+    painter.begin(&printer);
+
+    if (!painter.isActive()) {
+        QMessageBox::warning(this, QObject::tr("错误"), QObject::tr("保存PDF失败，可能是文件占用。"));
+        return false;
+    }
+    painter.scale(printer.width() / scene()->width(), printer.width() / scene()->width());
+    painter.setPen(QPen(config().text_color));
+    QFont font;
+    font.setPixelSize(40);
+    font.setBold(true);
+    painter.setFont(font);
+
+    painter.drawText(margins().left, 80, title);
+
+    font.setPixelSize(20);
+    font.setBold(false);
+    painter.setFont(font);
+
+    if (!_diagram.note().isEmpty()) {
+        QString s(_diagram.note());
+        s.replace("\n", " ");
+        s = QString("备注：") + s;
+        painter.drawText(margins().left, scene()->height() + 100 + 40, s);
+    }
+
+    //todo: 版本记号
+    QString mark("由qETRC列车运行图系统（开发版）导出");
+    painter.drawText(scene()->width() - 400, scene()->height() + 100 + 40, mark);
+    scene()->render(&painter, QRectF(0, 100, scene()->width(), scene()->height()));
+    painter.end();
+
+    updateDistanceAxis();
+    updateTimeAxis();
+    return true;
 }
 
 void DiagramWidget::mousePressEvent(QMouseEvent* e)
@@ -126,6 +182,12 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
         //todo: context menu
     }
     QGraphicsView::mousePressEvent(e);
+}
+
+void DiagramWidget::mouseDoubleClickEvent(QMouseEvent* e)
+{
+    qDebug() << "DiagramWidget: save PDF" << Qt::endl;
+    toPdf(R"(D:\QTProject\qETRC\测试数据\sample.pdf)", "qETRC多线路测试样张");
 }
 
 void DiagramWidget::resizeEvent(QResizeEvent* e)
@@ -588,6 +650,111 @@ void DiagramWidget::unselectTrain()
         _selectedTrain = nullptr;
         nowItem->setText(" ");
     }
+}
+
+void DiagramWidget::showAllForbids()
+{
+    for (auto p : _diagram.railways()) {
+        for (auto f : p->forbids()) {
+            showForbid(f, Direction::Down);
+            showForbid(f, Direction::Up);
+        }
+    }
+}
+
+void DiagramWidget::showForbid(std::shared_ptr<Forbid> forbid, Direction dir)
+{
+    removeForbid(forbid, dir);
+    QPen pen(Qt::transparent);
+    bool isService = (forbid->index() == 0);
+    QColor color;
+    if (isService) {
+        color = QColor(85, 85, 85);
+    }
+    else {
+        color = QColor(85, 85, 255);
+    }
+    color.setAlpha(200);
+    QBrush brush(color);
+    if (!forbid->different()) {
+        if (dir != Direction::Down)
+            return;
+        brush.setStyle(Qt::DiagCrossPattern);
+    }
+    else if (dir == Direction::Down) {
+        brush.setStyle(Qt::FDiagPattern);
+    }
+    else {
+        brush.setStyle(Qt::BDiagPattern);
+    }
+    QBrush brush2(Qt::transparent);
+    if (!isService) {
+        brush2 = QColor(170, 170, 170, 80);
+    }
+
+    for (auto node = forbid->firstDirNode(dir); node; node = node->nextNode()) {
+        addForbidNode(forbid, node, brush, pen);
+        if (!isService) {
+            addForbidNode(forbid, node, brush2, pen);
+        }
+    }
+}
+
+void DiagramWidget::removeForbid(std::shared_ptr<Forbid> forbid, Direction dir)
+{
+    auto& items = forbid->dirItems(dir);
+    for (auto p : items) {
+        scene()->removeItem(p);
+    }
+    items.clear();
+}
+
+void DiagramWidget::addForbidNode(std::shared_ptr<Forbid> forbid, 
+    std::shared_ptr<ForbidNode> node, const QBrush& brush, const QPen& pen)
+{
+    auto& railint = node->railInterval();
+    auto& railway = forbid->railway();
+    double start_y = railway.startYValue();
+    double y1 = railint.fromStation()->y_value.value(),
+        y2 = railint.toStation()->y_value.value();
+    if (y1 > y2)
+        std::swap(y1, y2);
+    //保证y1<=y2  方便搞方框
+    double xstart = calXFromStart(node->beginTime),
+        xend = calXFromStart(node->endTime);
+    double width = config().diagramWidth();    //图形总宽度
+    if (xstart == xend)   //莫得数据，再见
+        return;
+    else if (xstart < xend) {
+        //没有跨界的简单情况
+        if (xstart <= width) {
+            //存在界内部分
+            xend = std::min(xend, width);
+            auto* item = scene()->addRect(xstart + margins().left, y1 + start_y, xend - xstart, y2 - y1,
+                pen, brush);
+            forbid->addItem(railint.direction(), item);
+        }
+    }
+    else {
+        //存在跨界的情况  先处理右半部分
+        if (xstart <= width) {
+            forbid->addItem(railint.direction(), scene()->addRect(
+                xstart + margins().left, y1 + start_y, width - xstart, y2 - y1, pen, brush
+            ));
+        }
+        //左半部分  一定有
+        forbid->addItem(railint.direction(), scene()->addRect(
+            margins().left, y1 + start_y, xend, y2 - y1, pen, brush
+        ));
+    }
+}
+
+double DiagramWidget::calXFromStart(const QTime& time) const
+{
+    int sec = startTime.secsTo(time);
+    if (sec < 0)
+        sec += 24 * 3600;
+    return sec / config().seconds_per_pix;
 }
 
 

@@ -85,6 +85,7 @@ public:
     inline int type()const override { return Type; }
 
     Train& train();
+    const Train& train()const;
 
     void highlight();
     void unhighlight();

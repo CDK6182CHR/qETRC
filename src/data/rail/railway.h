@@ -373,6 +373,9 @@ public:
     inline const Forbid& getForbid(int i)const{return *_forbids[i];}
     inline Forbid& getForbid(int i){return *_forbids[i];}
 
+    inline auto& forbids() { return _forbids; }
+    inline const auto& forbids()const { return _forbids; }
+
     inline std::shared_ptr<Ruler> ordinate(){return _ordinate;}
     inline void setOrdinate(std::shared_ptr<Ruler> ord){_ordinate=ord;}
     inline void resetOrdinate(){_ordinate=nullptr;}

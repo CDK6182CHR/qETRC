@@ -650,9 +650,9 @@ Ruler& Railway::addRuler(const QJsonObject& obj)
 std::shared_ptr<RailInterval> Railway::findInterval(const StationName& from, const StationName& to)
 {
 	auto t = stationByName(from);
-	if (t->hasDownAdjacent() && t->downAdjacent()->name == to)
+	if (t && t->hasDownAdjacent() && t->downAdjacent()->name == to)
 		return t->downNext;
-	else if (t->hasUpAdjacent() && t->upAdjacent()->name == to)
+	else if (t && t->hasUpAdjacent() && t->upAdjacent()->name == to)
 		return t->upNext;
 	return std::shared_ptr<RailInterval>();
 }
@@ -661,14 +661,14 @@ std::shared_ptr<RailInterval> Railway::findGeneralInterval(const StationName& fr
 {
 	auto t = stationByGeneralName(from);
 	//首先精确查找to
-	if (t->hasDownAdjacent() && t->downAdjacent()->name == to)
+	if (t && t->hasDownAdjacent() && t->downAdjacent()->name == to)
 		return t->downNext;
-	else if (t->hasUpAdjacent() && t->upAdjacent()->name == to)
+	else if (t && t->hasUpAdjacent() && t->upAdjacent()->name == to)
 		return t->upNext;
 
-	if (t->hasDownAdjacent() && t->downAdjacent()->name.equalOrContains(to))
+	if (t && t->hasDownAdjacent() && t->downAdjacent()->name.equalOrContains(to))
 		return t->downNext;
-	else if (t->hasUpAdjacent() && t->upAdjacent()->name.equalOrContains(to))
+	else if (t &&t->hasUpAdjacent() && t->upAdjacent()->name.equalOrContains(to))
 		return t->upNext;
 	return std::shared_ptr<RailInterval>();
 }

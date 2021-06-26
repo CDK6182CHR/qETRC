@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QHash>
 #include "data/train/train.h"
+#include "data/train/traintype.h"
 
 /**
  * @brief The TrainCollection class
@@ -25,6 +26,8 @@ class TrainCollection
      */
     QHash<TrainName, std::shared_ptr<Train>> fullNameMap;
     QHash<QString, QList<std::shared_ptr<Train>>> singleNameMap;
+
+    TypeManager _manager;
 public:
     TrainCollection() = default;
     TrainCollection(const TrainCollection&) = delete;

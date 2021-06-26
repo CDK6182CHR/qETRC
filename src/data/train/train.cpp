@@ -4,6 +4,7 @@
 #include "data/rail/rail.h"
 #include "data/diagram/trainline.h"
 #include "data/diagram/trainadapter.h"
+#include "data/train/traintype.h"
 
 
 Train::Train(const TrainName &trainName,
@@ -16,14 +17,14 @@ Train::Train(const TrainName &trainName,
 
 }
 
-Train::Train(const QJsonObject &obj)
+Train::Train(const QJsonObject &obj, TypeManager& manager)
 {
-    fromJson(obj);
+    fromJson(obj, manager);
 }
 
 Train::Train(const Train& another):
     _trainName(another._trainName),_starting(another._starting),_terminal(another._terminal),
-    _type(another._type),_ui(another._ui),
+    _type(another._type),_pen(another._pen),
     _passenger(another._passenger),_show(another._show),
     _timetable(another._timetable),
     _autoLines(another._autoLines)
@@ -34,7 +35,7 @@ Train::Train(const Train& another):
 Train::Train(Train&& another) noexcept:
     _trainName(std::move(another._trainName)), _starting(std::move(another._starting)),
     _terminal(std::move(another._terminal)),
-    _type(std::move(another._type)), _ui(std::move(another._ui)),
+    _type(std::move(another._type)), _pen(std::move(another._pen)),
     _passenger(another._passenger), _show(another._show),
     _timetable(std::move(another._timetable)),
     _autoLines(another._autoLines)
@@ -42,12 +43,12 @@ Train::Train(Train&& another) noexcept:
     //TrainAdapter not moved
 }
 
-void Train::fromJson(const QJsonObject &obj)
+void Train::fromJson(const QJsonObject &obj, TypeManager& manager)
 {
     const QJsonArray& archeci=obj.value("checi").toArray();
     _trainName.fromJson(archeci);
 
-    _type=obj.value("type").toString();
+    setType(obj.value("type").toString(), manager);
     _starting=StationName::fromSingleLiteral( obj.value("sfz").toString());
     _terminal=StationName::fromSingleLiteral(obj.value("zdz").toString());
     _show=obj.value("shown").toBool();
@@ -76,7 +77,7 @@ QJsonObject Train::toJson() const
     
     QJsonObject obj{
         {"checi",_trainName.toJson()},
-        {"type",_type},
+        {"type",_type->name()},
         {"sfz",_starting.toSingleLiteral()},
         {"zdz",_terminal.toSingleLiteral()},
         {"shown",_show},
@@ -93,6 +94,19 @@ QJsonObject Train::toJson() const
         //obj.insert("itemInfo", items);
     }
     return obj;
+}
+
+void Train::setType(const QString& _typeName, TypeManager& manager)
+{
+    _type = manager.findOrCreate(_typeName);
+}
+
+std::shared_ptr<QPen> Train::pen() const
+{
+    if (_pen)
+        return _pen;
+    else
+        return _type->pen();
 }
 
 void Train::appendStation(const StationName &name,
