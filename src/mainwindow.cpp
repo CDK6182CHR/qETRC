@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     //auto s = QString(R"(D:\Python\train_graph\sample.pyetgr)");
-    //auto s = QString(R"(D:\Python\train_graph\source\合九线.json)");
+    //auto s = QString(R"(D:\Python\train_graph\source\京沪线上局段20191230.pyetgr)");
     auto s = QString(R"(D:\Python\train_graph\source\濉阜线.json)");
 
     _diagram.fromJson(s);

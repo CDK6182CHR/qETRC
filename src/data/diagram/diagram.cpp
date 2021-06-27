@@ -1,5 +1,6 @@
 ﻿#include "diagram.h"
 #include "data/rail/railway.h"
+#include "trainadapter.h"
 
 #include <QFile>
 #include <QJsonObject>
@@ -45,6 +46,15 @@ void Diagram::updateTrain(std::shared_ptr<Train> t)
     for(const auto& r:_railways){
         t->updateBoundRailway(*r, _config);
     }
+}
+
+TrainEventList Diagram::listTrainEvents(const Train& train) const
+{
+    TrainEventList res;
+    for (auto p : train.adapters()) {
+        res.append(qMakePair(p, p->listAdapterEvents(_trainCollection)));
+    }
+    return res;
 }
 
 void Diagram::bindAllTrains()

@@ -51,6 +51,21 @@ bool TrainStation::nameEqual(const TrainStation& t1, const TrainStation& t2)
     return t1.name == t2.name;
 }
 
+bool TrainStation::timeInStoppedRange(int msecs) const
+{
+    static constexpr int msecsOfADay = 24 * 3600 * 1000;
+    int t1 = arrive.msecsSinceStartOfDay(), t2 = depart.msecsSinceStartOfDay();
+    if (t2 < t1)t2 += msecsOfADay;
+    msecs = (msecs + msecsOfADay) % msecsOfADay;
+    //考虑最多一个边界条件
+    if (t1 <= msecs && msecs <= t2) 
+        return true;
+    msecs += msecsOfADay;
+    if (t1 <= msecs && msecs <= t2)
+        return true;
+    return false;
+}
+
 QDebug operator<<(QDebug debug, const TrainStation& ts)
 {
     debug << ts.name << " " <<

@@ -165,5 +165,12 @@ signals:
 private slots:
     void updateTimeAxis();
     void updateDistanceAxis();
+
+public slots:
+
+    /**
+     * @brief showTrainEventText  临时使用 ETRC风格的文本形式输出事件表
+     */
+    void showTrainEventText();
 };
 

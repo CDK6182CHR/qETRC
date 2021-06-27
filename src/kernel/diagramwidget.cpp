@@ -11,6 +11,9 @@
 #include <cmath>
 #include <QPrinter>
 #include <QMessageBox>
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QTextBrowser>
 
 DiagramWidget::DiagramWidget(Diagram &diagram, QWidget* parent):
     QGraphicsView(parent),_diagram(diagram),startTime(diagram.config().start_hour,0,0)
@@ -186,8 +189,9 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
 
 void DiagramWidget::mouseDoubleClickEvent(QMouseEvent* e)
 {
-    qDebug() << "DiagramWidget: save PDF" << Qt::endl;
-    toPdf(R"(D:\QTProject\qETRC\测试数据\sample.pdf)", "qETRC多线路测试样张");
+    //qDebug() << "DiagramWidget: save PDF" << Qt::endl;
+    //toPdf(R"(D:\QTProject\qETRC\测试数据\sample.pdf)", "qETRC多线路测试样张");
+    showTrainEventText();
 }
 
 void DiagramWidget::resizeEvent(QResizeEvent* e)
@@ -778,4 +782,37 @@ void DiagramWidget::updateDistanceAxis()
     QPoint p2(width(), 0);
     auto sp2 = mapToScene(p2);
     marginItems.right->setX(sp2.x() - scene()->width() - 20);
+}
+
+void DiagramWidget::showTrainEventText()
+{
+    if (!_selectedTrain) {
+        QMessageBox::warning(this, QObject::tr("错误"),
+            QObject::tr("当前车次事件表：请先选择一个车次！"));
+        return;
+    }
+    TrainEventList lst = _diagram.listTrainEvents(*_selectedTrain);
+    QString res;
+    for (const auto& p : lst) {
+        res += _selectedTrain->trainName().full() + " 在 " +
+            p.first->railway().name() + " 上的事件时刻表: \n";
+        for (const auto& q : p.second) {
+            //站内事件表
+            for (const auto& r : q.stEvents) {
+                res += r.toString() + '\n';
+            }
+            for (const auto& r : q.itEvents) {
+                res += r.toString() + '\n';
+            }
+        }
+    }
+
+    QDialog* dialog=new QDialog(this);
+    QVBoxLayout* layout = new QVBoxLayout;
+    auto* browser = new  QTextBrowser;
+    browser->setText(res);
+    layout->addWidget(browser);
+    dialog->setLayout(layout);
+    dialog->show();
+    dialog->exec();
 }

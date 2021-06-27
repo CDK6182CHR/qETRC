@@ -139,7 +139,7 @@ private:
 
     /**
      * @brief detectPassStations  推定区间通过站时刻
-     * 注意通过站时刻是属于IntervalEvent的
+     * 注意通过站时刻放在左边那个站的StationEvent里面
      * @param index  区间左端点下标，即插入位置
      * @param itr 区间左端点 迭代器
      */
@@ -151,6 +151,10 @@ private:
      */
     void eventsWithSameDir(LineEventList& res, const TrainLine& another, const Train& antrain)const;
 
+    /**
+     * @brief eventsWithCounter 反向列车事件表：主要是交会
+     * 反向列车用反向迭代器，这样保证y的方向是单向变化的
+     */
     void eventsWithCounter(LineEventList& res, const TrainLine& another, const Train& antrain)const;
 
     /**
@@ -164,8 +168,18 @@ private:
     /**
      * @brief yComp 两个站的y坐标比较
      * 如果y(st1)<y(st2)，返回-1.
+     * 采用模版，是为了对付反向迭代器
      */
-    int yComp(ConstAdaPtr st1, ConstAdaPtr st2)const;
+    template <typename ForwardIter1, typename ForwardIter2>
+    inline int yComp(ForwardIter1 st1, ForwardIter2 st2)const {
+        double y1 = st1->railStation.lock()->y_value.value(),
+            y2 = st2->railStation.lock()->y_value.value();
+        if (y1 == y2)
+            return 0;
+        else if (y1 < y2)
+            return -1;
+        return +1;
+    }
 
     /**
      * @brief xComp 两个时刻，也即横坐标的比较
@@ -181,8 +195,29 @@ private:
      * @param phe: 对方的迭代器 引用！
      * 保证传入的不是end()
      */
-    void sameDirStep(int ycond, ConstAdaPtr& pme, ConstAdaPtr& phe,
-        ConstAdaPtr& mylast, ConstAdaPtr& hislast,int& index)const;
+    template <typename ForwardIter1,typename ForwardIter2>
+    inline void sameDirStep(int ycond, ForwardIter1& pme, ForwardIter2& phe,
+        ForwardIter1& mylast, ForwardIter2& hislast,int& index)const {
+        if (ycond == 0) {
+            //同一站，共进一步
+            mylast = pme;
+            ++pme;
+            ++index;
+            hislast = phe;
+            ++phe;
+        }
+        else if (dir() == Direction::Down && ycond < 0 ||
+            dir() == Direction::Up && ycond>0) {
+            //下行时，我的y较小，即比较落后，因此进一步
+            mylast = pme;
+            ++index;
+            ++pme;
+        }
+        else {
+            hislast = phe;
+            ++phe;
+        }
+    }
 
     /**
      * @brief getPrevousPassedTime 推定前一站通过的时刻。
@@ -191,7 +226,20 @@ private:
      * @param target 要推定时刻的目标车站。
      * @return 目标站的时刻，以【毫秒数】表示！！
      */
-    int getPrevousPassedTime(ConstAdaPtr st, std::shared_ptr<RailStation> target)const;
+    template <typename BidirIter>
+    inline int getPrevousPassedTime(BidirIter st, std::shared_ptr<RailStation> target)const {
+        static constexpr int msecsOfADay = 24 * 3600 * 1000;
+        auto prev = st; --prev;
+        double y0 = prev->railStation.lock()->y_value.value();
+        double yn = st->railStation.lock()->y_value.value();
+        double yi = target->y_value.value();
+
+        int x0 = prev->trainStation->depart.msecsSinceStartOfDay();
+        int xn = st->trainStation->arrive.msecsSinceStartOfDay();
+
+        if (xn < x0) xn += msecsOfADay;
+        return int(std::round((yi - y0) / (yn - y0) * (xn - x0) + x0)) % msecsOfADay;
+    }
 
     /**
      * @brief findIntervalIntersectionSameDIr 判断同向区间交点。
@@ -201,6 +249,18 @@ private:
     std::optional<std::tuple<double, QTime, TrainEventType>>
         findIntervalIntersectionSameDir(ConstAdaPtr mylast, ConstAdaPtr mythis,
             ConstAdaPtr hislast, ConstAdaPtr histhis)const;
+
+    /**
+     * @brief findIntervalIntersectionCounter 判断对向区间交点。
+     * 基本照抄同向的；但是只需要判定是否有交叉。
+     * 代码重复比较多。但为了避免在.h文件里搞一大堆代码，似乎只能这样
+     */
+    std::optional<std::tuple<double, QTime, TrainEventType>>
+        findIntervalIntersectionCounter(ConstAdaPtr mylast, ConstAdaPtr mythis,
+            std::list<AdapterStation>::const_reverse_iterator hislast,
+            std::list<AdapterStation>::const_reverse_iterator histhis)const;
+    
+    QString stationString(const AdapterStation& st)const;
 
 };
 

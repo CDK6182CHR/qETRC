@@ -51,6 +51,15 @@ void TrainAdapter::unhighlightItems()
 	}
 }
 
+AdapterEventList TrainAdapter::listAdapterEvents(const TrainCollection& coll) const
+{
+	AdapterEventList res;
+	for (auto p : _lines) {
+		res.append(p->listLineEvents(coll));
+	}
+	return res;
+}
+
 void TrainAdapter::autoLines(const Config& config)
 {
 	//命名规则：前缀r表示rail，t表示train

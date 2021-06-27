@@ -109,7 +109,7 @@ public:
      * 4. 任何区间和停站时长都小于12小时。否则会干扰时刻前后判断。
      *    时刻前后的判断不依赖于前后文，只考虑当前：PBC下使得差值绝对值较小的理解。
      */
-    TrainEventList listTrainEvents(std::shared_ptr<Train> train)const;
+    TrainEventList listTrainEvents(const Train& train)const;
 
 private:
     void bindAllTrains();
