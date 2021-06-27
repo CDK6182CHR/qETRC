@@ -32,7 +32,8 @@ SOURCES += \
     src/kernel/diagramwidget.cpp \
     src/kernel/trainitem.cpp \
     src/main.cpp \
-    src/mainwindow.cpp
+    src/mainwindow.cpp \
+    src/util/utilfunc.cpp
 
 HEADERS += \
     src/data/common/direction.h \
@@ -59,7 +60,8 @@ HEADERS += \
     src/kernel/diagramwidget.h \
     src/kernel/trainitem.h \
     src/mainwindow.h \
-    src/util/qeexceptions.h
+    src/util/qeexceptions.h \
+    src/util/utilfunc.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

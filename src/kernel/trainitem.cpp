@@ -25,6 +25,7 @@ TrainItem::TrainItem(TrainLine& line,
 
 QRectF TrainItem::boundingRect() const
 {
+    return QRectF();
     if (pathItem)
         return _bounding;
     else
@@ -187,8 +188,11 @@ TrainItem::~TrainItem() noexcept
 
     for (auto p : markLabels)
         delete p;
-    markLabels.clear();
+    markLabels.clear();  
+}
 
+void TrainItem::clearLabelInfo()
+{
     auto& sl = _line.firstRailStation()->startingLabels(_line.dir());
     auto& se = _line.lastRailStation()->terminalLabels(_line.dir());
     if (startLabelInfo != sl.end()) {
@@ -350,10 +354,10 @@ void TrainItem::setPathItem(const QString& trainName)
         QPen expen(Qt::transparent, pen.width() * config().valid_width);
         expandItem = new QGraphicsPathItem(outpath, this);
         expandItem->setPen(expen);
-        _bounding = expandItem->boundingRect();
+        //_bounding = expandItem->boundingRect();
     }
     else {
-        _bounding = pathItem->boundingRect();
+        //_bounding = pathItem->boundingRect();
     }
 
     //跨界点标记
@@ -373,7 +377,7 @@ void TrainItem::setPathItem(const QString& trainName)
             item->setFont(font);
         item->setPos(start_x - sw, p - sh / 2 + start_y);
         spanItems.append(item);
-        _bounding |= item->boundingRect();
+        //_bounding |= item->boundingRect();
     }
     for (auto p : spanRight) {
         auto* item = setStartEndLabelText(trainName, pen.color());
@@ -387,7 +391,7 @@ void TrainItem::setPathItem(const QString& trainName)
             item->setFont(font);
         item->setPos(start_x + width, p - sh / 2 + start_y);
         spanItems.append(item);
-        _bounding |= item->boundingRect();
+        //_bounding |= item->boundingRect();
     }
 
    

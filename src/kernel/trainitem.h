@@ -94,6 +94,16 @@ public:
 
     ~TrainItem()noexcept;
 
+    /**
+     * 清除Railway中保存的标签高度信息。
+     * 逻辑上这个好像该析构函数去做。但如果是整张图重新铺画的情况，铺画前高度信息应该已经没有了，
+     * 此时迭代器失效，再去删除会搞出问题来。
+     * 因此只有单独重新铺画一趟车的运行线时，才有必要手动删除信息。
+     * 
+     * 以后写刷新操作时，应当把线路绑定信息也刷新一下。
+     */
+    void clearLabelInfo();
+
 private:
     
     const Config& config()const { return _diagram.config(); }

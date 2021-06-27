@@ -138,7 +138,7 @@
       <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
       <ObjectFileName>debug\</ObjectFileName>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -199,8 +199,10 @@
     <ClCompile Include="src\kernel\trainitem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mainwindow.cpp" />
+    <ClCompile Include="src\util\utilfunc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\util\utilfunc.h" />
     <QtMoc Include="src\mainwindow.h">
     </QtMoc>
     <ClInclude Include="src\data\common\common_header.h" />

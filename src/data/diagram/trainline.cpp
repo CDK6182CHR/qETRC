@@ -251,71 +251,28 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 	ConstAdaPtr mylast = _stations.begin(), hislast = another._stations.begin();   //上一站的迭代器
 	int index = 0;   //自己的站序下标，用来插入结果的
 
-	int ylast = 0, xlast = 0;    //记载上一站比较结果
-
-	//把第一站的情况直接处理掉
-	int xcond, ycond = yComp(pme, phe);
-	if (ycond == 0) {
-		//首站是同一个站，需要判断
-		auto tme = pme->trainStation, the = phe->trainStation;
-		xlast = xComp(tme->arrive, the->arrive);
-		xcond = xComp(tme->depart, the->depart);
-		if (xcond == xlast) {
-			//到开比较情况一致，只有重合需要说明一下
-			if (xcond == 0) {
-				res[0].emplace(StationEvent(
-					TrainEventType::Coincidence, tme->arrive, pme->railStation,
-					std::cref(antrain), QObject::tr("站内共线")
-				));
-			}
-		}
-		else if (xcond > xlast) {
-			//规定：第一次碰到0时不处理
-			if (xcond > 0) {
-				//被踩
-				res[0].emplace(StationEvent(
-					TrainEventType::Avoid, the->depart, pme->railStation,
-					std::cref(antrain)
-				));
-			}
-		}
-		else {  // xcond < xlast
-			if (xcond < 0) {
-				//踩了对方
-				res[0].emplace(StationEvent(
-					TrainEventType::OverTaking, tme->depart, pme->railStation,
-					std::cref(antrain)
-				));
-			}
-		}
-		ylast = ycond;
-		xlast = xcond;
-		sameDirStep(ycond, pme, phe, mylast, hislast, index);
-	}
-	else {
-		//首站不是同一个站，啥都不用管了
-		ylast = ycond;
-		xlast = xComp(pme->trainStation->depart, phe->trainStation->depart);
-		sameDirStep(ycond, pme, phe, mylast, hislast, index);
-	}
+	int ylast = -2, xlast = 0;    //记载上一站比较结果
+	double xcond, ycond;
 
 	//后面的站 类似merge过程
 	while (pme != _stations.end() && phe != another._stations.end()) {
 		ycond = yComp(pme, phe);
-		if (ycond == ylast && ycond != 0) {
+		if ((ycond == ylast || ylast == -2) && ycond != 0) {
 			//和上一次访问在同一个区间，啥都不用干，继续
 			ylast = ycond;
 			sameDirStep(ycond, pme, phe, mylast, hislast, index);
 			continue;
 		}
 		//先判定上一个区间有没有发生什么事情。注意此时两个都必定是直线段
-		auto pint = findIntervalIntersectionSameDir(mylast, pme, hislast, phe);
-		if (pint.has_value()) {
-			res[index - 1].emplace(IntervalEvent(
-				std::get<2>(pint.value()), std::get<1>(pint.value()),
-				mylast, pme, std::cref(antrain), std::get<0>(pint.value()),
-				QObject::tr("区间越行??")
-			));
+		if (pme != mylast && phe != hislast) {
+			auto pint = findIntervalIntersectionSameDir(mylast, pme, hislast, phe);
+			if (pint.has_value()) {
+				res[index - 1].emplace(IntervalEvent(
+					std::get<2>(pint.value()), std::get<1>(pint.value()),
+					mylast, pme, std::cref(antrain), std::get<0>(pint.value()),
+					QObject::tr("区间越行??")
+				));
+			}
 		}
 
 		auto tme = pme->trainStation, the = phe->trainStation;
@@ -375,9 +332,9 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 					}
 				}
 				else {
-					qDebug() << "TrainLine::eventsWithSameDir: WARNING: "
-						<< "Invalid begin() of iterator encountered at station: "
-						<< stationString(*pme) << Qt::endl;
+					//qDebug() << "TrainLine::eventsWithSameDir: WARNING: "
+					//	<< "Invalid begin() of iterator encountered at station: "
+					//	<< stationString(*pme) << Qt::endl;
 				}
 				
 			}
@@ -394,9 +351,9 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 					}
 				}
 				else {
-					qDebug() << "TrainLine::eventsWithSameDir: WARNING: "
-						<< "Invalid begin() of iterator encountered at station: "
-						<< stationString(*pme) << Qt::endl;
+					//qDebug() << "TrainLine::eventsWithSameDir: WARNING: "
+					//	<< "Invalid begin() of iterator encountered at station: "
+					//	<< stationString(*pme) << Qt::endl;
 				}
 			}
 			ylast = ycond;
@@ -421,74 +378,29 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
 	auto hislast = another._stations.rbegin();   //上一站的迭代器
 	int index = 0;   //自己的站序下标，用来插入结果的
 
-	int ylast = 0, xlast = 0;    //记载上一站比较结果  注意其实只有ylast有用 
-
-	//把第一站的情况直接处理掉
-	int xcond, ycond = yComp(pme, phe);
-	if (ycond == 0) {
-		//首站是同一个站，只需要看有没有交叉
-		//只要不是 （先到先开，后到后开）这两种情况，就有交点。
-		//如果我先到，那么对方的到达时间是事件时刻；反之就是我到的时刻。
-		auto tme = pme->trainStation, the = phe->trainStation;
-		xlast = xComp(tme->arrive, the->arrive);
-		
-		if (xlast == 0) {
-			//同时到站，直接判定会车
-			//会车时刻：this到达的时刻
-			res[index].emplace(StationEvent(
-				TrainEventType::Meet, tme->arrive, pme->railStation, std::cref(antrain)
-			));
-		}
-		else if (xlast < 0) {
-			//他来的时候我还没走，发生会车
-			if (xComp(the->arrive, tme->depart) <= 0) {
-				//会车时刻：他到达的时刻
-				res[index].emplace(StationEvent(
-					TrainEventType::Meet, the->arrive, pme->railStation, std::cref(antrain)
-				));
-			}
-		}
-		else {  //xlast > 0
-			//我到的时候他还没走
-			if (xComp(tme->arrive, the->depart) <= 0) {
-				//会车时刻：我到达的时刻
-				res[index].emplace(StationEvent(
-					TrainEventType::Meet, tme->arrive, pme->railStation, std::cref(antrain)
-				));
-			}
-		}
-		ylast = ycond;
-		sameDirStep(ycond, pme, phe, mylast, hislast, index);
-	}
-	else {
-		//首站不是同一个站，啥都不用管了
-		ylast = ycond;
-		sameDirStep(ycond, pme, phe, mylast, hislast, index);
-	}
+	int ylast = -2, xlast = 0;    //记载上一站比较结果  注意其实只有ylast有用  -2为开始标志
+	int ycond;
+	
 
 	//后面的站 类似merge过程
 	while (pme != _stations.end() && phe != another._stations.rend()) {
 		ycond = yComp(pme, phe);
-		if (ycond == ylast && ycond != 0) {
-			//和上一次访问在同一个区间，啥都不用干，继续
+		if ((ylast==-2 || ycond == ylast) && ycond != 0) {
+			//和上一次访问在同一个区间，或者第一次。啥都不用干，继续
 			ylast = ycond;
 			sameDirStep(ycond, pme, phe, mylast, hislast, index);
 			continue;
 		}
+
 		//先判定上一个区间有没有发生什么事情。注意此时两个都必定是直线段
-		//小心：第一站警告！！K1045, K1198测试用例。
-		if (antrain.trainName().down() == "K1045") {
-			qDebug() << "interval check: " << mylast->trainStation->name
-				<< " -> " << pme->trainStation->name << ", "
-				<< hislast->trainStation->name << " -> " <<
-				phe->trainStation->name << Qt::endl;
-		}
-		auto pint = findIntervalIntersectionCounter(mylast, pme, hislast, phe);
-		if (pint.has_value()) {
-			res[index - 1].emplace(IntervalEvent(
-				std::get<2>(pint.value()), std::get<1>(pint.value()),
-				mylast, pme, std::cref(antrain), std::get<0>(pint.value())
-			));
+		if (pme != _stations.begin() && phe != another._stations.rbegin()) {
+			auto pint = findIntervalIntersectionCounter(mylast, pme, hislast, phe);
+			if (pint.has_value()) {
+				res[index - 1].emplace(IntervalEvent(
+					std::get<2>(pint.value()), std::get<1>(pint.value()),
+					mylast, pme, std::cref(antrain), std::get<0>(pint.value())
+				));
+			}
 		}
 
 		auto tme = pme->trainStation, the = phe->trainStation;

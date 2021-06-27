@@ -22,7 +22,7 @@ DiagramWidget::DiagramWidget(Diagram &diagram, QWidget* parent):
     setRenderHint(QPainter::Antialiasing, true);
     setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
-    setScene(new QGraphicsScene);
+    setScene(new QGraphicsScene(this));
     //todo: label span
     paintGraph();
 
@@ -31,11 +31,6 @@ DiagramWidget::DiagramWidget(Diagram &diagram, QWidget* parent):
 
 DiagramWidget::~DiagramWidget() noexcept
 {
-    if (scene()) {
-        auto* s = scene();
-        setScene(nullptr);
-        delete s;
-    }
 }
 
 void DiagramWidget::autoPaintGraph()

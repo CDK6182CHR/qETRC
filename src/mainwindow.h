@@ -16,6 +16,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
     Diagram _diagram;
+    DiagramWidget* diagramWidget;
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();

@@ -1,4 +1,5 @@
 ﻿#include "trainstation.h"
+#include "util/utilfunc.h"
 
 
 TrainStation::TrainStation(const StationName& name_, 
@@ -17,11 +18,13 @@ TrainStation::TrainStation(const QJsonObject &obj)
 void TrainStation::fromJson(const QJsonObject &obj)
 {
     name=StationName::fromSingleLiteral(obj.value("zhanming").toString());
-    arrive=QTime::fromString(obj.value("ddsj").toString(),"hh:mm:ss");
+    //arrive=QTime::fromString(obj.value("ddsj").toString(),"hh:mm:ss");
+    arrive = qeutil::parseTime(obj.value("ddsj").toString());
     if(!arrive.isValid()){
         arrive=QTime::fromString(obj.value("ddsj").toString(),"hh:mm");
     }
-    depart=QTime::fromString(obj.value("cfsj").toString(),"hh:mm:ss");
+    //depart=QTime::fromString(obj.value("cfsj").toString(),"hh:mm:ss");
+    depart = qeutil::parseTime(obj.value("cfsj").toString());
     if(!depart.isValid()){
         depart=QTime::fromString(obj.value("cfsj").toString(),"hh:mm");
     }
