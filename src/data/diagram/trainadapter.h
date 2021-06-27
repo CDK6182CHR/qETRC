@@ -9,7 +9,7 @@
 #include "data/diagram/config.h"
 #include "trainline.h"
 
-
+class TrainCollection;
 
 /**
  * @brief 与线路数据相结合的列车信息
@@ -69,6 +69,16 @@ public:
     void highlightItems();
 
     void unhighlightItems();
+
+    inline bool isInSameRailway(const TrainAdapter& another)const {
+        return &_railway == &(another._railway);
+    }
+
+    /**
+     * @brief listAdapterEvents 列出本次列车在本线的事件表
+     * 逐段运行线计算。实际上只是个转发
+     */
+    AdapterEventList listAdapterEvents(const TrainCollection& coll)const;
 
 private:
 

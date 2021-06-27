@@ -15,6 +15,7 @@ SOURCES += \
     src/data/diagram/config.cpp \
     src/data/diagram/diagram.cpp \
     src/data/diagram/trainadapter.cpp \
+    src/data/diagram/trainevents.cpp \
     src/data/diagram/trainline.cpp \
     src/data/rail/forbid.cpp \
     src/data/rail/railinterval.cpp \
@@ -39,6 +40,7 @@ HEADERS += \
     src/data/diagram/config.h \
     src/data/diagram/diagram.h \
     src/data/diagram/trainadapter.h \
+    src/data/diagram/trainevents.h \
     src/data/diagram/trainline.h \
     src/data/rail/forbid.h \
     src/data/rail/rail.h \

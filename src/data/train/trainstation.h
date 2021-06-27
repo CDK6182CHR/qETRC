@@ -13,7 +13,7 @@
 #include "data/common/stationname.h"
 #include "data/rail/railstation.h"
 
-/*
+/**
  * 注：目前支持在（绑定到相同线路的）不同车次间移动时不出问题。
  * jointTrain()方法依赖这一特性
  */
@@ -41,6 +41,13 @@ public:
     int stopSec()const;
 
     static bool nameEqual(const TrainStation& t1, const TrainStation& t2);
+
+    /**
+     * @brief timeInStoppedRange 判定所给时间是否在本站的停车时间范围内。
+     * 注意周期边界条件的消歧约定。
+     * @param msecs  要判定的时间，以毫秒数表示
+     */
+    bool timeInStoppedRange(int msecs)const;
 };
 
 QDebug operator<<(QDebug debug, const TrainStation& ts);

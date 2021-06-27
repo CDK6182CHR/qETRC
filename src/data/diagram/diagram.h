@@ -8,6 +8,7 @@
 #include "config.h"
 #include "data/train/traincollection.h"
 #include "data/train/traintype.h"
+#include "data/diagram/trainline.h"
 
 
 class Train;
@@ -95,6 +96,20 @@ public:
     void updateTrain(std::shared_ptr<Train> t);
 
     auto& trains() { return _trainCollection.trains(); }
+
+    /**
+     * @brief pyETRC.GraphicsWidget.listTrainEvent  列出事件表
+     * 采用类似ETRC的算法，逐个Adapter、逐个Item计算，而不是直接找图元交叠。
+     * 暂时写成const，如果写不下去再改
+     * preconditions:
+     * 1. 所有里程、标尺严格递增。运行图已经铺画（车站y坐标已知）。
+     * 2. 所有运行线是严格单调的，也就是说上行运行线y值单调不增。i.e. 运行线分划是严格正确的
+     * 3. 折返车次优化：对重叠站，后一段运行线的事件表从出发开始列。即，如果没有开始标签，
+     *    则第一站只列出出发时刻数据。
+     * 4. 任何区间和停站时长都小于12小时。否则会干扰时刻前后判断。
+     *    时刻前后的判断不依赖于前后文，只考虑当前：PBC下使得差值绝对值较小的理解。
+     */
+    TrainEventList listTrainEvents(std::shared_ptr<Train> train)const;
 
 private:
     void bindAllTrains();

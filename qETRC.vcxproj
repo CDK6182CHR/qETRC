@@ -182,6 +182,7 @@
     <ClCompile Include="src\data\diagram\config.cpp" />
     <ClCompile Include="src\data\diagram\diagram.cpp" />
     <ClCompile Include="src\data\diagram\trainadapter.cpp" />
+    <ClCompile Include="src\data\diagram\trainevents.cpp" />
     <ClCompile Include="src\data\diagram\trainline.cpp" />
     <ClCompile Include="src\data\rail\forbid.cpp" />
     <ClCompile Include="src\data\rail\railinterval.cpp" />
@@ -208,6 +209,7 @@
     <ClInclude Include="src\data\diagram\config.h" />
     <ClInclude Include="src\data\diagram\diagram.h" />
     <ClInclude Include="src\data\diagram\trainadapter.h" />
+    <ClInclude Include="src\data\diagram\trainevents.h" />
     <ClInclude Include="src\data\diagram\trainline.h" />
     <ClInclude Include="src\data\rail\forbid.h" />
     <ClInclude Include="src\data\rail\rail.h" />

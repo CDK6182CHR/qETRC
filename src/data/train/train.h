@@ -6,7 +6,6 @@
 #include <list>
 #include "trainname.h"
 #include "trainstation.h"
-#include "data/diagram/trainline.h"
 #include "data/diagram/config.h"
 
 enum class TrainPassenger:
