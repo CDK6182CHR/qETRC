@@ -70,13 +70,13 @@ struct AdapterStation;
 struct IntervalEvent{
     TrainEventType type;
     QTime time;
-    std::list<AdapterStation>::const_iterator former,latter;
+    const AdapterStation& former, & latter;
     std::reference_wrapper<const Train> another;
     double mile;
     QString note;
     IntervalEvent(TrainEventType type_,const QTime& time_,
-                  std::list<AdapterStation>::const_iterator former_,
-                  std::list<AdapterStation>::const_iterator latter_,
+                  const AdapterStation& former_,
+                  const AdapterStation& latter_,
                   std::reference_wrapper<const Train> another_,
                   double mile_, const QString& note_=""
                   ):

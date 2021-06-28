@@ -269,7 +269,7 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 			if (pint.has_value()) {
 				res[index - 1].emplace(IntervalEvent(
 					std::get<2>(pint.value()), std::get<1>(pint.value()),
-					mylast, pme, std::cref(antrain), std::get<0>(pint.value()),
+					*mylast, *pme, std::cref(antrain), std::get<0>(pint.value()),
 					QObject::tr("区间越行??")
 				));
 			}
@@ -330,7 +330,7 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 						res[index - 1].emplace(IntervalEvent(
 							TrainEventType::OverTaking,
 							QTime::fromMSecsSinceStartOfDay(passedTime),
-							mylast, pme, std::cref(antrain), rhe->mile,
+							*mylast, *pme, std::cref(antrain), rhe->mile,
 							QObject::tr("推定")
 						));
 					}
@@ -396,7 +396,7 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
 			if (pint.has_value()) {
 				res[index - 1].emplace(IntervalEvent(
 					std::get<2>(pint.value()), std::get<1>(pint.value()),
-					mylast, pme, std::cref(antrain), std::get<0>(pint.value())
+					*mylast, *pme, std::cref(antrain), std::get<0>(pint.value())
 				));
 			}
 		}
@@ -450,7 +450,7 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
 							res[index - 1].emplace(IntervalEvent(
 								TrainEventType::Meet,
 								QTime::fromMSecsSinceStartOfDay(passedTime),
-								mylast, pme, std::cref(antrain), rhe->mile,
+								*mylast, *pme, std::cref(antrain), rhe->mile,
 								QObject::tr("推定")
 							));
 						}
@@ -647,8 +647,8 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
 
 std::optional<std::tuple<double, QTime, TrainEventType>> 
 	TrainLine::findIntervalIntersectionCounter(ConstAdaPtr mylast, ConstAdaPtr mythis, 
-		std::list<AdapterStation>::const_reverse_iterator hislast, 
-		std::list<AdapterStation>::const_reverse_iterator histhis) const
+		std::deque<AdapterStation>::const_reverse_iterator hislast, 
+		std::deque<AdapterStation>::const_reverse_iterator histhis) const
 {
 	auto rm1 = mylast->railStation.lock(), rm2 = mythis->railStation.lock();
 	auto rh1 = hislast->railStation.lock(), rh2 = histhis->railStation.lock();

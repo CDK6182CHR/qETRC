@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <memory>
-#include <list>
+#include <deque>
 #include <optional>
 #include <tuple>
 #include <QJsonObject>
@@ -47,14 +47,22 @@ class TrainLine
 {
     friend class TrainAdapter;
     TrainAdapter& _adapter;
-    std::list<AdapterStation> _stations;
+
+    /**
+     * 采用std::deque实现，保证指针和引用的安全性，但注意迭代器仍然是不安全的！
+     */
+    std::deque<AdapterStation> _stations;
     Direction _dir;
     bool _show;
     bool _startLabel, _endLabel;
     TrainItem* _item;
-
-    using AdaPtr = std::list<AdapterStation>::iterator;
-    using ConstAdaPtr = std::list<AdapterStation>::const_iterator;
+    
+    /**
+     * 迭代器使用注意：全程必须保证_stations不变
+     * 即仅能在const下使用
+     * 原则上，迭代器不能外传
+     */
+    using ConstAdaPtr = std::deque<AdapterStation>::const_iterator;
 
 public:
     /**
@@ -82,6 +90,10 @@ public:
     inline Direction dir()const { return _dir; }
     inline bool startLabel()const { return _startLabel; }
     inline bool endLabel()const { return _endLabel; }
+
+    /**
+     * 注意：原则上不允许在中间修改
+     */
     auto& stations() { return _stations; }
     auto& adapter() { return _adapter; }
     Train& train();
@@ -257,8 +269,8 @@ private:
      */
     std::optional<std::tuple<double, QTime, TrainEventType>>
         findIntervalIntersectionCounter(ConstAdaPtr mylast, ConstAdaPtr mythis,
-            std::list<AdapterStation>::const_reverse_iterator hislast,
-            std::list<AdapterStation>::const_reverse_iterator histhis)const;
+            std::deque<AdapterStation>::const_reverse_iterator hislast,
+            std::deque<AdapterStation>::const_reverse_iterator histhis)const;
     
     QString stationString(const AdapterStation& st)const;
 

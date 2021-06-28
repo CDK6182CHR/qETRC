@@ -69,8 +69,8 @@ QString IntervalEvent::toString() const
 {
 	auto s = QString::asprintf("%.3lf km. ", mile);
 	s += time.toString(" hh:mm:ss ");
-	s += QString(" [") + former->trainStation->name.toSingleLiteral() + " - "
-		+ latter->trainStation->name.toSingleLiteral() + QString("] 区间 ");
+	s += QString(" [") + former.trainStation->name.toSingleLiteral() + " - "
+		+ latter.trainStation->name.toSingleLiteral() + QString("] 区间 ");
 	switch (type) {
 	case TrainEventType::Meet:return s + "会 " + another.get().trainName().full();
 	case TrainEventType::Avoid:return s + "让 " + another.get().trainName().full();
