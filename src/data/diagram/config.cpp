@@ -24,10 +24,34 @@ void MarginConfig::fromJson(const QJsonObject& obj)
     FROM_OBJ(gap_between_railways, Int);
 }
 
+#define TO_OBJ(_key) {#_key,_key},
 
+#define TO_OBJ_NAME(_key,_strkey) {#_strkey,_key},
 
-void Config::fromJson(const QJsonObject& obj)
+QJsonObject MarginConfig::toJson() const
 {
+    return QJsonObject{
+        TO_OBJ(left_white)
+        TO_OBJ(right_white)
+        TO_OBJ(left)
+        TO_OBJ(right)
+        TO_OBJ(up)
+        TO_OBJ(down)
+        TO_OBJ(label_width)
+        TO_OBJ(mile_label_width)
+        TO_OBJ(ruler_label_width)
+        TO_OBJ(title_row_height)
+        TO_OBJ(first_row_append)
+        TO_OBJ(gap_between_railways)
+    };
+}
+
+
+
+bool Config::fromJson(const QJsonObject& obj)
+{
+    if (obj.empty())
+        return false;
     FROM_OBJ(seconds_per_pix, Double);
     FROM_OBJ(seconds_per_pix_y, Double);
     FROM_OBJ(pixels_per_km, Double);
@@ -52,6 +76,9 @@ void Config::fromJson(const QJsonObject& obj)
     FROM_OBJ(table_row_height, Int);
     FROM_OBJ(link_line_height, Int);
 
+    FROM_OBJ(auto_paint, Bool);
+    FROM_OBJ_NAME(show_full_train_name, showFullCheci, Bool);
+
     FROM_OBJ(show_time_mark, Int);
     FROM_OBJ(max_passed_stations, Int);
 
@@ -63,9 +90,6 @@ void Config::fromJson(const QJsonObject& obj)
     FROM_OBJ(bold_grid_width, Double);
     FROM_OBJ(valid_width, Int);
 
-    FROM_OBJ(auto_paint, Bool);
-    FROM_OBJ_NAME(show_full_train_name, showFullCheci, Bool);
-
     FROM_OBJ_NAME(end_label_name, end_label_checi, Bool);
 
     margins.fromJson(obj.value("margins").toObject());
@@ -75,6 +99,48 @@ void Config::fromJson(const QJsonObject& obj)
     for (const auto& p : artypes) {
         not_show_types.insert(p.toString());
     }
+    return true;
+}
+
+QJsonObject Config::toJson() const
+{
+    //先把能够一行转换的写了，其他的再后面插
+    QJsonObject obj{
+        TO_OBJ(seconds_per_pix)
+        TO_OBJ(seconds_per_pix_y)
+        TO_OBJ(pixels_per_km)
+        TO_OBJ_NAME(default_passenger_width,
+            default_keche_width)
+        TO_OBJ_NAME(default_freight_width,
+            default_huoche_width)
+        TO_OBJ(default_db_file)
+        TO_OBJ(start_hour)
+        TO_OBJ(end_hour)
+        TO_OBJ(minutes_per_vertical_line)
+        TO_OBJ(minute_mark_gap_pix)
+        TO_OBJ(bold_line_level)
+        TO_OBJ(show_line_in_station)
+        TO_OBJ(start_label_height)
+        TO_OBJ(end_label_height)
+        TO_OBJ(table_row_height)
+        TO_OBJ(link_line_height)
+        TO_OBJ(auto_paint)
+        TO_OBJ_NAME(show_full_train_name,
+            showFullCheci)
+        TO_OBJ(show_time_mark)
+        TO_OBJ(max_passed_stations)
+        TO_OBJ(avoid_cover)
+        TO_OBJ(base_label_height)
+        TO_OBJ(step_label_height)
+        TO_OBJ(default_grid_width)
+        TO_OBJ(bold_grid_width)
+        TO_OBJ(valid_width)
+        TO_OBJ_NAME(end_label_name,end_label_checi)
+    };
+    obj.insert("grid_color", grid_color.name());
+    obj.insert("text_color", text_color.name());
+    obj.insert("margins", margins.toJson());
+    return obj;
 }
 
 double Config::diagramWidth() const

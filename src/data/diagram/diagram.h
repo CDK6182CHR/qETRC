@@ -39,14 +39,21 @@ public:
     Diagram& operator=(Diagram&&)=delete;
 
     /**
+     * 读取默认配置文件 config.json
+     * 包含Config和类型系统两部分
+     */
+    bool readDefaultConfigs(const QString& filename);
+
+    /**
      * @brief fromJson  清空既有数据，从文件读取，同时保存文件名
      */
-    void fromJson(const QString& filename);
+    bool fromJson(const QString& filename);
 
     /**
      * @brief fromJson  读入数据后绑定车次和线路
+     * 返回是否成功 （如果为空则失败）
      */
-    void fromJson(const QJsonObject& obj);
+    bool fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;
 
     inline auto& railways(){return _railways;}

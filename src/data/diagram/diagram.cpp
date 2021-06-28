@@ -67,22 +67,32 @@ void Diagram::bindAllTrains()
 }
 
 
-void Diagram::fromJson(const QString& filename)
+bool Diagram::fromJson(const QString& filename)
 {
     QFile f(filename);
     f.open(QFile::ReadOnly);
+    if (!f.isOpen()) {
+        qDebug() << "Diagram::fromJson: ERROR: open file " << filename << " failed. " << Qt::endl;
+        return false;
+    }
     auto contents = f.readAll();
     QJsonDocument doc = QJsonDocument::fromJson(contents);
-    fromJson(doc.object());
+    bool flag = fromJson(doc.object());
     f.close();
+    return flag;
 }
 
-void Diagram::fromJson(const QJsonObject& obj)
+bool Diagram::fromJson(const QJsonObject& obj)
 {
+    if (obj.empty())
+        return false;
     //车次和Config直接转发即可
     _trainCollection.fromJson(obj);
     //todo: 默认值的处理
-    _config.fromJson(obj.value("config").toObject());
+    bool flag = _config.fromJson(obj.value("config").toObject());
+    if (!flag) {
+        //缺配置信息，使用默认值
+    }
     _note = obj.value("markdown").toString();
     _version = obj.value("version").toString();
 
@@ -102,5 +112,5 @@ void Diagram::fromJson(const QJsonObject& obj)
         _railways.at(0)->setOrdinate(t.toString());
     }
     bindAllTrains();
-
+    return true;
 }

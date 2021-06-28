@@ -102,7 +102,11 @@ public:
     std::shared_ptr<TrainType> findOrCreate(const QString& name);
 
 private:
-    void fromJson(const QJsonObject& obj);
+    /**
+     * 输入格式是pyETRC的config.json或者graph中config对象
+     * 返回是否成功
+     */
+    bool fromJson(const QJsonObject& obj);
 
     void initDefaultTypes();
 };

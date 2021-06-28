@@ -55,6 +55,8 @@ struct Config
     QColor
         grid_color=QColor(170,170,127),  // #AAAA7F
         text_color=QColor(0,0,255);      // #0000FF
+    
+    // 默认客车和货车线宽，好像也没用了
     double
         default_passenger_width = 1.5,
         default_freight_width = 0.75;
@@ -104,15 +106,13 @@ struct Config
      */
     int end_label_name = true;
 
-    //todo 类型
-
     MarginConfig margins{};
 
     //排图标尺，现在改为Railway的性质
     //std::weak_ptr<Ruler> ordinate;
     QSet<QString> not_show_types;
 
-    void fromJson(const QJsonObject& obj);
+    bool fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;
 
     double diagramWidth()const;
