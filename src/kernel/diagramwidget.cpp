@@ -186,6 +186,7 @@ void DiagramWidget::mouseDoubleClickEvent(QMouseEvent* e)
 {
     //qDebug() << "DiagramWidget: save PDF" << Qt::endl;
     //toPdf(R"(D:\QTProject\qETRC\测试数据\sample.pdf)", "qETRC多线路测试样张");
+    qDebug() << "showStationEventText" << Qt::endl;
     showTrainEventText();
 }
 
@@ -406,10 +407,8 @@ void DiagramWidget::setVLines(double width, int hour_count,
     int minute_thres = config().minute_mark_gap_pix;
     int minute_marks_gap = std::max(int(minute_thres / gap_px), 1);  //每隔多少竖线标注一次分钟
     int vlines = 60 / gap;   //每小时纵线数量+1
-    int mark_count = vlines / minute_marks_gap;    //int div
     int centerj = vlines / 2;   //中心那条线的j下标。与它除minute_marks_gap同余的是要标注的
 
-    int line_count = gap * hour_count;    //小区间总数
     QPen
         pen_hour(config().grid_color, config().bold_grid_width),
         pen_half(config().grid_color, config().default_grid_width, Qt::DashLine),
@@ -511,6 +510,28 @@ void DiagramWidget::paintTrain(std::shared_ptr<Train> train)
                 //这个是不应该的
                 qDebug() << "DiagramWidget::paintTrain: WARNING: " <<
                     "Unexpected null TrainLine! " << train->trainName().full() << Qt::endl;
+            }
+            else {
+                auto* item = new TrainItem(*line, adp->railway(), _diagram);
+                line->setItem(item);
+                item->setZValue(5);
+                scene()->addItem(item);
+            }
+        }
+    }
+}
+
+void DiagramWidget::paintTrain(Train& train)
+{
+    train.clearItems();
+    if (!train.isShow())
+        return;
+    for (auto adp : train.adapters()) {
+        for (auto line : adp->lines()) {
+            if (line->isNull()) {
+                //这个是不应该的
+                qDebug() << "DiagramWidget::paintTrain: WARNING: " <<
+                    "Unexpected null TrainLine! " << train.trainName().full() << Qt::endl;
             }
             else {
                 auto* item = new TrainItem(*line, adp->railway(), _diagram);
@@ -795,10 +816,20 @@ void DiagramWidget::showTrainEventText()
             //站内事件表
             for (const auto& r : q.stEvents) {
                 res += r.toString() + '\n';
+
+                //debug: 把与本次列车有交集的车都画出来！
+                //if (r.another.has_value()&&!r.another.value().get().isShow()) {
+                //    auto& rr = const_cast<Train&>(r.another.value().get());
+                //    rr.setIsShow(true);
+                //    paintTrain(rr);
+                //}
             }
             for (const auto& r : q.itEvents) {
                 res += r.toString() + '\n';
             }
+
+           
+            
         }
     }
 

@@ -3,7 +3,9 @@
 #include <cstdint>
 #include <QList>
 #include <QJsonObject>
+#include <QPen>
 #include <list>
+#include <optional>
 #include "trainname.h"
 #include "trainstation.h"
 #include "data/diagram/config.h"
@@ -36,7 +38,7 @@ class Train
      * 整个运行过程中，应当保证非空
      */
     std::shared_ptr<TrainType> _type;
-    std::shared_ptr<QPen> _pen;
+    std::optional<QPen> _pen;
     TrainPassenger _passenger;
     bool _show;
 
@@ -113,7 +115,7 @@ public:
      * @brief pen
      * 返回非空指针。如果_pen为空（采用默认设置），返回类型默认值
      */
-    std::shared_ptr<QPen> pen()const;
+    const QPen& pen()const;
 
     inline ConstStationPtr nullStation()const { return _timetable.cend(); }
     inline StationPtr nullStation(){return _timetable.end();}

@@ -143,7 +143,7 @@ private:
      * @brief 封装查询列车绘制图形的方法
      * 暂定给个默认的
      */
-    QPen trainPen()const;
+    const QPen& trainPen()const;
 
     QColor trainColor()const;
 

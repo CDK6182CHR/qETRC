@@ -101,12 +101,13 @@ void Train::setType(const QString& _typeName, TypeManager& manager)
     _type = manager.findOrCreate(_typeName);
 }
 
-std::shared_ptr<QPen> Train::pen() const
+const QPen& Train::pen() const
 {
-    if (_pen)
-        return _pen;
+    //注意不能用value_or，因为返回的是值类型。
+    if (_pen.has_value())
+        return _pen.value();
     else
-        return _type->pen();
+        return type()->pen();
 }
 
 void Train::appendStation(const StationName &name,

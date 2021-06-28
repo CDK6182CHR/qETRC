@@ -90,6 +90,8 @@ private:
 
     void paintTrain(std::shared_ptr<Train> train);
 
+    void paintTrain(Train& train);
+
     /**
      * pyETRC.GraphicsWidget._addLeftTableText(self, text: str, 
      *           textFont, textColor, start_x, start_y, width, height)

@@ -21,14 +21,13 @@
 class TrainType
 {
     QString _name;
-    const std::shared_ptr<QPen> _pen;
+    QPen _pen;
     bool _passenger;
 public:
     TrainType(const QString& name, const QPen& pen, bool passenger=false) :
-        _name(name), _pen(std::make_shared<QPen>(pen)),_passenger(passenger){}
+        _name(name), _pen(pen),_passenger(passenger){}
 
-    std::shared_ptr<QPen> pen(){return _pen;}
-    std::shared_ptr<const QPen> pen()const{return _pen;}
+    const QPen& pen()const{return _pen;}
 
     bool isPassenger()const { return _passenger; }
     void setIsPassenger(bool p) { _passenger = p; }
@@ -54,7 +53,7 @@ class TypeManager{
      * @brief _regs
      * 按顺序进行正则匹配
      */
-    QList<QPair<QRegExp,std::shared_ptr<TrainType>>> _regs;
+    QList<QPair<QRegExp, std::shared_ptr<TrainType>>> _regs;
 
     static QPen defaultPen;
     static std::shared_ptr<TrainType> defaultType;
@@ -67,7 +66,12 @@ public:
     }
     TypeManager(const TypeManager&)=delete;
     TypeManager(TypeManager&&)=default;
-    TypeManager& operator=(const TypeManager&)=delete;
+
+    /**
+     * 拷贝赋值 手写 复制所有类型对象。
+     */
+    TypeManager& operator=(const TypeManager& another);
+
     TypeManager& operator=(TypeManager&&)=default;
 
     void readForDefault(const QJsonObject& obj);

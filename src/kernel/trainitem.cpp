@@ -229,7 +229,6 @@ void TrainItem::setPathItem(const QString& trainName)
     double start_x = margins().left;
     double start_y = _railway.startYValue();
     double width = config().diagramWidth();
-    double fullwidth = config().fullWidth();
 
     bool started = false;    //是否已经开始铺画
     double ylast = -1, xlast = -1;
@@ -363,7 +362,6 @@ void TrainItem::setPathItem(const QString& trainName)
     //跨界点标记
     QFont font;
     bool calculated = false;
-    double span_width = margins().right - margins().label_width;
     double sw = -1, sh = -1;    //item宽度
     for (auto p : spanLeft) {
         auto* item = setStartEndLabelText(trainName, pen.color());
@@ -557,9 +555,9 @@ double TrainItem::getInGraph(double xout, double yout, double xin, double yin, Q
     return yp;
 }
 
-QPen TrainItem::trainPen() const
+const QPen& TrainItem::trainPen() const
 {
-    return *(train().pen());
+    return train().pen();
 }
 
 QColor TrainItem::trainColor() const
@@ -685,8 +683,7 @@ void TrainItem::markArriveTime(double x, double y, const QTime& tm)
     if (tm.second() >= 30)m++;
     auto* item = new QGraphicsSimpleTextItem(QString::number(m % 10), this);
     item->setBrush(pen.color());
-    const auto& t = item->boundingRect();
-    double w = t.width(), h = t.height();
+    double h = item->boundingRect().height();
     if (_line.dir() == Direction::Down) {
         item->setPos(x + start_x, y - h + start_y);
     }

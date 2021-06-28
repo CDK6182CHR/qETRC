@@ -56,7 +56,6 @@ bool TrainStation::nameEqual(const TrainStation& t1, const TrainStation& t2)
 
 bool TrainStation::timeInStoppedRange(int msecs) const
 {
-    static constexpr int msecsOfADay = 24 * 3600 * 1000;
     int t1 = arrive.msecsSinceStartOfDay(), t2 = depart.msecsSinceStartOfDay();
     if (t2 < t1)t2 += msecsOfADay;
     msecs = (msecs + msecsOfADay) % msecsOfADay;
@@ -67,6 +66,15 @@ bool TrainStation::timeInStoppedRange(int msecs) const
     if (t1 <= msecs && msecs <= t2)
         return true;
     return false;
+}
+
+bool TrainStation::stopRangeIntersected(const TrainStation& another) const
+{
+    int xm1 = arrive.msecsSinceStartOfDay(), xm2 = depart.msecsSinceStartOfDay();
+    int xh1 = another.arrive.msecsSinceStartOfDay(), xh2 = another.depart.msecsSinceStartOfDay();
+    if (xm2 < xm1)xm2 += msecsOfADay;
+    if (xh2 < xh1)xh2 += msecsOfADay;
+    return std::max(xm1, xh1) <= std::min(xm2, xh2);
 }
 
 QDebug operator<<(QDebug debug, const TrainStation& ts)

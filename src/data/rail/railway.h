@@ -333,19 +333,19 @@ public:
 
     void showIntervals()const;
 
-    /*
+    /**
      * Line.addEmptyRuler()
      * 最标准的添加标尺方法
      */
-    Ruler& addEmptyRuler(const QString& name,bool different);
+    std::shared_ptr<Ruler> addEmptyRuler(const QString& name,bool different);
 
-    /*
+    /**
      * 替代Ruler的构造函数
      * 目前兼容pyETRC 3.3的文件，构造效率比较低
      */
-    Ruler& addRuler(const QJsonObject& obj);
+    std::shared_ptr<Ruler> addRuler(const QJsonObject& obj);
 
-    /*
+    /**
      * 寻找相邻区间
      * 注意 不考虑跨区间，因此是常数复杂度
      * 精确查找。
@@ -353,13 +353,13 @@ public:
     std::shared_ptr<RailInterval> findInterval(const StationName& from,
                                                const StationName& to);
 
-    /*
+    /**
      * 支持域解析符条件下查找区间，不考虑跨区间
      */
     std::shared_ptr<RailInterval> findGeneralInterval(const StationName& from,
                                                       const StationName& to);
 
-    /*
+    /**
      * 原Ruler.getInfo()中allow_multi模式
      * 返回路径中的Interval顺序表
      * 允许域解析符匹配
@@ -401,36 +401,38 @@ public:
     double startYValue()const { return _startYValue; }
     void setStartYValue(int y) { _startYValue = y; }
 
-    /*
+    /**
      * 和RailInterval::nextInterval()差不多
      * 但额外支持一次性解决上行的
      */
     std::shared_ptr<RailInterval> nextIntervalCirc(std::shared_ptr<RailInterval> railint);
 
 private:
-    /*
+    /**
      * 维护nameMap和fieldMap
      */
     void addMapInfo(const std::shared_ptr<RailStation>& st);
 
-    /*
+    /**
      * 删除车站时维护数据
      */
     void removeMapInfo(const StationName& name);
 
     void setMapInfo();
 
-    /*
+    /**
      * 启用和禁用numberMap
      * 用于初始化时快速找下标
      */
     void enableNumberMap();
     void disableNumberMap();
 
-    //暴力线性算法
+    /**
+     * 暴力线性算法查找
+     */
     int stationIndexBrute(const StationName& name)const;
 
-    /*
+    /**
      * Line.nameMapToLine()
      * 将站名映射到本线
      */
@@ -489,7 +491,7 @@ private:
     std::shared_ptr<RailStation>
         rightBothStation(std::shared_ptr<RailStation>);
 
-    /*
+    /**
      * 添加一个区间，代替RailInterval的构造函数。
      * 注意shared_from_this不能再构造函数中调用。
      */
@@ -497,12 +499,12 @@ private:
             std::shared_ptr<RailStation> from,
             std::shared_ptr<RailStation> to);
 
-    Forbid& addEmptyForbid(bool different=true);
+    std::shared_ptr<Forbid> addEmptyForbid(bool different=true);
 
-    /*
+    /**
      * 如果不存在，就进来一个空的obj，这样也能构造空的Forbid出来
      */
-    Forbid& addForbid(const QJsonObject& obj);
+    std::shared_ptr<Forbid> addForbid(const QJsonObject& obj);
 
     /**
      * @brief calStationYValueByMile  强制按里程计算每个站的坐标。

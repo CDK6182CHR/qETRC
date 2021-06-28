@@ -25,6 +25,8 @@ public:
     bool business;    //是否办理业务
     QString track;
     QString note;
+
+    static constexpr int msecsOfADay = 24 * 3600 * 1000;
     
     TrainStation(const StationName& name_, const QTime& arrive_,
         const QTime& depart_, bool business_ = true,
@@ -48,6 +50,11 @@ public:
      * @param msecs  要判定的时间，以毫秒数表示
      */
     bool timeInStoppedRange(int msecs)const;
+
+    /**
+     * 判断两车站停车时间是否存在交集。注意PBC约定
+     */
+    bool stopRangeIntersected(const TrainStation& another)const;
 };
 
 QDebug operator<<(QDebug debug, const TrainStation& ts);

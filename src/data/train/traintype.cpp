@@ -5,6 +5,19 @@ std::shared_ptr<TrainType> TypeManager::defaultType =
 	std::make_shared<TrainType>(QObject::tr("其他"), TypeManager::defaultPen);
 
 
+TypeManager& TypeManager::operator=(const TypeManager& another)
+{
+	_types.clear();
+	_regs.clear();
+	for (auto p=another._types.begin();p!=another._types.end();++p) {
+		_types.insert(p.key(), std::make_shared<TrainType>(*(p.value())));
+	}
+	for (const auto& p : another._regs) {
+		_regs.append(qMakePair(p.first, findOrCreate(p.second->name())));
+	}
+	return *this;
+}
+
 std::shared_ptr<TrainType> TypeManager::addType(const QString& name, const QPen& pen)
 {
 	auto t = std::make_shared<TrainType>(name, pen);

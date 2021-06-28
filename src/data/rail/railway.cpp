@@ -607,7 +607,7 @@ void Railway::showIntervals() const
 	}
 }
 
-Ruler& Railway::addEmptyRuler(const QString& name, bool different)
+std::shared_ptr<Ruler> Railway::addEmptyRuler(const QString& name, bool different)
 {
 	int idx = _rulers.count();
     auto r=std::shared_ptr<Ruler>(new Ruler(*this,name,different,idx));
@@ -621,14 +621,14 @@ Ruler& Railway::addEmptyRuler(const QString& name, bool different)
 	for (; p; p = p->nextInterval()) {
         p->_rulerNodes.append(std::make_shared<RulerNode>(*r, *p));
 	}
-    return *r;
+	return r;
 }
 
-Ruler& Railway::addRuler(const QJsonObject& obj)
+std::shared_ptr<Ruler> Railway::addRuler(const QJsonObject& obj)
 {
 	const QString& name = obj.value("name").toString();
 	bool dif = obj.value("different").toBool();
-	Ruler& ruler = addEmptyRuler(name, dif);
+	auto ruler = addEmptyRuler(name, dif);
 	const QJsonArray& nodes = obj.value("nodes").toArray();
 	for (auto p = nodes.cbegin(); p != nodes.cend(); ++p) {
 		const QJsonObject& node = p->toObject();
@@ -641,7 +641,7 @@ Ruler& Railway::addRuler(const QJsonObject& obj)
 				", to be ignored. " << Qt::endl;
 		}
 		else {
-			it->rulerNodeAt(ruler.index())->fromJson(node);
+			it->rulerNodeAt(ruler->index())->fromJson(node);
 		}
 	}
 	return ruler;
@@ -1008,7 +1008,7 @@ std::shared_ptr<RailInterval> Railway::addInterval(Direction _dir, std::shared_p
     return t;
 }
 
-Forbid &Railway::addEmptyForbid(bool different)
+std::shared_ptr<Forbid> Railway::addEmptyForbid(bool different)
 {
     int n=_forbids.count();
 	auto forbid = std::shared_ptr<Forbid>(new Forbid(*this, different, n));
@@ -1021,20 +1021,20 @@ Forbid &Railway::addEmptyForbid(bool different)
     for(;p;p=p->nextInterval()){
         p->_forbidNodes.append(std::make_shared<ForbidNode>(*forbid,*p));
     }
-    return *forbid;
+    return forbid;
 }
 
-Forbid &Railway::addForbid(const QJsonObject &obj)
+std::shared_ptr<Forbid> Railway::addForbid(const QJsonObject &obj)
 {
     bool diff=obj.value("different").toBool(true);
-    Forbid& forbid=addEmptyForbid(diff);
+    auto forbid=addEmptyForbid(diff);
     const QJsonArray& ar=obj.value("nodes").toArray();
     for(auto p=ar.cbegin();p!=ar.cend();++p){
         const QJsonObject& obnode=p->toObject();
         const StationName
                 & from=StationName::fromSingleLiteral( obnode.value("fazhan").toString()),
                 & to=StationName::fromSingleLiteral(obnode.value("daozhan").toString());
-        auto pnode=forbid.getNode(from,to);
+        auto pnode=forbid->getNode(from,to);
         if(!pnode){
             qDebug()<<"Railway::addForbid: WARNING: invalid interval "<<
                       from<<"->"<<to<<Qt::endl;
@@ -1042,8 +1042,8 @@ Forbid &Railway::addForbid(const QJsonObject &obj)
             pnode->fromJson(obnode);
         }
     }
-    forbid.downShow=obj.value("downShow").toBool();
-    forbid.upShow=obj.value("upShow").toBool();
+    forbid->downShow=obj.value("downShow").toBool();
+    forbid->upShow=obj.value("upShow").toBool();
     return forbid;
 }
 

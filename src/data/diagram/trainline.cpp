@@ -223,7 +223,6 @@ void TrainLine::detectPassStations(LineEventList& res, int index, ConstAdaPtr it
 		return;
 	}
 	double m0 = rs0->mile, mn = rsn->mile;
-	double dm = mn - m0;
 
 	for (auto p = rs0->dirNextInterval(dir()); 
 		p && p->toStation() != rsn; p = p->nextInterval()) {
@@ -242,6 +241,7 @@ void TrainLine::detectPassStations(LineEventList& res, int index, ConstAdaPtr it
 void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another, 
 	const Train& antrain) const
 {
+	//注意：间隔12小时的站内事件判定可能会有问题！可能要先判定交集
 	if (std::max(yMin(), another.yMin()) >= std::min(yMax(), another.yMax())) {
 		//提前终止条件，y范围根本不相交，不用搞
 		return;
@@ -251,7 +251,7 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 	ConstAdaPtr mylast = _stations.begin(), hislast = another._stations.begin();   //上一站的迭代器
 	int index = 0;   //自己的站序下标，用来插入结果的
 
-	int ylast = -2, xlast = 0;    //记载上一站比较结果
+	int ylast = -2, xlast = 0;    //记载上一站比较结果  -2为起始标志
 	double xcond, ycond;
 
 	//后面的站 类似merge过程
@@ -279,49 +279,53 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 		auto rme = pme->railStation.lock(), rhe = phe->railStation.lock();
 		//判断站内有没有发生什么事情 这个复杂一点
 		//麻烦在：可能出现一趟车站内停车，另一趟车通过但这里没有停点的情况
-		if (ycond == 0) {
+		if (ycond == 0 && (index!=0||startLabel())) {
 			//本站时刻表是重合的，那很简单，跟第一站写的那个一样
-			xlast = xComp(tme->arrive, the->arrive);
-			xcond = xComp(tme->depart, the->depart);
-			if (xcond == xlast) {
-				//到开比较情况一致，只有重合需要说明一下
-				if (xcond == 0) {
-					res[index].emplace(StationEvent(
-						TrainEventType::Coincidence, tme->arrive, pme->railStation,
-						std::cref(antrain), QObject::tr("站内共线")
-					));
+			if (tme->stopRangeIntersected(*the)) {
+				xlast = xComp(tme->arrive, the->arrive);
+				xcond = xComp(tme->depart, the->depart);
+				if (xcond == xlast) {
+					//到开比较情况一致，只有重合需要说明一下
+					if (xcond == 0) {
+						res[index].emplace(StationEvent(
+							TrainEventType::Coincidence, tme->arrive, pme->railStation,
+							std::cref(antrain), QObject::tr("站内共线")
+						));
+					}
 				}
-			}
-			else if (xcond > xlast) {
-				//规定：第一次碰到0时不处理
-				if (xcond > 0) {
-					//比别人发车晚，被踩
-					res[index].emplace(StationEvent(
-						TrainEventType::Avoid, the->depart, pme->railStation,
-						std::cref(antrain)
-					));
-				}
-			}
-			else {  // xcond < xlast
-				if (xcond < 0) {
-					//比别人发车早，踩了别人
-					res[index].emplace(StationEvent(
-						TrainEventType::OverTaking, tme->depart, pme->railStation,
-						std::cref(antrain)
-					));
+				else if (notStartOrEnd(another, pme, phe)) {
+					//存在始发终到站的情况，不允许踩
+					if (xcond > xlast) {
+						//规定：第一次碰到0时不处理
+						if (xcond > 0) {
+							//比别人发车晚，被踩
+							res[index].emplace(StationEvent(
+								TrainEventType::Avoid, the->depart, pme->railStation,
+								std::cref(antrain)
+							));
+						}
+					}
+					else {  // xcond < xlast
+						if (xcond < 0) {
+							//比别人发车早，踩了别人
+							res[index].emplace(StationEvent(
+								TrainEventType::OverTaking, tme->depart, pme->railStation,
+								std::cref(antrain)
+							));
+						}
+					}
 				}
 			}
 			ylast = ycond;
-			xlast = xcond;
 		}
 		else {
 			if (ycond > 0 && dir() == Direction::Up ||
 				ycond < 0 && dir() == Direction::Down) {
 				//本次列车领先，推定出在前面那个站有无交叉
 				if (pme != _stations.begin()) {
-					//安全起见的保护
 					int passedTime = getPrevousPassedTime(pme, rhe);
-					if (the->timeInStoppedRange(passedTime)) {
+					if (the->timeInStoppedRange(passedTime)&&
+						!another.isStartingOrTerminal(phe)) {
 						//本次列车在上一站踩了它
 						res[index - 1].emplace(IntervalEvent(
 							TrainEventType::OverTaking,
@@ -331,16 +335,10 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 						));
 					}
 				}
-				else {
-					//qDebug() << "TrainLine::eventsWithSameDir: WARNING: "
-					//	<< "Invalid begin() of iterator encountered at station: "
-					//	<< stationString(*pme) << Qt::endl;
-				}
-				
 			}
-			else {
+			else if (!isStartingOrTerminal(pme)) {
 				//本次列车落后，推定对方在本次列车这个站
-				if (phe != another._stations.begin()) {
+				if (phe != another._stations.begin() && (index != 0 || startLabel())) {
 					int passedTime = getPrevousPassedTime(phe, rme);
 					if (tme->timeInStoppedRange(passedTime)) {
 						//本次列车在本站被踩
@@ -407,7 +405,7 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
 		auto rme = pme->railStation.lock(), rhe = phe->railStation.lock();
 		//判断站内有没有发生什么事情 这个复杂一点
 		//麻烦在：可能出现一趟车站内停车，另一趟车通过但这里没有停点的情况
-		if (ycond == 0) {
+		if (ycond == 0 && (index != 0 || startLabel())) {
 			//本站时刻表是重合的，那很简单，跟第一站写的那个一样
 			auto tme = pme->trainStation, the = phe->trainStation;
 			xlast = xComp(tme->arrive, the->arrive);
@@ -471,7 +469,7 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
 			}
 			else {
 				//本次列车落后，推定对方在本次列车这个站
-				if (rme->isDirectionVia(another.dir())) {
+				if (rme->isDirectionVia(another.dir())&& (index != 0 || startLabel())) {
 					if (phe != another._stations.rbegin()) {
 						int passedTime = getPrevousPassedTime(phe, rme);
 						if (tme->timeInStoppedRange(passedTime)) {
@@ -770,5 +768,22 @@ QString TrainLine::stationString(const AdapterStation& st) const
 {
 	return st.trainStation->name.toSingleLiteral() + " [" +
 		train().trainName().full() + " @ " + _adapter.railway().name() + "]";
+}
+
+bool TrainLine::notStartOrEnd(const TrainLine& another, ConstAdaPtr pme, ConstAdaPtr phe)const
+{
+	return !isStartingStation(pme) && !isTerminalStation(pme) &&
+		!another.isStartingStation(phe) && !another.isTerminalStation(phe);
+}
+
+bool TrainLine::isStartingStation(ConstAdaPtr st) const
+{
+	return startAtThis() && st == _stations.begin();
+}
+
+bool TrainLine::isTerminalStation(ConstAdaPtr st) const
+{
+	ConstAdaPtr last = _stations.end(); --last;
+	return endAtThis() && st == last;
 }
 
