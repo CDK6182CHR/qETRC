@@ -39,9 +39,9 @@ public:
      * @brief TrainCollection  从JSON读取
      * @param obj  原pyETRC中Graph对应的object。数据不会全用掉
      */
-    TrainCollection(const QJsonObject& obj);
+    TrainCollection(const QJsonObject& obj, const TypeManager& defaultManage);
 
-    void fromJson(const QJsonObject& obj);
+    void fromJson(const QJsonObject& obj, const TypeManager& defaultManager);
 
     /**
      * @brief toJson  导出JSON
@@ -91,6 +91,9 @@ public:
      * @return 第一个符合条件的列表
      */
     std::shared_ptr<Train> findFirstSingleName(const QString& name);
+
+    auto& typeManager() { return _manager; }
+    const auto& typeManager()const { return _manager; }
 
 private:
     /**

@@ -28,6 +28,7 @@ public:
         _name(name), _pen(pen),_passenger(passenger){}
 
     const QPen& pen()const{return _pen;}
+    QPen& pen() { return _pen; }
 
     bool isPassenger()const { return _passenger; }
     void setIsPassenger(bool p) { _passenger = p; }
@@ -55,15 +56,14 @@ class TypeManager{
      */
     QList<QPair<QRegExp, std::shared_ptr<TrainType>>> _regs;
 
-    static QPen defaultPen;
-    static std::shared_ptr<TrainType> defaultType;
+    /**
+     * 默认的版本。注意这个不应该是static，因为系统Config和默认Config指定的默认颜色可能不同。
+     */
+    QPen defaultPen;
+    std::shared_ptr<TrainType> defaultType;
 
 public:
-    //todo: copy assign, for default assign
-    TypeManager() {
-        //TODO: 临时版本：采用默认
-        initDefaultTypes();
-    }
+    TypeManager();
     TypeManager(const TypeManager&)=delete;
     TypeManager(TypeManager&&)=default;
 
@@ -74,10 +74,23 @@ public:
 
     TypeManager& operator=(TypeManager&&)=default;
 
+    /**
+     * 读取系统默认配置 config.json
+     * 如果读取失败，采用内置参数
+     */
     void readForDefault(const QJsonObject& obj);
+
+    /**
+     * 读取运行图的设置。如果读取失败，采用默认设置
+     */
     void readForDiagram(const QJsonObject& obj, const TypeManager& defaultManager);
+
+    void initDefaultTypes();
     
-    QJsonObject toJson()const;
+    /**
+     * obj所示为具有Config格式的对象。
+     */
+    void toJson(QJsonObject& obj)const;
 
     /**
      * @brief 添加新的类型
@@ -90,7 +103,7 @@ public:
     /**
      * 用来读pyETRC的配置数据，同时写进是否客车的数据
      */
-    void appendRegex(const QRegExp& reg, const QString& name, bool passenger);
+    std::shared_ptr<TrainType> appendRegex(const QRegExp& reg, const QString& name, bool passenger);
 
     std::shared_ptr<const TrainType> fromRegex(const TrainName& name)const;
 
@@ -108,7 +121,7 @@ private:
      */
     bool fromJson(const QJsonObject& obj);
 
-    void initDefaultTypes();
+    
 };
 
 

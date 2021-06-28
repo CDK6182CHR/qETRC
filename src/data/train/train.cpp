@@ -52,19 +52,23 @@ void Train::fromJson(const QJsonObject &obj, TypeManager& manager)
     _starting=StationName::fromSingleLiteral( obj.value("sfz").toString());
     _terminal=StationName::fromSingleLiteral(obj.value("zdz").toString());
     _show=obj.value("shown").toBool();
-    _passenger=static_cast<TrainPassenger>(obj.value("passenger").toInt());
+    const auto& valpass = obj.value("passenger");
+    if(valpass.isBool())
+        _passenger = static_cast<TrainPassenger>(obj.value("passenger").toBool());
+    else
+        _passenger = static_cast<TrainPassenger>(obj.value("passenger").toInt());
     const QJsonArray& artable=obj.value("timetable").toArray();
     _autoLines = obj.value("autoItem").toBool(true);
-    //if (!_autoLines) {
-    //    _lines.clear();
-    //    const QJsonArray& aritems = obj.value("itemInfo").toArray();
-    //    for (auto p = aritems.begin(); p != aritems.end(); ++p) {
-    //        _lines.append(std::make_shared<TrainLine>(p->toObject(), *this));
-    //    }
-    //}
-    //todo: UI, circuit, item
+
+    //todo:  circuit, item
     for (auto p=artable.cbegin();p!=artable.cend();++p){
         _timetable.emplace_back(p->toObject());
+    }
+    const QJsonObject ui = obj.value("UI").toObject();
+    if (!ui.isEmpty()) {
+        QPen pen = QPen(QColor(ui.value("Color").toString()), ui.value("LineWidth").toDouble(1.0),
+            static_cast<Qt::PenStyle>(ui.value("LineStyle").toInt(Qt::SolidLine)));
+        _pen = pen;
     }
 }
 
@@ -85,6 +89,15 @@ QJsonObject Train::toJson() const
         {"timetable",ar},
         {"autoItem",_autoLines}
     };
+
+    QJsonObject ui;
+    if (_pen.has_value()) {
+        const auto& p = _pen.value();
+        ui.insert("Color", p.color().name());
+        ui.insert("LineWidth", p.widthF());
+        ui.insert("LineStyle", p.style());   //新增
+    }
+    obj.insert("UI", ui);
     
     if (!_autoLines) {
         //QJsonArray items;

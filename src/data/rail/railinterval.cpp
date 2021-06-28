@@ -31,6 +31,16 @@ std::shared_ptr<RailInterval>
     return t;
 }
 
+QString RailInterval::fromStationNameLit() const
+{
+    return fromStation()->name.toSingleLiteral();
+}
+
+QString RailInterval::toStationNameLit() const
+{
+    return toStation()->name.toSingleLiteral();
+}
+
 std::shared_ptr<RailInterval> RailInterval::prevInterval()const
 {
 	if (!fromStation())

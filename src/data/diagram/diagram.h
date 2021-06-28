@@ -5,10 +5,45 @@
 #include <QList>
 #include <QJsonObject>
 #include <QString>
+#include <QStringView>
 #include "config.h"
 #include "data/train/traincollection.h"
 #include "data/train/traintype.h"
 #include "data/diagram/trainline.h"
+
+
+/**
+ * PyETRC中system.json 默认配置文件的抽象
+ */
+class SystemJson {
+    static constexpr int history_count = 20;
+    static SystemJson instance;
+
+    QString last_file;
+    QString default_file = "sample.pyetgr";
+    //todo: dock show..
+
+    /**
+     * 新增  历史记录  从back加，front出
+     */
+    QList<QString> history;
+
+    void saveFile();
+
+    void addHistoryFile(const QString& name);
+
+    ~SystemJson();
+
+private:
+    /**
+     * 构造函数直接读文件
+     */
+    SystemJson();
+
+    void fromJson(const QJsonObject& obj);
+
+    QJsonObject toJson()const;
+};
 
 
 class Train;
@@ -29,8 +64,9 @@ class Diagram
     QString _filename;
     QString _version, _note;
     TypeManager _defaultManager;
+
 public:
-    Diagram() = default;
+    Diagram();
 
     //拷贝和移动暂时禁用，需要时再考虑
     Diagram(const Diagram&)=delete;
@@ -55,6 +91,16 @@ public:
      */
     bool fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;
+
+    /**
+     * 另存为 （同时记录文件名）
+     */
+    bool saveAs(const QString& filename);
+
+    /**
+     * 保存 （使用当前文件名）
+     */
+    bool save()const;
 
     inline auto& railways(){return _railways;}
     inline const auto& railways()const{return _railways;}

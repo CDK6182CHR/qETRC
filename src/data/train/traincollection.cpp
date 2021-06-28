@@ -2,19 +2,20 @@
 
 #include <QJsonArray>
 
-TrainCollection::TrainCollection(const QJsonObject& obj)
+TrainCollection::TrainCollection(const QJsonObject& obj, const TypeManager& defaultManager)
 {
-	fromJson(obj);
+	fromJson(obj, defaultManager);
 }
 
-void TrainCollection::fromJson(const QJsonObject& obj)
+void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaultManager)
 {
 	_trains.clear();
 	const QJsonArray& artrains = obj.value("trains").toArray();
 	for (const auto& p : artrains) {
 		_trains.append(std::make_shared<Train>(p.toObject(), _manager));
 	}
-	//todo 交路 类型系统
+	_manager.readForDiagram(obj.value("config").toObject(), defaultManager);
+	//todo 交路
     resetMapInfo();
 }
 

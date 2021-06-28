@@ -57,6 +57,9 @@ public:
 	inline const std::shared_ptr<RailStation> toStation()const {
 		return to.lock();
 	}
+    QString fromStationNameLit()const;
+    QString toStationNameLit()const;
+
 
 	/// <summary>
 	/// 前、后区间，通过车站的信息进行索引

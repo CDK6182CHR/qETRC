@@ -222,7 +222,6 @@ void TrainLine::detectPassStations(LineEventList& res, int index, ConstAdaPtr it
 		//这个情况很吊诡，应该不会存在。安全起见，特殊处理
 		return;
 	}
-	double m0 = rs0->mile, mn = rsn->mile;
 
 	for (auto p = rs0->dirNextInterval(dir()); 
 		p && p->toStation() != rsn; p = p->nextInterval()) {

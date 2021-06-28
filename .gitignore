@@ -58,3 +58,10 @@ release
 *.vcxproj.filters
 *.vcxproj.user
 *.vcxproj.user.*
+
+# pyETRC & qETRC generated
+system.json
+config.json
+sample.json
+sample.pyetgr
+

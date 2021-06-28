@@ -56,10 +56,11 @@ QJsonObject RailStation::toJson() const
     obj.insert("zhanming",name.toSingleLiteral());
     obj.insert("licheng",mile);
     obj.insert("dengji",level);
+    obj.insert("direction", static_cast<int>(direction));
     if(counter.has_value()){
         obj.insert("counter",counter.value());
     }else{
-        obj.insert("connter",QJsonValue(QJsonValue::Null));
+        obj.insert("counter",QJsonValue(QJsonValue::Null));
     }
     obj.insert("show",_show);
     obj.insert("passenger",passenger);

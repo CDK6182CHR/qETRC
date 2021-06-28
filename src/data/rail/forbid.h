@@ -28,6 +28,10 @@ public:
     int durationSec()const;
 
     int durationMin()const;
+
+    inline bool isNull()const { 
+        return beginTime.isNull() || endTime.isNull() || beginTime == endTime; 
+    }
 };
 
 
