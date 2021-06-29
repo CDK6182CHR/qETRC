@@ -77,6 +77,8 @@ public:
     /**
      * 读取默认配置文件 config.json
      * 包含Config和类型系统两部分
+     * 注意：似乎应当移动到mainWindow的启动操作里面去 
+     * （导入运行图等操作也要创建临时的Diagram对象）
      */
     bool readDefaultConfigs(const QString& filename);
 

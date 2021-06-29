@@ -95,6 +95,11 @@ public:
     auto& typeManager() { return _manager; }
     const auto& typeManager()const { return _manager; }
 
+    inline auto size()const { return _trains.size(); }
+
+    inline std::shared_ptr<Train> trainAt(int i) { return _trains.at(i); }
+    inline std::shared_ptr<const Train> trainAt(int i)const { return _trains.at(i); }
+
 private:
     /**
      * @brief addMapInfo

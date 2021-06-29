@@ -86,7 +86,7 @@ LineEventList TrainLine::listLineEvents(const TrainCollection& coll) const
 	LineEventList res;
 	res.reserve(_stations.size());
 	for (int i = 0; i < _stations.size(); i++) {
-		res.append(StationEventList());
+		res.push_back(StationEventList());
 	}
 
 	//车站到开时刻

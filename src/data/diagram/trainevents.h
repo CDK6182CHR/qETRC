@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <deque>
 #include <QList>
 #include <QString>
 
@@ -52,6 +53,9 @@ struct StationEvent {
                  const QString& note_=""):
         type(type_),time(time_),station(station_),another(another_),note(note_){}
 
+    StationEvent(StationEvent&&)noexcept = default;
+    StationEvent(const StationEvent&) = default;
+
     bool operator<(const StationEvent& another)const;
 
     /**
@@ -82,6 +86,9 @@ struct IntervalEvent{
                   ):
         type(type_),time(time_),former(former_),latter(latter_),
         another(another_),mile(mile_),note(note_){}
+
+    IntervalEvent(IntervalEvent&&)noexcept = default;
+    IntervalEvent(const IntervalEvent&) = default;
 
     bool operator<(const IntervalEvent& another)const;
 
@@ -119,11 +126,11 @@ using LineEventList=QList<StationEventList>;
 /**
  * Adapter的事件描述由TrainLine的简单加和。
  */
-using AdapterEventList=LineEventList;
+using AdapterEventList = LineEventList;
 
 /**
  * 列车事件表是Adapter事件表的简单组合。
  */
-using TrainEventList=QList<QPair<std::shared_ptr<TrainAdapter>,AdapterEventList>>;
+using TrainEventList=std::deque<QPair<std::shared_ptr<TrainAdapter>,AdapterEventList>>;
 
 

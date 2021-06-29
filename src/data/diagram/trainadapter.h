@@ -47,7 +47,7 @@ public:
      * 基于同一组railway, train对象的实现
      * 暂定不处理对象指针
      */
-    TrainAdapter& operator=(TrainAdapter&& another);
+    TrainAdapter& operator=(TrainAdapter&& another)noexcept;
 
     void print()const;
 

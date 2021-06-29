@@ -2,6 +2,12 @@
 
 #include <QString>
 
+//test...
+#include <QTableView>
+#include <QDockWidget>
+#include <QHeaderView>
+#include "model/train/trainlistmodel.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -24,6 +30,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     diagramWidget = new DiagramWidget(_diagram, this);
     setCentralWidget(diagramWidget);
+
+    //QTableView* view = new QTableView;
+    //view->verticalHeader()->setDefaultSectionSize(20);
+    //QDockWidget* dock = new QDockWidget;
+    //TrainListModel* model = new TrainListModel(_diagram.trainCollection(), this);
+    //view->setModel(model);
+    //for (int i = 0; i < 7; i++) {
+    //    //view->setColumnWidth(i, widths[i]);
+    //}
+    //view->resizeColumnsToContents();
+    //dock->setWidget(view);
+    //addDockWidget(Qt::LeftDockWidgetArea, dock);
 }
 
 MainWindow::~MainWindow()

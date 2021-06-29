@@ -11,7 +11,7 @@ TrainAdapter::TrainAdapter(Train& train,
 }
 
 
-TrainAdapter& TrainAdapter::operator=(TrainAdapter&& another)
+TrainAdapter& TrainAdapter::operator=(TrainAdapter&& another)noexcept
 {
 	assert(&_railway == &(another._railway));
 	assert(&_train == &(another._train));
@@ -55,7 +55,9 @@ AdapterEventList TrainAdapter::listAdapterEvents(const TrainCollection& coll) co
 {
 	AdapterEventList res;
 	for (auto p : _lines) {
-		res.append(p->listLineEvents(coll));
+		//res.append(p->listLineEvents(coll));
+		auto&& t = p->listLineEvents(coll);
+		res.append(t);
 	}
 	return res;
 }

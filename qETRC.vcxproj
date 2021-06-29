@@ -199,9 +199,11 @@
     <ClCompile Include="src\kernel\trainitem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mainwindow.cpp" />
+    <ClCompile Include="src\model\train\trainlistmodel.cpp" />
     <ClCompile Include="src\util\utilfunc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="src\model\train\trainlistmodel.h" />
     <ClInclude Include="src\util\utilfunc.h" />
     <QtMoc Include="src\mainwindow.h">
     </QtMoc>

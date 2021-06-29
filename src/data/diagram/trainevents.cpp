@@ -84,12 +84,13 @@ QString IntervalEvent::toString() const
 void StationEventList::emplace(StationEvent&& e)
 {
 	//采用upper_bound -- 新插入的被认为是最大的。
+	//QList的这个insert其实是Copy
 	auto it = std::upper_bound(stEvents.begin(), stEvents.end(), e);
-	stEvents.insert(it, e);
+	stEvents.insert(it, std::forward<StationEvent>(e));
 }
 
 void StationEventList::emplace(IntervalEvent&& e)
 {
 	auto it = std::upper_bound(itEvents.begin(), itEvents.end(), e);
-	itEvents.insert(it, e);
+	itEvents.insert(it, std::forward<IntervalEvent>(e));
 }

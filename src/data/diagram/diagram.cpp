@@ -121,7 +121,7 @@ TrainEventList Diagram::listTrainEvents(const Train& train) const
 {
     TrainEventList res;
     for (auto p : train.adapters()) {
-        res.append(qMakePair(p, p->listAdapterEvents(_trainCollection)));
+        res.push_back(qMakePair(p, p->listAdapterEvents(_trainCollection)));
     }
     return res;
 }

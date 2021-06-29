@@ -33,6 +33,7 @@ SOURCES += \
     src/kernel/trainitem.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
+    src/model/train/trainlistmodel.cpp \
     src/util/utilfunc.cpp
 
 HEADERS += \
@@ -60,6 +61,7 @@ HEADERS += \
     src/kernel/diagramwidget.h \
     src/kernel/trainitem.h \
     src/mainwindow.h \
+    src/model/train/trainlistmodel.h \
     src/util/qeexceptions.h \
     src/util/utilfunc.h
 
