@@ -21,6 +21,10 @@ class TrainAdapter;
 
 class TrainType;
 class TypeManager;
+class Routing;
+
+template<>
+class Routing::NodePtr;
 
 /**
  * pyETRC.train.Train
@@ -63,6 +67,9 @@ class Train
      * 注意：仅考虑数量很少的情况，因此一切查找皆为线性
      */
     QList<std::shared_ptr<TrainAdapter>> _adapters;
+
+    std::weak_ptr<Routing> _routing;
+    std::optional<Routing::NodePtr> _routingNode;
 
     //todo: 交路，随机访问Map表等
 
@@ -279,6 +286,23 @@ public:
     void highlightItems();
 
     void unhighlightItems();
+
+    inline bool hasRouting()const { return !_routing.expired(); }
+
+    inline std::weak_ptr<Routing> routing() { return _routing; }
+
+    /**
+     * 设置交路，同时设定Node指针（迭代器）
+     * 由Routing调用
+     */
+    void setRouting(std::weak_ptr<Routing> rout, Routing::NodePtr node);
+
+    /**
+     * 清除交路数据
+     * 根据实际需要决定：是否从Routing移除自己的数据
+     * 需要时再写实现
+     */
+    void resetRouting();
 
 };
 

@@ -190,6 +190,7 @@
     <ClCompile Include="src\data\rail\railway.cpp" />
     <ClCompile Include="src\data\rail\ruler.cpp" />
     <ClCompile Include="src\data\rail\rulernode.cpp" />
+    <ClCompile Include="src\data\train\routing.cpp" />
     <ClCompile Include="src\data\train\train.cpp" />
     <ClCompile Include="src\data\train\traincollection.cpp" />
     <ClCompile Include="src\data\train\trainname.cpp" />
@@ -204,6 +205,7 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\model\train\trainlistmodel.h" />
+    <ClInclude Include="src\data\train\routing.h" />
     <ClInclude Include="src\util\utilfunc.h" />
     <QtMoc Include="src\mainwindow.h">
     </QtMoc>

@@ -24,6 +24,7 @@ SOURCES += \
     src/data/rail/ruler.cpp \
     src/data/rail/rulernode.cpp \
     src/data/common/stationname.cpp \
+    src/data/train/routing.cpp \
     src/data/train/train.cpp \
     src/data/train/traincollection.cpp \
     src/data/train/trainname.cpp \
@@ -53,6 +54,7 @@ HEADERS += \
     src/data/rail/railway.h \
     src/data/rail/ruler.h \
     src/data/rail/rulernode.h \
+    src/data/train/routing.h \
     src/data/train/train.h \
     src/data/train/traincollection.h \
     src/data/train/trainname.h \
