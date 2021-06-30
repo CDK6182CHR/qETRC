@@ -14,7 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     //auto s = QString(R"(D:\Python\train_graph\sample.pyetgr)");
     //auto s = QString(R"(D:\Python\train_graph\source\京沪线上局段20191230.pyetgr)");
-    auto s = QString(R"(D:\Python\train_graph\source\濉阜线.json)");
+    //auto s = QString(R"(D:\Python\train_graph\source\濉阜线.json)");
+    auto s = R"(D:\Python\train_graph\source\成贵客专线F20191230-分颜色.pyetgr)";
 
     _diagram.fromJson(s);
     //_diagram.config().avoid_cover = false;

@@ -60,7 +60,6 @@ void Train::fromJson(const QJsonObject &obj, TypeManager& manager)
     const QJsonArray& artable=obj.value("timetable").toArray();
     _autoLines = obj.value("autoItem").toBool(true);
 
-    //todo:  circuit, item
     for (auto p=artable.cbegin();p!=artable.cend();++p){
         _timetable.emplace_back(p->toObject());
     }
@@ -68,6 +67,10 @@ void Train::fromJson(const QJsonObject &obj, TypeManager& manager)
     if (!ui.isEmpty()) {
         QPen pen = QPen(QColor(ui.value("Color").toString()), ui.value("LineWidth").toDouble(1.0),
             static_cast<Qt::PenStyle>(ui.value("LineStyle").toInt(Qt::SolidLine)));
+        if (pen.width() == 0) {
+            //线宽为0表示采用默认
+            pen.setWidthF(_type->pen().widthF());
+        }
         _pen = pen;
     }
 }
@@ -519,4 +522,50 @@ void Train::unhighlightItems()
     for (auto adp : _adapters) {
         adp->unhighlightItems();
     }
+}
+
+void Train::setRouting(std::weak_ptr<Routing> rout, std::list<RoutingNode>::iterator node)
+{
+    _routing = rout;
+    _routingNode = node;
+}
+
+const AdapterStation* Train::boundTerminal() const
+{
+    if (_timetable.empty())return nullptr;
+    auto lastIter = _timetable.end(); --lastIter;
+    for (auto p : _adapters) {
+        auto* last = p->lastStation();
+        if (last && last->trainStation == lastIter)
+            return last;
+    }
+    return nullptr;
+}
+
+std::shared_ptr<RailStation> Train::boundTerminalRail() const
+{
+    auto* last = boundTerminal();
+    if (last)
+        return last->railStation.lock();
+    return nullptr;
+}
+
+const AdapterStation* Train::boundStarting() const
+{
+    if (_timetable.empty())
+        return nullptr;
+    for (auto p : _adapters) {
+        auto* first = p->firstStation();
+        if (first && first->trainStation == _timetable.begin())
+            return first;
+    }
+    return nullptr;
+}
+
+std::shared_ptr<RailStation> Train::boundStartingRail() const
+{
+    auto* first = boundStarting();
+    if (first)
+        return first->railStation.lock();
+    return nullptr;
 }

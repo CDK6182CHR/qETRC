@@ -180,6 +180,13 @@ private:
     void markArriveTime(double x, double y, const QTime& tm);
 
     void markDepartTime(double x, double y, const QTime& tm);
+
+    /**
+     * @brief addLinkLine
+     * 添加与交路前序车次之间的连线
+     */
+    void addLinkLine();
+
 };
 
 

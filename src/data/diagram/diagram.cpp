@@ -175,6 +175,8 @@ bool Diagram::fromJson(const QJsonObject& obj)
 {
     if (obj.empty())
         return false;
+    _railways.clear();
+
     //车次和Config直接转发即可
     _trainCollection.fromJson(obj, _defaultManager);
     bool flag = _config.fromJson(obj.value("config").toObject());

@@ -1,12 +1,17 @@
 ﻿#pragma once
 
 #include <list>
+#include <QJsonObject>
 #include "train.h"
 
 /**
  * @brief The RoutingNode class 交路中的一个结点 pyETRC.data.CircuitNode
  * 可能是虚拟的或者持有实际列车对象
  * 列车暂定采用std::shared_ptr保存
+ * 
+ * 在两车次之间连线，当且仅当：
+ * （1）用户勾选了连线；
+ * （2）前一车次终到站、后一车次始发站为本线同一车站。
  */
 class RoutingNode{
     std::shared_ptr<Train> _train;
@@ -23,12 +28,14 @@ public:
     /**
      * @brief 具有列车对象，创建实际交路结点
      */
-    RoutingNode(std::shared_ptr<Train> train,bool link);
+    RoutingNode(std::shared_ptr<Train> train, bool link);
 
     RoutingNode(const RoutingNode&)=default;
     RoutingNode(RoutingNode&&)noexcept=default;
     RoutingNode& operator=(const RoutingNode&)=default;
     RoutingNode& operator=(RoutingNode&&)noexcept=default;
+
+    QJsonObject toJson()const;
 
     std::shared_ptr<Train> train() const;
     void setTrain(const std::shared_ptr<Train> &train);
@@ -38,6 +45,8 @@ public:
     void setVirtual(bool _virtual);
     bool link() const;
     void setLink(bool link);
+
+    QString toString()const;
 };
 
 
@@ -50,7 +59,7 @@ class TrainCollection;
 class Routing:
     public std::enable_shared_from_this<Routing>
 {
-    TrainCollection& coll;
+    TrainCollection& _coll;
     std::list<RoutingNode> _order;
     QString _name, _note, _model, _owner;
 
@@ -70,7 +79,10 @@ public:
     Routing& operator=(const Routing&)=delete;
     Routing& operator=(Routing&&)=delete;
 
-    void fromJson(const QJsonObject& obj,TrainCollection& coll);
+    /**
+     * 接受pyETRC格式的circuits数组元素
+     */
+    void fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;
 
     inline const QString& name()const{return _name;}
@@ -92,7 +104,15 @@ public:
      * 注意同时向列车设置交路信息
      * 注意列车不能属于其他交路，否则添加失败
      */
-    bool appendTrain(std::shared_ptr<Train> train);
+    bool appendTrain(std::shared_ptr<Train> train, bool link);
+
+    /**
+     * 读JSON的操作  返回是否成功
+     * 如果失败，直接加虚拟结点
+     */
+    bool appendTrainFromName(const QString& trainName, bool link);
+
+    bool appendVirtualTrain(const QString& trainName, bool link);
 
     /**
      * @brief pyETRC.Circuit.changeTrainToVirtual()
@@ -104,12 +124,14 @@ public:
     QString orderString()const;
 
     /**
-     * @brief 如果前序车能够连上，那么返回该节点
+     * @brief 如果前序车能够连上，那么返回该节点  pyETRC.data.Circuit.preorderLinked
      * 否则返回空
      */
     RoutingNode* preLinked(const Train& train);
 
     RoutingNode* postLinked(const Train& train);
+
+    void print()const;
 
     //解析车次等 下次
 };

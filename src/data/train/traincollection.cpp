@@ -1,4 +1,5 @@
 ﻿#include "traincollection.h"
+#include "routing.h"
 
 #include <QJsonArray>
 
@@ -10,13 +11,25 @@ TrainCollection::TrainCollection(const QJsonObject& obj, const TypeManager& defa
 void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaultManager)
 {
 	_trains.clear();
+	_manager.readForDiagram(obj.value("config").toObject(), defaultManager);
+	_routings.clear();
+
+	//Train类型的正确设置依赖于TypeManager的正确初始化
 	const QJsonArray& artrains = obj.value("trains").toArray();
 	for (const auto& p : artrains) {
 		_trains.append(std::make_shared<Train>(p.toObject(), _manager));
 	}
-	_manager.readForDiagram(obj.value("config").toObject(), defaultManager);
-	//todo 交路
-    resetMapInfo();
+	
+	resetMapInfo();
+
+	//注意Routing的读取依赖车次查找
+	const QJsonArray& arrouting = obj.value("circuits").toArray();
+	for (auto p = arrouting.begin(); p != arrouting.end(); ++p) {
+		auto r = std::make_shared<Routing>(*this);
+		r->fromJson(p->toObject());
+		_routings.append(r);
+	}
+    
 }
 
 QJsonObject TrainCollection::toJson() const
@@ -25,9 +38,13 @@ QJsonObject TrainCollection::toJson() const
 	for (const auto& p : _trains) {
 		artrains.append(p->toJson());
 	}
-	//todo 交路 类型系统
+	QJsonArray arrouting;
+	for (auto p : _routings) {
+		arrouting.append(p->toJson());
+	}
 	return QJsonObject{
-		{"trains",artrains}
+		{"trains",artrains},
+		{"circuits",arrouting}
 	};
 }
 
@@ -45,12 +62,17 @@ void TrainCollection::removeTrain(std::shared_ptr<Train> train)
 
 bool TrainCollection::trainNameExisted(const TrainName& name) const
 {
-	return fullNameMap.contains(name);
+	return fullNameMap.contains(name.full());
+}
+
+std::shared_ptr<Train> TrainCollection::findFullName(const QString& name)
+{
+	return fullNameMap.value(name);
 }
 
 std::shared_ptr<Train> TrainCollection::findFullName(const TrainName& name)
 {
-	return fullNameMap.value(name);
+	return findFullName(name.full());
 }
 
 QList<std::shared_ptr<Train>> TrainCollection::findAllSingleName(const QString& name)
@@ -65,7 +87,7 @@ std::shared_ptr<Train> TrainCollection::findFirstSingleName(const QString& name)
 
 void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 {
-	fullNameMap.insert(t->trainName(), t);
+	fullNameMap.insert(t->trainName().full(), t);
 	const TrainName& n = t->trainName();
 	if (!n.full().isEmpty()) {
 		singleNameMap[n.full()].append(t);
@@ -80,7 +102,7 @@ void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 
 void TrainCollection::removeMapInfo(std::shared_ptr<Train> t)
 {
-	fullNameMap.remove(t->trainName());
+	fullNameMap.remove(t->trainName().full());
 	const auto& n = t->trainName();
 	if (!n.full().isEmpty()) {
 		singleNameMap[n.full()].removeAll(t);

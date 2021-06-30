@@ -6,6 +6,7 @@
 #include <QHash>
 #include "data/train/train.h"
 #include "data/train/traintype.h"
+#include "routing.h"
 
 /**
  * @brief The TrainCollection class
@@ -17,14 +18,14 @@
 class TrainCollection
 {
     QList<std::shared_ptr<Train>> _trains;
-    //todo: 交路部分
-    //todo: 类型系统
+    QList<std::shared_ptr<Routing>> _routings;
 
     /**
-     * @brief 车次查找表
+     * @brief 车次查找表  
+     * 2021.06.30 全车次查找表还是改回用QString作为key。原因是读取交路等地方依赖这个的严格正确性
      * 注意全车次的QString形式也算进singleNameMap中
      */
-    QHash<TrainName, std::shared_ptr<Train>> fullNameMap;
+    QHash<QString, std::shared_ptr<Train>> fullNameMap;
     QHash<QString, QList<std::shared_ptr<Train>>> singleNameMap;
 
     TypeManager _manager;
@@ -51,6 +52,8 @@ public:
 
     auto& trains(){return _trains;}
     const auto& trains()const{return _trains;}
+    auto& routings() { return _routings; }
+    const auto& routings()const { return _routings; }
 
     /**
      * @brief appendTrain 添加车次
@@ -67,7 +70,7 @@ public:
 
     /**
      * @brief trainNameExisted  所给车次是否存在，即是否允许添加的判据
-     * 调用TrainName::operator==判定
+     * 使用full车次判定
      */
     bool trainNameExisted(const TrainName& name)const;
 
@@ -76,6 +79,8 @@ public:
      * @param name  全车次
      * 准常数时间
      */
+    std::shared_ptr<Train> findFullName(const QString& name);
+
     std::shared_ptr<Train> findFullName(const TrainName& name);
 
     /**

@@ -52,6 +52,10 @@ void Railway::moveStationInfo(Railway&& another)
 
 void Railway::fromJson(const QJsonObject& obj)
 {
+	_stations.clear();
+	_rulers.clear();
+	_forbids.clear();
+
 	_name = obj.value("name").toString();
 	_notes.fromJson(obj.value("notes").toObject());
 	const QJsonArray& ar = obj.value("stations").toArray();

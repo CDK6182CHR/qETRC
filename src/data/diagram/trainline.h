@@ -141,6 +141,13 @@ public:
      */
     LineEventList listLineEvents(const TrainCollection& coll)const;
 
+    inline const AdapterStation* lastStation()const {
+        return _stations.empty() ? nullptr : &(_stations.back());
+    }
+    inline const AdapterStation* firstStation()const {
+        return _stations.empty() ? nullptr : &(_stations.front());
+    }
+
 private:
 
     /**

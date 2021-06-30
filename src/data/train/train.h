@@ -22,9 +22,9 @@ class TrainAdapter;
 class TrainType;
 class TypeManager;
 class Routing;
+class RoutingNode;
+struct AdapterStation;
 
-template<>
-class Routing::NodePtr;
 
 /**
  * pyETRC.train.Train
@@ -69,7 +69,7 @@ class Train
     QList<std::shared_ptr<TrainAdapter>> _adapters;
 
     std::weak_ptr<Routing> _routing;
-    std::optional<Routing::NodePtr> _routingNode;
+    std::optional<std::list<RoutingNode>::iterator> _routingNode;
 
     //todo: 交路，随机访问Map表等
 
@@ -290,12 +290,14 @@ public:
     inline bool hasRouting()const { return !_routing.expired(); }
 
     inline std::weak_ptr<Routing> routing() { return _routing; }
+    inline std::weak_ptr<const Routing> routing()const { return _routing; }
+    inline auto routingNode()const { return _routingNode; }
 
     /**
      * 设置交路，同时设定Node指针（迭代器）
      * 由Routing调用
      */
-    void setRouting(std::weak_ptr<Routing> rout, Routing::NodePtr node);
+    void setRouting(std::weak_ptr<Routing> rout, std::list<RoutingNode>::iterator node);
 
     /**
      * 清除交路数据
@@ -303,6 +305,26 @@ public:
      * 需要时再写实现
      */
     void resetRouting();
+
+    /**
+     * @brief 如果终到站是已经绑定到线路的车站，返回它；
+     * 否则返回空
+     * 注意需要遍历所有的Adapter （Adapter并不一定是按顺序的）
+     */
+    const AdapterStation* boundTerminal()const;
+
+    std::shared_ptr<RailStation> boundTerminalRail()const;
+
+    const AdapterStation* boundStarting()const;
+
+    std::shared_ptr<RailStation> boundStartingRail()const;
+
+    inline auto firstStation()const { return _timetable.begin(); }
+    inline auto lastStation()const {
+        if (_timetable.empty()) return _timetable.end();
+        auto it = _timetable.end(); --it;
+        return it;
+    }
 
 };
 

@@ -1,6 +1,7 @@
 ﻿#include "trainitem.h"
 #include "data/diagram/trainadapter.h"
 #include "data/diagram/trainline.h"
+#include "data/train/routing.h"
 
 #include <QPainterPath>
 #include <QPointF>
@@ -221,6 +222,7 @@ void TrainItem::setLine()
         setEndItem(config().end_label_name ? trainName : "",
             labelPen);
     }
+    addLinkLine();
 }
 
 void TrainItem::setPathItem(const QString& trainName)
@@ -709,4 +711,54 @@ void TrainItem::markDepartTime(double x, double y, const QTime& tm)
         item->setPos(x - w + start_x, y - h + start_y);
     }
     markLabels.append(item);
+}
+
+void TrainItem::addLinkLine()
+{
+    if (!train().hasRouting())
+        return;
+    std::shared_ptr<Routing> rout = train().routing().lock();
+    auto* pre = rout->preLinked(train());
+    if (!pre)
+        return;
+    auto last = pre->train()->lastStation();
+    auto first = train().firstStation();
+    if (train().isNullStation(first) || pre->train()->isNullStation(last))
+        return;
+    const QTime& last_tm = last->depart;
+    const QTime& first_tm = first->arrive;
+    auto rs = train().boundStartingRail();
+    double xcur = calXFromStart(first_tm);
+    double xpre = calXFromStart(last_tm);
+
+    double width = config().diagramWidth();
+    double y = rs->y_value.value() + _railway.startYValue();
+    QPen pen = trainPen();
+    pen.setWidth(1);
+    pen.setStyle(Qt::DashLine);
+
+    if (xcur >= xpre) {
+        //无需跨界
+        if (xpre <= width) {
+            linkItem1 = new QGraphicsLineItem(
+                margins().left + xpre, y, margins().left + std::min(width, xcur), y, this
+            );
+            linkItem1->setPen(pen);
+        }
+    }
+    else {
+        //跨界
+        //左边的 一定存在
+        linkItem1 = new QGraphicsLineItem(
+            margins().left, y, margins().left + xcur, y, this
+        );
+        linkItem1->setPen(pen);
+        //右边的
+        if (xpre <= width) {
+            linkItem2 = new QGraphicsLineItem(
+                margins().left + xpre, y, margins().left + width, y, this
+            );
+            linkItem2->setPen(pen);
+        }
+    }
 }

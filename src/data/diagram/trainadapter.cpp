@@ -62,6 +62,20 @@ AdapterEventList TrainAdapter::listAdapterEvents(const TrainCollection& coll) co
 	return res;
 }
 
+const AdapterStation* TrainAdapter::lastStation() const
+{
+	if (_lines.empty())
+		return nullptr;
+	return _lines.last()->lastStation();
+}
+
+const AdapterStation* TrainAdapter::firstStation() const
+{
+	if (_lines.empty())
+		return nullptr;
+	return _lines.first()->firstStation();
+}
+
 void TrainAdapter::autoLines(const Config& config)
 {
 	//命名规则：前缀r表示rail，t表示train

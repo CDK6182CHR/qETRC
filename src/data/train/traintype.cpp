@@ -35,6 +35,8 @@ void TypeManager::readForDefault(const QJsonObject& obj)
 
 void TypeManager::readForDiagram(const QJsonObject& obj, const TypeManager& defaultManager)
 {
+	_types.clear();
+	_regs.clear();
 	bool flag = fromJson(obj);
 	if (!flag) {
 		qDebug() << "TypeManager::readForDiagram: WARNING: load type configuration for Diagram failed."

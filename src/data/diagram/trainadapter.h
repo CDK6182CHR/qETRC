@@ -80,6 +80,14 @@ public:
      */
     AdapterEventList listAdapterEvents(const TrainCollection& coll)const;
 
+    /**
+     * 返回最后一个绑定的车站。
+     * 如果为空（应该不存在这种情况），返回空指针
+     */
+    const AdapterStation* lastStation()const;
+
+    const AdapterStation* firstStation()const;
+
 private:
 
     /**
