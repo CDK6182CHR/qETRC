@@ -569,3 +569,44 @@ std::shared_ptr<RailStation> Train::boundStartingRail() const
         return first->railStation.lock();
     return nullptr;
 }
+
+double Train::localMile() const
+{
+    double res = 0;
+    for (auto p : _adapters)
+        res += p->totalMile();
+    return res;
+}
+
+int Train::localSecsFast() const
+{
+    int res = 0;
+    for (auto p : _adapters)
+        res += p->totalSecs();
+    return res;
+}
+
+std::pair<int, int> Train::localRunStaySecs() const
+{
+    int run = 0, stay = 0;
+    for (auto p : _adapters) {
+        auto d = p->runStaySecs();
+        run += d.first;
+        stay += d.second;
+    }
+    return std::make_pair(run, stay);
+}
+
+double Train::localTraverseSpeedFast() const
+{
+    double mile = localMile();
+    int secs = localSecsFast();
+    //secs如果是0则得inf，C++中不会出问题
+    return mile / secs * 3600;  
+}
+
+bool Train::ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
+{
+    return t1->trainName().full() < t2->trainName().full();
+}
+

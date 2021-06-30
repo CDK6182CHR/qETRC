@@ -44,7 +44,7 @@ public:
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
     //virtual bool removeRows(int row, int count, const QModelIndex &parent) override;
     //virtual bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild) override;
-    //virtual void sort(int column, Qt::SortOrder order) override;
+    virtual void sort(int column, Qt::SortOrder order) override;
 
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 

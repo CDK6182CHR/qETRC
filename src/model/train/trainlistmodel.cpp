@@ -28,9 +28,8 @@ QVariant TrainListModel::data(const QModelIndex& index, int role) const
 		case ColStarting:return t->starting().toSingleLiteral();
 		case ColTerminal:return t->terminal().toSingleLiteral();
 		case ColType:return t->type()->name();
-		//todo: 具体实现
-		case ColMile:return 0;
-		case ColSpeed:return 0;
+		case ColMile:return QString::number(t->localMile(), 'f', 3);
+		case ColSpeed:return QString::number(t->localTraverseSpeedFast(), 'f', 3);
 		}
 	}
 	else if (role == Qt::CheckStateRole) {
@@ -65,6 +64,18 @@ Qt::ItemFlags TrainListModel::flags(const QModelIndex& index) const
 	case ColShow:return QAbstractTableModel::flags(index) | Qt::ItemIsUserCheckable;
 	}
 	return QAbstractTableModel::flags(index);
+}
+
+void TrainListModel::sort(int column, Qt::SortOrder order)
+{
+	beginResetModel();
+	qDebug() << "sort" << Qt::endl;
+	auto& lst = coll.trains();
+	switch (column) {
+	case ColTrainName:std::sort(lst.begin(), lst.end(), &Train::ltName); break;
+	default:break;
+	}
+	endResetModel();
 }
 
 QVariant TrainListModel::headerData(int section, Qt::Orientation orientation, int role) const

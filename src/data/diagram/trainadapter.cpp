@@ -76,6 +76,33 @@ const AdapterStation* TrainAdapter::firstStation() const
 	return _lines.first()->firstStation();
 }
 
+int TrainAdapter::totalSecs() const
+{
+	int res = 0;
+	for (auto p : _lines)
+		res += p->totalSecs();
+	return res;
+}
+
+std::pair<int,int> TrainAdapter::runStaySecs() const
+{
+	int run = 0, stay = 0;
+	for (auto p : _lines) {
+		auto&& d = p->runStaySecs();
+		run += d.first;
+		stay += d.second;
+	}
+	return std::make_pair(run, stay);
+}
+
+double TrainAdapter::totalMile() const
+{
+	double res = 0;
+	for (auto p : _lines)
+		res += p->totalMile();
+	return res;
+}
+
 void TrainAdapter::autoLines(const Config& config)
 {
 	//命名规则：前缀r表示rail，t表示train

@@ -8,6 +8,9 @@ CONFIG += c++17
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+include(../../site-packages/SARibbon/SARibbonBar.pri)
+include(../site-packages/ads/ads.pri)
+
 INCLUDEPATH += src
 
 SOURCES += \
@@ -30,6 +33,7 @@ SOURCES += \
     src/data/train/trainname.cpp \
     src/data/train/trainstation.cpp \
     src/data/train/traintype.cpp \
+    src/editors/trainlistwidget.cpp \
     src/kernel/diagramwidget.cpp \
     src/kernel/trainitem.cpp \
     src/main.cpp \
@@ -60,10 +64,12 @@ HEADERS += \
     src/data/train/trainname.h \
     src/data/train/trainstation.h \
     src/data/train/traintype.h \
+    src/editors/trainlistwidget.h \
     src/kernel/diagramwidget.h \
     src/kernel/trainitem.h \
     src/mainwindow.h \
     src/model/train/trainlistmodel.h \
+    src/util/buttongroup.hpp \
     src/util/qeexceptions.h \
     src/util/utilfunc.h
 

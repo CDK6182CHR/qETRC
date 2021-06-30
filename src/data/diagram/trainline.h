@@ -148,6 +148,25 @@ public:
         return _stations.empty() ? nullptr : &(_stations.front());
     }
 
+    /**
+     * 本运行线的总时长。
+     * 假定总时长小于24小时。
+     * 存在折返的列车，不计首站停时。
+     */
+    int totalSecs()const;
+
+    /**
+     * 运行时间和停车时间
+     * 其中停车时间不计算始发终到；折返的车，不计算首站。
+     * 返回：运行时间，停车时间。逐个区间扫描。
+     */
+    std::pair<int, int> runStaySecs()const;
+
+    /**
+     * 本运行线总里程，终点减起点的绝对值
+     */
+    double totalMile()const;
+
 private:
 
     /**

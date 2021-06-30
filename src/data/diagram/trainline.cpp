@@ -4,6 +4,8 @@
 #include "trainadapter.h"
 #include "data/train/traincollection.h"
 #include "data/train/train.h"
+#include "data/rail/rail.h"
+#include "util/utilfunc.h"
 
 #include <QDebug>
 
@@ -110,6 +112,51 @@ LineEventList TrainLine::listLineEvents(const TrainCollection& coll) const
 		}
 	}
 	return res;
+}
+
+int TrainLine::totalSecs() const
+{
+	if (isNull())
+		return 0;
+	const QTime& first = startLabel() ? _stations.front().trainStation->arrive :
+		_stations.front().trainStation->depart;
+	const QTime& last = _stations.back().trainStation->depart;
+	int secs = first.secsTo(last);
+	if (secs <= 0)
+		secs += 24 * 3600;
+	return secs;
+}
+
+std::pair<int, int> TrainLine::runStaySecs() const
+{
+	if (isNull())
+		return std::make_pair(0, 0);
+	else if (_stations.size() == 1) {
+		return std::make_pair(0, qeutil::secsTo(_stations.front().trainStation->arrive,
+			_stations.front().trainStation->depart));
+	}
+	int run = 0, stay = 0;
+	auto p = _stations.begin();
+	if (!isStartingStation(p) && startLabel()) {
+		stay += p->trainStation->stopSec();
+	}
+	auto p0 = p; ++p;
+	for (; p != _stations.end(); ++p) {
+		//run
+		run += qeutil::secsTo(p0->trainStation->depart, p->trainStation->arrive);
+		if (!isTerminalStation(p))
+			stay += p->trainStation->stopSec();
+		p0 = p;
+	}
+	return std::make_pair(run, stay);
+}
+
+double TrainLine::totalMile() const
+{
+	if (isNull())
+		return 0.0;
+	return std::abs(_stations.back().railStation.lock()->mile -
+		_stations.front().railStation.lock()->mile);
 }
 
 void TrainLine::listStationEvents(LineEventList& res) const

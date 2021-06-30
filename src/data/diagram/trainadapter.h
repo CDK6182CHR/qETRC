@@ -88,6 +88,10 @@ public:
 
     const AdapterStation* firstStation()const;
 
+    int totalSecs()const;
+    std::pair<int, int> runStaySecs()const;
+    double totalMile()const;
+
 private:
 
     /**

@@ -326,6 +326,24 @@ public:
         return it;
     }
 
+    double localMile()const;
+
+    int localSecsFast()const;
+
+    std::pair<int, int> localRunStaySecs()const;
+
+    /**
+     * 本线旅速，快速计算（仅用TrainLine收尾数据）  km/h
+     * 用于TrainListTable
+     */
+    double localTraverseSpeedFast()const;
+
+    //static比较函数 用来排序
+    static bool ltName(const std::shared_ptr<const Train>& t1, 
+        const std::shared_ptr<const Train>& t2);
+    static bool ltStarting(const Train& t1, const Train& t2);
+    static bool ltTerminal(const Train& t1, const Train& t2);
+
 };
 
 

@@ -11,4 +11,12 @@ namespace qeutil{
  */
 QTime parseTime(const QString& tm);
 
+/**
+ * 返回tm1->tm2的秒数，考虑PBC
+ */
+inline int secsTo(const QTime& tm1, const QTime& tm2) {
+	int secs = tm1.secsTo(tm2);
+	return secs < 0 ? secs + 24 * 3600 : secs;
+}
+
 }
