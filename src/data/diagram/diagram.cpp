@@ -128,9 +128,19 @@ TrainEventList Diagram::listTrainEvents(const Train& train) const
 
 std::shared_ptr<DiagramPage> Diagram::createDefaultPage()
 {
-    auto t = std::make_shared< DiagramPage>(*this, _railways);
+    auto t = std::make_shared< DiagramPage>(*this, _railways, 
+        validPageName(QObject::tr("默认运行图")));
     _pages.append(t);
     return t;
+}
+
+bool Diagram::pageNameExisted(const QString& name) const
+{
+    for (auto p : _pages) {
+        if (p->name() == name)
+            return true;
+    }
+    return false;
 }
 
 void Diagram::bindAllTrains()
@@ -142,10 +152,15 @@ void Diagram::bindAllTrains()
     }
 }
 
-Diagram::Diagram()
+QString Diagram::validPageName(const QString& prefix) const
 {
-    readDefaultConfigs("config.json");
+    for (int i = 0;; i++) {
+        QString name = prefix + QString::number(i);
+        if (!pageNameExisted(name))
+            return name;
+    }
 }
+
 
 bool Diagram::readDefaultConfigs(const QString& filename)
 {

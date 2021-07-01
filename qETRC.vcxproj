@@ -200,6 +200,8 @@
     <ClCompile Include="src\data\diagram\trainevents.cpp" />
     <ClCompile Include="src\kernel\trainitem.cpp" />
     <ClCompile Include="src\data\diagram\trainline.cpp" />
+    <ClCompile Include="src\model\diagram\componentitems.cpp" />
+    <ClCompile Include="src\model\diagram\diagramnavimodel.cpp" />
     <ClCompile Include="src\model\train\trainlistmodel.cpp" />
     <ClCompile Include="src\data\train\trainname.cpp" />
     <ClCompile Include="src\data\train\trainstation.cpp" />
@@ -217,6 +219,8 @@
     <QtMoc Include="src\mainwindow.h">
     </QtMoc>
     <QtMoc Include="src\editors\trainlistwidget.h" />
+    <QtMoc Include="src\model\diagram\diagramnavimodel.h" />
+    <ClInclude Include="src\model\diagram\componentitems.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <ClInclude Include="src\util\qeexceptions.h" />
     <ClInclude Include="src\data\rail\rail.h" />

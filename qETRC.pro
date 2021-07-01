@@ -39,6 +39,8 @@ SOURCES += \
     src/kernel/trainitem.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
+    src/model/diagram/componentitems.cpp \
+    src/model/diagram/diagramnavimodel.cpp \
     src/model/train/trainlistmodel.cpp \
     src/util/utilfunc.cpp
 
@@ -70,6 +72,8 @@ HEADERS += \
     src/kernel/diagramwidget.h \
     src/kernel/trainitem.h \
     src/mainwindow.h \
+    src/model/diagram/componentitems.h \
+    src/model/diagram/diagramnavimodel.h \
     src/model/train/trainlistmodel.h \
     src/util/buttongroup.hpp \
     src/util/qeexceptions.h \
@@ -81,3 +85,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 QMAKE_CXXFLAGS += /utf-8
+
+RESOURCES += \
+    rsc/resource.qrc

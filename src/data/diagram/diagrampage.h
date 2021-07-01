@@ -21,14 +21,20 @@ class DiagramPage
     Diagram& _diagram;
     QList<std::shared_ptr<Railway>> _railways;
     QList<double> _startYs;
+    QString _name;
 public:
-    DiagramPage(Diagram& diagram, const QList<std::shared_ptr<Railway>>& railways);
+    DiagramPage(Diagram& diagram, const QList<std::shared_ptr<Railway>>& railways,
+        const QString& name);
     auto& diagram(){return _diagram;}
     const auto& diagram()const{return _diagram;}
     auto& railways(){return _railways;}
     const auto& railways()const{return _railways;}
     auto& startYs(){return _startYs;}
     auto railwayAt(int i)const { return _railways.at(i); }
+    const QString& name()const { return _name; }
+    void setName(const QString& s) { _name = s; }
+
+    QString railNameString()const;
 
     /**
      * 暂时实现为直接返回Diagram的数据 （不保存副本）

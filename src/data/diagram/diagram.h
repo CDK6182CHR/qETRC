@@ -68,13 +68,14 @@ class Diagram
     QList<std::shared_ptr<DiagramPage>> _pages;
 
 public:
-    Diagram();
+    Diagram() = default;
 
     //拷贝和移动暂时禁用，需要时再考虑
     Diagram(const Diagram&)=delete;
     Diagram(Diagram&&)=delete;
     Diagram& operator=(const Diagram&)=delete;
     Diagram& operator=(Diagram&&)=delete;
+    ~Diagram()noexcept = default;
 
     /**
      * 读取默认配置文件 config.json
@@ -82,7 +83,7 @@ public:
      * 注意：似乎应当移动到mainWindow的启动操作里面去 
      * （导入运行图等操作也要创建临时的Diagram对象）
      */
-    bool readDefaultConfigs(const QString& filename);
+    bool readDefaultConfigs(const QString& filename= "config.json");
 
     /**
      * @brief fromJson  清空既有数据，从文件读取，同时保存文件名
@@ -175,8 +176,11 @@ public:
      */
     std::shared_ptr<DiagramPage> createDefaultPage();
 
+    bool pageNameExisted(const QString& name)const;
+
 private:
     void bindAllTrains();
+    QString validPageName(const QString& prefix)const;
 };
 
 

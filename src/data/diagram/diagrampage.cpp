@@ -2,10 +2,23 @@
 #include "diagram.h"
 
 DiagramPage::DiagramPage(Diagram &diagram,
-                         const QList<std::shared_ptr<Railway> > &railways):
-    _diagram(diagram),_railways(railways)
+                         const QList<std::shared_ptr<Railway> > &railways,
+    const QString& name):
+    _diagram(diagram),_railways(railways),_name(name)
 {
 
+}
+
+QString DiagramPage::railNameString() const
+{
+    if (_railways.empty())
+        return "";
+    auto p = _railways.begin();
+    QString res = (*p)->name();
+    for (++p; p != _railways.end(); ++p) {
+        res += ", " + (*p)->name();
+    }
+    return res;
 }
 
 const Config& DiagramPage::config() const
