@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-
+    //暴力构造测试用例
 
 
     //auto s = QString(R"(D:\Python\train_graph\sample.pyetgr)");
@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     auto s = QString(R"(D:\Python\train_graph\source\濉阜线.json)");
     //auto s = R"(D:\Python\train_graph\source\成贵客专线F20191230-分颜色.pyetgr)";
 
+    clearDiagramUnchecked();
     _diagram.fromJson(s);
     //_diagram.config().avoid_cover = false;
     qDebug() << "trains count: " << _diagram.trainCollection().trains().size() << Qt::endl;
@@ -51,26 +52,13 @@ MainWindow::MainWindow(QWidget *parent)
     _diagram.addRailway(d2.firstRailway());
     _diagram.addTrains(d2.trainCollection());
 
-    diagramWidget = new DiagramWidget(*(_diagram.createDefaultPage()), this);
+    _diagram.createDefaultPage();
 
-    ads::CDockWidget* dock = new ads::CDockWidget(QObject::tr("运行图窗口"));
-    dock->setWidget(diagramWidget);
-
-    auto* dock1 = new ads::CDockWidget(QObject::tr("车次管理"));
-    auto* w = new TrainListWidget(_diagram.trainCollection());
-    dock1->setWidget(w);
-
-    manager->addDockWidget(ads::CenterDockWidgetArea, dock);
-    manager->addDockWidget(ads::LeftDockWidgetArea, dock1);
-
-    //
-    QTreeView* tree = new QTreeView;
-    DiagramNaviModel* dm = new DiagramNaviModel(_diagram, this);
-    tree->setModel(dm);
-    auto* dock2 = new ads::CDockWidget(QObject::tr("运行图资源管理器"));
-    dock2->setWidget(tree);
-
-    manager->addDockWidget(ads::LeftDockWidgetArea, dock2);
+    auto page = std::make_shared<DiagramPage>(_diagram,
+        QList<std::shared_ptr<Railway>>{ _diagram.railways().at(0) }, tr("濉阜线"));
+    _diagram.pages().append(page);
+    
+    endResetGraph();
 
 }
 
@@ -120,13 +108,16 @@ void MainWindow::initToolbar()
 
         QAction* act = new QAction(QIcon(":/icons/new-file.png"), QObject::tr("新建"), this);
         panel->addLargeAction(act);
+        act->setShortcut(Qt::CTRL + Qt::Key_N);
         connect(act, SIGNAL(triggered()), this, SLOT(actNewGraph()));
 
         act = new QAction(QIcon(":/icons/open.png"), QObject::tr("打开"), this);
+        act->setShortcut(Qt::CTRL + Qt::Key_O);
         panel->addLargeAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(actOpenGraph()));
 
         act = new QAction(QIcon(":/icons/save1.png"), QObject::tr("保存"), this);
+        act->setShortcut(Qt::CTRL + Qt::Key_S);
         panel->addLargeAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(actSaveGraph()));
 
@@ -206,6 +197,7 @@ void MainWindow::resetDiagramPages()
 
 bool MainWindow::openGraph(const QString& filename)
 {
+    clearDiagramUnchecked();
 
     Diagram dia;
     bool flag = dia.fromJson(filename);
@@ -225,8 +217,7 @@ bool MainWindow::openGraph(const QString& filename)
 
 void MainWindow::actOpenGraph()
 {
-    if (!clearDiagram())
-        return;
+    //todo: 询问保存
     QString res=QFileDialog::getOpenFileName(this, QObject::tr("打开"), QString(),
         QObject::tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)"));
     if (res.isNull())
@@ -245,6 +236,11 @@ void MainWindow::actSaveGraph()
 
 void MainWindow::actSaveGraphAs()
 {
+    QString res = QFileDialog::getSaveFileName(this, QObject::tr("另存为"), "",
+        tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)"));
+    if (res.isNull())
+        return;
+    _diagram.saveAs(res);
 }
 
 void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)

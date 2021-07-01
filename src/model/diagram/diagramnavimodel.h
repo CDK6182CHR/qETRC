@@ -18,7 +18,7 @@ class DiagramNaviModel : public QAbstractItemModel
     Q_OBJECT
 
     Diagram& _diagram;
-    std::unique_ptr<DiagramItem> _root;
+    std::unique_ptr<navi::DiagramItem> _root;
 public:
     explicit DiagramNaviModel(Diagram& diagram, QObject* parent);
 
@@ -38,9 +38,9 @@ public:
 
 private:
     //for convenient..
-    using ACI = AbstractComponentItem;
-    using pACI = AbstractComponentItem*;
-    AbstractComponentItem* getParentItem(const QModelIndex& parent)const;
-    };
+    using ACI = navi::AbstractComponentItem;
+    using pACI = navi::AbstractComponentItem*;
+    pACI getParentItem(const QModelIndex& parent)const;
+};
 
 

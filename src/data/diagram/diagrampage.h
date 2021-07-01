@@ -25,6 +25,7 @@ class DiagramPage
 public:
     DiagramPage(Diagram& diagram, const QList<std::shared_ptr<Railway>>& railways,
         const QString& name);
+    DiagramPage(Diagram& diagram, const QJsonObject& obj);
     auto& diagram(){return _diagram;}
     const auto& diagram()const{return _diagram;}
     auto& railways(){return _railways;}
@@ -51,6 +52,9 @@ public:
     int railwayIndex(const Railway& rail)const;
 
     double railwayStartY(const Railway& rail)const;
+
+    void fromJson(const QJsonObject& obj);
+    QJsonObject toJson()const;
 };
 
 

@@ -227,6 +227,13 @@ bool Diagram::fromJson(const QJsonObject& obj)
     if (t.isString() && !t.toString().isEmpty()) {
         _railways.at(0)->setOrdinate(t.toString());
     }
+
+    //新增 Page
+    const QJsonArray& arpage = obj.value("pages").toArray();
+    for (auto p = arpage.begin(); p != arpage.end(); ++p) {
+        _pages.append(std::make_shared<DiagramPage>(*this, p->toObject()));
+    }
+
     bindAllTrains();
     return true;
 }
@@ -248,6 +255,13 @@ QJsonObject Diagram::toJson() const
             obj.insert("lines", arrail);
         }
     }
+    //新增：Page的信息
+    QJsonArray arpage;
+    for (auto p : _pages) {
+        arpage.append(p->toJson());
+    }
+    obj.insert("pages", arpage);
+
     //配置信息
     QJsonObject objconfig = _config.toJson();
     _trainCollection.typeManager().toJson(objconfig);

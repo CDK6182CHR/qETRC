@@ -9,6 +9,12 @@ DiagramPage::DiagramPage(Diagram &diagram,
 
 }
 
+DiagramPage::DiagramPage(Diagram& diagram, const QJsonObject& obj):
+    _diagram(diagram)
+{
+    fromJson(obj);
+}
+
 QString DiagramPage::railNameString() const
 {
     if (_railways.empty())
@@ -46,4 +52,31 @@ double DiagramPage::railwayStartY(const Railway& rail) const
     if (idx == -1)
         return 0;
     return _startYs[idx];
+}
+
+void DiagramPage::fromJson(const QJsonObject& obj)
+{
+    QJsonArray ar = obj.value("railways").toArray();
+    for (auto p = ar.begin(); p != ar.end(); ++p) {
+        auto r = _diagram.railwayByName(p->toString());
+        if (!r) {
+            qDebug() << "DiagramPage::fromJson: WARNING: "
+                << "Railway not found: " << p->toString() << ", to be ignored" << Qt::endl;
+        }
+        else {
+            _railways.append(r);
+        }
+    }
+}
+
+QJsonObject DiagramPage::toJson() const
+{
+    QJsonArray ar;
+    for (auto p : _railways) {
+        ar.append(p->name());
+    }
+    return QJsonObject{
+        {"name",_name},
+        {"railways",ar}
+    };
 }

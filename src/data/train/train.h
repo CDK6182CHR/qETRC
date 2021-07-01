@@ -354,6 +354,10 @@ public:
      */
     void invalidateTempData();
 
+    inline QString startEndString()const {
+        return _starting.toSingleLiteral() + "->" + _terminal.toSingleLiteral();
+    }
+
     //static比较函数 用来排序
     static bool ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
     static bool ltStarting(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);

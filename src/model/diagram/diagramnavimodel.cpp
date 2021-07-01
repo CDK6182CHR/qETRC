@@ -3,7 +3,7 @@
 
 DiagramNaviModel::DiagramNaviModel(Diagram& diagram, QObject* parent):
     QAbstractItemModel(parent),_diagram(diagram),
-    _root(std::make_unique<DiagramItem>(diagram))
+    _root(std::make_unique<navi::DiagramItem>(diagram))
 {
 }
 
@@ -11,11 +11,11 @@ QModelIndex DiagramNaviModel::index(int row, int column, const QModelIndex& pare
 {
     if (!hasIndex(row, column, parent))
         return QModelIndex();
-    AbstractComponentItem* parentItem;
+    pACI parentItem;
     if (!parent.isValid())
         parentItem = _root.get();
     else
-        parentItem = static_cast<AbstractComponentItem*>(parent.internalPointer());
+        parentItem = static_cast<pACI>(parent.internalPointer());
     auto* childItem = parentItem->child(row);
     if (childItem) {
         return createIndex(row, column, childItem);
@@ -28,8 +28,8 @@ QModelIndex DiagramNaviModel::parent(const QModelIndex& child) const
     if (!child.isValid())
         return QModelIndex();
 
-    AbstractComponentItem* childItem = static_cast<pACI>(child.internalPointer());
-    AbstractComponentItem* parentItem = childItem->parent();
+    pACI childItem = static_cast<pACI>(child.internalPointer());
+    pACI parentItem = childItem->parent();
 
     if (!parentItem || parentItem == _root.get())
         return QModelIndex();
@@ -84,17 +84,17 @@ QVariant DiagramNaviModel::headerData(int section, Qt::Orientation orientation, 
 void DiagramNaviModel::resetModel()
 {
     beginResetModel();
-    _root = std::make_unique<DiagramItem>(_diagram);
+    _root = std::make_unique<navi::DiagramItem>(_diagram);
     endResetModel();
 }
 
-AbstractComponentItem* DiagramNaviModel::getParentItem(const QModelIndex& parent) const
+navi::AbstractComponentItem* DiagramNaviModel::getParentItem(const QModelIndex& parent) const
 {
-    AbstractComponentItem* parentItem;
+    pACI parentItem;
     if (!parent.isValid())
         parentItem = _root.get();
     else
-        parentItem = static_cast<AbstractComponentItem*>(parent.internalPointer());
+        parentItem = static_cast<pACI>(parent.internalPointer());
     return parentItem;
 }
 
