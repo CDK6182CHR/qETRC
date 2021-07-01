@@ -55,7 +55,6 @@ class TrainLine
     Direction _dir;
     bool _show;
     bool _startLabel, _endLabel;
-    TrainItem* _item;
     
     /**
      * 迭代器使用注意：全程必须保证_stations不变
@@ -98,9 +97,6 @@ public:
     auto& adapter() { return _adapter; }
     Train& train();
     const Train& train()const;
-
-    TrainItem* item() { return _item; }
-    void setItem(TrainItem* item) { _item = item; }
 
     inline const StationName& firstStationName()const { return _stations.front().trainStation->name; }
     inline const StationName& lastStationName()const { return _stations.back().trainStation->name; }

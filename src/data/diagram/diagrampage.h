@@ -2,26 +2,34 @@
 
 #include <memory>
 #include <QList>
+#include <QHash>
 
 #include "config.h"
+#include "data/train/train.h"
 
 class Railway;
 class Diagram;
 struct Config;
 struct MarginConfig;
+class TrainItem;
+class TrainLine;
+class Forbid;
+class QGraphicsRectItem;
 
 /**
  * @brief The DiagramPage class
  * Diagram的一个/页面/视图  显示一组Railway的运行图
  * DiagramWidget针对这个类绘图
- * 注意不保存实际数据
+ * 注意不保存实际数据；只持有Item的指针
  */
 class DiagramPage
 {
-    Diagram& _diagram;
+    Diagram & _diagram;
     QList<std::shared_ptr<Railway>> _railways;
     QList<double> _startYs;
     QString _name;
+    QHash<TrainLine*, TrainItem*> _itemMap;
+    QHash<const Forbid*, QList<QGraphicsRectItem*>> _forbidDMap, _forbidUMap;   //天窗的item映射，分为上下行
 public:
     DiagramPage(Diagram& diagram, const QList<std::shared_ptr<Railway>>& railways,
         const QString& name);
@@ -34,6 +42,9 @@ public:
     auto railwayAt(int i)const { return _railways.at(i); }
     const QString& name()const { return _name; }
     void setName(const QString& s) { _name = s; }
+
+    auto& itemMap() { return _itemMap; }
+    const auto& itemMap()const { return _itemMap; }
 
     QString railNameString()const;
 
@@ -55,6 +66,23 @@ public:
 
     void fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;
+
+    void addItemMap(TrainLine* line, TrainItem* item) {
+        _itemMap.insert(line, item);
+    }
+
+    void clearTrainItems(const Train& train);
+
+    void clearAllItems();
+
+    void highlightTrainItems(const Train& train);
+
+    void unhighlightTrainItems(const Train& train);
+
+    QList<QGraphicsRectItem*>& dirForbidItem(const Forbid* forbid, Direction dir);
+
+    void addForbidItem(const Forbid* forbid, Direction dir, QGraphicsRectItem* item);
+
 };
 
 

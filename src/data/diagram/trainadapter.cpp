@@ -28,28 +28,6 @@ void TrainAdapter::print() const
 	}
 }
 
-void TrainAdapter::clearItems()
-{
-	for (auto& p : _lines) {
-		p->setItem(nullptr);
-	}
-}
-
-void TrainAdapter::highlightItems()
-{
-	for (auto p : _lines) {
-		if (p->item())
-			p->item()->highlight();
-	}
-}
-
-void TrainAdapter::unhighlightItems()
-{
-	for (auto p : _lines) {
-		if (p->item())
-			p->item()->unhighlight();
-	}
-}
 
 AdapterEventList TrainAdapter::listAdapterEvents(const TrainCollection& coll) const
 {

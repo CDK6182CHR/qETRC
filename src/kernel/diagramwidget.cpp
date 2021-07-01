@@ -507,7 +507,7 @@ void DiagramWidget::paintTrain(std::shared_ptr<Train> train)
 
 void DiagramWidget::paintTrain(Train& train)
 {
-    train.clearItems();
+    _page.clearTrainItems(train);
     if (!train.isShow())
         return;
 
@@ -525,7 +525,7 @@ void DiagramWidget::paintTrain(Train& train)
                     else {
                         auto* item = new TrainItem(*line, adp->railway(), _page.diagram(),
                             _page.startYs().at(i));
-                        line->setItem(item);
+                        _page.addItemMap(line.get(), item);
                         item->setZValue(5);
                         scene()->addItem(item);
                     }
@@ -645,7 +645,7 @@ void DiagramWidget::selectTrain(TrainItem* item)
     if (!item)
         return;
     _selectedTrain = &(item->train());
-    _selectedTrain->highlightItems();
+    _page.highlightTrainItems(*_selectedTrain);
 
     nowItem->setText(_selectedTrain->trainName().full());
 
@@ -658,7 +658,7 @@ void DiagramWidget::unselectTrain()
     if (updating)
         return;
     if (_selectedTrain) {
-        _selectedTrain->unhighlightItems();
+        _page.unhighlightTrainItems(*_selectedTrain);
         _selectedTrain = nullptr;
         nowItem->setText(" ");
     }
@@ -724,7 +724,7 @@ void DiagramWidget::showForbid(std::shared_ptr<Forbid> forbid, Direction dir, in
 
 void DiagramWidget::removeForbid(std::shared_ptr<Forbid> forbid, Direction dir)
 {
-    auto& items = forbid->dirItems(dir);
+    auto& items = _page.dirForbidItem(forbid.get(), dir);
     for (auto p : items) {
         scene()->removeItem(p);
     }
@@ -753,18 +753,18 @@ void DiagramWidget::addForbidNode(std::shared_ptr<Forbid> forbid,
             xend = std::min(xend, width);
             auto* item = scene()->addRect(xstart + margins().left, y1 + start_y, xend - xstart, y2 - y1,
                 pen, brush);
-            forbid->addItem(railint.direction(), item);
+            _page.addForbidItem(forbid.get(), railint.direction(), item);
         }
     }
     else {
         //存在跨界的情况  先处理右半部分
         if (xstart <= width) {
-            forbid->addItem(railint.direction(), scene()->addRect(
+            _page.addForbidItem(forbid.get(),railint.direction(), scene()->addRect(
                 xstart + margins().left, y1 + start_y, width - xstart, y2 - y1, pen, brush
             ));
         }
         //左半部分  一定有
-        forbid->addItem(railint.direction(), scene()->addRect(
+        _page.addForbidItem(forbid.get(), railint.direction(), scene()->addRect(
             margins().left, y1 + start_y, xend, y2 - y1, pen, brush
         ));
     }

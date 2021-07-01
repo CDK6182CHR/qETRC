@@ -1,5 +1,7 @@
 ﻿#include "diagrampage.h"
 #include "diagram.h"
+#include "trainadapter.h"
+#include "kernel/trainitem.h"
 
 DiagramPage::DiagramPage(Diagram &diagram,
                          const QList<std::shared_ptr<Railway> > &railways,
@@ -79,4 +81,51 @@ QJsonObject DiagramPage::toJson() const
         {"name",_name},
         {"railways",ar}
     };
+}
+
+void DiagramPage::clearTrainItems(const Train& train)
+{
+    for (auto adp : train.adapters()) {
+        for (auto p : adp->lines()) {
+            _itemMap.remove(p.get());
+        }
+    }
+}
+
+void DiagramPage::clearAllItems()
+{
+    _itemMap.clear();
+}
+
+void DiagramPage::highlightTrainItems(const Train& train)
+{
+    for (auto adp : train.adapters()) {
+        for (auto p : adp->lines()) {
+            if (_itemMap.contains(p.get())) {
+                _itemMap.value(p.get())->highlight();
+            }
+        }
+    }
+}
+
+void DiagramPage::unhighlightTrainItems(const Train& train)
+{
+    for (auto adp : train.adapters()) {
+        for (auto p : adp->lines()) {
+            if (_itemMap.contains(p.get())) {
+                _itemMap.value(p.get())->unhighlight();
+            }
+        }
+    }
+}
+
+QList<QGraphicsRectItem*>& DiagramPage::dirForbidItem(const Forbid* forbid, Direction dir)
+{
+    return dir == Direction::Down ?
+        _forbidDMap[forbid] : _forbidUMap[forbid];
+}
+
+void DiagramPage::addForbidItem(const Forbid* forbid, Direction dir, QGraphicsRectItem* item)
+{
+    dirForbidItem(forbid, dir).append(item);
 }

@@ -60,16 +60,6 @@ public:
     inline auto& lines() { return _lines; }
     inline const auto& lines()const { return _lines; }
 
-    /**
-     * @brief clearItems
-     * 清除所附的所有运行线指针
-     */
-    void clearItems();
-
-    void highlightItems();
-
-    void unhighlightItems();
-
     inline bool isInSameRailway(const TrainAdapter& another)const {
         return &_railway == &(another._railway);
     }

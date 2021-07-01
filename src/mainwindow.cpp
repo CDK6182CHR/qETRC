@@ -29,8 +29,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-
-
     //暴力构造测试用例
 
 

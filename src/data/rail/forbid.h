@@ -9,7 +9,6 @@
 
 class Forbid;
 
-class QGraphicsRectItem;
 
 class ForbidNode:
         public RailIntervalNode<ForbidNode,Forbid>
@@ -45,8 +44,6 @@ class Forbid:
     Forbid(const Forbid&) = delete;
     Forbid(Forbid&&) = delete;
 
-    QList<QGraphicsRectItem*> _downItems, _upItems;
-
 public:
 
     inline bool isDownShow()const{return downShow;}
@@ -56,12 +53,4 @@ public:
     QJsonObject toJson()const;
 
     void _show()const;
-
-    auto& downItems() { return _downItems; }
-    auto& upItems() { return _upItems; }
-    auto& dirItems(Direction dir) { return dir == Direction::Down ? _downItems : _upItems; }
-
-    inline void addItem(Direction dir, QGraphicsRectItem* item) {
-        dirItems(dir).append(item);
-    }
 };

@@ -279,16 +279,6 @@ public:
      */
     void detectPassStation();
 
-    /**
-     * @brief clearItems
-     * 清除附属的TrainAdapter下的所有运行线指针
-     */
-    void clearItems();
-
-    void highlightItems();
-
-    void unhighlightItems();
-
     inline bool hasRouting()const { return !_routing.expired(); }
 
     inline std::weak_ptr<Routing> routing() { return _routing; }

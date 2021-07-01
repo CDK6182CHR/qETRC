@@ -503,27 +503,6 @@ void Train::intervalExchange(Train& train2, StationPtr start1, StationPtr end1,
     table2.splice(end2, tmp);
 }
 
-void Train::clearItems()
-{
-    for (auto p : _adapters) {
-        p->clearItems();
-    }
-}
-
-void Train::highlightItems()
-{
-    for (auto adp : _adapters) {
-        adp->highlightItems();
-    }
-}
-
-void Train::unhighlightItems()
-{
-    for (auto adp : _adapters) {
-        adp->unhighlightItems();
-    }
-}
-
 void Train::setRouting(std::weak_ptr<Routing> rout, std::list<RoutingNode>::iterator node)
 {
     _routing = rout;
