@@ -85,6 +85,15 @@ std::shared_ptr<Train> TrainCollection::findFirstSingleName(const QString& name)
 	return singleNameMap.value(name).first();
 }
 
+void TrainCollection::clear(const TypeManager& defaultManager)
+{
+	_trains.clear();
+	_routings.clear();
+	fullNameMap.clear();
+	singleNameMap.clear();
+	_manager = defaultManager;
+}
+
 void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 {
 	fullNameMap.insert(t->trainName().full(), t);

@@ -17,6 +17,7 @@
  * PyETRC中system.json 默认配置文件的抽象
  */
 class SystemJson {
+public:
     static constexpr int history_count = 20;
     static SystemJson instance;
 
@@ -31,6 +32,9 @@ class SystemJson {
 
     void saveFile();
 
+    /**
+     * 添加历史记录文件；同时记录为上一次的文件
+     */
     void addHistoryFile(const QString& name);
 
     ~SystemJson();
@@ -70,11 +74,14 @@ class Diagram
 public:
     Diagram() = default;
 
-    //拷贝和移动暂时禁用，需要时再考虑
+    /**
+     * 目前移动构造和赋值的默认行为都是正确的
+     * 用在打开新的运行图
+     */
     Diagram(const Diagram&)=delete;
-    Diagram(Diagram&&)=delete;
+    Diagram(Diagram&&)=default;
     Diagram& operator=(const Diagram&)=delete;
-    Diagram& operator=(Diagram&&)=delete;
+    Diagram& operator=(Diagram&&)=default;
     ~Diagram()noexcept = default;
 
     /**
@@ -106,6 +113,12 @@ public:
      * 保存 （使用当前文件名）
      */
     bool save()const;
+
+    /**
+     * 打开新运行图或者新建等操作调用
+     * 清理所有数据
+     */
+    void clear();
 
     inline auto& railways(){return _railways;}
     inline const auto& railways()const{return _railways;}
@@ -177,6 +190,13 @@ public:
     std::shared_ptr<DiagramPage> createDefaultPage();
 
     bool pageNameExisted(const QString& name)const;
+
+    /**
+     * 如果读取失败，则运行图是个Null。
+     * 没有任何线路的运行图是Null。
+     * 这里还是要想清楚
+     */
+    inline bool isNull()const { return _railways.empty(); }
 
 private:
     void bindAllTrains();

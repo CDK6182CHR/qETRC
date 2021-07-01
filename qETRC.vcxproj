@@ -128,6 +128,13 @@
       <QtMocDir>$(Configuration)</QtMocDir>
       <QtMocFileName>moc_%(Filename).cpp</QtMocFileName>
     </QtMoc>
+    <QtRcc>
+      <Compression>default</Compression>
+      <InitFuncName>resource</InitFuncName>
+      <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
+      <QtRccDir>$(Configuration)</QtRccDir>
+      <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
+    </QtRcc>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -177,12 +184,20 @@
       <QtMocDir>$(Configuration)</QtMocDir>
       <QtMocFileName>moc_%(Filename).cpp</QtMocFileName>
     </QtMoc>
+    <QtRcc>
+      <Compression>default</Compression>
+      <InitFuncName>resource</InitFuncName>
+      <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
+      <QtRccDir>$(Configuration)</QtRccDir>
+      <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
+    </QtRcc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\model\diagram\componentitems.cpp" />
     <ClCompile Include="src\data\diagram\config.cpp" />
     <ClCompile Include="src\data\diagram\diagram.cpp" />
+    <ClCompile Include="src\model\diagram\diagramnavimodel.cpp" />
     <ClCompile Include="src\data\diagram\diagrampage.cpp" />
-    <ClCompile Include="src\editors\trainlistwidget.cpp" />
     <ClCompile Include="src\kernel\diagramwidget.cpp" />
     <ClCompile Include="src\data\rail\forbid.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -200,28 +215,27 @@
     <ClCompile Include="src\data\diagram\trainevents.cpp" />
     <ClCompile Include="src\kernel\trainitem.cpp" />
     <ClCompile Include="src\data\diagram\trainline.cpp" />
-    <ClCompile Include="src\model\diagram\componentitems.cpp" />
-    <ClCompile Include="src\model\diagram\diagramnavimodel.cpp" />
     <ClCompile Include="src\model\train\trainlistmodel.cpp" />
+    <ClCompile Include="src\editors\trainlistwidget.cpp" />
     <ClCompile Include="src\data\train\trainname.cpp" />
     <ClCompile Include="src\data\train\trainstation.cpp" />
     <ClCompile Include="src\data\train\traintype.cpp" />
     <ClCompile Include="src\util\utilfunc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\util\buttongroup.hpp" />
+    <ClInclude Include="src\model\diagram\componentitems.h" />
     <ClInclude Include="src\data\diagram\config.h" />
     <ClInclude Include="src\data\diagram\diagram.h" />
+    <QtMoc Include="src\model\diagram\diagramnavimodel.h">
+    </QtMoc>
+    <ClInclude Include="src\data\diagram\diagrampage.h" />
     <QtMoc Include="src\kernel\diagramwidget.h">
     </QtMoc>
     <ClInclude Include="src\data\common\direction.h" />
-    <ClInclude Include="src\data\diagram\diagrampage.h" />
     <ClInclude Include="src\data\rail\forbid.h" />
     <QtMoc Include="src\mainwindow.h">
     </QtMoc>
-    <QtMoc Include="src\editors\trainlistwidget.h" />
-    <QtMoc Include="src\model\diagram\diagramnavimodel.h" />
-    <ClInclude Include="src\model\diagram\componentitems.h" />
-    <ClInclude Include="src\util\buttongroup.hpp" />
     <ClInclude Include="src\util\qeexceptions.h" />
     <ClInclude Include="src\data\rail\rail.h" />
     <ClInclude Include="src\data\rail\railinterval.h" />
@@ -240,6 +254,8 @@
     <ClInclude Include="src\kernel\trainitem.h" />
     <ClInclude Include="src\data\diagram\trainline.h" />
     <QtMoc Include="src\model\train\trainlistmodel.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\trainlistwidget.h">
     </QtMoc>
     <ClInclude Include="src\data\train\trainname.h" />
     <ClInclude Include="src\data\train\trainstation.h" />
@@ -263,6 +279,61 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">release\moc_predefs.h;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="rsc\icons\ETRC-dynamic.png" />
+    <None Include="rsc\icons\add.png" />
+    <None Include="rsc\icons\add_train.png" />
+    <None Include="rsc\icons\adjust-2.png" />
+    <None Include="rsc\icons\adjust.png" />
+    <None Include="rsc\icons\arrow.png" />
+    <None Include="rsc\icons\brush.png" />
+    <None Include="rsc\icons\clock.png" />
+    <None Include="rsc\icons\close.png" />
+    <None Include="rsc\icons\compare.png" />
+    <None Include="rsc\icons\config.png" />
+    <None Include="rsc\icons\copy.png" />
+    <None Include="rsc\icons\counter.png" />
+    <None Include="rsc\icons\data.png" />
+    <None Include="rsc\icons\database.png" />
+    <None Include="rsc\icons\edit.png" />
+    <None Include="rsc\icons\electronic-clock.png" />
+    <None Include="rsc\icons\excel.png" />
+    <None Include="rsc\icons\exchange.png" />
+    <None Include="rsc\icons\exchange1.png" />
+    <None Include="rsc\icons\filter.png" />
+    <None Include="rsc\icons\forbid.png" />
+    <None Include="rsc\icons\h_expand.png" />
+    <None Include="rsc\icons\h_shrink.png" />
+    <None Include="rsc\icons\help.png" />
+    <None Include="rsc\icons\icon.ico" />
+    <None Include="rsc\icons\identify.png" />
+    <None Include="rsc\icons\info.png" />
+    <None Include="rsc\icons\joint.png" />
+    <None Include="rsc\icons\list.png" />
+    <None Include="rsc\icons\menu.png" />
+    <None Include="rsc\icons\new-file.png" />
+    <None Include="rsc\icons\open.png" />
+    <None Include="rsc\icons\pdf.png" />
+    <None Include="rsc\icons\png.png" />
+    <None Include="rsc\icons\polyline.png" />
+    <None Include="rsc\icons\rail.png" />
+    <None Include="rsc\icons\refresh.png" />
+    <QtRcc Include="rsc\resource.qrc">
+    </QtRcc>
+    <None Include="rsc\icons\ruler.png" />
+    <None Include="rsc\icons\ruler_pen.png" />
+    <None Include="rsc\icons\save1.png" />
+    <None Include="rsc\icons\saveas.png" />
+    <None Include="rsc\icons\search.png" />
+    <None Include="rsc\icons\settings.png" />
+    <None Include="rsc\icons\text.png" />
+    <None Include="rsc\icons\timetable.png" />
+    <None Include="rsc\icons\train.png" />
+    <None Include="rsc\icons\v_expand.png" />
+    <None Include="rsc\icons\v_shrink.png" />
+    <None Include="rsc\icons\zoom-in.png" />
+    <None Include="rsc\icons\zoom-out.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

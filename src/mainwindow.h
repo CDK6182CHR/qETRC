@@ -2,15 +2,18 @@
 
 #include <QMainWindow>
 #include <QTreeView>
+#include <QList>
 
 #include "data/rail/railway.h"
 #include "data/diagram/diagram.h"
 
 #include "kernel/diagramwidget.h"
 #include "model/diagram/diagramnavimodel.h"
+#include "editors/trainlistwidget.h"
 
 //for SARibbon
 #include "SARibbonMainWindow.h"
+#include "SARibbonMenu.h"
 #include "DockManager.h"
 
 /**
@@ -26,6 +29,10 @@ class MainWindow : public SARibbonMainWindow
     //窗口，Model的指针
     DiagramNaviModel* naviModel;
     QTreeView* naviView;
+    SARibbonMenu* pageMenu;
+    QList<ads::CDockWidget*> diagramDocks;
+    ads::CDockWidget* naviDock, * trainListDock;
+    TrainListWidget* trainListWidget;
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -43,6 +50,24 @@ private:
     void initToolbar();
 
     /**
+     * 程序启动，依次尝试读取上次打开的和默认文件
+     */
+    void loadInitDiagram();
+
+    /**
+     * 打开新的运行图、重置运行图等之前执行。
+     * 询问是否保存、
+     * 清理当前运行图的东西。
+     */
+    bool clearDiagram();
+
+    /**
+     * 清理运行图数据。
+     * 用在打开运行图失败时
+     */
+    void clearDiagramUnchecked();
+
+    /**
      * 重置操作之前调用，例如打开运行图 
      */
     void beforeResetGraph();
@@ -52,10 +77,26 @@ private:
      */
     void endResetGraph();
 
+    /**
+     * 打开新运行图时的操作
+     * 每个Page添加一个窗口
+     */
+    void resetDiagramPages();
+
+    /**
+     * 打开运行图 返回是否成功
+     */
+    bool openGraph(const QString& filename);
+
 private slots:
     void actNewGraph();
     void actOpenGraph();
     void actSaveGraph();
     void actSaveGraphAs();
+
+    /**
+     * 调用前，应当已经把Page加入到Diagram中
+     */
+    void addPageWidget(std::shared_ptr<DiagramPage> page);
 };
 

@@ -26,10 +26,11 @@ class TrainListWidget : public QWidget
 
 public:
     explicit TrainListWidget(TrainCollection& coll_, QWidget *parent_ = nullptr);
+    void refreshData();
 
 private:
     void initUI();
-    void refreshData();
+    
 
 signals:
     void currentTrainChanged(std::shared_ptr<Train> train);

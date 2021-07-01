@@ -10,6 +10,13 @@ TrainListWidget::TrainListWidget(TrainCollection& coll_, QWidget* parent):
 	initUI();
 }
 
+void TrainListWidget::refreshData()
+{
+	model->endResetModel();
+	table->update();
+	table->resizeColumnsToContents();
+}
+
 void TrainListWidget::initUI()
 {
 	auto* vlay = new QVBoxLayout;

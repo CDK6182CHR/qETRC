@@ -105,6 +105,8 @@ public:
     inline std::shared_ptr<Train> trainAt(int i) { return _trains.at(i); }
     inline std::shared_ptr<const Train> trainAt(int i)const { return _trains.at(i); }
 
+    void clear(const TypeManager& defaultManager);
+
 private:
     /**
      * @brief addMapInfo

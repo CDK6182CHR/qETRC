@@ -32,6 +32,7 @@ class TrainListModel : public QAbstractTableModel
         MAX_COLUMNS
     };
 public:
+    friend class TrainListWidget;
 
     TrainListModel(TrainCollection& coll, QObject* parent);
 

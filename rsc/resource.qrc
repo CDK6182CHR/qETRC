@@ -51,5 +51,7 @@
         <file>icons/counter.png</file>
         <file>icons/train.png</file>
         <file>icons/ruler_pen.png</file>
+        <file>icons/Graph-add.png</file>
+        <file>icons/diagram.png</file>
     </qresource>
 </RCC>

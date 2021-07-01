@@ -27,6 +27,7 @@ void SystemJson::addHistoryFile(const QString& name)
     if (history.size() >= history_count)
         history.pop_front();
     history.push_back(name);
+    last_file = name;
 }
 
 SystemJson::~SystemJson()
@@ -190,6 +191,8 @@ bool Diagram::fromJson(const QString& filename)
     QJsonDocument doc = QJsonDocument::fromJson(contents);
     bool flag = fromJson(doc.object());
     f.close();
+    if (flag)
+        _filename = filename;
     return flag;
 }
 
@@ -273,6 +276,16 @@ bool Diagram::save() const
     file.write(doc.toJson());
     file.close();
     return true;
+}
+
+void Diagram::clear()
+{
+    _pages.clear();
+    _trainCollection.clear(_defaultManager);
+    _railways.clear();
+    _config = _defaultConfig;
+    _note = "";
+    _version = "";
 }
 
 
