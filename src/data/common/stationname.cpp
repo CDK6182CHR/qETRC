@@ -46,3 +46,17 @@ bool StationName::operator==(const StationName &name) const
 {
     return _station==name._station && _field==name._field;
 }
+
+bool StationName::operator<(const StationName& name) const
+{
+    if (_station == name._station)
+        return _field < name._field;
+    return _station < name._station;
+}
+
+bool StationName::operator>(const StationName& name) const
+{
+    if (_station == name._station)
+        return _field > name._field;
+    return _station > name._station;
+}

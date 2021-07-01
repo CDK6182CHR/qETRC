@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
     _diagram.addRailway(d2.firstRailway());
     _diagram.addTrains(d2.trainCollection());
 
-    diagramWidget = new DiagramWidget(_diagram, this);
+    diagramWidget = new DiagramWidget(*(_diagram.createDefaultPage()), this);
 
     manager = new ads::CDockManager(this);
     ads::CDockWidget* dock = new ads::CDockWidget(QObject::tr("运行图窗口"));

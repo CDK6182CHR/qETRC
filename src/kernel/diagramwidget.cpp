@@ -15,15 +15,14 @@
 #include <QVBoxLayout>
 #include <QTextBrowser>
 
-DiagramWidget::DiagramWidget(Diagram &diagram, QWidget* parent):
-    QGraphicsView(parent),_diagram(diagram),startTime(diagram.config().start_hour,0,0)
+DiagramWidget::DiagramWidget(DiagramPage &page, QWidget* parent):
+    QGraphicsView(parent),_page(page),startTime(page.config().start_hour,0,0)
 {
     //todo: menu...
     setRenderHint(QPainter::Antialiasing, true);
     setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
     setScene(new QGraphicsScene(this));
-    //todo: label span
     paintGraph();
 
     setMouseTracking(true);
@@ -35,7 +34,7 @@ DiagramWidget::~DiagramWidget() noexcept
 
 void DiagramWidget::autoPaintGraph()
 {
-    if (_diagram.config().auto_paint)
+    if (config().auto_paint)
         paintGraph();
 }
 
@@ -46,7 +45,7 @@ void DiagramWidget::paintGraph()
     _selectedTrain = nullptr;
     emit showNewStatus(QString("正在铺画运行图"));
 
-    const Config& cfg = _diagram.config();
+    const Config& cfg = config();
     const auto& margins = cfg.margins;
     int hstart = cfg.start_hour, hend = cfg.end_hour;
     if (hend <= hstart)
@@ -56,8 +55,8 @@ void DiagramWidget::paintGraph()
     double width = hour_count * (3600.0 / cfg.seconds_per_pix);
 
     //暂定上下边距只算一次
-    double height = (_diagram.railwayCount()-1) * cfg.margins.gap_between_railways;
-    for (const auto& p : _diagram.railways()) {
+    double height = (_page.railwayCount()-1) * cfg.margins.gap_between_railways;
+    for (const auto& p : _page.railways()) {
         height += p->calStationYValue(cfg);
     }
     const QColor& gridColor = cfg.grid_color;
@@ -70,8 +69,10 @@ void DiagramWidget::paintGraph()
     QList<QPair<double, double>> railYRanges;   //每条线路的时间线纵坐标起止点
     QList<QGraphicsItem*> leftItems, rightItems;
 
-    for (auto p : _diagram.railways()) {
-        p->setStartYValue(ystart);
+    _page.startYs().clear();
+    for (int i = 0;i<_page.railwayCount();i++) {
+        auto p = _page.railways().at(i);
+        _page.startYs().append(ystart);
         setHLines(p, ystart, width, leftItems, rightItems);
         scene()->addRect(margins.left, ystart, width, p->diagramHeight(), gridColor);
         railYRanges.append(qMakePair(ystart, ystart + p->diagramHeight()));
@@ -88,7 +89,7 @@ void DiagramWidget::paintGraph()
     //todo: labelSpan
     
     //todo: 绘制提示进度条
-    for (auto p : _diagram.trainCollection().trains()) {
+    for (auto p : _page.diagram().trainCollection().trains()) {
         paintTrain(p);
     }
 
@@ -141,8 +142,8 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title)
     font.setBold(false);
     painter.setFont(font);
 
-    if (!_diagram.note().isEmpty()) {
-        QString s(_diagram.note());
+    if (!_page.diagram().note().isEmpty()) {
+        QString s(_page.diagram().note());
         s.replace("\n", " ");
         s = QString("备注：") + s;
         painter.drawText(margins().left, scene()->height() + 100 + 40, s);
@@ -202,7 +203,7 @@ void DiagramWidget::resizeEvent(QResizeEvent* e)
 void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, double width,
     QList<QGraphicsItem*>& leftItems, QList<QGraphicsItem*>& rightItems)
 {
-    const Config& cfg = _diagram.config();
+    const Config& cfg = config();
     const auto& margins = cfg.margins;
     const QColor& textColor = cfg.text_color;
     QColor brushColor(Qt::white);
@@ -501,24 +502,7 @@ double DiagramWidget::minitesToPixels(int minutes) const
 
 void DiagramWidget::paintTrain(std::shared_ptr<Train> train)
 {
-    train->clearItems();
-    if (!train->isShow())
-        return;
-    for (auto adp : train->adapters()) {
-        for (auto line : adp->lines()) {
-            if (line->isNull()) {
-                //这个是不应该的
-                qDebug() << "DiagramWidget::paintTrain: WARNING: " <<
-                    "Unexpected null TrainLine! " << train->trainName().full() << Qt::endl;
-            }
-            else {
-                auto* item = new TrainItem(*line, adp->railway(), _diagram);
-                line->setItem(item);
-                item->setZValue(5);
-                scene()->addItem(item);
-            }
-        }
-    }
+    paintTrain(*train);
 }
 
 void DiagramWidget::paintTrain(Train& train)
@@ -526,18 +510,26 @@ void DiagramWidget::paintTrain(Train& train)
     train.clearItems();
     if (!train.isShow())
         return;
+
     for (auto adp : train.adapters()) {
-        for (auto line : adp->lines()) {
-            if (line->isNull()) {
-                //这个是不应该的
-                qDebug() << "DiagramWidget::paintTrain: WARNING: " <<
-                    "Unexpected null TrainLine! " << train.trainName().full() << Qt::endl;
-            }
-            else {
-                auto* item = new TrainItem(*line, adp->railway(), _diagram);
-                line->setItem(item);
-                item->setZValue(5);
-                scene()->addItem(item);
+        //暂时按照暴力平方遍历的方法去找符合条件的Railway
+        for (int i = 0; i < _page.railwayCount(); i++) {
+            auto r = _page.railways().at(i);
+            if (&(adp->railway()) == r.get()) {
+                for (auto line : adp->lines()) {
+                    if (line->isNull()) {
+                        //这个是不应该的
+                        qDebug() << "DiagramWidget::paintTrain: WARNING: " <<
+                            "Unexpected null TrainLine! " << train.trainName().full() << Qt::endl;
+                    }
+                    else {
+                        auto* item = new TrainItem(*line, adp->railway(), _page.diagram(),
+                            _page.startYs().at(i));
+                        line->setItem(item);
+                        item->setZValue(5);
+                        scene()->addItem(item);
+                    }
+                }
             }
         }
     }
@@ -552,8 +544,8 @@ QGraphicsSimpleTextItem* DiagramWidget::addLeftTableText(const char* str,
 QGraphicsSimpleTextItem* DiagramWidget::addLeftTableText(const QString& str, 
     const QFont& textFont, double start_x, double start_y, double width, double height)
 {
-    const QColor& textColor = _diagram.config().text_color;
-    const auto& margins = _diagram.config().margins;
+    const QColor& textColor = config().text_color;
+    const auto& margins = config().margins;
     start_x += margins.left_white;
 
     auto* text = scene()->addSimpleText(str);
@@ -574,8 +566,8 @@ QGraphicsSimpleTextItem* DiagramWidget::addLeftTableText(const QString& str,
 QGraphicsSimpleTextItem* DiagramWidget::addStationTableText(const QString& str,
     const QFont& textFont, double start_x, double center_y, double width)
 {
-    const QColor& textColor = _diagram.config().text_color;
-    const auto& margins = _diagram.config().margins;
+    const QColor& textColor = config().text_color;
+    const auto& margins = config().margins;
     start_x += margins.left_white;
 
     auto* text = scene()->addSimpleText(str);
@@ -674,16 +666,26 @@ void DiagramWidget::unselectTrain()
 
 void DiagramWidget::showAllForbids()
 {
-    for (auto p : _diagram.railways()) {
+    for (int i = 0; i < _page.railwayCount();i++) {
+        auto p = _page.railwayAt(i);
         for (auto f : p->forbids()) {
-            showForbid(f, Direction::Down);
-            showForbid(f, Direction::Up);
+            showForbid(f, Direction::Down, i);
+            showForbid(f, Direction::Up, i);
         }
     }
 }
 
 void DiagramWidget::showForbid(std::shared_ptr<Forbid> forbid, Direction dir)
 {
+    int idx = _page.railwayIndex(forbid->railway());
+    if (idx == -1)
+        return;
+    showForbid(forbid, dir, idx);
+}
+
+void DiagramWidget::showForbid(std::shared_ptr<Forbid> forbid, Direction dir, int index)
+{
+    double starty = _page.startYs().at(index);
     removeForbid(forbid, dir);
     QPen pen(Qt::transparent);
     bool isService = (forbid->index() == 0);
@@ -713,9 +715,9 @@ void DiagramWidget::showForbid(std::shared_ptr<Forbid> forbid, Direction dir)
     }
 
     for (auto node = forbid->firstDirNode(dir); node; node = node->nextNode()) {
-        addForbidNode(forbid, node, brush, pen);
+        addForbidNode(forbid, node, brush, pen, starty);
         if (!isService) {
-            addForbidNode(forbid, node, brush2, pen);
+            addForbidNode(forbid, node, brush2, pen, starty);
         }
     }
 }
@@ -730,11 +732,10 @@ void DiagramWidget::removeForbid(std::shared_ptr<Forbid> forbid, Direction dir)
 }
 
 void DiagramWidget::addForbidNode(std::shared_ptr<Forbid> forbid, 
-    std::shared_ptr<ForbidNode> node, const QBrush& brush, const QPen& pen)
+    std::shared_ptr<ForbidNode> node, const QBrush& brush, const QPen& pen, double start_y)
 {
     auto& railint = node->railInterval();
     auto& railway = forbid->railway();
-    double start_y = railway.startYValue();
     double y1 = railint.fromStation()->y_value.value(),
         y2 = railint.toStation()->y_value.value();
     if (y1 > y2)
@@ -807,7 +808,7 @@ void DiagramWidget::showTrainEventText()
             QObject::tr("当前车次事件表：请先选择一个车次！"));
         return;
     }
-    TrainEventList lst = _diagram.listTrainEvents(*_selectedTrain);
+    TrainEventList lst = _page.diagram().listTrainEvents(*_selectedTrain);
     QString res;
     for (const auto& p : lst) {
         res += _selectedTrain->trainName().full() + " 在 " +

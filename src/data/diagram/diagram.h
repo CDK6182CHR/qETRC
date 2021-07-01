@@ -10,6 +10,7 @@
 #include "data/train/traincollection.h"
 #include "data/train/traintype.h"
 #include "data/diagram/trainline.h"
+#include "diagrampage.h"
 
 
 /**
@@ -64,6 +65,7 @@ class Diagram
     QString _filename;
     QString _version, _note;
     TypeManager _defaultManager;
+    QList<std::shared_ptr<DiagramPage>> _pages;
 
 public:
     Diagram();
@@ -106,6 +108,8 @@ public:
 
     inline auto& railways(){return _railways;}
     inline const auto& railways()const{return _railways;}
+    inline auto& pages() { return _pages; }
+    inline const auto& pages()const { return _pages; }
     inline auto firstRailway() { return _railways.first(); }
     inline auto& trainCollection(){return _trainCollection;}
     inline const auto& trainCollection()const{return _trainCollection;}
@@ -165,6 +169,11 @@ public:
      *    时刻前后的判断不依赖于前后文，只考虑当前：PBC下使得差值绝对值较小的理解。
      */
     TrainEventList listTrainEvents(const Train& train)const;
+
+    /**
+     * 创建默认的运行图视图，即按顺序包含本线的所有线路
+     */
+    std::shared_ptr<DiagramPage> createDefaultPage();
 
 private:
     void bindAllTrains();

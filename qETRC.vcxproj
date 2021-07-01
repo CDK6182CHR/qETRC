@@ -181,6 +181,7 @@
   <ItemGroup>
     <ClCompile Include="src\data\diagram\config.cpp" />
     <ClCompile Include="src\data\diagram\diagram.cpp" />
+    <ClCompile Include="src\data\diagram\diagrampage.cpp" />
     <ClCompile Include="src\editors\trainlistwidget.cpp" />
     <ClCompile Include="src\kernel\diagramwidget.cpp" />
     <ClCompile Include="src\data\rail\forbid.cpp" />
@@ -211,6 +212,7 @@
     <QtMoc Include="src\kernel\diagramwidget.h">
     </QtMoc>
     <ClInclude Include="src\data\common\direction.h" />
+    <ClInclude Include="src\data\diagram\diagrampage.h" />
     <ClInclude Include="src\data\rail\forbid.h" />
     <QtMoc Include="src\mainwindow.h">
     </QtMoc>

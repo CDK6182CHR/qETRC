@@ -74,7 +74,7 @@ class TrainItem : public QGraphicsItem
 
 public:
     enum { Type = UserType + 1 };
-    TrainItem(TrainLine& line, Railway& railway, Diagram& diagram,
+    TrainItem(TrainLine& line, Railway& railway, Diagram& diagram, double startY,
         QGraphicsItem* parent = nullptr);
 
     virtual QRectF boundingRect()const override;

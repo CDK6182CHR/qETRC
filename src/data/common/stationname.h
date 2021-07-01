@@ -29,23 +29,27 @@ public:
     inline void setStation(const QString& s){_station=s;}
     inline void setField(const QString& s){_field=s;}
 
-    /*
+    /**
      * 与旧有的Python实现类似，从域解析符::形式解出来
      */
     static StationName fromSingleLiteral(const QString& s);
     QString toSingleLiteral()const;
 
-    /*
+    /**
      * 把::换成*，显示出来更好看
      */
     QString toDisplayLiteral()const;
 
-    /*
+    /**
      * 这是基本的实现，仅考虑是否完全一样
      */
     bool operator==(const StationName& name)const;
 
-    /*
+    bool operator<(const StationName& name)const;
+
+    bool operator>(const StationName& name)const;
+
+    /**
      * 是否为仅有站名没有场名的类型
      */
     inline bool isBare()const{

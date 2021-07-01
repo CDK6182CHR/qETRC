@@ -126,6 +126,13 @@ TrainEventList Diagram::listTrainEvents(const Train& train) const
     return res;
 }
 
+std::shared_ptr<DiagramPage> Diagram::createDefaultPage()
+{
+    auto t = std::make_shared< DiagramPage>(*this, _railways);
+    _pages.append(t);
+    return t;
+}
+
 void Diagram::bindAllTrains()
 {
     for (auto p : _railways) {

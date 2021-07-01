@@ -71,7 +71,9 @@ class Train
     std::weak_ptr<Routing> _routing;
     std::optional<std::list<RoutingNode>::iterator> _routingNode;
 
-    //todo: 交路，随机访问Map表等
+    //以下数据：状态不变时有效，一旦状态改变则失效
+    std::optional<double> _locMile;
+    std::optional<int> _locRunSecs, _locStaySecs;
 
 public:
     using StationPtr=std::list<TrainStation>::iterator;
@@ -326,23 +328,50 @@ public:
         return it;
     }
 
-    double localMile()const;
+    double localMile();
 
-    int localSecsFast()const;
+    int localSecs();
 
-    std::pair<int, int> localRunStaySecs()const;
+    int localRunSecs();
+
+    std::pair<int, int> localRunStaySecs();
 
     /**
      * 本线旅速，快速计算（仅用TrainLine收尾数据）  km/h
      * 用于TrainListTable
      */
-    double localTraverseSpeedFast()const;
+    double localTraverseSpeed();
+
+    /**
+     * 本线技术速度 （忽略停车时长）
+     */
+    double localTechSpeed();
+
+    /**
+     * 数据改变 （例如线路数据变化）
+     * 使得保存的临时计算数据失效
+     * 一般来说，由绑定操作引起
+     */
+    void invalidateTempData();
 
     //static比较函数 用来排序
-    static bool ltName(const std::shared_ptr<const Train>& t1, 
-        const std::shared_ptr<const Train>& t2);
-    static bool ltStarting(const Train& t1, const Train& t2);
-    static bool ltTerminal(const Train& t1, const Train& t2);
+    static bool ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
+    static bool ltStarting(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
+    static bool ltTerminal(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
+    static bool ltShow(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
+    static bool ltType(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
+    static bool ltMile(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
+    static bool ltTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
+    static bool ltTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
+
+    static bool gtName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
+    static bool gtStarting(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
+    static bool gtTerminal(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
+    static bool gtShow(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
+    static bool gtType(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
+    static bool gtMile(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
+    static bool gtTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
+    static bool gtTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
 
 };
 

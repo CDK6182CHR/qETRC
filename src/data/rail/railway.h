@@ -67,7 +67,6 @@ class Railway
     bool numberMapEnabled;
 
     double _diagramHeight = -1;
-    double _startYValue = -1;   //起始y坐标
 
 public:
     Railway(const QString& name="");
@@ -398,8 +397,6 @@ public:
      */
     double diagramHeight()const { return _diagramHeight; }
 
-    double startYValue()const { return _startYValue; }
-    void setStartYValue(int y) { _startYValue = y; }
 
     /**
      * 和RailInterval::nextInterval()差不多

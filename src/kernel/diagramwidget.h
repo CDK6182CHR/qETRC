@@ -15,11 +15,12 @@
 class DiagramWidget : public QGraphicsView
 {
     Q_OBJECT
+
     /**
      * @brief _diagram  运行图基础数据，全程采用同一个对象
      * 类似单例
      */
-    Diagram& _diagram;
+    DiagramPage& _page;
 
     /**
      * @brief _selectedTrain  当前选中的列车对象
@@ -38,7 +39,7 @@ class DiagramWidget : public QGraphicsView
     QTime startTime;
 
 public:
-    DiagramWidget(Diagram& diagram, QWidget* parent = nullptr);
+    DiagramWidget(DiagramPage& page, QWidget* parent = nullptr);
     ~DiagramWidget()noexcept;
 
     /**
@@ -120,8 +121,8 @@ private:
         double width, QList<QGraphicsItem*>& leftItems,
         QList<QGraphicsItem*>& rightItems, double label_start_x);
 
-    const auto& margins()const { return _diagram.config().margins; }
-    const auto& config()const { return _diagram.config(); }
+    const auto& margins()const { return _page.config().margins; }
+    const auto& config()const { return _page.config(); }
 
     /**
      * 两端对齐且符合指定宽度的字符串
@@ -153,10 +154,12 @@ private:
      */
     void showForbid(std::shared_ptr<Forbid> forbid, Direction dir);
 
+    void showForbid(std::shared_ptr<Forbid> forbid, Direction dir, int index);
+
     void removeForbid(std::shared_ptr<Forbid> forbid, Direction dir);
 
     void addForbidNode(std::shared_ptr<Forbid> forbid, std::shared_ptr<ForbidNode> node,
-        const QBrush& brush, const QPen& pen);
+        const QBrush& brush, const QPen& pen, double startY);
 
     double calXFromStart(const QTime& time)const;
 

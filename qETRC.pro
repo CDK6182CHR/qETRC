@@ -17,6 +17,7 @@ SOURCES += \
     src/data/common/stationname.cpp \
     src/data/diagram/config.cpp \
     src/data/diagram/diagram.cpp \
+    src/data/diagram/diagrampage.cpp \
     src/data/diagram/trainadapter.cpp \
     src/data/diagram/trainevents.cpp \
     src/data/diagram/trainline.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     src/data/common/stationname.h \
     src/data/diagram/config.h \
     src/data/diagram/diagram.h \
+    src/data/diagram/diagrampage.h \
     src/data/diagram/trainadapter.h \
     src/data/diagram/trainevents.h \
     src/data/diagram/trainline.h \

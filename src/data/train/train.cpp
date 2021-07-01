@@ -570,43 +570,141 @@ std::shared_ptr<RailStation> Train::boundStartingRail() const
     return nullptr;
 }
 
-double Train::localMile() const
+double Train::localMile() 
 {
+    if (_locMile.has_value())
+        return _locMile.value();
     double res = 0;
     for (auto p : _adapters)
         res += p->totalMile();
+    _locMile = res;
     return res;
 }
 
-int Train::localSecsFast() const
+int Train::localSecs() 
 {
-    int res = 0;
-    for (auto p : _adapters)
-        res += p->totalSecs();
-    return res;
+    auto&& t = localRunStaySecs();
+    return t.first + t.second;
 }
 
-std::pair<int, int> Train::localRunStaySecs() const
+std::pair<int, int> Train::localRunStaySecs()
 {
+    if (_locRunSecs.has_value())
+        return std::make_pair(_locRunSecs.value(), _locStaySecs.value());
     int run = 0, stay = 0;
     for (auto p : _adapters) {
         auto d = p->runStaySecs();
         run += d.first;
         stay += d.second;
     }
+    _locRunSecs = run;
+    _locStaySecs = stay;
     return std::make_pair(run, stay);
 }
 
-double Train::localTraverseSpeedFast() const
+int Train::localRunSecs()
+{
+    return localRunStaySecs().first;
+}
+
+double Train::localTraverseSpeed() 
 {
     double mile = localMile();
-    int secs = localSecsFast();
+    int secs = localSecs();
     //secs如果是0则得inf，C++中不会出问题
     return mile / secs * 3600;  
 }
+
+double Train::localTechSpeed()
+{
+    return localMile() / localRunSecs() * 3600;
+}
+
+void Train::invalidateTempData()
+{
+    _locMile = std::nullopt;
+    _locRunSecs = std::nullopt;
+    _locStaySecs = std::nullopt;
+}
+
+
 
 bool Train::ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
 {
     return t1->trainName().full() < t2->trainName().full();
 }
 
+bool Train::ltStarting(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
+{
+    return t1->starting() < t2->starting();
+}
+
+bool Train::ltTerminal(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
+{
+    return t1->terminal() < t2->terminal();
+}
+
+bool Train::ltShow(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
+{
+    return t1->isShow() < t2->isShow();
+}
+
+bool Train::ltTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
+{
+    return t1->localTraverseSpeed() < t2->localTraverseSpeed();
+}
+
+bool Train::ltTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
+{
+    return t1->localTechSpeed() < t2->localTechSpeed();
+}
+
+bool Train::ltMile(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
+{
+    return t1->localMile() < t2->localMile();
+}
+
+bool Train::ltType(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
+{
+    return t1->type()->name() < t2->type()->name();
+}
+
+bool Train::gtName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
+{
+    return t1->trainName().full() > t2->trainName().full();
+}
+
+bool Train::gtStarting(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
+{
+    return t1->starting() > t2->starting();
+}
+
+bool Train::gtTerminal(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
+{
+    return t1->terminal() > t2->terminal();
+}
+
+bool Train::gtShow(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
+{
+    return t1->isShow() > t2->isShow();
+}
+
+bool Train::gtType(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
+{
+    return t1->type()->name() > t2->type()->name();
+}
+
+bool Train::gtTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
+{
+    return t1->localTraverseSpeed() > t2->localTraverseSpeed();
+}
+
+bool Train::gtTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
+{
+    return t1->localTechSpeed() > t2->localTechSpeed();
+}
+
+bool Train::gtMile(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
+{
+    return t1->localMile() > t2->localMile();
+}

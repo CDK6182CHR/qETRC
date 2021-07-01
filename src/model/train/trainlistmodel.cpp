@@ -21,7 +21,7 @@ QVariant TrainListModel::data(const QModelIndex& index, int role) const
 {
 	if (!index.isValid())
 		return {};
-	std::shared_ptr<const Train> t = coll.trainAt(index.row());
+	std::shared_ptr<Train> t = coll.trainAt(index.row());
 	if (role == Qt::DisplayRole) {
 		switch (index.column()) {
 		case ColTrainName:return t->trainName().full();
@@ -29,7 +29,7 @@ QVariant TrainListModel::data(const QModelIndex& index, int role) const
 		case ColTerminal:return t->terminal().toSingleLiteral();
 		case ColType:return t->type()->name();
 		case ColMile:return QString::number(t->localMile(), 'f', 3);
-		case ColSpeed:return QString::number(t->localTraverseSpeedFast(), 'f', 3);
+		case ColSpeed:return QString::number(t->localTraverseSpeed(), 'f', 3);
 		}
 	}
 	else if (role == Qt::CheckStateRole) {
@@ -69,12 +69,32 @@ Qt::ItemFlags TrainListModel::flags(const QModelIndex& index) const
 void TrainListModel::sort(int column, Qt::SortOrder order)
 {
 	beginResetModel();
-	qDebug() << "sort" << Qt::endl;
 	auto& lst = coll.trains();
-	switch (column) {
-	case ColTrainName:std::sort(lst.begin(), lst.end(), &Train::ltName); break;
-	default:break;
+	if (order == Qt::AscendingOrder) {
+		switch (column) {
+		case ColTrainName:std::sort(lst.begin(), lst.end(), &Train::ltName); break;
+		case ColStarting:std::sort(lst.begin(), lst.end(), &Train::ltStarting); break;
+		case ColTerminal:std::sort(lst.begin(), lst.end(), &Train::ltTerminal); break;
+		case ColType:std::sort(lst.begin(), lst.end(), &Train::ltType); break;
+		case ColShow:std::sort(lst.begin(), lst.end(), &Train::ltShow); break;
+		case ColMile:std::sort(lst.begin(), lst.end(), &Train::ltMile); break;
+		case ColSpeed:std::sort(lst.begin(), lst.end(), &Train::ltTravSpeed); break;
+		default:break;
+		}
 	}
+	else {
+		switch (column) {
+		case ColTrainName:std::sort(lst.begin(), lst.end(), &Train::gtName); break;
+		case ColStarting:std::sort(lst.begin(), lst.end(), &Train::gtStarting); break;
+		case ColTerminal:std::sort(lst.begin(), lst.end(), &Train::gtTerminal); break;
+		case ColType:std::sort(lst.begin(), lst.end(), &Train::gtType); break;
+		case ColShow:std::sort(lst.begin(), lst.end(), &Train::gtShow); break;
+		case ColMile:std::sort(lst.begin(), lst.end(), &Train::gtMile); break;
+		case ColSpeed:std::sort(lst.begin(), lst.end(), &Train::gtTravSpeed); break;
+		default:break;
+		}
+	}
+	
 	endResetModel();
 }
 

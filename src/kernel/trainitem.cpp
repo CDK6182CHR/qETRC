@@ -9,11 +9,11 @@
 #include <QGraphicsScene>
 
 TrainItem::TrainItem(TrainLine& line,
-    Railway& railway, Diagram& diagram, QGraphicsItem* parent):
+    Railway& railway, Diagram& diagram, double startY, QGraphicsItem* parent):
     QGraphicsItem(parent),
     _line(line),_railway(railway),_diagram(diagram),
     startTime(diagram.config().start_hour,0,0),
-    start_x(diagram.config().margins.left),start_y(railway.startYValue())
+    start_x(diagram.config().margins.left),start_y(startY)
 {
     _startAtThis = train().isStartingStation(_line.firstStationName());
     _endAtThis = train().isTerminalStation(_line.lastStationName());
@@ -228,8 +228,6 @@ void TrainItem::setLine()
 void TrainItem::setPathItem(const QString& trainName)
 {
     //和图幅有关的数值
-    double start_x = margins().left;
-    double start_y = _railway.startYValue();
     double width = config().diagramWidth();
 
     bool started = false;    //是否已经开始铺画
@@ -536,8 +534,6 @@ double TrainItem::getOutGraph(double xin, double yin, double xout, double yout,
 {
     double fullwidth = config().fullWidth();
     double width = config().diagramWidth();
-    double start_x = margins().left;
-    double start_y = _railway.startYValue();
     double xright = xout + fullwidth;
     double yp = yin + (width - xin) * (yout - yin) / (xright - xin);
     QPointF pout(start_x + width, start_y + yp);
@@ -548,8 +544,6 @@ double TrainItem::getOutGraph(double xin, double yin, double xout, double yout,
 double TrainItem::getInGraph(double xout, double yout, double xin, double yin, QPainterPath& path)
 {
     double fullwidth = config().fullWidth();
-    double start_x = margins().left;
-    double start_y = _railway.startYValue();
     double xleft = xout - fullwidth;
     double yp = yout - xleft * (yin - yout) / (xin - xleft);  //入图点纵坐标
     QPointF pin(start_x, yp + start_y);
@@ -732,7 +726,7 @@ void TrainItem::addLinkLine()
     double xpre = calXFromStart(last_tm);
 
     double width = config().diagramWidth();
-    double y = rs->y_value.value() + _railway.startYValue();
+    double y = rs->y_value.value() + start_y;
     QPen pen = trainPen();
     pen.setWidth(1);
     pen.setStyle(Qt::DashLine);
