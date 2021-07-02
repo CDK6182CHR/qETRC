@@ -5,6 +5,7 @@
 #include <QPen>
 
 #include "data/diagram/diagram.h"
+#include "data/diagram/diagrampage.h"
 #include "data/rail/railstation.h"
 
 class TrainAdapter;
@@ -20,7 +21,7 @@ class Railway;
 class TrainItem : public QGraphicsItem
 {
     TrainLine& _line;
-    Diagram& _diagram;
+    DiagramPage& _page;
     Railway& _railway;
 
     QGraphicsPathItem* pathItem = nullptr, * expandItem = nullptr;
@@ -74,7 +75,7 @@ class TrainItem : public QGraphicsItem
 
 public:
     enum { Type = UserType + 1 };
-    TrainItem(TrainLine& line, Railway& railway, Diagram& diagram, double startY,
+    TrainItem(TrainLine& line, Railway& railway, DiagramPage& page, double startY,
         QGraphicsItem* parent = nullptr);
 
     virtual QRectF boundingRect()const override;
@@ -101,13 +102,15 @@ public:
      * 因此只有单独重新铺画一趟车的运行线时，才有必要手动删除信息。
      * 
      * 以后写刷新操作时，应当把线路绑定信息也刷新一下。
+     * ---
+     * 2021.07.02  将LabelInfo迁移到TrainPage之后，应该可以在析构中执行这个了
      */
     void clearLabelInfo();
 
 private:
     
-    const Config& config()const { return _diagram.config(); }
-    const auto& margins()const { return _diagram.config().margins; }
+    const Config& config()const { return _page.config(); }
+    const auto& margins()const { return _page.margins(); }
 
     void setLine();
 

@@ -1074,7 +1074,6 @@ void Railway::clearYValues()
 {
 	for (auto& p : _stations) {
 		p->y_value = std::nullopt;
-		p->clearLabelInfo();
 	}
 }
 

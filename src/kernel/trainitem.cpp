@@ -9,16 +9,16 @@
 #include <QGraphicsScene>
 
 TrainItem::TrainItem(TrainLine& line,
-    Railway& railway, Diagram& diagram, double startY, QGraphicsItem* parent):
+    Railway& railway, DiagramPage& page, double startY, QGraphicsItem* parent):
     QGraphicsItem(parent),
-    _line(line),_railway(railway),_diagram(diagram),
-    startTime(diagram.config().start_hour,0,0),
-    start_x(diagram.config().margins.left),start_y(startY)
+    _line(line),_railway(railway),_page(page),
+    startTime(page.config().start_hour,0,0),
+    start_x(page.config().margins.left),start_y(startY)
 {
     _startAtThis = train().isStartingStation(_line.firstStationName());
     _endAtThis = train().isTerminalStation(_line.lastStationName());
-    startLabelInfo = _line.firstRailStation()->startingNullLabel(_line.dir());
-    endLabelInfo = _line.lastRailStation()->terminalNullLabel(_line.dir());
+    startLabelInfo = _page.startingNullLabel(_line.firstRailStation().get(),_line.dir());
+    endLabelInfo = _page.terminalNullLabel(_line.lastRailStation().get(), _line.dir());
     pen = trainPen();
 
     setLine();
@@ -190,12 +190,14 @@ TrainItem::~TrainItem() noexcept
     for (auto p : markLabels)
         delete p;
     markLabels.clear();  
+
+    clearLabelInfo();
 }
 
 void TrainItem::clearLabelInfo()
 {
-    auto& sl = _line.firstRailStation()->startingLabels(_line.dir());
-    auto& se = _line.lastRailStation()->terminalLabels(_line.dir());
+    auto& sl = _page.startingLabels(_line.firstRailStation().get(), _line.dir());
+    auto& se = _page.terminalLabels(_line.lastRailStation().get(), _line.dir());
     if (startLabelInfo != sl.end()) {
         sl.erase(startLabelInfo);
         startLabelInfo = sl.end();
@@ -576,10 +578,10 @@ double TrainItem::determineStartLabelHeight()
     }
     auto rst = _line.firstRailStation();
     if (_line.dir() == Direction::Down) {
-        startLabelInfo = determineLabelHeight(rst->overLabels(), x, wl, wr);
+        startLabelInfo = determineLabelHeight(_page.overLabels(rst.get()), x, wl, wr);
     }
     else {
-        startLabelInfo = determineLabelHeight(rst->belowLabels(), x, wl, wr);
+        startLabelInfo = determineLabelHeight(_page.belowLabels(rst.get()), x, wl, wr);
     }
     return startLabelInfo->second.height;
 }
@@ -601,10 +603,10 @@ double TrainItem::determineEndLabelHeight()
     }
     auto rst = _line.lastRailStation();
     if (_line.dir() == Direction::Down) {
-        endLabelInfo = determineLabelHeight(rst->belowLabels(), x, wl, wr);
+        endLabelInfo = determineLabelHeight(_page.belowLabels(rst.get()), x, wl, wr);
     }
     else {
-        endLabelInfo = determineLabelHeight(rst->overLabels(), x, wl, wr);
+        endLabelInfo = determineLabelHeight(_page.overLabels(rst.get()), x, wl, wr);
     }
     return endLabelInfo->second.height;
 }

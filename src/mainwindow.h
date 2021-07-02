@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include <QTreeView>
 #include <QList>
+#include <QUndoStack>
 
 #include "data/rail/railway.h"
 #include "data/diagram/diagram.h"
@@ -23,20 +24,26 @@ class MainWindow : public SARibbonMainWindow
 {
     Q_OBJECT
     Diagram _diagram;
-    DiagramWidget* diagramWidget;
     ads::CDockManager* manager;
+    QUndoStack* undoStack;
 
     //窗口，Model的指针
     DiagramNaviModel* naviModel;
     QTreeView* naviView;
     SARibbonMenu* pageMenu;
     QList<ads::CDockWidget*> diagramDocks;
+    QList<DiagramWidget*> diagramWidgets;
     ads::CDockWidget* naviDock, * trainListDock;
     TrainListWidget* trainListWidget;
+
+    bool changed = false;
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+    void undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains,
+        const QList<int>& indexes);
 
 private:
     /**
@@ -88,6 +95,14 @@ private:
      */
     bool openGraph(const QString& filename);
 
+    /**
+     * 向所有运行图窗口添加指定运行线。
+     * （简单封装）
+     */
+    void addTrainLine(Train& train);
+    void removeTrainLine(Train& train);
+
+
 private slots:
     void actNewGraph();
     void actOpenGraph();
@@ -98,5 +113,19 @@ private slots:
      * 调用前，应当已经把Page加入到Diagram中
      */
     void addPageWidget(std::shared_ptr<DiagramPage> page);
+
+    
+
+public slots:
+
+    /**
+     * 从TrainListWidget发起的删除列车操作
+     */
+    void trainsRemoved(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes);
+
+    /**
+     * 列车列表变化（添加或删除），提示相关更新
+     */
+    void informTrainListChanged();
 };
 

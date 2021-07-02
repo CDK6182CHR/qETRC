@@ -94,9 +94,3 @@ std::shared_ptr<RailStation> RailStation::upAdjacent()
         return std::shared_ptr<RailStation>();
     return upNext->toStation();
 }
-
-void RailStation::clearLabelInfo()
-{
-    _belowLabels.clear();
-    _overLabels.clear();
-}

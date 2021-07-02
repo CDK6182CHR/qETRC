@@ -94,6 +94,19 @@ void TrainCollection::clear(const TypeManager& defaultManager)
 	_manager = defaultManager;
 }
 
+std::shared_ptr<Train> TrainCollection::takeTrainAt(int i)
+{
+	auto t = _trains.takeAt(i);
+	removeMapInfo(t);
+	return t;
+}
+
+void TrainCollection::insertTrain(int i, std::shared_ptr<Train> train)
+{
+	_trains.insert(i, train);
+	addMapInfo(train);
+}
+
 void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 {
 	fullNameMap.insert(t->trainName().full(), t);

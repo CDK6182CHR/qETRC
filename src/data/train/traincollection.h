@@ -107,6 +107,17 @@ public:
 
     void clear(const TypeManager& defaultManager);
 
+    /**
+     * 给TrainListWidget提供的删除API
+     * 删除和返回指定列车的指针  注意更新映射表
+     */
+    std::shared_ptr<Train> takeTrainAt(int i);
+
+    /**
+     * 按照index插入车次 用于撤销删除车次
+     */
+    void insertTrain(int i, std::shared_ptr<Train> train);
+
 private:
     /**
      * @brief addMapInfo

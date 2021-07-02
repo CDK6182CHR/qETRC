@@ -83,6 +83,20 @@ QJsonObject DiagramPage::toJson() const
     };
 }
 
+TrainItem* DiagramPage::getTrainItem(TrainLine* line)
+{
+    if (_itemMap.contains(line))
+        return _itemMap.value(line);
+    return nullptr;
+}
+
+TrainItem* DiagramPage::takeTrainItem(TrainLine* line)
+{
+    if (_itemMap.contains(line))
+        return _itemMap.take(line);
+    return nullptr;
+}
+
 void DiagramPage::clearTrainItems(const Train& train)
 {
     for (auto adp : train.adapters()) {

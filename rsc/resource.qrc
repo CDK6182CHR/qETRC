@@ -53,5 +53,7 @@
         <file>icons/ruler_pen.png</file>
         <file>icons/Graph-add.png</file>
         <file>icons/diagram.png</file>
+        <file>icons/redo.png</file>
+        <file>icons/undo.png</file>
     </qresource>
 </RCC>

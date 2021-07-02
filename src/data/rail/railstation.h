@@ -19,30 +19,7 @@ enum class PassedDirection {
     BothVia = 0b11
 };
 
-/**
- * @brief The LabelPositionInfo struct
- * 图形界面的部分的数据，为了方便，也写在RailStation中。
- * 车次标签占位信息。参考点的横坐标是放在key中的。
- */
-struct LabelPositionInfo {
-    /**
-     * @brief height  标签高度
-     */
-    double height;
 
-    /**
-     * @brief left  参考点左侧的宽度
-     */
-    double left;
-
-    /**
-     * @brief right  参考点右侧的宽度
-     */
-    double right;
-
-    LabelPositionInfo(double height_,double left_,double right_):
-        height(height_),left(left_),right(right_){}
-};
 
 
 /**
@@ -57,7 +34,7 @@ class RailStation
     //todo: 详细维护算法
     std::shared_ptr<RailInterval> downPrev, downNext;
     std::shared_ptr<RailInterval> upPrev, upNext;
-    std::multimap<double, LabelPositionInfo> _overLabels, _belowLabels;
+    
 public:
     StationName name;
     double mile;
@@ -155,28 +132,6 @@ public:
         default:
             return nullptr;
         }
-    }
-
-    /**
-     * @brief clearLabelInfo 清空标签信息
-     */
-    void clearLabelInfo();
-
-    inline auto overNullLabel() { return _overLabels.end(); }
-    inline auto belowNullLabel() { return _belowLabels.end(); }
-    inline auto startingNullLabel(Direction dir) {
-        return dir == Direction::Down ? overNullLabel() : belowNullLabel();
-    }
-    inline auto terminalNullLabel(Direction dir) {
-        return dir == Direction::Down ? belowNullLabel() : overNullLabel();
-    }
-    inline auto& overLabels() { return _overLabels; }
-    inline auto& belowLabels() { return _belowLabels; }
-    inline auto& startingLabels(Direction dir) {
-        return dir == Direction::Down ? _overLabels : _belowLabels;
-    }
-    inline auto& terminalLabels(Direction dir) {
-        return dir == Direction::Down ? _belowLabels : _overLabels;
     }
 };
 

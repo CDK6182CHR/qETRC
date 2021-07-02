@@ -9,11 +9,13 @@ TrainListModel::TrainListModel(TrainCollection& collection, QObject* parent):
 
 int TrainListModel::rowCount(const QModelIndex& parent) const
 {
+	Q_UNUSED(parent);
 	return coll.size();
 }
 
 int TrainListModel::columnCount(const QModelIndex& parent) const
 {
+	Q_UNUSED(parent);
 	return MAX_COLUMNS;
 }
 

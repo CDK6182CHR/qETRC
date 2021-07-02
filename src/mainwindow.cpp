@@ -15,11 +15,13 @@
 #include "SARibbonCategory.h"
 #include "SARibbonMenu.h"
 #include "SARibbonPannel.h"
+#include "SARibbonQuickAccessBar.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
     : SARibbonMainWindow(parent),manager(new ads::CDockManager(this)),
-    naviModel(new DiagramNaviModel(_diagram,this))
+    naviModel(new DiagramNaviModel(_diagram,this)),
+    undoStack(new QUndoStack(this))
 {
     _diagram.readDefaultConfigs();
 
@@ -65,6 +67,16 @@ MainWindow::~MainWindow()
 
 }
 
+void MainWindow::undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains, 
+    const QList<int>& indexes)
+{
+    //重新添加运行线
+    for (auto p : trains) {
+        addTrainLine(*p);
+    }
+    informTrainListChanged();
+}
+
 void MainWindow::initUI()
 {
     initDockWidgets();
@@ -92,12 +104,30 @@ void MainWindow::initDockWidgets()
     trainListDock = dock;
     dock->setWidget(tw);
     manager->addDockWidget(ads::LeftDockWidgetArea, dock);
+    connect(tw, SIGNAL(trainsRemoved(const QList<std::shared_ptr<Train>>&, const QList<int>&)),
+        this, SLOT(trainsRemoved(const QList<std::shared_ptr<Train>>&, const QList<int>&)));
 }
 
 void MainWindow::initToolbar()
 {
     SARibbonBar* ribbon = ribbonBar();
+    ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
     ribbon->applitionButton()->setText(QStringLiteral("文件"));
+
+    //顶上的工具条
+    if constexpr (true) {
+        //撤销重做
+        QAction* act = undoStack->createUndoAction(this, tr("撤销"));
+        act->setIcon(QIcon(":/icons/undo.png"));
+        act->setShortcut(Qt::CTRL + Qt::Key_Z);
+        ribbon->quickAccessBar()->addButton(act);
+
+        act = undoStack->createRedoAction(this, tr("重做"));
+        act->setIcon(QIcon(":/icons/redo.png"));
+        act->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
+        ribbon->quickAccessBar()->addButton(act);
+
+    }
 
     //开始
     if constexpr (true) {
@@ -161,6 +191,7 @@ void MainWindow::clearDiagramUnchecked()
         delete p;
     }
     diagramDocks.clear();
+    diagramWidgets.clear();
 
     //最后：清理数据
     _diagram.clear();
@@ -213,6 +244,25 @@ bool MainWindow::openGraph(const QString& filename)
     }
 }
 
+void MainWindow::addTrainLine(Train& train)
+{
+    for (auto p : diagramWidgets)
+        p->paintTrain(train);
+}
+
+void MainWindow::removeTrainLine(Train& train)
+{
+    for (auto p : diagramWidgets)
+        p->removeTrain(train);
+}
+
+void MainWindow::informTrainListChanged()
+{
+    naviModel->resetModel();
+    trainListWidget->refreshData();
+    changed = true;   //既然通知变化了，就默认真的发生了变化！
+}
+
 void MainWindow::actOpenGraph()
 {
     //todo: 询问保存
@@ -223,6 +273,8 @@ void MainWindow::actOpenGraph()
     bool flag = openGraph(res);
     if (!flag)
         QMessageBox::warning(this, QObject::tr("错误"), QObject::tr("文件错误，请检查!"));
+    else
+        changed = false;
 }
 
 void MainWindow::actSaveGraph()
@@ -230,6 +282,7 @@ void MainWindow::actSaveGraph()
     if (_diagram.filename().isEmpty())
         actSaveGraphAs();
     _diagram.save();
+    changed = false;
 }
 
 void MainWindow::actSaveGraphAs()
@@ -239,16 +292,31 @@ void MainWindow::actSaveGraphAs()
     if (res.isNull())
         return;
     _diagram.saveAs(res);
+    changed = false;
 }
 
 void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)
 {
-    DiagramWidget* dw = new DiagramWidget(*page);
+    DiagramWidget* dw = new DiagramWidget(page);
     auto* dock = new ads::CDockWidget(page->name());
     dock->setWidget(dw);
     manager->addDockWidget(ads::RightDockWidgetArea, dock);
     QAction* act = dock->toggleViewAction();
     pageMenu->addAction(act);
     diagramDocks.append(dock);
+    diagramWidgets.append(dw);
 }
+
+void MainWindow::trainsRemoved(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes)
+{
+    for (auto p : diagramWidgets) {
+        for (auto t : trains) {
+            p->removeTrain(*t);
+        }
+    }
+    undoStack->push(new qecmd::RemoveTrains(trains, indexes, _diagram.trainCollection(), this));
+
+    informTrainListChanged();
+}
+
 

@@ -18,9 +18,11 @@ class DiagramWidget : public QGraphicsView
 
     /**
      * @brief _diagram  运行图基础数据，全程采用同一个对象
-     * 类似单例
+     * 2021.07.02：将这里改成shared_ptr. 
+     * 原因是_page中保存了一些图元的指针，特别是Label的信息，为了保证析构不出问题，
+     * 必须保证Page的析构晚于DiagramWidget的析构。
      */
-    DiagramPage& _page;
+    const std::shared_ptr<DiagramPage> _page;
 
     /**
      * @brief _selectedTrain  当前选中的列车对象
@@ -39,7 +41,7 @@ class DiagramWidget : public QGraphicsView
     QTime startTime;
 
 public:
-    DiagramWidget(DiagramPage& page, QWidget* parent = nullptr);
+    DiagramWidget(std::shared_ptr<DiagramPage> page, QWidget* parent = nullptr);
     ~DiagramWidget()noexcept;
 
     /**
@@ -58,6 +60,15 @@ public:
     void setSelectedTrain(Train* train) { _selectedTrain = train; }
 
     bool toPdf(const QString& filename, const QString& title);
+
+    void paintTrain(std::shared_ptr<Train> train);
+    void paintTrain(Train& train);
+
+    /**
+     * 删除列车时调用
+     * 移除和删除列车运行线  注意相关映射表的处理，对象的删除等
+     */
+    void removeTrain(Train& train);
 
 protected:
     virtual void mousePressEvent(QMouseEvent* e)override;
@@ -89,10 +100,6 @@ private:
      */
     void paintTrain(std::shared_ptr<Railway> railway, std::shared_ptr<Train> train);
 
-    void paintTrain(std::shared_ptr<Train> train);
-
-    void paintTrain(Train& train);
-
     /**
      * pyETRC.GraphicsWidget._addLeftTableText(self, text: str, 
      *           textFont, textColor, start_x, start_y, width, height)
@@ -121,8 +128,8 @@ private:
         double width, QList<QGraphicsItem*>& leftItems,
         QList<QGraphicsItem*>& rightItems, double label_start_x);
 
-    const auto& margins()const { return _page.config().margins; }
-    const auto& config()const { return _page.config(); }
+    const auto& margins()const { return _page->config().margins; }
+    const auto& config()const { return _page->config(); }
 
     /**
      * 两端对齐且符合指定宽度的字符串
