@@ -77,6 +77,16 @@ void MainWindow::undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains,
     informTrainListChanged();
 }
 
+void MainWindow::redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes)
+{
+    for (auto p : diagramWidgets) {
+        for (auto t : trains) {
+            p->removeTrain(*t);
+        }
+    }
+    informTrainListChanged();
+}
+
 void MainWindow::initUI()
 {
     initDockWidgets();
@@ -111,23 +121,24 @@ void MainWindow::initDockWidgets()
 void MainWindow::initToolbar()
 {
     SARibbonBar* ribbon = ribbonBar();
-    ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
-    ribbon->applitionButton()->setText(QStringLiteral("文件"));
+    //ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
+    ribbon->applicationButton()->setText(QStringLiteral("文件"));
 
     //顶上的工具条
     if constexpr (true) {
         //撤销重做
+        //Redo action加到顶上会莫名其妙产生问题，暂时改成放到别的地方
         QAction* act = undoStack->createUndoAction(this, tr("撤销"));
         act->setIcon(QIcon(":/icons/undo.png"));
         act->setShortcut(Qt::CTRL + Qt::Key_Z);
-        ribbon->quickAccessBar()->addButton(act);
+        ribbon->quickAccessBar()->addAction(act);
 
         act = undoStack->createRedoAction(this, tr("重做"));
         act->setIcon(QIcon(":/icons/redo.png"));
         act->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
-        ribbon->quickAccessBar()->addButton(act);
-
+        ribbon->quickAccessBar()->addAction(act);
     }
+    
 
     //开始
     if constexpr (true) {
@@ -149,7 +160,7 @@ void MainWindow::initToolbar()
         panel->addLargeAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(actSaveGraph()));
 
-        panel = cat->addPannel("窗口");
+        panel = cat->addPannel(tr("窗口"));
         act = naviDock->toggleViewAction();
         act->setText(QObject::tr("导航"));
         act->setIcon(QIcon(":/icons/Graph-add.png"));
@@ -165,6 +176,22 @@ void MainWindow::initToolbar()
         menu->setTitle(QObject::tr("运行图窗口"));
         menu->setIcon(QIcon(":/icons/diagram.png"));
         panel->addLargeMenu(menu);
+
+        ////临时：撤销重做
+        //panel = cat->addPannel(tr("操作"));
+        //act = undoStack->createUndoAction(this, tr("撤销"));
+        //act->setIcon(QIcon(":/icons/undo.png"));
+        //panel->addMediumAction(act);
+        //connect(undoStack, SIGNAL(canUndoChanged(bool)), act, SLOT(setEnabled(bool)));
+        //
+        ////act = undoStack->createRedoAction(this, tr("重做"));
+        //act = new QAction(this);
+        //act->setText(tr("重做"));
+        //act->setEnabled(false);
+        //act->setIcon(QIcon(":/icons/redo.png"));
+        //connect(undoStack, SIGNAL(canRedoChanged(bool)), act, SLOT(setEnabled(bool)));
+        //connect(act, SIGNAL(triggered()), undoStack, SLOT(redo()));
+        //panel->addMediumAction(act);
     }
 }
 
@@ -309,14 +336,8 @@ void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)
 
 void MainWindow::trainsRemoved(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes)
 {
-    for (auto p : diagramWidgets) {
-        for (auto t : trains) {
-            p->removeTrain(*t);
-        }
-    }
     undoStack->push(new qecmd::RemoveTrains(trains, indexes, _diagram.trainCollection(), this));
-
-    informTrainListChanged();
+    redoRemoveTrains(trains, indexes);
 }
 
 

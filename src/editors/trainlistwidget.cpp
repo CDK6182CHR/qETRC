@@ -131,6 +131,7 @@ void qecmd::RemoveTrains::redo()
 		coll.takeTrainAt(*p);
 	}
 	if (mw) {
-		mw->trainsRemoved(_trains, _indexes);
+		//不能这么干！递归调用了push()，然后又redo()了
+		mw->redoRemoveTrains(_trains, _indexes);
 	}
 }

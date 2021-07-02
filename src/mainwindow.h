@@ -45,6 +45,9 @@ public:
     void undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains,
         const QList<int>& indexes);
 
+    void redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains,
+        const QList<int>& indexes);
+
 private:
     /**
      * 程序启动，构建UI
