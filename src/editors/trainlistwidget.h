@@ -92,6 +92,11 @@ signals:
      */
     void trainsRemoved(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes);
 
+    /**
+     * 列车发生排序，但没有增删改
+     */
+    void trainReordered();
+
 private slots:
     void searchTrain();
     void editButtonClicked();

@@ -143,3 +143,11 @@ void DiagramPage::addForbidItem(const Forbid* forbid, Direction dir, QGraphicsRe
 {
     dirForbidItem(forbid, dir).append(item);
 }
+
+void DiagramPage::clearGraphics()
+{
+    _itemMap.clear();
+    _forbidDMap.clear();
+    _forbidUMap.clear();
+    //注意不要删LabelInfo，那个在清理运行线时自动清理掉
+}

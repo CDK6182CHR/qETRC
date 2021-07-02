@@ -38,10 +38,14 @@ SOURCES += \
     src/kernel/diagramwidget.cpp \
     src/kernel/trainitem.cpp \
     src/main.cpp \
-    src/mainwindow.cpp \
+    src/mainwindow/mainwindow.cpp \
+    src/mainwindow/traincontext.cpp \
     src/model/diagram/componentitems.cpp \
     src/model/diagram/diagramnavimodel.cpp \
+    src/model/diagram/railtablemodel.cpp \
     src/model/train/trainlistmodel.cpp \
+    src/navi/addpagedialog.cpp \
+    src/navi/navitree.cpp \
     src/util/utilfunc.cpp
 
 HEADERS += \
@@ -71,10 +75,15 @@ HEADERS += \
     src/editors/trainlistwidget.h \
     src/kernel/diagramwidget.h \
     src/kernel/trainitem.h \
-    src/mainwindow.h \
+    src/mainwindow/mainwindow.h \
+    src/mainwindow/traincontext.h \
+    src/mainwindow/version.h \
     src/model/diagram/componentitems.h \
     src/model/diagram/diagramnavimodel.h \
+    src/model/diagram/railtablemodel.h \
     src/model/train/trainlistmodel.h \
+    src/navi/addpagedialog.h \
+    src/navi/navitree.h \
     src/util/buttongroup.hpp \
     src/util/qeexceptions.h \
     src/util/utilfunc.h

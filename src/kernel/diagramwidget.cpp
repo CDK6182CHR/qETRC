@@ -30,6 +30,8 @@ DiagramWidget::DiagramWidget(std::shared_ptr<DiagramPage> page, QWidget* parent)
 
 DiagramWidget::~DiagramWidget() noexcept
 {
+    scene()->clear();   //据说这样快一些？
+    _page->clearGraphics();
 }
 
 void DiagramWidget::autoPaintGraph()
@@ -748,7 +750,6 @@ void DiagramWidget::addForbidNode(std::shared_ptr<Forbid> forbid,
     std::shared_ptr<ForbidNode> node, const QBrush& brush, const QPen& pen, double start_y)
 {
     auto& railint = node->railInterval();
-    auto& railway = forbid->railway();
     double y1 = railint.fromStation()->y_value.value(),
         y2 = railint.toStation()->y_value.value();
     if (y1 > y2)

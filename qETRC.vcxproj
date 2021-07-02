@@ -193,6 +193,8 @@
     </QtRcc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\mainwindow\mainwindow.cpp" />
+    <ClCompile Include="src\mainwindow\traincontext.cpp" />
     <ClCompile Include="src\model\diagram\componentitems.cpp" />
     <ClCompile Include="src\data\diagram\config.cpp" />
     <ClCompile Include="src\data\diagram\diagram.cpp" />
@@ -201,7 +203,6 @@
     <ClCompile Include="src\kernel\diagramwidget.cpp" />
     <ClCompile Include="src\data\rail\forbid.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\mainwindow.cpp" />
     <ClCompile Include="src\data\rail\railinterval.cpp" />
     <ClCompile Include="src\data\rail\railstation.cpp" />
     <ClCompile Include="src\data\rail\railway.cpp" />
@@ -215,14 +216,23 @@
     <ClCompile Include="src\data\diagram\trainevents.cpp" />
     <ClCompile Include="src\kernel\trainitem.cpp" />
     <ClCompile Include="src\data\diagram\trainline.cpp" />
+    <ClCompile Include="src\model\diagram\railtablemodel.cpp" />
     <ClCompile Include="src\model\train\trainlistmodel.cpp" />
     <ClCompile Include="src\editors\trainlistwidget.cpp" />
     <ClCompile Include="src\data\train\trainname.cpp" />
     <ClCompile Include="src\data\train\trainstation.cpp" />
     <ClCompile Include="src\data\train\traintype.cpp" />
+    <ClCompile Include="src\navi\addpagedialog.cpp" />
+    <ClCompile Include="src\navi\navitree.cpp" />
     <ClCompile Include="src\util\utilfunc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="src\mainwindow\mainwindow.h" />
+    <QtMoc Include="src\mainwindow\traincontext.h" />
+    <ClInclude Include="src\mainwindow\version.h" />
+    <QtMoc Include="src\navi\navitree.h" />
+    <QtMoc Include="src\model\diagram\railtablemodel.h" />
+    <QtMoc Include="src\navi\addpagedialog.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <ClInclude Include="src\model\diagram\componentitems.h" />
     <ClInclude Include="src\data\diagram\config.h" />
@@ -234,8 +244,6 @@
     </QtMoc>
     <ClInclude Include="src\data\common\direction.h" />
     <ClInclude Include="src\data\rail\forbid.h" />
-    <QtMoc Include="src\mainwindow.h">
-    </QtMoc>
     <ClInclude Include="src\util\qeexceptions.h" />
     <ClInclude Include="src\data\rail\rail.h" />
     <ClInclude Include="src\data\rail\railinterval.h" />

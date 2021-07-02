@@ -98,6 +98,7 @@ void TrainListModel::sort(int column, Qt::SortOrder order)
 	}
 	
 	endResetModel();
+	emit trainSorted();
 }
 
 QVariant TrainListModel::headerData(int section, Qt::Orientation orientation, int role) const

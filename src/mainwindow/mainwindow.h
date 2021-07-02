@@ -4,6 +4,7 @@
 #include <QTreeView>
 #include <QList>
 #include <QUndoStack>
+#include <QStringLiteral>
 
 #include "data/rail/railway.h"
 #include "data/diagram/diagram.h"
@@ -11,11 +12,16 @@
 #include "kernel/diagramwidget.h"
 #include "model/diagram/diagramnavimodel.h"
 #include "editors/trainlistwidget.h"
+#include "navi/navitree.h"
 
 //for SARibbon
 #include "SARibbonMainWindow.h"
 #include "SARibbonMenu.h"
+#include "SARibbonContextCategory.h"
+
 #include "DockManager.h"
+
+#include "traincontext.h"
 
 /**
  * @brief The MainWindow class
@@ -29,12 +35,15 @@ class MainWindow : public SARibbonMainWindow
 
     //窗口，Model的指针
     DiagramNaviModel* naviModel;
-    QTreeView* naviView;
+    NaviTree* naviView;
     SARibbonMenu* pageMenu;
     QList<ads::CDockWidget*> diagramDocks;
     QList<DiagramWidget*> diagramWidgets;
     ads::CDockWidget* naviDock, * trainListDock;
     TrainListWidget* trainListWidget;
+
+    SARibbonContextCategory* contextPage;
+    TrainContext* contextTrain;
 
     bool changed = false;
 
@@ -47,6 +56,16 @@ public:
 
     void redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains,
         const QList<int>& indexes);
+
+    /**
+     * 注意既然是Undo，这个就肯定在栈顶，直接删除最后一个就好了
+     */
+    void undoAddPage(std::shared_ptr<DiagramPage> page);
+
+    /**
+     * 调用前，应当已经把Page加入到Diagram中
+     */
+    void addPageWidget(std::shared_ptr<DiagramPage> page);
 
 private:
     /**
@@ -105,18 +124,36 @@ private:
     void addTrainLine(Train& train);
     void removeTrainLine(Train& train);
 
+    void updateWindowTitle();
+
 
 private slots:
+    /**
+     * act前缀表示action，强调用户直接动作
+     */
     void actNewGraph();
     void actOpenGraph();
     void actSaveGraph();
     void actSaveGraphAs();
 
-    /**
-     * 调用前，应当已经把Page加入到Diagram中
-     */
-    void addPageWidget(std::shared_ptr<DiagramPage> page);
+    
 
+    /**
+     * 用户操作的新增运行图页面，需做Undo操作
+     */
+    void actAddPage(std::shared_ptr<DiagramPage> page);
+
+    void markChanged();
+
+    void markUnchanged();
+
+    /**
+     * 引起contextMenu展示或者隐藏的操作
+     */
+    void focusInPage(std::shared_ptr<DiagramPage> page);
+    void focusOutPage();
+    void focusInTrain(std::shared_ptr<Train> train);
+    void focusOutTrain();
     
 
 public slots:
@@ -130,5 +167,10 @@ public slots:
      * 列车列表变化（添加或删除），提示相关更新
      */
     void informTrainListChanged();
+
+    void informPageListChanged();
+
+    //列车排序。注意不支持撤销！
+    void trainsReordered();
 };
 

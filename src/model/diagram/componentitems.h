@@ -34,6 +34,7 @@ namespace navi {
 		virtual AbstractComponentItem* child(int i) = 0;
 		virtual int childCount()const = 0;
 		virtual QString data(int i)const = 0;
+		virtual int type()const = 0;
 		inline AbstractComponentItem* parent() { return _parent; }
 		inline int row()const { return _row; }
 	};
@@ -65,6 +66,7 @@ namespace navi {
 		virtual AbstractComponentItem* child(int i)override;
 		inline virtual int childCount()const override { return MaxDiagramRows; }
 		virtual QString data(int i)const override { return i == 0 ? QObject::tr("运行图") : ""; }
+		inline virtual int type()const override { return Type; }
 	};
 
 	class RailwayItem;
@@ -82,6 +84,7 @@ namespace navi {
 		virtual AbstractComponentItem* child(int i) override;
 		inline virtual int childCount()const override { return _rails.size(); }
 		virtual QString data(int i)const override;
+		inline virtual int type()const override { return Type; }
 	};
 
 	class PageItem;
@@ -90,11 +93,12 @@ namespace navi {
 		Diagram& _diagram;
 		std::deque<std::unique_ptr<PageItem>> _pages;
 	public:
-		enum { type = 3 };
+		enum { Type = 3 };
 		PageListItem(Diagram& diagram, DiagramItem* parent);
 		virtual AbstractComponentItem* child(int i) override;
 		inline virtual int childCount()const override { return _pages.size(); }
 		virtual QString data(int i)const override;
+		inline virtual int type()const override { return Type; }
 	};
 
 
@@ -107,6 +111,7 @@ namespace navi {
 		virtual AbstractComponentItem* child(int i)override;
 		inline virtual int childCount()const override { return 0; }
 		virtual QString data(int i)const override;
+		inline virtual int type()const override { return Type; }
 	};
 
 	class PageItem :public AbstractComponentItem
@@ -118,6 +123,8 @@ namespace navi {
 		inline virtual AbstractComponentItem* child(int i)override { return nullptr; }
 		inline virtual int childCount()const override { return 0; }
 		virtual QString data(int i)const override;
+		inline virtual int type()const override { return Type; }
+		inline auto page() { return _page; }
 	};
 
 	class TrainModelItem;
@@ -131,6 +138,7 @@ namespace navi {
 		inline virtual AbstractComponentItem* child(int i)override;
 		inline virtual int childCount()const override { return _trains.size(); }
 		virtual QString data(int i)const override;
+		inline virtual int type()const override { return Type; }
 	};
 
 	class TrainModelItem :public AbstractComponentItem
@@ -142,6 +150,8 @@ namespace navi {
 		inline virtual AbstractComponentItem* child(int i)override { return nullptr; }
 		inline virtual int childCount()const override { return 0; }
 		virtual QString data(int i)const override;
+		inline virtual int type()const override { return Type; }
+		inline auto train() { return _train; }
 	};
 
 }

@@ -29,6 +29,7 @@ public:
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    inline Diagram& diagram() { return _diagram; }
 
     /**
      * 发生了打开新运行图等操作，直接暴力重新加载Item

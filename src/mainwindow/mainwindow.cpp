@@ -2,7 +2,7 @@
 
 #include <QString>
 
-//test...
+
 #include <QTableView>
 #include <QDockWidget>
 #include <QtWidgets>
@@ -10,6 +10,10 @@
 #include "editors/trainlistwidget.h"
 #include "model/diagram/diagramnavimodel.h"
 #include "data/diagram/diagram.h"
+#include "navi/navitree.h"
+#include "navi/addpagedialog.h"
+
+#include "version.h"
 
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
@@ -19,13 +23,16 @@
 
 
 MainWindow::MainWindow(QWidget *parent)
-    : SARibbonMainWindow(parent),manager(new ads::CDockManager(this)),
+    : SARibbonMainWindow(parent),
+    manager(new ads::CDockManager(this)),
     naviModel(new DiagramNaviModel(_diagram,this)),
     undoStack(new QUndoStack(this))
 {
     _diagram.readDefaultConfigs();
+    undoStack->setUndoLimit(100);
 
     initUI();
+    loadInitDiagram();
 
     return;
 
@@ -87,12 +94,19 @@ void MainWindow::redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains, c
     informTrainListChanged();
 }
 
+void MainWindow::undoAddPage(std::shared_ptr<DiagramPage> page)
+{
+    auto dock = diagramDocks.takeLast();
+    manager->removeDockWidget(dock);
+    delete dock;
+    diagramWidgets.removeLast();
+    informPageListChanged();
+}
+
 void MainWindow::initUI()
 {
     initDockWidgets();
     initToolbar();
-
-    loadInitDiagram();
 }
 
 void MainWindow::initDockWidgets()
@@ -100,22 +114,33 @@ void MainWindow::initDockWidgets()
     ads::CDockWidget* dock;
 
     //总导航
-    auto* tree = new QTreeView;
-    naviView = tree;
-    dock = new ads::CDockWidget(QObject::tr("运行图资源管理器"));
-    naviDock = dock;
-    tree->setModel(naviModel);
-    dock->setWidget(tree);
-    manager->addDockWidget(ads::LeftDockWidgetArea, dock);
+    if constexpr (true) {
+        auto* tree = new NaviTree(naviModel);
+        naviView = tree;
+        dock = new ads::CDockWidget(QObject::tr("运行图资源管理器"));
+        naviDock = dock;
+        dock->setWidget(tree);
+        manager->addDockWidget(ads::LeftDockWidgetArea, dock);
+        connect(tree, &NaviTree::pageAdded, this, &MainWindow::actAddPage);
+        connect(tree, &NaviTree::focusInPage, this, &MainWindow::focusInPage);
+        connect(tree, &NaviTree::focusOutPage, this, &MainWindow::focusOutPage);
+        connect(tree, &NaviTree::focusInTrain, this, &MainWindow::focusInTrain);
+        connect(tree, &NaviTree::focusOutTrain, this, &MainWindow::focusOutTrain);
+    }
+    
+    //列车管理
+    if constexpr (true) {
+        auto* tw = new TrainListWidget(_diagram.trainCollection());
+        dock = new ads::CDockWidget(tr("列车管理"));
+        trainListWidget = tw;
+        trainListDock = dock;
+        dock->setWidget(tw);
+        manager->addDockWidget(ads::LeftDockWidgetArea, dock);
+        connect(tw, SIGNAL(trainsRemoved(const QList<std::shared_ptr<Train>>&, const QList<int>&)),
+            this, SLOT(trainsRemoved(const QList<std::shared_ptr<Train>>&, const QList<int>&)));
+        connect(tw, SIGNAL(trainReordered()), this, SLOT(trainsReordered()));
+    }
 
-    auto* tw = new TrainListWidget(_diagram.trainCollection());
-    dock = new ads::CDockWidget(tr("列车管理"));
-    trainListWidget = tw;
-    trainListDock = dock;
-    dock->setWidget(tw);
-    manager->addDockWidget(ads::LeftDockWidgetArea, dock);
-    connect(tw, SIGNAL(trainsRemoved(const QList<std::shared_ptr<Train>>&, const QList<int>&)),
-        this, SLOT(trainsRemoved(const QList<std::shared_ptr<Train>>&, const QList<int>&)));
 }
 
 void MainWindow::initToolbar()
@@ -177,21 +202,24 @@ void MainWindow::initToolbar()
         menu->setIcon(QIcon(":/icons/diagram.png"));
         panel->addLargeMenu(menu);
 
-        ////临时：撤销重做
-        //panel = cat->addPannel(tr("操作"));
-        //act = undoStack->createUndoAction(this, tr("撤销"));
-        //act->setIcon(QIcon(":/icons/undo.png"));
-        //panel->addMediumAction(act);
-        //connect(undoStack, SIGNAL(canUndoChanged(bool)), act, SLOT(setEnabled(bool)));
-        //
-        ////act = undoStack->createRedoAction(this, tr("重做"));
-        //act = new QAction(this);
-        //act->setText(tr("重做"));
-        //act->setEnabled(false);
-        //act->setIcon(QIcon(":/icons/redo.png"));
-        //connect(undoStack, SIGNAL(canRedoChanged(bool)), act, SLOT(setEnabled(bool)));
-        //connect(act, SIGNAL(triggered()), undoStack, SLOT(redo()));
-        //panel->addMediumAction(act);
+    }
+
+    //context: page
+    if constexpr (true) {
+        auto* cat = ribbon->addContextCategory(tr("运行图"));
+        contextPage = cat;
+        auto* page = cat->addCategoryPage(tr("管理"));
+        auto* panel = page->addPannel(tr(""));
+
+        QAction* act = new QAction(QIcon(":/icons/close.png"), tr("删除"), this);
+        //todo: connect
+        panel->addLargeAction(act);
+    }
+
+    //context: train
+    if constexpr (true) {
+        auto* cat = ribbon->addContextCategory(tr("列车"));
+        contextTrain = new TrainContext(_diagram, cat, this);
     }
 }
 
@@ -199,6 +227,7 @@ void MainWindow::loadInitDiagram()
 {
     if (!openGraph(SystemJson::instance.last_file))
         openGraph(SystemJson::instance.default_file);
+    updateWindowTitle();
 }
 
 bool MainWindow::clearDiagram()
@@ -219,6 +248,9 @@ void MainWindow::clearDiagramUnchecked()
     }
     diagramDocks.clear();
     diagramWidgets.clear();
+
+    undoStack->clear();
+    undoStack->resetClean();
 
     //最后：清理数据
     _diagram.clear();
@@ -283,11 +315,36 @@ void MainWindow::removeTrainLine(Train& train)
         p->removeTrain(train);
 }
 
+void MainWindow::updateWindowTitle()
+{
+    QString filename = _diagram.filename();
+    if (filename.isNull())
+        filename = "新运行图";
+    QString s = QString(qespec::TITLE.data()) + "_" + qespec::VERSION.data() + " - ";
+    //暂定用自己维护的标志位来判定修改
+    if (changed)
+        s += "* ";
+    s += filename;
+    setWindowTitle(s);
+}
+
 void MainWindow::informTrainListChanged()
 {
     naviModel->resetModel();
     trainListWidget->refreshData();
-    changed = true;   //既然通知变化了，就默认真的发生了变化！
+    markChanged();   //既然通知变化了，就默认真的发生了变化！
+}
+
+void MainWindow::informPageListChanged()
+{
+    naviModel->resetModel();
+    markChanged();
+}
+
+void MainWindow::trainsReordered()
+{
+    undoStack->clear();
+    informTrainListChanged();
 }
 
 void MainWindow::actOpenGraph()
@@ -301,7 +358,7 @@ void MainWindow::actOpenGraph()
     if (!flag)
         QMessageBox::warning(this, QObject::tr("错误"), QObject::tr("文件错误，请检查!"));
     else
-        changed = false;
+        markUnchanged();
 }
 
 void MainWindow::actSaveGraph()
@@ -309,7 +366,8 @@ void MainWindow::actSaveGraph()
     if (_diagram.filename().isEmpty())
         actSaveGraphAs();
     _diagram.save();
-    changed = false;
+    markUnchanged();
+    undoStack->setClean();
 }
 
 void MainWindow::actSaveGraphAs()
@@ -319,7 +377,8 @@ void MainWindow::actSaveGraphAs()
     if (res.isNull())
         return;
     _diagram.saveAs(res);
-    changed = false;
+    markUnchanged();
+    undoStack->setClean();
 }
 
 void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)
@@ -332,6 +391,49 @@ void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)
     pageMenu->addAction(act);
     diagramDocks.append(dock);
     diagramWidgets.append(dw);
+    informPageListChanged();
+}
+
+void MainWindow::actAddPage(std::shared_ptr<DiagramPage> page)
+{
+    undoStack->push(new qecmd::AddPage(_diagram, page, this));
+}
+
+void MainWindow::markChanged()
+{
+    if (!changed) { 
+        changed = true;
+        updateWindowTitle();
+    }
+}
+
+void MainWindow::markUnchanged()
+{
+    if (changed) {
+        changed = false;
+        updateWindowTitle();
+    }
+}
+
+void MainWindow::focusInPage(std::shared_ptr<DiagramPage> page)
+{
+    ribbonBar()->showContextCategory(contextPage);
+}
+
+void MainWindow::focusOutPage()
+{
+    ribbonBar()->hideContextCategory(contextPage);
+}
+
+void MainWindow::focusInTrain(std::shared_ptr<Train> train)
+{
+    ribbonBar()->showContextCategory(contextTrain->context());
+    contextTrain->setTrain(train);
+}
+
+void MainWindow::focusOutTrain()
+{
+    ribbonBar()->hideContextCategory(contextTrain->context());
 }
 
 void MainWindow::trainsRemoved(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes)

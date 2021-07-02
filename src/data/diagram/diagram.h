@@ -136,6 +136,8 @@ public:
     inline const QString& note()const { return _note; }
     inline void setNote(const QString& n) { _note = n; }
 
+    inline std::shared_ptr<Railway> railwayAt(int i) { return _railways.at(i); }
+
     /**
      * @brief addRailway 添加线路
      * 同时将所有车次绑定到新线路

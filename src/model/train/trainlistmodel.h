@@ -51,5 +51,6 @@ public:
 
 signals:
     void trainShowChanged(std::shared_ptr<Train> train, bool show);
+    void trainSorted();
 };
 

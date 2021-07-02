@@ -403,6 +403,8 @@ public:
      */
     std::shared_ptr<RailInterval> nextIntervalCirc(std::shared_ptr<RailInterval> railint);
 
+    inline double totalMile()const { return empty() ? 0.0 : _stations.last()->mile; }
+
 private:
     /**
      * 维护nameMap和fieldMap

@@ -139,6 +139,11 @@ public:
         return dir == Direction::Down ? belowLabels(st) : overLabels(st);
     }
 
+    /**
+    * 当关联的窗口被关闭（删除）时，清理掉相关联的Page中的Item指针。
+    */
+    void clearGraphics();
+
 };
 
 //inline auto overNullLabel() { return _overLabels.end(); }

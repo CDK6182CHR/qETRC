@@ -1,7 +1,7 @@
 ﻿#include "trainlistwidget.h"
 #include "util/buttongroup.hpp"
 
-#include "mainwindow.h"
+#include "mainwindow/mainwindow.h"
 
 #include <QtWidgets>
 #include <QString>
@@ -41,8 +41,9 @@ void TrainListWidget::initUI()
 	table->resizeColumnsToContents();
 	vlay->addWidget(table);
 	connect(table, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(editButtonClicked()));
+	connect(model, SIGNAL(trainSorted()), this, SIGNAL(trainReordered()));
 
-	auto* h = new ButtonGroup<3>({ "上移","下移","保存顺序" });
+	auto* h = new ButtonGroup<2>({ "上移","下移"});
 	h->setMinimumWidth(50);
 	vlay->addLayout(h);
 	//todo: connect
@@ -59,8 +60,9 @@ void TrainListWidget::initUI()
 
 void TrainListWidget::searchTrain()
 {
-
+	//todo...
 }
+
 
 void TrainListWidget::editButtonClicked()
 {

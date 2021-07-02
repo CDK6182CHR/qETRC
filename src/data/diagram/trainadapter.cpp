@@ -119,8 +119,14 @@ void TrainAdapter::autoLines(const Config& config)
 				loccnt--;
 			}
 			else if (rcur->isDirectionVia(locdir = rail.gapDirection(rlast, rcur))) {  
+				if (rcur == rlast) {
+					//如果本站和上一站是同一站...直接绑定
+					//此时不对方向有任何判断
+					line->addStation(tcur, rcur);
+					bound = true;
+				}
 				// !rlast  此前已经有过绑定
-                if (rail.stationsBetween(rlast, rcur) + tpass >
+                else if (rail.stationsBetween(rlast, rcur) + tpass >
 					config.max_passed_stations) {
 					//跨越区间数量超限，截断运行线
 					if (loccnt >= 2) {  
