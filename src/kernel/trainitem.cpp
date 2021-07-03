@@ -8,12 +8,12 @@
 #include <QPen>
 #include <QGraphicsScene>
 
-TrainItem::TrainItem(TrainLine& line,
+TrainItem::TrainItem(Diagram& diagram, TrainLine& line,
     Railway& railway, DiagramPage& page, double startY, QGraphicsItem* parent):
-    QGraphicsItem(parent),
+    QGraphicsItem(parent),_diagram(diagram),
     _line(line),_railway(railway),_page(page),
-    startTime(page.config().start_hour,0,0),
-    start_x(page.config().margins.left),start_y(startY)
+    startTime(diagram.config().start_hour,0,0),
+    start_x(diagram.config().margins.left),start_y(startY)
 {
     _startAtThis = train().isStartingStation(_line.firstStationName());
     _endAtThis = train().isTerminalStation(_line.lastStationName());

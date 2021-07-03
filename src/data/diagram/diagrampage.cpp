@@ -3,18 +3,16 @@
 #include "trainadapter.h"
 #include "kernel/trainitem.h"
 
-DiagramPage::DiagramPage(Diagram &diagram,
-                         const QList<std::shared_ptr<Railway> > &railways,
+DiagramPage::DiagramPage(const QList<std::shared_ptr<Railway> > &railways,
     const QString& name):
-    _diagram(diagram),_railways(railways),_name(name)
+    _railways(railways),_name(name)
 {
 
 }
 
-DiagramPage::DiagramPage(Diagram& diagram, const QJsonObject& obj):
-    _diagram(diagram)
+DiagramPage::DiagramPage(const QJsonObject& obj, Diagram& _diagram)
 {
-    fromJson(obj);
+    fromJson(obj, _diagram);
 }
 
 QString DiagramPage::railNameString() const
@@ -27,16 +25,6 @@ QString DiagramPage::railNameString() const
         res += ", " + (*p)->name();
     }
     return res;
-}
-
-const Config& DiagramPage::config() const
-{
-    return _diagram.config();
-}
-
-const MarginConfig& DiagramPage::margins() const
-{
-    return _diagram.config().margins;
 }
 
 int DiagramPage::railwayIndex(const Railway& rail) const
@@ -56,8 +44,9 @@ double DiagramPage::railwayStartY(const Railway& rail) const
     return _startYs[idx];
 }
 
-void DiagramPage::fromJson(const QJsonObject& obj)
+void DiagramPage::fromJson(const QJsonObject& obj, Diagram& _diagram)
 {
+    _name = obj.value("name").toString();
     QJsonArray ar = obj.value("railways").toArray();
     for (auto p = ar.begin(); p != ar.end(); ++p) {
         auto r = _diagram.railwayByName(p->toString());

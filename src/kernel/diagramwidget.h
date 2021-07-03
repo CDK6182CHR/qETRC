@@ -23,6 +23,7 @@ class DiagramWidget : public QGraphicsView
      * 必须保证Page的析构晚于DiagramWidget的析构。
      */
     const std::shared_ptr<DiagramPage> _page;
+    Diagram& _diagram;
 
     /**
      * @brief _selectedTrain  当前选中的列车对象
@@ -41,7 +42,7 @@ class DiagramWidget : public QGraphicsView
     QTime startTime;
 
 public:
-    DiagramWidget(std::shared_ptr<DiagramPage> page, QWidget* parent = nullptr);
+    DiagramWidget(Diagram& daigram, std::shared_ptr<DiagramPage> page, QWidget* parent = nullptr);
     ~DiagramWidget()noexcept;
 
     /**
@@ -128,8 +129,8 @@ private:
         double width, QList<QGraphicsItem*>& leftItems,
         QList<QGraphicsItem*>& rightItems, double label_start_x);
 
-    const auto& margins()const { return _page->config().margins; }
-    const auto& config()const { return _page->config(); }
+    const auto& margins()const { return _diagram.config().margins; }
+    const auto& config()const { return _diagram.config(); }
 
     /**
      * 两端对齐且符合指定宽度的字符串

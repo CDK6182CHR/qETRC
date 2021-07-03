@@ -93,6 +93,11 @@ class TrainListWidget : public QWidget
 
 public:
     explicit TrainListWidget(TrainCollection& coll_, QWidget *parent_ = nullptr);
+
+    /**
+     * 刷新数据。
+     * TODO: 这个操作总觉得很危险。。
+     */
     void refreshData();
 
 private:

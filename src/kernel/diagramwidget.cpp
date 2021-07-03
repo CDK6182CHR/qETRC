@@ -15,8 +15,9 @@
 #include <QVBoxLayout>
 #include <QTextBrowser>
 
-DiagramWidget::DiagramWidget(std::shared_ptr<DiagramPage> page, QWidget* parent):
-    QGraphicsView(parent),_page(page),startTime(page->config().start_hour,0,0)
+DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page, QWidget* parent):
+    _diagram(diagram),
+    QGraphicsView(parent),_page(page),startTime(diagram.config().start_hour,0,0)
 {
     //todo: menu...
     setRenderHint(QPainter::Antialiasing, true);
@@ -91,7 +92,7 @@ void DiagramWidget::paintGraph()
     //todo: labelSpan
     
     //todo: 绘制提示进度条
-    for (auto p : _page->diagram().trainCollection().trains()) {
+    for (auto p : _diagram.trainCollection().trains()) {
         paintTrain(p);
     }
 
@@ -144,8 +145,8 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title)
     font.setBold(false);
     painter.setFont(font);
 
-    if (!_page->diagram().note().isEmpty()) {
-        QString s(_page->diagram().note());
+    if (!_diagram.note().isEmpty()) {
+        QString s(_diagram.note());
         s.replace("\n", " ");
         s = QString("备注：") + s;
         painter.drawText(margins().left, scene()->height() + 100 + 40, s);
@@ -274,9 +275,9 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     //标尺栏横向界限
     line = scene()->addLine(
         margins.left_white,
-        rect_start_y + margins.title_row_height / 2,
+        rect_start_y + margins.title_row_height / 2.0,
         margins.ruler_label_width + margins.left_white,
-        rect_start_y + margins.title_row_height / 2,
+        rect_start_y + margins.title_row_height / 2.0,
         defaultPen
     );
     leftItems.append(line);
@@ -538,7 +539,7 @@ void DiagramWidget::paintTrain(Train& train)
                             "Unexpected null TrainLine! " << train.trainName().full() << Qt::endl;
                     }
                     else {
-                        auto* item = new TrainItem(*line, adp->railway(), *_page,
+                        auto* item = new TrainItem(_diagram, *line, adp->railway(), *_page,
                             _page->startYs().at(i));
                         _page->addItemMap(line.get(), item);
                         item->setZValue(5);
@@ -822,7 +823,7 @@ void DiagramWidget::showTrainEventText()
             QObject::tr("当前车次事件表：请先选择一个车次！"));
         return;
     }
-    TrainEventList lst = _page->diagram().listTrainEvents(*_selectedTrain);
+    TrainEventList lst = _diagram.listTrainEvents(*_selectedTrain);
     QString res;
     for (const auto& p : lst) {
         res += _selectedTrain->trainName().full() + " 在 " +

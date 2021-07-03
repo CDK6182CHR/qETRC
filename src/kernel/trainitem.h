@@ -21,6 +21,7 @@ class Railway;
 class TrainItem : public QGraphicsItem
 {
     TrainLine& _line;
+    Diagram& _diagram;
     DiagramPage& _page;
     Railway& _railway;
 
@@ -75,7 +76,7 @@ class TrainItem : public QGraphicsItem
 
 public:
     enum { Type = UserType + 1 };
-    TrainItem(TrainLine& line, Railway& railway, DiagramPage& page, double startY,
+    TrainItem(Diagram& diagram, TrainLine& line, Railway& railway, DiagramPage& page, double startY,
         QGraphicsItem* parent = nullptr);
 
     virtual QRectF boundingRect()const override;
@@ -109,8 +110,8 @@ public:
 
 private:
     
-    const Config& config()const { return _page.config(); }
-    const auto& margins()const { return _page.margins(); }
+    const Config& config()const { return _diagram.config(); }
+    const auto& margins()const { return _diagram.config().margins; }
 
     void setLine();
 

@@ -76,7 +76,9 @@ public:
 
     /**
      * 目前移动构造和赋值的默认行为都是正确的
-     * 用在打开新的运行图
+     * 有问题... copy assign导致_page也被挪过来了
+     * 但是Page中有Diagram的引用，这就导致出问题!
+     * 暂定重新设置。
      */
     Diagram(const Diagram&)=delete;
     Diagram(Diagram&&)=default;

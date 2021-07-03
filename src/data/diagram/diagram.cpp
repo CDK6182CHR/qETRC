@@ -129,7 +129,7 @@ TrainEventList Diagram::listTrainEvents(const Train& train) const
 
 std::shared_ptr<DiagramPage> Diagram::createDefaultPage()
 {
-    auto t = std::make_shared< DiagramPage>(*this, _railways, 
+    auto t = std::make_shared<DiagramPage>(_railways,
         validPageName(QObject::tr("默认运行图")));
     _pages.append(t);
     return t;
@@ -250,7 +250,7 @@ bool Diagram::fromJson(const QJsonObject& obj)
     //新增 Page
     const QJsonArray& arpage = obj.value("pages").toArray();
     for (auto p = arpage.begin(); p != arpage.end(); ++p) {
-        _pages.append(std::make_shared<DiagramPage>(*this, p->toObject()));
+        _pages.append(std::make_shared<DiagramPage>(p->toObject(), *this));
     }
 
     bindAllTrains();

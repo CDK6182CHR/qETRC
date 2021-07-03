@@ -23,6 +23,9 @@
 
 #include "DockAreaWidget.h"
 
+//以下引入的是临时测试的
+#include "editors/railstationwidget.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : SARibbonMainWindow(parent),
@@ -64,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     _diagram.createDefaultPage();
 
-    auto page = std::make_shared<DiagramPage>(_diagram,
+    auto page = std::make_shared<DiagramPage>(
         QList<std::shared_ptr<Railway>>{ _diagram.railways().at(0) }, tr("濉阜线"));
     _diagram.pages().append(page);
     
@@ -293,6 +296,18 @@ void MainWindow::endResetGraph()
     //导航窗口
     naviModel->resetModel();
     trainListWidget->refreshData();
+
+
+    //测试!!!!
+    if constexpr (true) {
+        //线路里程编辑：暂时直接上
+        auto* w = new RailStationWidget(undoStack);
+        auto* dock = new ads::CDockWidget(tr("基线编辑"));
+        dock->setWidget(w);
+        w->setRailway(_diagram.railwayAt(0));
+
+        manager->addDockWidgetFloating(dock);
+    }
 }
 
 void MainWindow::resetDiagramPages()
@@ -411,7 +426,7 @@ void MainWindow::actSaveGraphAs()
 
 void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)
 {
-    DiagramWidget* dw = new DiagramWidget(page);
+    DiagramWidget* dw = new DiagramWidget(_diagram, page);
     auto* dock = new ads::CDockWidget(page->name());
     dock->setWidget(dw);
     manager->addDockWidget(ads::RightDockWidgetArea, dock);

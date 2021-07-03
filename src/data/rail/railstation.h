@@ -3,6 +3,8 @@
 #include <optional>
 #include <map>
 #include <QtCore>
+#include <QString>
+#include <Qt>
 
 #include "data/common/stationname.h"
 #include "railinterval.h"
@@ -18,6 +20,28 @@ enum class PassedDirection {
     UpVia = 0b10,
     BothVia = 0b11
 };
+
+namespace qeutil {
+    inline QString passDirStr(PassedDirection dir) {
+        switch (dir)
+        {
+        case PassedDirection::NoVia: return QObject::tr("不通过");
+            break;
+        case PassedDirection::DownVia:return QObject::tr("下行");
+            break;
+        case PassedDirection::UpVia:return QObject::tr("上行");
+            break;
+        case PassedDirection::BothVia:return QObject::tr("上下行");
+            break;
+        default:
+            break;
+        }
+    }
+
+    inline Qt::CheckState boolToCheckState(bool d) {
+        return d ? Qt::Checked : Qt::Unchecked;
+    }
+}
 
 
 

@@ -49,10 +49,11 @@ struct LabelPositionInfo {
  * Diagram的一个/页面/视图  显示一组Railway的运行图
  * DiagramWidget针对这个类绘图
  * 注意不保存实际数据；只持有Item的指针
+ * 
+ * 2021.07.03：为了使Diagram的默认移动/拷贝行为正确，这里不能维护反向指针（引用）。
  */
 class DiagramPage
 {
-    Diagram & _diagram;
     QList<std::shared_ptr<Railway>> _railways;
     QList<double> _startYs;
     QString _name;
@@ -66,11 +67,13 @@ class DiagramPage
     QHash<const RailStation*, label_map_t> _overLabels, _belowLabels;
 
 public:
-    DiagramPage(Diagram& diagram, const QList<std::shared_ptr<Railway>>& railways,
+    DiagramPage(const QList<std::shared_ptr<Railway>>& railways,
         const QString& name);
-    DiagramPage(Diagram& diagram, const QJsonObject& obj);
-    auto& diagram(){return _diagram;}
-    const auto& diagram()const{return _diagram;}
+    /**
+     * 注意这个Diagram只是借过来构造的，并不维护
+     */
+    DiagramPage(const QJsonObject& obj, Diagram& _diagram);
+
     auto& railways(){return _railways;}
     const auto& railways()const{return _railways;}
     auto& startYs(){return _startYs;}
@@ -83,12 +86,6 @@ public:
 
     QString railNameString()const;
 
-    /**
-     * 暂时实现为直接返回Diagram的数据 （不保存副本）
-     */
-    const Config& config()const;
-    const MarginConfig& margins()const;
-
     inline int railwayCount()const { return _railways.size(); }
 
     /**
@@ -99,7 +96,7 @@ public:
 
     double railwayStartY(const Railway& rail)const;
 
-    void fromJson(const QJsonObject& obj);
+    void fromJson(const QJsonObject& obj, Diagram& _diagram);
     QJsonObject toJson()const;
 
     void addItemMap(TrainLine* line, TrainItem* item) {
