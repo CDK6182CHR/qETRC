@@ -144,6 +144,25 @@ bool Diagram::pageNameExisted(const QString& name) const
     return false;
 }
 
+bool Diagram::railwayNameExisted(const QString& name) const
+{
+    for (auto p : _railways) {
+        if (p->name() == name)
+            return true;
+    }
+    return false;
+}
+
+QString Diagram::validRailwayName(const QString& prefix) const
+{
+    for (int i = 0;; i++) {
+        QString res = prefix;
+        if (i)res += QString::number(i);
+        if (!railwayNameExisted(res))
+            return res;
+    }
+}
+
 void Diagram::bindAllTrains()
 {
     for (auto p : _railways) {

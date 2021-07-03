@@ -51,11 +51,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains,
-        const QList<int>& indexes);
 
-    void redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains,
-        const QList<int>& indexes);
 
     /**
      * 注意既然是Undo，这个就肯定在栈顶，直接删除最后一个就好了
@@ -154,17 +150,23 @@ private slots:
     void focusOutPage();
     void focusInTrain(std::shared_ptr<Train> train);
     void focusOutTrain();
+
+    void undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains);
+    void redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains);
     
 
 public slots:
 
     /**
      * 从TrainListWidget发起的删除列车操作
+     * 注意包含UndoStack压栈操作！！
      */
-    void trainsRemoved(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes);
+    void trainsRemoved(const QList<std::shared_ptr<Train>>& trains, 
+        const QList<int>& indexes, TrainListModel* model);
 
     /**
      * 列车列表变化（添加或删除），提示相关更新
+     * 主要是通告Navi那边变化！
      */
     void informTrainListChanged();
 
@@ -172,5 +174,7 @@ public slots:
 
     //列车排序。注意不支持撤销！
     void trainsReordered();
+
+    void trainSorted(const QList<std::shared_ptr<Train>>& oldList, TrainListModel* model);
 };
 

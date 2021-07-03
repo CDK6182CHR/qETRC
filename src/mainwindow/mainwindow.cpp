@@ -21,6 +21,8 @@
 #include "SARibbonPannel.h"
 #include "SARibbonQuickAccessBar.h"
 
+#include "DockAreaWidget.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : SARibbonMainWindow(parent),
@@ -30,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     _diagram.readDefaultConfigs();
     undoStack->setUndoLimit(100);
+    connect(undoStack, SIGNAL(indexChanged(int)), this, SLOT(markChanged()));
 
     initUI();
     loadInitDiagram();
@@ -74,8 +77,7 @@ MainWindow::~MainWindow()
 
 }
 
-void MainWindow::undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains, 
-    const QList<int>& indexes)
+void MainWindow::undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains)
 {
     //重新添加运行线
     for (auto p : trains) {
@@ -84,7 +86,7 @@ void MainWindow::undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains,
     informTrainListChanged();
 }
 
-void MainWindow::redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes)
+void MainWindow::redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains)
 {
     for (auto p : diagramWidgets) {
         for (auto t : trains) {
@@ -115,7 +117,7 @@ void MainWindow::initDockWidgets()
 
     //总导航
     if constexpr (true) {
-        auto* tree = new NaviTree(naviModel);
+        auto* tree = new NaviTree(naviModel, undoStack);
         naviView = tree;
         dock = new ads::CDockWidget(QObject::tr("运行图资源管理器"));
         naviDock = dock;
@@ -136,9 +138,14 @@ void MainWindow::initDockWidgets()
         trainListDock = dock;
         dock->setWidget(tw);
         manager->addDockWidget(ads::LeftDockWidgetArea, dock);
-        connect(tw, SIGNAL(trainsRemoved(const QList<std::shared_ptr<Train>>&, const QList<int>&)),
-            this, SLOT(trainsRemoved(const QList<std::shared_ptr<Train>>&, const QList<int>&)));
+        connect(tw, SIGNAL(trainsRemoved(const QList<std::shared_ptr<Train>>&, const QList<int>&,
+            TrainListModel*)),
+            this, SLOT(trainsRemoved(const QList<std::shared_ptr<Train>>&, const QList<int>&,
+                TrainListModel*)));
         connect(tw, SIGNAL(trainReordered()), this, SLOT(trainsReordered()));
+        connect(tw, &TrainListWidget::trainSorted, this, &MainWindow::trainSorted);
+        connect(tw, &TrainListWidget::trainsRemovedUndone, this, &MainWindow::undoRemoveTrains);
+        connect(tw, &TrainListWidget::trainsRemovedRedone, this, &MainWindow::redoRemoveTrains);
     }
 
 }
@@ -202,6 +209,18 @@ void MainWindow::initToolbar()
         menu->setIcon(QIcon(":/icons/diagram.png"));
         panel->addLargeMenu(menu);
 
+        //undo  试一下把dock也放在这里初始化...
+        QUndoView* view = new QUndoView(undoStack);
+        auto* dock = new ads::CDockWidget(tr("历史记录"));
+        dock->setWidget(view);
+        auto* a=manager->addDockWidgetTab(ads::CenterDockWidgetArea,dock);
+        
+
+        act = dock->toggleViewAction();
+        act->setText(tr("历史记录"));
+        act->setIcon(QIcon(":/icons/clock.png"));
+        panel->addLargeAction(act);
+
     }
 
     //context: page
@@ -214,6 +233,8 @@ void MainWindow::initToolbar()
         QAction* act = new QAction(QIcon(":/icons/close.png"), tr("删除"), this);
         //todo: connect
         panel->addLargeAction(act);
+
+
     }
 
     //context: train
@@ -227,7 +248,7 @@ void MainWindow::loadInitDiagram()
 {
     if (!openGraph(SystemJson::instance.last_file))
         openGraph(SystemJson::instance.default_file);
-    updateWindowTitle();
+    markUnchanged();
 }
 
 bool MainWindow::clearDiagram()
@@ -330,8 +351,9 @@ void MainWindow::updateWindowTitle()
 
 void MainWindow::informTrainListChanged()
 {
+    //注意：现在这个函数总是由TrainList那边变化发起的，所以TrainList不用更新
     naviModel->resetModel();
-    trainListWidget->refreshData();
+    //trainListWidget->refreshData();
     markChanged();   //既然通知变化了，就默认真的发生了变化！
 }
 
@@ -343,8 +365,14 @@ void MainWindow::informPageListChanged()
 
 void MainWindow::trainsReordered()
 {
-    undoStack->clear();
     informTrainListChanged();
+}
+
+void MainWindow::trainSorted(const QList<std::shared_ptr<Train>>& oldList, 
+    TrainListModel* model)
+{
+    undoStack->push(new qecmd::SortTrains(oldList, model));
+    trainsReordered();
 }
 
 void MainWindow::actOpenGraph()
@@ -436,10 +464,10 @@ void MainWindow::focusOutTrain()
     ribbonBar()->hideContextCategory(contextTrain->context());
 }
 
-void MainWindow::trainsRemoved(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes)
+void MainWindow::trainsRemoved(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes,
+    TrainListModel* model)
 {
-    undoStack->push(new qecmd::RemoveTrains(trains, indexes, _diagram.trainCollection(), this));
-    redoRemoveTrains(trains, indexes);
+    undoStack->push(new qecmd::RemoveTrains(trains, indexes, _diagram.trainCollection(),model, this));
 }
 
 

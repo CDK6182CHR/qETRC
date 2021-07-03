@@ -36,6 +36,13 @@ public:
      */
     void resetModel();
 
+    /**
+     * 试验：导入线路，缀加到尾部。
+     * 实际的添加由这里完成！！
+     */
+    void importRailways(const QList<std::shared_ptr<Railway>> rails);
+
+    void removeTailRailways(int cnt);
 
 private:
     //for convenient..

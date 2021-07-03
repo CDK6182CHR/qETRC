@@ -70,6 +70,8 @@ Qt::ItemFlags TrainListModel::flags(const QModelIndex& index) const
 
 void TrainListModel::sort(int column, Qt::SortOrder order)
 {
+	//把旧版的列表复制一份
+	QList<std::shared_ptr<Train>> oldList(coll.trains());   //copy construct!!
 	beginResetModel();
 	auto& lst = coll.trains();
 	if (order == Qt::AscendingOrder) {
@@ -98,7 +100,8 @@ void TrainListModel::sort(int column, Qt::SortOrder order)
 	}
 	
 	endResetModel();
-	emit trainSorted();
+	if (oldList != lst)   //顺序一样就当作无事发生
+		emit trainSorted(oldList, this);
 }
 
 QVariant TrainListModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -117,4 +120,34 @@ QVariant TrainListModel::headerData(int section, Qt::Orientation orientation, in
 	return QAbstractTableModel::headerData(section, orientation, role);
 }
 
+void TrainListModel::undoRedoSort(QList<std::shared_ptr<Train>>& lst)
+{
+	beginResetModel();
+	std::swap(coll.trains(), lst);
+	endResetModel();
+	emit informTrainSorted();
+}
+
+void TrainListModel::redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains,
+	const QList<int>& indexes)
+{
+	beginResetModel();
+	//注意：倒序遍历
+	for (auto p = indexes.rbegin(); p != indexes.rend(); ++p) {
+		std::shared_ptr<Train> train(coll.takeTrainAt(*p));   //move 
+	}
+	endResetModel();
+	emit trainsRemovedRedone(trains);
+}
+
+void TrainListModel::undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains, 
+	const QList<int>& indexes)
+{
+	beginResetModel();
+	for (int i = 0; i < trains.size(); i++) {
+		coll.insertTrain(indexes.at(i), trains.at(i));
+	}
+	endResetModel();
+	emit trainsRemovedUndone(trains);
+}
 

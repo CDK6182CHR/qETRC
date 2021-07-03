@@ -51,6 +51,34 @@ public:
 
 signals:
     void trainShowChanged(std::shared_ptr<Train> train, bool show);
-    void trainSorted();
+
+    /**
+     * 这个信号通告MainWindow, 完成UndoCmd的压栈操作
+     */
+    void trainSorted(const QList<std::shared_ptr<Train>>& oldList,
+        TrainListModel* model);
+
+    /**
+     * 这个信号只用来通告MainWindow，让NaviTree重新排序一下
+     */
+    void informTrainSorted();
+
+    void trainsRemovedUndone(const QList<std::shared_ptr<Train>>& trains);
+    void trainsRemovedRedone(const QList<std::shared_ptr<Train>>& trains);
+
+public slots:
+    /**
+     * 撤销或重做排序，操作都一样。由UndoCommand调用
+     * 重新排序，然后提醒MainWindow那边更新
+     */
+    void undoRedoSort(QList<std::shared_ptr<Train>>& lst);
+
+    /**
+     * 执行删除，然后通告Main那边调整顺序 （转发给Navi）
+     */
+    void redoRemoveTrains(const QList<std::shared_ptr<Train>>& trainsconst,const  QList<int>& indexes);
+
+    void undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains,
+        const QList<int>& indexes);
 };
 

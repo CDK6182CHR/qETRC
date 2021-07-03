@@ -193,6 +193,10 @@ public:
 
     bool pageNameExisted(const QString& name)const;
 
+    bool railwayNameExisted(const QString& name)const;
+
+    QString validRailwayName(const QString& prefix)const;
+
     /**
      * 如果读取失败，则运行图是个Null。
      * 没有任何线路的运行图是Null。

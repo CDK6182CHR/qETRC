@@ -326,6 +326,7 @@ public:
     inline const QString& name()const{
         return _name;
     }
+    inline void setName(const QString& n) { _name = n; }
 
     void showStations()const;
 

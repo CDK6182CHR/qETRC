@@ -28,6 +28,7 @@ namespace qecmd {
         QList<std::shared_ptr<Train>> _trains;
         QList<int> _indexes;
         TrainCollection& coll;
+        TrainListModel* const model;
 
         /**
          * 如果持有MainWindow指针，则在Undo, redo时执行相应的界面操作
@@ -37,6 +38,7 @@ namespace qecmd {
     public:
         RemoveTrains(const QList<std::shared_ptr<Train>>& trains,
             const QList<int>& indexes, TrainCollection& coll_,
+            TrainListModel* model_,
             MainWindow* mw,
             QUndoCommand* parent = nullptr);
 
@@ -53,6 +55,23 @@ namespace qecmd {
         auto& trains() { return _trains; }
 
         void setMainWindow(MainWindow* d) { mw = d; }
+    };
+
+    /**
+     * 排序。支持合并 
+     */
+    class SortTrains :public QUndoCommand {
+        QList<std::shared_ptr<Train>> ord;
+        TrainListModel* const model;
+        static constexpr int ID = 100;
+        bool first = true;
+    public:
+        SortTrains(const QList<std::shared_ptr<Train>>& ord_, TrainListModel* model_,
+            QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+        virtual int id()const override { return ID; }
+        virtual bool mergeWith(const QUndoCommand* another)override;
     };
 }
 
@@ -90,12 +109,19 @@ signals:
      * 列车删除后发送信号给MainWindow
      * 注意不能传cmd，否则如果没人接受，就内存泄漏了
      */
-    void trainsRemoved(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes);
+    void trainsRemoved(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes,
+        TrainListModel* model);
+
+    void trainsRemovedUndone(const QList<std::shared_ptr<Train>>& trains);
+    void trainsRemovedRedone(const QList<std::shared_ptr<Train>>& trains);
+
 
     /**
      * 列车发生排序，但没有增删改
      */
     void trainReordered();
+
+    void trainSorted(const QList<std::shared_ptr<Train>>& ord, TrainListModel* model);
 
 private slots:
     void searchTrain();
@@ -109,7 +135,8 @@ private slots:
      * （3）创建CMD对象，通知Main发生了删除事件；
      * （4）暂定由Main负责发起更新界面数据的操作。
      */
-    void removeTrains();
+    void actRemoveTrains();
+
 };
 
 

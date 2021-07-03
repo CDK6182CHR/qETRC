@@ -11,6 +11,11 @@ TrainListWidget::TrainListWidget(TrainCollection& coll_, QWidget* parent):
 	table(new QTableView),editSearch(new QLineEdit)
 {
 	initUI();
+
+	connect(model, SIGNAL(trainsRemovedUndone(const QList<std::shared_ptr<Train>>&)),
+		this, SIGNAL(trainsRemovedUndone(const QList<std::shared_ptr<Train>>&)));
+	connect(model, SIGNAL(trainsRemovedRedone(const QList<std::shared_ptr<Train>>&)),
+		this, SIGNAL(trainsRemovedRedone(const QList<std::shared_ptr<Train>>&)));
 }
 
 void TrainListWidget::refreshData()
@@ -41,7 +46,9 @@ void TrainListWidget::initUI()
 	table->resizeColumnsToContents();
 	vlay->addWidget(table);
 	connect(table, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(editButtonClicked()));
-	connect(model, SIGNAL(trainSorted()), this, SIGNAL(trainReordered()));
+	connect(model, SIGNAL(informTrainSorted()), this, SIGNAL(trainReordered()));
+	connect(model, SIGNAL(trainSorted(const QList<std::shared_ptr<Train>>&, TrainListModel*)),
+		this, SIGNAL(trainSorted(const QList<std::shared_ptr<Train>>&, TrainListModel*)));
 
 	auto* h = new ButtonGroup<2>({ "上移","下移"});
 	h->setMinimumWidth(50);
@@ -52,7 +59,7 @@ void TrainListWidget::initUI()
 	g->setMinimumWidth(50);
 	vlay->addLayout(g);
 	g->connectAll(SIGNAL(clicked()), this, {
-		SLOT(editButtonClicked()),SLOT(batchChange()),SIGNAL(addNewTrain()),SLOT(removeTrains())
+		SLOT(editButtonClicked()),SLOT(batchChange()),SIGNAL(addNewTrain()),SLOT(actRemoveTrains())
 		});
 
 	setLayout(vlay);
@@ -79,7 +86,7 @@ void TrainListWidget::batchChange()
 }
 
 
-void TrainListWidget::removeTrains()
+void TrainListWidget::actRemoveTrains()
 {
 	auto lst = table->selectionModel()->selectedRows(0);
 	if (lst.empty())
@@ -95,31 +102,28 @@ void TrainListWidget::removeTrains()
 	QList<std::shared_ptr<Train>> trains;
 	trains.reserve(rows.size());
 
-	//注意：倒序遍历
+	//注意实际的删除由Model执行。这里生成列表，发给Main来执行CMD压栈
 	for (auto p = rows.rbegin(); p != rows.rend(); ++p) {
-		std::shared_ptr<Train> train(coll.takeTrainAt(*p));   //move 
+		std::shared_ptr<Train> train(coll.trainAt(*p));   //move 
 		trains.prepend(train);
 	}
 
-	emit trainsRemoved(trains, rows);
+	model->redoRemoveTrains(trains, rows);
+
+	emit trainsRemoved(trains, rows, model);
 }
 
 qecmd::RemoveTrains::RemoveTrains(const QList<std::shared_ptr<Train>>& trains,
-	const QList<int>& indexes, TrainCollection& coll_, MainWindow* mw_, QUndoCommand* parent) :
+	const QList<int>& indexes, TrainCollection& coll_, TrainListModel* model_,
+	MainWindow* mw_, QUndoCommand* parent) :
 	QUndoCommand(QObject::tr("删除") + QString::number(trains.size()) + QObject::tr("个车次"), parent),
-	_trains(trains), _indexes(indexes), coll(coll_), mw(mw_)
+	_trains(trains), _indexes(indexes), coll(coll_), model(model_), mw(mw_)
 {
 }
 
 void qecmd::RemoveTrains::undo()
 {
-	//把车次添加回表里面
-	for (int i = 0; i < _trains.size(); i++) {
-		coll.insertTrain(_indexes.at(i), _trains.at(i));
-	}
-	if (mw) {
-		mw->undoRemoveTrains(_trains, _indexes);
-	}
+	model->undoRemoveTrains(_trains, _indexes);
 }
 
 void qecmd::RemoveTrains::redo()
@@ -128,12 +132,38 @@ void qecmd::RemoveTrains::redo()
 		first = false;
 		return;
 	}
-	//倒序，把表里面的车次再一个个删掉
-	for (auto p = _indexes.rbegin(); p != _indexes.rend(); ++p) {
-		coll.takeTrainAt(*p);
+	model->redoRemoveTrains(_trains, _indexes);
+}
+
+qecmd::SortTrains::SortTrains(const QList<std::shared_ptr<Train>>& ord_, 
+	TrainListModel* model_, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("列车排序"),parent),ord(ord_),model(model_)
+{
+}
+
+void qecmd::SortTrains::undo()
+{
+	model->undoRedoSort(ord);
+}
+
+void qecmd::SortTrains::redo()
+{
+	if (first) {
+		first = false;
+		return;
 	}
-	if (mw) {
-		//不能这么干！递归调用了push()，然后又redo()了
-		mw->redoRemoveTrains(_trains, _indexes);
+	model->undoRedoSort(ord);
+}
+
+bool qecmd::SortTrains::mergeWith(const QUndoCommand* another)
+{
+	if (id() != another->id())
+		return false;
+	auto cmd = static_cast<const qecmd::SortTrains*>(another);
+	if (model == cmd->model) {
+		//只针对同一个model的排序做合并
+		//成功合并：抛弃中间状态
+		return true;
 	}
+	return false;
 }

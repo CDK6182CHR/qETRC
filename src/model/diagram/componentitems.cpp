@@ -43,6 +43,23 @@ QString navi::RailwayListItem::data(int i) const
 	}
 }
 
+void navi::RailwayListItem::appendRailways(const QList<std::shared_ptr<Railway>>& rails) 
+{
+	int row = _diagram.railwayCount();
+	for (auto p = rails.begin(); p != rails.end(); ++p) {
+		_diagram.railways().append(*p);
+		_rails.emplace_back(std::make_unique<RailwayItem>(*p, row++, this));
+	}
+}
+
+void navi::RailwayListItem::removeTailRailways(int cnt)
+{
+	for (int i = 0; i < cnt; i++) {
+		_rails.pop_back();
+		_diagram.railways().pop_back();
+	}
+}
+
 navi::PageListItem::PageListItem(Diagram& diagram, DiagramItem* parent):
 	AbstractComponentItem(1,parent),_diagram(diagram)
 {

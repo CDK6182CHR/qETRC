@@ -88,6 +88,27 @@ void DiagramNaviModel::resetModel()
     endResetModel();
 }
 
+void DiagramNaviModel::importRailways(const QList<std::shared_ptr<Railway>> rails)
+{
+    auto idx = index(navi::DiagramItem::RowRailways, 0);
+    int cnt = _diagram.railways().size();
+    beginInsertRows(idx, cnt, cnt + rails.size() - 1);
+    navi::RailwayListItem* it = static_cast<navi::RailwayListItem*>(idx.internalPointer());
+    it->appendRailways(rails);
+    endInsertRows();
+}
+
+void DiagramNaviModel::removeTailRailways(int cnt)
+{
+    int tot = _diagram.railways().size();
+    auto idx = index(navi::DiagramItem::RowRailways, 0);
+    navi::RailwayListItem* it = static_cast<navi::RailwayListItem*>(idx.internalPointer());
+    beginRemoveRows(idx, tot - cnt, tot - 1);
+    it->removeTailRailways(cnt);
+    endRemoveRows();
+}
+
+
 navi::AbstractComponentItem* DiagramNaviModel::getParentItem(const QModelIndex& parent) const
 {
     pACI parentItem;

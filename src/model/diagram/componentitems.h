@@ -85,6 +85,13 @@ namespace navi {
 		inline virtual int childCount()const override { return _rails.size(); }
 		virtual QString data(int i)const override;
 		inline virtual int type()const override { return Type; }
+		
+		/**
+		 * 暂定在这里执行真实的添加工作
+		 */
+		void appendRailways(const QList<std::shared_ptr<Railway>>& rails);
+
+		void removeTailRailways(int cnt);
 	};
 
 	class PageItem;
