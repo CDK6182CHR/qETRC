@@ -26,6 +26,7 @@ void RailStationWidget::initUI()
 	ctable->table()->setModel(model);
 	auto* dele = new ComboDelegate({ tr("不通过"),tr("下行"),tr("上行"),tr("上下行") }, this);
 	ctable->table()->setItemDelegateForColumn(RailStationModel::ColDir, dele);
+	ctable->table()->setEditTriggers(QTableView::CurrentChanged);
 	vlay->addWidget(ctable);
 
 	auto* g = new ButtonGroup<2>({ "确定","还原" });

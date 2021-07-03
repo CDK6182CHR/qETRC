@@ -28,5 +28,4 @@ void ComboDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, con
 	if (!index.isValid())return;
 	auto* combo = static_cast<QComboBox*>(editor);
 	model->setData(index, combo->currentIndex(), Qt::EditRole);
-	model->setData(index, combo->currentText(), Qt::DisplayRole);
 }

@@ -37,23 +37,64 @@ bool RailStationModel::insertRows(int row, int count, const QModelIndex& parent)
 
         it = new SI;
         it->setCheckState(Qt::Checked);
+        it->setCheckable(true);
+        it->setEditable(false);
         setItem(i, ColShow, it);
 
         it = new SI;
         it->setData(3, Qt::EditRole);
-        it->setData(qeutil::passDirStr(PassedDirection::BothVia), Qt::DisplayRole);
         setItem(i, ColDir, it);
 
         it = new SI;
         it->setCheckState(Qt::Unchecked);
+        it->setCheckable(true);
+        it->setEditable(false);
         setItem(i, ColPassenger, it);
 
         it = new SI;
         it->setCheckState(Qt::Unchecked);
+        it->setEditable(false);
+        it->setCheckable(true);
         setItem(i, ColFreight, it);
     }
     return true;
 }
+
+QVariant RailStationModel::data(const QModelIndex& index, int role) const
+{
+    if (index.isValid() && index.column() == ColDir && role == Qt::DisplayRole) {
+        return qeutil::passDirStr(index.data(Qt::EditRole).toInt());
+    }
+    return QStandardItemModel::data(index, role);
+}
+
+Qt::ItemFlags RailStationModel::flags(const QModelIndex& index) const
+{
+    return QStandardItemModel::flags(index);
+}
+
+bool RailStationModel::moveRows(const QModelIndex& sourceParent, int sourceRow, int count, 
+    const QModelIndex& destinationParent, int destinationChild)
+{
+    if (sourceParent == destinationParent) {
+        for (int i = 0; i < count; i++) {
+            int src = sourceRow + i, dst = destinationChild + i;
+            if (src != dst) {
+                //在dst前面插入一行，内容为src；然后删除src那一行
+                insertRow(dst);
+                int nsrc = src > dst ? src + 1 : src;
+                for (int j = 0; j < ColMAX; j++) {
+                    setItem(dst, j, takeItem(nsrc, j));  //注行号可能变了!
+                }
+                removeRow(nsrc);
+            }
+        }
+    }
+
+    return QStandardItemModel::moveRows(sourceParent, sourceRow, count, 
+        destinationParent, destinationChild);
+}
+
 
 void RailStationModel::setupModel()
 {
@@ -97,23 +138,25 @@ void RailStationModel::setupModel()
         item = new QStandardItem;
         item->setCheckState(st->_show ? Qt::Checked : Qt::Unchecked);
         item->setCheckable(true);
+        item->setEditable(false);
         setItem(i, ColShow, item);
 
         //单向站
         item = new QStandardItem;
         item->setData(static_cast<int>(st->direction), Qt::EditRole);
-        item->setData(qeutil::passDirStr(st->direction), Qt::DisplayRole);
         setItem(i, ColDir, item);
 
         //办客
         item = new QStandardItem;
         item->setCheckable(true);
+        item->setEditable(false);
         item->setCheckState(qeutil::boolToCheckState(st->passenger));
         setItem(i, ColPassenger, item);
 
         //办货
         item = new QStandardItem;
         item->setCheckable(true);
+        item->setEditable(false);
         item->setCheckState(qeutil::boolToCheckState(st->freight));
         setItem(i, ColFreight, item);
     }

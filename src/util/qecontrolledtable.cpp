@@ -56,13 +56,16 @@ void QEControlledTable::moveUp()
 	auto idx = _table->currentIndex();
 	if (idx.isValid()&&idx.row()!=0) {
 		_table->model()->moveRow(QModelIndex(), idx.row(), QModelIndex(), idx.row() - 1);
+		_table->setCurrentIndex(_table->model()->index(idx.row() - 1, idx.column()));
 	}
 }
 
 void QEControlledTable::moveDown()
 {
+	//下移这一行，等价于把它下面一行上移
 	auto idx = _table->currentIndex();
 	if (idx.isValid() && idx.row() != _table->model()->rowCount() - 1) {
-		_table->model()->moveRow(QModelIndex(), idx.row(), QModelIndex(), idx.row() + 1);
+		_table->model()->moveRow(QModelIndex(), idx.row() + 1, QModelIndex(), idx.row());
+		_table->setCurrentIndex(_table->model()->index(idx.row() + 1, idx.column()));
 	}
 }

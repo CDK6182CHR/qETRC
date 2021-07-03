@@ -33,9 +33,12 @@ namespace qeutil {
             break;
         case PassedDirection::BothVia:return QObject::tr("上下行");
             break;
-        default:
+        default:return "";
             break;
         }
+    }
+    inline QString passDirStr(int dir) {
+        return passDirStr(static_cast<PassedDirection>(dir));
     }
 
     inline Qt::CheckState boolToCheckState(bool d) {
