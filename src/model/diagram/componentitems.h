@@ -119,6 +119,7 @@ namespace navi {
 		inline virtual int childCount()const override { return 0; }
 		virtual QString data(int i)const override;
 		inline virtual int type()const override { return Type; }
+		inline auto railway()const { return _railway; }
 	};
 
 	class PageItem :public AbstractComponentItem

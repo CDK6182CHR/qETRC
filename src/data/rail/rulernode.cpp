@@ -14,6 +14,14 @@ RulerNode::RulerNode(Ruler &ruler, RailInterval &railint,
 
 }
 
+RulerNode& RulerNode::operator=(const RulerNode& other)
+{
+    interval = other.interval;
+    start = other.start;
+    stop = other.stop;
+    return *this;
+}
+
 void RulerNode::fromJson(const QJsonObject &obj)
 {
     interval=obj.value("interval").toInt();

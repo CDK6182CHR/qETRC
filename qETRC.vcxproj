@@ -195,6 +195,7 @@
   <ItemGroup>
     <ClCompile Include="src\editors\railstationwidget.cpp" />
     <ClCompile Include="src\mainwindow\mainwindow.cpp" />
+    <ClCompile Include="src\mainwindow\railcontext.cpp" />
     <ClCompile Include="src\mainwindow\traincontext.cpp" />
     <ClCompile Include="src\model\delegate\combodelegate.cpp" />
     <ClCompile Include="src\model\diagram\componentitems.cpp" />
@@ -234,6 +235,7 @@
     <QtMoc Include="src\mainwindow\mainwindow.h" />
     <QtMoc Include="src\mainwindow\traincontext.h" />
     <QtMoc Include="src\editors\railstationwidget.h" />
+    <QtMoc Include="src\mainwindow\railcontext.h" />
     <ClInclude Include="src\mainwindow\version.h" />
     <QtMoc Include="src\navi\navitree.h" />
     <QtMoc Include="src\model\diagram\railtablemodel.h" />

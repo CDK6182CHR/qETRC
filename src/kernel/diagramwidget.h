@@ -57,6 +57,13 @@ public:
      */
     void paintGraph();
 
+    /**
+     * 暴力清空图元、所有映射关系。用在重新铺画之前。
+     * 主要原因：如果发生了重新绑定，则TrainLine数据失效，原有的映射失效，
+     * 如果简单的clear()则会造成析构异常。（原有的TrainLine地址无了，映射到奇怪的东西）
+     */
+    void clearGraph();
+
     auto selectedTrain() { return _selectedTrain; }
     void setSelectedTrain(Train* train) { _selectedTrain = train; }
 

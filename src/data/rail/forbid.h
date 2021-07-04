@@ -15,10 +15,16 @@ class ForbidNode:
 {
 public:
     QTime beginTime, endTime;
-    ForbidNode(Forbid& forbid,RailInterval& railint);
+    ForbidNode(Forbid& forbid, RailInterval& railint, const QTime& beginTime_ = QTime(),
+        const QTime& endTime_ = QTime());
 
     void fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;
+
+    /**
+     * 注意只复制时间！
+     */
+    ForbidNode& operator=(const ForbidNode& other);
 
     /**
      * 天窗时长，以秒为单位

@@ -26,7 +26,7 @@ public:
     //todo: dock show..
 
     /**
-     * 新增  历史记录  从back加，front出
+     * 新增  历史记录  从front加，back出
      */
     QList<QString> history;
 

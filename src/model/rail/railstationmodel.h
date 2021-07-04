@@ -3,6 +3,7 @@
 #include <QStandardItemModel>
 #include <QStyledItemDelegate>
 #include <QUndoStack>
+#include <QUndoCommand>
 #include <memory>
 
 #include "data/rail/rail.h"
@@ -12,6 +13,7 @@
  * @brief The RailStationModel class
  * 线路的站表（里程表）的数据模型，用于编辑里程的表格。
  * 注意使用StandartItem来暂存数据。
+ * 注意要求parent()是QWidget，以方便弹出警告对话框。
  */
 class RailStationModel : public QStandardItemModel
 {
@@ -31,7 +33,7 @@ public:
         ColMAX
     };
     explicit RailStationModel(QUndoStack* undo,
-                              QObject *parent = nullptr);
+                              QWidget *parent = nullptr);
 
     void setRailway(std::shared_ptr<Railway> rail);
 
@@ -59,6 +61,24 @@ public:
         int sourceRow, int count,
         const QModelIndex& destinationParent, int destinationChild)override;
 
+    /**
+    * 提交前检查表格数据是否存在非法情况，如果存在则以对话框提示。
+    * 返回检查是否通过。
+    */
+    bool checkRailway(std::shared_ptr<Railway> rail);
+
+    /**
+     * 按当前数据生成Railway对象。新对象只包含线路基础数据。
+     * 可能会出错（例如，站名重复），此时返回空。
+     */
+    std::shared_ptr<Railway> generateRailway()const;
+
+signals:
+    /**
+     * 现阶段的主要任务好像只是通告Main来重新铺画
+     */
+    void stationTableChanged(std::shared_ptr<Railway> railway, bool equiv);
+
 public slots:
 
     /**
@@ -72,9 +92,25 @@ public slots:
      */
     void actCancel();
 
+    inline void refreshData() { setupModel(); }
+
 private:
     void setupModel();
 };
 
+
+namespace qecmd {
+    class UpdateRailStations:public QUndoCommand {
+        RailStationModel* const model;
+        std::shared_ptr<Railway> railold, railnew;
+        bool equiv;
+        int ordinateIndex;
+    public:
+        UpdateRailStations(RailStationModel* model_, std::shared_ptr<Railway> old_,
+            std::shared_ptr<Railway> new_, bool equiv_, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+}
 
 

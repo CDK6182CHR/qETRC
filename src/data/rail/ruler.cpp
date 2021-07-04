@@ -33,8 +33,10 @@ void Ruler::show() const
     qDebug()<<"Ruler "<<_name<<", diff: "<<different()<<  Qt::endl;
     auto p=firstDownNode();
     for(;p;p=p->nextNodeCirc()){
-        qDebug()<<p->fromStationName()<<"->"<<p->toStationName()<<'\t'
-               <<p->interval<<", "<<p->start<<", "<<p->stop<<Qt::endl;
+        qDebug() << p->fromStationName() << "->" << p->toStationName() << '\t'
+            << p->interval << ", " << p->start << ", " << p->stop << '\t'
+            << this << " @ " << &p->railInterval()
+            << Qt::endl;
     }
 }
 

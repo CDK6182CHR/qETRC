@@ -138,8 +138,17 @@ public:
 
     /**
     * 当关联的窗口被关闭（删除）时，清理掉相关联的Page中的Item指针。
+    * 防止撤销/重做操作出问题。
     */
     void clearGraphics();
+
+    /**
+     * 在TrainItem清除LabelInfo前的保护
+     * LabelInfo有可能已经全部被清楚了；这种情况下，析构的时候不要在那边删除。
+     */
+    inline bool hasLabelInfo()const { return !_belowLabels.isEmpty() || !_overLabels.isEmpty(); }
+
+    bool containsRailway(std::shared_ptr<Railway> rail)const { return _railways.contains(rail); }
 
 };
 

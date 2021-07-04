@@ -44,7 +44,7 @@ void DiagramWidget::autoPaintGraph()
 void DiagramWidget::paintGraph()
 {
     updating = true;
-    scene()->clear();
+    clearGraph();
     _selectedTrain = nullptr;
     emit showNewStatus(QString("正在铺画运行图"));
 
@@ -107,6 +107,12 @@ void DiagramWidget::paintGraph()
     updateDistanceAxis();
     emit showNewStatus(QObject::tr("运行图铺画完毕"));
     updating = false;
+}
+
+void DiagramWidget::clearGraph()
+{
+    _page->clearGraphics();
+    scene()->clear();
 }
 
 bool DiagramWidget::toPdf(const QString& filename, const QString& title)
@@ -355,6 +361,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     double lasty = start_y, cummile = 0.0;
     int cuminterval = 0;
     bool cumvalid = true;
+
 
     //标注区间数据  每个区间标注带上区间【终点】的界限
     for (auto p = rail->firstDownInterval(); p; p = rail->nextIntervalCirc(p)) {

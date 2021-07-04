@@ -52,7 +52,7 @@ public:
 
     inline std::shared_ptr<_Node> nextNodeCirc(){
         auto t=nextNode();
-        if(!t&&_data.different()&&isDownInterval()){
+        if(!t&&isDownInterval()){
             return _data.firstUpNode();
         }else{
             return t;
@@ -61,7 +61,7 @@ public:
 
     inline std::shared_ptr<const _Node> nextNodeCirc()const{
         auto t=nextNode();
-        if(!t&&_data.different()&&isDownInterval()){
+        if(!t&&isDownInterval()){
             return _data.firstUpNode();
         }else{
             return t;

@@ -23,10 +23,14 @@ public:
 
     void setRailway(std::shared_ptr<Railway> rail);
 
+    auto getRailway() { return railway; }
+
 private:
     void initUI();
+   
 
 signals:
+    void stationTableChanged(std::shared_ptr<Railway> railway, bool equiv);
 
 private slots:
     void actApply();

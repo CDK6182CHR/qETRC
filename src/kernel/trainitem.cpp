@@ -196,6 +196,8 @@ TrainItem::~TrainItem() noexcept
 
 void TrainItem::clearLabelInfo()
 {
+    if (!_page.hasLabelInfo())
+        return;
     auto& sl = _page.startingLabels(_line.firstRailStation().get(), _line.dir());
     auto& se = _page.terminalLabels(_line.lastRailStation().get(), _line.dir());
     if (startLabelInfo != sl.end()) {

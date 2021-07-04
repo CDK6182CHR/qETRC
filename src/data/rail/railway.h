@@ -74,10 +74,15 @@ public:
     //copy ctor & copy = 需要时再写
     //注意可能需要深拷贝
     Railway(const Railway& rail) = delete;
-    Railway(Railway&& rail) = default;
+
+    /**
+     * 2021.07.04  警告！！ IntervalData持有Railway的反向引用
+     * 默认的move行为应该是不正确的！！
+     */
+    Railway(Railway&& rail) = delete;
 
     Railway& operator=(const Railway& rail) = delete;
-    Railway& operator=(Railway&& rail) = default;
+    Railway& operator=(Railway&& rail) = delete;
 
     /// <summary>
     /// Line.copyData() 不复制ruler的模式
@@ -97,14 +102,18 @@ public:
     QJsonObject toJson()const;
 
     void appendStation(const StationName& name, double mile,
-                    int level=4,
-                    std::optional<double> counter=std::nullopt,
-                    PassedDirection direction=PassedDirection::BothVia);
+        int level = 4,
+        std::optional<double> counter = std::nullopt,
+        PassedDirection direction = PassedDirection::BothVia,bool show=true,
+        bool passenger = false, bool freight = false
+    );
     void insertStation(int index,
-                    const StationName& name, double mile,
-                    int level=4,
-                    std::optional<double> counter=std::nullopt,
-                    PassedDirection direction=PassedDirection::BothVia);
+        const StationName& name, double mile,
+        int level = 4,
+        std::optional<double> counter = std::nullopt,
+        PassedDirection direction = PassedDirection::BothVia, bool show = true,
+        bool passenger = false, bool freight = false
+    );
 
     /*
      * Line.stationDictByName 的严格模式
@@ -238,6 +247,8 @@ public:
      */
     void clearRulers();
 
+    void clearForbids();
+
     /// <summary>
     /// Line.changeStationNameUpdateMap
     /// 但所做的事情更多一些
@@ -304,6 +315,8 @@ public:
     /// Line.slice()
     /// [start, end) 的切片
     /// 注意  这是浅拷贝
+    /// 
+    /// 注意拷贝行为暂不确定，先不实现这个
     /// </summary>
     Railway slice(int start, int end)const;
 
@@ -336,7 +349,13 @@ public:
      * Line.addEmptyRuler()
      * 最标准的添加标尺方法
      */
-    std::shared_ptr<Ruler> addEmptyRuler(const QString& name,bool different);
+    std::shared_ptr<Ruler> addEmptyRuler(const QString& name, bool different);
+
+    /**
+     * 注意 TOPO等价时才能用！！ 否则UB  不做检查
+     * 从对方ruler中添加一个新的标尺，各个区间数据都完全一致。
+     */
+    std::shared_ptr<Ruler> addRulerFrom(std::shared_ptr<Ruler> r);
 
     /**
      * 替代Ruler的构造函数
@@ -351,6 +370,10 @@ public:
      */
     std::shared_ptr<RailInterval> findInterval(const StationName& from,
                                                const StationName& to);
+
+    std::shared_ptr<const RailInterval> findInterval(const StationName& from,
+        const StationName& to)const;
+
 
     /**
      * 支持域解析符条件下查找区间，不考虑跨区间
@@ -383,6 +406,17 @@ public:
     }
 
     /**
+     * 按照下标设置排图标尺。-1表示无效。
+     * 用在撤销线路信息更改
+     */
+    inline void setOrdinateIndex(int idx) {
+        if (idx >= 0)
+            setOrdinate(_rulers.at(idx));
+    }
+
+    int ordinateIndex()const;
+
+    /**
      * @brief 计算每个站的y坐标
      * 如果是标尺排图，返回标尺排图的高度；如果是里程排图，返回里程对应的高度。
      * 如果标尺不完备，reset。注意同时还要保证所有不铺画的站的yValue无效 （-1）
@@ -405,6 +439,37 @@ public:
     std::shared_ptr<RailInterval> nextIntervalCirc(std::shared_ptr<RailInterval> railint);
 
     inline double totalMile()const { return empty() ? 0.0 : _stations.last()->mile; }
+
+    /**
+     * 本线与指定线路是否是Topo等价的。
+     * Topo等价当且仅当站数一样，且每个站的单向站性质一样，
+     * 此时对线路的任何修改可以理解为修改站名以及修改相应站和区间的数据，
+     * 旧有的区间数据可以得到全盘保留。
+     */
+    bool topoEquivalent(const Railway& another)const;
+
+    bool stationNameExisted(const QString& name)const;
+
+    bool stationNameExisted(const StationName& name)const;
+
+    /**
+     * 合并对方的区间数据到本线，即标尺天窗。
+     * 分为两种情况：如果topo等价，则逐个区间合并；
+     * 否则按区间名检索。皆为线性复杂度。
+     * 返回是否topo等价
+     */
+    bool mergeIntervalData(const Railway& other);
+
+    /**
+     * !!危险操作  想清楚再调用!!
+     * 
+     * 将本线与other的里程数据以及区间数据交换。
+     * 即：交换_stations, _rulers, _forbids。
+     * 同时交换Ruler/Forbid中的Railway引用！！
+     * 此操作后，与列车的绑定数据失效
+     * precondition: 标尺、天窗的数目一致。
+     */
+    void swapBaseWith(Railway& other);
 
 private:
     /**
@@ -504,6 +569,12 @@ private:
      * 如果不存在，就进来一个空的obj，这样也能构造空的Forbid出来
      */
     std::shared_ptr<Forbid> addForbid(const QJsonObject& obj);
+
+    /**
+     * 从已有的Forbid中复制数据。
+     * precondition: 两线路topo等价，否则引发UB
+     */
+    std::shared_ptr<Forbid> addForbidFrom(std::shared_ptr<Forbid> other);
 
     /**
      * @brief calStationYValueByMile  强制按里程计算每个站的坐标。

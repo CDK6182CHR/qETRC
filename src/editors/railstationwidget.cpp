@@ -9,6 +9,8 @@ RailStationWidget::RailStationWidget(QUndoStack* undo, QWidget *parent) :
 {
 	//暂定Model的Parent就是自己！
 	initUI();
+	connect(model, &RailStationModel::stationTableChanged,
+		this, &RailStationWidget::stationTableChanged);
 }
 
 void RailStationWidget::setRailway(std::shared_ptr<Railway> rail)
@@ -39,9 +41,10 @@ void RailStationWidget::initUI()
 
 void RailStationWidget::actCancel()
 {
+	model->actCancel();
 }
 
 void RailStationWidget::actApply()
 {
-
+	model->actApply();
 }

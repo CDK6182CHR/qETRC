@@ -225,18 +225,11 @@ std::shared_ptr<TrainAdapter> Train::bindToRailway(Railway& railway, const Confi
 std::shared_ptr<TrainAdapter> Train::updateBoundRailway(Railway& railway, const Config& config)
 {
     //2021.06.24  基于Adapter新的实现
+    //2021.07.04  TrainLine里面有Adapter的引用。不要move assign，直接删了重来好了
     for (auto p = _adapters.begin(); p != _adapters.end(); ++p) {
         if (&((*p)->railway()) == &railway) {
-            TrainAdapter adp(*this, railway, config);
-            if (!adp.isNull()) {
-                //原位替代原有对象
-                (*p)->operator=(std::move(adp));
-                return *p;
-            }
-            else {
-                _adapters.erase(p);
-                return nullptr;
-            }
+            _adapters.erase(p);
+            break;
         }
     }
     //没找到，则创建

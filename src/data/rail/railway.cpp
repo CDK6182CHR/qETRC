@@ -110,34 +110,25 @@ QJsonObject Railway::toJson() const
 		obj.insert("ordinate", QJsonValue(QJsonValue::Null));
 
 	return obj;
-
-
-	/*
-	todos:
-	info = {
-	"routes":[],
-	"stations":self.stations,
-	"forbid":self.forbid.outInfo(),
-	"forbid2":self.forbid2.outInfo(),
-	"notes":self.notes,
 }
 
-*/
-}
-
-void Railway::appendStation(const StationName& name, double mile, int level, std::optional<double> counter, PassedDirection direction)
+void Railway::appendStation(const StationName& name, double mile, int level, 
+	std::optional<double> counter, PassedDirection direction, bool show,
+	bool passenger, bool freight)
 {
 	auto&& t = std::make_shared<RailStation>(
-		name, mile, level, counter, direction);
+		name, mile, level, counter, direction, show, passenger, freight);
 	_stations.append(t);
 	addMapInfo(t);
 	appendInterval(t);
 }
 
 void Railway::insertStation(int index, const StationName& name, double mile,
-	int level, std::optional<double> counter, PassedDirection direction)
+	int level, std::optional<double> counter, PassedDirection direction, bool show,
+	bool passenger, bool freight)
 {
-	auto&& t = std::make_shared<RailStation>(name, mile, level, counter, direction);
+	auto&& t = std::make_shared<RailStation>(name, mile, level, counter, direction,
+		show, passenger, freight);
 	if (index == -1)
 		_stations.append(t);
 	else
@@ -388,6 +379,15 @@ void Railway::clearRulers()
 	_rulers.clear();
 }
 
+void Railway::clearForbids()
+{
+	//先去清理结点数据，免得Ruler对象被析构引起引用的危险
+	for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
+		p->_forbidNodes.clear();
+	}
+	_forbids.clear();
+}
+
 void Railway::changeStationName(const StationName& oldname,
 	const StationName& newname)
 {
@@ -518,6 +518,7 @@ void Railway::mergeCounter(const Railway& another)
 	}
 }
 
+#if 0
 Railway Railway::slice(int start, int end) const
 {
 	Railway rail;
@@ -529,6 +530,7 @@ Railway Railway::slice(int start, int end) const
 	rail.setMapInfo();
 	return rail;
 }
+#endif
 
 void Railway::jointWith(const Railway& another, bool former, bool reverse)
 {
@@ -601,13 +603,13 @@ void Railway::showIntervals() const
 	auto p = firstDownInterval();
 	for (; p; p = p->nextInterval()) {
 		qDebug() << p->fromStation()->name << "->" << p->toStation()->name << '\t'
-			<< p->mile() << Qt::endl;
+			<< p->mile() << '\t' << p.get() << Qt::endl;
 	}
 	qDebug() << "Up intervals for railway: " << _name << Qt::endl;
 	p = firstUpInterval();
 	for (; p; p = p->nextInterval()) {
 		qDebug() << p->fromStation()->name << "->" << p->toStation()->name << '\t'
-			<< p->mile() << Qt::endl;
+			<< p->mile() << '\t' << p.get() << Qt::endl;
 	}
 }
 
@@ -626,6 +628,23 @@ std::shared_ptr<Ruler> Railway::addEmptyRuler(const QString& name, bool differen
         p->_rulerNodes.append(std::make_shared<RulerNode>(*r, *p));
 	}
 	return r;
+}
+
+std::shared_ptr<Ruler> Railway::addRulerFrom(std::shared_ptr<Ruler> r)
+{
+	int idx = _rulers.count();
+	auto ruler = std::shared_ptr<Ruler>(new Ruler(*this, r->name(), r->different(), idx));
+	_rulers.append(ruler);
+	auto p = firstDownInterval();
+	auto n = r->firstDownNode();
+	for (; p && n; p = nextIntervalCirc(p), n = n->nextNodeCirc()) {
+		//qDebug() << "addRulerFrom: "<<*p<<'\t' << p->_rulerNodes.last().get() << " @ " << p.get();
+		p->_rulerNodes.append(std::make_shared<RulerNode>(*ruler, *p, n->interval, n->start, n->stop));
+	}
+	if (p || n) {
+		qDebug() << "Railway::addRulerFrom: unexpected early termination!";
+	}
+	return ruler;
 }
 
 std::shared_ptr<Ruler> Railway::addRuler(const QJsonObject& obj)
@@ -659,6 +678,17 @@ std::shared_ptr<RailInterval> Railway::findInterval(const StationName& from, con
 	else if (t && t->hasUpAdjacent() && t->upAdjacent()->name == to)
 		return t->upNext;
 	return std::shared_ptr<RailInterval>();
+}
+
+std::shared_ptr<const RailInterval> Railway::findInterval(const StationName& from,
+	const StationName& to) const
+{
+	auto t = stationByName(from);
+	if (t && t->hasDownAdjacent() && t->downAdjacent()->name == to)
+		return t->downNext;
+	else if (t && t->hasUpAdjacent() && t->upAdjacent()->name == to)
+		return t->upNext;
+	return nullptr;
 }
 
 std::shared_ptr<RailInterval> Railway::findGeneralInterval(const StationName& from, const StationName& to)
@@ -729,12 +759,17 @@ QList<std::shared_ptr<RailInterval>>
 	}
 }
 
+int Railway::ordinateIndex() const
+{
+	return _ordinate ? _ordinate->index() : -1;
+}
+
 double Railway::calStationYValue(const Config& config)
 {
+	clearYValues();
 	if(!ordinate())
 		return calStationYValueByMile(config);
 	//标尺排图
-	clearYValues();
 	auto ruler = ordinate();
 	double y = 0;
 	auto p = ruler->firstDownNode();
@@ -774,6 +809,90 @@ double Railway::calStationYValue(const Config& config)
 		}
 	}
 	return _diagramHeight;
+}
+
+bool Railway::topoEquivalent(const Railway& another) const
+{
+	if (stationCount() != another.stationCount())
+		return false;
+	for (auto p = _stations.begin(), q = another.stations().begin();
+		p != _stations.end() && q != another.stations().end(); ++p, ++q) {
+		if ((*p)->direction != (*q)->direction)
+			return false;
+	}
+	return true;
+}
+
+bool Railway::stationNameExisted(const QString& name) const
+{
+	return nameMap.contains(StationName::fromSingleLiteral(name));
+}
+
+bool Railway::stationNameExisted(const StationName& name) const
+{
+	return nameMap.contains(name);
+}
+
+bool Railway::mergeIntervalData(const Railway& other)
+{
+	bool equiv = topoEquivalent(other);
+	//首先按照对方的，添加标尺和天窗
+	clearRulers();
+	clearForbids();
+
+	if (equiv) {
+		for (auto r : other._rulers)
+			addRulerFrom(r);
+		for (auto f : other._forbids)
+			addForbidFrom(f);
+	}
+	else {
+		//非equiv，只能逐个区间检索。先搞空的
+		for (auto r : other._rulers) {
+			addEmptyRuler(r->name(), r->different());
+		}
+		for (auto f : other._forbids) {
+			addEmptyForbid(f->different());
+		}
+		for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
+			auto it = other.findInterval(p->fromStation()->name, p->toStation()->name);
+			if (it) {
+				//!! 不能直接赋值或者std::copy，这是对shared_ptr的操作！！
+				for (int i = 0; i < p->_rulerNodes.count(); i++) {
+					p->_rulerNodes[i]->operator=(*(it->_rulerNodes[i]));   //注意这里只assign了数据
+				}
+				for (int i = 0; i < p->_forbidNodes.count(); i++) {
+					p->_forbidNodes[i]->operator = (*(it->_forbidNodes[i]));
+				}
+				//std::copy(it->_rulerNodes.begin(), it->_rulerNodes.end(), p->_rulerNodes.begin());
+				//std::copy(it->_forbidNodes.begin(), it->_forbidNodes.end(), p->_forbidNodes.begin());
+			}
+		}
+	}
+	return equiv;
+}
+
+void Railway::swapBaseWith(Railway& other)
+{
+	std::swap(_stations, other._stations);   //浅拷贝（移动）
+	std::swap(_rulers, other._rulers);
+	std::swap(_forbids, other._forbids);
+	for (int i = 0; i < _rulers.count(); i++) {
+		std::swap(_rulers[i]->_railway, other._rulers[i]->_railway);
+	}
+	for (int i = 0; i < _forbids.count(); i++) {
+		std::swap(_forbids[i]->_railway, other._forbids[i]->_railway);
+	}
+	//ordinate
+	if (_ordinate) {
+		_ordinate = _rulers.at(_ordinate->index());
+		assert(&(_ordinate->_railway.get()) == this);
+	}
+		
+	if (!_rulers.empty()) {
+		assert(&(_rulers.first()->_railway.get()) == this);
+		qDebug() << "Assertion of ruler railway passed.";
+	}
 }
 
 void Railway::addMapInfo(const std::shared_ptr<RailStation>& st)
@@ -1060,6 +1179,19 @@ std::shared_ptr<RailInterval> Railway::nextIntervalCirc(std::shared_ptr<RailInte
     return t;
 }
 
+std::shared_ptr<Forbid> Railway::addForbidFrom(std::shared_ptr<Forbid> other)
+{
+	int idx = _forbids.count();
+	auto forbid = std::shared_ptr<Forbid>(new Forbid(*this, other->different(), idx));
+	_forbids.append(forbid);
+	auto p = firstDownInterval();
+	auto n = other->firstDownNode();
+	for (; p && n; p = nextIntervalCirc(p), n = n->nextNodeCirc()) {
+		p->_forbidNodes.append(std::make_shared<ForbidNode>(*forbid, *p, n->beginTime, n->endTime));
+	}
+	return forbid;
+}
+
 double Railway::calStationYValueByMile(const Config& config)
 {
 	for (auto& p : _stations) {
@@ -1075,6 +1207,7 @@ void Railway::clearYValues()
 	for (auto& p : _stations) {
 		p->y_value = std::nullopt;
 	}
+	_diagramHeight = -1;
 }
 
 

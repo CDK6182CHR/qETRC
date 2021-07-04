@@ -1,6 +1,4 @@
-﻿/*
- * 新增针对线路区间的抽象
- */
+﻿
 #pragma once
 #include <memory>
 #include <QList>
@@ -14,6 +12,9 @@ class RulerNode;
 class ForbidNode;
 class Ruler;
 
+/**
+ * 新增针对线路区间的抽象
+ */
 class RailInterval:
 	std::enable_shared_from_this<RailInterval>
 {

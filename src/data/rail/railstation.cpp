@@ -2,14 +2,16 @@
 #include "data/common/stationname.h"
 #include <QDebug>
 
-RailStation::RailStation(const StationName &name_,
-                         double mile_,
-                         int level_,
-                         std::optional<double> counter_,
-                         PassedDirection direction_):
-    name(name_),mile(mile_),level(level_),counter(counter_),
-    y_value(-1),direction(direction_),
-    _show(true),passenger(true),freight(true),
+RailStation::RailStation(const StationName& name_,
+    double mile_,
+    int level_,
+    std::optional<double> counter_,
+    PassedDirection direction_,
+    bool show_,
+    bool passenger_, bool freight_) :
+    name(name_), mile(mile_), level(level_), counter(counter_),
+    y_value(-1), direction(direction_),
+    _show(show_), passenger(passenger_), freight(freight_),
     tracks()
 {
 }

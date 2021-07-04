@@ -12,6 +12,7 @@ NaviTree::NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget *parent):
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
         this, SLOT(showContextMenu(const QPoint&)));
+    connect(this, &QAbstractItemView::doubleClicked, this, &NaviTree::onDoubleClicked);
     initContextMenus();
     setModel(_model);
     expandAll();
@@ -65,6 +66,16 @@ void NaviTree::importRailways()
     _undo->push(new qecmd::ImportRailways(_model, rails));
 }
 
+void NaviTree::onDoubleClicked(const QModelIndex& index)
+{
+    ACI* item = getItem(index);
+    if (!item)return;
+    switch (item->type()) {
+    case navi::RailwayItem::Type:
+        emit editRailway(static_cast<navi::RailwayItem*>(item)->railway()); break;
+    }
+}
+
 void NaviTree::currentChanged(const QModelIndex& cur, const QModelIndex& prev)
 {
     ACI* ipre = getItem(prev), *icur = getItem(cur);
@@ -74,6 +85,7 @@ void NaviTree::currentChanged(const QModelIndex& cur, const QModelIndex& prev)
         switch (ipre->type()) {
         case navi::PageItem::Type:emit focusOutPage(); break;
         case navi::TrainModelItem::Type:emit focusOutTrain(); break;
+        case navi::RailwayItem::Type:emit focusOutRailway(); break;
         }
     }
 
@@ -83,6 +95,8 @@ void NaviTree::currentChanged(const QModelIndex& cur, const QModelIndex& prev)
         case navi::PageItem::Type:emit focusInPage(static_cast<navi::PageItem*>(icur)->page()); break;
         case navi::TrainModelItem::Type:
             emit focusInTrain(static_cast<navi::TrainModelItem*>(icur)->train()); break;
+        case navi::RailwayItem::Type:
+            emit focusInRailway(static_cast<navi::RailwayItem*>(icur)->railway()); break;
         }
     }
 }

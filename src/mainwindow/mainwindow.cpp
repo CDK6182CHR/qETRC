@@ -99,6 +99,22 @@ void MainWindow::redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains)
     informTrainListChanged();
 }
 
+void MainWindow::onStationTableChanged(std::shared_ptr<Railway> rail, bool equiv)
+{
+    _diagram.updateRailway(rail);
+    updateRailwayDiagrams(rail);
+}
+
+void MainWindow::updateRailwayDiagrams(std::shared_ptr<Railway> rail)
+{
+    for (int i = 0; i < _diagram.pages().size(); i++) {
+        if (_diagram.pages().at(i)->containsRailway(rail)) {
+            diagramWidgets.at(i)->paintGraph();
+        }
+    }
+}
+
+
 void MainWindow::undoAddPage(std::shared_ptr<DiagramPage> page)
 {
     auto dock = diagramDocks.takeLast();
@@ -131,6 +147,9 @@ void MainWindow::initDockWidgets()
         connect(tree, &NaviTree::focusOutPage, this, &MainWindow::focusOutPage);
         connect(tree, &NaviTree::focusInTrain, this, &MainWindow::focusInTrain);
         connect(tree, &NaviTree::focusOutTrain, this, &MainWindow::focusOutTrain);
+        connect(tree, &NaviTree::focusInRailway, this, &MainWindow::focusInRailway);
+        connect(tree, &NaviTree::focusOutRailway, this, &MainWindow::focusOutRailway);
+        connect(tree, &NaviTree::editRailway, this, &MainWindow::actOpenRailStationWidget);
     }
     
     //列车管理
@@ -156,7 +175,7 @@ void MainWindow::initDockWidgets()
 void MainWindow::initToolbar()
 {
     SARibbonBar* ribbon = ribbonBar();
-    //ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
+    ribbon->setRibbonStyle(SARibbonBar::OfficeStyle);
     ribbon->applicationButton()->setText(QStringLiteral("文件"));
 
     //顶上的工具条
@@ -199,18 +218,21 @@ void MainWindow::initToolbar()
         act = naviDock->toggleViewAction();
         act->setText(QObject::tr("导航"));
         act->setIcon(QIcon(":/icons/Graph-add.png"));
-        panel->addLargeAction(act);
+        auto* btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
 
         act = trainListDock->toggleViewAction();
         act->setText(tr("列车管理"));
         act->setIcon(QIcon(":/icons/list.png"));
-        panel->addLargeAction(act);
+        btn=panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
 
         SARibbonMenu* menu = new SARibbonMenu(this);
         pageMenu = menu;
         menu->setTitle(QObject::tr("运行图窗口"));
         menu->setIcon(QIcon(":/icons/diagram.png"));
-        panel->addLargeMenu(menu);
+        btn=panel->addLargeMenu(menu);
+        btn->setMinimumWidth(80);
 
         //undo  试一下把dock也放在这里初始化...
         QUndoView* view = new QUndoView(undoStack);
@@ -218,12 +240,35 @@ void MainWindow::initToolbar()
         dock->setWidget(view);
         auto* a=manager->addDockWidgetTab(ads::CenterDockWidgetArea,dock);
         
-
         act = dock->toggleViewAction();
         act->setText(tr("历史记录"));
         act->setIcon(QIcon(":/icons/clock.png"));
-        panel->addLargeAction(act);
+        btn=panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
 
+        act = new QAction(QIcon(":/icons/add.png"), tr("添加运行图"), this);
+        connect(act, SIGNAL(triggered()), naviView, SLOT(addNewPage()));
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
+
+    }
+
+    //线路
+    if constexpr (true) {
+        auto* cat = ribbon->addCategoryPage(tr("线路"));
+        auto* panel = cat->addPannel(tr("基础数据"));
+
+        auto* act = new QAction(QIcon(":/icons/add.png"), tr("导入线路"), this);
+        connect(act, SIGNAL(triggered()), naviView, SLOT(importRailways()));
+        auto* btn=panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
+
+        auto* menu = new SARibbonMenu(this);
+        railMenu = menu;
+        menu->setTitle(tr("线路编辑"));
+        menu->setIcon(QIcon(":/icons/rail.png"));
+        btn = panel->addLargeMenu(menu);
+        btn->setMinimumWidth(80);
     }
 
     //context: page
@@ -242,8 +287,11 @@ void MainWindow::initToolbar()
 
     //context: train
     if constexpr (true) {
-        auto* cat = ribbon->addContextCategory(tr("列车"));
+        auto* cat = ribbon->addContextCategory(tr("当前列车"));
         contextTrain = new TrainContext(_diagram, cat, this);
+
+        cat = ribbon->addContextCategory(tr("当前线路"));
+        contextRail = new RailContext(_diagram, cat, this, this);
     }
 }
 
@@ -296,18 +344,6 @@ void MainWindow::endResetGraph()
     //导航窗口
     naviModel->resetModel();
     trainListWidget->refreshData();
-
-
-    //测试!!!!
-    if constexpr (true) {
-        //线路里程编辑：暂时直接上
-        auto* w = new RailStationWidget(undoStack);
-        auto* dock = new ads::CDockWidget(tr("基线编辑"));
-        dock->setWidget(w);
-        w->setRailway(_diagram.railwayAt(0));
-
-        manager->addDockWidgetFloating(dock);
-    }
 }
 
 void MainWindow::resetDiagramPages()
@@ -390,6 +426,29 @@ void MainWindow::trainSorted(const QList<std::shared_ptr<Train>>& oldList,
     trainsReordered();
 }
 
+void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
+{
+    for (auto p : railStationWidgets) {
+        if (p->getRailway() == rail) {
+            p->setVisible(true);
+            return;
+        }
+    }
+    //创建
+    auto* w = new RailStationWidget(undoStack);
+    auto* dock = new ads::CDockWidget(tr("基线编辑-%1").arg(rail->name()));
+    auto* act = dock->toggleViewAction();
+    railMenu->addAction(act);
+    dock->setWidget(w);
+    w->setRailway(rail);
+    connect(w, &RailStationWidget::stationTableChanged,
+        this, &MainWindow::onStationTableChanged);
+    railStationWidgets.append(w);
+    railStationDocks.append(dock);
+
+    manager->addDockWidgetFloating(dock);
+}
+
 void MainWindow::actOpenGraph()
 {
     //todo: 询问保存
@@ -427,7 +486,7 @@ void MainWindow::actSaveGraphAs()
 void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)
 {
     DiagramWidget* dw = new DiagramWidget(_diagram, page);
-    auto* dock = new ads::CDockWidget(page->name());
+    auto* dock = new ads::CDockWidget(tr("运行图-%1").arg(page->name()));
     dock->setWidget(dw);
     manager->addDockWidget(ads::RightDockWidgetArea, dock);
     QAction* act = dock->toggleViewAction();
@@ -477,6 +536,17 @@ void MainWindow::focusInTrain(std::shared_ptr<Train> train)
 void MainWindow::focusOutTrain()
 {
     ribbonBar()->hideContextCategory(contextTrain->context());
+}
+
+void MainWindow::focusInRailway(std::shared_ptr<Railway> rail)
+{
+    ribbonBar()->showContextCategory(contextRail->context());
+    contextRail->setRailway(rail);
+}
+
+void MainWindow::focusOutRailway()
+{
+    ribbonBar()->hideContextCategory(contextRail->context());
 }
 
 void MainWindow::trainsRemoved(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes,

@@ -1,5 +1,6 @@
 ﻿#include "utilfunc.h"
 #include <QList>
+#include <QMessageBox>
 
 
 
@@ -29,5 +30,4 @@ QTime qeutil::parseTime(const QString& tm)
 		return QTime(sub[0], sub[1], sub[2]);
 	return QTime();
 }
-
 

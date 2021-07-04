@@ -1,11 +1,4 @@
-﻿/*
- * 与标尺有关的数据结构，以及标尺封装（代理）类
- * 与pyETRC不同，Ruler类并不包含真正的数据，更像一个View
- * 尽量去实现旧有的API
- * 新增index，要求必须等于在QList中的坐标，采用这个去定位
- */
-#ifndef RULER_H
-#define RULER_H
+﻿#pragma once
 
 #include <QString>
 #include <QJsonObject>
@@ -17,6 +10,12 @@
 
 class Railway;
 
+/**
+ * 与标尺有关的数据结构，以及标尺封装（代理）类
+ * 与pyETRC不同，Ruler类并不包含真正的数据，更像一个View
+ * 尽量去实现旧有的API
+ * 新增index，要求必须等于在QList中的坐标，采用这个去定位
+ */
 class Ruler:
         public RailIntervalData<RulerNode, Ruler>
 {
@@ -51,4 +50,3 @@ public:
 
 };
 
-#endif // RULER_H

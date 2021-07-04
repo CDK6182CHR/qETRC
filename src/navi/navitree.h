@@ -38,12 +38,19 @@ signals:
     void focusOutPage();
     void focusInTrain(std::shared_ptr<Train> train);
     void focusOutTrain();
+    void focusInRailway(std::shared_ptr<Railway>);
+    void editRailway(std::shared_ptr<Railway>);
+    void focusOutRailway();
     void railwayListChanged();   //只是通知主窗口更新数据  其实都不见得有必要
 
 private slots:
     void showContextMenu(const QPoint& pos);
-    void addNewPage();
+    
+    void onDoubleClicked(const QModelIndex& index);
+
+public slots:
     void importRailways();
+    void addNewPage();
     
 };
 

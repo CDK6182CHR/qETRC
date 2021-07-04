@@ -3,6 +3,8 @@
 #include <QTime>
 #include <QString>
 
+class QWidget;
+
 namespace qeutil{
 
 /**

@@ -12,6 +12,7 @@
 #include "kernel/diagramwidget.h"
 #include "model/diagram/diagramnavimodel.h"
 #include "editors/trainlistwidget.h"
+#include "editors/railstationwidget.h"
 #include "navi/navitree.h"
 
 //for SARibbon
@@ -22,6 +23,7 @@
 #include "DockManager.h"
 
 #include "traincontext.h"
+#include "railcontext.h"
 
 /**
  * @brief The MainWindow class
@@ -36,14 +38,17 @@ class MainWindow : public SARibbonMainWindow
     //窗口，Model的指针
     DiagramNaviModel* naviModel;
     NaviTree* naviView;
-    SARibbonMenu* pageMenu;
+    SARibbonMenu* pageMenu, * railMenu;
     QList<ads::CDockWidget*> diagramDocks;
     QList<DiagramWidget*> diagramWidgets;
     ads::CDockWidget* naviDock, * trainListDock;
     TrainListWidget* trainListWidget;
+    QList<RailStationWidget*> railStationWidgets;
+    QList<ads::CDockWidget*> railStationDocks;
 
     SARibbonContextCategory* contextPage;
     TrainContext* contextTrain;
+    RailContext* contextRail;
 
     bool changed = false;
 
@@ -150,9 +155,22 @@ private slots:
     void focusOutPage();
     void focusInTrain(std::shared_ptr<Train> train);
     void focusOutTrain();
+    void focusInRailway(std::shared_ptr<Railway> rail);
+    void focusOutRailway();
 
     void undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains);
     void redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains);
+
+    /**
+     * 线路站表变化时调用这里。
+     * 目前的主要任务是重新铺画有关运行图。
+     */
+    void onStationTableChanged(std::shared_ptr<Railway> rail, bool equiv);
+
+    /**
+     * 更新所有包含指定线路的运行图。
+     */
+    void updateRailwayDiagrams(std::shared_ptr<Railway> rail);
     
 
 public slots:
@@ -172,9 +190,13 @@ public slots:
 
     void informPageListChanged();
 
-    //列车排序。注意不支持撤销！
     void trainsReordered();
 
     void trainSorted(const QList<std::shared_ptr<Train>>& oldList, TrainListModel* model);
+
+    /**
+     * 打开（或创建）指定线路的编辑面板
+     */
+    void actOpenRailStationWidget(std::shared_ptr<Railway> rail);
 };
 

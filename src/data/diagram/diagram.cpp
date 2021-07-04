@@ -24,9 +24,10 @@ void SystemJson::saveFile()
 
 void SystemJson::addHistoryFile(const QString& name)
 {
+    history.removeAll(name);
     if (history.size() >= history_count)
-        history.pop_front();
-    history.push_back(name);
+        history.pop_back();
+    history.push_front(name);
     last_file = name;
 }
 

@@ -78,11 +78,12 @@ public:
     bool passenger,freight;
     QList<QString> tracks;
     RailStation(const StationName& name_,
-                double mile_,
-                int level_=4,
-                std::optional<double> counter_=std::nullopt,
-                PassedDirection direction_=PassedDirection::BothVia
-                );
+        double mile_,
+        int level_ = 4,
+        std::optional<double> counter_ = std::nullopt,
+        PassedDirection direction_ = PassedDirection::BothVia, bool show = true,
+        bool passenger = false, bool freight = false
+    );
     RailStation(const QJsonObject& obj);
 
     /// <summary>

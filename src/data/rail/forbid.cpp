@@ -37,8 +37,10 @@ void Forbid::_show() const
     }
 }
 
-ForbidNode::ForbidNode(Forbid& forbid, RailInterval& railint) :
-    RailIntervalNode<ForbidNode, Forbid>(forbid, railint)
+ForbidNode::ForbidNode(Forbid& forbid, RailInterval& railint, const QTime& beginTime_ ,
+    const QTime& endTime_) :
+    RailIntervalNode<ForbidNode, Forbid>(forbid, railint),beginTime(beginTime_),
+    endTime(endTime_)
 {
 
 }
@@ -57,6 +59,13 @@ QJsonObject ForbidNode::toJson() const
         {"begin",beginTime.toString("hh:mm")},
         {"end",endTime.toString("hh:mm")}
         });
+}
+
+ForbidNode& ForbidNode::operator=(const ForbidNode& other)
+{
+    beginTime = other.beginTime;
+    endTime = other.endTime;
+    return *this;
 }
 
 int ForbidNode::durationSec() const

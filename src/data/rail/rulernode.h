@@ -21,7 +21,12 @@ public:
     //需要时实现
     RulerNode(const RulerNode&)=delete;
     RulerNode(RulerNode&&)=default;
-    RulerNode& operator=(const RulerNode&)=delete;
+
+    /**
+     * 实现添加对方线路标尺（mergeIntervalData）时调用
+     * 注意只复制了数据，没包含引用
+     */
+    RulerNode& operator=(const RulerNode& other);
     RulerNode& operator=(RulerNode&&)=delete;
 
     void fromJson(const QJsonObject& obj);
