@@ -92,9 +92,10 @@ public:
 
     /**
      * 2021.07.04 准备实现  导入交路时使用
+     * 在不同的交路间拷贝。注意这个时候原则上应该全都是虚拟车次。
      * 相当于原来的coverBaseData
      */
-    Routing& operator=(Routing&&)noexcept;
+    Routing& operator=(Routing&& other)noexcept;
 
     /**
      * 接受pyETRC格式的circuits数组元素
@@ -157,10 +158,17 @@ public:
 
     /**
      * 替换列车。使用newTrain将结点中的oldTrain替换掉。
-     * 其中oldTrain逻辑上是xvalue，此操作同时清除其中对circuit的引用。
+     * 其中oldTrain逻辑上是xvalue，此操作同时清除其中对routing的引用。
      * 同时将本交路引用交给newTrain.
      * 已知oldTrain本来是属于本交路的。
      */
     void replaceTrain(std::shared_ptr<Train> oldTrain, std::shared_ptr<Train> newTrain);
+
+    /**
+     * 将node所示位置的列车设置为train。
+     * 如果node以前存在列车，将其释放掉。
+     * 此操作由ImportTrain调用。不放在Train或者Node里面，是因为shared_from_this总是出错
+     */
+    void setNodeTrain(std::shared_ptr<Train> train, std::list<RoutingNode>::iterator node);
 };
 

@@ -60,7 +60,10 @@ void ImportTrainDialog::initUI()
 
 void ImportTrainDialog::actView()
 {
-	QString filename = QFileDialog::getOpenFileName(this, tr("导入车次"), {}, qeutil::fileFilter);
+	QString filename = QFileDialog::getOpenFileName(this, tr("导入车次"), {}, 
+        QObject::tr("pyETRC车次数据库文件(*.pyetdb; *.json);\n"
+            "pyETRC运行图文件(*.pyetgr; *.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)")
+    );
 	if (filename.isEmpty())
 		return;
 	bool flag=other.fromJson(filename, diagram.trainCollection().typeManager());
@@ -106,6 +109,10 @@ void ImportTrainDialog::actApply()
             coll.removeTrain(oldTrain);
             coll.appendTrain(train);
         }
+        else {
+            //清理交路信息
+            train->resetRouting();
+        }
     }
 
     //下面导入交路
@@ -125,14 +132,15 @@ void ImportTrainDialog::actApply()
                     continue;   //继续虚拟
                 if (!t->hasRouting()) {
                     //原来没有交路，放心添加就好
-                    t->setRouting(newRouting, p);  //这里附带了所有操作
+                    newRouting->setNodeTrain(t, p);
                 }
                 else if (coverRouting) {
                     //且以新图中交路为准，则把老交路中这个节点设置为虚拟
                     //注意pyETRC中是删除，这里改了一下
                     //其实直接执行Train的reset就好
                     t->resetRouting();
-                    t->setRouting(newRouting, p);
+                    newRouting->setNodeTrain(t, p);
+                    //t->setRouting(newRouting, p);
                 }
             }
             if (newRouting->anyValidTrains()) {

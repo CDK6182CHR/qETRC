@@ -109,10 +109,20 @@ void TrainCollection::clear(const TypeManager& defaultManager)
 	_manager = defaultManager;
 }
 
+void TrainCollection::clearTrains()
+{
+	//这样操作是为了保证交路正确
+	while (!_trains.empty())
+		removeTrainAt(0);
+}
+
 std::shared_ptr<Train> TrainCollection::takeTrainAt(int i)
 {
 	auto t = _trains.takeAt(i);
 	removeMapInfo(t);
+	if (t->hasRouting()) {
+		t->routingNode().value()->makeVirtual();
+	}
 	return t;
 }
 
@@ -127,9 +137,12 @@ void TrainCollection::removeTrainAt(int i)
 	}
 }
 
-void TrainCollection::insertTrain(int i, std::shared_ptr<Train> train)
+void TrainCollection::insertTrainForUndo(int i, std::shared_ptr<Train> train)
 {
 	_trains.insert(i, train);
+	if (train->hasRouting()) {
+		train->routingNode().value()->setTrain(train);
+	}
 	addMapInfo(train);
 }
 
@@ -139,9 +152,27 @@ void TrainCollection::removeUnboundTrains()
 	for (int i = _trains.size() - 1; i >= 0; i--) {
 		auto t = _trains.at(i);
 		if (t->adapters().empty()) {
-			//删除
-			_trains.removeAt(i);
+			//删除  调用函数来正确处理交路
+			removeTrainAt(i);
 		}
+	}
+}
+
+bool TrainCollection::routingNameExisted(const QString& name) const
+{
+	for (auto p : _routings)
+		if (p->name() == name)
+			return true;
+	return false;
+}
+
+QString TrainCollection::validRoutingName(const QString& prefix)
+{
+	for (int i = 0;; i++) {
+		QString res = prefix;
+		if (i)res += "_" + QString::number(i);
+		if (!routingNameExisted(res))
+			return res;
 	}
 }
 

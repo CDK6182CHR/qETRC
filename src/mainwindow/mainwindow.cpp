@@ -114,6 +114,34 @@ void MainWindow::updateRailwayDiagrams(std::shared_ptr<Railway> rail)
     }
 }
 
+void MainWindow::updateAllDiagrams()
+{
+    for (auto p : diagramWidgets)
+        p->paintGraph();
+}
+
+void MainWindow::onTrainsImported()
+{
+    updateAllDiagrams();
+    informTrainListChanged();
+    //手动更新TrainList
+    trainListWidget->refreshData();
+    undoStack->clear();  //不支持撤销
+    markChanged();
+}
+
+void MainWindow::removeAllTrains()
+{
+    auto flag = QMessageBox::question(this, tr("警告"),
+        tr("此操作删除所有车次，且不可撤销，是否继续？\n"
+            "此操作通常用于导入新的车次之前。"));
+    if (flag != QMessageBox::Yes)
+        return;
+    
+    _diagram.trainCollection().clearTrains();
+    onTrainsImported();   //后操作是一样的
+}
+
 
 void MainWindow::undoAddPage(std::shared_ptr<DiagramPage> page)
 {
@@ -150,6 +178,7 @@ void MainWindow::initDockWidgets()
         connect(tree, &NaviTree::focusInRailway, this, &MainWindow::focusInRailway);
         connect(tree, &NaviTree::focusOutRailway, this, &MainWindow::focusOutRailway);
         connect(tree, &NaviTree::editRailway, this, &MainWindow::actOpenRailStationWidget);
+        connect(tree, &NaviTree::trainsImported, this, &MainWindow::onTrainsImported);
     }
     
     //列车管理
@@ -269,6 +298,29 @@ void MainWindow::initToolbar()
         menu->setIcon(QIcon(":/icons/rail.png"));
         btn = panel->addLargeMenu(menu);
         btn->setMinimumWidth(80);
+    }
+
+    //列车
+    if constexpr (true) {
+        auto* cat = ribbon->addCategoryPage(tr("列车"));
+        auto* panel = cat->addPannel(tr("车次管理"));
+        
+        auto* act = new QAction(QIcon(":/icons/list.png"), tr("列车管理"), this);
+        auto* menu = new QMenu(tr("列车管理扩展"), this);
+        
+        auto* actsub = new QAction(tr("删除所有车次"), this);
+        connect(actsub, SIGNAL(triggered()), this, SLOT(removeAllTrains()));
+        menu->addAction(actsub);
+        
+        act->setMenu(menu);
+        auto* btn=panel->addLargeAction(act);
+        btn->setMinimumWidth(70);
+
+        act = new QAction(QIcon(":/icons/add_train.png"), tr("导入车次"), this);
+        act->setShortcut(Qt::CTRL + Qt::Key_D);
+        connect(act, SIGNAL(triggered()), naviView, SLOT(importTrains()));
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(70);
     }
 
     //context: page

@@ -52,7 +52,7 @@ void Train::fromJson(const QJsonObject &obj, TypeManager& manager)
     setType(obj.value("type").toString(), manager);
     _starting=StationName::fromSingleLiteral( obj.value("sfz").toString());
     _terminal=StationName::fromSingleLiteral(obj.value("zdz").toString());
-    _show=obj.value("shown").toBool();
+    _show=obj.value("shown").toBool(true);
     const auto& valpass = obj.value("passenger");
     if(valpass.isBool())
         _passenger = static_cast<TrainPassenger>(obj.value("passenger").toBool());
@@ -499,9 +499,10 @@ void Train::intervalExchange(Train& train2, StationPtr start1, StationPtr end1,
 
 void Train::setRouting(std::weak_ptr<Routing> rout, std::list<RoutingNode>::iterator node)
 {
+    resetRouting();   //设置之前清理掉旧的
     _routing = rout;
     _routingNode = node;
-    node->setTrain(shared_from_this());
+    //这里如果用shared_from_this会出错，不知道为什么
 }
 
 void Train::resetRouting()

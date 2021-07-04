@@ -114,10 +114,16 @@ public:
     void clear(const TypeManager& defaultManager);
 
     /**
+     * 仅删除所有车次，不管其他的
+     */
+    void clearTrains();
+
+    /**
      * 给TrainListWidget提供的删除API
      * 删除和返回指定列车的指针  注意更新映射表
      * 
-     * 注意 交路信息！！
+     * 关于交路：这里做的是可撤销删除。原则上被“拿掉”的列车对象已经不再需要了，
+     * 因此这边的数据不用删掉，方便撤销的时候恢复。但是必须把交路数据设为virtual。
      */
     std::shared_ptr<Train> takeTrainAt(int i);
 
@@ -129,8 +135,10 @@ public:
 
     /**
      * 按照index插入车次 用于撤销删除车次
+     * ！！注意特殊操作：恢复交路信息。如果存在交路信息，则使得指向的结点恢复non-virtual状态
+     * seealso: takeTrainAt
      */
-    void insertTrain(int i, std::shared_ptr<Train> train);
+    void insertTrainForUndo(int i, std::shared_ptr<Train> train);
 
     /**
      * 删除所有没有绑定到线路的车次。
@@ -141,7 +149,7 @@ public:
 
     inline bool isNull()const { return _trains.isEmpty(); }
 
-    bool routingNameExisted()const;
+    bool routingNameExisted(const QString& name)const;
 
     QString validRoutingName(const QString& prefix);
 

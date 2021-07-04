@@ -12,10 +12,6 @@ bool RoutingNode::isVirtual() const
     return _virtual;
 }
 
-void RoutingNode::setVirtual(bool virtual_)
-{
-    _virtual = virtual_;
-}
 
 bool RoutingNode::link() const
 {
@@ -85,6 +81,23 @@ const QString &RoutingNode::name() const
 Routing::Routing(TrainCollection& coll):
     _coll(coll)
 {
+}
+
+Routing& Routing::operator=(Routing&& other) noexcept
+{
+    _order = std::move(other._order);
+    _name = std::move(other._name);
+    _note = std::move(other._note);
+    _model = std::move(other._model);
+    _owner = std::move(other._owner);
+    //安全起见，检查一下
+    for (auto p =_order.begin();p!=_order.end();++p) {
+        if (!p->isVirtual()) {
+            qDebug() << "Routing::operator=: WARNING: Unexpected non-virtual node: "
+                << p->name() << " in " << _name << Qt::endl;
+        }
+    }
+    return *this;
 }
 
 void Routing::fromJson(const QJsonObject& obj)
@@ -215,4 +228,32 @@ RoutingNode* Routing::postLinked(const Train& train)
 void Routing::print() const
 {
     qDebug() << "Routing [" << name() << "]: " << orderString() << Qt::endl;
+}
+
+bool Routing::anyValidTrains() const
+{
+    for (auto p = _order.begin(); p != _order.end(); ++p) {
+        if (!p->isVirtual())
+            return true;
+    }
+    return false;
+}
+
+void Routing::replaceTrain(std::shared_ptr<Train> oldTrain, std::shared_ptr<Train> newTrain)
+{
+    if (!oldTrain->hasRouting() || oldTrain->routing().lock().get() != this) {
+        qDebug() << "Routing::replaceTrain: WARNING: Invalid call: routing not complicatable. "
+            << Qt::endl;
+        return;
+    }
+    auto t = oldTrain->routingNode().value();
+    oldTrain->resetRouting();
+    t->setTrain(newTrain);
+    newTrain->setRouting(shared_from_this(), t);  //包含了setRouting操作
+}
+
+void Routing::setNodeTrain(std::shared_ptr<Train> train, std::list<RoutingNode>::iterator node)
+{
+    node->setTrain(train);
+    train->setRouting(shared_from_this(), node);
 }

@@ -290,8 +290,7 @@ public:
 
     /**
      * 设置交路，同时设定Node指针（迭代器）
-     * 由Routing调用  
-     * 如果iterator没有设置好本次列车，同时设置
+     * 由Routing调用  注意不负责更新RoutingNode的数据
      */
     void setRouting(std::weak_ptr<Routing> rout, std::list<RoutingNode>::iterator node);
 

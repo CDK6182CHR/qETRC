@@ -171,6 +171,21 @@ private slots:
      * 更新所有包含指定线路的运行图。
      */
     void updateRailwayDiagrams(std::shared_ptr<Railway> rail);
+
+    /**
+     * 重新铺画所有运行图。
+     */
+    void updateAllDiagrams();
+
+    /**
+     * 导入车次。刷新相关面板，重新铺画运行图。
+     */
+    void onTrainsImported();
+
+    /**
+     * 删除所有车次
+     */
+    void removeAllTrains();
     
 
 public slots:
@@ -198,5 +213,7 @@ public slots:
      * 打开（或创建）指定线路的编辑面板
      */
     void actOpenRailStationWidget(std::shared_ptr<Railway> rail);
+
+
 };
 

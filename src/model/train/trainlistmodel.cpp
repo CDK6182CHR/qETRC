@@ -145,7 +145,7 @@ void TrainListModel::undoRemoveTrains(const QList<std::shared_ptr<Train>>& train
 {
 	beginResetModel();
 	for (int i = 0; i < trains.size(); i++) {
-		coll.insertTrain(indexes.at(i), trains.at(i));
+		coll.insertTrainForUndo(indexes.at(i), trains.at(i));
 	}
 	endResetModel();
 	emit trainsRemovedUndone(trains);
