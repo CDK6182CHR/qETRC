@@ -3,10 +3,12 @@
 #include <QtWidgets>
 #include "model/diagram/diagramnavimodel.h"
 #include "addpagedialog.h"
+#include "dialogs/importtraindialog.h"
 
 
 NaviTree::NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget *parent):
     QTreeView(parent),mePageList(new QMenu(this)),meRailList(new QMenu(this)),
+    meTrainList(new QMenu(this)),
     _model(model_),_undo(undo)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -27,6 +29,10 @@ void NaviTree::initContextMenus()
     //RailList
     act = meRailList->addAction(tr("导入线路"));
     connect(act, SIGNAL(triggered()), this, SLOT(importRailways()));
+
+    //TrainList
+    act = meTrainList->addAction(tr("导入车次"));
+    connect(act, SIGNAL(triggered()), this, SLOT(importTrains()));
 }
 
 NaviTree::ACI* NaviTree::getItem(const QModelIndex& idx)
@@ -41,6 +47,13 @@ void NaviTree::addNewPage()
     auto* dialog = new AddPageDialog(_model->diagram(), this);
     connect(dialog, SIGNAL(creationDone(std::shared_ptr<DiagramPage>)),
         this, SIGNAL(pageAdded(std::shared_ptr<DiagramPage>)));
+    dialog->open();
+}
+
+void NaviTree::importTrains()
+{
+    auto* dialog = new ImportTrainDialog(_model->diagram(), this);
+    connect(dialog, SIGNAL(trainsImported()), this, SIGNAL(trainsImported()));
     dialog->open();
 }
 
@@ -113,6 +126,7 @@ void NaviTree::showContextMenu(const QPoint& pos)
     switch (item->type()) {
     case navi::PageListItem::Type:mePageList->popup(p); break;
     case navi::RailwayListItem::Type:meRailList->popup(p); break;
+    case navi::TrainListItem::Type:meTrainList->popup(p); break;
     }
     
 }

@@ -38,11 +38,23 @@ public:
     QJsonObject toJson()const;
 
     std::shared_ptr<Train> train() const;
+
+    /**
+     * 同时设置为非虚拟
+     * 但不包含对列车那边的操作 （因为自己拿不到自己的迭代器）
+     */
     void setTrain(const std::shared_ptr<Train> &train);
+
+    /**
+     * 清除已有的列车指向，同时设置为虚拟结点
+     * 删除列车时，由TrainCollection调用
+     */
+    void makeVirtual();
+
     const QString& name() const;
     void setName(const QString &name);
     bool isVirtual() const;
-    void setVirtual(bool _virtual);
+    //void setVirtual(bool _virtual);
     bool link() const;
     void setLink(bool link);
 
@@ -77,7 +89,12 @@ public:
     Routing(const Routing&)=default;
     Routing(Routing&&)noexcept=default;
     Routing& operator=(const Routing&)=delete;
-    Routing& operator=(Routing&&)=delete;
+
+    /**
+     * 2021.07.04 准备实现  导入交路时使用
+     * 相当于原来的coverBaseData
+     */
+    Routing& operator=(Routing&&)noexcept;
 
     /**
      * 接受pyETRC格式的circuits数组元素
@@ -133,6 +150,17 @@ public:
 
     void print()const;
 
-    //解析车次等 下次
+    /**
+     * 是否有至少一个非虚拟车次
+     */
+    bool anyValidTrains()const;
+
+    /**
+     * 替换列车。使用newTrain将结点中的oldTrain替换掉。
+     * 其中oldTrain逻辑上是xvalue，此操作同时清除其中对circuit的引用。
+     * 同时将本交路引用交给newTrain.
+     * 已知oldTrain本来是属于本交路的。
+     */
+    void replaceTrain(std::shared_ptr<Train> oldTrain, std::shared_ptr<Train> newTrain);
 };
 

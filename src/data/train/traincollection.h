@@ -45,6 +45,12 @@ public:
     void fromJson(const QJsonObject& obj, const TypeManager& defaultManager);
 
     /**
+     * 读取Diagram文件，但只要TrainCollection的部分。
+     * 这个版本用来处理导入列车。
+     */
+    bool fromJson(const QString& filename, const TypeManager& defaultManager);
+
+    /**
      * @brief toJson  导出JSON
      * @return 原pyETRC.Graph对应的object，但缺Config等信息
      */
@@ -110,13 +116,36 @@ public:
     /**
      * 给TrainListWidget提供的删除API
      * 删除和返回指定列车的指针  注意更新映射表
+     * 
+     * 注意 交路信息！！
      */
     std::shared_ptr<Train> takeTrainAt(int i);
+
+    /**
+     * 用在导入车次时。
+     * 删除车次，且不考虑撤销。直接把交路信息也删掉
+     */
+    void removeTrainAt(int i);
 
     /**
      * 按照index插入车次 用于撤销删除车次
      */
     void insertTrain(int i, std::shared_ptr<Train> train);
+
+    /**
+     * 删除所有没有绑定到线路的车次。
+     * 注意只能在绑定操作执行之后，否则相当于清空。
+     * 用于导入车次。
+     */
+    void removeUnboundTrains();
+
+    inline bool isNull()const { return _trains.isEmpty(); }
+
+    bool routingNameExisted()const;
+
+    QString validRoutingName(const QString& prefix);
+
+    inline int trainCount()const { return _trains.size(); }
 
 private:
     /**

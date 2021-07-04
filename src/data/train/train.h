@@ -32,7 +32,8 @@ struct AdapterStation;
  * 也就是说这里的一切操作都要是在没有Railway情况下合法的
  * 与Railway相关的操作，在新建类TrainAdapter中完成
  */
-class Train
+class Train:
+    std::enable_shared_from_this<Train>
 {
     TrainName _trainName;
     StationName _starting,_terminal;
@@ -101,6 +102,7 @@ public:
     QJsonObject toJson()const;
 
     inline const TrainName& trainName()const{return _trainName;}
+    inline TrainName& trainName(){ return _trainName; }
     inline const StationName& starting()const{return _starting;}
     inline const StationName& terminal()const{return _terminal;}
     inline auto type()const{return _type;}
@@ -284,17 +286,20 @@ public:
     inline std::weak_ptr<Routing> routing() { return _routing; }
     inline std::weak_ptr<const Routing> routing()const { return _routing; }
     inline auto routingNode()const { return _routingNode; }
+    inline auto routingNode() { return _routingNode; }
 
     /**
      * 设置交路，同时设定Node指针（迭代器）
-     * 由Routing调用
+     * 由Routing调用  
+     * 如果iterator没有设置好本次列车，同时设置
      */
     void setRouting(std::weak_ptr<Routing> rout, std::list<RoutingNode>::iterator node);
 
     /**
      * 清除交路数据
-     * 根据实际需要决定：是否从Routing移除自己的数据
-     * 需要时再写实现
+     * 2021.07.04实现，用于导入车次时清除所引入图中的交路信息
+     * 同时将RoutingNode那边的数据清理掉 （设置为虚拟）
+     * 不考虑撤销
      */
     void resetRouting();
 

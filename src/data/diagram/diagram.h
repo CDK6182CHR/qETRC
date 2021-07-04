@@ -23,6 +23,7 @@ public:
 
     QString last_file;
     QString default_file = "sample.pyetgr";
+    int table_row_height = 25;
     //todo: dock show..
 
     /**
@@ -205,6 +206,13 @@ public:
      * 这里还是要想清楚
      */
     inline bool isNull()const { return _railways.empty(); }
+
+    /**
+     * 对指定TrainCollection （不一定是本图的Collection）。
+     * 使用本线的所有线路与之绑定。
+     * 用于导入列车时
+     */
+    void applyBindOn(TrainCollection& coll);
 
 private:
     void bindAllTrains();

@@ -31,3 +31,5 @@ QTime qeutil::parseTime(const QString& tm)
 	return QTime();
 }
 
+const QString qeutil::fileFilter =
+	QObject::tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)");

@@ -68,6 +68,13 @@ std::shared_ptr<Train> RoutingNode::train() const
 void RoutingNode::setTrain(const std::shared_ptr<Train> &train)
 {
     _train = train;
+    _virtual = false;
+}
+
+void RoutingNode::makeVirtual()
+{
+    _train = nullptr;
+    _virtual = true;
 }
 
 const QString &RoutingNode::name() const

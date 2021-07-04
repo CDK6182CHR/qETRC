@@ -5,6 +5,7 @@
 #include "data/diagram/trainline.h"
 #include "data/diagram/trainadapter.h"
 #include "data/train/traintype.h"
+#include "routing.h"
 
 
 Train::Train(const TrainName &trainName,
@@ -500,6 +501,16 @@ void Train::setRouting(std::weak_ptr<Routing> rout, std::list<RoutingNode>::iter
 {
     _routing = rout;
     _routingNode = node;
+    node->setTrain(shared_from_this());
+}
+
+void Train::resetRouting()
+{
+    if (_routingNode.has_value()) {
+        _routingNode.value()->makeVirtual();
+        _routingNode.reset();
+    }
+    _routing.reset();
 }
 
 const AdapterStation* Train::boundTerminal() const

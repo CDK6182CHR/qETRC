@@ -1,0 +1,165 @@
+﻿#include "importtraindialog.h"
+#include "util/utilfunc.h"
+#include "data/train/routing.h"
+
+#include<QtWidgets>
+#include <QString>
+
+ImportTrainDialog::ImportTrainDialog(Diagram& diagram_, QWidget* parent):
+	QDialog(parent),diagram(diagram_)
+{
+	setAttribute(Qt::WA_DeleteOnClose);
+	initUI();
+	resize(1200, 800);
+	setWindowTitle(tr("导入车次"));
+}
+
+void ImportTrainDialog::initUI()
+{
+	auto* hlay = new QHBoxLayout;
+	widget = new TrainListWidget(other);
+	hlay->addWidget(widget);
+
+	auto* vlay = new QVBoxLayout;
+	auto* form = new QFormLayout;
+
+	auto* ch = new QHBoxLayout;
+	edFile = new QLineEdit;
+	ch->addWidget(edFile);
+	auto* btn = new QPushButton(tr("浏览"));
+	connect(btn, SIGNAL(clicked()), this, SLOT(actView()));
+	ch->addWidget(btn);
+	vlay->addLayout(ch);
+
+	ckLocal = new QCheckBox(tr("仅与本运行图有重叠的车次"));
+	ckLocal->setChecked(true);
+	form->addRow(tr("筛选"), ckLocal);
+
+	rdConflict = new RadioButtonGroup<2,QVBoxLayout>({ "忽略冲突车次","覆盖冲突车次" }, this);
+	form->addRow(tr("冲突车次"), rdConflict);
+	rdConflict->get(0)->setChecked(true);
+
+	rdRouting = new RadioButtonGroup<3,QVBoxLayout>({ "以原图交路为准","以新图交路为准","不导入任何交路" }, this);
+	form->addRow(tr("冲突交路"), rdRouting);
+	rdRouting->get(0)->setChecked(true);
+
+	edPrefix = new QLineEdit;
+	form->addRow(tr("附加前缀"), edPrefix);
+	edSuffix = new QLineEdit;
+	form->addRow(tr("附加后缀"), edSuffix);
+	vlay->addLayout(form);
+	
+	auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+	vlay->addWidget(buttons);
+	connect(buttons, SIGNAL(accepted()), this, SLOT(actApply()));
+	connect(buttons, SIGNAL(rejected()), this, SLOT(actCancel()));
+
+	hlay->addLayout(vlay);
+	setLayout(hlay);
+}
+
+void ImportTrainDialog::actView()
+{
+	QString filename = QFileDialog::getOpenFileName(this, tr("导入车次"), {}, qeutil::fileFilter);
+	if (filename.isEmpty())
+		return;
+	bool flag=other.fromJson(filename, diagram.trainCollection().typeManager());
+	if (!flag || other.isNull()) {
+		QMessageBox::warning(this, tr("错误"), tr("文件错误或为空，请检查！"));
+		return;
+	}
+	diagram.applyBindOn(other);
+	if (ckLocal->isChecked())
+		other.removeUnboundTrains();
+	widget->refreshData();
+	edFile->setText(filename);
+}
+
+void ImportTrainDialog::actApply()
+{
+    bool cover = rdConflict->get(1)->isChecked();
+    //删除新导入的图中没有任何牵连的交路
+    QList<std::shared_ptr<Routing>> routings;
+    for (auto p : other.routings()) {
+        if (p->anyValidTrains()) {
+            routings.append(p);   //注意还是原来的对象
+        }
+    }
+
+    auto& coll = diagram.trainCollection();
+    //导入车次
+    int new_cnt = 0;
+    for (auto train : other.trains()) {
+        train->trainName().setFull(edPrefix->text() + 
+            train->trainName().full() + edSuffix->text());
+        auto oldTrain = diagram.trainCollection().findFullName(train->trainName());
+        if (!oldTrain) {
+            //可以直接添加
+            train->resetRouting();  // ?
+            diagram.trainCollection().appendTrain(train);
+            new_cnt++;
+        }
+        else if (cover) {
+            if (oldTrain->hasRouting()) {
+                oldTrain->routing().lock()->replaceTrain(oldTrain, train);
+            }
+            coll.removeTrain(oldTrain);
+            coll.appendTrain(train);
+        }
+    }
+
+    //下面导入交路
+    int routing_cnt = 0;
+    if (!rdRouting->get(2)->isChecked()) {
+        bool coverRouting = rdRouting->get(1)->isChecked();
+        for (auto routing : other.routings()) {
+            //有反向引用，必须创建新对象
+            auto newRouting = std::make_shared<Routing>(coll);
+            //Move。注意此时原来交路的所有Node都应该为虚拟
+            newRouting->operator=(std::move(*routing));
+            newRouting->setName(coll.validRoutingName(newRouting->name()));
+            for (auto p = newRouting->order().begin(); p != newRouting->order().end(); ++p) {
+                //注意这是std::list！
+                auto t = coll.findFullName(p->name());
+                if (!t)
+                    continue;   //继续虚拟
+                if (!t->hasRouting()) {
+                    //原来没有交路，放心添加就好
+                    t->setRouting(newRouting, p);  //这里附带了所有操作
+                }
+                else if (coverRouting) {
+                    //且以新图中交路为准，则把老交路中这个节点设置为虚拟
+                    //注意pyETRC中是删除，这里改了一下
+                    //其实直接执行Train的reset就好
+                    t->resetRouting();
+                    t->setRouting(newRouting, p);
+                }
+            }
+            if (newRouting->anyValidTrains()) {
+                coll.routings().append(newRouting);
+                routing_cnt++;
+            }
+        }
+    }
+    int all_cnt = other.trainCount();
+    QString text = "";
+    if (cover) {
+        text += tr("成功导入%1个车次。\n").arg(all_cnt);
+        text += tr("其中覆盖%1个车次。\n").arg(all_cnt - new_cnt);
+    }
+    else {
+        text += tr("成功导入%1个车次。\n").arg(new_cnt);
+        text += tr("有%1个重复车次被跳过。\n").arg(all_cnt - new_cnt);
+    }
+    if (routing_cnt) {
+        text += tr("同时引入%1个新交路。").arg(routing_cnt);
+    }
+    QMessageBox::information(this, tr("信息"), text);
+    emit trainsImported();
+    done(QDialog::Accepted);
+}
+
+void ImportTrainDialog::actCancel()
+{
+	done(QDialog::Rejected);
+}

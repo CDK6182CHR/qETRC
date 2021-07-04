@@ -32,6 +32,21 @@ void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaul
     
 }
 
+bool TrainCollection::fromJson(const QString& filename, const TypeManager& defaultManager)
+{
+	QFile file(filename);
+	file.open(QFile::ReadOnly);
+	if (!file.isOpen()) {
+		qDebug() << "TrainCollection::fromJson: WARNING: Open file " << filename
+			<< " failed." << Qt::endl;
+		return false;
+	}
+	QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+	fromJson(doc.object(), defaultManager);
+	file.close();
+	return true;
+}
+
 QJsonObject TrainCollection::toJson() const
 {
 	QJsonArray artrains;
@@ -101,10 +116,33 @@ std::shared_ptr<Train> TrainCollection::takeTrainAt(int i)
 	return t;
 }
 
+void TrainCollection::removeTrainAt(int i)
+{
+	auto t = _trains.takeAt(i);
+	removeMapInfo(t);
+	if (t->hasRouting()) {
+		auto it = t->routingNode();
+		it.value()->makeVirtual();
+		it.reset();
+	}
+}
+
 void TrainCollection::insertTrain(int i, std::shared_ptr<Train> train)
 {
 	_trains.insert(i, train);
 	addMapInfo(train);
+}
+
+void TrainCollection::removeUnboundTrains()
+{
+	//倒着遍历
+	for (int i = _trains.size() - 1; i >= 0; i--) {
+		auto t = _trains.at(i);
+		if (t->adapters().empty()) {
+			//删除
+			_trains.removeAt(i);
+		}
+	}
 }
 
 void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)

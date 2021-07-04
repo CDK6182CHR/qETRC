@@ -3,6 +3,8 @@
 #include <QHBoxLayout>
 #include <QBoxLayout>
 #include <QPushButton>
+#include <QRadioButton>
+#include <QButtonGroup>
 #include <array>
 #include <type_traits>
 #include <initializer_list>
@@ -14,7 +16,8 @@ template <size_t _Num, typename _Layout=QHBoxLayout, typename _Button=QPushButto
 class ButtonGroup:
         public _Layout
 {
-    static_assert (std::is_base_of<QLayout,_Layout>::value,"Invalid Layout");
+    static_assert (std::is_base_of<QLayout, _Layout>::value, "Invalid Layout");
+protected:
     std::array<_Button*,_Num> buttons;
 public:
     //ButtonGroup(const std::array<QString,_Num>& labels);
@@ -66,3 +69,21 @@ void ButtonGroup<_Num, _Layout, _Button>::setMinimumWidth(int w)
 }
 
 
+
+/**
+ * 增加添加到QButtonGroup的逻辑。
+ */
+template <size_t _Num, typename _Layout = QHBoxLayout, typename _Button = QRadioButton>
+class RadioButtonGroup :
+    public ButtonGroup<_Num, _Layout, _Button>
+{
+    QButtonGroup* group;
+public:
+    RadioButtonGroup(const std::array<const char*, _Num>& labels, QWidget* parent) :
+        ButtonGroup(labels), group(new QButtonGroup(parent)) 
+    {
+        for (int i = 0; i < _Num; i++) {
+            group->addButton(buttons[i]);
+        }
+    }
+};

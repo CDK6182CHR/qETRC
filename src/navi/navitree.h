@@ -17,7 +17,7 @@ class NaviTree : public QTreeView
 {
     Q_OBJECT;
 
-    QMenu* mePageList, *meRailList;
+    QMenu* mePageList, * meRailList, * meTrainList;
     DiagramNaviModel* _model;
     QUndoStack* const _undo;
 public:
@@ -43,6 +43,11 @@ signals:
     void focusOutRailway();
     void railwayListChanged();   //只是通知主窗口更新数据  其实都不见得有必要
 
+    /**
+     * 转发给主窗口去画图  所有页面重新铺画
+     */
+    void trainsImported();
+
 private slots:
     void showContextMenu(const QPoint& pos);
     
@@ -51,6 +56,7 @@ private slots:
 public slots:
     void importRailways();
     void addNewPage();
+    void importTrains();
     
 };
 
