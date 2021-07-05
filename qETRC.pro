@@ -43,6 +43,7 @@ SOURCES += \
     src/mainwindow/mainwindow.cpp \
     src/mainwindow/railcontext.cpp \
     src/mainwindow/traincontext.cpp \
+    src/mainwindow/viewcategory.cpp \
     src/model/delegate/combodelegate.cpp \
     src/model/diagram/componentitems.cpp \
     src/model/diagram/diagramnavimodel.cpp \
@@ -87,6 +88,7 @@ HEADERS += \
     src/mainwindow/railcontext.h \
     src/mainwindow/traincontext.h \
     src/mainwindow/version.h \
+    src/mainwindow/viewcategory.h \
     src/model/delegate/combodelegate.h \
     src/model/delegate/qedelegate.h \
     src/model/diagram/componentitems.h \

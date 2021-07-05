@@ -204,21 +204,20 @@ void MainWindow::initDockWidgets()
 void MainWindow::initToolbar()
 {
     SARibbonBar* ribbon = ribbonBar();
-    ribbon->setRibbonStyle(SARibbonBar::OfficeStyle);
     ribbon->applicationButton()->setText(QStringLiteral("文件"));
 
     //顶上的工具条
     if constexpr (true) {
         //撤销重做
-        //Redo action加到顶上会莫名其妙产生问题，暂时改成放到别的地方
         QAction* act = undoStack->createUndoAction(this, tr("撤销"));
         act->setIcon(QIcon(":/icons/undo.png"));
         act->setShortcut(Qt::CTRL + Qt::Key_Z);
+        act->setShortcutContext(Qt::WindowShortcut);
         ribbon->quickAccessBar()->addAction(act);
 
         act = undoStack->createRedoAction(this, tr("重做"));
         act->setIcon(QIcon(":/icons/redo.png"));
-        act->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
+        act->setShortcut(Qt::CTRL + Qt::Key_Y);
         ribbon->quickAccessBar()->addAction(act);
     }
     
@@ -231,15 +230,18 @@ void MainWindow::initToolbar()
         QAction* act = new QAction(QIcon(":/icons/new-file.png"), QObject::tr("新建"), this);
         panel->addLargeAction(act);
         act->setShortcut(Qt::CTRL + Qt::Key_N);
+        addAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(actNewGraph()));
 
         act = new QAction(QIcon(":/icons/open.png"), QObject::tr("打开"), this);
+        addAction(act);
         act->setShortcut(Qt::CTRL + Qt::Key_O);
         panel->addLargeAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(actOpenGraph()));
 
         act = new QAction(QIcon(":/icons/save1.png"), QObject::tr("保存"), this);
         act->setShortcut(Qt::CTRL + Qt::Key_S);
+        addAction(act);
         panel->addLargeAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(actSaveGraph()));
 
@@ -318,9 +320,16 @@ void MainWindow::initToolbar()
 
         act = new QAction(QIcon(":/icons/add_train.png"), tr("导入车次"), this);
         act->setShortcut(Qt::CTRL + Qt::Key_D);
+        addAction(act);
         connect(act, SIGNAL(triggered()), naviView, SLOT(importTrains()));
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(70);
+    }
+
+    //显示
+    if constexpr (true) {
+        auto* cat = ribbon->addCategoryPage(tr("显示"));
+        catView = new ViewCategory(this, cat, this);
     }
 
     //context: page
@@ -345,6 +354,8 @@ void MainWindow::initToolbar()
         cat = ribbon->addContextCategory(tr("当前线路"));
         contextRail = new RailContext(_diagram, cat, this, this);
     }
+
+    ribbon->setRibbonStyle(SARibbonBar::OfficeStyle);
 }
 
 void MainWindow::loadInitDiagram()
@@ -386,7 +397,10 @@ void MainWindow::beforeResetGraph()
 
 void MainWindow::actNewGraph()
 {
-
+    if (changed && !saveQuestion())
+        return;
+    clearDiagram();
+    _diagram.setFilename("");
 }
 
 void MainWindow::endResetGraph()
@@ -396,6 +410,7 @@ void MainWindow::endResetGraph()
     //导航窗口
     naviModel->resetModel();
     trainListWidget->refreshData();
+    catView->refreshTypeGroup();
 }
 
 void MainWindow::resetDiagramPages()
@@ -452,6 +467,31 @@ void MainWindow::updateWindowTitle()
     setWindowTitle(s);
 }
 
+bool MainWindow::saveQuestion()
+{
+    auto flag = QMessageBox::question(this, tr(qespec::TITLE.data()),
+        tr("是否保存对运行图文件[%1]的更改？").arg(_diagram.filename()),
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel);
+    if (flag == QMessageBox::Yes) {
+        actSaveGraph();
+        return true;
+    }
+    else if (flag == QMessageBox::No) {
+        return true;
+    }
+    else {
+        //包括Cancel和NoButton
+        return false;
+    }
+}
+
+void MainWindow::closeEvent(QCloseEvent* e)
+{
+    if (changed && !saveQuestion())
+        e->ignore();
+    e->accept();
+}
+
 void MainWindow::informTrainListChanged()
 {
     //注意：现在这个函数总是由TrainList那边变化发起的，所以TrainList不用更新
@@ -503,7 +543,8 @@ void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
 
 void MainWindow::actOpenGraph()
 {
-    //todo: 询问保存
+    if (changed && !saveQuestion())
+        return;
     QString res=QFileDialog::getOpenFileName(this, QObject::tr("打开"), QString(),
         QObject::tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)"));
     if (res.isNull())

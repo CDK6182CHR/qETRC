@@ -140,6 +140,11 @@ QJsonObject Config::toJson() const
     obj.insert("grid_color", grid_color.name());
     obj.insert("text_color", text_color.name());
     obj.insert("margins", margins.toJson());
+    QJsonArray ns;
+    for (auto p = not_show_types.begin(); p != not_show_types.end(); ++p) {
+        ns.append(*p);
+    }
+    obj.insert("not_show_types", ns);
     return obj;
 }
 

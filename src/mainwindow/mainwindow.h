@@ -24,6 +24,7 @@
 
 #include "traincontext.h"
 #include "railcontext.h"
+#include "viewcategory.h"
 
 /**
  * @brief The MainWindow class
@@ -49,6 +50,9 @@ class MainWindow : public SARibbonMainWindow
     SARibbonContextCategory* contextPage;
     TrainContext* contextTrain;
     RailContext* contextRail;
+    ViewCategory* catView;
+
+    friend class ViewCategory;
 
     bool changed = false;
 
@@ -126,6 +130,14 @@ private:
     void removeTrainLine(Train& train);
 
     void updateWindowTitle();
+
+    /**
+     * 询问是否保存。返回程序是否继续
+     */
+    bool saveQuestion();
+
+protected:
+    virtual void closeEvent(QCloseEvent* e)override;
 
 
 private slots:

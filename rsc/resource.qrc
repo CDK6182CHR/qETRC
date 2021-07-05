@@ -55,5 +55,6 @@
         <file>icons/diagram.png</file>
         <file>icons/redo.png</file>
         <file>icons/undo.png</file>
+        <file>icons/tick.png</file>
     </qresource>
 </RCC>

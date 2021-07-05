@@ -150,6 +150,8 @@ public:
 
     bool containsRailway(std::shared_ptr<Railway> rail)const { return _railways.contains(rail); }
 
+    bool containsRailway(const Railway& railway)const;
+
 };
 
 //inline auto overNullLabel() { return _overLabels.end(); }

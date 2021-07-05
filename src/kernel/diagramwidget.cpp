@@ -182,6 +182,39 @@ void DiagramWidget::removeTrain(Train& train)
     }
 }
 
+void DiagramWidget::setTrainShow(std::shared_ptr<TrainAdapter> adp, bool show)
+{
+    if (!_page->containsRailway(adp->railway())) {
+        return;
+    }
+    for (auto line : adp->lines()) {
+        setTrainShow(line, show);
+    }
+}
+
+void DiagramWidget::setTrainShow(std::shared_ptr<TrainLine> line, bool show)
+{
+    if (!_page->containsRailway(line->adapter().railway())) {
+        return;
+    }
+    if (show) {
+        //显示
+        auto* item = _page->getTrainItem(line.get());
+        if (item) {
+            item->setVisible(true);
+        }
+        else {
+            paintTrainLine(line);
+        }
+            
+    }
+    else {
+        auto* item = _page->getTrainItem(line.get());
+        if (item)
+            item->setVisible(false);
+    }
+}
+
 void DiagramWidget::mousePressEvent(QMouseEvent* e)
 {
     if (updating)
@@ -555,6 +588,22 @@ void DiagramWidget::paintTrain(Train& train)
                 }
             }
         }
+    }
+}
+
+void DiagramWidget::paintTrainLine(std::shared_ptr<TrainLine> line)
+{
+    if (line->isNull()) {
+        //这个是不应该的
+        qDebug() << "DiagramWidget::paintTrain: WARNING: " <<
+            "Unexpected null TrainLine! " << line->adapter().train().trainName().full() << Qt::endl;
+    }
+    else {
+        auto* item = new TrainItem(_diagram, *line, line->adapter().railway(), *_page,
+            _page->railwayStartY(line->adapter().railway()));
+        _page->addItemMap(line.get(), item);
+        item->setZValue(5);
+        scene()->addItem(item);
     }
 }
 

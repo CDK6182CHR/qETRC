@@ -81,6 +81,31 @@ double TrainAdapter::totalMile() const
 	return res;
 }
 
+void TrainAdapter::setIsShow(bool on)
+{
+	for (auto p : _lines) {
+		p->setIsShow(on);
+	}
+}
+
+void TrainAdapter::setIsShowLineWise(Direction dir, bool on)
+{
+	for (auto p : _lines) {
+		if (p->dir() == dir)
+			p->setIsShow(on);
+	}
+}
+
+Direction TrainAdapter::firstDirection() const
+{
+	return isNull() ? Direction::Undefined : _lines.first()->dir();
+}
+
+Direction TrainAdapter::lastDirection() const
+{
+	return isNull() ? Direction::Undefined : _lines.last()->dir();
+}
+
 void TrainAdapter::autoLines(const Config& config)
 {
 	//命名规则：前缀r表示rail，t表示train

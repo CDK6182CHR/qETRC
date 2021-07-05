@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <QString>
-#include <QHash>
+#include <QMap>
 #include <QList>
 #include <memory>
 #include <Qt>
@@ -47,8 +47,9 @@ class TypeManager{
     /**
      * @brief _types
      * 逻辑上，这里作为类型的容器。注意，原则上，所有的类型都应该属于这个表。
+     * 使用Map，原因是希望保持一定的迭代顺序
      */
-    QHash<QString,std::shared_ptr<TrainType>> _types;
+    QMap<QString,std::shared_ptr<TrainType>> _types;
 
     /**
      * @brief _regs
@@ -73,6 +74,8 @@ public:
     TypeManager& operator=(const TypeManager& another);
 
     TypeManager& operator=(TypeManager&&)=default;
+
+    const auto& types()const { return _types; }
 
     /**
      * 读取系统默认配置 config.json
@@ -113,6 +116,11 @@ public:
      * 创建新的UI时，复制默认的。
      */
     std::shared_ptr<TrainType> findOrCreate(const QString& name);
+
+    /**
+     * 如果找不到，返回空
+     */
+    std::shared_ptr<TrainType> find(const QString& name)const { return _types.value(name); }
 
 private:
     /**

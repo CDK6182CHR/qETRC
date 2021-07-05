@@ -85,6 +85,7 @@ public:
     void print()const;
 
     inline bool show()const { return _show; }
+    inline void setIsShow(bool on) { _show = on; }
 
     inline Direction dir()const { return _dir; }
     inline bool startLabel()const { return _startLabel; }

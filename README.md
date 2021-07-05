@@ -10,6 +10,28 @@ Electronic Train Running Chart implemented with Qt
 
 
 
+## 环境
+
+本项目的开发环境：
+
+- Windows 10 x64
+- Qt 5.15.2  MSVC 2019 x64
+
+对环境的已知要求：
+
+- Qt5
+- **支持C++17标准**。已知的使用的C++17的特性包括`std::optional` `std::string_view`以及`if constexpr`等。
+
+
+
+## 与pyETRC的关系
+
+本项目定位为采用C++重构版本的pyETRC，并做一定的扩展。进行这个重构是因为Python的动态类型难于拿捏，在过去三年pyETRC的开发过程中，由于数据结构设计的草率等原因，代码难以维护。另外，使用Python开发时，对对象生命周期的控制较弱（由于赋值语义问题，多个对象共享同一个数据对象时容易出问题），对数据结构的控制不够精细（并不是说不能，但用Python写链表之类的东西总是怪怪的），这些限制了原有程序的重构。
+
+qETRC重新设计了数据结构，新增**线路区间**（`RailInterval`）的抽象，并采用类似双链表的形式组织数据，使得基于区间的数据（标尺、天窗）等有了实际的依托，理论上更加安全。此外，依托新的界面，对原有框架进行扩展，由仅支持一条线路、一个运行图窗口拓展到支持多条线路和多个运行图窗口同时打开。
+
+qETRC远期计划完全替代pyETRC，实现绝大多数的pyETRC既有功能，除了一些不大常用或容易引起问题的小功能。目前比较明确将会丢弃的功能是手动运行线管理功能。
+
 ## 基本概念
 
 本项目数据的最高级别抽象（i.e. 最大范围）为**运行图**(`Diagram`)，每个程序实例在同一时刻仅处理一个运行图对象。每个运行图对象含有以下基础数据：
@@ -63,4 +85,15 @@ Electronic Train Running Chart implemented with Qt
 - `viewers` 原pyETRC中，运行图分析的功能，例如事件表等。
 - `railnet` 中远期规划，原pyETRC线网管理模块的功能。
 - `util` 一些杂项，对Qt的轻度扩展等。
+
+
+
+## 致谢
+
+本项目使用了以下的开源库：
+
+- [Advanced-Docking-System](https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System)：提供了任意组织停靠面板的功能。
+- [SARibbon](https://github.com/czyt1988/SARibbon): 提供了Ribbon风格工具栏的功能。
+
+衷心感谢以上项目相关开发者的工作及其提供的便利。
 

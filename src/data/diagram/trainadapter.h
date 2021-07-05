@@ -82,6 +82,24 @@ public:
     std::pair<int, int> runStaySecs()const;
     double totalMile()const;
 
+    /**
+     * 注意TrainAdapter并没有show的属性。 这个只是方便一次性设置所有运行线的显示与否
+     */
+    void setIsShow(bool on);
+
+    /**
+     * 设置所有方向为dir的运行线的_show属性为on。
+     * 非dir方向的运行线不受影响。
+     */
+    void setIsShowLineWise(Direction dir, bool on);
+
+    /**
+     * 入图行别，即第一运行线的行别
+     */
+    Direction firstDirection()const;
+
+    Direction lastDirection()const;
+
 private:
 
     /**

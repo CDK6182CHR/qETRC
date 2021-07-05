@@ -198,6 +198,7 @@
     <ClCompile Include="src\mainwindow\mainwindow.cpp" />
     <ClCompile Include="src\mainwindow\railcontext.cpp" />
     <ClCompile Include="src\mainwindow\traincontext.cpp" />
+    <ClCompile Include="src\mainwindow\viewcategory.cpp" />
     <ClCompile Include="src\model\delegate\combodelegate.cpp" />
     <ClCompile Include="src\model\diagram\componentitems.cpp" />
     <ClCompile Include="src\data\diagram\config.cpp" />
@@ -244,6 +245,7 @@
     <QtMoc Include="src\navi\addpagedialog.h" />
     <QtMoc Include="src\model\rail\railstationmodel.h" />
     <QtMoc Include="src\model\delegate\combodelegate.h" />
+    <QtMoc Include="src\mainwindow\viewcategory.h" />
     <ClInclude Include="src\model\delegate\qedelegate.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <ClInclude Include="src\model\diagram\componentitems.h" />

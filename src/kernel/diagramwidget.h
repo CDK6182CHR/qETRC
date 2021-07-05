@@ -73,10 +73,24 @@ public:
     void paintTrain(Train& train);
 
     /**
+     * 铺画列车运行线。注意paintTrain()不采用此方法，因为这里涉及查找Railway的序号等操作，
+     * 效率低一点点
+     */
+    void paintTrainLine(std::shared_ptr<TrainLine> line);
+
+    /**
      * 删除列车时调用
      * 移除和删除列车运行线  注意相关映射表的处理，对象的删除等
      */
     void removeTrain(Train& train);
+
+    /**
+     * 显示或隐藏列车运行线
+     * 如果没有铺画过，现场铺画
+     */
+    void setTrainShow(std::shared_ptr<TrainAdapter> adp, bool show);
+
+    void setTrainShow(std::shared_ptr<TrainLine> line, bool show);
 
 protected:
     virtual void mousePressEvent(QMouseEvent* e)override;

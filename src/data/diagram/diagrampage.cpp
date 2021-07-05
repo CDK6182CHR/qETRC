@@ -141,3 +141,12 @@ void DiagramPage::clearGraphics()
     _belowLabels.clear();
     _overLabels.clear();
 }
+
+bool DiagramPage::containsRailway(const Railway& railway) const
+{
+    for (auto r : _railways) {
+        if (&railway == r.get())
+            return true;
+    }
+    return false;
+}

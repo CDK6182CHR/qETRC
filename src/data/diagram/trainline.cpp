@@ -49,7 +49,8 @@ QJsonObject TrainLine::toJson() const
 #endif
 
 TrainLine::TrainLine(TrainAdapter& adapter) :
-	_adapter(adapter), _dir(Direction::Undefined), _show(true), _startLabel(true), _endLabel(true)
+	_adapter(adapter), _dir(Direction::Undefined), _show(adapter.train().isShow()),
+	_startLabel(true), _endLabel(true)
 {
 }
 
