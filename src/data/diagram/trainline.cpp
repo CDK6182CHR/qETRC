@@ -279,7 +279,7 @@ void TrainLine::detectPassStations(LineEventList& res, int index, ConstAdaPtr it
 		int dsi = int(std::round(dsif));
 		res[index].emplace(StationEvent(
 			TrainEventType::CalculatedPass, ts0->depart.addSecs(dsi),
-			rsi, std::nullopt, QObject::tr("推定")
+			rsi, std::nullopt, QObject::tr("推算")
 		));
 	}
 }

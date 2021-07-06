@@ -195,6 +195,7 @@ private:
 
 signals:
     void showNewStatus(QString);
+    void trainSelected(std::shared_ptr<Train> train);
 
 private slots:
     void updateTimeAxis();

@@ -587,6 +587,7 @@ void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)
     diagramDocks.append(dock);
     diagramWidgets.append(dw);
     informPageListChanged();
+    connect(dw, &DiagramWidget::trainSelected, this, &MainWindow::focusInTrain);
 }
 
 void MainWindow::actAddPage(std::shared_ptr<DiagramPage> page)

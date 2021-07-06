@@ -52,8 +52,10 @@ SOURCES += \
     src/model/train/trainlistmodel.cpp \
     src/navi/addpagedialog.cpp \
     src/navi/navitree.cpp \
+    src/util/dialogadapter.cpp \
     src/util/qecontrolledtable.cpp \
-    src/util/utilfunc.cpp
+    src/util/utilfunc.cpp \
+    src/viewers/traineventdialog.cpp
 
 HEADERS += \
     src/data/common/direction.h \
@@ -99,9 +101,11 @@ HEADERS += \
     src/navi/addpagedialog.h \
     src/navi/navitree.h \
     src/util/buttongroup.hpp \
+    src/util/dialogadapter.h \
     src/util/qecontrolledtable.h \
     src/util/qeexceptions.h \
-    src/util/utilfunc.h
+    src/util/utilfunc.h \
+    src/viewers/traineventdialog.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

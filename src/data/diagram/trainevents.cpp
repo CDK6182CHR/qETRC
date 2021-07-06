@@ -94,3 +94,31 @@ void StationEventList::emplace(IntervalEvent&& e)
 	auto it = std::upper_bound(itEvents.begin(), itEvents.end(), e);
 	itEvents.insert(it, std::forward<IntervalEvent>(e));
 }
+
+QString qeutil::eventTypeString(TrainEventType t)
+{
+	switch (t)
+	{
+	case TrainEventType::Meet:return QObject::tr("交会");
+		break;
+	case TrainEventType::OverTaking:return QObject::tr("越行");
+		break;
+	case TrainEventType::Avoid:return QObject::tr("让行");
+		break;
+	case TrainEventType::Arrive:return QObject::tr("到达");
+		break;
+	case TrainEventType::Depart:return QObject::tr("出发");
+		break;
+	case TrainEventType::SettledPass:
+	case TrainEventType::CalculatedPass:return QObject::tr("通过");
+		break;
+	case TrainEventType::Origination:return QObject::tr("始发");
+		break;
+	case TrainEventType::Destination:return QObject::tr("终到");
+		break;
+	case TrainEventType::Coincidence:return QObject::tr("共线");
+		break;
+	default:return QObject::tr("非法事件");
+		break;
+	}
+}
