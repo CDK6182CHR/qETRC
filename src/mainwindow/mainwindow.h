@@ -39,7 +39,7 @@ class MainWindow : public SARibbonMainWindow
     //窗口，Model的指针
     DiagramNaviModel* naviModel;
     NaviTree* naviView;
-    SARibbonMenu* pageMenu, * railMenu;
+    SARibbonMenu* pageMenu, * railMenu, *appMenu;
     QList<ads::CDockWidget*> diagramDocks;
     QList<DiagramWidget*> diagramWidgets;
     ads::CDockWidget* naviDock, * trainListDock;
@@ -51,6 +51,14 @@ class MainWindow : public SARibbonMainWindow
     TrainContext* contextTrain;
     RailContext* contextRail;
     ViewCategory* catView;
+
+    /**
+     * 可能在多个地方使用到的action，包装一下
+     */
+    struct {
+        QAction* open, * save, * saveas, * newfile;
+    } sharedActions;
+    QList<QAction*> actRecent;
 
     friend class ViewCategory;
 
@@ -82,6 +90,8 @@ private:
     void initDockWidgets();
 
     void initToolbar();
+
+    void initAppMenu();
 
     /**
      * 程序启动，依次尝试读取上次打开的和默认文件
@@ -149,6 +159,13 @@ private slots:
     void actSaveGraph();
     void actSaveGraphAs();
 
+    void actPopupAppButton();
+
+    void addRecentFile(const QString& filename);
+
+    void resetRecentActions();
+
+    void openRecentFile();
     
 
     /**

@@ -142,6 +142,8 @@ private slots:
      */
     void actRemoveTrains();
 
+    void onCurrentRowChanged(const QModelIndex& idx);
+
 };
 
 

@@ -49,6 +49,9 @@ void TrainListWidget::initUI()
 	connect(model, SIGNAL(informTrainSorted()), this, SIGNAL(trainReordered()));
 	connect(model, SIGNAL(trainSorted(const QList<std::shared_ptr<Train>>&, TrainListModel*)),
 		this, SIGNAL(trainSorted(const QList<std::shared_ptr<Train>>&, TrainListModel*)));
+	
+	connect(table->selectionModel(), &QItemSelectionModel::currentRowChanged,
+		this, &TrainListWidget::onCurrentRowChanged);
 
 	auto* h = new ButtonGroup<2>({ "上移","下移"});
 	h->setMinimumWidth(50);
@@ -111,6 +114,14 @@ void TrainListWidget::actRemoveTrains()
 	model->redoRemoveTrains(trains, rows);
 
 	emit trainsRemoved(trains, rows, model);
+}
+
+void TrainListWidget::onCurrentRowChanged(const QModelIndex& idx)
+{
+	if (!idx.isValid())
+		return;
+	int row = idx.row();
+	emit currentTrainChanged(coll.trainAt(row));
 }
 
 qecmd::RemoveTrains::RemoveTrains(const QList<std::shared_ptr<Train>>& trains,

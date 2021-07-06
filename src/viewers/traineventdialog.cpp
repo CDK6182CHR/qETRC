@@ -58,7 +58,7 @@ void TrainEventModel::setupModel()
 				setItem(row, ColTime, new SI(t.time.toString("hh:mm:ss")));
 				setItem(row, ColPlace, new SI(tr("%1-%2")
 					.arg(t.former.trainStation->name.toSingleLiteral())
-					.arg(t.former.trainStation->name.toSingleLiteral())));
+					.arg(t.latter.trainStation->name.toSingleLiteral())));
 				setItem(row, ColMile, new SI(QString::number(t.mile, 'f', 3)));
 				setItem(row, ColEvent, new SI(qeutil::eventTypeString(t.type)));
 				setItem(row, ColOther, new SI(t.another.get().trainName().full()));

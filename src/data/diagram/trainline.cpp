@@ -303,7 +303,7 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 	//后面的站 类似merge过程
 	while (pme != _stations.end() && phe != another._stations.end()) {
 		ycond = yComp(pme, phe);
-		if ((ycond == ylast || ylast == -2) && ycond != 0) {
+		if (ylast==-2) {
 			//和上一次访问在同一个区间，啥都不用干，继续
 			ylast = ycond;
 			sameDirStep(ycond, pme, phe, mylast, hislast, index);
@@ -370,7 +370,7 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 				//本次列车领先，推定出在前面那个站有无交叉
 				if (pme != _stations.begin()) {
 					int passedTime = getPrevousPassedTime(pme, rhe);
-					if (the->timeInStoppedRange(passedTime)&&
+					if (ycond != ylast&&the->timeInStoppedRange(passedTime)&&
 						!another.isStartingOrTerminal(phe)) {
 						//本次列车在上一站踩了它
 						res[index - 1].emplace(IntervalEvent(
@@ -386,7 +386,7 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 				//本次列车落后，推定对方在本次列车这个站
 				if (phe != another._stations.begin() && (index != 0 || startLabel())) {
 					int passedTime = getPrevousPassedTime(phe, rme);
-					if (tme->timeInStoppedRange(passedTime)) {
+					if (ycond!=ylast&&tme->timeInStoppedRange(passedTime)) {
 						//本次列车在本站被踩
 						res[index].emplace(StationEvent(
 							TrainEventType::Avoid, QTime::fromMSecsSinceStartOfDay(passedTime),
@@ -429,8 +429,10 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
 	//后面的站 类似merge过程
 	while (pme != _stations.end() && phe != another._stations.rend()) {
 		ycond = yComp(pme, phe);
-		if ((ylast==-2 || ycond == ylast) && ycond != 0) {
-			//和上一次访问在同一个区间，或者第一次。啥都不用干，继续
+		if (ylast==-2) {
+			//和上一次访问在同一个区间，或者第一次。
+			//并不总是能直接跳过；还是可能会发生一些事情。
+			//previous: if (ylast==-2 || ycond == ylast) && ycond != 0
 			ylast = ycond;
 			sameDirStep(ycond, pme, phe, mylast, hislast, index);
 			continue;
@@ -491,7 +493,8 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
 				if (rhe->isDirectionVia(dir())) {
 					if (pme!=_stations.begin()) {
 						int passedTime = getPrevousPassedTime(pme, rhe);
-						if (the->timeInStoppedRange(passedTime)) {
+						if (the->timeInStoppedRange(passedTime) && ycond != ylast) {
+							//新增ycond!=ylast条件，保证这个区间内前后关系变了
 							//本次列车在上一站踩了它
 							res[index - 1].emplace(IntervalEvent(
 								TrainEventType::Meet,
@@ -518,7 +521,7 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
 				if (rme->isDirectionVia(another.dir())&& (index != 0 || startLabel())) {
 					if (phe != another._stations.rbegin()) {
 						int passedTime = getPrevousPassedTime(phe, rme);
-						if (tme->timeInStoppedRange(passedTime)) {
+						if (tme->timeInStoppedRange(passedTime)&&ycond!=ylast) {
 							//本次列车在本站被踩
 							res[index].emplace(StationEvent(
 								TrainEventType::Meet, QTime::fromMSecsSinceStartOfDay(passedTime),
@@ -587,7 +590,7 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
 
 	//y值：是直接确定的
 	double ym1 = rm1->y_value.value(), ym2 = rm2->y_value.value();
-	double yh1 = rh1->y_value.value(), yh2 = rm2->y_value.value();
+	double yh1 = rh1->y_value.value(), yh2 = rh2->y_value.value();
 
 	//x值，按照msecs表示
 	double xm1 = mylast->trainStation->depart.msecsSinceStartOfDay(),
@@ -667,9 +670,15 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
 		xinter = (-c1 - b1 * yinter) / a1;
 	}
 
-	//判定交点是否在合理范围内。用x判定，因为x的大小关系是明确的
-	if (xm1 <= xinter && xinter <= xm2 &&
-		xh1 <= xinter && xinter <= xh2) {
+	//2021.07.06 由于12小时问题, x判定可能并不安全，因此还是采用y判定
+	double yhmin = yh1, yhmax = yh2;
+	if (yhmin > yhmax)std::swap(yhmin, yhmax);
+	double ymmin = ym1, ymmax = ym2;
+	if (ymmin > ymmax)std::swap(ymmin, ymmax);
+
+	//判定交点是否在合理范围内
+	if (ymmin <= yinter && yinter <= ymmax &&
+		yhmin <= yinter && yinter <= yhmax) {
 		//合法交点  在本次列车的运行线上算出里程
 		double mile;
 		if (b1 == 0)mile = rm1->mile;   //斜率无穷大，没得算
@@ -794,9 +803,14 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
 		xinter = (-c1 - b1 * yinter) / a1;
 	}
 
+	double yhmin = yh1, yhmax = yh2;
+	if (yhmin > yhmax)std::swap(yhmin, yhmax);
+	double ymmin = ym1, ymmax = ym2;
+	if (ymmin > ymmax)std::swap(ymmin, ymmax);
+
 	//判定交点是否在合理范围内。用x判定，因为x的大小关系是明确的
-	if (xm1 <= xinter && xinter <= xm2 &&
-		xh2 <= xinter && xinter <= xh1) {
+	if (yhmin <= yinter && yinter <= yhmax &&
+		ymmin <= yinter && yinter <= ymmax) {
 		//合法交点  在本次列车的运行线上算出里程
 		double mile;
 		if (b1 == 0)mile = rm1->mile;   //斜率无穷大，没得算
