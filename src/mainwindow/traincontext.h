@@ -2,6 +2,7 @@
 
 #include <SARibbonContextCategory.h>
 #include <memory>
+#include <QLineEdit>
 
 #include "data/diagram/diagram.h"
 
@@ -19,9 +20,13 @@ class TrainContext : public QObject
     std::shared_ptr<Train> train{};
     SARibbonContextCategory* const cont;
     MainWindow* const mw;
+
+    QLineEdit* edName, * edStart, * edEnd;
 public:
     TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_, MainWindow* mw);
     auto* context() { return cont; }
+    auto getTrain() { return train; }
+    void resetTrain();
     
 private:
     void initUI();

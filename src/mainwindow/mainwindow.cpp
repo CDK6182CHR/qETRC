@@ -20,6 +20,7 @@
 #include "SARibbonMenu.h"
 #include "SARibbonPannel.h"
 #include "SARibbonQuickAccessBar.h"
+#include <SARibbonToolButton.h>
 
 #include "DockAreaWidget.h"
 
@@ -94,6 +95,10 @@ void MainWindow::redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains)
     for (auto p : diagramWidgets) {
         for (auto t : trains) {
             p->removeTrain(*t);
+            if (t == contextTrain->getTrain()) {
+                contextTrain->resetTrain();
+                focusOutTrain();
+            }
         }
     }
     informTrainListChanged();
@@ -140,6 +145,8 @@ void MainWindow::removeAllTrains()
     
     _diagram.trainCollection().clearTrains();
     onTrainsImported();   //后操作是一样的
+    contextTrain->resetTrain();
+    focusOutTrain();
 }
 
 
@@ -170,13 +177,16 @@ void MainWindow::initDockWidgets()
         naviDock = dock;
         dock->setWidget(tree);
         manager->addDockWidget(ads::LeftDockWidgetArea, dock);
+
+        //context的显示条件：第一次触发时显示；后续一直在，该车次（线路，运行图）被删除则隐藏
+        //各种focusout的slot保留，在需要隐藏的时候调用
         connect(tree, &NaviTree::pageAdded, this, &MainWindow::actAddPage);
         connect(tree, &NaviTree::focusInPage, this, &MainWindow::focusInPage);
-        connect(tree, &NaviTree::focusOutPage, this, &MainWindow::focusOutPage);
+        //connect(tree, &NaviTree::focusOutPage, this, &MainWindow::focusOutPage);
         connect(tree, &NaviTree::focusInTrain, this, &MainWindow::focusInTrain);
-        connect(tree, &NaviTree::focusOutTrain, this, &MainWindow::focusOutTrain);
+        //connect(tree, &NaviTree::focusOutTrain, this, &MainWindow::focusOutTrain);
         connect(tree, &NaviTree::focusInRailway, this, &MainWindow::focusInRailway);
-        connect(tree, &NaviTree::focusOutRailway, this, &MainWindow::focusOutRailway);
+        //connect(tree, &NaviTree::focusOutRailway, this, &MainWindow::focusOutRailway);
         connect(tree, &NaviTree::editRailway, this, &MainWindow::actOpenRailStationWidget);
         connect(tree, &NaviTree::trainsImported, this, &MainWindow::onTrainsImported);
     }
@@ -197,6 +207,7 @@ void MainWindow::initDockWidgets()
         connect(tw, &TrainListWidget::trainSorted, this, &MainWindow::trainSorted);
         connect(tw, &TrainListWidget::trainsRemovedUndone, this, &MainWindow::undoRemoveTrains);
         connect(tw, &TrainListWidget::trainsRemovedRedone, this, &MainWindow::redoRemoveTrains);
+        connect(tw, &TrainListWidget::currentTrainChanged, this, &MainWindow::focusInTrain);
     }
 
 }
@@ -205,6 +216,7 @@ void MainWindow::initToolbar()
 {
     SARibbonBar* ribbon = ribbonBar();
     ribbon->applicationButton()->setText(QStringLiteral("文件"));
+    
 
     //顶上的工具条
     if constexpr (true) {
@@ -232,18 +244,21 @@ void MainWindow::initToolbar()
         act->setShortcut(Qt::CTRL + Qt::Key_N);
         addAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(actNewGraph()));
+        sharedActions.newfile = act;
 
         act = new QAction(QIcon(":/icons/open.png"), QObject::tr("打开"), this);
         addAction(act);
         act->setShortcut(Qt::CTRL + Qt::Key_O);
         panel->addLargeAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(actOpenGraph()));
+        sharedActions.open = act;
 
         act = new QAction(QIcon(":/icons/save1.png"), QObject::tr("保存"), this);
         act->setShortcut(Qt::CTRL + Qt::Key_S);
         addAction(act);
         panel->addLargeAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(actSaveGraph()));
+        sharedActions.save = act;
 
         panel = cat->addPannel(tr("窗口"));
         act = naviDock->toggleViewAction();
@@ -346,7 +361,7 @@ void MainWindow::initToolbar()
 
     }
 
-    //context: train
+    //context: train & rail
     if constexpr (true) {
         auto* cat = ribbon->addContextCategory(tr("当前列车"));
         contextTrain = new TrainContext(_diagram, cat, this);
@@ -355,7 +370,29 @@ void MainWindow::initToolbar()
         contextRail = new RailContext(_diagram, cat, this, this);
     }
 
+    //ApplicationMenu的初始化放在最后，因为可能用到前面的..
+    initAppMenu();
+    connect(ribbon->applicationButton(), SIGNAL(clicked()), this,
+        SLOT(actPopupAppButton()));
+
     ribbon->setRibbonStyle(SARibbonBar::OfficeStyle);
+}
+
+void MainWindow::initAppMenu()
+{
+    auto* menu = new SARibbonMenu(tr("qETRC"), this);
+
+    menu->addAction(sharedActions.newfile);
+    menu->addAction(sharedActions.open);
+    menu->addAction(sharedActions.save);
+
+    auto* act = new QAction(QIcon(":/icons/saveas.png"), tr("另存为"), this);
+    
+    menu->addSeparator();
+
+    appMenu = menu;
+
+    resetRecentActions();
 }
 
 void MainWindow::loadInitDiagram()
@@ -433,7 +470,7 @@ bool MainWindow::openGraph(const QString& filename)
         beforeResetGraph();
         _diagram = std::move(dia);   //move assign
         endResetGraph();
-        SystemJson::instance.addHistoryFile(filename);
+        addRecentFile(filename);
         return true;
     }
     else {
@@ -571,9 +608,58 @@ void MainWindow::actSaveGraphAs()
         tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)"));
     if (res.isNull())
         return;
-    _diagram.saveAs(res);
-    markUnchanged();
-    undoStack->setClean();
+    bool flag=_diagram.saveAs(res);
+    if (flag) {
+        markUnchanged();
+        undoStack->setClean();
+        addRecentFile(res);
+    }
+}
+
+void MainWindow::actPopupAppButton()
+{
+    auto* btn = ribbonBar()->applicationButton();
+    appMenu->popup(btn->mapToGlobal(QPoint(0, btn->height())));
+}
+
+void MainWindow::addRecentFile(const QString& filename)
+{
+    SystemJson::instance.addHistoryFile(filename);
+}
+
+void MainWindow::resetRecentActions()
+{
+    for (auto a : actRecent) {
+        appMenu->removeAction(a);
+    }
+    actRecent.clear();
+
+    int i = 0;
+    for (const auto& p : SystemJson::instance.history) {
+        auto* act = new QAction(tr("%1. %2").arg(++i).arg(p), this);
+        appMenu->addAction(act);
+        actRecent.append(act);
+        act->setData(p);
+        connect(act, SIGNAL(triggered()), this, SLOT(openRecentFile()));
+    }
+
+}
+
+void MainWindow::openRecentFile()
+{
+    QAction* act = qobject_cast<QAction*>(sender());
+    if (act) {
+        const QString& filename = act->data().toString();
+        if (!changed || saveQuestion()) {
+            bool flag = openGraph(filename);
+            if (!flag)
+                QMessageBox::warning(this, QObject::tr("错误"), QObject::tr("文件错误，请检查!"));
+            else {
+                markUnchanged();
+                resetRecentActions();
+            }
+        }
+    }
 }
 
 void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)

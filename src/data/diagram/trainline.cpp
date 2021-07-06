@@ -303,7 +303,7 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 	//后面的站 类似merge过程
 	while (pme != _stations.end() && phe != another._stations.end()) {
 		ycond = yComp(pme, phe);
-		if ((ycond == ylast || ylast == -2) && ycond != 0) {
+		if (ylast==-2) {
 			//和上一次访问在同一个区间，啥都不用干，继续
 			ylast = ycond;
 			sameDirStep(ycond, pme, phe, mylast, hislast, index);
@@ -429,8 +429,10 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
 	//后面的站 类似merge过程
 	while (pme != _stations.end() && phe != another._stations.rend()) {
 		ycond = yComp(pme, phe);
-		if ((ylast==-2 || ycond == ylast) && ycond != 0) {
-			//和上一次访问在同一个区间，或者第一次。啥都不用干，继续
+		if (ylast==-2) {
+			//和上一次访问在同一个区间，或者第一次。
+			//并不总是能直接跳过；还是可能会发生一些事情。
+			//previous: if (ylast==-2 || ycond == ylast) && ycond != 0
 			ylast = ycond;
 			sameDirStep(ycond, pme, phe, mylast, hislast, index);
 			continue;
@@ -587,7 +589,7 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
 
 	//y值：是直接确定的
 	double ym1 = rm1->y_value.value(), ym2 = rm2->y_value.value();
-	double yh1 = rh1->y_value.value(), yh2 = rm2->y_value.value();
+	double yh1 = rh1->y_value.value(), yh2 = rh2->y_value.value();
 
 	//x值，按照msecs表示
 	double xm1 = mylast->trainStation->depart.msecsSinceStartOfDay(),

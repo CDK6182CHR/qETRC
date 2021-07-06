@@ -242,10 +242,7 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
 
 void DiagramWidget::mouseDoubleClickEvent(QMouseEvent* e)
 {
-    //qDebug() << "DiagramWidget: save PDF" << Qt::endl;
-    //toPdf(R"(D:\QTProject\qETRC\测试数据\sample.pdf)", "qETRC多线路测试样张");
-    qDebug() << "showStationEventText" << Qt::endl;
-    showTrainEventText();
+    QGraphicsView::mouseDoubleClickEvent(e);
 }
 
 void DiagramWidget::resizeEvent(QResizeEvent* e)
