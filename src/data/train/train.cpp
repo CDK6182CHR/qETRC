@@ -214,7 +214,7 @@ std::shared_ptr<TrainAdapter> Train::bindToRailway(Railway& railway, const Confi
         if (&((*p)->railway()) == &railway)
             return *p;
     }
-    auto adp = std::make_shared<TrainAdapter>(*this, railway, config);
+    auto adp = std::make_shared<TrainAdapter>(shared_from_this(), railway, config);
     if (!adp->isNull()) {
         _adapters.append(adp);
         return adp;
@@ -234,7 +234,7 @@ std::shared_ptr<TrainAdapter> Train::updateBoundRailway(Railway& railway, const 
         }
     }
     //没找到，则创建
-    auto p = std::make_shared<TrainAdapter>(*this, railway, config);
+    auto p = std::make_shared<TrainAdapter>(weak_from_this(), railway, config);
     if (!p->isNull()) {
         _adapters.append(p);
         return p;

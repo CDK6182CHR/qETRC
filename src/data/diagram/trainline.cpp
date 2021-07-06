@@ -49,7 +49,7 @@ QJsonObject TrainLine::toJson() const
 #endif
 
 TrainLine::TrainLine(TrainAdapter& adapter) :
-	_adapter(adapter), _dir(Direction::Undefined), _show(adapter.train().isShow()),
+	_adapter(adapter), _dir(Direction::Undefined), _show(adapter.train()->isShow()),
 	_startLabel(true), _endLabel(true)
 {
 }
@@ -57,30 +57,30 @@ TrainLine::TrainLine(TrainAdapter& adapter) :
 void TrainLine::print() const
 {
 	qDebug() << "TrainLine  labels (" << _startLabel << ", " << _endLabel << "): ";
-	qDebug() << train().trainName().full() << " @ " << _adapter.railway().name() << Qt::endl;
+	qDebug() << train()->trainName().full() << " @ " << _adapter.railway().name() << Qt::endl;
 	for (const auto& p : _stations) {
 		qDebug() << *p.trainStation << " -> " << p.railStation.lock()->name << Qt::endl;
 	}
 }
 
-Train& TrainLine::train()
+std::shared_ptr<Train> TrainLine::train()
 {
 	return _adapter.train();
 }
 
-const Train& TrainLine::train() const
+std::shared_ptr<const Train> TrainLine::train() const
 {
 	return _adapter.train();
 }
 
 bool TrainLine::startAtThis() const
 {
-	return !isNull() && train().isStartingStation(_stations.front().trainStation->name);
+	return !isNull() && train()->isStartingStation(_stations.front().trainStation->name);
 }
 
 bool TrainLine::endAtThis() const
 {
-	return !isNull() && train().isTerminalStation(_stations.back().trainStation->name);
+	return !isNull() && train()->isTerminalStation(_stations.back().trainStation->name);
 }
 
 LineEventList TrainLine::listLineEvents(const TrainCollection& coll) const
@@ -96,7 +96,7 @@ LineEventList TrainLine::listLineEvents(const TrainCollection& coll) const
 
 	//与其他列车的互作用
 	for (auto t : coll.trains()) {
-		if (t.get() == &(train()))
+		if (t == train())
 			continue;
 		for (auto adp : t->adapters()) {
 			if (_adapter.isInSameRailway(*adp)) {
@@ -813,7 +813,7 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
 QString TrainLine::stationString(const AdapterStation& st) const
 {
 	return st.trainStation->name.toSingleLiteral() + " [" +
-		train().trainName().full() + " @ " + _adapter.railway().name() + "]";
+		train()->trainName().full() + " @ " + _adapter.railway().name() + "]";
 }
 
 bool TrainLine::notStartOrEnd(const TrainLine& another, ConstAdaPtr pme, ConstAdaPtr phe)const

@@ -86,8 +86,8 @@ public:
 
     inline int type()const override { return Type; }
 
-    Train& train();
-    const Train& train()const;
+    std::shared_ptr<Train> train();
+    std::shared_ptr<const Train> train()const;
 
     void highlight();
     void unhighlight();

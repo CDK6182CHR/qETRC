@@ -20,7 +20,7 @@ class TrainCollection;
 class TrainAdapter
 {
     Railway& _railway;
-    Train& _train;
+    std::weak_ptr<Train> _train;
 
     /**
      * 运行线数据描述以及对象指针
@@ -35,7 +35,7 @@ public:
      * @brief 将线路与列车绑定，生成相关信息
      * @param config  暂时不保存，只用来生成信息
      */
-    TrainAdapter(Train& train, Railway& railway,
+    TrainAdapter(std::weak_ptr<Train> train, Railway& railway,
                  const Config& config);
     TrainAdapter(const TrainAdapter&) = delete;
     TrainAdapter(TrainAdapter&&) = default;
@@ -55,8 +55,8 @@ public:
 
     inline auto& railway() { return _railway; }
     inline const auto& railway()const { return _railway; }
-    inline auto& train() { return _train; }
-    inline const auto& train()const { return _train; }
+    std::shared_ptr<Train> train() { return _train.lock(); }
+    std::shared_ptr<const Train> train()const { return _train.lock(); }
     inline auto& lines() { return _lines; }
     inline const auto& lines()const { return _lines; }
 

@@ -15,8 +15,8 @@ TrainItem::TrainItem(Diagram& diagram, TrainLine& line,
     startTime(diagram.config().start_hour,0,0),
     start_x(diagram.config().margins.left),start_y(startY)
 {
-    _startAtThis = train().isStartingStation(_line.firstStationName());
-    _endAtThis = train().isTerminalStation(_line.lastStationName());
+    _startAtThis = train()->isStartingStation(_line.firstStationName());
+    _endAtThis = train()->isTerminalStation(_line.lastStationName());
     startLabelInfo = _page.startingNullLabel(_line.firstRailStation().get(),_line.dir());
     endLabelInfo = _page.terminalNullLabel(_line.lastRailStation().get(), _line.dir());
     pen = trainPen();
@@ -37,12 +37,12 @@ void TrainItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 {
 }
 
-Train& TrainItem::train()
+std::shared_ptr<Train> TrainItem::train()
 {
     return _line.train();
 }
 
-const Train& TrainItem::train() const
+std::shared_ptr<const Train> TrainItem::train() const
 {
     return _line.train();
 }
@@ -213,7 +213,7 @@ void TrainItem::clearLabelInfo()
 void TrainItem::setLine()
 {
     const QString& trainName = config().show_full_train_name ?
-        train().trainName().full() : train().trainName().dirOrFull(_line.dir());
+        train()->trainName().full() : train()->trainName().dirOrFull(_line.dir());
 
     setPathItem(trainName);
 
@@ -557,7 +557,7 @@ double TrainItem::getInGraph(double xout, double yout, double xin, double yin, Q
 
 const QPen& TrainItem::trainPen() const
 {
-    return train().pen();
+    return train()->pen();
 }
 
 QColor TrainItem::trainColor() const
@@ -713,19 +713,19 @@ void TrainItem::markDepartTime(double x, double y, const QTime& tm)
 
 void TrainItem::addLinkLine()
 {
-    if (!train().hasRouting())
+    if (!train()->hasRouting())
         return;
-    std::shared_ptr<Routing> rout = train().routing().lock();
-    auto* pre = rout->preLinked(train());
+    std::shared_ptr<Routing> rout = train()->routing().lock();
+    auto* pre = rout->preLinked(*train());
     if (!pre)
         return;
     auto last = pre->train()->lastStation();
-    auto first = train().firstStation();
-    if (train().isNullStation(first) || pre->train()->isNullStation(last))
+    auto first = train()->firstStation();
+    if (train()->isNullStation(first) || pre->train()->isNullStation(last))
         return;
     const QTime& last_tm = last->depart;
     const QTime& first_tm = first->arrive;
-    auto rs = train().boundStartingRail();
+    auto rs = train()->boundStartingRail();
     double xcur = calXFromStart(first_tm);
     double xpre = calXFromStart(last_tm);
 

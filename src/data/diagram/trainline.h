@@ -96,8 +96,8 @@ public:
      */
     auto& stations() { return _stations; }
     auto& adapter() { return _adapter; }
-    Train& train();
-    const Train& train()const;
+    std::shared_ptr<Train> train();
+    std::shared_ptr<const Train> train()const;
 
     inline const StationName& firstStationName()const { return _stations.front().trainStation->name; }
     inline const StationName& lastStationName()const { return _stations.back().trainStation->name; }

@@ -40,7 +40,7 @@ public:
                     Diagram& diagram_,
                     QObject* parent=nullptr);
 
-    const QString& etrc()const { return etrcReport; }
+    const QString& etrc()const{return etrcReport;}
 
 private:
     void setupModel();

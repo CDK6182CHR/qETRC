@@ -3,7 +3,7 @@
 
 #include "kernel/trainitem.h"
 
-TrainAdapter::TrainAdapter(Train& train,
+TrainAdapter::TrainAdapter(std::weak_ptr<Train> train,
     Railway& railway, const Config& config):
     _railway(railway),_train(train)
 {
@@ -21,7 +21,7 @@ TrainAdapter& TrainAdapter::operator=(TrainAdapter&& another)noexcept
 
 void TrainAdapter::print() const
 {
-    qDebug() << "TrainAdapter: " << _train.trainName().full() << " @ " <<
+    qDebug() << "TrainAdapter: " << train()->trainName().full() << " @ " <<
         _railway.name() << ", lines: " << _lines.size() << Qt::endl;
 	for (const auto& p : _lines) {
 		p->print();
@@ -109,10 +109,10 @@ Direction TrainAdapter::lastDirection() const
 void TrainAdapter::autoLines(const Config& config)
 {
 	//命名规则：前缀r表示rail，t表示train
-    auto& table = _train.timetable();
+    auto& table = train()->timetable();
     auto& rail = _railway;    //alias
 	//上一个绑定到的车站
-    auto tlast = _train.nullStation();
+    auto tlast = train()->nullStation();
 	std::shared_ptr<RailStation> rlast{};
 	Direction locdir = Direction::Undefined;    //当前站前区间的行别
 	std::shared_ptr<TrainLine> line = std::make_shared<TrainLine>(*this);  //当前运行线。初始空

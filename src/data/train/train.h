@@ -33,7 +33,7 @@ struct AdapterStation;
  * 与Railway相关的操作，在新建类TrainAdapter中完成
  */
 class Train:
-    std::enable_shared_from_this<Train>
+    public std::enable_shared_from_this<Train>
 {
     TrainName _trainName;
     StationName _starting,_terminal;

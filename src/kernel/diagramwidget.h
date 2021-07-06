@@ -28,8 +28,9 @@ class DiagramWidget : public QGraphicsView
     /**
      * @brief _selectedTrain  当前选中的列车对象
      * 用裸指针似乎不太好。但实现的结构确实拿不到shared_ptr
+     * 2021.07.06--改为shared
      */
-    Train* _selectedTrain = nullptr;
+    std::shared_ptr<Train> _selectedTrain = nullptr;
 
     struct {
         QGraphicsItemGroup* left, * right, * top, * bottom;
@@ -65,7 +66,7 @@ public:
     void clearGraph();
 
     auto selectedTrain() { return _selectedTrain; }
-    void setSelectedTrain(Train* train) { _selectedTrain = train; }
+    void setSelectedTrain(std::shared_ptr<Train> train) { _selectedTrain = train; }
 
     bool toPdf(const QString& filename, const QString& title);
 

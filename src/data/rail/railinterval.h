@@ -16,7 +16,7 @@ class Ruler;
  * 新增针对线路区间的抽象
  */
 class RailInterval:
-	std::enable_shared_from_this<RailInterval>
+	public std::enable_shared_from_this<RailInterval>
 {
 	friend class Railway;
 	//注意一律按照有向边约定
