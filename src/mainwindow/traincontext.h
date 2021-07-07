@@ -27,6 +27,9 @@ public:
     auto* context() { return cont; }
     auto getTrain() { return train; }
     void resetTrain();
+
+signals:
+    void highlightTrainLine(std::shared_ptr<Train> train);
     
 private:
     void initUI();
@@ -36,5 +39,6 @@ public slots:
 
 private slots:
     void showTrainEvents();
+    void actShowTrainLine();
 };
 

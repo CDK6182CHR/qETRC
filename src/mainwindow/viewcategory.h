@@ -58,7 +58,7 @@ private:
     void setDirTrainsShow(Direction dir, bool show);
 
     void setTrainShow(std::shared_ptr<TrainLine> line, bool show);
-    void setTrainShow(std::shared_ptr<TrainAdapter> adp, bool show);
+    //void setTrainShow(std::shared_ptr<TrainAdapter> adp, bool show);
 
     /*
      * 列车所属类型是否被隐藏。如果被隐藏，则使用显示上行操作时，它不会出现

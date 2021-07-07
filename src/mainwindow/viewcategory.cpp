@@ -151,11 +151,11 @@ void ViewCategory::setTrainShow(std::shared_ptr<TrainLine> line, bool show)
         p->setTrainShow(line, show);
 }
 
-void ViewCategory::setTrainShow(std::shared_ptr<TrainAdapter> adp, bool show)
-{
-    for (auto p : mw->diagramWidgets)
-        p->setTrainShow(adp, show);
-}
+//void ViewCategory::setTrainShow(std::shared_ptr<TrainAdapter> adp, bool show)
+//{
+//    for (auto p : mw->diagramWidgets)
+//        p->setTrainShow(adp, show);
+//}
 
 bool ViewCategory::typeIsShow(std::shared_ptr<Train> train) const
 {

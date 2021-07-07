@@ -55,6 +55,11 @@ public:
      * 判断两车站停车时间是否存在交集。注意PBC约定
      */
     bool stopRangeIntersected(const TrainStation& another)const;
+
+    /**
+     * 停车时间的字符串表示：x分，或者x分x秒
+     */
+    QString stopString()const;
 };
 
 QDebug operator<<(QDebug debug, const TrainStation& ts);

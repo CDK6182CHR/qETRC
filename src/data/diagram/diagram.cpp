@@ -56,6 +56,7 @@ void SystemJson::fromJson(const QJsonObject& obj)
     last_file = obj.value("last_file").toString();
     default_file = obj.value("default_file").toString(default_file);
     table_row_height = obj.value("table_row_height").toInt(table_row_height);
+    show_train_tooltip = obj.value("show_train_tooltip").toBool(show_train_tooltip);
 
     const QJsonArray& arhis = obj.value("history").toArray();
     for (const auto& p : arhis) {
@@ -72,7 +73,8 @@ QJsonObject SystemJson::toJson() const
         {"last_file",last_file},
         {"default_file",default_file},
         {"history",ar},
-        {"table_row_height",table_row_height}
+        {"table_row_height",table_row_height},
+        {"show_train_tooltip",show_train_tooltip}
     };
 }
 
@@ -173,6 +175,17 @@ void Diagram::applyBindOn(TrainCollection& coll)
             t->bindToRailway(*p, _config);
         }
     }
+}
+
+bool Diagram::isValidRailName(const QString& name, std::shared_ptr<Railway> rail)
+{
+    if (name.isEmpty())
+        return false;
+    for (auto r : _railways) {
+        if (r != rail && r->name() == name)
+            return false;
+    }
+    return true;
 }
 
 void Diagram::bindAllTrains()

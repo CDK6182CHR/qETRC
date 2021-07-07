@@ -31,5 +31,13 @@ QTime qeutil::parseTime(const QString& tm)
 	return QTime();
 }
 
+QString qeutil::secsToString(int secs)
+{
+	if (secs % 60 == 0)
+		return QObject::tr("%1分").arg(secs / 60);
+	else
+		return QObject::tr("%1分%2秒").arg(secs / 60).arg(secs % 60);
+}
+
 const QString qeutil::fileFilter =
 	QObject::tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)");

@@ -23,4 +23,9 @@ inline int secsTo(const QTime& tm1, const QTime& tm2) {
 	return secs < 0 ? secs + 24 * 3600 : secs;
 }
 
+/**
+ * 返回时间的中文字符串表示：xx分 或者 xx分xx秒
+ */
+QString secsToString(int secs);
+
 }

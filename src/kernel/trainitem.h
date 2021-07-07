@@ -86,8 +86,13 @@ public:
 
     inline int type()const override { return Type; }
 
+    double getStartY()const { return start_y; }
+
     std::shared_ptr<Train> train();
     std::shared_ptr<const Train> train()const;
+
+    auto& trainLine() { return _line; }
+    const auto& trainLine()const { return _line; }
 
     void highlight();
     void unhighlight();

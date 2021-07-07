@@ -18,11 +18,18 @@ void RailStationWidget::setRailway(std::shared_ptr<Railway> rail)
 	railway = rail;
 	model->setRailway(rail);
 	ctable->table()->resizeColumnsToContents();
+	//edName->setText(rail->name());
 }
 
 void RailStationWidget::initUI()
 {
 	auto* vlay = new QVBoxLayout;
+
+	//auto* form = new QFormLayout;
+	//edName = new QLineEdit;
+	//form->addRow(tr("线名"), edName);
+	//vlay->addLayout(form);
+
 	ctable = new QEControlledTable;
 	ctable->table()->verticalHeader()->setDefaultSectionSize(25);
 	ctable->table()->setModel(model);

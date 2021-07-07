@@ -847,3 +847,21 @@ bool TrainLine::isTerminalStation(ConstAdaPtr st) const
 	return endAtThis() && st == last;
 }
 
+std::deque<AdapterStation>::const_iterator TrainLine::stationFromYValue(double y) const
+{
+	if (dir() == Direction::Down)
+		return std::lower_bound(_stations.begin(), _stations.end(), y);
+	else {
+		return std::lower_bound(_stations.rbegin(), _stations.rend(), y).base();
+	}
+}
+
+bool AdapterStation::operator<(double y) const
+{
+	return railStation.lock()->y_value.value() < y;
+}
+
+bool operator<(double y, const AdapterStation& adp)
+{
+	return y < adp.railStation.lock()->y_value.value();
+}

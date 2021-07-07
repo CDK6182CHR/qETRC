@@ -116,3 +116,6 @@ QMAKE_CXXFLAGS += /utf-8
 
 RESOURCES += \
     rsc/resource.qrc
+
+DISTFILES += \
+    rsc/icons/trainline.png

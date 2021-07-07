@@ -27,7 +27,6 @@ class DiagramWidget : public QGraphicsView
 
     /**
      * @brief _selectedTrain  当前选中的列车对象
-     * 用裸指针似乎不太好。但实现的结构确实拿不到shared_ptr
      * 2021.07.06--改为shared
      */
     std::shared_ptr<Train> _selectedTrain = nullptr;
@@ -89,12 +88,16 @@ public:
      * 显示或隐藏列车运行线
      * 如果没有铺画过，现场铺画
      */
+    void setTrainShow(std::shared_ptr<Train> trains, bool show);
+
     void setTrainShow(std::shared_ptr<TrainAdapter> adp, bool show);
 
     void setTrainShow(std::shared_ptr<TrainLine> line, bool show);
 
 protected:
     virtual void mousePressEvent(QMouseEvent* e)override;
+
+    virtual void mouseMoveEvent(QMouseEvent* e)override;
 
     virtual void mouseDoubleClickEvent(QMouseEvent* e)override;
 
@@ -193,6 +196,17 @@ private:
 
     double calXFromStart(const QTime& time)const;
 
+    /**
+     * 指定位置的TrainItem，如果没有，返回空、
+     * 注意pos应当是mapToScene后的位置
+     */
+    TrainItem* posTrainItem(const QPointF& pos);
+
+    void stationToolTip(std::deque<AdapterStation>::const_iterator st, const TrainLine& line);
+
+    void intervalToolTip(std::deque<AdapterStation>::const_iterator former,
+        std::deque<AdapterStation>::const_iterator latter, const TrainLine& line);
+
 
 signals:
     void showNewStatus(QString);
@@ -208,5 +222,11 @@ public slots:
      * @brief showTrainEventText  临时使用 ETRC风格的文本形式输出事件表
      */
     void showTrainEventText();
+
+    /**
+     * 选中一趟列车，高亮显示，但不发送信号。
+     * 由MainWindow那边调用，避免递归的信号。
+     */
+    void highlightTrain(std::shared_ptr<Train> train);
 };
 

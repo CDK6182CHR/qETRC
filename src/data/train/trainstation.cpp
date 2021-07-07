@@ -77,6 +77,11 @@ bool TrainStation::stopRangeIntersected(const TrainStation& another) const
     return std::max(xm1, xh1) <= std::min(xm2, xh2);
 }
 
+QString TrainStation::stopString() const
+{
+    return qeutil::secsToString(stopSec());
+}
+
 QDebug operator<<(QDebug debug, const TrainStation& ts)
 {
     debug << ts.name << " " <<

@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "trainadapter.h"
 
-bool timeCompare(const QTime& tm1, const QTime& tm2)
+bool qeutil::timeCompare(const QTime& tm1, const QTime& tm2)
 {
 	static constexpr int secsOfADay = 3600 * 24;
 	int secs = tm1.secsTo(tm2);
@@ -17,7 +17,7 @@ bool StationEvent::operator<(const StationEvent& another) const
 	if (time == another.time) {
 		return static_cast<int8_t>(type) < static_cast<int8_t>(another.type);
 	}
-	return timeCompare(time, another.time);
+	return qeutil::timeCompare(time, another.time);
 }
 
 //enum class TrainEventType :int8_t {
@@ -62,7 +62,7 @@ bool IntervalEvent::operator<(const IntervalEvent& another) const
 	if (time == another.time) {
 		return static_cast<int8_t>(type) < static_cast<int8_t>(another.type);
 	}
-	return timeCompare(time, another.time);
+	return qeutil::timeCompare(time, another.time);
 }
 
 QString IntervalEvent::toString() const

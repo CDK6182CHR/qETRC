@@ -557,9 +557,14 @@ void MainWindow::trainSorted(const QList<std::shared_ptr<Train>>& oldList,
 
 void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
 {
-    for (auto p : railStationWidgets) {
-        if (p->getRailway() == rail) {
-            p->setVisible(true);
+    for (int i = 0; i < railStationWidgets.count(); i++) {
+        if (railStationWidgets.at(i)->getRailway() == rail) {
+            manager->setDockWidgetFocused(railStationDocks.at(i));
+            auto* dock = railStationDocks.at(i);
+            if (dock->isClosed())
+                dock->toggleView(true);
+            else
+                dock->setAsCurrentTab();
             return;
         }
     }
@@ -674,6 +679,7 @@ void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)
     diagramWidgets.append(dw);
     informPageListChanged();
     connect(dw, &DiagramWidget::trainSelected, this, &MainWindow::focusInTrain);
+    connect(contextTrain, &TrainContext::highlightTrainLine, dw, &DiagramWidget::highlightTrain);
 }
 
 void MainWindow::actAddPage(std::shared_ptr<DiagramPage> page)

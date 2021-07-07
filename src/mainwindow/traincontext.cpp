@@ -54,12 +54,17 @@ void TrainContext::initUI()
 			panel->addWidget(w, SARibbonPannelItem::Large);
 		}
 
+		auto* act = new QAction(QIcon(":/icons/trainline.png"), tr("运行线"), this);
+		act->setToolTip(tr("高亮列车运行线\n在所有运行图窗口中，高亮本次列车运行线"));
+		auto* btn = panel->addLargeAction(act);
+		btn->setMinimumWidth(70);
+		connect(act, SIGNAL(triggered()), this, SLOT(actShowTrainLine()));
 
 		panel = page->addPannel(tr("分析"));
 
-		auto* act = new QAction(QIcon(":/icons/clock.png"), tr("事件表"), this);
+		act = new QAction(QIcon(":/icons/clock.png"), tr("事件表"), this);
 		connect(act, SIGNAL(triggered()), this, SLOT(showTrainEvents()));
-		auto* btn = panel->addLargeAction(act);
+		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(70);
 	}
 
@@ -69,6 +74,11 @@ void TrainContext::initUI()
 		auto* panel = page->addPannel(tr(""));
 	}
 	
+}
+
+void TrainContext::actShowTrainLine()
+{
+	emit highlightTrainLine(train);
 }
 
 void TrainContext::setTrain(std::shared_ptr<Train> train_)

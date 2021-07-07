@@ -1,6 +1,7 @@
 ﻿#include "diagramwidget.h"
 #include "data/diagram/trainadapter.h"
 #include "trainitem.h"
+#include "util/utilfunc.h"
 #include <QPainter>
 #include <Qt>
 #include <QGraphicsScene>
@@ -184,6 +185,12 @@ void DiagramWidget::removeTrain(Train& train)
         _selectedTrain.reset();
 }
 
+void DiagramWidget::setTrainShow(std::shared_ptr<Train> train, bool show)
+{
+    for (auto adp : train->adapters())
+        setTrainShow(adp, show);
+}
+
 void DiagramWidget::setTrainShow(std::shared_ptr<TrainAdapter> adp, bool show)
 {
     if (!_page->containsRailway(adp->railway())) {
@@ -199,6 +206,7 @@ void DiagramWidget::setTrainShow(std::shared_ptr<TrainLine> line, bool show)
     if (!_page->containsRailway(line->adapter().railway())) {
         return;
     }
+    line->setIsShow(show);   //安全起见，保证同步
     if (show) {
         //显示
         auto* item = _page->getTrainItem(line.get());
@@ -219,25 +227,61 @@ void DiagramWidget::setTrainShow(std::shared_ptr<TrainLine> line, bool show)
 
 void DiagramWidget::mousePressEvent(QMouseEvent* e)
 {
+    QGraphicsView::mousePressEvent(e);
     if (updating)
         return;
     if (e->button() == Qt::LeftButton) {
         auto pos = mapToScene(e->pos());
         unselectTrain();
 
-        auto* item = scene()->itemAt(pos, transform());
-        if (!item)
-            return;
-        while (item->parentItem())
-            item = item->parentItem();
-        if (item->type() == TrainItem::Type) {
-            selectTrain(qgraphicsitem_cast<TrainItem*>(item));
+        auto* item = posTrainItem(pos);
+        if (item) {
+            selectTrain(item);
         }
     }
     else if (e->button() == Qt::RightButton) {
         //todo: context menu
     }
-    QGraphicsView::mousePressEvent(e);
+    
+}
+
+void DiagramWidget::mouseMoveEvent(QMouseEvent* e)
+{
+    QGraphicsView::mouseMoveEvent(e);
+    if (updating)
+        return;
+    if (!SystemJson::instance.show_train_tooltip)
+        return;
+    auto pos = mapToScene(e->pos());
+    TrainItem* item = posTrainItem(pos);
+    if (!item || item->train() != _selectedTrain) {
+        setToolTip("");
+        return;
+    }
+
+    const TrainLine& line = item->trainLine();
+
+    double y = pos.y() - item->getStartY();
+    auto itr = line.stationFromYValue(y);
+    const auto& dq = line.stations();
+    if (itr == dq.end())
+        return;
+    static constexpr double STATION_SPAN = 5;
+    //第一种情况：属于站内
+    if (std::abs(itr->yValue() - y) <= STATION_SPAN) {
+        stationToolTip(itr, line);
+        return;
+    }
+    //否则：找区间的另一个站
+    if (itr == dq.begin())
+        return;
+    auto prev = itr; --prev;    //区间前一个站
+    if (std::abs(prev->yValue() - y) <= STATION_SPAN) {
+        stationToolTip(prev, line);
+        return;
+    }
+    //到现在：只能是区间了
+    intervalToolTip(prev, itr, line);
 }
 
 void DiagramWidget::mouseDoubleClickEvent(QMouseEvent* e)
@@ -715,6 +759,7 @@ void DiagramWidget::selectTrain(TrainItem* item)
         return;
     if (!item)
         return;
+
     _selectedTrain = item->train();
     _page->highlightTrainItems(*_selectedTrain);
 
@@ -847,6 +892,53 @@ double DiagramWidget::calXFromStart(const QTime& time) const
     return sec / config().seconds_per_pix;
 }
 
+TrainItem* DiagramWidget::posTrainItem(const QPointF& pos)
+{
+    auto* item = scene()->itemAt(pos, transform());
+    if (!item)
+        return nullptr;
+    while (item->parentItem())
+        item = item->parentItem();
+    if (item->type() == TrainItem::Type)
+        return qgraphicsitem_cast<TrainItem*>(item);
+    return nullptr;
+}
+
+void DiagramWidget::stationToolTip(std::deque<AdapterStation>::const_iterator st, const TrainLine& line)
+{
+    QString text = tr("%1 在 %2 站 ").arg(line.train()->trainName().full())
+        .arg(st->trainStation->name.toSingleLiteral());
+    if (st->trainStation->isStopped()) {
+        text += tr("%1/%2 停车 %3").arg(st->trainStation->arrive.toString("hh:mm:ss"))
+            .arg(st->trainStation->depart.toString("hh:mm:ss"))
+            .arg(st->trainStation->stopString());
+    }
+    else {
+        text += tr("%1/...").arg(st->trainStation->arrive.toString("hh:mm:ss"));
+    }
+    setToolTip(text);
+}
+
+void DiagramWidget::intervalToolTip(std::deque<AdapterStation>::const_iterator former, 
+    std::deque<AdapterStation>::const_iterator latter, const TrainLine& line)
+{
+    const auto& ts1 = former->trainStation, & ts2 = latter->trainStation;
+    int sec = qeutil::secsTo(ts1->depart, ts2->arrive);
+    double mile = std::abs(latter->railStation.lock()->mile -
+        former->railStation.lock()->mile);
+    double spd = mile / sec * 3600;
+    QString text = tr("%1 在 %2 - %3 区间  %4-%5  运行 %6\n区间里程 %7 km  技术速度 %8 km/h")
+        .arg(line.train()->trainName().full())
+        .arg(ts1->name.toSingleLiteral())
+        .arg(ts2->name.toSingleLiteral())
+        .arg(ts1->depart.toString("hh:mm:ss"))
+        .arg(ts2->arrive.toString("hh:mm:ss"))
+        .arg(qeutil::secsToString(sec))
+        .arg(mile, 0, 'f', 3)
+        .arg(spd, 0, 'f', 3);
+    setToolTip(text);
+}
+
 
 void DiagramWidget::updateTimeAxis()
 {
@@ -868,6 +960,17 @@ void DiagramWidget::updateDistanceAxis()
     QPoint p2(width(), 0);
     auto sp2 = mapToScene(p2);
     marginItems.right->setX(sp2.x() - scene()->width() - 20);
+}
+
+void DiagramWidget::highlightTrain(std::shared_ptr<Train> train)
+{
+    unselectTrain();
+    _selectedTrain = train;
+
+    setTrainShow(train, true);
+    _page->highlightTrainItems(*_selectedTrain);
+
+    nowItem->setText(_selectedTrain->trainName().full());
 }
 
 void DiagramWidget::showTrainEventText()

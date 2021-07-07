@@ -24,6 +24,9 @@ public:
     QString last_file;
     QString default_file = "sample.pyetgr";
     int table_row_height = 25;
+
+    bool show_train_tooltip = true;
+
     //todo: dock show..
 
     /**
@@ -213,6 +216,11 @@ public:
      * 用于导入列车时
      */
     void applyBindOn(TrainCollection& coll);
+
+    /**
+     * 所给线名是否非空且不与别人重复，但忽略rail所示对象
+     */
+    bool isValidRailName(const QString& name, std::shared_ptr<Railway> rail);
 
 private:
     void bindAllTrains();

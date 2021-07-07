@@ -29,7 +29,11 @@ struct AdapterStation{
     AdapterStation(std::list<TrainStation>::iterator trainStation_,
         std::weak_ptr<RailStation> railStation_):
         trainStation(trainStation_),railStation(railStation_){}
+    bool operator<(double y)const;
+    inline double yValue()const { return railStation.lock()->y_value.value(); }
 };
+
+bool operator<(double y, const AdapterStation& adp);
 
 
 
@@ -95,6 +99,7 @@ public:
      * 注意：原则上不允许在中间修改
      */
     auto& stations() { return _stations; }
+    const auto& stations()const { return _stations; }
     auto& adapter() { return _adapter; }
     std::shared_ptr<Train> train();
     std::shared_ptr<const Train> train()const;
@@ -163,6 +168,17 @@ public:
      * 本运行线总里程，终点减起点的绝对值
      */
     double totalMile()const;
+
+
+    /**
+     * 由指定y，通过二分查找，返回相应的车站。
+     * 返回车站采用：运行方向的区间后站。
+     * 返回车站采用std::lower_bound: iterator to he first element that not less than `y`.
+     * 对上行采用反迭代器查
+     * ！！注意迭代器有效性！！
+     */
+    std::deque<AdapterStation>::const_iterator
+        stationFromYValue(double y)const;
 
 private:
 
@@ -310,6 +326,7 @@ private:
     inline bool isStartingOrTerminal(ConstAdaPtr st)const {
         return isStartingStation(st) || isTerminalStation(st);
     }
+
 
 };
 

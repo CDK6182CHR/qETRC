@@ -29,14 +29,16 @@ enum class TrainEventType:int8_t {
 
 namespace qeutil {
     QString eventTypeString(TrainEventType t);
+
+    /**
+     * @brief timeCompare  全局函数 考虑周期边界条件下的时间比较
+     * 采用能够使得两时刻之间所差时长最短的理解方式来消歧
+     * @return tm1 < tm2  tm1是否被认为在tm2之前
+     */
+    bool timeCompare(const QTime& tm1, const QTime& tm2);
 }
 
-/**
- * @brief timeCompare  全局函数 考虑周期边界条件下的时间比较
- * 采用能够使得两时刻之间所差时长最短的理解方式来消歧
- * @return tm1 < tm2  tm1是否被认为在tm2之前
- */
-bool timeCompare(const QTime& tm1, const QTime& tm2);
+
 
 
 /**
