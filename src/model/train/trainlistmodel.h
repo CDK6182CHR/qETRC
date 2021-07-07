@@ -2,6 +2,7 @@
 
 #include <QAbstractTableModel>
 #include <QObject>
+#include <QUndoStack>
 #include <memory>
 #include <functional>
 #include <optional>
@@ -21,6 +22,8 @@ class TrainListModel : public QAbstractTableModel
     Q_OBJECT
 
     TrainCollection& coll;
+    QUndoStack*const _undo;
+
     enum Columns {
         ColTrainName=0,
         ColStarting,
@@ -34,7 +37,7 @@ class TrainListModel : public QAbstractTableModel
 public:
     friend class TrainListWidget;
 
-    TrainListModel(TrainCollection& coll, QObject* parent);
+    TrainListModel(TrainCollection& coll,QUndoStack* undo, QObject* parent);
 
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual int columnCount(const QModelIndex &parent) const override;
@@ -53,15 +56,9 @@ signals:
     void trainShowChanged(std::shared_ptr<Train> train, bool show);
 
     /**
-     * 这个信号通告MainWindow, 完成UndoCmd的压栈操作
-     */
-    void trainSorted(const QList<std::shared_ptr<Train>>& oldList,
-        TrainListModel* model);
-
-    /**
      * 这个信号只用来通告MainWindow，让NaviTree重新排序一下
      */
-    void informTrainSorted();
+    //void informTrainSorted();
 
     void trainsRemovedUndone(const QList<std::shared_ptr<Train>>& trains);
     void trainsRemovedRedone(const QList<std::shared_ptr<Train>>& trains);

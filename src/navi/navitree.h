@@ -23,6 +23,8 @@ class NaviTree : public QTreeView
 public:
     NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget* parent = nullptr);
 
+    DiagramNaviModel* naviModel() { return _model; }
+
 protected:
     virtual void currentChanged(const QModelIndex& cur, const QModelIndex& prev)override;
 

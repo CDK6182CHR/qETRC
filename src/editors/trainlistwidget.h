@@ -5,12 +5,13 @@
 #include <QString>
 #include <QLineEdit>
 #include <QUndoCommand>
+#include <QUndoStack>
 #include <QList>
 
 #include "data/train/traincollection.h"
 #include "model/train/trainlistmodel.h"
 
-class MainWindow;
+
 
 /**
  * 和undo/redo有关的命令放在qecmd命名空间以回避冲突
@@ -29,17 +30,10 @@ namespace qecmd {
         QList<int> _indexes;
         TrainCollection& coll;
         TrainListModel* const model;
-
-        /**
-         * 如果持有MainWindow指针，则在Undo, redo时执行相应的界面操作
-         */
-        MainWindow* mw = nullptr;
-        bool first = true;
     public:
         RemoveTrains(const QList<std::shared_ptr<Train>>& trains,
             const QList<int>& indexes, TrainCollection& coll_,
             TrainListModel* model_,
-            MainWindow* mw,
             QUndoCommand* parent = nullptr);
 
         virtual void undo()override;
@@ -53,8 +47,6 @@ namespace qecmd {
 
         const auto& trains()const { return _trains; }
         auto& trains() { return _trains; }
-
-        void setMainWindow(MainWindow* d) { mw = d; }
     };
 
     /**
@@ -81,24 +73,28 @@ namespace qecmd {
  * 列车列表  主体是一个类似只读的ListView
  * 暂时直接套ListView实现
  * 注意尽量不要用Diagram的API，方便以后用到列车数据库中去
+ * undoStack传入空指针表示不支持撤销
  */
 class TrainListWidget : public QWidget
 {
     Q_OBJECT
 
     TrainCollection& coll;
+    QUndoStack* const _undo;
     QTableView* table;
     QLineEdit* editSearch;
     TrainListModel* model;
 
 public:
-    explicit TrainListWidget(TrainCollection& coll_, QWidget *parent_ = nullptr);
+    explicit TrainListWidget(TrainCollection& coll_, QUndoStack* undo, QWidget *parent_ = nullptr);
 
     /**
      * 刷新数据。
      * TODO: 这个操作总觉得很危险。。
      */
     void refreshData();
+
+    auto* getModel() { return model; }
 
 private:
     void initUI();
@@ -111,22 +107,9 @@ signals:
     void addNewTrain();
 
     /**
-     * 列车删除后发送信号给MainWindow
-     * 注意不能传cmd，否则如果没人接受，就内存泄漏了
-     */
-    void trainsRemoved(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes,
-        TrainListModel* model);
-
-    void trainsRemovedUndone(const QList<std::shared_ptr<Train>>& trains);
-    void trainsRemovedRedone(const QList<std::shared_ptr<Train>>& trains);
-
-
-    /**
      * 列车发生排序，但没有增删改
      */
-    void trainReordered();
-
-    void trainSorted(const QList<std::shared_ptr<Train>>& ord, TrainListModel* model);
+    //void trainReordered();
 
 private slots:
     void searchTrain();

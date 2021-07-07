@@ -6,22 +6,17 @@
 #include <QtWidgets>
 #include <QString>
 
-TrainListWidget::TrainListWidget(TrainCollection& coll_, QWidget* parent):
-	QWidget(parent), coll(coll_),model(new TrainListModel(coll_,this)),
+TrainListWidget::TrainListWidget(TrainCollection& coll_, QUndoStack* undo, QWidget* parent):
+	QWidget(parent), coll(coll_),_undo(undo), model(new TrainListModel(coll_,undo,this)),
 	table(new QTableView),editSearch(new QLineEdit)
 {
 	initUI();
-
-	connect(model, SIGNAL(trainsRemovedUndone(const QList<std::shared_ptr<Train>>&)),
-		this, SIGNAL(trainsRemovedUndone(const QList<std::shared_ptr<Train>>&)));
-	connect(model, SIGNAL(trainsRemovedRedone(const QList<std::shared_ptr<Train>>&)),
-		this, SIGNAL(trainsRemovedRedone(const QList<std::shared_ptr<Train>>&)));
 }
 
 void TrainListWidget::refreshData()
 {
+	model->beginResetModel();
 	model->endResetModel();
-	table->update();
 	table->resizeColumnsToContents();
 }
 
@@ -46,9 +41,6 @@ void TrainListWidget::initUI()
 	table->resizeColumnsToContents();
 	vlay->addWidget(table);
 	connect(table, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(editButtonClicked()));
-	connect(model, SIGNAL(informTrainSorted()), this, SIGNAL(trainReordered()));
-	connect(model, SIGNAL(trainSorted(const QList<std::shared_ptr<Train>>&, TrainListModel*)),
-		this, SIGNAL(trainSorted(const QList<std::shared_ptr<Train>>&, TrainListModel*)));
 	
 	connect(table->selectionModel(), &QItemSelectionModel::currentRowChanged,
 		this, &TrainListWidget::onCurrentRowChanged);
@@ -111,9 +103,13 @@ void TrainListWidget::actRemoveTrains()
 		trains.prepend(train);
 	}
 
-	model->redoRemoveTrains(trains, rows);
-
-	emit trainsRemoved(trains, rows, model);
+	if (_undo) {
+		_undo->push(new qecmd::RemoveTrains(trains, rows, coll, model));
+	}
+	else {
+		//不支持撤销，就直接执行了
+		model->redoRemoveTrains(trains, rows);
+	}
 }
 
 void TrainListWidget::onCurrentRowChanged(const QModelIndex& idx)
@@ -126,9 +122,9 @@ void TrainListWidget::onCurrentRowChanged(const QModelIndex& idx)
 
 qecmd::RemoveTrains::RemoveTrains(const QList<std::shared_ptr<Train>>& trains,
 	const QList<int>& indexes, TrainCollection& coll_, TrainListModel* model_,
-	MainWindow* mw_, QUndoCommand* parent) :
+	QUndoCommand* parent) :
 	QUndoCommand(QObject::tr("删除") + QString::number(trains.size()) + QObject::tr("个车次"), parent),
-	_trains(trains), _indexes(indexes), coll(coll_), model(model_), mw(mw_)
+	_trains(trains), _indexes(indexes), coll(coll_), model(model_)
 {
 }
 
@@ -139,10 +135,6 @@ void qecmd::RemoveTrains::undo()
 
 void qecmd::RemoveTrains::redo()
 {
-	if (first) {
-		first = false;
-		return;
-	}
 	model->redoRemoveTrains(_trains, _indexes);
 }
 

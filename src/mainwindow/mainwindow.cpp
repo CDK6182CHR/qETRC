@@ -87,7 +87,8 @@ void MainWindow::undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains)
     for (auto p : trains) {
         addTrainLine(*p);
     }
-    informTrainListChanged();
+    //现在TrainListModel的信号直接发给NaviModel了
+    //informTrainListChanged();
 }
 
 void MainWindow::redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains)
@@ -101,7 +102,7 @@ void MainWindow::redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains)
             }
         }
     }
-    informTrainListChanged();
+    //informTrainListChanged();
 }
 
 void MainWindow::onStationTableChanged(std::shared_ptr<Railway> rail, bool equiv)
@@ -128,9 +129,9 @@ void MainWindow::updateAllDiagrams()
 void MainWindow::onTrainsImported()
 {
     updateAllDiagrams();
-    informTrainListChanged();
+    //informTrainListChanged();
     //手动更新TrainList
-    trainListWidget->refreshData();
+    trainListWidget->refreshData();   //这个自动调用naviTree的更新操作！
     undoStack->clear();  //不支持撤销
     markChanged();
 }
@@ -193,20 +194,18 @@ void MainWindow::initDockWidgets()
     
     //列车管理
     if constexpr (true) {
-        auto* tw = new TrainListWidget(_diagram.trainCollection());
+        auto* tw = new TrainListWidget(_diagram.trainCollection(), undoStack);
         dock = new ads::CDockWidget(tr("列车管理"));
         trainListWidget = tw;
         trainListDock = dock;
         dock->setWidget(tw);
         manager->addDockWidget(ads::LeftDockWidgetArea, dock);
-        connect(tw, SIGNAL(trainsRemoved(const QList<std::shared_ptr<Train>>&, const QList<int>&,
-            TrainListModel*)),
-            this, SLOT(trainsRemoved(const QList<std::shared_ptr<Train>>&, const QList<int>&,
-                TrainListModel*)));
-        connect(tw, SIGNAL(trainReordered()), this, SLOT(trainsReordered()));
-        connect(tw, &TrainListWidget::trainSorted, this, &MainWindow::trainSorted);
-        connect(tw, &TrainListWidget::trainsRemovedUndone, this, &MainWindow::undoRemoveTrains);
-        connect(tw, &TrainListWidget::trainsRemovedRedone, this, &MainWindow::redoRemoveTrains);
+        connect(tw->getModel(), &TrainListModel::trainsRemovedUndone,
+            this, &MainWindow::undoRemoveTrains);
+        connect(tw->getModel(), &TrainListModel::trainsRemovedRedone, 
+            this, &MainWindow::redoRemoveTrains);
+        connect(tw->getModel(), &QAbstractItemModel::modelReset,
+            naviModel, &DiagramNaviModel::resetTrainList);
         connect(tw, &TrainListWidget::currentTrainChanged, this, &MainWindow::focusInTrain);
     }
 
@@ -529,13 +528,13 @@ void MainWindow::closeEvent(QCloseEvent* e)
     e->accept();
 }
 
-void MainWindow::informTrainListChanged()
-{
-    //注意：现在这个函数总是由TrainList那边变化发起的，所以TrainList不用更新
-    naviModel->resetModel();
-    //trainListWidget->refreshData();
-    markChanged();   //既然通知变化了，就默认真的发生了变化！
-}
+//void MainWindow::informTrainListChanged()
+//{
+//    //注意：现在这个函数总是由TrainList那边变化发起的，所以TrainList不用更新
+//    naviModel->resetModel();
+//    //trainListWidget->refreshData();
+//    markChanged();   //既然通知变化了，就默认真的发生了变化！
+//}
 
 void MainWindow::informPageListChanged()
 {
@@ -543,17 +542,17 @@ void MainWindow::informPageListChanged()
     markChanged();
 }
 
-void MainWindow::trainsReordered()
-{
-    informTrainListChanged();
-}
-
-void MainWindow::trainSorted(const QList<std::shared_ptr<Train>>& oldList, 
-    TrainListModel* model)
-{
-    undoStack->push(new qecmd::SortTrains(oldList, model));
-    trainsReordered();
-}
+//void MainWindow::trainsReordered()
+//{
+//    //informTrainListChanged();
+//}
+//
+//void MainWindow::trainSorted(const QList<std::shared_ptr<Train>>& oldList, 
+//    TrainListModel* model)
+//{
+//    undoStack->push(new qecmd::SortTrains(oldList, model));
+//    trainsReordered();
+//}
 
 void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
 {
@@ -733,12 +732,6 @@ void MainWindow::focusInRailway(std::shared_ptr<Railway> rail)
 void MainWindow::focusOutRailway()
 {
     ribbonBar()->hideContextCategory(contextRail->context());
-}
-
-void MainWindow::trainsRemoved(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes,
-    TrainListModel* model)
-{
-    undoStack->push(new qecmd::RemoveTrains(trains, indexes, _diagram.trainCollection(),model, this));
 }
 
 

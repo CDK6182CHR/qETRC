@@ -220,23 +220,16 @@ private slots:
 public slots:
 
     /**
-     * 从TrainListWidget发起的删除列车操作
-     * 注意包含UndoStack压栈操作！！
-     */
-    void trainsRemoved(const QList<std::shared_ptr<Train>>& trains, 
-        const QList<int>& indexes, TrainListModel* model);
-
-    /**
      * 列车列表变化（添加或删除），提示相关更新
      * 主要是通告Navi那边变化！
      */
-    void informTrainListChanged();
+    //void informTrainListChanged();
 
     void informPageListChanged();
 
-    void trainsReordered();
+    //void trainsReordered();
 
-    void trainSorted(const QList<std::shared_ptr<Train>>& oldList, TrainListModel* model);
+    //void trainSorted(const QList<std::shared_ptr<Train>>& oldList, TrainListModel* model);
 
     /**
      * 打开（或创建）指定线路的编辑面板

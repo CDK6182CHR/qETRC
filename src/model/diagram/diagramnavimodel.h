@@ -19,6 +19,7 @@ class DiagramNaviModel : public QAbstractItemModel
 
     Diagram& _diagram;
     std::unique_ptr<navi::DiagramItem> _root;
+
 public:
     explicit DiagramNaviModel(Diagram& diagram, QObject* parent);
 
@@ -48,7 +49,12 @@ private:
     //for convenient..
     using ACI = navi::AbstractComponentItem;
     using pACI = navi::AbstractComponentItem*;
-    pACI getParentItem(const QModelIndex& parent)const;
+    pACI getItem(const QModelIndex& parent)const;
+
+public slots:
+    void resetTrainList();
+    //void resetRailwayList();
+    //void resetPageList();
 };
 
 

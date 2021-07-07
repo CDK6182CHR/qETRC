@@ -138,6 +138,15 @@ QString navi::TrainListItem::data(int i) const
 	}
 }
 
+void navi::TrainListItem::resetChildren()
+{
+	_trains.clear();   //删除child
+	int row = 0;
+	for (auto p : _coll.trains()) {
+		_trains.emplace_back(std::make_unique<TrainModelItem>(p, row++, this));
+	}
+}
+
 navi::AbstractComponentItem* navi::TrainListItem::child(int i)
 {
 	if (i >= 0 && i < _trains.size())

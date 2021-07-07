@@ -41,7 +41,7 @@ int DiagramNaviModel::rowCount(const QModelIndex& parent) const
 {
     if (parent.column() > 0)
         return 0;
-    auto* parentItem = getParentItem(parent);
+    auto* parentItem = getItem(parent);
     if (parentItem)
         return parentItem->childCount();
     return 0;
@@ -109,7 +109,7 @@ void DiagramNaviModel::removeTailRailways(int cnt)
 }
 
 
-navi::AbstractComponentItem* DiagramNaviModel::getParentItem(const QModelIndex& parent) const
+navi::AbstractComponentItem* DiagramNaviModel::getItem(const QModelIndex& parent) const
 {
     pACI parentItem;
     if (!parent.isValid())
@@ -117,6 +117,15 @@ navi::AbstractComponentItem* DiagramNaviModel::getParentItem(const QModelIndex& 
     else
         parentItem = static_cast<pACI>(parent.internalPointer());
     return parentItem;
+}
+
+void DiagramNaviModel::resetTrainList()
+{
+    beginResetModel();
+    auto idx = index(navi::DiagramItem::RowTrains, 0);
+    auto item = static_cast<navi::TrainListItem*>(getItem(idx));
+    item->resetChildren();
+    endResetModel();
 }
 
 

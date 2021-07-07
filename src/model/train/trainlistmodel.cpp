@@ -1,9 +1,9 @@
 ﻿#include "trainlistmodel.h"
+#include "editors/trainlistwidget.h"
 
 
-
-TrainListModel::TrainListModel(TrainCollection& collection, QObject* parent):
-	QAbstractTableModel(parent), coll(collection)
+TrainListModel::TrainListModel(TrainCollection& collection, QUndoStack* undo, QObject* parent):
+	QAbstractTableModel(parent), coll(collection), _undo(undo)
 {
 }
 
@@ -100,8 +100,13 @@ void TrainListModel::sort(int column, Qt::SortOrder order)
 	}
 	
 	endResetModel();
-	if (oldList != lst)   //顺序一样就当作无事发生
-		emit trainSorted(oldList, this);
+
+	if (oldList != lst) {
+		if (_undo) {
+			//注意压栈后的第一个Redo是不执行的
+			_undo->push(new qecmd::SortTrains(oldList, this));
+		}
+	}
 }
 
 QVariant TrainListModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -125,7 +130,6 @@ void TrainListModel::undoRedoSort(QList<std::shared_ptr<Train>>& lst)
 	beginResetModel();
 	std::swap(coll.trains(), lst);
 	endResetModel();
-	emit informTrainSorted();
 }
 
 void TrainListModel::redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains,

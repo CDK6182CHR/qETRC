@@ -17,7 +17,7 @@ ImportTrainDialog::ImportTrainDialog(Diagram& diagram_, QWidget* parent):
 void ImportTrainDialog::initUI()
 {
 	auto* hlay = new QHBoxLayout;
-	widget = new TrainListWidget(other);
+    widget = new TrainListWidget(other, nullptr);
 	hlay->addWidget(widget);
 
 	auto* vlay = new QVBoxLayout;
