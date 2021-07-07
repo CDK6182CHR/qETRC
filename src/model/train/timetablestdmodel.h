@@ -25,6 +25,7 @@ class TimetableStdModel : public QEMoveableModel
      * 如果不启用，则为目前的主程序设计，以信号的形式，由第三方来处理undo/redo的操作。
      */
     const bool commitInPlace;
+    bool updating = false;
 public:
     enum Columns {
         ColName=0,
@@ -54,6 +55,11 @@ private slots:
     void actApply();
     void actCancel();
     void actRemove();
+
+    /**
+     * 当时刻数据变化，实时计算停时
+     */
+    void onDataChanged(const QModelIndex& leftTop, const QModelIndex& rightBottom);
 
 
 };

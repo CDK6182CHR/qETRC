@@ -80,6 +80,8 @@ public:
      */
     void addPageWidget(std::shared_ptr<DiagramPage> page);
 
+    auto* getManager() { return manager; }
+
 private:
     /**
      * 程序启动，构建UI

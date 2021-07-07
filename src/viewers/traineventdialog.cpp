@@ -30,45 +30,61 @@ void TrainEventModel::setupModel()
 			tr("在%1的事件表:\n").arg(adp->railway().name());
 		for (const StationEventList& st : lst) {
 			int row = rowCount();
-			setRowCount(row + st.stEvents.size());
-			//站内事件表
-			for (const StationEvent& t : st.stEvents) {
-				auto* it = new SI(adp->railway().name());
-				setItem(row, ColRail, it);
-
-				it = new SI(t.time.toString("hh:mm:ss"));
-				setItem(row, ColTime, it);
-
-				auto rst = t.station.lock();
-				setItem(row, ColPlace, new SI(rst->name.toSingleLiteral()));
-				setItem(row, ColMile, new SI(QString::number(rst->mile, 'f', 3)));
-				setItem(row, ColEvent, new SI(qeutil::eventTypeString(t.type)));
-				if (t.another.has_value())
-					setItem(row, ColOther, new SI(t.another.value().get().trainName().full()));
+			setRowCount(row + st.stEvents.size() + st.itEvents.size());
+			//采用MergeSort的办法处理...
+			auto pst = st.stEvents.begin();
+			auto pit = st.itEvents.begin();
+			while (pst != st.stEvents.end() && pit != st.itEvents.end()) {
+				if (qeutil::timeCompare(pit->time, pst->time))
+					setIntervalRow(row++, adp, *(pit++));
 				else
-					setItem(row, ColOther, new SI);
-				setItem(row, ColNote, new SI(t.note));
-				etrcReport += t.toString() + "\n";
-				++row;
+					setStationRow(row++, adp, *(pst++));
 			}
-			setRowCount(row + st.itEvents.size());
-			//区间事件表
-			for (const IntervalEvent& t : st.itEvents) {
-				setItem(row, ColRail, new SI(adp->railway().name()));
-				setItem(row, ColTime, new SI(t.time.toString("hh:mm:ss")));
-				setItem(row, ColPlace, new SI(tr("%1-%2")
-					.arg(t.former.trainStation->name.toSingleLiteral())
-					.arg(t.latter.trainStation->name.toSingleLiteral())));
-				setItem(row, ColMile, new SI(QString::number(t.mile, 'f', 3)));
-				setItem(row, ColEvent, new SI(qeutil::eventTypeString(t.type)));
-				setItem(row, ColOther, new SI(t.another.get().trainName().full()));
-				setItem(row, ColNote, new SI(t.note));
-				etrcReport += t.toString() + '\n';
-				++row;
+			for (; pst != st.stEvents.end(); ++pst) {
+				setStationRow(row++, adp, *pst);
+			}
+			for (; pit != st.itEvents.end(); ++pit) {
+				setIntervalRow(row++, adp, *pit);
 			}
 		}
 	}
 	endResetModel();
+}
+
+void TrainEventModel::setStationRow(int row,std::shared_ptr<TrainAdapter> adp, const StationEvent& t)
+{
+	using SI = QStandardItem;
+	auto* it = new SI(adp->railway().name());
+	setItem(row, ColRail, it);
+
+	it = new SI(t.time.toString("hh:mm:ss"));
+	setItem(row, ColTime, it);
+
+	auto rst = t.station.lock();
+	setItem(row, ColPlace, new SI(rst->name.toSingleLiteral()));
+	setItem(row, ColMile, new SI(QString::number(rst->mile, 'f', 3)));
+	setItem(row, ColEvent, new SI(qeutil::eventTypeString(t.type)));
+	if (t.another.has_value())
+		setItem(row, ColOther, new SI(t.another.value().get().trainName().full()));
+	else
+		setItem(row, ColOther, new SI);
+	setItem(row, ColNote, new SI(t.note));
+	etrcReport += QString::number(row + 1) + ". " + t.toString() + "\n";
+}
+
+void TrainEventModel::setIntervalRow(int row, std::shared_ptr<TrainAdapter> adp, const IntervalEvent& t)
+{
+	using SI = QStandardItem;
+	setItem(row, ColRail, new SI(adp->railway().name()));
+	setItem(row, ColTime, new SI(t.time.toString("hh:mm:ss")));
+	setItem(row, ColPlace, new SI(tr("%1-%2")
+		.arg(t.former.trainStation->name.toSingleLiteral())
+		.arg(t.latter.trainStation->name.toSingleLiteral())));
+	setItem(row, ColMile, new SI(QString::number(t.mile, 'f', 3)));
+	setItem(row, ColEvent, new SI(qeutil::eventTypeString(t.type)));
+	setItem(row, ColOther, new SI(t.another.get().trainName().full()));
+	setItem(row, ColNote, new SI(t.note));
+	etrcReport += QString::number(row + 1) + ". " + t.toString() + '\n';
 }
 
 TrainEventDialog::TrainEventDialog(Diagram& diagram_, std::shared_ptr<Train> train_, QWidget* parent) :
@@ -86,6 +102,7 @@ void TrainEventDialog::initUI()
 	
 	auto* vlay = new QVBoxLayout;
 	auto* table = new QTableView;
+	table->setEditTriggers(QTableView::NoEditTriggers);
 	table->setModel(model);
 	table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
 	table->resizeColumnsToContents();

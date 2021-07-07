@@ -1,11 +1,16 @@
 ﻿#include "timetablestdmodel.h"
+#include <utility>
 
+#include "util/utilfunc.h"
 
 
 TimetableStdModel::TimetableStdModel(bool inplace, QObject *parent):
     QEMoveableModel(parent), commitInPlace(inplace)
 {
-
+    connect(this, &QStandardItemModel::dataChanged, this, &TimetableStdModel::onDataChanged);
+    setHorizontalHeaderLabels({
+        tr("站名"),tr("到点"),tr("开点"),tr("营业"),tr("股道"),tr("备注"),tr("停时")
+        });
 }
 
 void TimetableStdModel::setTrain(std::shared_ptr<Train> train)
@@ -42,6 +47,7 @@ void TimetableStdModel::setupModel()
         setRowCount(0);
         return;
     }
+    updating = true;
     using SI=QStandardItem;
     setRowCount(_train->timetable().size());
     setColumnCount(ColMAX);
@@ -72,9 +78,11 @@ void TimetableStdModel::setupModel()
         int sec=p->stopSec();
         if(sec){
             it=new SI(p->stopString());
+            it->setEditable(false);
             setItem(row,ColStopTime,it);
         }
     }
+    updating = false;
 }
 
 void TimetableStdModel::actCancel()
@@ -83,6 +91,30 @@ void TimetableStdModel::actCancel()
 
 void TimetableStdModel::actRemove()
 {
+}
+
+void TimetableStdModel::onDataChanged(const QModelIndex& leftTop, const QModelIndex& rightBottom)
+{
+    if (updating)
+        return;
+    int row1 = leftTop.row(), row2 = rightBottom.row();
+    int col1 = leftTop.column(), col2 = rightBottom.column();
+    //[row1,row2]包含时间的两列条件
+    if (std::max(col1, static_cast<int>(ColArrive)) <= 
+        std::min(col2, static_cast<int>(ColDepart))) {
+        for (int i = std::max(row1,0); i <= std::min(row2,rowCount()-1); i++) {
+            const QTime& arr = qvariant_cast<QTime>(item(i, ColArrive)->data(Qt::EditRole));
+            const QTime& dep = qvariant_cast<QTime>(item(i, ColDepart)->data(Qt::EditRole));
+            if (arr != dep) {
+                auto* it = new QStandardItem(qeutil::secsToString(arr, dep));
+                it->setEditable(false);
+                setItem(i, ColStopTime, it);
+            }
+            else {
+                takeItem(i, ColStopTime);
+            }
+        }
+    }
 }
 
 void TimetableStdModel::actApply()

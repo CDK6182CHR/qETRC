@@ -71,14 +71,53 @@ void TrainContext::initUI()
 	//编辑
 	if constexpr (true) {
 		auto* page = cont->addCategoryPage(tr("编辑"));
-		auto* panel = page->addPannel(tr(""));
+		auto* panel = page->addPannel(tr("基本"));
+
+		auto* act = new QAction(QIcon(":/icons/timetable.png"), tr("基本编辑"), this);
+		auto* btn = panel->addLargeAction(act);
+		btn->setMinimumWidth(80);
+		connect(act, SIGNAL(triggered()), this, SLOT(actShowBasicWidget()));
 	}
 	
+}
+
+int TrainContext::getBasicWidgetIndex()
+{
+	for (int i = 0; i < basicWidgets.size(); i++) {
+		auto p = basicWidgets.at(i);
+		if (p->train() == train)
+			return i;
+	}
+	return -1;
 }
 
 void TrainContext::actShowTrainLine()
 {
 	emit highlightTrainLine(train);
+}
+
+void TrainContext::actShowBasicWidget()
+{
+	int idx = getBasicWidgetIndex();
+	if (idx == -1) {
+		//创建
+		auto* w = new BasicTrainWidget(diagram.trainCollection(), false);
+		w->setTrain(train);
+		auto* dock = new ads::CDockWidget(tr("列车基本编辑 - %1").arg(train->trainName().full()));
+		dock->setWidget(w);
+		mw->getManager()->addDockWidgetFloating(dock);
+		basicWidgets.append(w);
+		basicDocks.append(dock);
+	}
+	else {
+		//保证可见
+		auto* dock = basicDocks.at(idx);
+		if (dock->isClosed()) {
+			dock->toggleView(true);
+		}
+		else
+			dock->setAsCurrentTab();
+	}
 }
 
 void TrainContext::setTrain(std::shared_ptr<Train> train_)

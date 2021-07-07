@@ -28,4 +28,6 @@ inline int secsTo(const QTime& tm1, const QTime& tm2) {
  */
 QString secsToString(int secs);
 
+QString secsToString(const QTime& tm1, const QTime& tm2);
+
 }

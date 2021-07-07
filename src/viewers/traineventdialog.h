@@ -44,6 +44,8 @@ public:
 
 private:
     void setupModel();
+    void setStationRow(int row, std::shared_ptr<TrainAdapter> adp, const StationEvent& e);
+    void setIntervalRow(int row, std::shared_ptr<TrainAdapter> adp, const IntervalEvent& e);
 };
 
 
