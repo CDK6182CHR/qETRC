@@ -8,6 +8,7 @@
 
 #include "data/rail/rail.h"
 #include "model/delegate/qedelegate.h"
+#include "model/general/qemoveablemodel.h"
 
 /**
  * @brief The RailStationModel class
@@ -15,7 +16,7 @@
  * 注意使用StandartItem来暂存数据。
  * 注意要求parent()是QWidget，以方便弹出警告对话框。
  */
-class RailStationModel : public QStandardItemModel
+class RailStationModel : public QEMoveableModel
 {
     Q_OBJECT
     std::shared_ptr<Railway> railway;
@@ -37,7 +38,7 @@ public:
 
     void setRailway(std::shared_ptr<Railway> rail);
 
-    virtual bool insertRows(int row, int count, const QModelIndex &parent) override;
+    virtual void setupNewRow(int row)override;
 
     /*
      * 默认实现的DisplayRole和EditRole是同一个东西。要想显示的不一样，只有重写
@@ -49,17 +50,6 @@ public:
      * 三个Check的列不能编辑只能Check
      */
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
-
-    /**
-     * QStandardItemModel似乎没有实现这玩意，因此只有自己写。
-     * 这个API有点小题大做。
-     * preconditions: 
-     * （1）sourceParent==destinationParent （否则返回false）
-     * （2）src和dest的范围不重合 （否则UB）
-     */
-    virtual bool moveRows(const QModelIndex& sourceParent,
-        int sourceRow, int count,
-        const QModelIndex& destinationParent, int destinationChild)override;
 
     /**
     * 提交前检查表格数据是否存在非法情况，如果存在则以对话框提示。

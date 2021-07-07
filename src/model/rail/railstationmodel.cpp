@@ -4,7 +4,7 @@
 
 
 RailStationModel::RailStationModel(QUndoStack *undo, QWidget *parent):
-    QStandardItemModel(parent),_undo(undo)
+    QEMoveableModel(parent),_undo(undo)
 {
     setupModel();
 }
@@ -16,49 +16,45 @@ void RailStationModel::setRailway(std::shared_ptr<Railway> rail)
     setupModel();
 }
 
-bool RailStationModel::insertRows(int row, int count, const QModelIndex& parent)
+void RailStationModel::setupNewRow(int i)
 {
     using SI = QStandardItem;
-    QStandardItemModel::insertRows(row, count, parent);
-    //设置新插入的列的数据
-    //默认情况下，新插入的行有没有Item? 没有！
-    for (int i = row; i < row + count; i++) {
-        setItem(i, ColName, new QStandardItem);
-        
-        auto* it = new SI;
-        it->setData(0.0, Qt::EditRole);
-        setItem(i, ColMile, it);
 
-        setItem(i, ColCounter, new SI);
+    setItem(i, ColName, new QStandardItem);
 
-        it = new SI;
-        it->setData(4, Qt::EditRole);
-        setItem(i, ColLevel, it);
+    auto* it = new SI;
+    it->setData(0.0, Qt::EditRole);
+    setItem(i, ColMile, it);
 
-        it = new SI;
-        it->setCheckState(Qt::Checked);
-        it->setCheckable(true);
-        it->setEditable(false);
-        setItem(i, ColShow, it);
+    setItem(i, ColCounter, new SI);
 
-        it = new SI;
-        it->setData(3, Qt::EditRole);
-        setItem(i, ColDir, it);
+    it = new SI;
+    it->setData(4, Qt::EditRole);
+    setItem(i, ColLevel, it);
 
-        it = new SI;
-        it->setCheckState(Qt::Unchecked);
-        it->setCheckable(true);
-        it->setEditable(false);
-        setItem(i, ColPassenger, it);
+    it = new SI;
+    it->setCheckState(Qt::Checked);
+    it->setCheckable(true);
+    it->setEditable(false);
+    setItem(i, ColShow, it);
 
-        it = new SI;
-        it->setCheckState(Qt::Unchecked);
-        it->setEditable(false);
-        it->setCheckable(true);
-        setItem(i, ColFreight, it);
-    }
-    return true;
+    it = new SI;
+    it->setData(3, Qt::EditRole);
+    setItem(i, ColDir, it);
+
+    it = new SI;
+    it->setCheckState(Qt::Unchecked);
+    it->setCheckable(true);
+    it->setEditable(false);
+    setItem(i, ColPassenger, it);
+
+    it = new SI;
+    it->setCheckState(Qt::Unchecked);
+    it->setEditable(false);
+    it->setCheckable(true);
+    setItem(i, ColFreight, it);
 }
+
 
 QVariant RailStationModel::data(const QModelIndex& index, int role) const
 {
@@ -73,27 +69,6 @@ Qt::ItemFlags RailStationModel::flags(const QModelIndex& index) const
     return QStandardItemModel::flags(index);
 }
 
-bool RailStationModel::moveRows(const QModelIndex& sourceParent, int sourceRow, int count, 
-    const QModelIndex& destinationParent, int destinationChild)
-{
-    if (sourceParent == destinationParent) {
-        for (int i = 0; i < count; i++) {
-            int src = sourceRow + i, dst = destinationChild + i;
-            if (src != dst) {
-                //在dst前面插入一行，内容为src；然后删除src那一行
-                insertRow(dst);
-                int nsrc = src > dst ? src + 1 : src;
-                for (int j = 0; j < ColMAX; j++) {
-                    setItem(dst, j, takeItem(nsrc, j));  //注行号可能变了!
-                }
-                removeRow(nsrc);
-            }
-        }
-    }
-
-    return QStandardItemModel::moveRows(sourceParent, sourceRow, count, 
-        destinationParent, destinationChild);
-}
 
 bool RailStationModel::checkRailway(std::shared_ptr<Railway> rail)
 {

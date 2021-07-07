@@ -48,7 +48,9 @@ SOURCES += \
     src/model/diagram/componentitems.cpp \
     src/model/diagram/diagramnavimodel.cpp \
     src/model/diagram/railtablemodel.cpp \
+    src/model/general/qemoveablemodel.cpp \
     src/model/rail/railstationmodel.cpp \
+    src/model/train/timetablestdmodel.cpp \
     src/model/train/trainlistmodel.cpp \
     src/navi/addpagedialog.cpp \
     src/navi/navitree.cpp \
@@ -96,7 +98,9 @@ HEADERS += \
     src/model/diagram/componentitems.h \
     src/model/diagram/diagramnavimodel.h \
     src/model/diagram/railtablemodel.h \
+    src/model/general/qemoveablemodel.h \
     src/model/rail/railstationmodel.h \
+    src/model/train/timetablestdmodel.h \
     src/model/train/trainlistmodel.h \
     src/navi/addpagedialog.h \
     src/navi/navitree.h \
