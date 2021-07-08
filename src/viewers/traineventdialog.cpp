@@ -78,8 +78,8 @@ void TrainEventModel::setIntervalRow(int row, std::shared_ptr<TrainAdapter> adp,
 	setItem(row, ColRail, new SI(adp->railway().name()));
 	setItem(row, ColTime, new SI(t.time.toString("hh:mm:ss")));
 	setItem(row, ColPlace, new SI(tr("%1-%2")
-		.arg(t.former.trainStation->name.toSingleLiteral())
-		.arg(t.latter.trainStation->name.toSingleLiteral())));
+		.arg(t.former->name.toSingleLiteral())
+		.arg(t.latter->name.toSingleLiteral())));
 	setItem(row, ColMile, new SI(QString::number(t.mile, 'f', 3)));
 	setItem(row, ColEvent, new SI(qeutil::eventTypeString(t.type)));
 	setItem(row, ColOther, new SI(t.another.get().trainName().full()));
@@ -107,6 +107,8 @@ void TrainEventDialog::initUI()
 	table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
 	table->resizeColumnsToContents();
 	vlay->addWidget(table);
+	connect(table->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
+		table, SLOT(sortByColumn(int, Qt::SortOrder)));
 
     auto* g = new ButtonGroup<4>({ "ETRC风格","导出表格","导出文本","关闭" });
 	vlay->addLayout(g);

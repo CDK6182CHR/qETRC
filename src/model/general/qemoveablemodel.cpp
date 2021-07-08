@@ -7,6 +7,7 @@ QEMoveableModel::QEMoveableModel(QObject* parent) : QStandardItemModel(parent)
 
 bool QEMoveableModel::moveRows(const QModelIndex& sourceParent, int sourceRow, int count, const QModelIndex& destinationParent, int destinationChild)
 {
+	updating = true;
 	if (sourceParent == destinationParent) {
 		for (int i = 0; i < count; i++) {
 			int src = sourceRow + i, dst = destinationChild + i;
@@ -15,22 +16,24 @@ bool QEMoveableModel::moveRows(const QModelIndex& sourceParent, int sourceRow, i
 				insertRow(dst);
 				int nsrc = src > dst ? src + 1 : src;
 				for (int j = 0; j < columnCount(); j++) {
-					setItem(dst, j, takeItem(nsrc, j));  //注行号可能变了!
+					setItem(dst, j, takeItem(nsrc, j));  //行号可能变了!
 				}
 				removeRow(nsrc);
 			}
 		}
 	}
-	return QStandardItemModel::moveRows(sourceParent, sourceRow, count,
-		destinationParent, destinationChild);
+	updating = false;
+	return true;
 }
 
 bool QEMoveableModel::insertRows(int row, int count, const QModelIndex& parent)
 {
+	updating = true;
 	bool flag = QStandardItemModel::insertRows(row, count, parent);
 	if (flag)
 		for (int i = 0; i < count; i++)
 			setupNewRow(row + i);
+	updating = false;
 	return flag;
 }
 

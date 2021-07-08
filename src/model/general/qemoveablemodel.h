@@ -9,6 +9,8 @@
 class QEMoveableModel : public QStandardItemModel
 {
 	Q_OBJECT
+protected:
+	bool updating = false;
 public:
 	explicit QEMoveableModel(QObject* parent = nullptr);
 

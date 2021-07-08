@@ -83,12 +83,31 @@ void TrainContext::initUI()
 
 int TrainContext::getBasicWidgetIndex()
 {
+	return getBasicWidgetIndex(train);
+}
+
+int TrainContext::getBasicWidgetIndex(std::shared_ptr<Train> t)
+{
 	for (int i = 0; i < basicWidgets.size(); i++) {
 		auto p = basicWidgets.at(i);
-		if (p->train() == train)
+		if (p->train() == t)
 			return i;
 	}
 	return -1;
+}
+
+int TrainContext::getBasicWidgetIndex(ads::CDockWidget* dock)
+{
+	for (int i = 0; i < basicDocks.size(); i++) {
+		if (basicDocks.at(i) == dock)
+			return i;
+	}
+	return -1;
+}
+
+void TrainContext::removeTrainWidget(std::shared_ptr<Train> train)
+{
+	removeBasicDockAt(getBasicWidgetIndex(train));
 }
 
 void TrainContext::actShowTrainLine()
@@ -105,6 +124,8 @@ void TrainContext::actShowBasicWidget()
 		w->setTrain(train);
 		auto* dock = new ads::CDockWidget(tr("列车基本编辑 - %1").arg(train->trainName().full()));
 		dock->setWidget(w);
+		//dock->setAttribute(Qt::WA_DeleteOnClose);
+		connect(dock, SIGNAL(closed()), this, SLOT(onTrainDockClosed()));
 		mw->getManager()->addDockWidgetFloating(dock);
 		basicWidgets.append(w);
 		basicDocks.append(dock);
@@ -118,6 +139,26 @@ void TrainContext::actShowBasicWidget()
 		else
 			dock->setAsCurrentTab();
 	}
+}
+
+void TrainContext::onTrainDockClosed()
+{
+	auto* dock = static_cast<ads::CDockWidget*>(sender());
+	if (dock) {
+		int idx = getBasicWidgetIndex(dock);
+		if (idx == -1)
+			return;
+		removeBasicDockAt(idx);
+	}
+}
+
+void TrainContext::removeBasicDockAt(int idx)
+{
+	if (idx == -1)
+		return;
+	auto* dock = basicDocks.takeAt(idx);
+	basicWidgets.removeAt(idx);
+	dock->deleteDockWidget();
 }
 
 void TrainContext::setTrain(std::shared_ptr<Train> train_)

@@ -1,10 +1,11 @@
 ﻿#include "timetablestdmodel.h"
 #include <utility>
+#include <QMessageBox>
 
 #include "util/utilfunc.h"
 
 
-TimetableStdModel::TimetableStdModel(bool inplace, QObject *parent):
+TimetableStdModel::TimetableStdModel(bool inplace, QWidget *parent):
     QEMoveableModel(parent), commitInPlace(inplace)
 {
     connect(this, &QStandardItemModel::dataChanged, this, &TimetableStdModel::onDataChanged);
@@ -81,16 +82,39 @@ void TimetableStdModel::setupModel()
             it->setEditable(false);
             setItem(row,ColStopTime,it);
         }
+        else {
+            takeItem(row, ColStopTime);
+        }
     }
     updating = false;
 }
 
-void TimetableStdModel::actCancel()
+std::shared_ptr<Train> TimetableStdModel::getTimetableTrain()
 {
+    auto* p = qobject_cast<QWidget*>(parent());
+    auto t = std::make_shared<Train>(_train->trainName());
+    for (int i = 0; i < rowCount(); i++) {
+        const  QString& name = item(i, ColName)->text();
+        if (name.isEmpty()) {
+            QMessageBox::warning(p, tr("错误"),
+                tr("站名不能为空，请重新输入。\n第%1行").arg(i + 1));
+            return nullptr;
+        }
+        t->appendStation(
+            StationName::fromSingleLiteral(name),
+            qvariant_cast<QTime>(item(i, ColArrive)->data(Qt::EditRole)),
+            qvariant_cast<QTime>(item(i, ColDepart)->data(Qt::EditRole)),
+            item(i, ColBusiness)->checkState() == Qt::Checked,
+            item(i, ColTrack)->text(),
+            item(i, ColNote)->text()
+        );
+    }
+    return t;
 }
 
-void TimetableStdModel::actRemove()
+void TimetableStdModel::actCancel()
 {
+    refreshData();
 }
 
 void TimetableStdModel::onDataChanged(const QModelIndex& leftTop, const QModelIndex& rightBottom)
@@ -119,5 +143,8 @@ void TimetableStdModel::onDataChanged(const QModelIndex& leftTop, const QModelIn
 
 void TimetableStdModel::actApply()
 {
-
+    auto t = getTimetableTrain();
+    if (!t)
+        return;
+    //TODO here: 比较时刻表是否变化，然后发送信号
 }

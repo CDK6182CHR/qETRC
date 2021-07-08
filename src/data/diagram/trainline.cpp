@@ -313,11 +313,9 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 		if (pme != mylast && phe != hislast) {
 			auto pint = findIntervalIntersectionSameDir(mylast, pme, hislast, phe);
 			if (pint.has_value()) {
-				res[index - 1].emplace(IntervalEvent(
-					std::get<2>(pint.value()), std::get<1>(pint.value()),
+				addIntervalEvent(res, index - 1, std::get<2>(pint.value()), std::get<1>(pint.value()),
 					*mylast, *pme, std::cref(antrain), std::get<0>(pint.value()),
-					QObject::tr("区间越行??")
-				));
+					QObject::tr("区间越行??"));
 			}
 		}
 
@@ -365,20 +363,30 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 			ylast = ycond;
 		}
 		else {
-			if (ycond > 0 && dir() == Direction::Up ||
-				ycond < 0 && dir() == Direction::Down) {
+			if (ycond > 0 && dir() == Direction::Down ||
+				ycond < 0 && dir() == Direction::Up) {
 				//本次列车领先，推定出在前面那个站有无交叉
 				if (pme != _stations.begin()) {
 					int passedTime = getPrevousPassedTime(pme, rhe);
-					if (ycond != ylast&&the->timeInStoppedRange(passedTime)&&
+					if (the->timeInStoppedRange(passedTime)&&
 						!another.isStartingOrTerminal(phe)) {
-						//本次列车在上一站踩了它
-						res[index - 1].emplace(IntervalEvent(
+						//本次列车在上一站踩了它  改成站内事件
+						//res[index - 1].emplace(IntervalEvent(
+						//	TrainEventType::OverTaking,
+						//	QTime::fromMSecsSinceStartOfDay(passedTime),
+						//	*mylast, *pme, std::cref(antrain), rhe->mile,
+						//	QObject::tr("推定")
+						//));
+						res[index - 1].emplace(StationEvent(
 							TrainEventType::OverTaking,
 							QTime::fromMSecsSinceStartOfDay(passedTime),
-							*mylast, *pme, std::cref(antrain), rhe->mile,
-							QObject::tr("推定")
+							rhe, std::cref(antrain), QObject::tr("推定")
 						));
+						//qDebug() << ycond;
+						//qDebug() << "推定越行 " << mylast->trainStation->name << ", " <<
+						//	pme->trainStation->name;
+						//qDebug() << "HIS: " << hislast->trainStation->name << ", " <<
+						//	phe->trainStation->name << ", at " << rhe->name;
 					}
 				}
 			}
@@ -386,7 +394,7 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 				//本次列车落后，推定对方在本次列车这个站
 				if (phe != another._stations.begin() && (index != 0 || startLabel())) {
 					int passedTime = getPrevousPassedTime(phe, rme);
-					if (ycond!=ylast&&tme->timeInStoppedRange(passedTime)) {
+					if (tme->timeInStoppedRange(passedTime)) {
 						//本次列车在本站被踩
 						res[index].emplace(StationEvent(
 							TrainEventType::Avoid, QTime::fromMSecsSinceStartOfDay(passedTime),
@@ -405,6 +413,12 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
 		sameDirStep(ycond, pme, phe, mylast, hislast, index);
 	}
 }
+
+#define SHOW_INTERVALS do{\
+qDebug() << "INTERVAL: [" << mylast->trainStation->name << " - "\
+<< pme->trainStation->name<<"] vs. [" << hislast->trainStation->name\
+<< " - " << phe->trainStation->name << "] @ " << antrain.trainName().full();\
+}while(false)
 
 void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, const Train& antrain) const
 {
@@ -442,10 +456,8 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
 		if (pme != _stations.begin() && phe != another._stations.rbegin()) {
 			auto pint = findIntervalIntersectionCounter(mylast, pme, hislast, phe);
 			if (pint.has_value()) {
-				res[index - 1].emplace(IntervalEvent(
-					std::get<2>(pint.value()), std::get<1>(pint.value()),
-					*mylast, *pme, std::cref(antrain), std::get<0>(pint.value())
-				));
+				addIntervalEvent(res, index - 1, std::get<2>(pint.value()), std::get<1>(pint.value()),
+					*mylast, *pme, std::cref(antrain), std::get<0>(pint.value()));
 			}
 		}
 
@@ -486,21 +498,26 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
 			ylast = ycond;
 		}
 		else {
-			if (ycond > 0 && dir() == Direction::Up ||
-				ycond < 0 && dir() == Direction::Down) {
+			if (ycond > 0 && dir() == Direction::Down ||
+				ycond < 0 && dir() == Direction::Up) {
 				//本次列车领先，推定出在前面那个站有无交叉
 				//注意单向站。判断一下对方那个站是不是本次列车方向也经过的
 				if (rhe->isDirectionVia(dir())) {
 					if (pme!=_stations.begin()) {
 						int passedTime = getPrevousPassedTime(pme, rhe);
-						if (the->timeInStoppedRange(passedTime) && ycond != ylast) {
+						if (the->timeInStoppedRange(passedTime)) {
 							//新增ycond!=ylast条件，保证这个区间内前后关系变了
 							//本次列车在上一站踩了它
-							res[index - 1].emplace(IntervalEvent(
+							//res[index - 1].emplace(IntervalEvent(
+							//	TrainEventType::Meet,
+							//	QTime::fromMSecsSinceStartOfDay(passedTime),
+							//	*mylast, *pme, std::cref(antrain), rhe->mile,
+							//	QObject::tr("推定")
+							//));
+							res[index - 1].emplace(StationEvent(
 								TrainEventType::Meet,
 								QTime::fromMSecsSinceStartOfDay(passedTime),
-								*mylast, *pme, std::cref(antrain), rhe->mile,
-								QObject::tr("推定")
+								rhe, std::cref(antrain), QObject::tr("推定")
 							));
 						}
 					}
@@ -521,7 +538,7 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
 				if (rme->isDirectionVia(another.dir())&& (index != 0 || startLabel())) {
 					if (phe != another._stations.rbegin()) {
 						int passedTime = getPrevousPassedTime(phe, rme);
-						if (tme->timeInStoppedRange(passedTime)&&ycond!=ylast) {
+						if (tme->timeInStoppedRange(passedTime)) {
 							//本次列车在本站被踩
 							res[index].emplace(StationEvent(
 								TrainEventType::Meet, QTime::fromMSecsSinceStartOfDay(passedTime),
@@ -822,6 +839,54 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
 	}
 	else
 		return std::nullopt;
+}
+
+void TrainLine::addIntervalEvent(LineEventList& res, int index, TrainEventType type,
+	const QTime& time, const AdapterStation& former, 
+	const AdapterStation& latter, 
+	std::reference_wrapper<const Train> another, double mile, const QString& note) const
+{
+	auto rfor = former.railStation.lock(), rlat = latter.railStation.lock();
+	if (rfor->dirAdjacent(dir()) != rlat) {
+		//非相邻站，收缩区间
+		//现在假定缺站情况不严重，线性地往中间搜索
+		auto r1 = rfor->dirAdjacent(dir());   //临时变量
+		while (r1 && mileBeforeEq(r1, mile)) {
+			rfor = r1; r1 = r1->dirAdjacent(dir());
+		}
+		auto invdir = DirFunc::reverse(dir());
+		r1 = rlat->dirAdjacent(invdir);
+		while (r1 && mileAfterEq(r1, mile)) {
+			rlat = r1; r1 = r1->dirAdjacent(invdir);
+		}
+		//现在：rfor, rlat是收缩后的区间界限
+	}
+	decltype(rfor) rin{};   //如果站内事件，用这个
+	if (rfor->mile == mile)
+		rin = rfor;
+	else if (rlat->mile == mile)
+		rin = rlat;
+	if (rin) {
+		//判定为站内事件
+		res[index].emplace(StationEvent(type, time, rin, another, note));
+	}
+	else {
+		res[index].emplace(IntervalEvent(type, time, rfor, rlat, another, mile, note));
+	}
+}
+
+bool TrainLine::mileBeforeEq(std::shared_ptr<const RailStation> st, double mile) const
+{
+	return dir() == Direction::Down ?
+		st->mile <= mile :
+		st->mile >= mile;
+}
+
+bool TrainLine::mileAfterEq(std::shared_ptr<const RailStation> st, double mile) const
+{
+	return dir() == Direction::Down ?
+		st->mile >= mile :
+		st->mile <= mile;
 }
 
 QString TrainLine::stationString(const AdapterStation& st) const

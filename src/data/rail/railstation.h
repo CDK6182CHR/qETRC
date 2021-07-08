@@ -161,5 +161,13 @@ public:
             return nullptr;
         }
     }
+
+    inline bool operator<(double mile_)const {
+        return this->mile < mile_;
+    }
 };
+
+inline bool operator<(double mile, const RailStation& rs) {
+    return mile < rs.mile;
+}
 

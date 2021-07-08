@@ -46,8 +46,17 @@ private:
      */
     int getBasicWidgetIndex();
 
+    int getBasicWidgetIndex(std::shared_ptr<Train> t);
+
+    /**
+     * 由所给dock查找下标，用于关闭面板时删除
+     */
+    int getBasicWidgetIndex(ads::CDockWidget* dock);
+
 public slots:
     void setTrain(std::shared_ptr<Train> train_);
+
+    void removeTrainWidget(std::shared_ptr<Train> train);
 
 private slots:
     void showTrainEvents();
@@ -57,5 +66,9 @@ private slots:
      * 显示或者创建当前车次的基本编辑面板。
      */
     void actShowBasicWidget();
+
+    void onTrainDockClosed();
+
+    void removeBasicDockAt(int idx);
 };
 

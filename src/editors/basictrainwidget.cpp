@@ -2,6 +2,7 @@
 
 #include <QtWidgets>
 #include "data/diagram/diagram.h"
+#include "util/buttongroup.hpp"
 
 
 BasicTrainWidget::BasicTrainWidget(TrainCollection &coll_, bool commitInPlace_,
@@ -32,15 +33,34 @@ void BasicTrainWidget::refreshBasicData()
 
 void BasicTrainWidget::initUI()
 {
-    model=new TimetableStdModel(commitInPlace,this);
+    model = new TimetableStdModel(commitInPlace, this);
     auto* vlay = new QVBoxLayout;
+
     //暂时只搞一个table
     ctable = new QEControlledTable;
     table = ctable->table();
     table->setModel(model);
+    table->setEditTriggers(QTableView::CurrentChanged);
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     vlay->addWidget(ctable);
 
+    auto* g = new ButtonGroup<2>({ "确定","还原"});
+    vlay->addLayout(g);
+    g->connectAll(SIGNAL(clicked()), this, {
+        SLOT(actApply()),SLOT(actCancel())
+        });
+
     setLayout(vlay);
 }
+
+void BasicTrainWidget::actCancel()
+{
+    model->actCancel();
+}
+
+void BasicTrainWidget::actApply()
+{
+    model->actApply();
+}
+

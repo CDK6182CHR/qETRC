@@ -310,6 +310,26 @@ private:
         findIntervalIntersectionCounter(ConstAdaPtr mylast, ConstAdaPtr mythis,
             std::deque<AdapterStation>::const_reverse_iterator hislast,
             std::deque<AdapterStation>::const_reverse_iterator histhis)const;
+
+    /**
+     * 封装添加区间事件的操作，相比简单的添加，主要是增加了区间的判断。
+     * 对于列车时刻表区间非本线的小区间的情况，对线路做二分搜索确定具体区间。
+     * 当然，这样搜索出来，可能会得到站内事件。仅有恰好等于y坐标时（几乎不可能），才判为站内事件。
+     * index: 要插入的目标位置
+     * 注意搜索按照里程搜。这样可以保证被搜索序列递增 （用户设置线路数据时，添加强制检查）
+     */
+    void addIntervalEvent(LineEventList& res, int index, TrainEventType type, const QTime& time,
+        const AdapterStation& former, const AdapterStation& latter,
+        std::reference_wrapper<const Train> another, double mile,
+        const QString& note = "")const;
+
+    /**
+     * 判定st所示站是否在mile所示里程的运行方向前方或相等，即下行时里程比它小、上行时里程比它大
+     * 简单地比较里程
+     */
+    bool mileBeforeEq(std::shared_ptr<const RailStation> st, double mile)const;
+
+    bool mileAfterEq(std::shared_ptr<const RailStation> st, double m2)const;
     
     QString stationString(const AdapterStation& st)const;
 

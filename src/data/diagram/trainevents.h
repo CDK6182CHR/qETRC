@@ -80,18 +80,20 @@ struct AdapterStation;
 struct IntervalEvent{
     TrainEventType type;
     QTime time;
-    const AdapterStation& former, & latter;
+    std::shared_ptr<const RailStation> former, latter;
     std::reference_wrapper<const Train> another;
     double mile;
     QString note;
-    IntervalEvent(TrainEventType type_,const QTime& time_,
-                  const AdapterStation& former_,
-                  const AdapterStation& latter_,
-                  std::reference_wrapper<const Train> another_,
-                  double mile_, const QString& note_=""
-                  ):
-        type(type_),time(time_),former(former_),latter(latter_),
-        another(another_),mile(mile_),note(note_){}
+    IntervalEvent(TrainEventType type_, const QTime& time_,
+        std::shared_ptr<const RailStation> former_,
+        std::shared_ptr<const RailStation> latter_,
+        std::reference_wrapper<const Train> another_,
+        double mile_, const QString& note_ = ""
+    ) :
+        type(type_), time(time_), former(former_), latter(latter_),
+        another(another_), mile(mile_), note(note_) 
+    {
+    }
 
     IntervalEvent(IntervalEvent&&)noexcept = default;
     IntervalEvent(const IntervalEvent&) = default;

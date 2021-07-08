@@ -96,6 +96,7 @@ void MainWindow::redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains)
     for (auto p : diagramWidgets) {
         for (auto t : trains) {
             p->removeTrain(*t);
+            contextTrain->removeTrainWidget(t);
             if (t == contextTrain->getTrain()) {
                 contextTrain->resetTrain();
                 focusOutTrain();

@@ -34,11 +34,15 @@ public:
     void refreshData();
     void refreshBasicData();
     auto* timetableModel(){return model;}
+    ~BasicTrainWidget()noexcept = default;
 
 private:
     void initUI();
 
 signals:
 
+private slots:
+    void actApply();
+    void actCancel();
 };
 
