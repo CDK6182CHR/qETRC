@@ -62,6 +62,7 @@ class MainWindow : public SARibbonMainWindow
     QList<QAction*> actRecent;
 
     friend class ViewCategory;
+    friend class PageContext;
 
     bool changed = false;
 

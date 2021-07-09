@@ -57,6 +57,7 @@ class DiagramPage
     QList<std::shared_ptr<Railway>> _railways;
     QList<double> _startYs;
     QString _name;
+    QString _note;
     QHash<TrainLine*, TrainItem*> _itemMap;
     QHash<const Forbid*, QList<QGraphicsRectItem*>> _forbidDMap, _forbidUMap;   //天窗的item映射，分为上下行
     
@@ -68,7 +69,7 @@ class DiagramPage
 
 public:
     DiagramPage(const QList<std::shared_ptr<Railway>>& railways,
-        const QString& name);
+        const QString& name, const QString& note = "");
     /**
      * 注意这个Diagram只是借过来构造的，并不维护
      */
@@ -80,6 +81,10 @@ public:
     auto railwayAt(int i)const { return _railways.at(i); }
     const QString& name()const { return _name; }
     void setName(const QString& s) { _name = s; }
+
+    const QString& note()const { return _note; }
+    QString& note() { return _note; }
+    void setNote(const QString& n) { _note = n; }
 
     auto& itemMap() { return _itemMap; }
     const auto& itemMap()const { return _itemMap; }
@@ -151,6 +156,11 @@ public:
     bool containsRailway(std::shared_ptr<Railway> rail)const { return _railways.contains(rail); }
 
     bool containsRailway(const Railway& railway)const;
+
+    /**
+     * 交换名称和note，但不交换其他
+     */
+    void swapBaseInfo(DiagramPage& other);
 
 };
 

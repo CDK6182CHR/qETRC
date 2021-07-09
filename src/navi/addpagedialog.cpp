@@ -39,6 +39,10 @@ void AddPageDialog::initUI()
     form->addRow(tr("线路顺序预览"), editPrev);
     vlay->addLayout(form);
 
+    vlay->addWidget(new QLabel(tr("备注：")));
+    edNote = new QTextEdit;
+    vlay->addWidget(edNote);
+
     auto* box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal);
     vlay->addWidget(box);
 
@@ -84,7 +88,7 @@ void AddPageDialog::okClicked()
         rails.append(diagram.railways().at(p.row()));
     }
 
-    auto page = std::make_shared<DiagramPage>(rails, name);
+    auto page = std::make_shared<DiagramPage>(rails, name, edNote->toPlainText());
     emit creationDone(page);
     done(QDialog::Accepted);
 }

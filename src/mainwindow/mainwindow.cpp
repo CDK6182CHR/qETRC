@@ -40,40 +40,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     initUI();
     loadInitDiagram();
-
-    return;
-
-
-
-    //暴力构造测试用例
-
-
-    //auto s = QString(R"(D:\Python\train_graph\sample.pyetgr)");
-    //auto s = QString(R"(D:\Python\train_graph\source\京沪线上局段20191230.pyetgr)");
-    auto s = QString(R"(D:\Python\train_graph\source\濉阜线.json)");
-    //auto s = R"(D:\Python\train_graph\source\成贵客专线F20191230-分颜色.pyetgr)";
-
-    clearDiagramUnchecked();
-    _diagram.fromJson(s);
-    //_diagram.config().avoid_cover = false;
-    qDebug() << "trains count: " << _diagram.trainCollection().trains().size() << Qt::endl;
-
-    
-    auto t = QString(R"(D:\Python\train_graph\source\阜淮、淮南线.json)");
-    //auto t = QString(R"(D:\Python\train_graph\source\京局410\京广线京石段.json)");
-    Diagram d2;
-    d2.fromJson(t);
-    _diagram.addRailway(d2.firstRailway());
-    _diagram.addTrains(d2.trainCollection());
-
-    _diagram.createDefaultPage();
-
-    auto page = std::make_shared<DiagramPage>(
-        QList<std::shared_ptr<Railway>>{ _diagram.railways().at(0) }, tr("濉阜线"));
-    _diagram.pages().append(page);
-    
-    endResetGraph();
-
 }
 
 MainWindow::~MainWindow()
@@ -357,6 +323,8 @@ void MainWindow::initToolbar()
         contextPage = new PageContext(_diagram, cat, this);
         connect(contextPage, &PageContext::pageRemoved,
             naviView, &NaviTree::removePage);
+        connect(contextPage, &PageContext::pageNameChanged,
+            naviModel, &DiagramNaviModel::onPageNameChanged);
     }
 
     //context: train

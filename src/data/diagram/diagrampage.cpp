@@ -4,8 +4,8 @@
 #include "kernel/trainitem.h"
 
 DiagramPage::DiagramPage(const QList<std::shared_ptr<Railway> > &railways,
-    const QString& name):
-    _railways(railways),_name(name)
+    const QString& name,const QString& note):
+    _railways(railways),_name(name),_note(note)
 {
 
 }
@@ -47,6 +47,7 @@ double DiagramPage::railwayStartY(const Railway& rail) const
 void DiagramPage::fromJson(const QJsonObject& obj, Diagram& _diagram)
 {
     _name = obj.value("name").toString();
+    _note = obj.value("note").toString();
     QJsonArray ar = obj.value("railways").toArray();
     for (auto p = ar.begin(); p != ar.end(); ++p) {
         auto r = _diagram.railwayByName(p->toString());
@@ -68,7 +69,8 @@ QJsonObject DiagramPage::toJson() const
     }
     return QJsonObject{
         {"name",_name},
-        {"railways",ar}
+        {"railways",ar},
+        {"note",_note}
     };
 }
 
@@ -149,4 +151,10 @@ bool DiagramPage::containsRailway(const Railway& railway) const
             return true;
     }
     return false;
+}
+
+void DiagramPage::swapBaseInfo(DiagramPage& other)
+{
+    std::swap(_name, other._name);
+    std::swap(_note, other._note);
 }

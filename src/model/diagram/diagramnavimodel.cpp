@@ -137,6 +137,13 @@ void DiagramNaviModel::removePageAt(int idx)
     endRemoveColumns();
 }
 
+void DiagramNaviModel::onPageNameChanged(int i)
+{
+    QModelIndex idx0 = index(navi::DiagramItem::RowPages, 0);
+    QModelIndex idx1 = index(i, 0, idx0);
+    emit dataChanged(idx1, idx1);
+}
+
 void DiagramNaviModel::resetTrainList()
 {
     beginResetModel();

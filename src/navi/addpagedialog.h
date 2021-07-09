@@ -3,6 +3,7 @@
 #include <QDialog>
 #include <QTableView>
 #include <QLineEdit>
+#include <QTextEdit>
 #include <QItemSelection>
 #include <QUndoCommand>
 
@@ -52,6 +53,7 @@ class AddPageDialog : public QDialog
     RailTableModel* model;
     QTableView* table;
     QLineEdit* editName, * editPrev;
+    QTextEdit* edNote;
 public:
     AddPageDialog(Diagram& diagram_, QWidget* parent=nullptr);
 

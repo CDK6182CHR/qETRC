@@ -58,6 +58,8 @@ public slots:
 
     void insertPage(std::shared_ptr<DiagramPage> page, int index);
     void removePageAt(int index);
+
+    void onPageNameChanged(int i);
 };
 
 
