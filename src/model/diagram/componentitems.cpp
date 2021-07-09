@@ -82,11 +82,35 @@ QString navi::PageListItem::data(int i)const
 	case ColItemName:return QObject::tr("运行图视窗");
 	case ColItemNumber:return QString::number(_diagram.pages().size());
 	default:return "";
-	}
+    }
+}
+
+void navi::PageListItem::insertPage(std::shared_ptr<DiagramPage> page, int i)
+{
+    _diagram.pages().insert(i,page);
+    auto p=_pages.begin();
+    std::advance(p,i);
+    p=_pages.insert(p,std::make_unique<PageItem>(page,i,this));
+    for(++p;p!=_pages.end();++p){
+        (*p)->setRow((*p)->row()+1);
+    }
+
+}
+
+void navi::PageListItem::removePageAt(int i)
+{
+    _diagram.pages().removeAt(i);
+    auto p=_pages.begin();
+    std::advance(p,i);
+    p=_pages.erase(p);
+    for(;p!=_pages.end();++p){
+        (*p)->setRow((*p)->row()-1);
+    }
 }
 
 navi::AbstractComponentItem* navi::RailwayItem::child(int i)
 {
+    Q_UNUSED(i);
 	return nullptr;
 }
 

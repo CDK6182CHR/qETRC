@@ -188,6 +188,14 @@ bool Diagram::isValidRailName(const QString& name, std::shared_ptr<Railway> rail
     return true;
 }
 
+int Diagram::getPageIndex(std::shared_ptr<DiagramPage> page) const
+{
+    for (int i = 0; i < _pages.size(); i++)
+        if (_pages.at(i) == page)
+            return i;
+    return -1;
+}
+
 void Diagram::bindAllTrains()
 {
     for (auto p : _railways) {

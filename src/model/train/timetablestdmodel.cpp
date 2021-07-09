@@ -146,5 +146,7 @@ void TimetableStdModel::actApply()
     auto t = getTimetableTrain();
     if (!t)
         return;
-    //TODO here: 比较时刻表是否变化，然后发送信号
+    if (_train->timetableSame(*t))
+        return;
+    emit timetableChanged(_train, t);
 }

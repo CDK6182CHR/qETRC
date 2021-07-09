@@ -120,6 +120,8 @@ void TrainListWidget::onCurrentRowChanged(const QModelIndex& idx)
 	emit currentTrainChanged(coll.trainAt(row));
 }
 
+
+
 qecmd::RemoveTrains::RemoveTrains(const QList<std::shared_ptr<Train>>& trains,
 	const QList<int>& indexes, TrainCollection& coll_, TrainListModel* model_,
 	QUndoCommand* parent) :

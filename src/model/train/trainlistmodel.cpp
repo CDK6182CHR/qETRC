@@ -155,3 +155,11 @@ void TrainListModel::undoRemoveTrains(const QList<std::shared_ptr<Train>>& train
 	emit trainsRemovedUndone(trains);
 }
 
+void TrainListModel::onTrainChanged(std::shared_ptr<Train> train)
+{
+	int idx = coll.getTrainIndex(train);
+	if (idx != -1) {
+		emit dataChanged(index(idx, ColTrainName), index(idx, MAX_COLUMNS - 1));
+	}
+}
+

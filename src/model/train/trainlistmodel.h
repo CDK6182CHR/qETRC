@@ -77,5 +77,11 @@ public slots:
 
     void undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains,
         const QList<int>& indexes);
+
+    /**
+     * 指定列车数据更改 （目前仅考虑时刻表更改）
+     * 更新数据。暂定线性查找
+     */
+    void onTrainChanged(std::shared_ptr<Train> train);
 };
 

@@ -611,6 +611,26 @@ void Train::invalidateTempData()
     _locStaySecs = std::nullopt;
 }
 
+bool Train::timetableSame(const Train& other)const
+{
+    const auto& tab1 = _timetable, & tab2 = other._timetable;
+    if (tab1.size() != tab2.size())
+        return false;
+    for (auto p = tab1.begin(), q = tab2.begin();
+        p != tab1.end(); ++p, ++q) {
+        if (*p != *q)
+            return false;
+    }
+    return true;
+}
+
+
+void Train::swapTimetable(Train& other)
+{
+    std::swap(_timetable, other._timetable);
+    invalidateTempData();
+}
+
 
 
 bool Train::ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)

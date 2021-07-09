@@ -35,6 +35,7 @@ public:
 
 signals:
     void highlightTrainLine(std::shared_ptr<Train> train);
+    void timetableChanged(std::shared_ptr<Train> train);
     
 private:
     void initUI();
@@ -53,10 +54,26 @@ private:
      */
     int getBasicWidgetIndex(ads::CDockWidget* dock);
 
+    /**
+     * 更新指定车次打开的时刻表窗口。未见得是当前车次。
+     */
+    void updateTrainWidget(std::shared_ptr<Train> t);
+
 public slots:
     void setTrain(std::shared_ptr<Train> train_);
 
     void removeTrainWidget(std::shared_ptr<Train> train);
+
+    /**
+     * 由更新命令直接调用，将操作cmd压栈
+     */
+    void onTrainTimetableChanged(std::shared_ptr<Train> train, std::shared_ptr<Train> table);
+
+    /**
+     * 实际更新时刻表。undo/redo调用。
+     * 更新数据，重新绑定数据，更新时刻表页面，更新列表页面（可能有里程等数据的变化），铺画运行图
+     */
+    void commitTimetableChange(std::shared_ptr<Train> train, std::shared_ptr<Train> table);
 
 private slots:
     void showTrainEvents();
@@ -71,4 +88,19 @@ private slots:
 
     void removeBasicDockAt(int idx);
 };
+
+
+namespace qecmd {
+    class ChangeTimetable :
+        public QUndoCommand
+    {
+        std::shared_ptr<Train> train, table;
+        TrainContext* const cont;
+    public:
+        ChangeTimetable(std::shared_ptr<Train> train, std::shared_ptr<Train> newtable,
+            TrainContext* context, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+}
 

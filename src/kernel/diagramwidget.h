@@ -85,6 +85,20 @@ public:
     void removeTrain(Train& train);
 
     /**
+     * 删除由adps所指的原本属于某列车的运行线，用于更新列车运行线
+     * 注意对adp只允许使用其中TrainLine的地址信息，用作删除索引。
+     * 右值引用，强调xvalue语义
+     */
+    void removeTrain(QList<std::shared_ptr<TrainAdapter>>&& adps);
+
+    /**
+     * 当指定列车时刻更新时调用。
+     * 暂定为先删除再重新铺画
+     * adps作为旧运行线的索引,xvalue语义
+     */
+    void updateTrain(std::shared_ptr<Train>, QList<std::shared_ptr<TrainAdapter>>&& adps);
+
+    /**
      * 显示或隐藏列车运行线
      * 如果没有铺画过，现场铺画
      */
@@ -94,6 +108,8 @@ public:
 
     void setTrainShow(std::shared_ptr<TrainLine> line, bool show);
 
+    auto page()const { return _page; }
+
 protected:
     virtual void mousePressEvent(QMouseEvent* e)override;
 
@@ -102,6 +118,8 @@ protected:
     virtual void mouseDoubleClickEvent(QMouseEvent* e)override;
 
     virtual void resizeEvent(QResizeEvent* e)override;
+
+    virtual void focusInEvent(QFocusEvent* e)override;
 
 private:
 
@@ -211,6 +229,7 @@ private:
 signals:
     void showNewStatus(QString);
     void trainSelected(std::shared_ptr<Train> train);
+    void pageFocussedIn(std::shared_ptr<DiagramPage> page);
 
 private slots:
     void updateTimeAxis();

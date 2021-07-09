@@ -352,6 +352,18 @@ public:
         return _starting.toSingleLiteral() + "->" + _terminal.toSingleLiteral();
     }
 
+    /**
+     * 比较两车次时刻表是否一致。
+     * 但不比较其他的东西
+     */
+    bool timetableSame(const Train& other)const;
+
+    /**
+     * 与指定对象交换时刻表，用于undo/redo时刻表更新
+     */
+    void swapTimetable(Train& other);
+
+
     //static比较函数 用来排序
     static bool ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
     static bool ltStarting(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);

@@ -17,7 +17,7 @@ class NaviTree : public QTreeView
 {
     Q_OBJECT;
 
-    QMenu* mePageList, * meRailList, * meTrainList;
+    QMenu* mePageList, * meRailList, * meTrainList, * mePage;
     DiagramNaviModel* _model;
     QUndoStack* const _undo;
 public:
@@ -35,7 +35,10 @@ private:
 
 
 signals:
-    void pageAdded(std::shared_ptr<DiagramPage> page);
+    void pageInserted(std::shared_ptr<DiagramPage> page, int index);
+    void pageRemoved(int index);
+
+
     void focusInPage(std::shared_ptr<DiagramPage> page);
     void focusOutPage();
     void focusInTrain(std::shared_ptr<Train> train);
@@ -55,10 +58,34 @@ private slots:
     
     void onDoubleClicked(const QModelIndex& index);
 
+    /**
+     * AddPageDialog返回后进入
+     */
+    void addNewPageApply(std::shared_ptr<DiagramPage> page);
+
+    void onRemovePageContext();
+
 public slots:
     void importRailways();
     void addNewPage();
+    
     void importTrains();
+
+    void commitAddPage(std::shared_ptr<DiagramPage> page);
+
+    /**
+     * 撤销添加页面，则直接删掉最后一个就好了
+     */
+    void undoAddPage();
+
+    /**
+     * 压栈cmd操作
+     */
+    void removePage(int index);
+
+    void commitRemovePage(int index);
+
+    void undoRemovePage(std::shared_ptr<DiagramPage> page, int index);
     
 };
 
@@ -74,4 +101,5 @@ namespace qecmd {
         virtual void undo()override;
         virtual void redo()override;
     };
+
 }

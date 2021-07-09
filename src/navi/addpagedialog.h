@@ -10,15 +10,30 @@
 #include "data/diagram/diagrampage.h"
 #include "model/diagram/railtablemodel.h"
 
-class MainWindow;
+class NaviTree;
 namespace qecmd {
     class AddPage :public QUndoCommand {
         Diagram& diagram;
         std::shared_ptr<DiagramPage> page;
-        MainWindow* mw;
+        NaviTree* navi;
     public:
         AddPage(Diagram& diagram_, std::shared_ptr<DiagramPage> page_,
-            MainWindow* mw_, QUndoCommand* parent = nullptr);
+            NaviTree* nv, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    /**
+     * 虽然和AddPage没关系，但是属于对偶操作，放在一起 
+     */
+    class RemovePage :public QUndoCommand {
+        Diagram& diagram;
+        std::shared_ptr<DiagramPage> page;
+        NaviTree* navi;
+        int index;
+    public:
+        RemovePage(Diagram& diagram_, int index_,
+            NaviTree* navi_, QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
     };

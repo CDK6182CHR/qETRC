@@ -185,6 +185,27 @@ void DiagramWidget::removeTrain(Train& train)
         _selectedTrain.reset();
 }
 
+void DiagramWidget::removeTrain(QList<std::shared_ptr<TrainAdapter>>&& adps)
+{
+    for (auto adp : adps) {
+        for (auto p : adp->lines()) {
+            auto* item = _page->takeTrainItem(p.get());
+            if (item) {
+                scene()->removeItem(item);
+                delete item;
+            }
+        }
+    }
+}
+
+void DiagramWidget::updateTrain(std::shared_ptr<Train> train, QList<std::shared_ptr<TrainAdapter>>&& adps)
+{
+    removeTrain(std::move(adps));
+    paintTrain(train);
+    if (_selectedTrain == train)
+        highlightTrain(train);
+}
+
 void DiagramWidget::setTrainShow(std::shared_ptr<Train> train, bool show)
 {
     for (auto adp : train->adapters())
@@ -298,6 +319,12 @@ void DiagramWidget::resizeEvent(QResizeEvent* e)
     }
 }
 
+void DiagramWidget::focusInEvent(QFocusEvent* e)
+{
+    QGraphicsView::focusInEvent(e);
+    emit pageFocussedIn(_page);
+}
+
 void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, double width,
     QList<QGraphicsItem*>& leftItems, QList<QGraphicsItem*>& rightItems)
 {
@@ -385,7 +412,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
 
     const char* s0 = rail->ordinate() ? "排图标尺" : "区间距离";
     leftItems.append(addLeftTableText(
-        s0, textFont, 0, rect_start_y, margins.ruler_label_width, margins.title_row_height / 2
+        s0, textFont, 0, rect_start_y, margins.ruler_label_width, margins.title_row_height / 2.0
     ));
 
     leftItems.append(addLeftTableText(

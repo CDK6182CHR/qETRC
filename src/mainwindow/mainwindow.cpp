@@ -152,14 +152,14 @@ void MainWindow::removeAllTrains()
 }
 
 
-void MainWindow::undoAddPage(std::shared_ptr<DiagramPage> page)
-{
-    auto dock = diagramDocks.takeLast();
-    manager->removeDockWidget(dock);
-    delete dock;
-    diagramWidgets.removeLast();
-    informPageListChanged();
-}
+//void MainWindow::undoAddPage(std::shared_ptr<DiagramPage> page)
+//{
+//    auto dock = diagramDocks.takeLast();
+//    manager->removeDockWidget(dock);
+//    delete dock;
+//    diagramWidgets.removeLast();
+//    informPageListChanged();
+//}
 
 void MainWindow::initUI()
 {
@@ -182,7 +182,11 @@ void MainWindow::initDockWidgets()
 
         //context的显示条件：第一次触发时显示；后续一直在，该车次（线路，运行图）被删除则隐藏
         //各种focusout的slot保留，在需要隐藏的时候调用
-        connect(tree, &NaviTree::pageAdded, this, &MainWindow::actAddPage);
+        //connect(tree, &NaviTree::pageAdded, this, &MainWindow::actAddPage);
+
+        connect(tree, &NaviTree::pageInserted, this, &MainWindow::insertPageWidget);
+        connect(tree, &NaviTree::pageRemoved, this, &MainWindow::removePageAt);
+
         connect(tree, &NaviTree::focusInPage, this, &MainWindow::focusInPage);
         //connect(tree, &NaviTree::focusOutPage, this, &MainWindow::focusOutPage);
         connect(tree, &NaviTree::focusInTrain, this, &MainWindow::focusInTrain);
@@ -350,23 +354,23 @@ void MainWindow::initToolbar()
     //context: page
     if constexpr (true) {
         auto* cat = ribbon->addContextCategory(tr("运行图"));
-        contextPage = cat;
-        auto* page = cat->addCategoryPage(tr("管理"));
-        auto* panel = page->addPannel(tr(""));
-
-        QAction* act = new QAction(QIcon(":/icons/close.png"), tr("删除"), this);
-        //todo: connect
-        panel->addLargeAction(act);
-
-
+        contextPage = new PageContext(_diagram, cat, this);
+        connect(contextPage, &PageContext::pageRemoved,
+            naviView, &NaviTree::removePage);
     }
 
-    //context: train & rail
+    //context: train
     if constexpr (true) {
         auto* cat = ribbon->addContextCategory(tr("当前列车"));
         contextTrain = new TrainContext(_diagram, cat, this);
 
-        cat = ribbon->addContextCategory(tr("当前线路"));
+        connect(contextTrain, &TrainContext::timetableChanged,
+            trainListWidget->getModel(), &TrainListModel::onTrainChanged);
+    }
+
+    //context: rail
+    if constexpr (true) {
+        auto* cat = ribbon->addContextCategory(tr("当前线路"));
         contextRail = new RailContext(_diagram, cat, this, this);
     }
 
@@ -583,6 +587,13 @@ void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
     manager->addDockWidgetFloating(dock);
 }
 
+void MainWindow::updateTrainLines(std::shared_ptr<Train> train,QList<std::shared_ptr<TrainAdapter>>&& adps)
+{
+    for (auto p : diagramWidgets) {
+        p->updateTrain(train, std::move(adps));
+    }
+}
+
 void MainWindow::actOpenGraph()
 {
     if (changed && !saveQuestion())
@@ -669,23 +680,45 @@ void MainWindow::openRecentFile()
 
 void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)
 {
+
+    int idx = diagramDocks.size();
+    insertPageWidget(page, idx);
+}
+
+void MainWindow::insertPageWidget(std::shared_ptr<DiagramPage> page, int index)
+{
     DiagramWidget* dw = new DiagramWidget(_diagram, page);
-    auto* dock = new ads::CDockWidget(tr("运行图-%1").arg(page->name()));
+    auto* dock = new ads::CDockWidget(tr("运行图 - %1").arg(page->name()));
     dock->setWidget(dw);
     manager->addDockWidget(ads::RightDockWidgetArea, dock);
     QAction* act = dock->toggleViewAction();
     pageMenu->addAction(act);
-    diagramDocks.append(dock);
-    diagramWidgets.append(dw);
-    informPageListChanged();
+    diagramDocks.insert(index, dock);
+    diagramWidgets.insert(index, dw);
+    //informPageListChanged();
     connect(dw, &DiagramWidget::trainSelected, this, &MainWindow::focusInTrain);
     connect(contextTrain, &TrainContext::highlightTrainLine, dw, &DiagramWidget::highlightTrain);
+    connect(dw, &DiagramWidget::pageFocussedIn, this, &MainWindow::focusInPage);
 }
 
-void MainWindow::actAddPage(std::shared_ptr<DiagramPage> page)
+//void MainWindow::actAddPage(std::shared_ptr<DiagramPage> page)
+//{
+//    undoStack->push(new qecmd::AddPage(_diagram, page, this));
+//}
+
+void MainWindow::removePageAt(int index)
 {
-    undoStack->push(new qecmd::AddPage(_diagram, page, this));
+    auto dw = diagramWidgets.takeAt(index);
+    auto dock = diagramDocks.takeAt(index);
+    //借用dw来索引到被删除的Page 
+    if (contextPage->getPage() == dw->page()) {
+        contextPage->resetPage();
+        focusOutPage();
+    }
+    manager->removeDockWidget(dock);
+    delete dock;
 }
+
 
 void MainWindow::markChanged()
 {
@@ -705,12 +738,13 @@ void MainWindow::markUnchanged()
 
 void MainWindow::focusInPage(std::shared_ptr<DiagramPage> page)
 {
-    ribbonBar()->showContextCategory(contextPage);
+    contextPage->setPage(page);
+    ribbonBar()->showContextCategory(contextPage->context());
 }
 
 void MainWindow::focusOutPage()
 {
-    ribbonBar()->hideContextCategory(contextPage);
+    ribbonBar()->hideContextCategory(contextPage->context());
 }
 
 void MainWindow::focusInTrain(std::shared_ptr<Train> train)

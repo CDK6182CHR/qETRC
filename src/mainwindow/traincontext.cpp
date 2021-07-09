@@ -105,9 +105,34 @@ int TrainContext::getBasicWidgetIndex(ads::CDockWidget* dock)
 	return -1;
 }
 
+void TrainContext::updateTrainWidget(std::shared_ptr<Train> t)
+{
+	for (auto p : basicWidgets) {
+		if (p->train() == t)
+			p->refreshData();
+	}
+}
+
 void TrainContext::removeTrainWidget(std::shared_ptr<Train> train)
 {
 	removeBasicDockAt(getBasicWidgetIndex(train));
+}
+
+void TrainContext::onTrainTimetableChanged(std::shared_ptr<Train> train, std::shared_ptr<Train> table)
+{
+	mw->getUndoStack()->push(new qecmd::ChangeTimetable(train, table, this));
+}
+
+void TrainContext::commitTimetableChange(std::shared_ptr<Train> train, std::shared_ptr<Train> table)
+{
+	//以前的adapters，拿出来做删除的索引
+	//注意不能用引用，因为后面数据会被搞掉
+	QList<std::shared_ptr<TrainAdapter>> adps = std::move(train->adapters());
+	train->swapTimetable(*table);
+	diagram.updateTrain(train);
+	updateTrainWidget(train);
+	mw->updateTrainLines(train, std::move(adps));
+	emit timetableChanged(train);
 }
 
 void TrainContext::actShowTrainLine()
@@ -126,6 +151,8 @@ void TrainContext::actShowBasicWidget()
 		dock->setWidget(w);
 		//dock->setAttribute(Qt::WA_DeleteOnClose);
 		connect(dock, SIGNAL(closed()), this, SLOT(onTrainDockClosed()));
+		connect(w->timetableModel(), &TimetableStdModel::timetableChanged,
+			this, &TrainContext::onTrainTimetableChanged);
 		mw->getManager()->addDockWidgetFloating(dock);
 		basicWidgets.append(w);
 		basicDocks.append(dock);
@@ -173,4 +200,21 @@ void TrainContext::showTrainEvents()
 {
 	auto* dialog = new TrainEventDialog(diagram, train, mw);
 	dialog->show();
+}
+
+qecmd::ChangeTimetable::ChangeTimetable(std::shared_ptr<Train> train_, 
+	std::shared_ptr<Train> newtable, TrainContext* context, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("更新时刻表: ")+train_->trainName().full(),parent),
+	train(train_),table(newtable),cont(context)
+{
+}
+
+void qecmd::ChangeTimetable::undo()
+{
+	cont->commitTimetableChange(train, table);
+}
+
+void qecmd::ChangeTimetable::redo()
+{
+	cont->commitTimetableChange(train, table);
 }

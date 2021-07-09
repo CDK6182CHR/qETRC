@@ -60,6 +60,10 @@ public:
      * 停车时间的字符串表示：x分，或者x分x秒
      */
     QString stopString()const;
+
+    bool operator==(const TrainStation& other)const;
+
+    inline bool operator!=(const TrainStation& other)const { return !(*this == other); }
 };
 
 QDebug operator<<(QDebug debug, const TrainStation& ts);

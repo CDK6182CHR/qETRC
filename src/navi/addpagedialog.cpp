@@ -8,7 +8,7 @@
 #include <QMessageBox>
 #include <QModelIndex>
 
-#include "mainwindow/mainwindow.h"
+#include "navi/navitree.h"
 
 AddPageDialog::AddPageDialog(Diagram &diagram_, QWidget *parent):
     QDialog(parent),diagram(diagram_),model(new RailTableModel(diagram, this)),
@@ -91,20 +91,36 @@ void AddPageDialog::okClicked()
 
 qecmd::AddPage::AddPage(Diagram& diagram_, 
     std::shared_ptr<DiagramPage> page_, 
-    MainWindow* mw_, QUndoCommand* parent):
+    NaviTree* nv, QUndoCommand* parent):
     QUndoCommand(QObject::tr("添加运行图 ")+page_->name(),parent),
-    diagram(diagram_),page(page_),mw(mw_)
+    diagram(diagram_),page(page_),navi(nv)
 {
 }
 
 void qecmd::AddPage::undo()
 {
-    diagram.pages().removeOne(page);
-    mw->undoAddPage(page);
+    navi->undoAddPage();
 }
 
 void qecmd::AddPage::redo()
 {
-    diagram.pages().append(page);
-    mw->addPageWidget(page);
+    navi->commitAddPage(page);
+}
+
+qecmd::RemovePage::RemovePage(Diagram& diagram_, int index_,
+    NaviTree* navi_, QUndoCommand* parent):
+    QUndoCommand(parent),
+    diagram(diagram_),page(diagram_.pages().at(index_)),index(index_), navi(navi_)
+{
+    setText(QObject::tr("删除运行图: ") + page->name());
+}
+
+void qecmd::RemovePage::undo()
+{
+    navi->undoRemovePage(page, index);
+}
+
+void qecmd::RemovePage::redo()
+{
+    navi->commitRemovePage(index);
 }

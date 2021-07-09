@@ -42,6 +42,7 @@ SOURCES += \
     src/kernel/trainitem.cpp \
     src/main.cpp \
     src/mainwindow/mainwindow.cpp \
+    src/mainwindow/pagecontext.cpp \
     src/mainwindow/railcontext.cpp \
     src/mainwindow/traincontext.cpp \
     src/mainwindow/viewcategory.cpp \
@@ -91,6 +92,7 @@ HEADERS += \
     src/kernel/diagramwidget.h \
     src/kernel/trainitem.h \
     src/mainwindow/mainwindow.h \
+    src/mainwindow/pagecontext.h \
     src/mainwindow/railcontext.h \
     src/mainwindow/traincontext.h \
     src/mainwindow/version.h \

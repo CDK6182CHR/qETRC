@@ -82,6 +82,16 @@ QString TrainStation::stopString() const
     return qeutil::secsToString(stopSec());
 }
 
+bool TrainStation::operator==(const TrainStation& other) const
+{
+    return name == other.name &&
+        arrive == other.arrive &&
+        depart == other.depart &&
+        note == other.note &&
+        track == other.track &&
+        business == other.business;
+}
+
 QDebug operator<<(QDebug debug, const TrainStation& ts)
 {
     debug << ts.name << " " <<

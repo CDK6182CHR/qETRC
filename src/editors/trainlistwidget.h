@@ -127,6 +127,10 @@ private slots:
 
     void onCurrentRowChanged(const QModelIndex& idx);
 
+public slots:
+
+  
+
 };
 
 

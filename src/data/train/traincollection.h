@@ -155,6 +155,12 @@ public:
 
     inline int trainCount()const { return _trains.size(); }
 
+    /**
+     * 返回指定列车下标；如果找不到，返回-1.
+     * 线性查找
+     */
+    int getTrainIndex(std::shared_ptr<Train> train)const;
+
 private:
     /**
      * @brief addMapInfo

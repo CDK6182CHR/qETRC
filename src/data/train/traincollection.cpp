@@ -176,6 +176,15 @@ QString TrainCollection::validRoutingName(const QString& prefix)
 	}
 }
 
+int TrainCollection::getTrainIndex(std::shared_ptr<Train> train) const
+{
+	auto p = std::find(_trains.begin(), _trains.end(), train);
+	if (p == _trains.end())
+		return -1;
+	else
+		return std::distance(_trains.begin(), p);
+}
+
 void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 {
 	fullNameMap.insert(t->trainName().full(), t);

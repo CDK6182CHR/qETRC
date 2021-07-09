@@ -36,7 +36,8 @@ namespace navi {
 		virtual QString data(int i)const = 0;
 		virtual int type()const = 0;
 		inline AbstractComponentItem* parent() { return _parent; }
-		inline int row()const { return _row; }
+        inline int row()const { return _row; }
+        inline void setRow(int r){_row=r;}
 	};
 
 	class RailwayListItem;
@@ -106,6 +107,12 @@ namespace navi {
 		inline virtual int childCount()const override { return _pages.size(); }
 		virtual QString data(int i)const override;
 		inline virtual int type()const override { return Type; }
+
+		/**
+		 * 暂定在这里实施实际的数据插入操作
+		 */
+		void insertPage(std::shared_ptr<DiagramPage> page, int i);
+		void removePageAt(int i);
 	};
 
 

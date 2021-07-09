@@ -49,12 +49,15 @@ private:
     //for convenient..
     using ACI = navi::AbstractComponentItem;
     using pACI = navi::AbstractComponentItem*;
-    pACI getItem(const QModelIndex& parent)const;
+    pACI getItem(const QModelIndex& idx)const;
 
 public slots:
     void resetTrainList();
     //void resetRailwayList();
     //void resetPageList();
+
+    void insertPage(std::shared_ptr<DiagramPage> page, int index);
+    void removePageAt(int index);
 };
 
 

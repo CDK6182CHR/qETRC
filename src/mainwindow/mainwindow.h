@@ -25,6 +25,7 @@
 #include "traincontext.h"
 #include "railcontext.h"
 #include "viewcategory.h"
+#include "pagecontext.h"
 
 /**
  * @brief The MainWindow class
@@ -47,7 +48,7 @@ class MainWindow : public SARibbonMainWindow
     QList<RailStationWidget*> railStationWidgets;
     QList<ads::CDockWidget*> railStationDocks;
 
-    SARibbonContextCategory* contextPage;
+    PageContext* contextPage;
     TrainContext* contextTrain;
     RailContext* contextRail;
     ViewCategory* catView;
@@ -73,14 +74,29 @@ public:
     /**
      * 注意既然是Undo，这个就肯定在栈顶，直接删除最后一个就好了
      */
-    void undoAddPage(std::shared_ptr<DiagramPage> page);
+    //void undoAddPage(std::shared_ptr<DiagramPage> page);
 
     /**
      * 调用前，应当已经把Page加入到Diagram中
      */
     void addPageWidget(std::shared_ptr<DiagramPage> page);
 
+    /**
+     * 插入操作，用来撤销删除。
+     * 注意dock与diagram的顺序应当完全一致！！
+     */
+    void insertPageWidget(std::shared_ptr<DiagramPage> page, int index);
+
     auto* getManager() { return manager; }
+
+    auto* getUndoStack() { return undoStack; }
+
+    /**
+     * 列车信息变化，更新指定车次的所有运行线
+     * adps: 旧的Adapter，用来做索引删除以前的运行线
+     * 右值引用似乎不能作为slot，因此不做slot
+     */
+    void updateTrainLines(std::shared_ptr<Train> train, QList<std::shared_ptr<TrainAdapter>>&& adps);
 
 private:
     /**
@@ -172,8 +188,16 @@ private slots:
 
     /**
      * 用户操作的新增运行图页面，需做Undo操作
+     * 删除---undo在navi里面搞！
      */
-    void actAddPage(std::shared_ptr<DiagramPage> page);
+    //void actAddPage(std::shared_ptr<DiagramPage> page);
+
+    void removePageAt(int index);
+
+    /**
+     * 用来撤销添加Page
+     */
+    //void removeLastPage();
 
     void markChanged();
 
@@ -237,6 +261,8 @@ public slots:
      * 打开（或创建）指定线路的编辑面板
      */
     void actOpenRailStationWidget(std::shared_ptr<Railway> rail);
+
+  
 
 
 };

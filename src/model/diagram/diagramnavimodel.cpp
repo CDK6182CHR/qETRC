@@ -109,14 +109,32 @@ void DiagramNaviModel::removeTailRailways(int cnt)
 }
 
 
-navi::AbstractComponentItem* DiagramNaviModel::getItem(const QModelIndex& parent) const
+navi::AbstractComponentItem* DiagramNaviModel::getItem(const QModelIndex& idx) const
 {
     pACI parentItem;
-    if (!parent.isValid())
+    if (!idx.isValid())
         parentItem = _root.get();
     else
-        parentItem = static_cast<pACI>(parent.internalPointer());
+        parentItem = static_cast<pACI>(idx.internalPointer());
     return parentItem;
+}
+
+void DiagramNaviModel::insertPage(std::shared_ptr<DiagramPage> page, int idx)
+{
+    QModelIndex idx0 = index(navi::DiagramItem::RowPages, 0);
+    auto* item = static_cast<navi::PageListItem*>(getItem(idx0));
+    beginInsertRows(idx0, idx, idx);
+    item->insertPage(page, idx);
+    endInsertRows();
+}
+
+void DiagramNaviModel::removePageAt(int idx)
+{
+    QModelIndex idx0 = index(navi::DiagramItem::RowPages, 0);
+    auto* item = static_cast<navi::PageListItem*>(getItem(idx0));
+    beginRemoveRows(idx0, idx, idx);
+    item->removePageAt(idx);
+    endRemoveColumns();
 }
 
 void DiagramNaviModel::resetTrainList()

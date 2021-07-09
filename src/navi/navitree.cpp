@@ -8,7 +8,7 @@
 
 NaviTree::NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget *parent):
     QTreeView(parent),mePageList(new QMenu(this)),meRailList(new QMenu(this)),
-    meTrainList(new QMenu(this)),
+    meTrainList(new QMenu(this)),mePage(new QMenu(this)),
     _model(model_),_undo(undo)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -33,6 +33,10 @@ void NaviTree::initContextMenus()
     //TrainList
     act = meTrainList->addAction(tr("导入车次"));
     connect(act, SIGNAL(triggered()), this, SLOT(importTrains()));
+
+    //Page
+    act = mePage->addAction(tr("删除"));
+    connect(act, SIGNAL(triggered()), this, SLOT(onRemovePageContext()));
 }
 
 NaviTree::ACI* NaviTree::getItem(const QModelIndex& idx)
@@ -42,11 +46,25 @@ NaviTree::ACI* NaviTree::getItem(const QModelIndex& idx)
     return static_cast<ACI*>(idx.internalPointer());
 }
 
+void NaviTree::addNewPageApply(std::shared_ptr<DiagramPage> page)
+{
+    _undo->push(new qecmd::AddPage(_model->diagram(), page, this));
+}
+
+void NaviTree::onRemovePageContext()
+{
+    auto idx = currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::PageItem::Type) {
+        removePage(idx.row());
+    }
+}
+
 void NaviTree::addNewPage()
 {
     auto* dialog = new AddPageDialog(_model->diagram(), this);
     connect(dialog, SIGNAL(creationDone(std::shared_ptr<DiagramPage>)),
-        this, SIGNAL(pageAdded(std::shared_ptr<DiagramPage>)));
+        this, SLOT(addNewPageApply(std::shared_ptr<DiagramPage>)));
     dialog->open();
 }
 
@@ -55,6 +73,37 @@ void NaviTree::importTrains()
     auto* dialog = new ImportTrainDialog(_model->diagram(), this);
     connect(dialog, SIGNAL(trainsImported()), this, SIGNAL(trainsImported()));
     dialog->open();
+}
+
+void NaviTree::commitAddPage(std::shared_ptr<DiagramPage> page)
+{
+    int cnt = _model->diagram().pages().size();
+    _model->insertPage(page, cnt);
+    emit pageInserted(page, cnt);
+}
+
+void NaviTree::undoAddPage()
+{
+    int idx = _model->diagram().pages().size() - 1;
+    _model->removePageAt(idx);
+    emit pageRemoved(idx);
+}
+
+void NaviTree::removePage(int index)
+{
+    _undo->push(new qecmd::RemovePage(_model->diagram(), index, this));
+}
+
+void NaviTree::commitRemovePage(int idx)
+{
+    _model->removePageAt(idx);
+    emit pageRemoved(idx);
+}
+
+void NaviTree::undoRemovePage(std::shared_ptr<DiagramPage> page, int index)
+{
+    _model->insertPage(page, index);
+    emit pageInserted(page, index);
 }
 
 void NaviTree::importRailways()
@@ -127,6 +176,7 @@ void NaviTree::showContextMenu(const QPoint& pos)
     case navi::PageListItem::Type:mePageList->popup(p); break;
     case navi::RailwayListItem::Type:meRailList->popup(p); break;
     case navi::TrainListItem::Type:meTrainList->popup(p); break;
+    case navi::PageItem::Type:mePage->popup(p); break;
     }
     
 }

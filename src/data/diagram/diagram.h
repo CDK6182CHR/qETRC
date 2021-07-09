@@ -222,6 +222,8 @@ public:
      */
     bool isValidRailName(const QString& name, std::shared_ptr<Railway> rail);
 
+    int getPageIndex(std::shared_ptr<DiagramPage> page)const;
+
 private:
     void bindAllTrains();
     QString validPageName(const QString& prefix)const;
