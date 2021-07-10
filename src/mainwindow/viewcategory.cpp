@@ -264,11 +264,13 @@ void ViewCategory::refreshTypeGroup()
     auto& cfg = diagram.config();
     model->clear();
     int row = 0;
-    for (auto p = manager.types().begin(); p != manager.types().end(); ++p) {
-        auto* act = new QAction(p.key(), this);
+    for (auto p = coll.typeCount().begin(); p != coll.typeCount().end(); ++p) {
+        if (p.value() <= 0)
+            continue;
+        auto* act = new QAction(p.key()->name(), this);
         auto* item = new SARibbonGalleryItem(act);
         model->append(item);
-        if (!cfg.not_show_types.contains(p.key())) {
+        if (!cfg.not_show_types.contains(p.key()->name())) {
             //选择
             group->selectionModel()->select(model->index(row, 0, QModelIndex()),
                 QItemSelectionModel::Select);
@@ -302,7 +304,8 @@ void qecmd::ChangeTrainShow::redo()
 qecmd::ChangeTypeShow::ChangeTypeShow(const QList<std::shared_ptr<TrainLine>>& lines_, 
     ViewCategory* cat_, Config& cfg_, 
     QSet<QString> notShowTypes_, QUndoCommand* parent):
-    QUndoCommand(QObject::tr("设置显示类型"), parent), lines(lines_),cat(cat_), 
+    QUndoCommand(QObject::tr("设置显示类型 影响%1条运行线").arg(lines_.size()), parent),
+    lines(lines_),cat(cat_), 
     cfg(cfg_), notShowTypes(notShowTypes_)
 {
 }

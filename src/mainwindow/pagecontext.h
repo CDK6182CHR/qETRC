@@ -45,6 +45,8 @@ private slots:
 
     void actEdit();
 
+    void actPrint();
+
 public slots:
     void onEditApplied(std::shared_ptr<DiagramPage> page,std::shared_ptr<DiagramPage> newinfo);
 
@@ -65,8 +67,9 @@ class EditPageDialog :public QDialog
     QLineEdit* edName;
     QTextEdit* edNote;
     std::shared_ptr<DiagramPage> page;
+    Diagram& diagram;
 public:
-    EditPageDialog(std::shared_ptr<DiagramPage> page_, QWidget* parent = nullptr);
+    EditPageDialog(std::shared_ptr<DiagramPage> page_,Diagram& dia, QWidget* parent = nullptr);
 
 private:
     void initUI();

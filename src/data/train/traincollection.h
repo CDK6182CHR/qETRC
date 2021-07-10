@@ -4,6 +4,7 @@
 #include <QList>
 #include <QJsonObject>
 #include <QHash>
+#include <QMap>
 #include "data/train/train.h"
 #include "data/train/traintype.h"
 #include "routing.h"
@@ -29,6 +30,8 @@ class TrainCollection
     QHash<QString, QList<std::shared_ptr<Train>>> singleNameMap;
 
     TypeManager _manager;
+    QMap<std::shared_ptr<TrainType>, int> _typeCount;
+
 public:
     TrainCollection() = default;
     TrainCollection(const TrainCollection&) = delete;
@@ -60,6 +63,8 @@ public:
     const auto& trains()const{return _trains;}
     auto& routings() { return _routings; }
     const auto& routings()const { return _routings; }
+    auto& typeCount() { return _typeCount; }
+    const auto& typeCount()const { return _typeCount; }
 
     /**
      * @brief appendTrain 添加车次

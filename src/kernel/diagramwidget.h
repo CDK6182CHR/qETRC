@@ -67,7 +67,7 @@ public:
     auto selectedTrain() { return _selectedTrain; }
     void setSelectedTrain(std::shared_ptr<Train> train) { _selectedTrain = train; }
 
-    bool toPdf(const QString& filename, const QString& title);
+    bool toPdf(const QString& filename, const QString& title, const QString& note);
 
     void paintTrain(std::shared_ptr<Train> train);
     void paintTrain(Train& train);

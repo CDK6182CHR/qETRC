@@ -149,6 +149,16 @@ bool Diagram::pageNameExisted(const QString& name) const
     return false;
 }
 
+bool Diagram::pageNameIsValid(const QString& name, std::shared_ptr<DiagramPage> page)
+{
+    if (name.isEmpty())return false;
+    for (auto p : _pages) {
+        if (p->name() == name && p != page)
+            return false;
+    }
+    return true;
+}
+
 bool Diagram::railwayNameExisted(const QString& name) const
 {
     for (auto p : _railways) {

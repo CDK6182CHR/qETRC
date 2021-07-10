@@ -16,6 +16,8 @@
 #include <QVBoxLayout>
 #include <QTextBrowser>
 
+#include "mainwindow/version.h"
+
 DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page, QWidget* parent):
     _diagram(diagram),
     QGraphicsView(parent),_page(page),startTime(diagram.config().start_hour,0,0)
@@ -116,7 +118,7 @@ void DiagramWidget::clearGraph()
     scene()->clear();
 }
 
-bool DiagramWidget::toPdf(const QString& filename, const QString& title)
+bool DiagramWidget::toPdf(const QString& filename, const QString& title, const QString& note)
 {
     marginItems.left->setX(0);
     marginItems.right->setX(0);
@@ -152,15 +154,14 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title)
     font.setBold(false);
     painter.setFont(font);
 
-    if (!_diagram.note().isEmpty()) {
-        QString s(_diagram.note());
+    if (!note.isEmpty()) {
+        QString s(note);
         s.replace("\n", " ");
         s = QString("备注：") + s;
         painter.drawText(margins().left, scene()->height() + 100 + 40, s);
     }
 
-    //todo: 版本记号
-    QString mark("由qETRC列车运行图系统（开发版）导出");
+    QString mark = tr("由 %1_%2 导出").arg(qespec::TITLE.data()).arg(qespec::VERSION.data());
     painter.drawText(scene()->width() - 400, scene()->height() + 100 + 40, mark);
     scene()->render(&painter, QRectF(0, 100, scene()->width(), scene()->height()));
     painter.end();

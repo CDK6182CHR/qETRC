@@ -199,6 +199,8 @@ public:
 
     bool pageNameExisted(const QString& name)const;
 
+    bool pageNameIsValid(const QString& name, std::shared_ptr<DiagramPage> page);
+
     bool railwayNameExisted(const QString& name)const;
 
     QString validRailwayName(const QString& prefix)const;

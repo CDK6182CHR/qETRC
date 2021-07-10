@@ -198,6 +198,7 @@ void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 	if (!n.up().isEmpty()) {
 		singleNameMap[n.up()].append(t);
 	}
+	++_typeCount[t->type()];   //利用默认为0的特性
 }
 
 void TrainCollection::removeMapInfo(std::shared_ptr<Train> t)
@@ -213,6 +214,7 @@ void TrainCollection::removeMapInfo(std::shared_ptr<Train> t)
 	if (!n.up().isEmpty()) {
 		singleNameMap[n.up()].removeAll(t);
 	}
+	--_typeCount[t->type()];
 }
 
 void TrainCollection::resetMapInfo()

@@ -1,6 +1,8 @@
 ﻿#include "pagecontext.h"
 #include "mainwindow.h"
 
+#include "dialogs/printdiagramdialog.h"
+
 #include <QtWidgets>
 
 PageContext::PageContext(Diagram &diagram_, SARibbonContextCategory *context,
@@ -61,6 +63,11 @@ void PageContext::initUI()
     btn->setMinimumWidth(70);
     connect(act, SIGNAL(triggered()), this, SLOT(actEdit()));
 
+    act = new QAction(QIcon(":/icons/pdf.png"), tr("导出"), this);
+    btn = panel->addLargeAction(act);
+    btn->setMinimumWidth(70);
+    connect(act, SIGNAL(triggered()), this, SLOT(actPrint()));
+
 
     act = new QAction(QIcon(":/icons/close.png"), tr("删除"), this);
     panel->addLargeAction(act);
@@ -69,9 +76,19 @@ void PageContext::initUI()
 
 void PageContext::actEdit()
 {
-    auto* dialog = new EditPageDialog(page, mw);
+    auto* dialog = new EditPageDialog(page,diagram, mw);
     connect(dialog, &EditPageDialog::editApplied, this, &PageContext::onEditApplied);
     dialog->open();
+}
+
+void PageContext::actPrint()
+{
+    int idx = diagram.getPageIndex(page);
+    if (idx != -1) {
+        auto* dw = mw->diagramWidgets.at(idx);
+        auto* dialog = new PrintDiagramDialog(dw, mw);
+        dialog->open();
+    }
 }
 
 void PageContext::commitEditInfo(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> newinfo)
@@ -96,8 +113,8 @@ void PageContext::actRemovePage()
     emit pageRemoved(diagram.getPageIndex(page));
 }
 
-EditPageDialog::EditPageDialog(std::shared_ptr<DiagramPage> page_, QWidget* parent):
-    QDialog(parent),page(page_)
+EditPageDialog::EditPageDialog(std::shared_ptr<DiagramPage> page_,Diagram& dia, QWidget* parent):
+    QDialog(parent),page(page_),diagram(dia)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     initUI();
@@ -129,6 +146,10 @@ void EditPageDialog::initUI()
 void EditPageDialog::actApply()
 {
     const QString& name = edName->text();
+    if (!diagram.pageNameIsValid(name, page)) {
+        QMessageBox::warning(this, tr("错误"), tr("运行图名称不能为空或与其他运行图名称冲突。"));
+        return;
+    }
     const QString& note = edNote->toPlainText();
     if (name != page->name() || note!=page->note()) {
         auto n = std::make_shared<DiagramPage>(QList<std::shared_ptr<Railway>>{}, name, note);

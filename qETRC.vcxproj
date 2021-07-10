@@ -194,6 +194,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\dialogs\importtraindialog.cpp" />
+    <ClCompile Include="src\dialogs\printdiagramdialog.cpp" />
     <ClCompile Include="src\editors\basictrainwidget.cpp" />
     <ClCompile Include="src\editors\railstationwidget.cpp" />
     <ClCompile Include="src\mainwindow\mainwindow.cpp" />
@@ -248,6 +249,7 @@
     <QtMoc Include="src\dialogs\importtraindialog.h" />
     <QtMoc Include="src\editors\basictrainwidget.h" />
     <QtMoc Include="src\mainwindow\pagecontext.h" />
+    <QtMoc Include="src\dialogs\printdiagramdialog.h" />
     <ClInclude Include="src\mainwindow\version.h" />
     <QtMoc Include="src\navi\navitree.h" />
     <QtMoc Include="src\model\diagram\railtablemodel.h" />
