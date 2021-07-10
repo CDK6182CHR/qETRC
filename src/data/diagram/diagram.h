@@ -67,7 +67,7 @@ class Railway;
  */
 class Diagram
 {
-    QList<std::shared_ptr<Railway>> _railways;
+    RailCategory _railcat;
     TrainCollection _trainCollection;
     Config _config, _defaultConfig;
     QString _filename;
@@ -89,6 +89,9 @@ public:
     Diagram& operator=(const Diagram&)=delete;
     Diagram& operator=(Diagram&&)=default;
     ~Diagram()noexcept = default;
+
+    auto& railCategory() { return _railcat; }
+    const auto& railCategory()const { return _railcat; }
 
     /**
      * 读取默认配置文件 config.json
@@ -126,11 +129,11 @@ public:
      */
     void clear();
 
-    inline auto& railways(){return _railways;}
-    inline const auto& railways()const{return _railways;}
+    inline auto& railways(){return _railcat.railways();}
+    inline const auto& railways()const{return _railcat.railways();}
     inline auto& pages() { return _pages; }
     inline const auto& pages()const { return _pages; }
-    inline auto firstRailway() { return _railways.first(); }
+    inline auto firstRailway() { return _railcat.railways().first(); }
     inline auto& trainCollection(){return _trainCollection;}
     inline const auto& trainCollection()const{return _trainCollection;}
     inline const QString& filename()const{return _filename;}
@@ -142,7 +145,7 @@ public:
     inline const QString& note()const { return _note; }
     inline void setNote(const QString& n) { _note = n; }
 
-    inline std::shared_ptr<Railway> railwayAt(int i) { return _railways.at(i); }
+    inline std::shared_ptr<Railway> railwayAt(int i) { return _railcat.railways().at(i); }
 
     /**
      * @brief addRailway 添加线路
@@ -162,7 +165,7 @@ public:
         railwayByName(const QString& name)const{
         return const_cast<Diagram*>(this)->railwayByName(name);
     }
-    int railwayCount()const { return _railways.size(); }
+    int railwayCount()const { return _railcat.railways().size(); }
 
     /**
      * @brief updateRailway  铺画准备
@@ -210,7 +213,7 @@ public:
      * 没有任何线路的运行图是Null。
      * 这里还是要想清楚
      */
-    inline bool isNull()const { return _railways.empty(); }
+    inline bool isNull()const { return _railcat.railways().empty(); }
 
     /**
      * 对指定TrainCollection （不一定是本图的Collection）。

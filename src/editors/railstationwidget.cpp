@@ -4,13 +4,11 @@
 #include <QtWidgets>
 
 
-RailStationWidget::RailStationWidget(QUndoStack* undo, QWidget *parent) : 
-	QWidget(parent),_undo(undo),model(new RailStationModel(undo,this))
+RailStationWidget::RailStationWidget(RailCategory& cat_, bool inplace, QWidget* parent) :
+	QWidget(parent), cat(cat_), commitInPlace(inplace), model(new RailStationModel(inplace, this))
 {
 	//暂定Model的Parent就是自己！
 	initUI();
-	connect(model, &RailStationModel::stationTableChanged,
-		this, &RailStationWidget::stationTableChanged);
 }
 
 void RailStationWidget::setRailway(std::shared_ptr<Railway> rail)
@@ -18,17 +16,24 @@ void RailStationWidget::setRailway(std::shared_ptr<Railway> rail)
 	railway = rail;
 	model->setRailway(rail);
 	ctable->table()->resizeColumnsToContents();
-	//edName->setText(rail->name());
+	edName->setText(railway->name());
+}
+
+void RailStationWidget::refreshData()
+{
+	model->refreshData();
+	ctable->table()->resizeColumnsToContents();
+	edName->setText(railway->name());
 }
 
 void RailStationWidget::initUI()
 {
 	auto* vlay = new QVBoxLayout;
 
-	//auto* form = new QFormLayout;
-	//edName = new QLineEdit;
-	//form->addRow(tr("线名"), edName);
-	//vlay->addLayout(form);
+	auto* form = new QFormLayout;
+	edName = new QLineEdit;
+	form->addRow(tr("线名"), edName);
+	vlay->addLayout(form);
 
 	ctable = new QEControlledTable;
 	ctable->table()->verticalHeader()->setDefaultSectionSize(25);
@@ -48,10 +53,24 @@ void RailStationWidget::initUI()
 
 void RailStationWidget::actCancel()
 {
-	model->actCancel();
+    model->actCancel();
 }
 
 void RailStationWidget::actApply()
 {
+	//先讨论线名的修改
+	const QString& name = edName->text();
+	if (name != railway->name()) {
+		if (!cat.railNameIsValid(name, railway)) {
+			QMessageBox::warning(this, tr("错误"), tr("线路名称不能为空或与其他线名冲突，请重新设置。"));
+			return;
+		}
+		if (commitInPlace) {
+			railway->setName(name);
+		}
+		else {
+			emit railNameChanged(railway, name);
+		}
+	}
 	model->actApply();
 }

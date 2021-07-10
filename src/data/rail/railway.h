@@ -339,6 +339,7 @@ public:
     inline const QString& name()const{
         return _name;
     }
+    inline QString& nameRef() { return _name; }  //用来搞交换
     inline void setName(const QString& n) { _name = n; }
 
     void showStations()const;

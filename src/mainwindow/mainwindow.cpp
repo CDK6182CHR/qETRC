@@ -117,6 +117,23 @@ void MainWindow::removeAllTrains()
     focusOutTrain();
 }
 
+void MainWindow::undoAddNewRailway(std::shared_ptr<Railway> rail)
+{
+    for (int i = railStationWidgets.size()-1; i>=0; i--) {
+        auto p = railStationWidgets.at(i);
+        if (p->getRailway() == rail) {
+            removeRailStationWidgetAt(i);
+        }
+    }
+}
+
+void MainWindow::removeRailStationWidgetAt(int i)
+{
+    auto* dock = railStationDocks.takeAt(i);
+    auto* w = railStationWidgets.takeAt(i);
+    dock->deleteDockWidget();
+}
+
 
 //void MainWindow::undoAddPage(std::shared_ptr<DiagramPage> page)
 //{
@@ -161,6 +178,11 @@ void MainWindow::initDockWidgets()
         //connect(tree, &NaviTree::focusOutRailway, this, &MainWindow::focusOutRailway);
         connect(tree, &NaviTree::editRailway, this, &MainWindow::actOpenRailStationWidget);
         connect(tree, &NaviTree::trainsImported, this, &MainWindow::onTrainsImported);
+
+        connect(naviModel, &DiagramNaviModel::newRailwayAdded,
+            this, &MainWindow::actOpenRailStationWidget);
+        connect(naviModel, &DiagramNaviModel::undoneAddRailway,
+            this, &MainWindow::undoAddNewRailway);
     }
     
     //列车管理
@@ -340,6 +362,10 @@ void MainWindow::initToolbar()
     if constexpr (true) {
         auto* cat = ribbon->addContextCategory(tr("当前线路"));
         contextRail = new RailContext(_diagram, cat, this, this);
+        connect(contextRail, &RailContext::railNameChanged,
+            naviModel, &DiagramNaviModel::onRailNameChanged);
+        connect(contextRail, &RailContext::stationTableChanged,
+            this, &MainWindow::onStationTableChanged);
     }
 
     //ApplicationMenu的初始化放在最后，因为可能用到前面的..
@@ -541,14 +567,16 @@ void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
         }
     }
     //创建
-    auto* w = new RailStationWidget(undoStack);
-    auto* dock = new ads::CDockWidget(tr("基线编辑-%1").arg(rail->name()));
+    auto* w = new RailStationWidget(_diagram.railCategory(), false);
+    auto* dock = new ads::CDockWidget(tr("基线编辑 - %1").arg(rail->name()));
     auto* act = dock->toggleViewAction();
     railMenu->addAction(act);
     dock->setWidget(w);
     w->setRailway(rail);
-    connect(w, &RailStationWidget::stationTableChanged,
-        this, &MainWindow::onStationTableChanged);
+    connect(w, &RailStationWidget::railNameChanged,
+        contextRail, &RailContext::actChangeRailName);
+    connect(w->getModel(), &RailStationModel::actStationTableChanged,
+        contextRail, &RailContext::actUpdateTimetable);
     railStationWidgets.append(w);
     railStationDocks.append(dock);
 

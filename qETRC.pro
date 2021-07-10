@@ -22,6 +22,7 @@ SOURCES += \
     src/data/diagram/trainevents.cpp \
     src/data/diagram/trainline.cpp \
     src/data/rail/forbid.cpp \
+    src/data/rail/railcategory.cpp \
     src/data/rail/railinterval.cpp \
     src/data/rail/railstation.cpp \
     src/data/rail/railway.cpp \
@@ -73,6 +74,7 @@ HEADERS += \
     src/data/diagram/trainline.h \
     src/data/rail/forbid.h \
     src/data/rail/rail.h \
+    src/data/rail/railcategory.h \
     src/data/rail/railinterval.h \
     src/data/rail/railintervaldata.hpp \
     src/data/rail/railintervalnode.hpp \

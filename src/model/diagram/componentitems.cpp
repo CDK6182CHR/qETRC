@@ -49,7 +49,14 @@ void navi::RailwayListItem::appendRailways(const QList<std::shared_ptr<Railway>>
 	for (auto p = rails.begin(); p != rails.end(); ++p) {
 		_diagram.railways().append(*p);
 		_rails.emplace_back(std::make_unique<RailwayItem>(*p, row++, this));
-	}
+    }
+}
+
+void navi::RailwayListItem::appendRailway(std::shared_ptr<Railway> rail)
+{
+    _diagram.railways().append(rail);
+    int row = _diagram.railwayCount();
+    _rails.emplace_back(std::make_unique<RailwayItem>(rail,row,this));
 }
 
 void navi::RailwayListItem::removeTailRailways(int cnt)

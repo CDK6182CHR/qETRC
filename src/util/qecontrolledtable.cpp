@@ -31,17 +31,13 @@ void QEControlledTable::initUI()
 void QEControlledTable::insertBefore()
 {
 	auto idx = _table->currentIndex();
-	if (idx.isValid()) {
-		_table->model()->insertRow(idx.row());
-	}
+	_table->model()->insertRow(idx.row());
 }
 
 void QEControlledTable::insertAfter()
 {
 	auto idx = _table->currentIndex();
-	if (idx.isValid()) {
-		_table->model()->insertRow(idx.row() + 1);
-	}
+	_table->model()->insertRow(idx.row() + 1);
 }
 
 void QEControlledTable::removeRow()

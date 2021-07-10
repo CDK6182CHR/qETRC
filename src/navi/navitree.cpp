@@ -29,6 +29,8 @@ void NaviTree::initContextMenus()
     //RailList
     act = meRailList->addAction(tr("导入线路"));
     connect(act, SIGNAL(triggered()), this, SLOT(importRailways()));
+    act = meRailList->addAction(tr("添加空白线路"));
+    connect(act, SIGNAL(triggered()), this, SLOT(actAddRailway()));
 
     //TrainList
     act = meTrainList->addAction(tr("导入车次"));
@@ -58,6 +60,13 @@ void NaviTree::onRemovePageContext()
     if (item && item->type() == navi::PageItem::Type) {
         removePage(idx.row());
     }
+}
+
+void NaviTree::actAddRailway()
+{
+    const QString name = _model->diagram().validRailwayName(tr("新线路"));
+    auto rail = std::make_shared<Railway>(name);
+    _undo->push(new qecmd::AddRailway(_model, rail));
 }
 
 void NaviTree::addNewPage()
@@ -198,4 +207,21 @@ void qecmd::ImportRailways::redo()
     //添加到线路表后面，然后inform change
     //现在不需要通知别人发生变化...
     navi->importRailways(rails);
+}
+
+qecmd::AddRailway::AddRailway(DiagramNaviModel* navi_, 
+    std::shared_ptr<Railway> rail_, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("添加空白线路"),parent),
+    navi(navi_),rail(rail_)
+{
+}
+
+void qecmd::AddRailway::undo()
+{
+    navi->undoAddRailway();
+}
+
+void qecmd::AddRailway::redo()
+{
+    navi->commitAddRailway(rail);
 }

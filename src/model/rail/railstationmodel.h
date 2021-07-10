@@ -20,7 +20,7 @@ class RailStationModel : public QEMoveableModel
 {
     Q_OBJECT
     std::shared_ptr<Railway> railway;
-    QUndoStack* const _undo;
+    const bool commitInPlace;
 public:
     enum Columns{
         ColName=0,
@@ -33,8 +33,7 @@ public:
         ColFreight,
         ColMAX
     };
-    explicit RailStationModel(QUndoStack* undo,
-                              QWidget *parent = nullptr);
+    explicit RailStationModel(bool inplace, QWidget *parent = nullptr);
 
     void setRailway(std::shared_ptr<Railway> rail);
 
@@ -64,10 +63,12 @@ public:
     std::shared_ptr<Railway> generateRailway()const;
 
 signals:
+
     /**
-     * 现阶段的主要任务好像只是通告Main来重新铺画
+     * 将实际处理的权限交给RailContext
      */
-    void stationTableChanged(std::shared_ptr<Railway> railway, bool equiv);
+    void actStationTableChanged(std::shared_ptr<Railway> railway,std::shared_ptr<Railway> newtable,
+        bool equiv);
 
 public slots:
 
@@ -89,18 +90,6 @@ private:
 };
 
 
-namespace qecmd {
-    class UpdateRailStations:public QUndoCommand {
-        RailStationModel* const model;
-        std::shared_ptr<Railway> railold, railnew;
-        bool equiv;
-        int ordinateIndex;
-    public:
-        UpdateRailStations(RailStationModel* model_, std::shared_ptr<Railway> old_,
-            std::shared_ptr<Railway> new_, bool equiv_, QUndoCommand* parent = nullptr);
-        virtual void undo()override;
-        virtual void redo()override;
-    };
-}
+
 
 

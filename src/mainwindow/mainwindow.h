@@ -63,6 +63,7 @@ class MainWindow : public SARibbonMainWindow
 
     friend class ViewCategory;
     friend class PageContext;
+    friend class RailContext;
 
     bool changed = false;
 
@@ -242,6 +243,13 @@ private slots:
      * 删除所有车次
      */
     void removeAllTrains();
+
+    /**
+     * 删除新增的线路，只要关闭/删除相应的widget即可
+     */
+    void undoAddNewRailway(std::shared_ptr<Railway> rail);
+
+    void removeRailStationWidgetAt(int i);
     
 
 public slots:

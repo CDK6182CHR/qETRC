@@ -8,3 +8,4 @@
 #include "ruler.h"
 #include "rulernode.h"
 #include "forbid.h"
+#include "railcategory.h"

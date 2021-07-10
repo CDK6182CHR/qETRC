@@ -65,6 +65,8 @@ private slots:
 
     void onRemovePageContext();
 
+    void actAddRailway();
+
 public slots:
     void importRailways();
     void addNewPage();
@@ -98,6 +100,16 @@ namespace qecmd {
     public:
         ImportRailways(DiagramNaviModel* navi_, const QList<std::shared_ptr<Railway>>& rails_,
             QUndoCommand* parent=nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    class AddRailway :public QUndoCommand {
+        DiagramNaviModel* const navi;
+        std::shared_ptr<Railway> rail;
+    public:
+        AddRailway(DiagramNaviModel* navi_, std::shared_ptr<Railway> rail_,
+            QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
     };

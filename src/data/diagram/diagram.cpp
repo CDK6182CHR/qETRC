@@ -82,7 +82,7 @@ QJsonObject SystemJson::toJson() const
 
 void Diagram::addRailway(std::shared_ptr<Railway> rail)
 {
-    _railways.append(rail);
+    railways().append(rail);
     for (auto p : trains()) {
         p->bindToRailway(*rail, _config);
     }
@@ -102,7 +102,7 @@ void Diagram::addTrains(const TrainCollection& coll)
 
 std::shared_ptr<Railway> Diagram::railwayByName(const QString &name)
 {
-    for(const auto& p:_railways){
+    for(const auto& p:railways()){
         if(p->name() == name)
             return p;
     }
@@ -118,7 +118,7 @@ void Diagram::updateRailway(std::shared_ptr<Railway> r)
 
 void Diagram::updateTrain(std::shared_ptr<Train> t)
 {
-    for(const auto& r:_railways){
+    for(const auto& r:railways()){
         t->updateBoundRailway(*r, _config);
     }
 }
@@ -134,7 +134,7 @@ TrainEventList Diagram::listTrainEvents(const Train& train) const
 
 std::shared_ptr<DiagramPage> Diagram::createDefaultPage()
 {
-    auto t = std::make_shared<DiagramPage>(_railways,
+    auto t = std::make_shared<DiagramPage>(railways(),
         validPageName(QObject::tr("默认运行图")));
     _pages.append(t);
     return t;
@@ -161,7 +161,7 @@ bool Diagram::pageNameIsValid(const QString& name, std::shared_ptr<DiagramPage> 
 
 bool Diagram::railwayNameExisted(const QString& name) const
 {
-    for (auto p : _railways) {
+    for (auto p : railways()) {
         if (p->name() == name)
             return true;
     }
@@ -180,7 +180,7 @@ QString Diagram::validRailwayName(const QString& prefix) const
 
 void Diagram::applyBindOn(TrainCollection& coll)
 {
-    for (auto p : _railways) {
+    for (auto p : railways()) {
         for (auto t : coll.trains()) {
             t->bindToRailway(*p, _config);
         }
@@ -191,7 +191,7 @@ bool Diagram::isValidRailName(const QString& name, std::shared_ptr<Railway> rail
 {
     if (name.isEmpty())
         return false;
-    for (auto r : _railways) {
+    for (auto r : railways()) {
         if (r != rail && r->name() == name)
             return false;
     }
@@ -208,7 +208,7 @@ int Diagram::getPageIndex(std::shared_ptr<DiagramPage> page) const
 
 void Diagram::bindAllTrains()
 {
-    for (auto p : _railways) {
+    for (auto p : railways()) {
         for (auto t : _trainCollection.trains()) {
             t->bindToRailway(*p, _config);
         }
@@ -262,7 +262,7 @@ bool Diagram::fromJson(const QJsonObject& obj)
 {
     if (obj.empty())
         return false;
-    _railways.clear();
+    railways().clear();
 
     //车次和Config直接转发即可
     _trainCollection.fromJson(obj, _defaultManager);
@@ -276,18 +276,18 @@ bool Diagram::fromJson(const QJsonObject& obj)
 
     //线路  line作为第一个，lines作为其他，不存在就是空
     auto rail0 = std::make_shared<Railway>(obj.value("line").toObject());
-    _railways.append(rail0);
+    railways().append(rail0);
 
     //其他线路
     const QJsonArray& arrail = obj.value("lines").toArray();
     for (const auto& r : arrail) {
-        _railways.append(std::make_shared<Railway>(r.toObject()));
+        railways().append(std::make_shared<Railway>(r.toObject()));
     }
 
     //特殊：旧版排图标尺 （优先级低于rail中的）
     const auto& t = obj.value("config").toObject().value("ordinate");
     if (t.isString() && !t.toString().isEmpty()) {
-        _railways.at(0)->setOrdinate(t.toString());
+        railways().at(0)->setOrdinate(t.toString());
     }
 
     //新增 Page
@@ -305,13 +305,13 @@ QJsonObject Diagram::toJson() const
     //车次信息表
     QJsonObject obj = _trainCollection.toJson();
     //线路信息
-    if (!_railways.isEmpty()) {
-        auto p = _railways.begin();
+    if (!railways().isEmpty()) {
+        auto p = railways().begin();
         obj.insert("line", (*p)->toJson());
         ++p;
-        if (p != _railways.end()) {
+        if (p != railways().end()) {
             QJsonArray arrail;
-            for (; p != _railways.end(); ++p) {
+            for (; p != railways().end(); ++p) {
                 arrail.append((*p)->toJson());
             }
             obj.insert("lines", arrail);
@@ -358,7 +358,7 @@ void Diagram::clear()
 {
     _pages.clear();
     _trainCollection.clear(_defaultManager);
-    _railways.clear();
+    railways().clear();
     _config = _defaultConfig;
     _note = "";
     _version = "";

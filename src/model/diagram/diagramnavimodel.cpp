@@ -144,6 +144,32 @@ void DiagramNaviModel::onPageNameChanged(int i)
     emit dataChanged(idx1, idx1);
 }
 
+void DiagramNaviModel::onRailNameChanged(std::shared_ptr<Railway> rail)
+{
+    int i = _diagram.railCategory().getRailwayIndex(rail);
+    QModelIndex idx0 = index(navi::DiagramItem::RowRailways, 0);
+    QModelIndex idx1 = index(i, 0, idx0);
+    emit dataChanged(idx1, idx1);
+}
+
+void DiagramNaviModel::commitAddRailway(std::shared_ptr<Railway> rail)
+{
+    auto idx = index(navi::DiagramItem::RowRailways, 0);
+    int cnt = _diagram.railways().size();
+    beginInsertRows(idx, cnt, cnt);
+    navi::RailwayListItem* it = static_cast<navi::RailwayListItem*>(idx.internalPointer());
+    it->appendRailway(rail);
+    endInsertRows();
+    emit newRailwayAdded(rail);
+}
+
+void DiagramNaviModel::undoAddRailway()
+{
+    auto rail = _diagram.railways().last();
+    removeTailRailways(1);
+    emit undoneAddRailway(rail);
+}
+
 void DiagramNaviModel::resetTrainList()
 {
     beginResetModel();

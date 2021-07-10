@@ -92,6 +92,8 @@ namespace navi {
 		 */
 		void appendRailways(const QList<std::shared_ptr<Railway>>& rails);
 
+        void appendRailway(std::shared_ptr<Railway> rail);
+
 		void removeTailRailways(int cnt);
 	};
 

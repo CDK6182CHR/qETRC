@@ -51,6 +51,18 @@ private:
     using pACI = navi::AbstractComponentItem*;
     pACI getItem(const QModelIndex& idx)const;
 
+signals:
+    
+    /**
+     * 发给主窗口，打开新的编辑窗口
+     */
+    void newRailwayAdded(std::shared_ptr<Railway> rail);
+
+    /**
+     * 发给主窗口，关闭编辑页面
+     */
+    void undoneAddRailway(std::shared_ptr<Railway> rail);
+
 public slots:
     void resetTrainList();
     //void resetRailwayList();
@@ -60,6 +72,12 @@ public slots:
     void removePageAt(int index);
 
     void onPageNameChanged(int i);
+
+    void onRailNameChanged(std::shared_ptr<Railway> rail);
+
+    void commitAddRailway(std::shared_ptr<Railway> rail);
+
+    void undoAddRailway();
 };
 
 
