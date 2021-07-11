@@ -127,11 +127,26 @@ const QPen& Train::pen() const
         return type()->pen();
 }
 
+bool Train::autoPen() const
+{
+    return !_pen.has_value();
+}
+
 void Train::appendStation(const StationName &name,
                           const QTime &arrive, const QTime &depart,
                           bool business, const QString &track, const QString &note)
 {
     _timetable.emplace_back(name, arrive, depart, business, track, note);
+}
+
+void Train::setPen(const QPen& pen)
+{
+    _pen = pen;
+}
+
+void Train::resetPen()
+{
+    _pen.reset();
 }
 
 void Train::prependStation(const StationName& name, 
@@ -631,6 +646,17 @@ void Train::swapTimetable(Train& other)
     invalidateTempData();
 }
 
+#define SWAP(_key) std::swap(_key,other._key)
+
+void Train::swapBaseInfo(Train& other)
+{
+    std::swap(_trainName, other._trainName);
+    std::swap(_starting, other._starting);
+    std::swap(_terminal, other._terminal);
+    SWAP(_type);
+    SWAP(_passenger);
+    SWAP(_pen);
+}
 
 
 bool Train::ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)

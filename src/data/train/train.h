@@ -128,6 +128,18 @@ public:
      */
     const QPen& pen()const;
 
+    /**
+     * 是否采用自动UI （类型设置的UI）
+     */
+    bool autoPen()const;
+
+    /**
+     * 清空Pen信息，即使用自动的
+     */
+    void resetPen();
+
+    void setPen(const QPen& pen);
+
     inline ConstStationPtr nullStation()const { return _timetable.cend(); }
     inline StationPtr nullStation(){return _timetable.end();}
     inline bool isNullStation(ConstStationPtr st)const { return st == _timetable.end(); }
@@ -362,6 +374,11 @@ public:
      * 与指定对象交换时刻表，用于undo/redo时刻表更新
      */
     void swapTimetable(Train& other);
+
+    /**
+     * 交换车次、始发终到等信息，但不交换时刻表
+     */
+    void swapBaseInfo(Train& other);
 
 
     //static比较函数 用来排序

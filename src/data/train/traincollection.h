@@ -86,6 +86,11 @@ public:
     bool trainNameExisted(const TrainName& name)const;
 
     /**
+     * 车次是否非空且不冲突
+     */
+    bool trainNameIsValid(const TrainName& name, std::shared_ptr<Train> train)const;
+
+    /**
      * @brief trainFromFullName  全车次快速查找
      * @param name  全车次
      * 准常数时间

@@ -170,6 +170,34 @@ void DiagramNaviModel::undoAddRailway()
     emit undoneAddRailway(rail);
 }
 
+void DiagramNaviModel::onTrainDataChanged(const QModelIndex& topleft, const QModelIndex& botright)
+{
+    QModelIndex par = index(navi::DiagramItem::RowTrains, 0);
+    emit dataChanged(index(topleft.row(), 0, par),
+        index(botright.row(), navi::DiagramItem::ColMaxNumber, par));
+}
+
+void DiagramNaviModel::commitRemoveSingleTrain(int i)
+{
+    QModelIndex par = index(navi::DiagramItem::RowTrains, 0);
+    auto train = diagram().trainCollection().trainAt(i);
+    auto* item = static_cast<navi::TrainListItem*>(par.internalPointer());
+    beginRemoveRows(par, i, i);
+    item->removeTrainAt(i);
+    endRemoveRows();
+    emit trainRemoved(train);
+}
+
+void DiagramNaviModel::undoRemoveSingleTrain(int i, std::shared_ptr<Train> train)
+{
+    QModelIndex par = index(navi::DiagramItem::RowTrains, 0);
+    auto* item = static_cast<navi::TrainListItem*>(par.internalPointer());
+    beginInsertRows(par, i, i);
+    item->undoRemoveTrainAt(train, i);
+    endInsertRows();
+    emit undoneTrainRemove(train);
+}
+
 void DiagramNaviModel::resetTrainList()
 {
     beginResetModel();

@@ -28,10 +28,10 @@
 #include "editors/railstationwidget.h"
 
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget* parent)
     : SARibbonMainWindow(parent),
     manager(new ads::CDockManager(this)),
-    naviModel(new DiagramNaviModel(_diagram,this)),
+    naviModel(new DiagramNaviModel(_diagram, this)),
     undoStack(new QUndoStack(this))
 {
     _diagram.readDefaultConfigs();
@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     initUI();
     loadInitDiagram();
+    updateWindowTitle();
 }
 
 MainWindow::~MainWindow()
@@ -59,17 +60,26 @@ void MainWindow::undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains)
 
 void MainWindow::redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains)
 {
-    for (auto p : diagramWidgets) {
-        for (auto t : trains) {
-            p->removeTrain(*t);
-            contextTrain->removeTrainWidget(t);
-            if (t == contextTrain->getTrain()) {
-                contextTrain->resetTrain();
-                focusOutTrain();
-            }
-        }
-    }
+    for (auto t : trains)
+        removeTrain(t);
     //informTrainListChanged();
+}
+
+void MainWindow::removeTrain(std::shared_ptr<Train> train)
+{
+    for (auto p : diagramWidgets) {
+        p->removeTrain(*train);
+    }
+    contextTrain->removeTrainWidget(train);
+    if (train == contextTrain->getTrain()) {
+        contextTrain->resetTrain();
+        focusOutTrain();
+    }
+}
+
+void MainWindow::undoRemoveTrain(std::shared_ptr<Train> train)
+{
+    addTrainLine(*train);
 }
 
 void MainWindow::onStationTableChanged(std::shared_ptr<Railway> rail, bool equiv)
@@ -110,7 +120,7 @@ void MainWindow::removeAllTrains()
             "此操作通常用于导入新的车次之前。"));
     if (flag != QMessageBox::Yes)
         return;
-    
+
     _diagram.trainCollection().clearTrains();
     onTrainsImported();   //后操作是一样的
     contextTrain->resetTrain();
@@ -119,7 +129,7 @@ void MainWindow::removeAllTrains()
 
 void MainWindow::undoAddNewRailway(std::shared_ptr<Railway> rail)
 {
-    for (int i = railStationWidgets.size()-1; i>=0; i--) {
+    for (int i = railStationWidgets.size() - 1; i >= 0; i--) {
         auto p = railStationWidgets.at(i);
         if (p->getRailway() == rail) {
             removeRailStationWidgetAt(i);
@@ -183,8 +193,13 @@ void MainWindow::initDockWidgets()
             this, &MainWindow::actOpenRailStationWidget);
         connect(naviModel, &DiagramNaviModel::undoneAddRailway,
             this, &MainWindow::undoAddNewRailway);
+
+        connect(naviModel, &DiagramNaviModel::trainRemoved,
+            this, &MainWindow::removeTrain);
+        connect(naviModel, &DiagramNaviModel::undoneTrainRemove,
+            this, &MainWindow::undoRemoveTrain);
     }
-    
+
     //列车管理
     if constexpr (true) {
         auto* tw = new TrainListWidget(_diagram.trainCollection(), undoStack);
@@ -195,11 +210,22 @@ void MainWindow::initDockWidgets()
         manager->addDockWidget(ads::LeftDockWidgetArea, dock);
         connect(tw->getModel(), &TrainListModel::trainsRemovedUndone,
             this, &MainWindow::undoRemoveTrains);
-        connect(tw->getModel(), &TrainListModel::trainsRemovedRedone, 
+        connect(tw->getModel(), &TrainListModel::trainsRemovedRedone,
             this, &MainWindow::redoRemoveTrains);
         connect(tw->getModel(), &QAbstractItemModel::modelReset,
             naviModel, &DiagramNaviModel::resetTrainList);
         connect(tw, &TrainListWidget::currentTrainChanged, this, &MainWindow::focusInTrain);
+        connect(tw->getModel(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+            naviModel, SLOT(onTrainDataChanged(const QModelIndex&, const QModelIndex&)));
+
+        connect(naviModel, &QAbstractItemModel::rowsAboutToBeInserted,
+            tw->getModel(), &TrainListModel::onBeginInsertRows);
+        connect(naviModel, &QAbstractItemModel::rowsInserted,
+            tw->getModel(), &TrainListModel::onEndInsertRows);
+        connect(naviModel, &QAbstractItemModel::rowsAboutToBeRemoved,
+            tw->getModel(), &TrainListModel::onBeginRemoveRows);
+        connect(naviModel, &QAbstractItemModel::rowsRemoved,
+            tw->getModel(), &TrainListModel::onEndRemoveRows);
     }
 
 }
@@ -208,7 +234,7 @@ void MainWindow::initToolbar()
 {
     SARibbonBar* ribbon = ribbonBar();
     ribbon->applicationButton()->setText(QStringLiteral("文件"));
-    
+
 
     //顶上的工具条
     if constexpr (true) {
@@ -224,7 +250,7 @@ void MainWindow::initToolbar()
         act->setShortcut(Qt::CTRL + Qt::Key_Y);
         ribbon->quickAccessBar()->addAction(act);
     }
-    
+
 
     //开始
     if constexpr (true) {
@@ -262,26 +288,26 @@ void MainWindow::initToolbar()
         act = trainListDock->toggleViewAction();
         act->setText(tr("列车管理"));
         act->setIcon(QIcon(":/icons/list.png"));
-        btn=panel->addLargeAction(act);
+        btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
         SARibbonMenu* menu = new SARibbonMenu(this);
         pageMenu = menu;
         menu->setTitle(QObject::tr("运行图窗口"));
         menu->setIcon(QIcon(":/icons/diagram.png"));
-        btn=panel->addLargeMenu(menu);
+        btn = panel->addLargeMenu(menu);
         btn->setMinimumWidth(80);
 
         //undo  试一下把dock也放在这里初始化...
         QUndoView* view = new QUndoView(undoStack);
         auto* dock = new ads::CDockWidget(tr("历史记录"));
         dock->setWidget(view);
-        auto* a=manager->addDockWidgetTab(ads::CenterDockWidgetArea,dock);
-        
+        auto* a = manager->addDockWidgetTab(ads::CenterDockWidgetArea, dock);
+
         act = dock->toggleViewAction();
         act->setText(tr("历史记录"));
         act->setIcon(QIcon(":/icons/clock.png"));
-        btn=panel->addLargeAction(act);
+        btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
         act = new QAction(QIcon(":/icons/add.png"), tr("添加运行图"), this);
@@ -298,7 +324,7 @@ void MainWindow::initToolbar()
 
         auto* act = new QAction(QIcon(":/icons/add.png"), tr("导入线路"), this);
         connect(act, SIGNAL(triggered()), naviView, SLOT(importRailways()));
-        auto* btn=panel->addLargeAction(act);
+        auto* btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
         auto* menu = new SARibbonMenu(this);
@@ -313,16 +339,16 @@ void MainWindow::initToolbar()
     if constexpr (true) {
         auto* cat = ribbon->addCategoryPage(tr("列车"));
         auto* panel = cat->addPannel(tr("车次管理"));
-        
+
         auto* act = new QAction(QIcon(":/icons/list.png"), tr("列车管理"), this);
         auto* menu = new QMenu(tr("列车管理扩展"), this);
-        
+
         auto* actsub = new QAction(tr("删除所有车次"), this);
         connect(actsub, SIGNAL(triggered()), this, SLOT(removeAllTrains()));
         menu->addAction(actsub);
-        
+
         act->setMenu(menu);
-        auto* btn=panel->addLargeAction(act);
+        auto* btn = panel->addLargeAction(act);
         btn->setMinimumWidth(70);
 
         act = new QAction(QIcon(":/icons/add_train.png"), tr("导入车次"), this);
@@ -385,7 +411,7 @@ void MainWindow::initAppMenu()
     menu->addAction(sharedActions.save);
 
     auto* act = new QAction(QIcon(":/icons/saveas.png"), tr("另存为"), this);
-    
+
     menu->addSeparator();
 
     appMenu = menu;
@@ -583,10 +609,17 @@ void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
     manager->addDockWidgetFloating(dock);
 }
 
-void MainWindow::updateTrainLines(std::shared_ptr<Train> train,QList<std::shared_ptr<TrainAdapter>>&& adps)
+void MainWindow::updateTrainLines(std::shared_ptr<Train> train, QList<std::shared_ptr<TrainAdapter>>&& adps)
 {
     for (auto p : diagramWidgets) {
         p->updateTrain(train, std::move(adps));
+    }
+}
+
+void MainWindow::repaintTrainLines(std::shared_ptr<Train> train)
+{
+    for (auto p : diagramWidgets) {
+        p->repaintTrain(train);
     }
 }
 
@@ -594,7 +627,7 @@ void MainWindow::actOpenGraph()
 {
     if (changed && !saveQuestion())
         return;
-    QString res=QFileDialog::getOpenFileName(this, QObject::tr("打开"), QString(),
+    QString res = QFileDialog::getOpenFileName(this, QObject::tr("打开"), QString(),
         QObject::tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)"));
     if (res.isNull())
         return;
@@ -620,7 +653,7 @@ void MainWindow::actSaveGraphAs()
         tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)"));
     if (res.isNull())
         return;
-    bool flag=_diagram.saveAs(res);
+    bool flag = _diagram.saveAs(res);
     if (flag) {
         markUnchanged();
         undoStack->setClean();
@@ -718,7 +751,7 @@ void MainWindow::removePageAt(int index)
 
 void MainWindow::markChanged()
 {
-    if (!changed) { 
+    if (!changed) {
         changed = true;
         updateWindowTitle();
     }

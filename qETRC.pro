@@ -59,6 +59,7 @@ SOURCES += \
     src/navi/addpagedialog.cpp \
     src/navi/navitree.cpp \
     src/util/dialogadapter.cpp \
+    src/util/linestylecombo.cpp \
     src/util/qecontrolledtable.cpp \
     src/util/utilfunc.cpp \
     src/viewers/traineventdialog.cpp
@@ -114,6 +115,7 @@ HEADERS += \
     src/navi/navitree.h \
     src/util/buttongroup.hpp \
     src/util/dialogadapter.h \
+    src/util/linestylecombo.h \
     src/util/qecontrolledtable.h \
     src/util/qeexceptions.h \
     src/util/utilfunc.h \

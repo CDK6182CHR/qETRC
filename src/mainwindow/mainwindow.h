@@ -100,6 +100,11 @@ public:
      */
     void updateTrainLines(std::shared_ptr<Train> train, QList<std::shared_ptr<TrainAdapter>>&& adps);
 
+    /**
+     * 在不进行重新绑定的情况下，更新列车运行线
+     */
+    void repaintTrainLines(std::shared_ptr<Train> train);
+
 private:
     /**
      * 程序启动，构建UI
@@ -217,6 +222,9 @@ private slots:
 
     void undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains);
     void redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains);
+
+    void removeTrain(std::shared_ptr<Train> train);
+    void undoRemoveTrain(std::shared_ptr<Train> train);
 
     /**
      * 线路站表变化时调用这里。

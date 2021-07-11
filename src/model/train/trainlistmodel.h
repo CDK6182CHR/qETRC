@@ -83,5 +83,22 @@ public slots:
      * 更新数据。暂定线性查找
      */
     void onTrainChanged(std::shared_ptr<Train> train);
+
+    /**
+     * 这几个slot用来接收navitree那边删除单个列车的信号
+     */
+    void onBeginRemoveRows(const QModelIndex& parent, int start, int end) {
+        beginRemoveRows({}, start, end);
+    }
+    void onEndRemoveRows() {
+        endRemoveRows();
+    }
+
+    void onBeginInsertRows(const QModelIndex& parent, int start, int end) {
+        beginInsertRows({}, start, end);
+    }
+    void onEndInsertRows() {
+        endInsertRows();
+    }
 };
 

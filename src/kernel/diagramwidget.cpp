@@ -207,6 +207,17 @@ void DiagramWidget::updateTrain(std::shared_ptr<Train> train, QList<std::shared_
         highlightTrain(train);
 }
 
+void DiagramWidget::repaintTrain(std::shared_ptr<Train> train)
+{
+    bool isSel = (train == _selectedTrain);
+    removeTrain(*train);
+    paintTrain(train);
+    if (isSel) {
+        _selectedTrain = train;
+        highlightTrain(train);
+    }
+}
+
 void DiagramWidget::setTrainShow(std::shared_ptr<Train> train, bool show)
 {
     for (auto adp : train->adapters())

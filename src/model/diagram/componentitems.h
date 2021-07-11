@@ -157,6 +157,9 @@ namespace navi {
 		virtual QString data(int i)const override;
 		inline virtual int type()const override { return Type; }
 		void resetChildren();
+
+        void removeTrainAt(int i);
+        void undoRemoveTrainAt(std::shared_ptr<Train> train,int i);
 	};
 
 	class TrainModelItem :public AbstractComponentItem

@@ -17,7 +17,7 @@ class NaviTree : public QTreeView
 {
     Q_OBJECT;
 
-    QMenu* mePageList, * meRailList, * meTrainList, * mePage;
+    QMenu* mePageList, * meRailList, * meTrainList, * mePage, * meTrain;
     DiagramNaviModel* _model;
     QUndoStack* const _undo;
 public:
@@ -65,6 +65,8 @@ private slots:
 
     void onRemovePageContext();
 
+    void onRemoveSingleTrainContext();
+
     void actAddRailway();
 
 public slots:
@@ -84,6 +86,11 @@ public slots:
      * 压栈cmd操作
      */
     void removePage(int index);
+
+    /**
+     * 压栈cmd
+     */
+    void removeSingleTrain(int index);
 
     void commitRemovePage(int index);
 
@@ -112,6 +119,23 @@ namespace qecmd {
             QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    class RemoveSingleTrain :public QUndoCommand {
+        DiagramNaviModel* const navi;
+        std::shared_ptr<Train> train;
+        int index;
+    public:
+        RemoveSingleTrain(DiagramNaviModel* navi_,std::shared_ptr<Train> train_, int index_,
+            QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("删除列车: ")+train_->trainName().full(),parent),
+            navi(navi_),train(train_),index(index_){}
+        virtual void undo()override {
+            navi->undoRemoveSingleTrain(index, train);
+        }
+        virtual void redo()override {
+            navi->commitRemoveSingleTrain(index);
+        }
     };
 
 }

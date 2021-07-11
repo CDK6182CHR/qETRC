@@ -4,9 +4,14 @@
 #include <memory>
 #include <QLineEdit>
 #include <DockWidget.h>
+#include <SARibbonLineEdit.h>
+#include <SARibbonComboBox.h>
+#include <SARibbonCheckBox.h>
+#include <QDoubleSpinBox>
 
 #include "data/diagram/diagram.h"
 #include "editors/basictrainwidget.h"
+#include "util/linestylecombo.h"
 
 class MainWindow;
 /**
@@ -23,7 +28,17 @@ class TrainContext : public QObject
     SARibbonContextCategory* const cont;
     MainWindow* const mw;
 
-    QLineEdit* edName, * edStart, * edEnd;
+    SARibbonLineEdit* edName, * edStart, * edEnd;
+
+    //后缀m表示可修改的控件
+    SARibbonLineEdit *edNamem,*edStartm,*edEndm;
+    SARibbonLineEdit *edNameDown,*edNameUp;
+    SARibbonComboBox* comboType;
+    PenStyleCombo* comboLs;
+    SARibbonCheckBox *checkPassen;
+    SARibbonToolButton* btnColor, * btnAutoUI;
+    QDoubleSpinBox* spWidth;
+    QColor tmpColor;
 
     QList<BasicTrainWidget*> basicWidgets;
     QList<ads::CDockWidget*> basicDocks;
@@ -39,6 +54,8 @@ signals:
     
 private:
     void initUI();
+
+    void setupTypeCombo();
 
     /**
      * 返回当前列车对应的BasicWidget的下标
@@ -75,6 +92,13 @@ public slots:
      */
     void commitTimetableChange(std::shared_ptr<Train> train, std::shared_ptr<Train> table);
 
+    /**
+     * 更新信息，重新铺画运行图（但不重新绑定）
+     * 更新当前页面（目前只需要更新当前页面），通知列表页面更新
+     * 似乎现在直接利用timetableChanged()信号就够了
+     */
+    void commitTraininfoChange(std::shared_ptr<Train> train, std::shared_ptr<Train> info);
+
 private slots:
     void showTrainEvents();
     void actShowTrainLine();
@@ -87,6 +111,16 @@ private slots:
     void onTrainDockClosed();
 
     void removeBasicDockAt(int idx);
+
+    void onFullNameChanged();
+
+    void onAutoUIChanged(bool on);
+
+    void actSelectColor();
+
+    void actApply();
+
+    void refreshData();
 };
 
 
@@ -101,6 +135,24 @@ namespace qecmd {
             TrainContext* context, QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    class UpdateTrainInfo :
+        public QUndoCommand
+    {
+        std::shared_ptr<Train> train, info;
+        TrainContext* const cont;
+    public:
+        UpdateTrainInfo(std::shared_ptr<Train> train_, std::shared_ptr<Train> newinfo,
+            TrainContext* context, QUndoCommand* parent = nullptr) :
+            QUndoCommand(QObject::tr("更新列车信息: ") + newinfo->trainName().full()),
+            train(train_), info(newinfo), cont(context) {}
+        virtual void undo()override {
+            cont->commitTraininfoChange(train, info);
+        }
+        virtual void redo()override {
+            cont->commitTraininfoChange(train, info);
+        }
     };
 }
 

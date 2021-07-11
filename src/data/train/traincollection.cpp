@@ -80,6 +80,15 @@ bool TrainCollection::trainNameExisted(const TrainName& name) const
 	return fullNameMap.contains(name.full());
 }
 
+bool TrainCollection::trainNameIsValid(const TrainName& name, std::shared_ptr<Train> train) const
+{
+	if (name.full().isEmpty())
+		return false;
+	if (fullNameMap.contains(name.full()) && fullNameMap.value(name.full()) != train)
+		return false;
+	return true;
+}
+
 std::shared_ptr<Train> TrainCollection::findFullName(const QString& name)
 {
 	return fullNameMap.value(name);

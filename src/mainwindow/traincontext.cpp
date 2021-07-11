@@ -2,13 +2,14 @@
 
 #include "viewers/traineventdialog.h"
 #include "mainwindow.h"
+#include "data/train/train.h"
 
 #include <QtWidgets>
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
-	MainWindow* mw_):
+	MainWindow* mw_) :
 	QObject(mw_),
-	diagram(diagram_),cont(context_),mw(mw_)
+	diagram(diagram_), cont(context_), mw(mw_)
 {
 	initUI();
 }
@@ -16,9 +17,7 @@ TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const con
 void TrainContext::resetTrain()
 {
 	train.reset();
-	edName->setText("");
-	edStart->setText("");
-	edEnd->setText("");
+	refreshData();
 }
 
 void TrainContext::initUI()
@@ -33,18 +32,18 @@ void TrainContext::initUI()
 		if constexpr (true) {
 			QWidget* w = new QWidget;
 			auto* vlay = new QVBoxLayout;
-			edName = new QLineEdit;
+			edName = new SARibbonLineEdit;
 			edName->setAlignment(Qt::AlignCenter);
 			edName->setFocusPolicy(Qt::NoFocus);
 			vlay->addWidget(edName);
 
 			auto* hlay = new QHBoxLayout;
-			edStart = new QLineEdit;
+			edStart = new SARibbonLineEdit;
 			edStart->setFocusPolicy(Qt::NoFocus);
 			edStart->setAlignment(Qt::AlignCenter);
 			hlay->addWidget(edStart);
 			hlay->addWidget(new QLabel("->"));
-			edEnd = new QLineEdit;
+			edEnd = new SARibbonLineEdit;
 			edEnd->setFocusPolicy(Qt::NoFocus);
 			edEnd->setAlignment(Qt::AlignCenter);
 			hlay->addWidget(edEnd);
@@ -71,15 +70,126 @@ void TrainContext::initUI()
 	//编辑
 	if constexpr (true) {
 		auto* page = cont->addCategoryPage(tr("编辑"));
-		auto* panel = page->addPannel(tr("基本"));
+		auto* panel = page->addPannel(tr("基本信息"));
 
-		auto* act = new QAction(QIcon(":/icons/timetable.png"), tr("基本编辑"), this);
-		auto* btn = panel->addLargeAction(act);
+		auto* w = new QWidget;
+		auto* vlay = new QVBoxLayout;
+		edNamem = new SARibbonLineEdit;
+		edNamem->setAlignment(Qt::AlignCenter);
+		edNamem->setToolTip(tr("列车全车次\n用以唯一识别列车，不能与其他车次重复"));
+		vlay->addWidget(edNamem);
+
+		auto* hlay = new QHBoxLayout;
+		edNameDown = new SARibbonLineEdit;
+		edNameDown->setAlignment(Qt::AlignCenter);
+		edNameDown->setToolTip(tr("下行车次"));
+		hlay->addWidget(edNameDown);
+		hlay->addWidget(new QLabel("/"));
+		edNameUp = new SARibbonLineEdit;
+		edNameUp->setToolTip(tr("上行车次"));
+		hlay->addWidget(edNameUp);
+		vlay->addLayout(hlay);
+		w->setLayout(vlay);
+		w->setFixedWidth(240);
+		panel->addWidget(w, SARibbonPannelItem::Large);
+		connect(edNamem, SIGNAL(editingFinished()), this,
+			SLOT(onFullNameChanged()));
+
+		panel->addSeparator();
+
+		w = new QWidget;
+		vlay = new QVBoxLayout;
+		hlay = new QHBoxLayout;
+		edStartm = new SARibbonLineEdit;
+		edStartm->setAlignment(Qt::AlignCenter);
+		edStartm->setToolTip(tr("始发站"));
+		hlay->addWidget(edStartm);
+		hlay->addWidget(new QLabel("-"));
+		edEndm = new SARibbonLineEdit;
+		edEndm->setAlignment(Qt::AlignCenter);
+		edEndm->setToolTip(tr("终到站"));
+		hlay->addWidget(edEndm);
+		vlay->addLayout(hlay);
+
+		hlay = new QHBoxLayout;
+		comboType = new SARibbonComboBox;
+		comboType->setEditable(true);
+		comboType->setToolTip(tr("列车类型\n下拉列表给出运行图目前存在的列车类型。"
+			"允许编辑，如果新类型不存在，将自动添加。如果留空，则按车次判定类型。"));
+		hlay->addWidget(comboType);
+		checkPassen = new SARibbonCheckBox();
+		checkPassen->setText(tr("旅客列车"));
+		checkPassen->setTristate(true);
+		checkPassen->setToolTip(tr("是否为旅客列车\n如果为半选中状态，则由列车种类判定"));
+		hlay->addWidget(checkPassen);
+		vlay->addLayout(hlay);
+
+		w->setLayout(vlay);
+		w->setFixedWidth(240);
+		panel->addWidget(w, SARibbonPannelItem::Large);
+
+		panel->addSeparator();
+
+		auto* act = new QAction(tr("自动运行线"), this);
+		act->setCheckable(true);
+		auto* btn = panel->addMediumAction(act);
+		btnAutoUI = btn;
+		btnAutoUI->setFixedWidth(80);
+		act->setToolTip(tr("自动配置运行线\n如果启用，则采用列车所属类型的运行线颜色、线形、宽度，"
+			"否则可针对本车次单独设置。"));
+		connect(act, SIGNAL(triggered(bool)), this, SLOT(onAutoUIChanged(bool)));
+
+		act = new QAction(tr("颜色"), this);
+		connect(act, SIGNAL(triggered()), this, SLOT(actSelectColor()));
+		btnColor = panel->addMediumAction(act);
+		btnColor->setFixedWidth(80);
+
+		w = new QWidget;
+		vlay = new QVBoxLayout;
+
+		auto* spin = new QDoubleSpinBox;
+		spin->setSingleStep(0.5);
+		spin->setToolTip(tr("运行线宽度"));
+		spWidth = spin;
+		vlay->addWidget(spin);
+		comboLs = new PenStyleCombo;
+		comboLs->setToolTip(tr("线型\n设置运行线线型"));
+
+		vlay->addWidget(comboLs);
+		w->setLayout(vlay);
+		w->setFixedWidth(150);
+		panel->addWidget(w, SARibbonPannelItem::Large);
+
+		act = new QAction(QIcon(":/icons/tick.png"), tr("应用"), this);
+		panel->addLargeAction(act);
+		connect(act, SIGNAL(triggered()), this, SLOT(actApply()));
+
+		act = new QAction(QIcon(":/icons/refresh.png"), tr("还原"), this);
+		panel->addLargeAction(act);
+		connect(act, SIGNAL(triggered()), this, SLOT(refreshData()));
+
+		panel = page->addPannel(tr(""));
+
+
+		act = new QAction(QIcon(":/icons/timetable.png"), tr("时刻表"), this);
+		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(80);
 		connect(act, SIGNAL(triggered()), this, SLOT(actShowBasicWidget()));
 	}
-	
+
 }
+
+void TrainContext::setupTypeCombo()
+{
+	comboType->clear();
+	const auto& types = diagram.trainCollection().typeCount();
+	for (auto p = types.begin(); p != types.end(); ++p) {
+		if (p.value() >= 0) {
+			comboType->addItem(p.key()->name());
+		}
+	}
+}
+
 
 int TrainContext::getBasicWidgetIndex()
 {
@@ -135,6 +245,16 @@ void TrainContext::commitTimetableChange(std::shared_ptr<Train> train, std::shar
 	emit timetableChanged(train);
 }
 
+void TrainContext::commitTraininfoChange(std::shared_ptr<Train> train, std::shared_ptr<Train> info)
+{
+	train->swapBaseInfo(*info);
+	if (train == this->train) {
+		refreshData();
+	}
+	mw->repaintTrainLines(train);
+	emit timetableChanged(train);
+}
+
 void TrainContext::actShowTrainLine()
 {
 	emit highlightTrainLine(train);
@@ -147,7 +267,7 @@ void TrainContext::actShowBasicWidget()
 		//创建
 		auto* w = new BasicTrainWidget(diagram.trainCollection(), false);
 		w->setTrain(train);
-		auto* dock = new ads::CDockWidget(tr("列车基本编辑 - %1").arg(train->trainName().full()));
+		auto* dock = new ads::CDockWidget(tr("时刻表编辑 - %1").arg(train->trainName().full()));
 		dock->setWidget(w);
 		//dock->setAttribute(Qt::WA_DeleteOnClose);
 		connect(dock, SIGNAL(closed()), this, SLOT(onTrainDockClosed()));
@@ -188,12 +308,99 @@ void TrainContext::removeBasicDockAt(int idx)
 	dock->deleteDockWidget();
 }
 
+void TrainContext::onFullNameChanged()
+{
+	TrainName tn(edNamem->text());
+	edNameDown->setText(tn.down());
+	edNameUp->setText(tn.up());
+}
+
+void TrainContext::onAutoUIChanged(bool on)
+{
+	btnColor->setEnabled(!on);
+	comboLs->setEnabled(!on);
+	spWidth->setEnabled(!on);
+}
+
+void TrainContext::actSelectColor()
+{
+	QColor color(tmpColor);
+	if (!color.isValid() && train)
+		color = train->pen().color();
+	color = QColorDialog::getColor(color, mw, tr("选择运行线颜色"));
+	if (color.isValid()) {
+		tmpColor = color;
+		btnColor->setText(tmpColor.name());
+	}
+}
+
+void TrainContext::actApply()
+{
+	if (!train)return;
+	//生成新的列车对象，新对象不包含时刻表信息，专门作为装基础信息的容器
+	TrainName name(edNamem->text(), edNameDown->text(), edNameUp->text());
+	if (!diagram.trainCollection().trainNameIsValid(name, train)) {
+		QMessageBox::warning(mw, tr("错误"),
+			tr("全车次不能为空或与其他车次冲突，请重新编辑。"));
+		return;
+	}
+	auto t = std::make_shared<Train>(name);
+	t->setStarting(StationName::fromSingleLiteral(edStartm->text()));
+	t->setTerminal(StationName::fromSingleLiteral(edEndm->text()));
+
+	auto& mana = diagram.trainCollection().typeManager();
+	const QString& tps = comboType->currentText();
+	std::shared_ptr<TrainType> tp;
+	if (tps.isEmpty()) {
+		tp = mana.fromRegex(name);
+	}
+	else {
+		tp = mana.findOrCreate(tps);
+	}
+	t->setType(tp);
+	t->setPassenger(static_cast<TrainPassenger>(checkPassen->checkState()));
+
+	bool autopen = btnAutoUI->isChecked();
+	if (autopen) {
+		t->resetPen();
+	}
+	else {
+		QColor color = tmpColor;
+		if (!color.isValid())
+			color = train->pen().color();
+		QPen pen = QPen(color, spWidth->value(), static_cast<Qt::PenStyle>(comboLs->currentIndex()));
+		t->setPen(pen);
+	}
+	mw->getUndoStack()->push(new qecmd::UpdateTrainInfo(train, t, this));
+}
+
+void TrainContext::refreshData()
+{
+	if (train) {
+		edName->setText(train->trainName().full());
+		edStart->setText(train->starting().toSingleLiteral());
+		edEnd->setText(train->terminal().toSingleLiteral());
+		edNamem->setText(train->trainName().full());
+		edStartm->setText(train->starting().toSingleLiteral());
+		edEndm->setText(train->terminal().toSingleLiteral());
+		edNameDown->setText(train->trainName().down());
+		edNameUp->setText(train->trainName().up());
+		setupTypeCombo();
+		comboType->setCurrentText(train->type()->name());
+		checkPassen->setCheckState(static_cast<Qt::CheckState>(train->passenger()));
+		btnAutoUI->setChecked(train->autoPen());
+		onAutoUIChanged(train->autoPen());
+		const QPen& pen = train->pen();
+		btnColor->setText(pen.color().name());
+		spWidth->setValue(pen.widthF());
+		comboLs->setCurrentIndex(static_cast<int>(pen.style()));
+	}
+}
+
 void TrainContext::setTrain(std::shared_ptr<Train> train_)
 {
 	train = train_;
-	edName->setText(train->trainName().full());
-	edStart->setText(train->starting().toSingleLiteral());
-	edEnd->setText(train->terminal().toSingleLiteral());
+	refreshData();
 }
 
 void TrainContext::showTrainEvents()
@@ -202,10 +409,10 @@ void TrainContext::showTrainEvents()
 	dialog->show();
 }
 
-qecmd::ChangeTimetable::ChangeTimetable(std::shared_ptr<Train> train_, 
-	std::shared_ptr<Train> newtable, TrainContext* context, QUndoCommand* parent):
-	QUndoCommand(QObject::tr("更新时刻表: ")+train_->trainName().full(),parent),
-	train(train_),table(newtable),cont(context)
+qecmd::ChangeTimetable::ChangeTimetable(std::shared_ptr<Train> train_,
+	std::shared_ptr<Train> newtable, TrainContext* context, QUndoCommand* parent) :
+	QUndoCommand(QObject::tr("更新时刻表: ") + train_->trainName().full(), parent),
+	train(train_), table(newtable), cont(context)
 {
 }
 

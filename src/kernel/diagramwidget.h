@@ -99,6 +99,12 @@ public:
     void updateTrain(std::shared_ptr<Train>, QList<std::shared_ptr<TrainAdapter>>&& adps);
 
     /**
+     * 在列车没有重新执行绑定的情况下，重新铺画
+     * 主要用于基本信息变化
+     */
+    void repaintTrain(std::shared_ptr<Train> train);
+
+    /**
      * 显示或隐藏列车运行线
      * 如果没有铺画过，现场铺画
      */

@@ -65,7 +65,7 @@ std::shared_ptr<TrainType> TypeManager::appendRegex(const QRegExp& reg, const QS
 	return t;
 }
 
-std::shared_ptr<const TrainType> TypeManager::fromRegex(const TrainName& name) const
+std::shared_ptr<TrainType> TypeManager::fromRegex(const TrainName& name) const
 {
 	for (const auto& p : _regs) {
 		if (p.first.indexIn(name.full()) == 0)

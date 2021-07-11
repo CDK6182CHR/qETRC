@@ -8,7 +8,7 @@
 
 NaviTree::NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget *parent):
     QTreeView(parent),mePageList(new QMenu(this)),meRailList(new QMenu(this)),
-    meTrainList(new QMenu(this)),mePage(new QMenu(this)),
+    meTrainList(new QMenu(this)),mePage(new QMenu(this)),meTrain(new QMenu(this)),
     _model(model_),_undo(undo)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -37,8 +37,12 @@ void NaviTree::initContextMenus()
     connect(act, SIGNAL(triggered()), this, SLOT(importTrains()));
 
     //Page
-    act = mePage->addAction(tr("删除"));
+    act = mePage->addAction(tr("删除运行图"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemovePageContext()));
+
+    //Train
+    act = meTrain->addAction(tr("删除列车"));
+    connect(act, SIGNAL(triggered()), this, SLOT(onRemoveSingleTrainContext()));
 }
 
 NaviTree::ACI* NaviTree::getItem(const QModelIndex& idx)
@@ -59,6 +63,15 @@ void NaviTree::onRemovePageContext()
     ACI* item = getItem(idx);
     if (item && item->type() == navi::PageItem::Type) {
         removePage(idx.row());
+    }
+}
+
+void NaviTree::onRemoveSingleTrainContext()
+{
+    auto idx = currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::TrainModelItem::Type) {
+        removeSingleTrain(idx.row());
     }
 }
 
@@ -101,6 +114,12 @@ void NaviTree::undoAddPage()
 void NaviTree::removePage(int index)
 {
     _undo->push(new qecmd::RemovePage(_model->diagram(), index, this));
+}
+
+void NaviTree::removeSingleTrain(int index)
+{
+    auto train = _model->diagram().trainCollection().trainAt(index);
+    _undo->push(new qecmd::RemoveSingleTrain(_model, train, index));
 }
 
 void NaviTree::commitRemovePage(int idx)
@@ -186,6 +205,7 @@ void NaviTree::showContextMenu(const QPoint& pos)
     case navi::RailwayListItem::Type:meRailList->popup(p); break;
     case navi::TrainListItem::Type:meTrainList->popup(p); break;
     case navi::PageItem::Type:mePage->popup(p); break;
+    case navi::TrainModelItem::Type:meTrain->popup(p); break;
     }
     
 }

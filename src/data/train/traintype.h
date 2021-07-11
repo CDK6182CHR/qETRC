@@ -108,7 +108,7 @@ public:
      */
     std::shared_ptr<TrainType> appendRegex(const QRegExp& reg, const QString& name, bool passenger);
 
-    std::shared_ptr<const TrainType> fromRegex(const TrainName& name)const;
+    std::shared_ptr<TrainType> fromRegex(const TrainName& name)const;
 
     /**
      * @brief findOrCreate

@@ -175,7 +175,29 @@ void navi::TrainListItem::resetChildren()
 	int row = 0;
 	for (auto p : _coll.trains()) {
 		_trains.emplace_back(std::make_unique<TrainModelItem>(p, row++, this));
-	}
+    }
+}
+
+void navi::TrainListItem::removeTrainAt(int i)
+{
+    _coll.takeTrainAt(i);
+    auto p=_trains.begin();
+    std::advance(p,i);
+    p=_trains.erase(p);
+    for(;p!=_trains.end();++p){
+        (*p)->setRow((*p)->row()-1);
+    }
+}
+
+void navi::TrainListItem::undoRemoveTrainAt(std::shared_ptr<Train> train, int i)
+{
+    _coll.insertTrainForUndo(i,train);
+    auto p=_trains.begin();
+    std::advance(p,i);
+    p=_trains.insert(p,std::make_unique<TrainModelItem>(train,i,this));
+    for(++p;p!=_trains.end();++p){
+        (*p)->setRow((*p)->row()+1);
+    }
 }
 
 navi::AbstractComponentItem* navi::TrainListItem::child(int i)
