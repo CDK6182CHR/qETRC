@@ -9,6 +9,7 @@
 NaviTree::NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget *parent):
     QTreeView(parent),mePageList(new QMenu(this)),meRailList(new QMenu(this)),
     meTrainList(new QMenu(this)),mePage(new QMenu(this)),meTrain(new QMenu(this)),
+    meRailway(new QMenu(this)),
     _model(model_),_undo(undo)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -43,6 +44,10 @@ void NaviTree::initContextMenus()
     //Train
     act = meTrain->addAction(tr("删除列车"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemoveSingleTrainContext()));
+
+    //Railway
+    act = meRailway->addAction(tr("删除基线"));
+    connect(act, SIGNAL(triggered()), this, SLOT(onRemoveRailwayContext()));
 }
 
 NaviTree::ACI* NaviTree::getItem(const QModelIndex& idx)
@@ -72,6 +77,20 @@ void NaviTree::onRemoveSingleTrainContext()
     ACI* item = getItem(idx);
     if (item && item->type() == navi::TrainModelItem::Type) {
         removeSingleTrain(idx.row());
+    }
+}
+
+void NaviTree::onRemoveRailwayContext()
+{
+    auto res = QMessageBox::question(this, tr("删除基线"),
+        tr("此操作将删除所选基线数据，同时从所有运行图中移除该基线。空白的运行图将被删除。\n"
+            "请注意此操作关涉较广且不可撤销。是否继续？"));
+    if (res != QMessageBox::Yes)
+        return;
+    auto idx = currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::RailwayItem::Type) {
+        _model->removeRailwayAt(idx.row());
     }
 }
 
@@ -163,6 +182,8 @@ void NaviTree::onDoubleClicked(const QModelIndex& index)
     switch (item->type()) {
     case navi::RailwayItem::Type:
         emit editRailway(static_cast<navi::RailwayItem*>(item)->railway()); break;
+    case navi::TrainModelItem::Type:
+        emit editTrain(static_cast<navi::TrainModelItem*>(item)->train()); break;
     }
 }
 
@@ -206,6 +227,7 @@ void NaviTree::showContextMenu(const QPoint& pos)
     case navi::TrainListItem::Type:meTrainList->popup(p); break;
     case navi::PageItem::Type:mePage->popup(p); break;
     case navi::TrainModelItem::Type:meTrain->popup(p); break;
+    case navi::RailwayItem::Type:meRailway->popup(p); break;
     }
     
 }

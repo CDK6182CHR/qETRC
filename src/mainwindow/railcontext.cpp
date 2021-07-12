@@ -8,6 +8,17 @@ RailContext::RailContext(Diagram& diagram_, SARibbonContextCategory* context,
 	initUI();
 }
 
+void RailContext::resetRailway()
+{
+	railway.reset();
+	refreshData();
+}
+
+void RailContext::refreshData()
+{
+	//todo...
+}
+
 void RailContext::initUI()
 {
 	auto* page = cont->addCategoryPage(tr("数据"));
@@ -48,6 +59,7 @@ void RailContext::commitUpdateTimetable(std::shared_ptr<Railway> railway, bool e
 void RailContext::setRailway(std::shared_ptr<Railway> rail)
 {
 	railway = rail;
+	refreshData();
 }
 
 void RailContext::actOpenStationWidget()

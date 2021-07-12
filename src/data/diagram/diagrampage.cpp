@@ -158,3 +158,25 @@ void DiagramPage::swapBaseInfo(DiagramPage& other)
     std::swap(_name, other._name);
     std::swap(_note, other._note);
 }
+
+bool DiagramPage::hasTrain(const Train& train) const
+{
+    for (auto r : _railways) {
+        for (auto a : train.adapters()) {
+            if (r.get() == &(a->railway()))
+                return true;
+        }
+    }
+    return false;
+}
+
+void DiagramPage::removeRailway(std::shared_ptr<Railway> rail)
+{
+    auto p = _railways.begin();
+    while (p != _railways.end()) {
+        if ((*p) == rail)
+            p = _railways.erase(p);
+        else
+            ++p;
+    }
+}

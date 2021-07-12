@@ -16,9 +16,12 @@ ImportTrainDialog::ImportTrainDialog(Diagram& diagram_, QWidget* parent):
 
 void ImportTrainDialog::initUI()
 {
-	auto* hlay = new QHBoxLayout;
+    auto* hlay = new QHBoxLayout;
+    auto* sp = new QSplitter(Qt::Horizontal);
     widget = new TrainListWidget(other, nullptr);
-	hlay->addWidget(widget);
+	sp->addWidget(widget);
+
+    auto* w = new QWidget;
 
 	auto* vlay = new QVBoxLayout;
 	auto* form = new QFormLayout;
@@ -39,7 +42,7 @@ void ImportTrainDialog::initUI()
 	form->addRow(tr("冲突车次"), rdConflict);
 	rdConflict->get(0)->setChecked(true);
 
-	rdRouting = new RadioButtonGroup<3,QVBoxLayout>({ "以原图交路为准","以新图交路为准","不导入任何交路" }, this);
+	rdRouting = new RadioButtonGroup<3,QVBoxLayout>({ "以原图交路为准","以所导入交路为准","不导入任何交路" }, this);
 	form->addRow(tr("冲突交路"), rdRouting);
 	rdRouting->get(0)->setChecked(true);
 
@@ -48,13 +51,25 @@ void ImportTrainDialog::initUI()
 	edSuffix = new QLineEdit;
 	form->addRow(tr("附加后缀"), edSuffix);
 	vlay->addLayout(form);
+
+    auto* label = new QLabel(tr("先选择文件名，然后在左侧列表中删除不需要导入的车次，剩余车次都将被导入。"
+        "若不选择“不导入任何交路”，则将导入指定运行图（或车次数据库）中的所有交路数据；"
+        "若交路名称与原有冲突则自动重命名。\n"
+        "如果车次同时属于一个既有交路和一个被导入运行图中的交路时，若选择“以原图交路为准”，"
+        "则将该车次划给原运行图中既有交路，而从导入的交路中删去该车次；若选择“以所导入交路为准”，"
+        "则将该车次从原图中既有交路删除，而划给新导入的交路。\n\n"
+        "请注意此操作不支持撤销。"));
+    label->setWordWrap(true);
+    vlay->addWidget(label);
 	
 	auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	vlay->addWidget(buttons);
 	connect(buttons, SIGNAL(accepted()), this, SLOT(actApply()));
 	connect(buttons, SIGNAL(rejected()), this, SLOT(actCancel()));
 
-	hlay->addLayout(vlay);
+    w->setLayout(vlay);
+    sp->addWidget(w);
+    hlay->addWidget(sp);
 	setLayout(hlay);
 }
 
@@ -80,6 +95,9 @@ void ImportTrainDialog::actView()
 
 void ImportTrainDialog::actApply()
 {
+    auto f = QMessageBox::question(this, tr("导入车次"), tr("导入车次操作不支持撤销。是否确认导入车次？"));
+    if (f != QMessageBox::Yes)
+        return;
     bool cover = rdConflict->get(1)->isChecked();
     //删除新导入的图中没有任何牵连的交路
     QList<std::shared_ptr<Routing>> routings;

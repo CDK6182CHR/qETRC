@@ -63,6 +63,8 @@ signals:
      */
     void undoneAddRailway(std::shared_ptr<Railway> rail);
 
+    void railwayRemoved(std::shared_ptr<Railway> rail);
+
     void trainRemoved(std::shared_ptr<Train> train);
 
     void undoneTrainRemove(std::shared_ptr<Train> train);
@@ -70,7 +72,7 @@ signals:
 public slots:
     void resetTrainList();
     //void resetRailwayList();
-    //void resetPageList();
+    void resetPageList();
 
     void insertPage(std::shared_ptr<DiagramPage> page, int index);
     void removePageAt(int index);
@@ -88,6 +90,12 @@ public slots:
     void commitRemoveSingleTrain(int index);
 
     void undoRemoveSingleTrain(int index, std::shared_ptr<Train> train);
+
+    /**
+     * 删除由下标指定的线路数据
+     * 由NaviTree调用。注意此操作不支持撤销，因此直接执行
+     */
+    void removeRailwayAt(int i);
 };
 
 

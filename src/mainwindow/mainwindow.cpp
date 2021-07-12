@@ -129,11 +129,29 @@ void MainWindow::removeAllTrains()
 
 void MainWindow::undoAddNewRailway(std::shared_ptr<Railway> rail)
 {
+    removeRailStationWidget(rail);
+}
+
+void MainWindow::onActRailwayRemoved(std::shared_ptr<Railway> rail)
+{
+    removeRailStationWidget(rail);
+    naviModel->resetPageList();
+    checkPagesValidity();
+    updateAllDiagrams();
+    undoStack->clear();
+}
+
+void MainWindow::removeRailStationWidget(std::shared_ptr<Railway> rail)
+{
     for (int i = railStationWidgets.size() - 1; i >= 0; i--) {
         auto p = railStationWidgets.at(i);
         if (p->getRailway() == rail) {
             removeRailStationWidgetAt(i);
         }
+    }
+    if (rail == contextRail->getRailway()) {
+        contextRail->resetRailway();
+        focusOutRailway();
     }
 }
 
@@ -142,6 +160,34 @@ void MainWindow::removeRailStationWidgetAt(int i)
     auto* dock = railStationDocks.takeAt(i);
     auto* w = railStationWidgets.takeAt(i);
     dock->deleteDockWidget();
+}
+
+void MainWindow::actOpenNewRailWidget()
+{
+    QStringList lst;
+    for (auto p : _diagram.railways()) {
+        lst << p->name();
+    }
+    bool ok;
+    auto res = QInputDialog::getItem(this, tr("基线编辑"), tr("请选择需要编辑的基线名称。"
+        "系统将创建新的基线编辑窗口。"), lst, 0, false, &ok);
+    if (ok && !res.isEmpty()) {
+        actOpenRailStationWidget(_diagram.railwayByName(res));
+    }
+}
+
+void MainWindow::checkPagesValidity()
+{
+    for (int i = diagramWidgets.size() - 1; i >= 0; i--) {
+        auto w = diagramWidgets.at(i);
+        auto pgInDia = w->page();
+        if (!_diagram.pages().contains(pgInDia)) {
+            //REMOVE THIS!!
+            diagramWidgets.removeAt(i);
+            auto* dock = diagramDocks.takeAt(i);
+            dock->deleteDockWidget();
+        }
+    }
 }
 
 
@@ -198,6 +244,9 @@ void MainWindow::initDockWidgets()
             this, &MainWindow::removeTrain);
         connect(naviModel, &DiagramNaviModel::undoneTrainRemove,
             this, &MainWindow::undoRemoveTrain);
+
+        connect(naviModel, &DiagramNaviModel::railwayRemoved,
+            this, &MainWindow::onActRailwayRemoved);
     }
 
     //列车管理
@@ -251,7 +300,7 @@ void MainWindow::initToolbar()
         ribbon->quickAccessBar()->addAction(act);
     }
 
-
+    QAction* actTrainList;
     //开始
     if constexpr (true) {
         SARibbonCategory* cat = ribbon->addCategoryPage(QObject::tr("开始"));
@@ -260,18 +309,21 @@ void MainWindow::initToolbar()
         QAction* act = new QAction(QIcon(":/icons/new-file.png"), QObject::tr("新建"), this);
         panel->addLargeAction(act);
         act->setShortcut(Qt::CTRL + Qt::Key_N);
+        act->setToolTip(tr("新建 (Ctrl+N)\n关闭当前运行图文件，并新建空白运行图文件。"));
         addAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(actNewGraph()));
         sharedActions.newfile = act;
 
         act = new QAction(QIcon(":/icons/open.png"), QObject::tr("打开"), this);
         addAction(act);
+        act->setToolTip(tr("打开 (Ctrl+O)\n关闭当前运行图文件，并打开新的既有运行图文件。"));
         act->setShortcut(Qt::CTRL + Qt::Key_O);
         panel->addLargeAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(actOpenGraph()));
         sharedActions.open = act;
 
         act = new QAction(QIcon(":/icons/save1.png"), QObject::tr("保存"), this);
+        act->setToolTip(tr("保存 (Ctrl+S)\n保存当前运行图。如果是新运行图，则需要先选择文件。"));
         act->setShortcut(Qt::CTRL + Qt::Key_S);
         addAction(act);
         panel->addLargeAction(act);
@@ -281,18 +333,22 @@ void MainWindow::initToolbar()
         panel = cat->addPannel(tr("窗口"));
         act = naviDock->toggleViewAction();
         act->setText(QObject::tr("导航"));
+        act->setText(tr("导航面板\n打开或关闭运行图总导航面板。"));
         act->setIcon(QIcon(":/icons/Graph-add.png"));
         auto* btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
         act = trainListDock->toggleViewAction();
+        actTrainList = act;
         act->setText(tr("列车管理"));
+        act->setToolTip(tr("列车管理\n打开或关闭（pyETRC风格的）列车管理列表面板。"));
         act->setIcon(QIcon(":/icons/list.png"));
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
         SARibbonMenu* menu = new SARibbonMenu(this);
         pageMenu = menu;
+        menu->setToolTip(tr("运行图窗口\n导航、打开或关闭现有运行图窗口。"));
         menu->setTitle(QObject::tr("运行图窗口"));
         menu->setIcon(QIcon(":/icons/diagram.png"));
         btn = panel->addLargeMenu(menu);
@@ -307,10 +363,13 @@ void MainWindow::initToolbar()
         act = dock->toggleViewAction();
         act->setText(tr("历史记录"));
         act->setIcon(QIcon(":/icons/clock.png"));
+        act->setToolTip(tr("历史记录\n打开或关闭历史记录面板。\n" 
+            "历史记录面板记录了可撤销的针对运行图文档的操作记录，可以查看、撤销、重做。"));
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
         act = new QAction(QIcon(":/icons/add.png"), tr("添加运行图"), this);
+        act->setToolTip(tr("添加运行图\n选择既有基线数据，建立新的运行图页面。"));
         connect(act, SIGNAL(triggered()), naviView, SLOT(addNewPage()));
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
@@ -324,14 +383,24 @@ void MainWindow::initToolbar()
 
         auto* act = new QAction(QIcon(":/icons/add.png"), tr("导入线路"), this);
         connect(act, SIGNAL(triggered()), naviView, SLOT(importRailways()));
+        act->setToolTip(tr("导入线路\n从既有运行图文件中导入（其中全部的）线路数据"));
         auto* btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
+        act = new QAction(QIcon(":/icons/rail.png"), tr("基线编辑"), this);
+        act->setToolTip(tr("基线编辑\n导航到、新建、打开或者关闭（pyETRC风格的）基线编辑面板。"));
+        connect(act, SIGNAL(triggered()), this, SLOT(actOpenNewRailWidget()));
         auto* menu = new SARibbonMenu(this);
         railMenu = menu;
+        act->setMenu(menu);
         menu->setTitle(tr("线路编辑"));
-        menu->setIcon(QIcon(":/icons/rail.png"));
-        btn = panel->addLargeMenu(menu);
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
+
+        act = new QAction(QIcon(":/icons/new-file.png"), tr("新建线路"), this);
+        connect(act, SIGNAL(triggered()), naviView, SLOT(actAddRailway()));
+        act->setToolTip(tr("新建线路\n新建空白的铁路线路"));
+        btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
     }
 
@@ -340,7 +409,7 @@ void MainWindow::initToolbar()
         auto* cat = ribbon->addCategoryPage(tr("列车"));
         auto* panel = cat->addPannel(tr("车次管理"));
 
-        auto* act = new QAction(QIcon(":/icons/list.png"), tr("列车管理"), this);
+        auto* act = actTrainList;
         auto* menu = new QMenu(tr("列车管理扩展"), this);
 
         auto* actsub = new QAction(tr("删除所有车次"), this);
@@ -352,6 +421,7 @@ void MainWindow::initToolbar()
         btn->setMinimumWidth(70);
 
         act = new QAction(QIcon(":/icons/add_train.png"), tr("导入车次"), this);
+        act->setToolTip(tr("导入车次 (Ctrl+D)\n从既有运行图或者车次数据库文件中导入部分或全部的车次。"));
         act->setShortcut(Qt::CTRL + Qt::Key_D);
         addAction(act);
         connect(act, SIGNAL(triggered()), naviView, SLOT(importTrains()));
@@ -382,6 +452,10 @@ void MainWindow::initToolbar()
 
         connect(contextTrain, &TrainContext::timetableChanged,
             trainListWidget->getModel(), &TrainListModel::onTrainChanged);
+        connect(contextTrain, &TrainContext::actRemoveTrain,
+            naviView, &NaviTree::removeSingleTrain);
+        connect(naviView, &NaviTree::editTrain,
+            contextTrain, &TrainContext::actShowBasicWidget);
     }
 
     //context: rail
@@ -603,6 +677,8 @@ void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
         contextRail, &RailContext::actChangeRailName);
     connect(w->getModel(), &RailStationModel::actStationTableChanged,
         contextRail, &RailContext::actUpdateTimetable);
+    connect(w, &RailStationWidget::focusInRailway,
+        this, &MainWindow::focusInRailway);
     railStationWidgets.append(w);
     railStationDocks.append(dock);
 

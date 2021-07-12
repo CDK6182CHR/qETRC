@@ -206,6 +206,24 @@ int Diagram::getPageIndex(std::shared_ptr<DiagramPage> page) const
     return -1;
 }
 
+void Diagram::removeRailwayAt(int i)
+{
+    auto rail = railways().takeAt(i);
+    //清理Page中的
+    auto it = _pages.begin();
+    while (it != _pages.end()) {
+        (*it)->removeRailway(rail);
+        if ((*it)->isNull())
+            it = _pages.erase(it);
+        else
+            ++it;
+    }
+    //与列车解除绑定
+    for (auto p : _trainCollection.trains()) {
+        p->unbindToRailway(*rail);
+    }
+}
+
 void Diagram::bindAllTrains()
 {
     for (auto p : railways()) {

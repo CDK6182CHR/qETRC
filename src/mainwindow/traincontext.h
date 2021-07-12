@@ -51,6 +51,7 @@ public:
 signals:
     void highlightTrainLine(std::shared_ptr<Train> train);
     void timetableChanged(std::shared_ptr<Train> train);
+    void actRemoveTrain(int index);
     
 private:
     void initUI();
@@ -99,14 +100,14 @@ public slots:
      */
     void commitTraininfoChange(std::shared_ptr<Train> train, std::shared_ptr<Train> info);
 
-private slots:
-    void showTrainEvents();
-    void actShowTrainLine();
-
     /**
      * 显示或者创建当前车次的基本编辑面板。
      */
     void actShowBasicWidget();
+
+private slots:
+    void showTrainEvents();
+    void actShowTrainLine();
 
     void onTrainDockClosed();
 
@@ -121,6 +122,8 @@ private slots:
     void actApply();
 
     void refreshData();
+
+    void actRemoveCurrentTrain();
 };
 
 

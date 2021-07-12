@@ -95,6 +95,12 @@ namespace navi {
         void appendRailway(std::shared_ptr<Railway> rail);
 
 		void removeTailRailways(int cnt);
+
+        /**
+         * @brief removeRailwayAt
+         * 删除指定下标的基线数据，同时触发删除既有车次、运行图中的数据，不可撤销。
+         */
+        void removeRailwayAt(int i);
 	};
 
 	class PageItem;
@@ -109,6 +115,7 @@ namespace navi {
 		inline virtual int childCount()const override { return _pages.size(); }
 		virtual QString data(int i)const override;
 		inline virtual int type()const override { return Type; }
+        void resetChildren();
 
 		/**
 		 * 暂定在这里实施实际的数据插入操作

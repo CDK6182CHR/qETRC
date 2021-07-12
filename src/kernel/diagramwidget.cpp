@@ -1003,6 +1003,8 @@ void DiagramWidget::updateDistanceAxis()
 
 void DiagramWidget::highlightTrain(std::shared_ptr<Train> train)
 {
+    if (!_page->hasTrain(*train))
+        return;
     unselectTrain();
     _selectedTrain = train;
 

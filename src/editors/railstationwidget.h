@@ -35,6 +35,9 @@ public:
 
     auto* getModel() { return model; }
 
+protected:
+    void focusInEvent(QFocusEvent* e)override;
+
 private:
     void initUI();
    
@@ -44,6 +47,8 @@ signals:
      * 此信号发送给railcontext来执行压栈
      */
     void railNameChanged(std::shared_ptr<Railway> railway, const QString& name);
+
+    void focusInRailway(std::shared_ptr<Railway> rail);
 
 private slots:
     void actApply();

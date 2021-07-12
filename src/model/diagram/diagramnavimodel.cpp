@@ -119,6 +119,31 @@ navi::AbstractComponentItem* DiagramNaviModel::getItem(const QModelIndex& idx) c
     return parentItem;
 }
 
+void DiagramNaviModel::resetTrainList()
+{
+    beginResetModel();
+    auto idx = index(navi::DiagramItem::RowTrains, 0);
+    auto item = static_cast<navi::TrainListItem*>(getItem(idx));
+    item->resetChildren();
+    endResetModel();
+}
+
+//void DiagramNaviModel::resetRailwayList()
+//{
+//    beginResetModel();
+//    auto idx = index(navi::DiagramItem::RowRailways, 0);
+//}
+
+
+void DiagramNaviModel::resetPageList()
+{
+    beginResetModel();
+    auto idx = index(navi::DiagramItem::RowPages, 0);
+    auto item = static_cast<navi::PageListItem*>(getItem(idx));
+    item->resetChildren();
+    endResetModel();
+}
+
 void DiagramNaviModel::insertPage(std::shared_ptr<DiagramPage> page, int idx)
 {
     QModelIndex idx0 = index(navi::DiagramItem::RowPages, 0);
@@ -198,13 +223,16 @@ void DiagramNaviModel::undoRemoveSingleTrain(int i, std::shared_ptr<Train> train
     emit undoneTrainRemove(train);
 }
 
-void DiagramNaviModel::resetTrainList()
+void DiagramNaviModel::removeRailwayAt(int i)
 {
-    beginResetModel();
-    auto idx = index(navi::DiagramItem::RowTrains, 0);
-    auto item = static_cast<navi::TrainListItem*>(getItem(idx));
-    item->resetChildren();
-    endResetModel();
+    QModelIndex par = index(navi::DiagramItem::RowRailways, 0);
+    auto* item = static_cast<navi::RailwayListItem*>(par.internalPointer());
+    auto rail = _diagram.railwayAt(i);
+    beginRemoveRows(par, i, i);
+    item->removeRailwayAt(i);
+    endRemoveRows();
+    emit railwayRemoved(rail);
 }
+
 
 

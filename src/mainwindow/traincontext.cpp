@@ -175,6 +175,11 @@ void TrainContext::initUI()
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(80);
 		connect(act, SIGNAL(triggered()), this, SLOT(actShowBasicWidget()));
+
+		act = new QAction(QIcon(":/icons/close.png"), tr("删除"), this);
+		connect(act, SIGNAL(triggered()), this, SLOT(actRemoveCurrentTrain()));
+		btn = panel->addLargeAction(act);
+		btn->setMinimumWidth(70);
 	}
 
 }
@@ -394,6 +399,16 @@ void TrainContext::refreshData()
 		btnColor->setText(pen.color().name());
 		spWidth->setValue(pen.widthF());
 		comboLs->setCurrentIndex(static_cast<int>(pen.style()));
+	}
+}
+
+void TrainContext::actRemoveCurrentTrain()
+{
+	if (train) {
+		int idx = diagram.trainCollection().getTrainIndex(train);
+		if (idx != -1) {
+			emit actRemoveTrain(idx);
+		}
 	}
 }
 

@@ -17,7 +17,7 @@ class NaviTree : public QTreeView
 {
     Q_OBJECT;
 
-    QMenu* mePageList, * meRailList, * meTrainList, * mePage, * meTrain;
+    QMenu* mePageList, * meRailList, * meTrainList, * mePage, * meTrain, * meRailway;
     DiagramNaviModel* _model;
     QUndoStack* const _undo;
 public:
@@ -45,6 +45,7 @@ signals:
     void focusOutTrain();
     void focusInRailway(std::shared_ptr<Railway>);
     void editRailway(std::shared_ptr<Railway>);
+    void editTrain(std::shared_ptr<Train>);
     void focusOutRailway();
     void railwayListChanged();   //只是通知主窗口更新数据  其实都不见得有必要
 
@@ -67,9 +68,10 @@ private slots:
 
     void onRemoveSingleTrainContext();
 
-    void actAddRailway();
-
+    void onRemoveRailwayContext();
+    
 public slots:
+    void actAddRailway();
     void importRailways();
     void addNewPage();
     

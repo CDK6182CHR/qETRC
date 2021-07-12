@@ -93,6 +93,8 @@ public:
 
     inline int railwayCount()const { return _railways.size(); }
 
+    inline bool isNull()const { return _railways.isEmpty(); }
+
     /**
      * 所给线路的下标。通过地址比较。线性算法。
      * 如果找不到，返回-1
@@ -161,6 +163,16 @@ public:
      * 交换名称和note，但不交换其他
      */
     void swapBaseInfo(DiagramPage& other);
+
+    /**
+     * 列车是否在本运行图所含线路中铺画。
+     */
+    bool hasTrain(const Train& train)const;
+
+    /**
+     * 将指定线路从本运行图的线路表中移除。如果本线没有它，则不管。
+     */
+    void removeRailway(std::shared_ptr<Railway> rail);
 
 };
 

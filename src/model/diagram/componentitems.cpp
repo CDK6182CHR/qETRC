@@ -64,7 +64,18 @@ void navi::RailwayListItem::removeTailRailways(int cnt)
 	for (int i = 0; i < cnt; i++) {
 		_rails.pop_back();
 		_diagram.railways().pop_back();
-	}
+    }
+}
+
+void navi::RailwayListItem::removeRailwayAt(int i)
+{
+    _diagram.removeRailwayAt(i);
+    auto p=_rails.begin();
+    std::advance(p,i);
+    p=_rails.erase(p);
+    for(;p!=_rails.end();++p){
+        (*p)->setRow((*p)->row()-1);
+    }
 }
 
 navi::PageListItem::PageListItem(Diagram& diagram, DiagramItem* parent):
@@ -89,6 +100,15 @@ QString navi::PageListItem::data(int i)const
 	case ColItemName:return QObject::tr("运行图视窗");
 	case ColItemNumber:return QString::number(_diagram.pages().size());
 	default:return "";
+    }
+}
+
+void navi::PageListItem::resetChildren()
+{
+    _pages.clear();
+    int row=0;
+    for(auto p:_diagram.pages()){
+        _pages.emplace_back(std::make_unique<PageItem>(p,row++,this));
     }
 }
 

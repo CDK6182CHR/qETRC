@@ -26,6 +26,12 @@ void RailStationWidget::refreshData()
 	edName->setText(railway->name());
 }
 
+void RailStationWidget::focusInEvent(QFocusEvent* e)
+{
+	if (railway)
+		emit focusInRailway(railway);
+}
+
 void RailStationWidget::initUI()
 {
 	auto* vlay = new QVBoxLayout;

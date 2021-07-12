@@ -229,6 +229,12 @@ public:
 
     int getPageIndex(std::shared_ptr<DiagramPage> page)const;
 
+    /**
+     * 删除指定下标的线路，同时清理列车、运行图中的数据。
+     * 不考虑撤销
+     */
+    void removeRailwayAt(int i);
+
 private:
     void bindAllTrains();
     QString validPageName(const QString& prefix)const;

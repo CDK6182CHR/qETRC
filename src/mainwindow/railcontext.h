@@ -27,6 +27,12 @@ public:
 
     void setRailway(std::shared_ptr<Railway> rail);
 
+    auto getRailway() { return railway; }
+
+    void resetRailway();
+
+    void refreshData();
+
 private:
     void initUI();
 

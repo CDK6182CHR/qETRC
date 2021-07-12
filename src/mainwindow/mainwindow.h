@@ -257,7 +257,23 @@ private slots:
      */
     void undoAddNewRailway(std::shared_ptr<Railway> rail);
 
+    void onActRailwayRemoved(std::shared_ptr<Railway> rail);
+
+    void removeRailStationWidget(std::shared_ptr<Railway> rail);
+
     void removeRailStationWidgetAt(int i);
+
+    /**
+     * 从工具栏，要求打开新的线路编辑窗口
+     */
+    void actOpenNewRailWidget();
+
+    /**
+     * 删除线路后，有的Page可能同时被删除。此函数检查是否存在这样的页面，
+     * 将它们从List中删除。
+     * 注意，利用Page的下标一致性约定
+     */
+    void checkPagesValidity();
     
 
 public slots:
