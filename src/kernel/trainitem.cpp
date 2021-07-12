@@ -8,17 +8,17 @@
 #include <QPen>
 #include <QGraphicsScene>
 
-TrainItem::TrainItem(Diagram& diagram, TrainLine& line,
+TrainItem::TrainItem(Diagram& diagram, std::shared_ptr<TrainLine> line,
     Railway& railway, DiagramPage& page, double startY, QGraphicsItem* parent):
     QGraphicsItem(parent),_diagram(diagram),
     _line(line),_railway(railway),_page(page),
     startTime(diagram.config().start_hour,0,0),
     start_x(diagram.config().margins.left),start_y(startY)
 {
-    _startAtThis = train()->isStartingStation(_line.firstStationName());
-    _endAtThis = train()->isTerminalStation(_line.lastStationName());
-    startLabelInfo = _page.startingNullLabel(_line.firstRailStation().get(),_line.dir());
-    endLabelInfo = _page.terminalNullLabel(_line.lastRailStation().get(), _line.dir());
+    _startAtThis = train()->isStartingStation(_line->firstStationName());
+    _endAtThis = train()->isTerminalStation(_line->lastStationName());
+    startLabelInfo = _page.startingNullLabel(_line->firstRailStation().get(),_line->dir());
+    endLabelInfo = _page.terminalNullLabel(_line->lastRailStation().get(), _line->dir());
     pen = trainPen();
 
     setLine();
@@ -39,12 +39,12 @@ void TrainItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 std::shared_ptr<Train> TrainItem::train()
 {
-    return _line.train();
+    return _line->train();
 }
 
 std::shared_ptr<const Train> TrainItem::train() const
 {
-    return _line.train();
+    return _line->train();
 }
 
 void TrainItem::highlight()
@@ -198,8 +198,8 @@ void TrainItem::clearLabelInfo()
 {
     if (!_page.hasLabelInfo())
         return;
-    auto& sl = _page.startingLabels(_line.firstRailStation().get(), _line.dir());
-    auto& se = _page.terminalLabels(_line.lastRailStation().get(), _line.dir());
+    auto& sl = _page.startingLabels(_line->firstRailStation().get(), _line->dir());
+    auto& se = _page.terminalLabels(_line->lastRailStation().get(), _line->dir());
     if (startLabelInfo != sl.end()) {
         sl.erase(startLabelInfo);
         startLabelInfo = sl.end();
@@ -213,16 +213,16 @@ void TrainItem::clearLabelInfo()
 void TrainItem::setLine()
 {
     const QString& trainName = config().show_full_train_name ?
-        train()->trainName().full() : train()->trainName().dirOrFull(_line.dir());
+        train()->trainName().full() : train()->trainName().dirOrFull(_line->dir());
 
     setPathItem(trainName);
 
     QPen labelPen = trainPen();
     labelPen.setWidth(1);
-    if (_line.startLabel() && startInRange) {
+    if (_line->startLabel() && startInRange) {
         setStartItem(trainName, labelPen);
     }
-    if (_line.endLabel() && endInRange) {
+    if (_line->endLabel() && endInRange) {
         setEndItem(config().end_label_name ? trainName : "",
             labelPen);
     }
@@ -244,9 +244,9 @@ void TrainItem::setPathItem(const QString& trainName)
 
     QList<double> spanLeft, spanRight;   //跨界点纵坐标
 
-    auto lastIter = _line.stations().end(); --lastIter;
+    auto lastIter = _line->stations().end(); --lastIter;
 
-    for (auto p = _line.stations().begin(); p != _line.stations().end(); ++p) {
+    for (auto p = _line->stations().begin(); p != _line->stations().end(); ++p) {
         auto ts = p->trainStation;
         auto rs = p->railStation.lock();
         double ycur = rs->y_value.value();
@@ -282,7 +282,7 @@ void TrainItem::setPathItem(const QString& trainName)
                 }
             }
             if (mark && ts->isStopped()) {
-                if (_line.startLabel() || p != _line.stations().begin()) {
+                if (_line->startLabel() || p != _line->stations().begin()) {
                     markArriveTime(xarr, ycur, ts->arrive);
                 }
             }
@@ -327,7 +327,7 @@ void TrainItem::setPathItem(const QString& trainName)
         //标记时刻 无论有没有停点，都要标注开点，除非是折返车的最后一站
         if (mark && xdep <= width) {
             if (p == lastIter) {
-                if (_line.endLabel() && !ts->isStopped()) {
+                if (_line->endLabel() && !ts->isStopped()) {
                     markArriveTime(xdep, ycur, ts->depart);
                 }
             }
@@ -414,7 +414,7 @@ void TrainItem::setStartItem(const QString& text,const QPen& pen)
 
     if (_startAtThis) {
         //本线始发
-        if (_line.dir() == Direction::Down) {
+        if (_line->dir() == Direction::Down) {
             QPointF pn(startPoint.x(), startPoint.y() - height);
             label.lineTo(pn);
             label.moveTo(pn.x() - w / 2, pn.y());
@@ -430,7 +430,7 @@ void TrainItem::setStartItem(const QString& text,const QPen& pen)
         }	
     }
     else {   //not startAtThis
-        if (_line.dir() == Direction::Down) {
+        if (_line->dir() == Direction::Down) {
             label.lineTo(x0, y0 - height);
             label.lineTo(x0 - w, y0 - height);
             label.lineTo(x0 - w - h, y0 - height - h);
@@ -463,7 +463,7 @@ void TrainItem::setEndItem(const QString& text, const QPen& pen)
 
     double beh = config().base_label_height;
 
-    if (_line.dir() == Direction::Down) {
+    if (_line->dir() == Direction::Down) {
         if (_endAtThis) {
             //curPoint.setY(curPoint.y() + eh - beh / 2)
             double y1 = y0 + height - beh / 2;   //三角形底边中点
@@ -578,8 +578,8 @@ double TrainItem::determineStartLabelHeight()
     else {
         wl = w; wr = 0;
     }
-    auto rst = _line.firstRailStation();
-    if (_line.dir() == Direction::Down) {
+    auto rst = _line->firstRailStation();
+    if (_line->dir() == Direction::Down) {
         startLabelInfo = determineLabelHeight(_page.overLabels(rst.get()), x, wl, wr);
     }
     else {
@@ -603,8 +603,8 @@ double TrainItem::determineEndLabelHeight()
     else {
         wl = 0; wr = w;
     }
-    auto rst = _line.lastRailStation();
-    if (_line.dir() == Direction::Down) {
+    auto rst = _line->lastRailStation();
+    if (dir() == Direction::Down) {
         endLabelInfo = determineLabelHeight(_page.belowLabels(rst.get()), x, wl, wr);
     }
     else {
@@ -646,8 +646,8 @@ void TrainItem::setStretchedFont(QFont& font, QGraphicsSimpleTextItem* item, dou
 
 void TrainItem::addTimeMarks()
 {
-    auto lastIter = _line.stations().end(); --lastIter;
-    for (auto p = _line.stations().begin(); p != _line.stations().end(); ++p) {
+    auto lastIter = _line->stations().end(); --lastIter;
+    for (auto p = _line->stations().begin(); p != _line->stations().end(); ++p) {
         auto ts = p->trainStation;
         auto rs = p->railStation.lock();
         double ycur = rs->y_value.value();
@@ -655,14 +655,14 @@ void TrainItem::addTimeMarks()
 
         //标注到点
         if (ts->isStopped() || p == lastIter) {
-            if (_line.startLabel() || p != _line.stations().begin()) {
+            if (_line->startLabel() || p != _line->stations().begin()) {
                 markArriveTime(xarr, ycur, ts->arrive);
             }
         }
 
         //标注开点
         if (ts->isStopped() || p != lastIter) {
-            if (_line.endLabel()) {
+            if (_line->endLabel()) {
                 markDepartTime(xdep, ycur, ts->depart);
             }
         }
@@ -684,7 +684,7 @@ void TrainItem::markArriveTime(double x, double y, const QTime& tm)
     auto* item = new QGraphicsSimpleTextItem(QString::number(m % 10), this);
     item->setBrush(pen.color());
     double h = item->boundingRect().height();
-    if (_line.dir() == Direction::Down) {
+    if (dir() == Direction::Down) {
         item->setPos(x + start_x, y - h + start_y);
     }
     else {
@@ -702,7 +702,7 @@ void TrainItem::markDepartTime(double x, double y, const QTime& tm)
     item->setBrush(pen.color());
     const auto& t = item->boundingRect();
     double w = t.width(), h = t.height();
-    if (_line.dir() == Direction::Down) {
+    if (dir() == Direction::Down) {
         item->setPos(x - w + start_x, y + start_y);
     }
     else {

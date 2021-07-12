@@ -17,10 +17,15 @@ class Railway;
  * 列车在特定线路上的一段运行线的抽象。
  * 生命周期不大于TrainLine以及Railway -- 采用引用
  * 注意构造本对象时，Train一定是要显示的（不做检查）
+ * 2021.07.12提出新问题：系统更新数据时，可能先更新了数据，此时TrainLine对象被删除，
+ * 再清理运行图时在析构函数发生异常。
+ * 暂定解决方案：将TrainLine改为shared_ptr
+ * 但注意这个并没有解决问题。TrainLine中间接采用ref引用到了Railway，此时Railway对象已经无了
+ * 现在暂时通过先删除page的信息，再集中析构Item。
  */
 class TrainItem : public QGraphicsItem
 {
-    TrainLine& _line;
+    std::shared_ptr<TrainLine> _line;
     Diagram& _diagram;
     DiagramPage& _page;
     Railway& _railway;
@@ -76,7 +81,7 @@ class TrainItem : public QGraphicsItem
 
 public:
     enum { Type = UserType + 1 };
-    TrainItem(Diagram& diagram, TrainLine& line, Railway& railway, DiagramPage& page, double startY,
+    TrainItem(Diagram& diagram, std::shared_ptr<TrainLine> line, Railway& railway, DiagramPage& page, double startY,
         QGraphicsItem* parent = nullptr);
 
     virtual QRectF boundingRect()const override;
@@ -112,6 +117,8 @@ public:
      * 2021.07.02  将LabelInfo迁移到TrainPage之后，应该可以在析构中执行这个了
      */
     void clearLabelInfo();
+
+    auto dir()const { return _line->dir(); }
 
 private:
     

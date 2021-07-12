@@ -34,8 +34,11 @@ DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page
 
 DiagramWidget::~DiagramWidget() noexcept
 {
-    scene()->clear();   //据说这样快一些？
+    //把这个放前面，是为了避免在TrainItem集体析构时，再次触发删除LabelInfo，引发异常
+    //通过这里大量析构Item，通常是运行图数据发生不可控的剧烈变化，
+    //此时TrainItem对数据的引用通常已经进入很危险的状态，应避免使用
     _page->clearGraphics();
+    scene()->clear();   //据说这样快一些？
 }
 
 void DiagramWidget::autoPaintGraph()
@@ -292,17 +295,17 @@ void DiagramWidget::mouseMoveEvent(QMouseEvent* e)
         return;
     }
 
-    const TrainLine& line = item->trainLine();
+    auto line = item->trainLine();
 
     double y = pos.y() - item->getStartY();
-    auto itr = line.stationFromYValue(y);
-    const auto& dq = line.stations();
+    auto itr = line->stationFromYValue(y);
+    const auto& dq = line->stations();
     if (itr == dq.end())
         return;
     static constexpr double STATION_SPAN = 5;
     //第一种情况：属于站内
     if (std::abs(itr->yValue() - y) <= STATION_SPAN) {
-        stationToolTip(itr, line);
+        stationToolTip(itr, *line);
         return;
     }
     //否则：找区间的另一个站
@@ -310,11 +313,11 @@ void DiagramWidget::mouseMoveEvent(QMouseEvent* e)
         return;
     auto prev = itr; --prev;    //区间前一个站
     if (std::abs(prev->yValue() - y) <= STATION_SPAN) {
-        stationToolTip(prev, line);
+        stationToolTip(prev, *line);
         return;
     }
     //到现在：只能是区间了
-    intervalToolTip(prev, itr, line);
+    intervalToolTip(prev, itr, *line);
 }
 
 void DiagramWidget::mouseDoubleClickEvent(QMouseEvent* e)
@@ -661,7 +664,7 @@ void DiagramWidget::paintTrain(Train& train)
                             "Unexpected null TrainLine! " << train.trainName().full() << Qt::endl;
                     }
                     else {
-                        auto* item = new TrainItem(_diagram, *line, adp->railway(), *_page,
+                        auto* item = new TrainItem(_diagram, line, adp->railway(), *_page,
                             _page->startYs().at(i));
                         _page->addItemMap(line.get(), item);
                         item->setZValue(5);
@@ -681,7 +684,7 @@ void DiagramWidget::paintTrainLine(std::shared_ptr<TrainLine> line)
             "Unexpected null TrainLine! " << line->adapter().train()->trainName().full() << Qt::endl;
     }
     else {
-        auto* item = new TrainItem(_diagram, *line, line->adapter().railway(), *_page,
+        auto* item = new TrainItem(_diagram, line, line->adapter().railway(), *_page,
             _page->railwayStartY(line->adapter().railway()));
         _page->addItemMap(line.get(), item);
         item->setZValue(5);

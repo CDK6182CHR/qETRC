@@ -333,7 +333,7 @@ void MainWindow::initToolbar()
         panel = cat->addPannel(tr("窗口"));
         act = naviDock->toggleViewAction();
         act->setText(QObject::tr("导航"));
-        act->setText(tr("导航面板\n打开或关闭运行图总导航面板。"));
+        act->setToolTip(tr("导航面板\n打开或关闭运行图总导航面板。"));
         act->setIcon(QIcon(":/icons/Graph-add.png"));
         auto* btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
