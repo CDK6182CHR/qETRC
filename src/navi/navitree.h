@@ -69,9 +69,15 @@ private slots:
     void onRemoveSingleTrainContext();
 
     void onRemoveRailwayContext();
+
+    void onEditRailwayContext();
+
+    void onEditTrainContext();
     
 public slots:
     void actAddRailway();
+    void actAddTrain();
+
     void importRailways();
     void addNewPage();
     
@@ -123,6 +129,22 @@ namespace qecmd {
         virtual void redo()override;
     };
 
+    class AddNewTrain :public QUndoCommand {
+        DiagramNaviModel* const navi;
+        std::shared_ptr<Train> train;
+    public:
+        AddNewTrain(DiagramNaviModel* navi_,std::shared_ptr<Train> train_,
+            QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("新建车次"),parent),
+            navi(navi_),train(train_){}
+        virtual void undo()override {
+            navi->undoAddTrain();
+        }
+        virtual void redo()override {
+            navi->commitAddTrain(train);
+        }
+    };
+
     class RemoveSingleTrain :public QUndoCommand {
         DiagramNaviModel* const navi;
         std::shared_ptr<Train> train;
@@ -139,5 +161,7 @@ namespace qecmd {
             navi->commitRemoveSingleTrain(index);
         }
     };
+
+    
 
 }

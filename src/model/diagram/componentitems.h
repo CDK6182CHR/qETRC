@@ -167,6 +167,12 @@ namespace navi {
 
         void removeTrainAt(int i);
         void undoRemoveTrainAt(std::shared_ptr<Train> train,int i);
+
+		/**
+		 * 将新列车实际添加到coll后面
+		 */
+		void addNewTrain(std::shared_ptr<Train> train);
+		void undoAddNewTrain();
 	};
 
 	class TrainModelItem :public AbstractComponentItem

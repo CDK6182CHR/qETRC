@@ -69,6 +69,10 @@ signals:
 
     void undoneTrainRemove(std::shared_ptr<Train> train);
 
+    void newTrainAdded(std::shared_ptr<Train> train);
+
+    void undoneAddTrain(std::shared_ptr<Train> train);
+
 public slots:
     void resetTrainList();
     //void resetRailwayList();
@@ -84,6 +88,10 @@ public slots:
     void commitAddRailway(std::shared_ptr<Railway> rail);
 
     void undoAddRailway();
+
+    void commitAddTrain(std::shared_ptr<Train> train);
+
+    void undoAddTrain();
 
     void onTrainDataChanged(const QModelIndex& topleft, const QModelIndex& botright);
 

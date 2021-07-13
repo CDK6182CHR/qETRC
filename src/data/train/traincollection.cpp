@@ -135,6 +135,16 @@ std::shared_ptr<Train> TrainCollection::takeTrainAt(int i)
 	return t;
 }
 
+std::shared_ptr<Train> TrainCollection::takeLastTrain()
+{
+	auto t = _trains.takeLast();
+	removeMapInfo(t);
+	if (t->hasRouting()) {
+		t->routingNode().value()->makeVirtual();
+	}
+	return t;
+}
+
 void TrainCollection::removeTrainAt(int i)
 {
 	auto t = _trains.takeAt(i);
@@ -194,6 +204,24 @@ int TrainCollection::getTrainIndex(std::shared_ptr<Train> train) const
 		return std::distance(_trains.begin(), p);
 }
 
+TrainName TrainCollection::validTrainFullName(const QString& prefix) const
+{
+	for (int i = 0;; i++) {
+		QString name = prefix;
+		if (i)
+			name += QString::number(i);
+		TrainName tn(name);
+		if (!trainNameExisted(tn))
+			return tn;
+	}
+}
+
+void TrainCollection::invalidateAllTempData()
+{
+	for (auto p : _trains)
+		p->invalidateTempData();
+}
+
 void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 {
 	fullNameMap.insert(t->trainName().full(), t);
@@ -206,6 +234,9 @@ void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 	}
 	if (!n.up().isEmpty()) {
 		singleNameMap[n.up()].append(t);
+	}
+	if (!t->type()) {
+		t->setType(_manager.fromRegex(t->trainName()));
 	}
 	++_typeCount[t->type()];   //利用默认为0的特性
 }

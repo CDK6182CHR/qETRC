@@ -138,6 +138,12 @@ public:
     std::shared_ptr<Train> takeTrainAt(int i);
 
     /**
+     * 删除最后一个车次，并且支持撤销。
+     * 用于撤销添加车次
+     */
+    std::shared_ptr<Train> takeLastTrain();
+
+    /**
      * 用在导入车次时。
      * 删除车次，且不考虑撤销。直接把交路信息也删掉
      */
@@ -171,10 +177,15 @@ public:
      */
     int getTrainIndex(std::shared_ptr<Train> train)const;
 
+    TrainName validTrainFullName(const QString& prefix)const;
+
+    void invalidateAllTempData();
+
 private:
     /**
      * @brief addMapInfo
      * 添加新车次时，增加映射表信息
+     * 同时完成列车类型统计；此操作结束后，保证类型非空
      */
     void addMapInfo(const std::shared_ptr<Train>& t);
 

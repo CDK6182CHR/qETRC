@@ -877,6 +877,8 @@ void Railway::swapBaseWith(Railway& other)
 	std::swap(_stations, other._stations);   //浅拷贝（移动）
 	std::swap(_rulers, other._rulers);
 	std::swap(_forbids, other._forbids);
+	std::swap(nameMap, other.nameMap);
+	std::swap(fieldMap, other.fieldMap);
 	for (int i = 0; i < _rulers.count(); i++) {
 		std::swap(_rulers[i]->_railway, other._rulers[i]->_railway);
 	}

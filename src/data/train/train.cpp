@@ -226,12 +226,15 @@ std::shared_ptr<TrainAdapter> Train::bindToRailway(Railway& railway, const Confi
 {
     //2021.06.24 新的实现 基于Adapter
     for (auto p = _adapters.begin(); p != _adapters.end(); ++p) {
-        if (&((*p)->railway()) == &railway)
+        if (&((*p)->railway()) == &railway) {
+            invalidateTempData();
             return *p;
+        }
     }
     auto adp = std::make_shared<TrainAdapter>(shared_from_this(), railway, config);
     if (!adp->isNull()) {
         _adapters.append(adp);
+        invalidateTempData();
         return adp;
     }
     return nullptr;
@@ -242,18 +245,8 @@ std::shared_ptr<TrainAdapter> Train::updateBoundRailway(Railway& railway, const 
 {
     //2021.06.24  基于Adapter新的实现
     //2021.07.04  TrainLine里面有Adapter的引用。不要move assign，直接删了重来好了
-    for (auto p = _adapters.begin(); p != _adapters.end(); ++p) {
-        if (&((*p)->railway()) == &railway) {
-            _adapters.erase(p);
-            break;
-        }
-    }
-    //没找到，则创建
-    auto p = std::make_shared<TrainAdapter>(weak_from_this(), railway, config);
-    if (!p->isNull()) {
-        _adapters.append(p);
-        return p;
-    }
+    unbindToRailway(railway);
+    bindToRailway(railway, config);
     return nullptr;
 }
 
@@ -262,13 +255,11 @@ void Train::unbindToRailway(const Railway& railway)
     for (auto p = _adapters.begin(); p != _adapters.end(); ++p) {
         if (&((*p)->railway()) == &railway) {
             _adapters.erase(p);
+            invalidateTempData();
             return;
         }
     }
 }
-
-
-
 
 #if 0
 void Train::bindToRailway(std::shared_ptr<Railway> railway)

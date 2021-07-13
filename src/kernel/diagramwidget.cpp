@@ -984,6 +984,8 @@ void DiagramWidget::intervalToolTip(std::deque<AdapterStation>::const_iterator f
 
 void DiagramWidget::updateTimeAxis()
 {
+    if (updating)
+        return;
     QPoint p(0, 0);
     auto ps = mapToScene(p);
     marginItems.top->setY(ps.y());
@@ -995,6 +997,7 @@ void DiagramWidget::updateTimeAxis()
 
 void DiagramWidget::updateDistanceAxis()
 {
+    if (updating)return;
     QPoint point(0, 0);
     auto scenepoint = mapToScene(point);
     marginItems.left->setX(scenepoint.x());

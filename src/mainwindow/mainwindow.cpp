@@ -85,6 +85,7 @@ void MainWindow::undoRemoveTrain(std::shared_ptr<Train> train)
 void MainWindow::onStationTableChanged(std::shared_ptr<Railway> rail, bool equiv)
 {
     _diagram.updateRailway(rail);
+    trainListWidget->getModel()->updateAllMileSpeed();
     updateRailwayDiagrams(rail);
 }
 
@@ -132,12 +133,20 @@ void MainWindow::undoAddNewRailway(std::shared_ptr<Railway> rail)
     removeRailStationWidget(rail);
 }
 
+void MainWindow::undoAddNewTrain(std::shared_ptr<Train> train)
+{
+    contextTrain->removeTrainWidget(train);
+    if (train == contextTrain->getTrain())
+        focusOutTrain();
+}
+
 void MainWindow::onActRailwayRemoved(std::shared_ptr<Railway> rail)
 {
     removeRailStationWidget(rail);
     naviModel->resetPageList();
     checkPagesValidity();
     updateAllDiagrams();
+    trainListWidget->getModel()->updateAllMileSpeed();
     undoStack->clear();
 }
 
@@ -239,6 +248,8 @@ void MainWindow::initDockWidgets()
             this, &MainWindow::actOpenRailStationWidget);
         connect(naviModel, &DiagramNaviModel::undoneAddRailway,
             this, &MainWindow::undoAddNewRailway);
+        //Add train的connect放到toolbar里面，因为依赖于contextTrain
+        
 
         connect(naviModel, &DiagramNaviModel::trainRemoved,
             this, &MainWindow::removeTrain);
@@ -456,6 +467,13 @@ void MainWindow::initToolbar()
             naviView, &NaviTree::removeSingleTrain);
         connect(naviView, &NaviTree::editTrain,
             contextTrain, &TrainContext::actShowBasicWidget);
+        connect(trainListWidget, &TrainListWidget::editTrain,
+            contextTrain, &TrainContext::actShowBasicWidget);
+
+        connect(naviModel, &DiagramNaviModel::newTrainAdded,
+            contextTrain, &TrainContext::showBasicWidget);
+        connect(naviModel, &DiagramNaviModel::undoneAddTrain,
+            this, &MainWindow::undoAddNewTrain);
     }
 
     //context: rail
@@ -518,6 +536,15 @@ void MainWindow::clearDiagramUnchecked()
     }
     diagramDocks.clear();
     diagramWidgets.clear();
+
+    //删除所有打开的基线编辑面板
+    for (auto p : railStationDocks) {
+        p->deleteDockWidget();
+    }
+    railStationDocks.clear();
+    railStationWidgets.clear();
+
+    contextTrain->removeAllTrainWidgets();
 
     undoStack->clear();
     undoStack->resetClean();

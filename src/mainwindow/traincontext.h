@@ -77,6 +77,8 @@ private:
      */
     void updateTrainWidget(std::shared_ptr<Train> t);
 
+    void updateTrainWidgetTitles(std::shared_ptr<Train> t);
+
 public slots:
     void setTrain(std::shared_ptr<Train> train_);
 
@@ -104,6 +106,13 @@ public slots:
      * 显示或者创建当前车次的基本编辑面板。
      */
     void actShowBasicWidget();
+
+    void showBasicWidget(std::shared_ptr<Train> train);
+
+    /**
+     * 清理运行图时，关闭所有既有的面板
+     */
+    void removeAllTrainWidgets();
 
 private slots:
     void showTrainEvents();

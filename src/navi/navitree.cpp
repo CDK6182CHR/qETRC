@@ -36,16 +36,22 @@ void NaviTree::initContextMenus()
     //TrainList
     act = meTrainList->addAction(tr("导入车次"));
     connect(act, SIGNAL(triggered()), this, SLOT(importTrains()));
+    act = meTrainList->addAction(tr("新建空白车次"));
+    connect(act, SIGNAL(triggered()), this, SLOT(actAddTrain()));
 
     //Page
     act = mePage->addAction(tr("删除运行图"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemovePageContext()));
 
     //Train
+    act = meTrain->addAction(tr("编辑时刻表"));
+    connect(act, SIGNAL(triggered()), this, SLOT(onEditTrainContext()));
     act = meTrain->addAction(tr("删除列车"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemoveSingleTrainContext()));
 
     //Railway
+    act = meRailway->addAction(tr("编辑基线"));
+    connect(act, SIGNAL(triggered()), this, SLOT(onEditRailwayContext()));
     act = meRailway->addAction(tr("删除基线"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemoveRailwayContext()));
 }
@@ -91,6 +97,24 @@ void NaviTree::onRemoveRailwayContext()
     ACI* item = getItem(idx);
     if (item && item->type() == navi::RailwayItem::Type) {
         _model->removeRailwayAt(idx.row());
+    }
+}
+
+void NaviTree::onEditRailwayContext()
+{
+    auto idx = currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::RailwayItem::Type) {
+        emit editRailway(static_cast<navi::RailwayItem*>(item)->railway());
+    }
+}
+
+void NaviTree::onEditTrainContext()
+{
+    auto idx = currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::TrainModelItem::Type) {
+        emit editTrain(static_cast<navi::TrainModelItem*>(item)->train());
     }
 }
 
@@ -151,6 +175,13 @@ void NaviTree::undoRemovePage(std::shared_ptr<DiagramPage> page, int index)
 {
     _model->insertPage(page, index);
     emit pageInserted(page, index);
+}
+
+void NaviTree::actAddTrain()
+{
+    TrainName&& tn = _model->diagram().trainCollection().validTrainFullName(tr("新车次"));
+    auto train = std::make_shared<Train>(tn);
+    _undo->push(new qecmd::AddNewTrain(_model, train));
 }
 
 void NaviTree::importRailways()

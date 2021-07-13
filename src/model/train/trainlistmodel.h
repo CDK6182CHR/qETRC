@@ -100,5 +100,10 @@ public slots:
     void onEndInsertRows() {
         endInsertRows();
     }
+
+    /**
+     * 删除线路后调用，更新所有列车的里程、均速数据
+     */
+    void updateAllMileSpeed();
 };
 

@@ -163,3 +163,9 @@ void TrainListModel::onTrainChanged(std::shared_ptr<Train> train)
 	}
 }
 
+void TrainListModel::updateAllMileSpeed()
+{
+	//coll.invalidateAllTempData();
+	emit dataChanged(index(0, ColMile), index(coll.trainCount()-1, ColSpeed));
+}
+

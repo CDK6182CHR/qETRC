@@ -228,6 +228,16 @@ void TrainContext::updateTrainWidget(std::shared_ptr<Train> t)
 	}
 }
 
+void TrainContext::updateTrainWidgetTitles(std::shared_ptr<Train> t)
+{
+	for (int i = 0; i < basicWidgets.size(); i++) {
+		auto p = basicWidgets.at(i);
+		if (p->train() == t) {
+			basicDocks.at(i)->setWindowTitle(tr("时刻表编辑 - %1").arg(t->trainName().full()));
+		}
+	}
+}
+
 void TrainContext::removeTrainWidget(std::shared_ptr<Train> train)
 {
 	removeBasicDockAt(getBasicWidgetIndex(train));
@@ -257,7 +267,17 @@ void TrainContext::commitTraininfoChange(std::shared_ptr<Train> train, std::shar
 		refreshData();
 	}
 	mw->repaintTrainLines(train);
+	updateTrainWidgetTitles(train);
 	emit timetableChanged(train);
+}
+
+void TrainContext::removeAllTrainWidgets()
+{
+	for (auto p : basicDocks) {
+		p->deleteDockWidget();
+	}
+	basicDocks.clear();
+	basicWidgets.clear();
 }
 
 void TrainContext::actShowTrainLine()
@@ -267,7 +287,12 @@ void TrainContext::actShowTrainLine()
 
 void TrainContext::actShowBasicWidget()
 {
-	int idx = getBasicWidgetIndex();
+	showBasicWidget(this->train);
+}
+
+void TrainContext::showBasicWidget(std::shared_ptr<Train> train)
+{
+	int idx = getBasicWidgetIndex(train);
 	if (idx == -1) {
 		//创建
 		auto* w = new BasicTrainWidget(diagram.trainCollection(), false);

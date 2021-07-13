@@ -220,6 +220,19 @@ void navi::TrainListItem::undoRemoveTrainAt(std::shared_ptr<Train> train, int i)
     }
 }
 
+void navi::TrainListItem::undoAddNewTrain()
+{
+	_coll.takeLastTrain();
+	_trains.pop_back();
+}
+
+void navi::TrainListItem::addNewTrain(std::shared_ptr<Train> train)
+{
+	_coll.appendTrain(train);
+	int row = _trains.size();
+	_trains.emplace_back(std::make_unique<TrainModelItem>(train, row, this));
+}
+
 navi::AbstractComponentItem* navi::TrainListItem::child(int i)
 {
 	if (i >= 0 && i < _trains.size())

@@ -1,6 +1,8 @@
 ﻿#include "railcontext.h"
 #include "mainwindow.h"
 
+#include <QtWidgets>
+
 RailContext::RailContext(Diagram& diagram_, SARibbonContextCategory* context, 
 	MainWindow* mw_, QObject* parent):
 	QObject(parent),diagram(diagram_),cont(context),mw(mw_)
@@ -16,13 +18,38 @@ void RailContext::resetRailway()
 
 void RailContext::refreshData()
 {
-	//todo...
+	if (railway) {
+		edName->setText(railway->name());
+	}
 }
 
 void RailContext::initUI()
 {
 	auto* page = cont->addCategoryPage(tr("数据"));
-	auto* panel = page->addPannel(tr("编辑"));
+
+	auto* panel = page->addPannel(tr(""));
+
+	if constexpr (true) {
+		auto* ed = new SARibbonLineEdit;
+		edName = ed;
+
+		QWidget* w = new QWidget;
+		auto* vlay = new QVBoxLayout;
+
+		auto* lab = new QLabel(tr("当前线路"));
+		lab->setAlignment(Qt::AlignCenter);
+		vlay->addWidget(lab);
+		
+		ed->setFocusPolicy(Qt::NoFocus);
+		ed->setAlignment(Qt::AlignCenter);
+		ed->setFixedWidth(120);
+
+		vlay->addWidget(ed);
+		w->setLayout(vlay);
+		panel->addWidget(w, SARibbonPannelItem::Large);
+	}
+
+	panel = page->addPannel(tr("编辑"));
 	
 	QAction* act;
 	act = new QAction(QIcon(":/icons/rail.png"), tr("基线编辑"), this);
@@ -66,6 +93,18 @@ void RailContext::actOpenStationWidget()
 {
 	if(railway)
         mw->actOpenRailStationWidget(railway);
+}
+
+void RailContext::actRemoveRailway()
+{
+	if (railway) {
+		auto flag = QMessageBox::question(mw, tr("删除线路"),
+			tr("删除当前线路，同时从所有运行图页面中删除当前线路，空白运行图将被删除。"
+				"请注意此操作牵涉较广，且不可撤销。\n"
+				"你是否确认要删除线路[%1]？").arg(railway->name()));
+		if (flag != QMessageBox::Yes)
+			return;
+	}
 }
 
 void RailContext::actChangeRailName(std::shared_ptr<Railway> rail, const QString &name)

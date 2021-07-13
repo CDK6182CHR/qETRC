@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QUndoCommand>
+#include <SARibbonLineEdit.h>
 #include "SARibbonContextCategory.h"
 #include "data/rail/rail.h"
 #include "data/diagram/diagram.h"
@@ -18,6 +19,7 @@ class RailContext : public QObject
     SARibbonContextCategory*const cont;
     MainWindow* const mw;
     std::shared_ptr<Railway> railway;
+    SARibbonLineEdit* edName;
 public:
     explicit RailContext(Diagram& diagram_, SARibbonContextCategory* context,
         MainWindow* mw_,
@@ -44,6 +46,7 @@ signals:
 
 private slots:
     void actOpenStationWidget();
+    void actRemoveRailway();
 
 public slots:
     void actChangeRailName(std::shared_ptr<Railway> rail, const QString& name);

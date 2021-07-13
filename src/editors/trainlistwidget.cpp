@@ -71,7 +71,6 @@ void TrainListWidget::editButtonClicked()
 	auto index = table->currentIndex();
 	if (index.isValid()) {
 		emit editTrain(coll.trainAt(index.row()));
-		qDebug() << "edit train: " << coll.trainAt(index.row())->trainName().full() << Qt::endl;
 	}
 }
 

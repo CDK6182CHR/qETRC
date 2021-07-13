@@ -257,6 +257,8 @@ private slots:
      */
     void undoAddNewRailway(std::shared_ptr<Railway> rail);
 
+    void undoAddNewTrain(std::shared_ptr<Train> train);
+
     void onActRailwayRemoved(std::shared_ptr<Railway> rail);
 
     void removeRailStationWidget(std::shared_ptr<Railway> rail);
@@ -294,9 +296,6 @@ public slots:
      * 打开（或创建）指定线路的编辑面板
      */
     void actOpenRailStationWidget(std::shared_ptr<Railway> rail);
-
-  
-
 
 };
 
