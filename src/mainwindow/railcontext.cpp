@@ -56,6 +56,11 @@ void RailContext::initUI()
 	auto* btn = panel->addLargeAction(act);
 	btn->setMinimumWidth(70);
 	connect(act, SIGNAL(triggered()), this, SLOT(actOpenStationWidget()));
+
+	act = new QAction(QIcon(":/icons/close.png"), tr("删除基线"), this);
+	btn = panel->addLargeAction(act);
+	btn->setMinimumWidth(70);
+	connect(act, SIGNAL(triggered()), this, SLOT(actRemoveRailway()));
 }
 
 void RailContext::updateRailWidget(std::shared_ptr<Railway> rail)
@@ -104,6 +109,10 @@ void RailContext::actRemoveRailway()
 				"你是否确认要删除线路[%1]？").arg(railway->name()));
 		if (flag != QMessageBox::Yes)
 			return;
+		int i = diagram.railCategory().getRailwayIndex(railway);
+		if (i != -1) {
+			mw->naviModel->removeRailwayAt(i);
+		}
 	}
 }
 

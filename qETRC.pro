@@ -38,6 +38,7 @@ SOURCES += \
     src/dialogs/importtraindialog.cpp \
     src/dialogs/printdiagramdialog.cpp \
     src/editors/basictrainwidget.cpp \
+    src/editors/configdialog.cpp \
     src/editors/railstationwidget.cpp \
     src/editors/trainlistwidget.cpp \
     src/kernel/diagramwidget.cpp \
@@ -92,6 +93,7 @@ HEADERS += \
     src/dialogs/importtraindialog.h \
     src/dialogs/printdiagramdialog.h \
     src/editors/basictrainwidget.h \
+    src/editors/configdialog.h \
     src/editors/railstationwidget.h \
     src/editors/trainlistwidget.h \
     src/kernel/diagramwidget.h \

@@ -89,6 +89,14 @@ private slots:
      */
     void applyTypeShow();
 
+    void actShowConfig();
+
+    /**
+     * 点击确认修改配置。压栈操作
+     */
+    void onActConfigApplied(Config& cfg, const Config& newcfg, bool repaint);
+
+
 public slots:
     
     /**
@@ -96,7 +104,10 @@ public slots:
      */
     void refreshTypeGroup();
 
-
+    /**
+     * 实际执行结束，只负责重新铺图
+     */
+    void commitConfigChange(Config& cfg, bool repaint);
 };
 
 

@@ -1,6 +1,7 @@
 ﻿#include "viewcategory.h"
 #include "mainwindow.h"
 #include "data/diagram/trainadapter.h"
+#include "editors/configdialog.h"
 
 
 #include <SARibbonPannelItem.h>
@@ -98,6 +99,12 @@ void ViewCategory::initUI()
     group->setGridSize(QSize(group->gridSize().width(), SystemJson::instance.table_row_height));
     gall->currentViewGroup()->setGridSize(QSize(group->gridSize().width(),
         SystemJson::instance.table_row_height));
+
+    panel = cat->addPannel(tr("设置"));
+    act = new QAction(QIcon(":/icons/config.png"), tr("显示设置"), this);
+    connect(act, SIGNAL(triggered()), this, SLOT(actShowConfig()));
+    btn = panel->addLargeAction(act);
+    btn->setMinimumWidth(80);
 }
 
 void ViewCategory::setDirTrainsShow(Direction dir, bool show)
@@ -254,6 +261,24 @@ void ViewCategory::applyTypeShow()
         //非平凡操作，压栈执行
         mw->undoStack->push(new qecmd::ChangeTypeShow(lines, this, diagram.config(), notShow));
     }
+}
+
+void ViewCategory::actShowConfig()
+{
+    auto* dialog = new ConfigDialog(diagram.config(), mw);
+    connect(dialog, &ConfigDialog::onConfigApplied, this,
+        &ViewCategory::onActConfigApplied);
+    dialog->open();
+}
+
+void ViewCategory::onActConfigApplied(Config& cfg, const Config& newcfg, bool repaint)
+{
+    mw->getUndoStack()->push(new qecmd::ChangeConfig(cfg, newcfg, repaint, this));
+}
+
+void ViewCategory::commitConfigChange(Config& cfg, bool repaint)
+{
+    mw->updateAllDiagrams();
 }
 
 void ViewCategory::refreshTypeGroup()
