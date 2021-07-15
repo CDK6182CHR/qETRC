@@ -66,6 +66,7 @@ private slots:
 };
 
 class ViewCategory;
+class MainWindow;
 
 namespace qecmd {
 
@@ -80,6 +81,23 @@ namespace qecmd {
         QUndoCommand(QObject::tr("更新显示设置"),parent),cfg(cfg_),newcfg(newcfg_),repaint(repaint_),
             cat(cat_)
         {}
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    /**
+     * 更改最大跨越站数。目前由MainWindow中的Ribbon操作控制。
+     */
+    class ChangePassedStation :public QUndoCommand {
+        int valueold, valuenew;
+        MainWindow* const mw;
+    public:
+        ChangePassedStation(int vold, int vnew,MainWindow* mw_,
+            QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("更改最大跨越站数为")+QString::number(vnew)),
+            valueold(vold),valuenew(vnew),mw(mw_)
+        {}
+
         virtual void undo()override;
         virtual void redo()override;
     };

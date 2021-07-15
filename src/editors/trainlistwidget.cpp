@@ -25,10 +25,15 @@ void TrainListWidget::initUI()
 	auto* vlay = new QVBoxLayout;
 
 	auto* hlay = new QHBoxLayout;
-	hlay->addWidget(editSearch);   //搜索行为改为filt?
+	hlay->addWidget(editSearch);   //搜索行为改为filt
 	connect(editSearch, SIGNAL(editingFinished()), this, SLOT(searchTrain()));
-	auto* btn = new QPushButton(QObject::tr("搜索"));
+	auto* btn = new QPushButton(QObject::tr("筛选"));
+	btn->setMinimumWidth(50);
 	connect(btn, SIGNAL(clicked()), this, SLOT(searchTrain()));
+	hlay->addWidget(btn);
+	btn = new QPushButton(tr("清空筛选"));
+	btn->setMinimumWidth(70);
+	connect(btn, SIGNAL(clicked()), this, SLOT(clearFilter()));
 	hlay->addWidget(btn);
 	vlay->addLayout(hlay);
 
@@ -45,9 +50,9 @@ void TrainListWidget::initUI()
 	connect(table->selectionModel(), &QItemSelectionModel::currentRowChanged,
 		this, &TrainListWidget::onCurrentRowChanged);
 
-	auto* h = new ButtonGroup<2>({ "上移","下移"});
-	h->setMinimumWidth(50);
-	vlay->addLayout(h);
+	//auto* h = new ButtonGroup<2>({ "上移","下移"});
+	//h->setMinimumWidth(50);
+	//vlay->addLayout(h);
 	//todo: connect
 
 	auto* g = new ButtonGroup<4>({ "编辑","批量调整","添加","删除" });
@@ -62,9 +67,24 @@ void TrainListWidget::initUI()
 
 void TrainListWidget::searchTrain()
 {
-	//todo...
+	const QString& s = editSearch->text();
+	if (s.isEmpty()) {
+		clearFilter();
+		return;
+	}
+	for (int i = 0; i < coll.trainCount(); i++) {
+		const auto& t = coll.trainAt(i);
+		table->setRowHidden(i, !t->trainName().contains(s));
+	}
 }
 
+
+void TrainListWidget::clearFilter()
+{
+	for (int i = 0; i < coll.trainCount(); i++) {
+		table->setRowHidden(i, false);
+	}
+}
 
 void TrainListWidget::editButtonClicked()
 {

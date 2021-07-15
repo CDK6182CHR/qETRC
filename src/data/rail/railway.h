@@ -391,13 +391,14 @@ public:
     QList<std::shared_ptr<RailInterval>> multiIntervalPath(const StationName& from,
         const StationName& to);
 
-    inline const Ruler& getRuler(int i)const{return *_rulers[i];}
-    inline Ruler& getRuler(int i){return *_rulers[i];}
-    inline const Forbid& getForbid(int i)const{return *_forbids[i];}
-    inline Forbid& getForbid(int i){return *_forbids[i];}
+    inline std::shared_ptr<const Ruler> getRuler(int i)const{return _rulers[i];}
+    inline auto getRuler(int i){return _rulers[i];}
+    inline std::shared_ptr<const Forbid> getForbid(int i)const{return _forbids[i];}
+    inline auto getForbid(int i){return _forbids[i];}
+    inline const auto& rulers()const { return _rulers; }
+    inline const auto& forbids()const { return _forbids; }
 
     inline auto& forbids() { return _forbids; }
-    inline const auto& forbids()const { return _forbids; }
 
     inline std::shared_ptr<Ruler> ordinate(){return _ordinate;}
     inline void setOrdinate(std::shared_ptr<Ruler> ord){_ordinate=ord;}
@@ -413,6 +414,8 @@ public:
     inline void setOrdinateIndex(int idx) {
         if (idx >= 0)
             setOrdinate(_rulers.at(idx));
+        else
+            resetOrdinate();
     }
 
     int ordinateIndex()const;
@@ -422,9 +425,9 @@ public:
      * 如果是标尺排图，返回标尺排图的高度；如果是里程排图，返回里程对应的高度。
      * 如果标尺不完备，reset。注意同时还要保证所有不铺画的站的yValue无效 （-1）
      * @param config  用于计算的配置表
-     * @return 运行图总高度 （不包括上下坐标轴那些）
+     * @return false-指定标尺排图，但标尺不完备不能用 otherwise true （2021.07.15修改）
      */
-    double calStationYValue(const Config& config);
+    bool calStationYValue(const Config& config);
 
     /**
      * @brief diagramHeight

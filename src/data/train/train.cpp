@@ -261,6 +261,13 @@ void Train::unbindToRailway(const Railway& railway)
     }
 }
 
+void Train::clearBoundRailways()
+{
+    _adapters.clear();
+    invalidateTempData();
+}
+
+
 #if 0
 void Train::bindToRailway(std::shared_ptr<Railway> railway)
 {

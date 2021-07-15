@@ -66,7 +66,8 @@ void DiagramWidget::paintGraph()
     //暂定上下边距只算一次
     double height = (_page->railwayCount()-1) * cfg.margins.gap_between_railways;
     for (const auto& p : _page->railways()) {
-        height += p->calStationYValue(cfg);
+        p->calStationYValue(cfg);
+        height += p->diagramHeight();
     }
     const QColor& gridColor = cfg.grid_color;
     

@@ -18,9 +18,20 @@ void RailContext::resetRailway()
 
 void RailContext::refreshData()
 {
-	if (railway) {
-		edName->setText(railway->name());
+	if (!railway) {
+		return;
 	}
+	updating = true;
+	edName->setText(railway->name());
+
+	cbRulers->clear();
+	cbRulers->addItem(tr("(按里程)"));
+	for (auto r : railway->rulers()) {
+		cbRulers->addItem(r->name());
+	}
+	cbRulers->setCurrentIndex(railway->ordinateIndex() + 1);
+
+	updating = false;
 }
 
 void RailContext::initUI()
@@ -49,6 +60,31 @@ void RailContext::initUI()
 		panel->addWidget(w, SARibbonPannelItem::Large);
 	}
 
+	panel = page->addPannel(tr("纵坐标标尺"));
+
+	if constexpr (true) {
+		auto* w = new QWidget;
+		auto* vlay = new QVBoxLayout;
+
+		auto* cb = new SARibbonComboBox;
+		cbRulers = cb;
+		cb->setEditable(false);
+		cb->setMinimumWidth(120);
+		cb->setMinimumHeight(25);
+		connect(cb, SIGNAL(currentIndexChanged(int)), this, SLOT(actChangeOrdinate(int)));
+
+		//panel->addWidget(cb, SARibbonPannelItem::Large);
+
+		auto* lab = new QLabel(tr("纵坐标标尺"));
+		lab->setAlignment(Qt::AlignCenter);
+
+		vlay->addWidget(lab);
+		vlay->addWidget(cb);
+		w->setLayout(vlay);
+
+		panel->addWidget(w, SARibbonPannelItem::Large);
+	}
+
 	panel = page->addPannel(tr("编辑"));
 	
 	QAction* act;
@@ -71,6 +107,37 @@ void RailContext::updateRailWidget(std::shared_ptr<Railway> rail)
 	}
 }
 
+void RailContext::actChangeOrdinate(int i)
+{
+	if (updating)
+		return;
+
+	int oldindex = railway->ordinateIndex();
+	int idx = i - 1;
+
+	if (idx == oldindex)
+		return;
+	updating = true;
+
+	//第一次操作要现场执行，试一下能不能行
+	railway->setOrdinateIndex(idx);
+	bool flag = railway->calStationYValue(diagram.config());
+	if (flag) {
+		//设置成功，cmd压栈，然后更新运行图
+		mw->getUndoStack()->push(new qecmd::ChangeOrdinate(this, railway, oldindex));
+		commitOrdinateChange(railway);
+	}
+	else {
+		//提示设置失败，还原
+		QMessageBox::warning(mw, tr("错误"),
+			tr("设置排图标尺：所选标尺[%1]不能用作排图标尺，"
+				"因为通过该标尺已有数据不能确定所有通过车站的坐标。已还原为上一次的设置。")
+			.arg(railway->getRuler(idx)->name()));
+		cbRulers->setCurrentIndex(oldindex + 1);
+	}
+	updating = false;
+}
+
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
 {
 	updateRailWidget(rail);
@@ -86,6 +153,11 @@ void RailContext::commitUpdateTimetable(std::shared_ptr<Railway> railway, bool e
 {
 	updateRailWidget(railway);
 	emit stationTableChanged(railway, equiv);
+}
+
+void RailContext::commitOrdinateChange(std::shared_ptr<Railway> railway)
+{
+	mw->updateRailwayDiagrams(railway);
 }
 
 void RailContext::setRailway(std::shared_ptr<Railway> rail)
@@ -162,4 +234,24 @@ void qecmd::UpdateRailStations::redo()
 {
 	railold->swapBaseWith(*railnew);
 	cont->commitUpdateTimetable(railold, equiv);
+}
+
+void qecmd::ChangeOrdinate::undo()
+{
+	int idx = rail->ordinateIndex();
+	rail->setOrdinateIndex(index);
+	index = idx;
+	cont->commitOrdinateChange(rail);
+}
+
+void qecmd::ChangeOrdinate::redo()
+{
+	if (first) {
+		first = false;
+		return;
+	}
+	int idx = rail->ordinateIndex();
+	rail->setOrdinateIndex(index);
+	index = idx;
+	cont->commitOrdinateChange(rail);
 }

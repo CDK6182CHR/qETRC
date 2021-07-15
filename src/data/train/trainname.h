@@ -59,6 +59,11 @@ public:
 
     void show()const;
 
+    /**
+     * 返回全车次或部分车次是否包含指定串
+     */
+    bool contains(const QString& s)const;
+
 private:
     /*
      * 由全车次（存储在full中）解析上下行车次

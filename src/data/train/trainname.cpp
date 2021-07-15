@@ -30,6 +30,11 @@ void TrainName::show() const
     qDebug() << "TrainName [" << full() << "]: " << down() << "/" << up() << Qt::endl;
 }
 
+bool TrainName::contains(const QString& s) const
+{
+    return _full.contains(s) || _down.contains(s) || _up.contains(s);
+}
+
 void TrainName::parseFullName()
 {
     //这里其实不需要关心字头的事

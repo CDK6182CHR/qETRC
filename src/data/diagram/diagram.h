@@ -235,6 +235,12 @@ public:
      */
     void removeRailwayAt(int i);
 
+    /**
+     * 更新参数（最大跨越站数）时执行
+     * 重新绑定所有列车与所有线路
+     */
+    void rebindAllTrains();
+
 private:
     void bindAllTrains();
     QString validPageName(const QString& prefix)const;

@@ -2,6 +2,7 @@
 #include "util/buttongroup.hpp"
 
 #include "mainwindow/viewcategory.h"
+#include "mainwindow/mainwindow.h"
 
 #include <QtWidgets>
 
@@ -380,3 +381,12 @@ void qecmd::ChangeConfig::redo()
     cat->commitConfigChange(cfg, repaint);
 }
 
+void qecmd::ChangePassedStation::undo()
+{
+    mw->commitPassedStationChange(valueold);
+}
+
+void qecmd::ChangePassedStation::redo()
+{
+    mw->commitPassedStationChange(valuenew);
+}

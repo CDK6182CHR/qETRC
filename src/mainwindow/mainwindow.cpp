@@ -12,6 +12,7 @@
 #include "data/diagram/diagram.h"
 #include "navi/navitree.h"
 #include "navi/addpagedialog.h"
+#include "editors/configdialog.h"
 
 #include "version.h"
 
@@ -199,6 +200,15 @@ void MainWindow::checkPagesValidity()
     }
 }
 
+void MainWindow::actChangePassedStations()
+{
+    int n = spPassedStations->value();
+    int old = _diagram.config().max_passed_stations;
+    if (n != old) {
+        undoStack->push(new qecmd::ChangePassedStation(old, n, this));
+    }
+}
+
 
 //void MainWindow::undoAddPage(std::shared_ptr<DiagramPage> page)
 //{
@@ -277,6 +287,7 @@ void MainWindow::initDockWidgets()
         connect(tw, &TrainListWidget::currentTrainChanged, this, &MainWindow::focusInTrain);
         connect(tw->getModel(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
             naviModel, SLOT(onTrainDataChanged(const QModelIndex&, const QModelIndex&)));
+        connect(tw, &TrainListWidget::addNewTrain, naviView, &NaviTree::actAddTrain);
 
         connect(naviModel, &QAbstractItemModel::rowsAboutToBeInserted,
             tw->getModel(), &TrainListModel::onBeginInsertRows);
@@ -438,6 +449,38 @@ void MainWindow::initToolbar()
         connect(act, SIGNAL(triggered()), naviView, SLOT(importTrains()));
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(70);
+
+        act = new QAction(QIcon(":/icons/add.png"), tr("新建车次"), this);
+        act->setToolTip(tr("新建车次\n新建空白车次"));
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(70);
+        connect(act, SIGNAL(triggered()), naviView, SLOT(actAddTrain()));
+
+        panel = cat->addPannel(tr("运行线控制"));
+
+        if constexpr (true) {
+            auto* sp = new QSpinBox;
+            spPassedStations = sp;
+            sp->setRange(0, 10000000);
+            sp->setToolTip(tr("最大跨越站数\n设置连续运行线段允许跨越的最大站数。"
+                "如果区间跨越站数超过指定数值，将被拆分成两段运行线。"));
+
+            auto* w = new QWidget;
+            auto* vlay = new QVBoxLayout;
+            vlay->addWidget(new QLabel(tr("最大跨越站数")));
+            vlay->addWidget(sp);
+            w->setLayout(vlay);
+
+            panel->addWidget(w, SARibbonPannelItem::Large);
+
+            act = new QAction(QIcon(":/icons/tick.png"), tr("应用"), this);
+            connect(act, SIGNAL(triggered()), this, SLOT(actChangePassedStations()));
+            btn = panel->addLargeAction(act);
+            btn->setMinimumWidth(80);
+        }
+       
+
+
     }
 
     //显示
@@ -536,6 +579,7 @@ void MainWindow::clearDiagramUnchecked()
     }
     diagramDocks.clear();
     diagramWidgets.clear();
+    focusOutPage();
 
     //删除所有打开的基线编辑面板
     for (auto p : railStationDocks) {
@@ -543,8 +587,10 @@ void MainWindow::clearDiagramUnchecked()
     }
     railStationDocks.clear();
     railStationWidgets.clear();
+    focusOutRailway();
 
     contextTrain->removeAllTrainWidgets();
+    focusOutTrain();
 
     undoStack->clear();
     undoStack->resetClean();
@@ -573,6 +619,8 @@ void MainWindow::endResetGraph()
     naviModel->resetModel();
     trainListWidget->refreshData();
     catView->refreshTypeGroup();
+
+    spPassedStations->setValue(_diagram.config().max_passed_stations);
 }
 
 void MainWindow::resetDiagramPages()
@@ -710,6 +758,14 @@ void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
     railStationDocks.append(dock);
 
     manager->addDockWidgetFloating(dock);
+}
+
+void MainWindow::commitPassedStationChange(int n)
+{
+    _diagram.config().max_passed_stations = n;
+    _diagram.rebindAllTrains();
+    trainListWidget->getModel()->updateAllMileSpeed();
+    updateAllDiagrams();
 }
 
 void MainWindow::updateTrainLines(std::shared_ptr<Train> train, QList<std::shared_ptr<TrainAdapter>>&& adps)

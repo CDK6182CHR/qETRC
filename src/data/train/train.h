@@ -199,6 +199,11 @@ public:
     std::shared_ptr<TrainAdapter> bindToRailway(Railway& railway, const Config& config);
 
     /**
+     * 一次性清除所有绑定数据
+     */
+    void clearBoundRailways();
+
+    /**
      * 适用于线路可能发生变化时，
      * 即使已经绑定到同一条线路，也会撤销再重来 （转移构造）
      */

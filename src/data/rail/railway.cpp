@@ -764,11 +764,13 @@ int Railway::ordinateIndex() const
 	return _ordinate ? _ordinate->index() : -1;
 }
 
-double Railway::calStationYValue(const Config& config)
+bool Railway::calStationYValue(const Config& config)
 {
 	clearYValues();
-	if(!ordinate())
-		return calStationYValueByMile(config);
+	if (!ordinate()) {
+		calStationYValueByMile(config);
+		return true;
+	}
 	//标尺排图
 	auto ruler = ordinate();
 	double y = 0;
@@ -781,7 +783,8 @@ double Railway::calStationYValue(const Config& config)
 				<< "Ruler [" << ruler->name() << "] not complate, cannot be used as"
 				<< "ordinate ruler. Interval: " << p->railInterval() << Qt::endl;
 			resetOrdinate();
-			return calStationYValueByMile(config);
+			calStationYValueByMile(config);
+			return false;
 		}
 		y += p->interval / config.seconds_per_pix_y;
 		p->railInterval().toStation()->y_value = y;
@@ -797,7 +800,8 @@ double Railway::calStationYValue(const Config& config)
 					<< "Ruler [" << ruler->name() << "] not complate, cannot be used as"
 					<< "ordinate ruler. Interval: " << p->railInterval() << Qt::endl;
 				resetOrdinate();
-				return calStationYValueByMile(config);
+				calStationYValueByMile(config);
+				return false;
 			}
 			auto rboth = rightBothStation(toStation), lboth = leftBothStation(toStation);
 
@@ -808,7 +812,7 @@ double Railway::calStationYValue(const Config& config)
 			toStation->y_value = y;
 		}
 	}
-	return _diagramHeight;
+	return true;
 }
 
 bool Railway::topoEquivalent(const Railway& another) const

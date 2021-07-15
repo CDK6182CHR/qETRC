@@ -113,6 +113,7 @@ signals:
 
 private slots:
     void searchTrain();
+    void clearFilter();
     void editButtonClicked();
     void batchChange();
 

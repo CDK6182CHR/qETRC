@@ -224,6 +224,16 @@ void Diagram::removeRailwayAt(int i)
     }
 }
 
+void Diagram::rebindAllTrains()
+{
+    for (auto t : _trainCollection.trains()) {
+        t->clearBoundRailways();
+        for (auto p : railways()) {
+            t->bindToRailway(*p, _config);
+        }
+    }
+}
+
 void Diagram::bindAllTrains()
 {
     for (auto p : railways()) {

@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QUndoCommand>
 #include <SARibbonLineEdit.h>
+#include <SARibbonComboBox.h>
 #include "SARibbonContextCategory.h"
 #include "data/rail/rail.h"
 #include "data/diagram/diagram.h"
@@ -20,6 +21,8 @@ class RailContext : public QObject
     MainWindow* const mw;
     std::shared_ptr<Railway> railway;
     SARibbonLineEdit* edName;
+    SARibbonComboBox* cbRulers;
+    bool updating = false;
 public:
     explicit RailContext(Diagram& diagram_, SARibbonContextCategory* context,
         MainWindow* mw_,
@@ -47,6 +50,12 @@ signals:
 private slots:
     void actOpenStationWidget();
     void actRemoveRailway();
+    
+    /**
+     * 修改排图标尺，暂定立即生效
+     * 压栈cmd
+     */
+    void actChangeOrdinate(int i);
 
 public slots:
     void actChangeRailName(std::shared_ptr<Railway> rail, const QString& name);
@@ -60,6 +69,11 @@ public slots:
      * 主要负责发射信号以及更新有关页面
      */
     void commitUpdateTimetable(std::shared_ptr<Railway> railway, bool equiv);
+
+    /**
+     * 已经完成变换操作后；这里主要触发排图操作
+     */
+    void commitOrdinateChange(std::shared_ptr<Railway> railway);
 
 };
 
@@ -92,6 +106,23 @@ namespace qecmd {
     public:
         UpdateRailStations(RailContext* context, std::shared_ptr<Railway> old_,
             std::shared_ptr<Railway> new_, bool equiv_, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+
+    class ChangeOrdinate :public QUndoCommand {
+        RailContext* const cont;
+        std::shared_ptr<Railway> rail;
+        int index;
+        bool first = true;
+    public:
+        ChangeOrdinate(RailContext* context_,std::shared_ptr<Railway> rail_,
+            int index_,QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("更改排图标尺: ")+rail_->name(),parent),
+            cont(context_),rail(rail_),index(index_)
+        {}
+
         virtual void undo()override;
         virtual void redo()override;
     };

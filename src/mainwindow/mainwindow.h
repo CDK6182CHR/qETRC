@@ -53,6 +53,8 @@ class MainWindow : public SARibbonMainWindow
     RailContext* contextRail;
     ViewCategory* catView;
 
+    QSpinBox* spPassedStations;
+
     /**
      * 可能在多个地方使用到的action，包装一下
      */
@@ -171,6 +173,8 @@ private:
      */
     bool saveQuestion();
 
+    
+
 protected:
     virtual void closeEvent(QCloseEvent* e)override;
 
@@ -277,6 +281,11 @@ private slots:
      */
     void checkPagesValidity();
     
+    /**
+     * 更改跨越站数的压栈操作。
+     * cmd写在ConfigDialog.h/cpp中
+     */
+    void actChangePassedStations();
 
 public slots:
 
@@ -296,6 +305,12 @@ public slots:
      * 打开（或创建）指定线路的编辑面板
      */
     void actOpenRailStationWidget(std::shared_ptr<Railway> rail);
+
+    /**
+     * 执行最大跨越站数调整。目前只允许直接作用于Diagram的Config上，因此不用指定操作对象
+     * 触发重新绑定、排图、铺画操作
+     */
+    void commitPassedStationChange(int n);
 
 };
 
