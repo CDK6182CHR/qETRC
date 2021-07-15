@@ -287,6 +287,8 @@ private slots:
      */
     void actChangePassedStations();
 
+    void showAboutDialog();
+
 public slots:
 
     /**

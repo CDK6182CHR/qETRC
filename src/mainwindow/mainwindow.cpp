@@ -85,6 +85,7 @@ void MainWindow::undoRemoveTrain(std::shared_ptr<Train> train)
 
 void MainWindow::onStationTableChanged(std::shared_ptr<Railway> rail, bool equiv)
 {
+    Q_UNUSED(equiv);
     _diagram.updateRailway(rail);
     trainListWidget->getModel()->updateAllMileSpeed();
     updateRailwayDiagrams(rail);
@@ -168,7 +169,7 @@ void MainWindow::removeRailStationWidget(std::shared_ptr<Railway> rail)
 void MainWindow::removeRailStationWidgetAt(int i)
 {
     auto* dock = railStationDocks.takeAt(i);
-    auto* w = railStationWidgets.takeAt(i);
+    railStationWidgets.takeAt(i);
     dock->deleteDockWidget();
 }
 
@@ -207,6 +208,18 @@ void MainWindow::actChangePassedStations()
     if (n != old) {
         undoStack->push(new qecmd::ChangePassedStation(old, n, this));
     }
+}
+
+void MainWindow::showAboutDialog()
+{
+    QString text = tr("%1_%2 Release %3\n%4\n")
+        .arg(qespec::TITLE.data())
+        .arg(qespec::VERSION.data())
+        .arg(qespec::RELEASE.data())
+        .arg(qespec::DATE.data());
+    text += tr("六方车迷会谈  萧迩珀  保留一切权利\nmxy0268@qq.com\n");
+    text += tr("QQ群：865211882\nhttps://github.com/CDK6182CHR/qETRC");
+    QMessageBox::about(this, tr("关于"), text);
 }
 
 
@@ -380,7 +393,7 @@ void MainWindow::initToolbar()
         QUndoView* view = new QUndoView(undoStack);
         auto* dock = new ads::CDockWidget(tr("历史记录"));
         dock->setWidget(view);
-        auto* a = manager->addDockWidgetTab(ads::CenterDockWidgetArea, dock);
+        manager->addDockWidgetTab(ads::CenterDockWidgetArea, dock);
 
         act = dock->toggleViewAction();
         act->setText(tr("历史记录"));
@@ -395,6 +408,15 @@ void MainWindow::initToolbar()
         connect(act, SIGNAL(triggered()), naviView, SLOT(addNewPage()));
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
+
+        panel = cat->addPannel(tr("系统"));
+        act = new QAction(QIcon(":/icons/info.png"), tr("关于"), this);
+        connect(act, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
+        panel->addLargeAction(act);
+
+        act = new QAction(QIcon(":/icons/close.png"), tr("退出"), this);
+        connect(act, SIGNAL(triggered()), this, SLOT(close()));
+        panel->addLargeAction(act);
 
     }
 
@@ -546,6 +568,7 @@ void MainWindow::initAppMenu()
     menu->addAction(sharedActions.save);
 
     auto* act = new QAction(QIcon(":/icons/saveas.png"), tr("另存为"), this);
+    menu->addAction(act);
 
     menu->addSeparator();
 

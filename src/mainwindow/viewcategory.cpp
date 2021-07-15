@@ -278,6 +278,8 @@ void ViewCategory::onActConfigApplied(Config& cfg, const Config& newcfg, bool re
 
 void ViewCategory::commitConfigChange(Config& cfg, bool repaint)
 {
+    Q_UNUSED(cfg);
+    Q_UNUSED(repaint);
     mw->updateAllDiagrams();
 }
 

@@ -3,11 +3,13 @@
 #include <QAbstractTableModel>
 #include <QObject>
 #include <QUndoStack>
+#include <QUndoCommand>
 #include <memory>
 #include <functional>
 #include <optional>
 
 #include "data/train/traincollection.h"
+#include "data/diagram/trainline.h"
 
 struct Config;
 
@@ -53,6 +55,9 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
 signals:
+    /**
+     * 此信号通告实际的变化发生
+     */
     void trainShowChanged(std::shared_ptr<Train> train, bool show);
 
     /**
@@ -88,6 +93,7 @@ public slots:
      * 这几个slot用来接收navitree那边删除单个列车的信号
      */
     void onBeginRemoveRows(const QModelIndex& parent, int start, int end) {
+        Q_UNUSED(parent);
         beginRemoveRows({}, start, end);
     }
     void onEndRemoveRows() {
@@ -95,6 +101,7 @@ public slots:
     }
 
     void onBeginInsertRows(const QModelIndex& parent, int start, int end) {
+        Q_UNUSED(parent);
         beginInsertRows({}, start, end);
     }
     void onEndInsertRows() {
@@ -105,5 +112,19 @@ public slots:
      * 删除线路后调用，更新所有列车的里程、均速数据
      */
     void updateAllMileSpeed();
+
+    /**
+     * 实施改变数据操作。实际上就是发射信号
+     */
+    void commitSetTrainShow(std::shared_ptr<Train> train, bool on);
 };
+
+namespace qecmd {
+    class ChangeSingleTrainShow :public QUndoCommand
+    {
+        std::shared_ptr<Train> train;
+        bool on;
+        QList<std::shared_ptr<TrainLine>> lines;
+    };
+}
 

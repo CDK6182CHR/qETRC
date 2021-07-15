@@ -35,6 +35,9 @@ QRectF TrainItem::boundingRect() const
 
 void TrainItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
+    Q_UNUSED(painter);
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 }
 
 std::shared_ptr<Train> TrainItem::train()
@@ -160,6 +163,7 @@ void TrainItem::unhighlight()
 
 bool TrainItem::contains(const QPointF& f) const
 {
+    Q_UNUSED(f);
     return false;
 }
 

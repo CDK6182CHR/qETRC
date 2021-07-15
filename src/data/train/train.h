@@ -31,6 +31,9 @@ struct AdapterStation;
  * 2021.06.22逻辑修订：要求这里仅包含于线路无关的操作
  * 也就是说这里的一切操作都要是在没有Railway情况下合法的
  * 与Railway相关的操作，在新建类TrainAdapter中完成
+ * 
+ * 2021.07.15  删除是否显示运行线/isShow这个内部属性
+ * 定义：isShow()返回true当且仅当存在至少一条运行线处于显示状态。
  */
 class Train:
     public std::enable_shared_from_this<Train>
@@ -45,6 +48,7 @@ class Train:
     std::shared_ptr<TrainType> _type;
     std::optional<QPen> _pen;
     TrainPassenger _passenger;
+
     bool _show;
 
     /**
@@ -107,14 +111,19 @@ public:
     inline const StationName& terminal()const{return _terminal;}
     inline auto type()const{return _type;}
     inline TrainPassenger passenger()const{return _passenger;}
-    inline bool isShow()const{return _show;}
+    inline bool isShow()const { return _show; }
 
     inline void setTrainName(const TrainName& n){_trainName=n;}
     inline void setStarting(const StationName& s){_starting=s;}
     inline void setTerminal(const StationName& s){_terminal=s;}
     inline void setType(std::shared_ptr<TrainType> t){_type=t;}
     inline void setPassenger(TrainPassenger t){_passenger=t;}
-    inline void setIsShow(bool s){_show=s;}
+    inline void setIsShow(bool  s) { _show = s; }
+    
+    /**
+     * 2021.07.15  对所有运行线设置
+     */
+    void setLineShow(bool s);
 
     /**
      * 根据类型名，设定类型。
@@ -404,6 +413,13 @@ public:
     static bool gtMile(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
     static bool gtTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
     static bool gtTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
+
+private:
+
+    /**
+     * 是否存在至少一条运行线是显示的
+     */
+    bool anyLineShown()const;
 
 };
 

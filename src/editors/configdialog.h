@@ -94,7 +94,7 @@ namespace qecmd {
     public:
         ChangePassedStation(int vold, int vnew,MainWindow* mw_,
             QUndoCommand* parent=nullptr):
-            QUndoCommand(QObject::tr("更改最大跨越站数为")+QString::number(vnew)),
+            QUndoCommand(QObject::tr("更改最大跨越站数为")+QString::number(vnew),parent),
             valueold(vold),valuenew(vnew),mw(mw_)
         {}
 

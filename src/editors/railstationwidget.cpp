@@ -28,6 +28,7 @@ void RailStationWidget::refreshData()
 
 void RailStationWidget::focusInEvent(QFocusEvent* e)
 {
+	Q_UNUSED(e);
 	if (railway)
 		emit focusInRailway(railway);
 }

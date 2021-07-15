@@ -113,6 +113,14 @@ QJsonObject Train::toJson() const
     return obj;
 }
 
+void Train::setLineShow(bool on)
+{
+    for (auto adp : _adapters) {
+        for (auto line : adp->lines())
+            line->setIsShow(on);
+    }
+}
+
 void Train::setType(const QString& _typeName, TypeManager& manager)
 {
     _type = manager.findOrCreate(_typeName);
@@ -654,6 +662,17 @@ void Train::swapBaseInfo(Train& other)
     SWAP(_type);
     SWAP(_passenger);
     SWAP(_pen);
+}
+
+bool Train::anyLineShown() const
+{
+    for (auto adp : _adapters) {
+        for (auto line : adp->lines()) {
+            if (line->show())
+                return true;
+        }
+    }
+    return false;
 }
 
 

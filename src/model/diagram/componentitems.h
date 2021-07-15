@@ -144,7 +144,7 @@ namespace navi {
 	public:
 		enum { Type = 5 };
 		PageItem(std::shared_ptr<DiagramPage> page, int row, PageListItem* parent);
-		inline virtual AbstractComponentItem* child(int i)override { return nullptr; }
+		inline virtual AbstractComponentItem* child(int )override { return nullptr; }
 		inline virtual int childCount()const override { return 0; }
 		virtual QString data(int i)const override;
 		inline virtual int type()const override { return Type; }
@@ -181,7 +181,7 @@ namespace navi {
 	public:
 		enum{Type=7};
 		TrainModelItem(std::shared_ptr<Train> train, int row, TrainListItem* parent);
-		inline virtual AbstractComponentItem* child(int i)override { return nullptr; }
+		inline virtual AbstractComponentItem* child(int )override { return nullptr; }
 		inline virtual int childCount()const override { return 0; }
 		virtual QString data(int i)const override;
 		inline virtual int type()const override { return Type; }

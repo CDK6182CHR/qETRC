@@ -157,7 +157,7 @@ namespace qecmd {
     public:
         UpdateTrainInfo(std::shared_ptr<Train> train_, std::shared_ptr<Train> newinfo,
             TrainContext* context, QUndoCommand* parent = nullptr) :
-            QUndoCommand(QObject::tr("更新列车信息: ") + newinfo->trainName().full()),
+            QUndoCommand(QObject::tr("更新列车信息: ") + newinfo->trainName().full(),parent),
             train(train_), info(newinfo), cont(context) {}
         virtual void undo()override {
             cont->commitTraininfoChange(train, info);

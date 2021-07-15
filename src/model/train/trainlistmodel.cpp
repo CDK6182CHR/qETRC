@@ -169,3 +169,8 @@ void TrainListModel::updateAllMileSpeed()
 	emit dataChanged(index(0, ColMile), index(coll.trainCount()-1, ColSpeed));
 }
 
+void TrainListModel::commitSetTrainShow(std::shared_ptr<Train> train, bool on)
+{
+	//todo...
+}
+
