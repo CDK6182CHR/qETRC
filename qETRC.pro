@@ -63,6 +63,7 @@ SOURCES += \
     src/util/linestylecombo.cpp \
     src/util/qecontrolledtable.cpp \
     src/util/utilfunc.cpp \
+    src/viewers/sectioncountdialog.cpp \
     src/viewers/traineventdialog.cpp
 
 HEADERS += \
@@ -121,6 +122,7 @@ HEADERS += \
     src/util/qecontrolledtable.h \
     src/util/qeexceptions.h \
     src/util/utilfunc.h \
+    src/viewers/sectioncountdialog.h \
     src/viewers/traineventdialog.h
 
 # Default rules for deployment.

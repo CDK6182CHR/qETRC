@@ -75,6 +75,8 @@ public slots:
      */
     void commitOrdinateChange(std::shared_ptr<Railway> railway);
 
+    void showSectionCount();
+
 };
 
 

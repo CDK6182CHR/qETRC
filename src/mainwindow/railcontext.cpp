@@ -1,6 +1,8 @@
 ﻿#include "railcontext.h"
 #include "mainwindow.h"
 
+#include "viewers/sectioncountdialog.h"
+
 #include <QtWidgets>
 
 RailContext::RailContext(Diagram& diagram_, SARibbonContextCategory* context, 
@@ -97,6 +99,13 @@ void RailContext::initUI()
 	btn = panel->addLargeAction(act);
 	btn->setMinimumWidth(70);
 	connect(act, SIGNAL(triggered()), this, SLOT(actRemoveRailway()));
+
+	panel = page->addPannel(tr("分析"));
+
+	act = new QAction(QIcon(":/icons/counter.png"), tr("断面对数"), this);
+	connect(act, SIGNAL(triggered()), this, SLOT(showSectionCount()));
+	btn = panel->addLargeAction(act);
+	btn->setMinimumWidth(70);
 }
 
 void RailContext::updateRailWidget(std::shared_ptr<Railway> rail)
@@ -158,6 +167,13 @@ void RailContext::commitUpdateTimetable(std::shared_ptr<Railway> railway, bool e
 void RailContext::commitOrdinateChange(std::shared_ptr<Railway> railway)
 {
 	mw->updateRailwayDiagrams(railway);
+}
+
+void RailContext::showSectionCount()
+{
+	if (!railway)return;
+	auto* dialog = new SectionCountDialog(diagram, railway, mw);
+	dialog->show();
 }
 
 void RailContext::setRailway(std::shared_ptr<Railway> rail)

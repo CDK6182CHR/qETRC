@@ -289,6 +289,9 @@ private slots:
 
     void showAboutDialog();
 
+    void useWpsStyle();
+    void useOfficeStyle();
+
 public slots:
 
     /**

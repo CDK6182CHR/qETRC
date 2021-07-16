@@ -4,6 +4,8 @@
 #pragma once
 
 #include <cstdint>
+#include <QString>
+#include <QObject>
 
 enum class Direction : std::int8_t {
 	Down, Up, Undefined
@@ -33,5 +35,13 @@ namespace DirFunc {
 	inline constexpr Direction fromIsDown(bool isDown) {
 		return isDown ? Direction::Down:Direction::Up;
 	}
+
+    inline QString dirToString(Direction dir){
+        switch (dir) {
+        case Direction::Down:return QObject::tr("下行");
+        case Direction::Up:return QObject::tr("上行");
+        default: return QObject::tr("无效方向");
+        }
+    }
 }
 

@@ -64,6 +64,7 @@
     <TargetName>qETRC</TargetName>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>D:\QTProject\site-packages\SARibbon\bin_qt5.15.2_debug_64;D:\QTProject\site-packages\Qt-Advanced-Docking-System\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <QtInstall>Qt5.15.2 MSVC2019</QtInstall>
@@ -241,9 +242,11 @@
     <ClCompile Include="src\util\linestylecombo.cpp" />
     <ClCompile Include="src\util\qecontrolledtable.cpp" />
     <ClCompile Include="src\util\utilfunc.cpp" />
+    <ClCompile Include="src\viewers\sectioncountdialog.cpp" />
     <ClCompile Include="src\viewers\traineventdialog.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="src\viewers\sectioncountdialog.h" />
     <QtMoc Include="src\viewers\traineventdialog.h" />
     <QtMoc Include="src\mainwindow\mainwindow.h" />
     <QtMoc Include="src\mainwindow\traincontext.h" />

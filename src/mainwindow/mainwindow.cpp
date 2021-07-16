@@ -222,6 +222,16 @@ void MainWindow::showAboutDialog()
     QMessageBox::about(this, tr("关于"), text);
 }
 
+void MainWindow::useWpsStyle()
+{
+    ribbonBar()->setRibbonStyle(SARibbonBar::WpsLiteStyle);
+}
+
+void MainWindow::useOfficeStyle()
+{
+    ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);
+}
+
 
 //void MainWindow::undoAddPage(std::shared_ptr<DiagramPage> page)
 //{
@@ -333,6 +343,14 @@ void MainWindow::initToolbar()
         act->setIcon(QIcon(":/icons/redo.png"));
         act->setShortcut(Qt::CTRL + Qt::Key_Y);
         ribbon->quickAccessBar()->addAction(act);
+
+        auto* menu = new QMenu();
+        act = menu->addAction(tr("使用Office风格Ribbon"));
+        connect(act, SIGNAL(triggered()), this, SLOT(useOfficeStyle()));
+        act = menu->addAction(tr("使用WPS风格Ribbon"));
+        connect(act, SIGNAL(triggered()), this, SLOT(useWpsStyle()));
+        ribbon->quickAccessBar()->addMenu(menu);
+
     }
 
     QAction* actTrainList;
@@ -955,6 +973,7 @@ void MainWindow::focusInPage(std::shared_ptr<DiagramPage> page)
 
 void MainWindow::focusOutPage()
 {
+    auto* cont = contextPage->context();
     ribbonBar()->hideContextCategory(contextPage->context());
 }
 

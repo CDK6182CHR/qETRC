@@ -1,0 +1,2538 @@
+{
+    "line": {
+        "name": "达成单线",
+        "rulers": [
+            {
+                "name": "快速*K4293",
+                "different": false,
+                "nodes": [
+                    {
+                        "fazhan": "遂宁",
+                        "daozhan": "遂宁西",
+                        "interval": 660,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "遂宁西",
+                        "daozhan": "星光",
+                        "interval": 540,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "星光",
+                        "daozhan": "大英",
+                        "interval": 600,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "大英",
+                        "daozhan": "玉峰",
+                        "interval": 540,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "玉峰",
+                        "daozhan": "骑龙",
+                        "interval": 300,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "骑龙",
+                        "daozhan": "仓山镇",
+                        "interval": 300,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "仓山镇",
+                        "daozhan": "会龙",
+                        "interval": 360,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "会龙",
+                        "daozhan": "梓潼",
+                        "interval": 420,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "梓潼",
+                        "daozhan": "积金",
+                        "interval": 480,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "积金",
+                        "daozhan": "转龙",
+                        "interval": 420,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "转龙",
+                        "daozhan": "隆盛",
+                        "interval": 480,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "隆盛",
+                        "daozhan": "高板",
+                        "interval": 360,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "高板",
+                        "daozhan": "淮口",
+                        "interval": 300,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "淮口",
+                        "daozhan": "道观音",
+                        "interval": 420,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "道观音",
+                        "daozhan": "温家店",
+                        "interval": 600,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "温家店",
+                        "daozhan": "金堂",
+                        "interval": 180,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "金堂",
+                        "daozhan": "城厢",
+                        "interval": 600,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "城厢",
+                        "daozhan": "成都北",
+                        "interval": 780,
+                        "start": 120,
+                        "stop": 60
+                    },
+                    {
+                        "fazhan": "成都北",
+                        "daozhan": "龙潭寺",
+                        "interval": 420,
+                        "start": 120,
+                        "stop": 60
+                    }
+                ],
+                "down_pass": [],
+                "up_pass": []
+            }
+        ],
+        "routes": [],
+        "stations": [
+            {
+                "zhanming": "遂宁",
+                "licheng": 0.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": 0.001,
+                "y_value": 90
+            },
+            {
+                "zhanming": "遂宁西",
+                "licheng": 10.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": 10.121,
+                "y_value": 172.5,
+                "tracks": [
+                    "1",
+                    "2"
+                ]
+            },
+            {
+                "zhanming": "星光",
+                "licheng": 20.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 240.0
+            },
+            {
+                "zhanming": "大英",
+                "licheng": 31.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 315.0
+            },
+            {
+                "zhanming": "玉峰",
+                "licheng": 40.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 382.5
+            },
+            {
+                "zhanming": "骑龙",
+                "licheng": 46.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 420.0
+            },
+            {
+                "zhanming": "仓山镇",
+                "licheng": 52.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 457.5
+            },
+            {
+                "zhanming": "会龙",
+                "licheng": 58.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 502.5
+            },
+            {
+                "zhanming": "梓潼",
+                "licheng": 66.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 555.0
+            },
+            {
+                "zhanming": "积金",
+                "licheng": 74.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 615.0
+            },
+            {
+                "zhanming": "转龙",
+                "licheng": 82.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 667.5
+            },
+            {
+                "zhanming": "隆盛",
+                "licheng": 91.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 727.5
+            },
+            {
+                "zhanming": "高板",
+                "licheng": 98.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 772.5
+            },
+            {
+                "zhanming": "淮口",
+                "licheng": 104.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 810.0
+            },
+            {
+                "zhanming": "道观音",
+                "licheng": 111.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 862.5
+            },
+            {
+                "zhanming": "温家店",
+                "licheng": 120.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 937.5
+            },
+            {
+                "zhanming": "金堂",
+                "licheng": 124.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 960.0
+            },
+            {
+                "zhanming": "城厢",
+                "licheng": 135.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 1035.0
+            },
+            {
+                "zhanming": "成都北",
+                "licheng": 152.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 1132.5
+            },
+            {
+                "zhanming": "龙潭寺",
+                "licheng": 161.0,
+                "dengji": 4,
+                "show": true,
+                "direction": 3,
+                "passenger": true,
+                "freight": true,
+                "counter": null,
+                "y_value": 1185.0
+            }
+        ],
+        "forbid": {
+            "different": true,
+            "nodes": [],
+            "upShow": false,
+            "downShow": false
+        },
+        "forbid2": {
+            "different": true,
+            "nodes": [],
+            "upShow": false,
+            "downShow": false
+        },
+        "notes": {
+            "author": "",
+            "version": "",
+            "note": ""
+        },
+        "tracks": []
+    },
+    "trains": [
+        {
+            "checi": [
+                "8801",
+                "8801",
+                ""
+            ],
+            "UI": {},
+            "type": "通勤",
+            "timetable": [
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "09:00:00",
+                    "cfsj": "09:00:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "09:12:00",
+                    "cfsj": "09:24:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "09:32:00",
+                    "cfsj": "09:32:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "城厢",
+            "zdz": "成都西",
+            "shown": true,
+            "localFirst": "城厢",
+            "localLast": "龙潭寺",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "城厢",
+                    "end": "龙潭寺",
+                    "down": true,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": null
+        },
+        {
+            "checi": [
+                "8802",
+                "",
+                "8802"
+            ],
+            "UI": {},
+            "type": "通勤",
+            "timetable": [
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "07:52:00",
+                    "cfsj": "07:52:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "08:00:00",
+                    "cfsj": "08:14:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "08:26:00",
+                    "cfsj": "08:26:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "成都西",
+            "zdz": "城厢",
+            "shown": true,
+            "localFirst": "龙潭寺",
+            "localLast": "城厢",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "龙潭寺",
+                    "end": "城厢",
+                    "down": false,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": null
+        },
+        {
+            "checi": [
+                "8805",
+                "8805",
+                ""
+            ],
+            "UI": {},
+            "type": "通勤",
+            "timetable": [
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "20:13:00",
+                    "cfsj": "20:13:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "20:25:00",
+                    "cfsj": "20:38:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "20:46:00",
+                    "cfsj": "20:46:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "城厢",
+            "zdz": "成都西",
+            "shown": true,
+            "localFirst": "城厢",
+            "localLast": "龙潭寺",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "城厢",
+                    "end": "龙潭寺",
+                    "down": true,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": null
+        },
+        {
+            "checi": [
+                "8806",
+                "",
+                "8806"
+            ],
+            "UI": {},
+            "type": "通勤",
+            "timetable": [
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "19:10:00",
+                    "cfsj": "19:10:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "19:18:00",
+                    "cfsj": "19:30:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "19:42:00",
+                    "cfsj": "19:42:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "成都西",
+            "zdz": "城厢",
+            "shown": true,
+            "localFirst": "龙潭寺",
+            "localLast": "城厢",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "龙潭寺",
+                    "end": "城厢",
+                    "down": false,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": null
+        },
+        {
+            "checi": [
+                "K4294",
+                "",
+                "K4294"
+            ],
+            "UI": {},
+            "type": "快速",
+            "timetable": [
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "10:03:00",
+                    "cfsj": "10:03:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "10:16:00",
+                    "cfsj": "10:16:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "10:28:00",
+                    "cfsj": "10:28:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "金堂",
+                    "ddsj": "10:37:00",
+                    "cfsj": "10:37:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "温家店",
+                    "ddsj": "10:41:00",
+                    "cfsj": "10:41:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "道观音",
+                    "ddsj": "10:50:00",
+                    "cfsj": "10:50:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "淮口",
+                    "ddsj": "10:58:00",
+                    "cfsj": "10:58:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "高板",
+                    "ddsj": "11:03:00",
+                    "cfsj": "11:03:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "隆盛",
+                    "ddsj": "11:08:00",
+                    "cfsj": "11:08:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "转龙",
+                    "ddsj": "11:17:00",
+                    "cfsj": "11:17:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "积金",
+                    "ddsj": "11:25:00",
+                    "cfsj": "11:25:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "梓潼",
+                    "ddsj": "11:34:00",
+                    "cfsj": "11:34:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "会龙",
+                    "ddsj": "11:42:00",
+                    "cfsj": "11:42:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "仓山镇",
+                    "ddsj": "11:48:00",
+                    "cfsj": "11:48:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "骑龙",
+                    "ddsj": "11:54:00",
+                    "cfsj": "11:54:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "玉峰",
+                    "ddsj": "11:59:00",
+                    "cfsj": "11:59:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "大英",
+                    "ddsj": "12:09:00",
+                    "cfsj": "12:16:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "星光",
+                    "ddsj": "12:26:00",
+                    "cfsj": "12:26:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁西",
+                    "ddsj": "12:35:00",
+                    "cfsj": "12:35:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁",
+                    "ddsj": "12:48:00",
+                    "cfsj": "12:55:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "成都",
+            "zdz": "北京西",
+            "shown": true,
+            "localFirst": "龙潭寺",
+            "localLast": "遂宁",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "龙潭寺",
+                    "end": "遂宁",
+                    "down": false,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": "K4293-4"
+        },
+        {
+            "checi": [
+                "K4734/1",
+                "K4731",
+                "K4734"
+            ],
+            "UI": {},
+            "type": "快速",
+            "timetable": [
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "07:21:00",
+                    "cfsj": "07:21:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "07:34:00",
+                    "cfsj": "07:34:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "07:48:00",
+                    "cfsj": "07:50:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "金堂",
+                    "ddsj": "08:01:00",
+                    "cfsj": "08:01:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "温家店",
+                    "ddsj": "08:04:00",
+                    "cfsj": "08:04:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "道观音",
+                    "ddsj": "08:14:00",
+                    "cfsj": "08:14:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "淮口",
+                    "ddsj": "08:21:00",
+                    "cfsj": "08:21:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "高板",
+                    "ddsj": "08:28:00",
+                    "cfsj": "08:34:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "隆盛",
+                    "ddsj": "08:43:00",
+                    "cfsj": "08:55:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "转龙",
+                    "ddsj": "09:06:00",
+                    "cfsj": "09:09:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "积金",
+                    "ddsj": "09:19:00",
+                    "cfsj": "09:24:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "梓潼",
+                    "ddsj": "09:33:00",
+                    "cfsj": "09:33:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "会龙",
+                    "ddsj": "09:42:00",
+                    "cfsj": "09:50:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "仓山镇",
+                    "ddsj": "09:57:00",
+                    "cfsj": "09:57:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "骑龙",
+                    "ddsj": "10:04:00",
+                    "cfsj": "10:11:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "玉峰",
+                    "ddsj": "10:18:00",
+                    "cfsj": "10:18:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "大英",
+                    "ddsj": "10:28:00",
+                    "cfsj": "10:41:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "星光",
+                    "ddsj": "10:51:00",
+                    "cfsj": "10:51:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁西",
+                    "ddsj": "11:02:00",
+                    "cfsj": "11:20:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁",
+                    "ddsj": "11:35:00",
+                    "cfsj": "11:41:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "成都",
+            "zdz": "深圳",
+            "shown": true,
+            "localFirst": "龙潭寺",
+            "localLast": "遂宁",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "龙潭寺",
+                    "end": "遂宁",
+                    "down": false,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": null
+        },
+        {
+            "checi": [
+                "K4732/3",
+                "K4733",
+                "K4732"
+            ],
+            "UI": {},
+            "type": "快速",
+            "timetable": [
+                {
+                    "zhanming": "遂宁",
+                    "ddsj": "14:32:00",
+                    "cfsj": "14:36:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁西",
+                    "ddsj": "14:49:00",
+                    "cfsj": "14:49:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "星光",
+                    "ddsj": "15:00:00",
+                    "cfsj": "15:10:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "大英",
+                    "ddsj": "15:21:00",
+                    "cfsj": "15:21:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "玉峰",
+                    "ddsj": "15:31:00",
+                    "cfsj": "15:34:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "骑龙",
+                    "ddsj": "15:41:00",
+                    "cfsj": "15:41:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "仓山镇",
+                    "ddsj": "15:47:00",
+                    "cfsj": "15:51:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "会龙",
+                    "ddsj": "16:00:00",
+                    "cfsj": "16:06:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "梓潼",
+                    "ddsj": "16:15:00",
+                    "cfsj": "16:15:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "积金",
+                    "ddsj": "16:24:00",
+                    "cfsj": "16:31:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "转龙",
+                    "ddsj": "16:41:00",
+                    "cfsj": "16:45:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "隆盛",
+                    "ddsj": "16:56:00",
+                    "cfsj": "17:01:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "高板",
+                    "ddsj": "17:08:00",
+                    "cfsj": "17:08:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "淮口",
+                    "ddsj": "17:15:00",
+                    "cfsj": "17:24:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "道观音",
+                    "ddsj": "17:34:00",
+                    "cfsj": "17:42:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "温家店",
+                    "ddsj": "17:55:00",
+                    "cfsj": "18:01:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "金堂",
+                    "ddsj": "18:08:00",
+                    "cfsj": "18:16:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "18:28:00",
+                    "cfsj": "18:47:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "19:09:00",
+                    "cfsj": "19:29:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "19:38:00",
+                    "cfsj": "19:38:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "深圳",
+            "zdz": "成都",
+            "shown": true,
+            "localFirst": "遂宁",
+            "localLast": "龙潭寺",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "遂宁",
+                    "end": "龙潭寺",
+                    "down": true,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": null
+        },
+        {
+            "checi": [
+                "K4571/0/1",
+                "K4571",
+                "K4570"
+            ],
+            "UI": {},
+            "type": "快速",
+            "timetable": [
+                {
+                    "zhanming": "遂宁",
+                    "ddsj": "06:25:00",
+                    "cfsj": "06:35:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁西",
+                    "ddsj": "06:48:00",
+                    "cfsj": "06:48:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "星光",
+                    "ddsj": "06:57:00",
+                    "cfsj": "06:57:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "大英",
+                    "ddsj": "07:08:00",
+                    "cfsj": "07:12:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "玉峰",
+                    "ddsj": "07:24:00",
+                    "cfsj": "07:29:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "骑龙",
+                    "ddsj": "07:37:00",
+                    "cfsj": "07:43:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "仓山镇",
+                    "ddsj": "07:51:00",
+                    "cfsj": "07:51:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "会龙",
+                    "ddsj": "07:56:00",
+                    "cfsj": "07:56:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "梓潼",
+                    "ddsj": "08:05:00",
+                    "cfsj": "08:13:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "积金",
+                    "ddsj": "08:22:00",
+                    "cfsj": "08:22:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "转龙",
+                    "ddsj": "08:31:00",
+                    "cfsj": "08:40:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "隆盛",
+                    "ddsj": "08:50:00",
+                    "cfsj": "08:50:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "高板",
+                    "ddsj": "08:57:00",
+                    "cfsj": "09:07:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "淮口",
+                    "ddsj": "09:15:00",
+                    "cfsj": "09:23:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "道观音",
+                    "ddsj": "09:33:00",
+                    "cfsj": "09:38:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "温家店",
+                    "ddsj": "09:51:00",
+                    "cfsj": "09:58:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "金堂",
+                    "ddsj": "10:05:00",
+                    "cfsj": "10:08:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "10:20:00",
+                    "cfsj": "10:41:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "10:57:00",
+                    "cfsj": "11:14:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "11:29:00",
+                    "cfsj": "11:29:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "东莞东",
+            "zdz": "成都",
+            "shown": true,
+            "localFirst": "遂宁",
+            "localLast": "龙潭寺",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "遂宁",
+                    "end": "龙潭寺",
+                    "down": true,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": null
+        },
+        {
+            "checi": [
+                "K4708/5",
+                "K4705",
+                "K4708"
+            ],
+            "UI": {},
+            "type": "快速",
+            "timetable": [
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "12:40:00",
+                    "cfsj": "12:40:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "12:53:00",
+                    "cfsj": "12:53:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "13:05:00",
+                    "cfsj": "13:05:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "金堂",
+                    "ddsj": "13:14:00",
+                    "cfsj": "13:14:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "温家店",
+                    "ddsj": "13:18:00",
+                    "cfsj": "13:18:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "道观音",
+                    "ddsj": "13:27:00",
+                    "cfsj": "13:27:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "淮口",
+                    "ddsj": "13:36:00",
+                    "cfsj": "13:38:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "高板",
+                    "ddsj": "13:45:00",
+                    "cfsj": "13:45:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "隆盛",
+                    "ddsj": "13:50:00",
+                    "cfsj": "13:50:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "转龙",
+                    "ddsj": "13:58:00",
+                    "cfsj": "13:58:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "积金",
+                    "ddsj": "14:07:00",
+                    "cfsj": "14:10:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "梓潼",
+                    "ddsj": "14:19:00",
+                    "cfsj": "14:19:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "会龙",
+                    "ddsj": "14:26:00",
+                    "cfsj": "14:26:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "仓山镇",
+                    "ddsj": "14:32:00",
+                    "cfsj": "14:32:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "骑龙",
+                    "ddsj": "14:37:00",
+                    "cfsj": "14:37:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "玉峰",
+                    "ddsj": "14:42:00",
+                    "cfsj": "14:42:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "大英",
+                    "ddsj": "14:52:00",
+                    "cfsj": "14:55:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "星光",
+                    "ddsj": "15:05:00",
+                    "cfsj": "15:05:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁西",
+                    "ddsj": "15:16:00",
+                    "cfsj": "15:20:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁",
+                    "ddsj": "15:35:00",
+                    "cfsj": "15:41:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "成都",
+            "zdz": "东莞东",
+            "shown": true,
+            "localFirst": "龙潭寺",
+            "localLast": "遂宁",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "龙潭寺",
+                    "end": "遂宁",
+                    "down": false,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": "K4707-8"
+        },
+        {
+            "checi": [
+                "K4706/7",
+                "K4707",
+                "K4706"
+            ],
+            "UI": {},
+            "type": "快速",
+            "timetable": [
+                {
+                    "zhanming": "遂宁",
+                    "ddsj": "23:28:00",
+                    "cfsj": "23:34:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁西",
+                    "ddsj": "23:47:00",
+                    "cfsj": "23:47:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "星光",
+                    "ddsj": "23:56:00",
+                    "cfsj": "23:56:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "大英",
+                    "ddsj": "00:06:00",
+                    "cfsj": "00:06:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "玉峰",
+                    "ddsj": "00:14:00",
+                    "cfsj": "00:14:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "骑龙",
+                    "ddsj": "00:19:00",
+                    "cfsj": "00:19:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "仓山镇",
+                    "ddsj": "00:24:00",
+                    "cfsj": "00:24:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "会龙",
+                    "ddsj": "00:30:00",
+                    "cfsj": "00:30:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "梓潼",
+                    "ddsj": "00:37:00",
+                    "cfsj": "00:37:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "积金",
+                    "ddsj": "00:46:00",
+                    "cfsj": "00:50:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "转龙",
+                    "ddsj": "00:59:00",
+                    "cfsj": "00:59:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "隆盛",
+                    "ddsj": "01:07:00",
+                    "cfsj": "01:07:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "高板",
+                    "ddsj": "01:12:00",
+                    "cfsj": "01:12:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "淮口",
+                    "ddsj": "01:17:00",
+                    "cfsj": "01:17:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "道观音",
+                    "ddsj": "01:25:00",
+                    "cfsj": "01:28:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "温家店",
+                    "ddsj": "01:39:00",
+                    "cfsj": "01:39:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "金堂",
+                    "ddsj": "01:43:00",
+                    "cfsj": "01:43:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "01:52:00",
+                    "cfsj": "01:52:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "02:12:00",
+                    "cfsj": "02:14:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "02:23:00",
+                    "cfsj": "02:23:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "东莞东",
+            "zdz": "成都",
+            "shown": true,
+            "localFirst": "遂宁",
+            "localLast": "龙潭寺",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "遂宁",
+                    "end": "龙潭寺",
+                    "down": true,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": "K4707-8"
+        },
+        {
+            "checi": [
+                "K4184/1",
+                "K4181",
+                "K4184"
+            ],
+            "UI": {},
+            "type": "快速",
+            "timetable": [
+                {
+                    "zhanming": "遂宁",
+                    "ddsj": "18:31:00",
+                    "cfsj": "18:41:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁西",
+                    "ddsj": "18:54:00",
+                    "cfsj": "18:54:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "星光",
+                    "ddsj": "19:03:00",
+                    "cfsj": "19:03:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "大英",
+                    "ddsj": "19:13:00",
+                    "cfsj": "19:13:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "玉峰",
+                    "ddsj": "19:21:00",
+                    "cfsj": "19:21:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "骑龙",
+                    "ddsj": "19:26:00",
+                    "cfsj": "19:26:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "仓山镇",
+                    "ddsj": "19:31:00",
+                    "cfsj": "19:31:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "会龙",
+                    "ddsj": "19:38:00",
+                    "cfsj": "19:54:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "梓潼",
+                    "ddsj": "20:03:00",
+                    "cfsj": "20:03:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "积金",
+                    "ddsj": "20:11:00",
+                    "cfsj": "20:11:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "转龙",
+                    "ddsj": "20:19:00",
+                    "cfsj": "20:29:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "隆盛",
+                    "ddsj": "20:39:00",
+                    "cfsj": "20:39:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "高板",
+                    "ddsj": "20:46:00",
+                    "cfsj": "20:59:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "淮口",
+                    "ddsj": "21:07:00",
+                    "cfsj": "21:27:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "道观音",
+                    "ddsj": "21:37:00",
+                    "cfsj": "22:30:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "温家店",
+                    "ddsj": "22:41:00",
+                    "cfsj": "22:41:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "金堂",
+                    "ddsj": "22:45:00",
+                    "cfsj": "22:45:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "22:55:00",
+                    "cfsj": "23:09:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "23:25:00",
+                    "cfsj": "23:53:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "00:08:00",
+                    "cfsj": "00:08:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "深圳东",
+            "zdz": "成都",
+            "shown": true,
+            "localFirst": "遂宁",
+            "localLast": "龙潭寺",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "遂宁",
+                    "end": "龙潭寺",
+                    "down": true,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": null
+        },
+        {
+            "checi": [
+                "K4567",
+                "K4567",
+                ""
+            ],
+            "UI": {},
+            "type": "快速",
+            "timetable": [
+                {
+                    "zhanming": "遂宁",
+                    "ddsj": "12:07:00",
+                    "cfsj": "12:11:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁西",
+                    "ddsj": "12:26:00",
+                    "cfsj": "12:38:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "星光",
+                    "ddsj": "12:50:00",
+                    "cfsj": "12:59:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "大英",
+                    "ddsj": "13:10:00",
+                    "cfsj": "13:10:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "玉峰",
+                    "ddsj": "13:20:00",
+                    "cfsj": "13:29:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "骑龙",
+                    "ddsj": "13:36:00",
+                    "cfsj": "13:36:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "仓山镇",
+                    "ddsj": "13:42:00",
+                    "cfsj": "13:46:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "会龙",
+                    "ddsj": "13:55:00",
+                    "cfsj": "14:00:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "梓潼",
+                    "ddsj": "14:10:00",
+                    "cfsj": "14:23:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "积金",
+                    "ddsj": "14:34:00",
+                    "cfsj": "14:38:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "转龙",
+                    "ddsj": "14:48:00",
+                    "cfsj": "14:51:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "隆盛",
+                    "ddsj": "15:01:00",
+                    "cfsj": "15:01:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "高板",
+                    "ddsj": "15:06:00",
+                    "cfsj": "15:06:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "淮口",
+                    "ddsj": "15:13:00",
+                    "cfsj": "15:17:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "道观音",
+                    "ddsj": "15:27:00",
+                    "cfsj": "15:37:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "温家店",
+                    "ddsj": "15:48:00",
+                    "cfsj": "15:48:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "金堂",
+                    "ddsj": "15:52:00",
+                    "cfsj": "15:52:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "16:01:00",
+                    "cfsj": "16:01:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "16:20:00",
+                    "cfsj": "16:20:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "16:27:00",
+                    "cfsj": "16:27:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "汉口",
+            "zdz": "成都",
+            "shown": true,
+            "localFirst": "遂宁",
+            "localLast": "龙潭寺",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "遂宁",
+                    "end": "龙潭寺",
+                    "down": true,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": null
+        },
+        {
+            "checi": [
+                "K4568",
+                "",
+                "K4568"
+            ],
+            "UI": {},
+            "type": "快速",
+            "timetable": [
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "17:49:00",
+                    "cfsj": "17:49:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "18:04:00",
+                    "cfsj": "18:25:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "18:39:00",
+                    "cfsj": "18:39:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "金堂",
+                    "ddsj": "18:48:00",
+                    "cfsj": "18:48:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "温家店",
+                    "ddsj": "18:51:00",
+                    "cfsj": "18:51:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "道观音",
+                    "ddsj": "19:01:00",
+                    "cfsj": "19:01:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "淮口",
+                    "ddsj": "19:08:00",
+                    "cfsj": "19:08:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "高板",
+                    "ddsj": "19:13:00",
+                    "cfsj": "19:13:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "隆盛",
+                    "ddsj": "19:19:00",
+                    "cfsj": "19:19:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "转龙",
+                    "ddsj": "19:27:00",
+                    "cfsj": "19:27:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "积金",
+                    "ddsj": "19:34:00",
+                    "cfsj": "19:34:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "梓潼",
+                    "ddsj": "19:41:00",
+                    "cfsj": "19:41:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "会龙",
+                    "ddsj": "19:48:00",
+                    "cfsj": "19:48:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "仓山镇",
+                    "ddsj": "19:54:00",
+                    "cfsj": "19:54:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "骑龙",
+                    "ddsj": "19:59:00",
+                    "cfsj": "19:59:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "玉峰",
+                    "ddsj": "20:04:00",
+                    "cfsj": "20:04:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "大英",
+                    "ddsj": "20:14:00",
+                    "cfsj": "20:23:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "星光",
+                    "ddsj": "20:34:00",
+                    "cfsj": "20:34:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁西",
+                    "ddsj": "20:43:00",
+                    "cfsj": "20:43:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁",
+                    "ddsj": "20:56:00",
+                    "cfsj": "21:10:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "成都",
+            "zdz": "汉口",
+            "shown": true,
+            "localFirst": "龙潭寺",
+            "localLast": "遂宁",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "龙潭寺",
+                    "end": "遂宁",
+                    "down": false,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": null
+        },
+        {
+            "checi": [
+                "K4293",
+                "K4293",
+                ""
+            ],
+            "UI": {},
+            "type": "快速",
+            "timetable": [
+                {
+                    "zhanming": "遂宁",
+                    "ddsj": "07:02:00",
+                    "cfsj": "07:12:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "遂宁西",
+                    "ddsj": "07:25:00",
+                    "cfsj": "07:25:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "星光",
+                    "ddsj": "07:34:00",
+                    "cfsj": "07:34:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "大英",
+                    "ddsj": "07:45:00",
+                    "cfsj": "07:53:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "玉峰",
+                    "ddsj": "08:05:00",
+                    "cfsj": "08:06:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "骑龙",
+                    "ddsj": "08:14:00",
+                    "cfsj": "08:15:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "仓山镇",
+                    "ddsj": "08:23:00",
+                    "cfsj": "08:24:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "会龙",
+                    "ddsj": "08:33:00",
+                    "cfsj": "08:34:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "梓潼",
+                    "ddsj": "08:44:00",
+                    "cfsj": "08:59:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "积金",
+                    "ddsj": "09:10:00",
+                    "cfsj": "09:27:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "转龙",
+                    "ddsj": "09:37:00",
+                    "cfsj": "09:47:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "隆盛",
+                    "ddsj": "09:57:00",
+                    "cfsj": "09:57:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "高板",
+                    "ddsj": "10:04:00",
+                    "cfsj": "10:12:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "淮口",
+                    "ddsj": "10:20:00",
+                    "cfsj": "10:30:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "道观音",
+                    "ddsj": "10:40:00",
+                    "cfsj": "10:59:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "温家店",
+                    "ddsj": "11:11:00",
+                    "cfsj": "11:11:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "金堂",
+                    "ddsj": "11:14:00",
+                    "cfsj": "11:14:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "城厢",
+                    "ddsj": "11:25:00",
+                    "cfsj": "12:10:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都北",
+                    "ddsj": "12:26:00",
+                    "cfsj": "13:22:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "龙潭寺",
+                    "ddsj": "13:31:00",
+                    "cfsj": "13:31:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "保平线路所",
+                    "ddsj": "13:34:00",
+                    "cfsj": "13:34:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "八里",
+                    "ddsj": "13:37:00",
+                    "cfsj": "13:37:00",
+                    "note": "",
+                    "track": ""
+                },
+                {
+                    "zhanming": "成都",
+                    "ddsj": "13:42:00",
+                    "cfsj": "13:42:00",
+                    "note": "",
+                    "track": ""
+                }
+            ],
+            "sfz": "北京西",
+            "zdz": "成都",
+            "shown": true,
+            "localFirst": "遂宁",
+            "localLast": "龙潭寺",
+            "autoItem": true,
+            "itemInfo": [
+                {
+                    "start": "遂宁",
+                    "end": "龙潭寺",
+                    "down": true,
+                    "show_start_label": true,
+                    "show_end_label": true
+                }
+            ],
+            "passenger": true,
+            "carriageCircuit": "K4293-4"
+        }
+    ],
+    "circuits": [
+        {
+            "name": "K4293-4",
+            "note": "25G型DC600V",
+            "model": "",
+            "owner": "",
+            "order": [
+                {
+                    "checi": "K4293",
+                    "start": "遂宁",
+                    "end": "龙潭寺",
+                    "link": true,
+                    "virtual": false
+                },
+                {
+                    "checi": "K4294",
+                    "start": "龙潭寺",
+                    "end": "遂宁",
+                    "link": true,
+                    "virtual": false
+                }
+            ]
+        },
+        {
+            "name": "K4707-8",
+            "note": "广铁绿皮",
+            "model": "",
+            "owner": "",
+            "order": [
+                {
+                    "checi": "K4706/7",
+                    "start": "遂宁",
+                    "end": "龙潭寺",
+                    "link": true,
+                    "virtual": false
+                },
+                {
+                    "checi": "K4708/5",
+                    "start": "龙潭寺",
+                    "end": "遂宁",
+                    "link": true,
+                    "virtual": false
+                }
+            ]
+        }
+    ],
+    "config": {
+        "seconds_per_pix": 20.0,
+        "seconds_per_pix_y": 8.0,
+        "pixes_per_km": 4.0,
+        "grid_color": "#00FF00",
+        "text_color": "#0000FF",
+        "default_keche_width": 1.5,
+        "default_huoche_width": 0.75,
+        "start_hour": 6,
+        "end_hour": 3,
+        "ordinate": "快速*K4293",
+        "minutes_per_vertical_line": 10.0,
+        "bold_line_level": 2,
+        "show_line_in_station": true,
+        "not_show_types": [],
+        "default_colors": {
+            "快速": "#FF0000",
+            "特快": "#0000FF",
+            "直达特快": "#FF00FF",
+            "动车组": "#804000",
+            "动车": "#804000",
+            "高速": "#FF00BE",
+            "城际": "#FF33CC",
+            "default": "#008000"
+        },
+        "last_file": "D:/Python/train_graph/source/成渝线成石段20190125.json",
+        "default_file": "京沪线徐沪段.json",
+        "showFullCheci": false,
+        "start_label_height": 30,
+        "end_label_height": 15,
+        "table_row_height": 30,
+        "show_time_mark": 1,
+        "max_passed_stations": 3,
+        "margins": {
+            "left_white": 15,
+            "right_white": 10,
+            "left": 325,
+            "up": 90,
+            "down": 90,
+            "right": 170,
+            "label_width": 100,
+            "mile_label_width": 50,
+            "ruler_label_width": 100
+        },
+        "type_regex": [
+            [
+                "高速",
+                "G\\d+",
+                true
+            ],
+            [
+                "动车组",
+                "D\\d+",
+                true
+            ],
+            [
+                "城际",
+                "C\\d+",
+                true
+            ],
+            [
+                "直达特快",
+                "Z\\d+",
+                true
+            ],
+            [
+                "特快",
+                "T\\d+",
+                true
+            ],
+            [
+                "快速",
+                "K\\d+",
+                true
+            ],
+            [
+                "普快",
+                "[1-5]\\d{3}",
+                true
+            ],
+            [
+                "普客",
+                "6\\d{3}",
+                true
+            ],
+            [
+                "普客",
+                "7[1-5]\\d{2}",
+                true
+            ],
+            [
+                "通勤",
+                "7\\d{3}",
+                true
+            ],
+            [
+                "通勤",
+                "8\\d{3}",
+                true
+            ],
+            [
+                "旅游",
+                "Y\\d+",
+                true
+            ],
+            [
+                "路用",
+                "57\\d+",
+                true
+            ],
+            [
+                "特快行包",
+                "X1\\d{2}",
+                true
+            ],
+            [
+                "动检",
+                "DJ\\d+",
+                true
+            ],
+            [
+                "客车底",
+                "0[GDCZTKY]\\d+",
+                true
+            ],
+            [
+                "临客",
+                "L\\d+",
+                true
+            ],
+            [
+                "客车底",
+                "0\\d{4}",
+                true
+            ],
+            [
+                "行包",
+                "X\\d{3}",
+                false
+            ],
+            [
+                "班列",
+                "X\\d{4}",
+                false
+            ],
+            [
+                "直达",
+                "1\\d{4}",
+                false
+            ],
+            [
+                "直货",
+                "2\\d{4}",
+                false
+            ],
+            [
+                "区段",
+                "3\\d{4}",
+                false
+            ],
+            [
+                "摘挂",
+                "4[0-4]\\d{3}",
+                false
+            ],
+            [
+                "小运转",
+                "4[5-9]\\d{3}",
+                false
+            ],
+            [
+                "单机",
+                "5[0-2]\\d{3}",
+                false
+            ],
+            [
+                "补机",
+                "5[3-4]\\d{3}",
+                false
+            ],
+            [
+                "试运转",
+                "55\\d{3}",
+                false
+            ]
+        ],
+        "default_grid_width": 1,
+        "bold_grid_width": 2.5,
+        "valid_width": 3,
+        "auto_paint": true,
+        "link_line_height": 10,
+        "default_db_file": "D:/Python/train_graph/linesNew.pyetlib",
+        "minute_mark_gap_pix": 200,
+        "avoid_cover": true,
+        "base_label_height": 15,
+        "step_label_height": 20,
+        "end_label_checi": true
+    },
+    "version": "V3.3.3",
+    "markdown": "2019.1.25爬取图定运行图。\n1.28 爬取数据增加K4293。"
+}

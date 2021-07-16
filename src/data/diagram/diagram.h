@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QString>
 #include <QStringView>
+#include <map>
 #include "config.h"
 #include "data/train/traincollection.h"
 #include "data/train/traintype.h"
@@ -241,9 +242,15 @@ public:
      */
     void rebindAllTrains();
 
+    std::map<std::shared_ptr<RailInterval>, int>
+        sectionTrainCount(std::shared_ptr<Railway> railway)const;
+
 private:
     void bindAllTrains();
     QString validPageName(const QString& prefix)const;
+
+    void sectionTrainCount(std::map<std::shared_ptr<RailInterval>, int>& res,
+        std::shared_ptr<TrainLine> line)const;
 };
 
 

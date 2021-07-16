@@ -234,6 +234,19 @@ void Diagram::rebindAllTrains()
     }
 }
 
+std::map<std::shared_ptr<RailInterval>, int> Diagram::sectionTrainCount(std::shared_ptr<Railway> railway) const
+{
+    std::map<std::shared_ptr<RailInterval>, int> res;
+    for (auto train : _trainCollection.trains()) {
+        for (auto adp : train->adapters()) {
+            if(&(adp->railway())==railway.get())
+                for(auto line:adp->lines())
+                    sectionTrainCount(res, line);
+        }
+    }
+    return res;
+}
+
 void Diagram::bindAllTrains()
 {
     for (auto p : railways()) {
@@ -250,6 +263,26 @@ QString Diagram::validPageName(const QString& prefix) const
         if (!pageNameExisted(name))
             return name;
     }
+}
+
+void Diagram::sectionTrainCount(std::map<std::shared_ptr<RailInterval>, int>& res, 
+    std::shared_ptr<TrainLine> line) const
+{
+    auto startst = line->firstRailStation();
+    auto endst = line->lastRailStation();
+    auto inter = startst->dirNextInterval(line->dir());
+    for (; inter && inter->toStation() != endst; inter = inter->nextInterval()) {
+        ++res[inter];
+    }
+    if (inter) {
+        //这是最后一个区间
+        ++res[inter];
+    }
+    else {
+        qDebug() << "Diagram::sectionTrainCount: WARNING: unexpected non-ended interval: "
+            << line->train()->trainName().full() << ", " << endst->name;
+    }
+        
 }
 
 
