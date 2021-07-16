@@ -312,13 +312,13 @@ void MainWindow::initDockWidgets()
             naviModel, SLOT(onTrainDataChanged(const QModelIndex&, const QModelIndex&)));
         connect(tw, &TrainListWidget::addNewTrain, naviView, &NaviTree::actAddTrain);
 
-        connect(naviModel, &QAbstractItemModel::rowsAboutToBeInserted,
+        connect(naviModel, &DiagramNaviModel::trainRowsAboutToBeInserted,
             tw->getModel(), &TrainListModel::onBeginInsertRows);
-        connect(naviModel, &QAbstractItemModel::rowsInserted,
+        connect(naviModel, &DiagramNaviModel::trainRowsInserted,
             tw->getModel(), &TrainListModel::onEndInsertRows);
-        connect(naviModel, &QAbstractItemModel::rowsAboutToBeRemoved,
+        connect(naviModel, &DiagramNaviModel::trainRowsAboutToBeRemoved,
             tw->getModel(), &TrainListModel::onBeginRemoveRows);
-        connect(naviModel, &QAbstractItemModel::rowsRemoved,
+        connect(naviModel, &DiagramNaviModel::trainRowsRemoved,
             tw->getModel(), &TrainListModel::onEndRemoveRows);
     }
 
@@ -650,6 +650,7 @@ void MainWindow::actNewGraph()
         return;
     clearDiagram();
     _diagram.setFilename("");
+    endResetGraph();
 }
 
 void MainWindow::endResetGraph()
@@ -666,7 +667,7 @@ void MainWindow::endResetGraph()
 
 void MainWindow::resetDiagramPages()
 {
-    if (_diagram.pages().empty())
+    if (_diagram.pages().empty()&&!_diagram.isNull())
         _diagram.createDefaultPage();
     for (auto p : _diagram.pages()) {
         addPageWidget(p);
@@ -678,6 +679,7 @@ bool MainWindow::openGraph(const QString& filename)
     clearDiagramUnchecked();
 
     Diagram dia;
+    dia.readDefaultConfigs();   //暂定这里读取一次默认配置，防止move时丢失数据
     bool flag = dia.fromJson(filename);
 
     if (flag && !dia.isNull()) {
@@ -740,7 +742,8 @@ void MainWindow::closeEvent(QCloseEvent* e)
 {
     if (changed && !saveQuestion())
         e->ignore();
-    e->accept();
+    else
+        e->accept();
 }
 
 //void MainWindow::informTrainListChanged()
@@ -973,7 +976,6 @@ void MainWindow::focusInPage(std::shared_ptr<DiagramPage> page)
 
 void MainWindow::focusOutPage()
 {
-    auto* cont = contextPage->context();
     ribbonBar()->hideContextCategory(contextPage->context());
 }
 

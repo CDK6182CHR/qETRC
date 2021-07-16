@@ -38,7 +38,7 @@ void TypeManager::readForDiagram(const QJsonObject& obj, const TypeManager& defa
 	_types.clear();
 	_regs.clear();
 	bool flag = fromJson(obj);
-	if (!flag) {
+	if (!flag||isNull()) {
 		qDebug() << "TypeManager::readForDiagram: WARNING: load type configuration for Diagram failed."
 			<< " Default TypeManager will be used. " << Qt::endl;
 		operator=(defaultManager);
@@ -134,7 +134,7 @@ bool TypeManager::fromJson(const QJsonObject& obj)
 		_types.insert(defaultType->name(), defaultType);
 	}
 
-	return true;
+	return _types.size() > 1;
 }
 
 void TypeManager::initDefaultTypes()

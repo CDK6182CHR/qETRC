@@ -73,6 +73,15 @@ signals:
 
     void undoneAddTrain(std::shared_ptr<Train> train);
 
+    /**
+     * 一组QAbstractItemModel风格的signals，专用于通告列车插入
+     * 如果直接连接默认的信号，则无法分辨是列车还是基线等的插入
+     */
+    void trainRowsAboutToBeInserted(int start, int end);
+    void trainRowsInserted(int start,int end);
+    void trainRowsAboutToBeRemoved(int start, int end);
+    void trainRowsRemoved(int start, int end);
+
 public slots:
     void resetTrainList();
     //void resetRailwayList();

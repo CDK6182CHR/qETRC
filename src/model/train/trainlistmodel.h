@@ -92,16 +92,14 @@ public slots:
     /**
      * 这几个slot用来接收navitree那边删除单个列车的信号
      */
-    void onBeginRemoveRows(const QModelIndex& parent, int start, int end) {
-        Q_UNUSED(parent);
+    void onBeginRemoveRows(int start, int end) {
         beginRemoveRows({}, start, end);
     }
     void onEndRemoveRows() {
         endRemoveRows();
     }
 
-    void onBeginInsertRows(const QModelIndex& parent, int start, int end) {
-        Q_UNUSED(parent);
+    void onBeginInsertRows(int start, int end) {
         beginInsertRows({}, start, end);
     }
     void onEndInsertRows() {

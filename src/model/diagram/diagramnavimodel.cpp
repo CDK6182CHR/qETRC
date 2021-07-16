@@ -201,9 +201,11 @@ void DiagramNaviModel::commitAddTrain(std::shared_ptr<Train> train)
     auto* item = static_cast<navi::TrainListItem*>(par.internalPointer());
     int r = _diagram.trainCollection().trainCount();
     beginInsertRows(par, r, r);
+    emit trainRowsAboutToBeInserted(r, r);
     item->addNewTrain(train);
     endInsertRows();
     emit newTrainAdded(train);
+    emit trainRowsInserted(r, r);
 }
 
 void DiagramNaviModel::undoAddTrain()
@@ -213,9 +215,11 @@ void DiagramNaviModel::undoAddTrain()
     int r = _diagram.trainCollection().trainCount() - 1;
     auto t = _diagram.trainCollection().trains().last();
     beginRemoveRows(par, r, r);
+    emit trainRowsAboutToBeRemoved(r, r);
     item->undoAddNewTrain();
     endRemoveRows();
     emit undoneAddTrain(t);
+    emit trainRowsRemoved(r, r);
 }
 
 void DiagramNaviModel::onTrainDataChanged(const QModelIndex& topleft, const QModelIndex& botright)
@@ -231,9 +235,11 @@ void DiagramNaviModel::commitRemoveSingleTrain(int i)
     auto train = diagram().trainCollection().trainAt(i);
     auto* item = static_cast<navi::TrainListItem*>(par.internalPointer());
     beginRemoveRows(par, i, i);
+    emit trainRowsAboutToBeRemoved(i, i);
     item->removeTrainAt(i);
     endRemoveRows();
     emit trainRemoved(train);
+    emit trainRowsRemoved(i, i);
 }
 
 void DiagramNaviModel::undoRemoveSingleTrain(int i, std::shared_ptr<Train> train)
@@ -241,9 +247,11 @@ void DiagramNaviModel::undoRemoveSingleTrain(int i, std::shared_ptr<Train> train
     QModelIndex par = index(navi::DiagramItem::RowTrains, 0);
     auto* item = static_cast<navi::TrainListItem*>(par.internalPointer());
     beginInsertRows(par, i, i);
+    emit trainRowsAboutToBeInserted(i, i);
     item->undoRemoveTrainAt(train, i);
     endInsertRows();
     emit undoneTrainRemove(train);
+    emit trainRowsInserted(i, i);
 }
 
 void DiagramNaviModel::removeRailwayAt(int i)

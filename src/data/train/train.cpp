@@ -57,7 +57,7 @@ void Train::fromJson(const QJsonObject &obj, TypeManager& manager)
     if(valpass.isBool())
         _passenger = static_cast<TrainPassenger>(obj.value("passenger").toBool());
     else
-        _passenger = static_cast<TrainPassenger>(obj.value("passenger").toInt());
+        _passenger = static_cast<TrainPassenger>(obj.value("passenger").toInt(1));
     const QJsonArray& artable=obj.value("timetable").toArray();
     _autoLines = obj.value("autoItem").toBool(true);
 

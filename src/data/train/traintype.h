@@ -122,6 +122,8 @@ public:
      */
     std::shared_ptr<TrainType> find(const QString& name)const { return _types.value(name); }
 
+    inline bool isNull()const { return _types.isEmpty(); }
+
 private:
     /**
      * 输入格式是pyETRC的config.json或者graph中config对象
