@@ -43,7 +43,7 @@ public:
     inline std::shared_ptr<_Node> firstDownNode(){
         auto t=railway().firstDownInterval();
         if(t){
-            return t->getDataAt<_Node>(_index);
+            return t->template getDataAt<_Node>(_index);
         }else{
             return std::shared_ptr<_Node>();
         }
@@ -51,7 +51,7 @@ public:
     inline std::shared_ptr<const _Node> firstDownNode()const{
         auto t= railway().firstDownInterval();
         if(t){
-            return t->getDataAt<_Node>(_index);
+            return t->template getDataAt<_Node>(_index);
         }else{
             return std::shared_ptr<_Node>();
         }
@@ -59,7 +59,7 @@ public:
     inline std::shared_ptr<_Node> firstUpNode(){
         auto t= railway().firstUpInterval();
         if(t){
-            return t->getDataAt<_Node>(_index);
+            return t->template getDataAt<_Node>(_index);
         }else{
             return std::shared_ptr<_Node>();
         }
@@ -67,7 +67,7 @@ public:
     inline std::shared_ptr<const _Node> firstUpNode()const{
         auto t= railway().firstUpInterval();
         if(t){
-            return t->getDataAt<_Node>(_index);
+            return t->template getDataAt<_Node>(_index);
         }else{
             return std::shared_ptr<_Node>();
         }
@@ -95,7 +95,7 @@ public:
             t= railway().findInterval(to,from);
         }
         if(t)
-            return t->getDataAt<_Node>(_index);
+            return t->template getDataAt<_Node>(_index);
         else
             return std::shared_ptr<_Node>();
     }
@@ -107,7 +107,7 @@ public:
             t= railway().findInterval(to,from);
         }
         if(t)
-            return t->getDataAt<_Node>(_index);
+            return t->template getDataAt<_Node>(_index);
         else
             return std::shared_ptr<_Node>();
     }

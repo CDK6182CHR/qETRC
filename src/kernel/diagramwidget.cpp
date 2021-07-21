@@ -5,16 +5,19 @@
 #include <QPainter>
 #include <Qt>
 #include <QGraphicsScene>
-#include <QScrollbar>
+#include <QScrollBar>
 #include <QList>
 #include <QPair>
 #include <QMouseEvent>
 #include <cmath>
-#include <QPrinter>
 #include <QMessageBox>
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QTextBrowser>
+
+#ifdef _Q_OS_WIN32
+#include <QPrinter>
+#endif
 
 #include "mainwindow/version.h"
 
@@ -124,6 +127,14 @@ void DiagramWidget::clearGraph()
 
 bool DiagramWidget::toPdf(const QString& filename, const QString& title, const QString& note)
 {
+#ifndef _Q_OS_WIN32
+    Q_UNUSED(filename);
+    Q_UNUSED(title);
+    Q_UNUSED(note)
+    QMessageBox::warning(this,tr("错误"),tr("由于当前平台不支持QtPrintSupport, "
+        "无法使用导出PDF功能"));
+    return false;
+#else
     marginItems.left->setX(0);
     marginItems.right->setX(0);
     marginItems.top->setY(0);
@@ -173,6 +184,7 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
     updateDistanceAxis();
     updateTimeAxis();
     return true;
+#endif
 }
 
 void DiagramWidget::removeTrain(Train& train)

@@ -100,6 +100,16 @@ void RailContext::initUI()
 	btn->setMinimumWidth(70);
 	connect(act, SIGNAL(triggered()), this, SLOT(actRemoveRailway()));
 
+	panel = page->addPannel(tr("标尺"));
+	act = new QAction(QIcon(":icons/ruler.png"), tr("标尺"), this);
+	auto* me = new SARibbonMenu;
+	act->setToolTip(tr("标尺编辑\n创建或者导航到本线标尺编辑的面板"));
+	meRulerWidgets = me;
+	act->setMenu(me);
+	connect(act, SIGNAL(triggered()), this, SLOT(actSelectRuler()));
+	btn = panel->addLargeAction(act);
+	btn->setMinimumWidth(70);
+
 	panel = page->addPannel(tr("分析"));
 
 	act = new QAction(QIcon(":/icons/counter.png"), tr("断面对数"), this);
@@ -145,6 +155,30 @@ void RailContext::actChangeOrdinate(int i)
 		cbRulers->setCurrentIndex(oldindex + 1);
 	}
 	updating = false;
+}
+
+void RailContext::actSelectRuler()
+{
+	if (!railway)return;
+	QStringList lst;
+	for (auto ruler : railway->rulers()) {
+		lst << ruler->name();
+	}
+	if (lst.isEmpty()) {
+		QMessageBox::warning(mw, tr("编辑标尺"), tr("当前线路尚无标尺，请先添加标尺。"));
+	}
+	bool ok;
+	QString res = QInputDialog::getItem(mw, tr("编辑标尺"), tr("请选择要导航到的标尺"), lst,
+		0, false, &ok);
+	if (!ok)return;
+	auto ruler = railway->rulerByName(res);
+	emit selectRuler(ruler);   //这个用来告诉main，focusInRuler
+	openRulerWidget(ruler);
+}
+
+void RailContext::openRulerWidget(std::shared_ptr<Ruler> ruler)
+{
+	//创建dock...
 }
 
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)

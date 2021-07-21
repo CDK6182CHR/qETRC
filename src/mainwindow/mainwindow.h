@@ -26,6 +26,7 @@
 #include "railcontext.h"
 #include "viewcategory.h"
 #include "pagecontext.h"
+#include "rulercontext.h"
 
 /**
  * @brief The MainWindow class
@@ -51,6 +52,7 @@ class MainWindow : public SARibbonMainWindow
     PageContext* contextPage;
     TrainContext* contextTrain;
     RailContext* contextRail;
+    RulerContext* contextRuler;
     ViewCategory* catView;
 
     QSpinBox* spPassedStations;
@@ -223,6 +225,8 @@ private slots:
     void focusOutTrain();
     void focusInRailway(std::shared_ptr<Railway> rail);
     void focusOutRailway();
+    void focusInRuler(std::shared_ptr<Ruler> ruler);
+    void focusOutRuler();
 
     void undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains);
     void redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains);

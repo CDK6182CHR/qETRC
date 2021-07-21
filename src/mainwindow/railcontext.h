@@ -4,6 +4,7 @@
 #include <QUndoCommand>
 #include <SARibbonLineEdit.h>
 #include <SARibbonComboBox.h>
+#include <SARibbonMenu.h>
 #include "SARibbonContextCategory.h"
 #include "data/rail/rail.h"
 #include "data/diagram/diagram.h"
@@ -23,6 +24,8 @@ class RailContext : public QObject
     SARibbonLineEdit* edName;
     SARibbonComboBox* cbRulers;
     bool updating = false;
+
+    SARibbonMenu* meRulerWidgets;
 public:
     explicit RailContext(Diagram& diagram_, SARibbonContextCategory* context,
         MainWindow* mw_,
@@ -46,6 +49,7 @@ private:
 signals:
     void railNameChanged(std::shared_ptr<Railway> rail);
     void stationTableChanged(std::shared_ptr<Railway> rail, bool equiv);
+    void selectRuler(std::shared_ptr<Ruler> ruler);
 
 private slots:
     void actOpenStationWidget();
@@ -56,6 +60,14 @@ private slots:
      * 压栈cmd
      */
     void actChangeOrdinate(int i);
+
+    /**
+     * 工具栏触发，编辑指定的标尺
+     */
+    void actSelectRuler();
+
+    void openRulerWidget(std::shared_ptr<Ruler> ruler);
+
 
 public slots:
     void actChangeRailName(std::shared_ptr<Railway> rail, const QString& name);

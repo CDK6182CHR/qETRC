@@ -68,6 +68,27 @@ public:
         }
     }
 
+    /**
+     * 仅在different时才循环的版本
+     */
+    inline std::shared_ptr<_Node> nextNodeDiffCirc(){
+        auto t=nextNode();
+        if(!t&&isDownInterval()&&_data.different()){
+            return _data.firstUpNode();
+        }else{
+            return t;
+        }
+    }
+
+    inline std::shared_ptr<const _Node> nextNodeDiffCirc()const{
+        auto t=nextNode();
+        if(!t&&isDownInterval()&&_data.different()){
+            return _data.firstUpNode();
+        }else{
+            return t;
+        }
+    }
+
     inline bool isDownInterval()const{
         return _railint.isDown();
     }

@@ -1,4 +1,5 @@
-QT       += core gui printsupport
+QT       += core gui
+qtHaveModule(printsupport): QT += printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -40,6 +41,7 @@ SOURCES += \
     src/editors/basictrainwidget.cpp \
     src/editors/configdialog.cpp \
     src/editors/railstationwidget.cpp \
+    src/editors/ruler/rulertabpy.cpp \
     src/editors/trainlistwidget.cpp \
     src/kernel/diagramwidget.cpp \
     src/kernel/trainitem.cpp \
@@ -47,6 +49,7 @@ SOURCES += \
     src/mainwindow/mainwindow.cpp \
     src/mainwindow/pagecontext.cpp \
     src/mainwindow/railcontext.cpp \
+    src/mainwindow/rulercontext.cpp \
     src/mainwindow/traincontext.cpp \
     src/mainwindow/viewcategory.cpp \
     src/model/delegate/combodelegate.cpp \
@@ -55,6 +58,7 @@ SOURCES += \
     src/model/diagram/railtablemodel.cpp \
     src/model/general/qemoveablemodel.cpp \
     src/model/rail/railstationmodel.cpp \
+    src/model/rail/rulermodel.cpp \
     src/model/train/timetablestdmodel.cpp \
     src/model/train/trainlistmodel.cpp \
     src/navi/addpagedialog.cpp \
@@ -96,12 +100,14 @@ HEADERS += \
     src/editors/basictrainwidget.h \
     src/editors/configdialog.h \
     src/editors/railstationwidget.h \
+    src/editors/ruler/rulertabpy.h \
     src/editors/trainlistwidget.h \
     src/kernel/diagramwidget.h \
     src/kernel/trainitem.h \
     src/mainwindow/mainwindow.h \
     src/mainwindow/pagecontext.h \
     src/mainwindow/railcontext.h \
+    src/mainwindow/rulercontext.h \
     src/mainwindow/traincontext.h \
     src/mainwindow/version.h \
     src/mainwindow/viewcategory.h \
@@ -112,6 +118,7 @@ HEADERS += \
     src/model/diagram/railtablemodel.h \
     src/model/general/qemoveablemodel.h \
     src/model/rail/railstationmodel.h \
+    src/model/rail/rulermodel.h \
     src/model/train/timetablestdmodel.h \
     src/model/train/trainlistmodel.h \
     src/navi/addpagedialog.h \

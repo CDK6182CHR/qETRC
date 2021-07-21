@@ -13,6 +13,30 @@ TrainEventModel::TrainEventModel(std::shared_ptr<Train> train_, Diagram& diagram
 	setupModel();
 }
 
+bool TrainEventModel::exportToCsv(const QString& filename)
+{
+	QFile file(filename);
+	file.open(QFile::WriteOnly);
+	if (!file.isOpen())return false;
+	QTextStream s(&file);
+
+	//标题
+	for (int i = 0; i < ColMAX; i++) {
+		s << horizontalHeaderItem(i)->text() << ",";
+	}
+	s << Qt::endl;
+
+	//内容
+	for (int i = 0; i < rowCount(); i++) {
+		for (int j = 0; j < ColMAX; j++) {
+			s << item(i, j)->text() << ",";
+		}
+		s << Qt::endl;
+	}
+	file.close();
+	return true;
+}
+
 void TrainEventModel::setupModel()
 {
 	using SI = QStandardItem;
@@ -110,10 +134,10 @@ void TrainEventDialog::initUI()
 	connect(table->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
 		table, SLOT(sortByColumn(int, Qt::SortOrder)));
 
-    auto* g = new ButtonGroup<4>({ "ETRC风格","导出表格","导出文本","关闭" });
+    auto* g = new ButtonGroup<5>({ "ETRC风格","导出Excel","导出CSV", "导出文本","关闭" });
 	vlay->addLayout(g);
 	g->connectAll(SIGNAL(clicked()), this, {
-		SLOT(exportETRC()),SLOT(exportExcel()),SLOT(exportText()),SLOT(close())
+		SLOT(exportETRC()),SLOT(exportExcel()),SLOT(exportCsv()), SLOT(exportText()),SLOT(close())
 		});
 
 	setLayout(vlay);
@@ -139,6 +163,24 @@ void TrainEventDialog::exportText()
 
 void TrainEventDialog::exportExcel()
 {
+	QMessageBox::warning(this, tr("提示"), tr("导出Excel功能尚未实现。可以使用导出csv功能。"));
+}
+
+void TrainEventDialog::exportCsv()
+{
+	QString f0 = tr("%1列车事件表").arg(train->trainName().full());
+	f0.replace('/', ',');
+	QString fn = QFileDialog::getSaveFileName(this, tr("导出列车事件表"), f0,
+		tr("逗号分隔文件 (*.csv)\n 所有文件 (*)"));
+	if (fn.isEmpty())return;
+	bool flag = model->exportToCsv(fn);
+	if (flag) {
+		QMessageBox::information(this, tr("提示"), tr("导出CSV文件成功"));
+	}
+	else {
+		QMessageBox::warning(this, tr("提示"), tr("导出CSV文件失败"));
+	}
+
 }
 
 void TrainEventDialog::exportETRC()

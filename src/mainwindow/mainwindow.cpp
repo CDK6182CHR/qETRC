@@ -567,6 +567,14 @@ void MainWindow::initToolbar()
             naviModel, &DiagramNaviModel::onRailNameChanged);
         connect(contextRail, &RailContext::stationTableChanged,
             this, &MainWindow::onStationTableChanged);
+        connect(contextRail, &RailContext::selectRuler,
+            this, &MainWindow::focusInRuler);
+    }
+
+    //context: ruler
+    if constexpr (true) {
+        auto* cat = ribbon->addContextCategory(tr("当前标尺"));
+        contextRuler = new RulerContext(_diagram, cat, this);
     }
 
     //ApplicationMenu的初始化放在最后，因为可能用到前面的..
@@ -999,6 +1007,17 @@ void MainWindow::focusInRailway(std::shared_ptr<Railway> rail)
 void MainWindow::focusOutRailway()
 {
     ribbonBar()->hideContextCategory(contextRail->context());
+}
+
+void MainWindow::focusInRuler(std::shared_ptr<Ruler> ruler)
+{
+    contextRuler->setRuler(ruler);
+    ribbonBar()->showContextCategory(contextRuler->context());
+}
+
+void MainWindow::focusOutRuler()
+{
+    ribbonBar()->hideContextCategory(contextRuler->context());
 }
 
 

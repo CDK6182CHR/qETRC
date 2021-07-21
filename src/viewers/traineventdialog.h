@@ -42,6 +42,8 @@ public:
 
     const QString& etrc()const{return etrcReport;}
 
+    bool exportToCsv(const QString& filename);
+
 private:
     void setupModel();
     void setStationRow(int row, std::shared_ptr<TrainAdapter> adp, const StationEvent& e);
@@ -68,5 +70,6 @@ private slots:
     void exportETRC();
     void exportText();
     void exportExcel();
+    void exportCsv();
 };
 

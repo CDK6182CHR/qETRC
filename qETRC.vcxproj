@@ -203,6 +203,7 @@
     <ClCompile Include="src\mainwindow\mainwindow.cpp" />
     <ClCompile Include="src\mainwindow\pagecontext.cpp" />
     <ClCompile Include="src\mainwindow\railcontext.cpp" />
+    <ClCompile Include="src\mainwindow\rulercontext.cpp" />
     <ClCompile Include="src\mainwindow\traincontext.cpp" />
     <ClCompile Include="src\mainwindow\viewcategory.cpp" />
     <ClCompile Include="src\model\delegate\combodelegate.cpp" />
@@ -230,6 +231,7 @@
     <ClCompile Include="src\model\diagram\railtablemodel.cpp" />
     <ClCompile Include="src\model\general\qemoveablemodel.cpp" />
     <ClCompile Include="src\model\rail\railstationmodel.cpp" />
+    <ClCompile Include="src\model\rail\rulermodel.cpp" />
     <ClCompile Include="src\model\train\timetablestdmodel.cpp" />
     <ClCompile Include="src\model\train\trainlistmodel.cpp" />
     <ClCompile Include="src\editors\trainlistwidget.cpp" />
@@ -258,6 +260,7 @@
     <QtMoc Include="src\dialogs\printdiagramdialog.h" />
     <ClInclude Include="src\data\rail\railcategory.h" />
     <QtMoc Include="src\editors\configdialog.h" />
+    <QtMoc Include="src\mainwindow\rulercontext.h" />
     <ClInclude Include="src\mainwindow\version.h" />
     <QtMoc Include="src\navi\navitree.h" />
     <QtMoc Include="src\model\diagram\railtablemodel.h" />
@@ -268,6 +271,7 @@
     <ClInclude Include="src\model\delegate\qedelegate.h" />
     <QtMoc Include="src\model\train\timetablestdmodel.h" />
     <QtMoc Include="src\model\general\qemoveablemodel.h" />
+    <QtMoc Include="src\model\rail\rulermodel.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <ClInclude Include="src\model\diagram\componentitems.h" />
     <ClInclude Include="src\data\diagram\config.h" />
