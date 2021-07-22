@@ -47,6 +47,19 @@ public:
                       std::shared_ptr<RailStation> to,
                       Direction _dir)const;
 
+    bool isOrdinateRuler()const;
+
+    /**
+     * 注意签名。
+     * 返回一个新建的Railway对象，只包含基线数据和当前标尺数据。
+     */
+    std::shared_ptr<Railway> clone()const;
+
+    /**
+     * 交换数据（但不交换对Railway的引用以及index）
+     */
+    void swap(Ruler& other);
+
 
 };
 

@@ -358,6 +358,8 @@ public:
      */
     std::shared_ptr<Ruler> addRulerFrom(std::shared_ptr<Ruler> r);
 
+    std::shared_ptr<Ruler> addRulerFrom(const Ruler& r);
+
     /**
      * 替代Ruler的构造函数
      * 目前兼容pyETRC 3.3的文件，构造效率比较低
@@ -474,6 +476,11 @@ public:
      * precondition: 标尺、天窗的数目一致。
      */
     void swapBaseWith(Railway& other);
+
+    /**
+     * 生成一个新的对象，仅包含基线数据，不包括标尺
+     */
+    std::shared_ptr<Railway> cloneBase()const;
 
 private:
     /**

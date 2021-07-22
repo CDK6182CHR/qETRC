@@ -42,6 +42,7 @@ SOURCES += \
     src/editors/configdialog.cpp \
     src/editors/railstationwidget.cpp \
     src/editors/ruler/rulertabpy.cpp \
+    src/editors/ruler/rulerwidget.cpp \
     src/editors/trainlistwidget.cpp \
     src/kernel/diagramwidget.cpp \
     src/kernel/trainitem.cpp \
@@ -53,6 +54,7 @@ SOURCES += \
     src/mainwindow/traincontext.cpp \
     src/mainwindow/viewcategory.cpp \
     src/model/delegate/combodelegate.cpp \
+    src/model/delegate/postivespindelegate.cpp \
     src/model/diagram/componentitems.cpp \
     src/model/diagram/diagramnavimodel.cpp \
     src/model/diagram/railtablemodel.cpp \
@@ -101,6 +103,7 @@ HEADERS += \
     src/editors/configdialog.h \
     src/editors/railstationwidget.h \
     src/editors/ruler/rulertabpy.h \
+    src/editors/ruler/rulerwidget.h \
     src/editors/trainlistwidget.h \
     src/kernel/diagramwidget.h \
     src/kernel/trainitem.h \
@@ -112,6 +115,7 @@ HEADERS += \
     src/mainwindow/version.h \
     src/mainwindow/viewcategory.h \
     src/model/delegate/combodelegate.h \
+    src/model/delegate/postivespindelegate.h \
     src/model/delegate/qedelegate.h \
     src/model/diagram/componentitems.h \
     src/model/diagram/diagramnavimodel.h \
@@ -137,7 +141,10 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-QMAKE_CXXFLAGS += /utf-8
+msvc {
+    QMAKE_CXXFLAGS += /utf-8
+    QMAKE_CFLAGS += /utf-8
+}
 
 RESOURCES += \
     rsc/resource.qrc

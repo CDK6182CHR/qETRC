@@ -26,6 +26,29 @@ void RulerModel::refreshData()
 	setupModel();
 }
 
+std::shared_ptr<Railway> RulerModel::appliedRuler()
+{
+	auto res = ruler->clone();
+	auto nr = res->getRuler(0);
+	int row = 0;
+	for (auto p = nr->firstDownNode(); p; p = p->nextNodeDiffCirc(),row++) {
+		if (row >= rowCount()) {
+			qDebug() << "RulerModel::appliedRuler: WARNING: " <<
+				"number of rows FEWER than number of intervals. row=" <<
+				row << ", interval=" << p->railInterval();
+			break;
+		}
+		p->interval = rowIntervalSecs(row);
+		p->start = item(row, ColStart)->data(Qt::EditRole).toInt();
+		p->stop = item(row, ColStop)->data(Qt::EditRole).toInt();
+	}
+	if (row < rowCount()) {
+		qDebug() << "RulerModel::appliedRuler: WARNING: " <<
+			"number of rows MORE than number of intervals. row=" << row;
+	}
+	return res;
+}
+
 void RulerModel::setupModel()
 {
 	if (!ruler) {
@@ -47,6 +70,7 @@ void RulerModel::setupModel()
 			.arg(spliter).arg(railint.toStationNameLit());
 
 		auto* it = new SI(s);
+		it->setEditable(false);
 		setItem(row, ColInterval, it);
 
 		it = new SI;
@@ -86,6 +110,12 @@ void RulerModel::setupModel()
 	updating = false;
 }
 
+int RulerModel::rowIntervalSecs(int row) const
+{
+	return item(row, ColMinute)->data(Qt::EditRole).toInt() * 60 +
+		item(row, ColSeconds)->data(Qt::EditRole).toInt();
+}
+
 void RulerModel::actCancel()
 {
 	setupModel();
@@ -113,8 +143,5 @@ void RulerModel::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bo
 	}
 }
 
-void RulerModel::actApply()
-{
 
-}
 

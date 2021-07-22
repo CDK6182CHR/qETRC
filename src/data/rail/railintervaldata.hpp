@@ -40,6 +40,29 @@ public:
     inline int index()const{return _index;}
     inline bool different()const{return _different;}
 
+    /**
+     * 如果设置为false，将下行数据改换为相应反向区间的数据。
+     * precondition: 如果设置为false，则不存在上下行分设。
+     */
+    inline void setDifferent(bool d) {
+        if (_different && !d) {
+            for (auto p = _railway.get().firstUpInterval(); p; p = p->nextInterval()) {
+                auto pinv = p->inverseInterval();
+                if (pinv) {
+                    auto d = p->template getDataAt<_Node>(_index);
+                    auto dinv = pinv->template getDataAt<_Node>(_index);
+                    d->operator=(*dinv);
+                }
+                else {
+                    qDebug() << "RailIntervalData::setDifferent: WARNING: "
+                        << "Unexpected null inverse interval: " << *p << Qt::endl;
+                }
+            }
+        }
+        _different = d; 
+
+    }
+
     inline std::shared_ptr<_Node> firstDownNode(){
         auto t=railway().firstDownInterval();
         if(t){

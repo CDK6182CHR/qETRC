@@ -632,11 +632,16 @@ std::shared_ptr<Ruler> Railway::addEmptyRuler(const QString& name, bool differen
 
 std::shared_ptr<Ruler> Railway::addRulerFrom(std::shared_ptr<Ruler> r)
 {
+	return addRulerFrom(*r);
+}
+
+std::shared_ptr<Ruler> Railway::addRulerFrom(const Ruler& r)
+{
 	int idx = _rulers.count();
-	auto ruler = std::shared_ptr<Ruler>(new Ruler(*this, r->name(), r->different(), idx));
+	auto ruler = std::shared_ptr<Ruler>(new Ruler(*this, r.name(), r.different(), idx));
 	_rulers.append(ruler);
 	auto p = firstDownInterval();
-	auto n = r->firstDownNode();
+	auto n = r.firstDownNode();
 	for (; p && n; p = nextIntervalCirc(p), n = n->nextNodeCirc()) {
 		//qDebug() << "addRulerFrom: "<<*p<<'\t' << p->_rulerNodes.last().get() << " @ " << p.get();
 		p->_rulerNodes.append(std::make_shared<RulerNode>(*ruler, *p, n->interval, n->start, n->stop));
@@ -899,6 +904,15 @@ void Railway::swapBaseWith(Railway& other)
 		assert(&(_rulers.first()->_railway.get()) == this);
 		qDebug() << "Assertion of ruler railway passed.";
 	}
+}
+
+std::shared_ptr<Railway> Railway::cloneBase() const
+{
+	auto res = std::make_shared<Railway>();
+	for (auto p : _stations) {
+		res->appendStation(*p);
+	}
+	return res;
 }
 
 void Railway::addMapInfo(const std::shared_ptr<RailStation>& st)

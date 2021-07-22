@@ -100,6 +100,15 @@ void MainWindow::updateRailwayDiagrams(std::shared_ptr<Railway> rail)
     }
 }
 
+void MainWindow::updateRailwayDiagrams(Railway& rail)
+{
+    for (int i = 0; i < _diagram.pages().size(); i++) {
+        if (_diagram.pages().at(i)->containsRailway(rail)) {
+            diagramWidgets.at(i)->paintGraph();
+        }
+    }
+}
+
 void MainWindow::updateAllDiagrams()
 {
     for (auto p : diagramWidgets)
@@ -575,6 +584,8 @@ void MainWindow::initToolbar()
     if constexpr (true) {
         auto* cat = ribbon->addContextCategory(tr("当前标尺"));
         contextRuler = new RulerContext(_diagram, cat, this);
+        connect(contextRuler, SIGNAL(ordinateRulerModified(Railway&)),
+            this, SLOT(updateRailwayDiagrams(Railway&)));
     }
 
     //ApplicationMenu的初始化放在最后，因为可能用到前面的..

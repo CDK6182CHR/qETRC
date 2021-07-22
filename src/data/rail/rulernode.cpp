@@ -48,4 +48,11 @@ QString RulerNode::intervalString() const
         return QString::asprintf("%d:%02d", interval / 60, interval % 60);
 }
 
+void RulerNode::swap(RulerNode& other)
+{
+    std::swap(interval, other.interval);
+    std::swap(start, other.start);
+    std::swap(stop, other.stop);
+}
+
 

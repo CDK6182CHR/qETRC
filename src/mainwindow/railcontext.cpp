@@ -123,7 +123,17 @@ void RailContext::updateRailWidget(std::shared_ptr<Railway> rail)
 	for (auto p : mw->railStationWidgets) {
 		if (p->getRailway() == rail)
 			p->refreshData();
-	}
+    }
+}
+
+int RailContext::rulerWidgetIndex(std::shared_ptr<Ruler> ruler)
+{
+    for(int i=0;i<rulerWidgets.size();i++){
+        auto* w=rulerWidgets.at(i);
+        if(w->getRuler()==ruler)
+            return i;
+    }
+    return -1;
 }
 
 void RailContext::actChangeOrdinate(int i)
@@ -178,7 +188,30 @@ void RailContext::actSelectRuler()
 
 void RailContext::openRulerWidget(std::shared_ptr<Ruler> ruler)
 {
-	//创建dock...
+	int i = rulerWidgetIndex(ruler);
+	if (i == -1) {
+		//创建
+		auto* rw = new RulerWidget(ruler);
+		auto* dock = new ads::CDockWidget(tr("标尺编辑 - %1 - %2").arg(ruler->name())
+			.arg(ruler->railway().name()));
+		dock->setWidget(rw);
+		rulerWidgets.append(rw);
+		rulerDocks.append(dock);
+		connect(rw, &RulerWidget::actChangeRulerData, mw->getRulerContext(),
+			&RulerContext::actChangeRulerData);
+		connect(rw, &RulerWidget::focusInRuler, mw, &MainWindow::focusInRuler);
+		mw->getManager()->addDockWidgetFloating(dock);
+	}
+	else {
+		//显示
+		auto* dock = rulerDocks.at(i);
+		if (dock->isClosed()) {
+			dock->toggleView(true);
+		}
+		else {
+			dock->setAsCurrentTab();
+		}
+	}
 }
 
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
@@ -210,6 +243,14 @@ void RailContext::showSectionCount()
 	dialog->show();
 }
 
+void RailContext::refreshRulerTable(std::shared_ptr<Ruler> ruler)
+{
+	for (auto p : rulerWidgets) {
+		if (p->getRuler() == ruler)
+			p->refreshData();
+	}
+}
+
 void RailContext::setRailway(std::shared_ptr<Railway> rail)
 {
 	railway = rail;
@@ -237,6 +278,8 @@ void RailContext::actRemoveRailway()
 		}
 	}
 }
+
+
 
 void RailContext::actChangeRailName(std::shared_ptr<Railway> rail, const QString &name)
 {

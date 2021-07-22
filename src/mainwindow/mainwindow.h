@@ -97,6 +97,9 @@ public:
 
     auto* getUndoStack() { return undoStack; }
 
+    auto* getRulerContext() { return contextRuler; }
+    auto* getRailContext() { return contextRail; }
+
     /**
      * 列车信息变化，更新指定车次的所有运行线
      * adps: 旧的Adapter，用来做索引删除以前的运行线
@@ -244,6 +247,8 @@ private slots:
      * 更新所有包含指定线路的运行图。
      */
     void updateRailwayDiagrams(std::shared_ptr<Railway> rail);
+
+    void updateRailwayDiagrams(Railway& rail);
 
     /**
      * 重新铺画所有运行图。

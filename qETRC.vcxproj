@@ -200,6 +200,8 @@
     <ClCompile Include="src\editors\basictrainwidget.cpp" />
     <ClCompile Include="src\editors\configdialog.cpp" />
     <ClCompile Include="src\editors\railstationwidget.cpp" />
+    <ClCompile Include="src\editors\ruler\rulertabpy.cpp" />
+    <ClCompile Include="src\editors\ruler\rulerwidget.cpp" />
     <ClCompile Include="src\mainwindow\mainwindow.cpp" />
     <ClCompile Include="src\mainwindow\pagecontext.cpp" />
     <ClCompile Include="src\mainwindow\railcontext.cpp" />
@@ -207,6 +209,7 @@
     <ClCompile Include="src\mainwindow\traincontext.cpp" />
     <ClCompile Include="src\mainwindow\viewcategory.cpp" />
     <ClCompile Include="src\model\delegate\combodelegate.cpp" />
+    <ClCompile Include="src\model\delegate\postivespindelegate.cpp" />
     <ClCompile Include="src\model\diagram\componentitems.cpp" />
     <ClCompile Include="src\data\diagram\config.cpp" />
     <ClCompile Include="src\data\diagram\diagram.cpp" />
@@ -261,6 +264,8 @@
     <ClInclude Include="src\data\rail\railcategory.h" />
     <QtMoc Include="src\editors\configdialog.h" />
     <QtMoc Include="src\mainwindow\rulercontext.h" />
+    <QtMoc Include="src\editors\ruler\rulertabpy.h" />
+    <QtMoc Include="src\editors\ruler\rulerwidget.h" />
     <ClInclude Include="src\mainwindow\version.h" />
     <QtMoc Include="src\navi\navitree.h" />
     <QtMoc Include="src\model\diagram\railtablemodel.h" />
@@ -268,6 +273,7 @@
     <QtMoc Include="src\model\rail\railstationmodel.h" />
     <QtMoc Include="src\model\delegate\combodelegate.h" />
     <QtMoc Include="src\mainwindow\viewcategory.h" />
+    <ClInclude Include="src\model\delegate\postivespindelegate.h" />
     <ClInclude Include="src\model\delegate\qedelegate.h" />
     <QtMoc Include="src\model\train\timetablestdmodel.h" />
     <QtMoc Include="src\model\general\qemoveablemodel.h" />

@@ -2,12 +2,15 @@
 
 #include <QObject>
 #include <QUndoCommand>
+#include <QList>
 #include <SARibbonLineEdit.h>
 #include <SARibbonComboBox.h>
 #include <SARibbonMenu.h>
+#include <DockWidget.h>
 #include "SARibbonContextCategory.h"
 #include "data/rail/rail.h"
 #include "data/diagram/diagram.h"
+#include "editors/ruler/rulerwidget.h"
 
 class MainWindow;
 /**
@@ -26,6 +29,10 @@ class RailContext : public QObject
     bool updating = false;
 
     SARibbonMenu* meRulerWidgets;
+
+    //全局所有的ruler都放这里
+    QList<RulerWidget*> rulerWidgets;
+    QList<ads::CDockWidget*> rulerDocks;
 public:
     explicit RailContext(Diagram& diagram_, SARibbonContextCategory* context,
         MainWindow* mw_,
@@ -46,6 +53,11 @@ private:
 
     void updateRailWidget(std::shared_ptr<Railway> rail);
 
+    /**
+     * 指定标尺的下标。注意所有线路的标尺都在这里
+     */
+    int rulerWidgetIndex(std::shared_ptr<Ruler> ruler);
+
 signals:
     void railNameChanged(std::shared_ptr<Railway> rail);
     void stationTableChanged(std::shared_ptr<Railway> rail, bool equiv);
@@ -54,6 +66,7 @@ signals:
 private slots:
     void actOpenStationWidget();
     void actRemoveRailway();
+
     
     /**
      * 修改排图标尺，暂定立即生效
@@ -88,6 +101,11 @@ public slots:
     void commitOrdinateChange(std::shared_ptr<Railway> railway);
 
     void showSectionCount();
+
+    /**
+     * 当标尺数据更新时，更新界面
+     */
+    void refreshRulerTable(std::shared_ptr<Ruler> ruler);
 
 };
 

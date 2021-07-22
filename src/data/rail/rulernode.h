@@ -1,5 +1,4 @@
-﻿#ifndef RULERNODE_H
-#define RULERNODE_H
+﻿#pragma once
 
 #include <memory>
 #include "railintervaldata.hpp"
@@ -39,6 +38,8 @@ public:
     QString intervalString()const;
 
     inline bool isNull()const { return interval == 0 && start == 0 && stop == 0; }
+
+    void swap(RulerNode& other);
 };
 
-#endif // RULERNODE_H
+
