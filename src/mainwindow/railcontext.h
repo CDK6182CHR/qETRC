@@ -81,6 +81,8 @@ private slots:
 
     void openRulerWidget(std::shared_ptr<Ruler> ruler);
 
+    void removeRulerWidgetAt(int i);
+
 
 public slots:
     void actChangeRailName(std::shared_ptr<Railway> rail, const QString& name);
@@ -106,6 +108,10 @@ public slots:
      * 当标尺数据更新时，更新界面
      */
     void refreshRulerTable(std::shared_ptr<Ruler> ruler);
+
+    void removeRulerWidgetsForRailway(std::shared_ptr<Railway> rail);
+
+    void removeRulerWidget(std::shared_ptr<Ruler> ruler);
 
 };
 

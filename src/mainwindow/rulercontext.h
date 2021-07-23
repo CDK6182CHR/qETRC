@@ -24,6 +24,7 @@ public:
     explicit RulerContext(Diagram& diagram, SARibbonContextCategory* context, MainWindow* mw_);
 
     void setRuler(std::shared_ptr<Ruler> ruler);
+    void resetRuler() { ruler.reset(); }
     auto getRuler(){return ruler;}
     void refreshData();
     auto* context() { return cont; }
@@ -38,6 +39,11 @@ signals:
      * 仅在排图标尺被更新时，通知重新铺画运行图
      */
     void ordinateRulerModified(Railway& rail);
+
+    /**
+     * 标尺被删除，关闭面板
+     */
+    void focusOutRuler();
 
 public slots:
 

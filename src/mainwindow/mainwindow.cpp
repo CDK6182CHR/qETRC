@@ -154,6 +154,7 @@ void MainWindow::undoAddNewTrain(std::shared_ptr<Train> train)
 void MainWindow::onActRailwayRemoved(std::shared_ptr<Railway> rail)
 {
     removeRailStationWidget(rail);
+    contextRail->removeRulerWidgetsForRailway(rail);
     naviModel->resetPageList();
     checkPagesValidity();
     updateAllDiagrams();
@@ -586,6 +587,8 @@ void MainWindow::initToolbar()
         contextRuler = new RulerContext(_diagram, cat, this);
         connect(contextRuler, SIGNAL(ordinateRulerModified(Railway&)),
             this, SLOT(updateRailwayDiagrams(Railway&)));
+        connect(contextRuler, &RulerContext::focusOutRuler,
+            this, &MainWindow::focusOutRuler);
     }
 
     //ApplicationMenu的初始化放在最后，因为可能用到前面的..

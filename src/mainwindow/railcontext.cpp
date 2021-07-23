@@ -214,6 +214,13 @@ void RailContext::openRulerWidget(std::shared_ptr<Ruler> ruler)
 	}
 }
 
+void RailContext::removeRulerWidgetAt(int i)
+{
+	auto dock = rulerDocks.takeAt(i);
+	rulerWidgets.removeAt(i);
+	dock->deleteDockWidget();
+}
+
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
 {
 	updateRailWidget(rail);
@@ -248,6 +255,29 @@ void RailContext::refreshRulerTable(std::shared_ptr<Ruler> ruler)
 	for (auto p : rulerWidgets) {
 		if (p->getRuler() == ruler)
 			p->refreshData();
+	}
+}
+
+void RailContext::removeRulerWidgetsForRailway(std::shared_ptr<Railway> rail)
+{
+	for (auto ruler : rail->rulers())
+		removeRulerWidget(ruler);
+}
+
+void RailContext::removeRulerWidget(std::shared_ptr<Ruler> ruler)
+{
+	auto cont = mw->getRulerContext();
+	if (ruler == cont->getRuler()) {
+		cont->resetRuler();
+		emit cont->focusOutRuler();
+	}
+	int i = 0;
+	while (i < rulerWidgets.size()) {
+		if (rulerWidgets.at(i)->getRuler() == ruler) {
+			removeRulerWidgetAt(i);
+		}
+		else 
+			i++;
 	}
 }
 
