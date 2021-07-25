@@ -106,6 +106,24 @@ Direction TrainAdapter::lastDirection() const
 	return isNull() ? Direction::Undefined : _lines.last()->dir();
 }
 
+bool TrainAdapter::isFirstStation(const AdapterStation* st) const
+{
+	if (isNull())return false;
+	auto p = _lines.first();
+	if (p->isNull())return false;
+	return st->trainStation->name == train()->starting() &&
+		st == &(p->stations().front());
+}
+
+bool TrainAdapter::isLastStation(const AdapterStation* st) const
+{
+	if (isNull())return false;
+	auto p = _lines.last();
+	if (p->isNull())return false;
+	return st->trainStation->name == train()->terminal() &&
+		st == &(p->stations().back());
+}
+
 void TrainAdapter::autoLines(const Config& config)
 {
 	//命名规则：前缀r表示rail，t表示train

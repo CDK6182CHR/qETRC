@@ -241,9 +241,17 @@ public:
      * 重新绑定所有列车与所有线路
      */
     void rebindAllTrains();
-
+    
     std::map<std::shared_ptr<RailInterval>, int>
         sectionTrainCount(std::shared_ptr<Railway> railway)const;
+
+    /**
+     * 2021.07.25  pyETRC风格的车站时刻表
+     * 按照列车组织，给出每一列车的到点、开点等信息。注意只包含图定，不包含推断时刻
+     */
+    QList<QPair<std::shared_ptr<TrainLine>, const AdapterStation*>>
+        stationTrainsSettled(std::shared_ptr<Railway> railway, 
+            std::shared_ptr<RailStation> st)const;
 
 private:
     void bindAllTrains();

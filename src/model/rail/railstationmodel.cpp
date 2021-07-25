@@ -9,6 +9,13 @@ RailStationModel::RailStationModel(bool inplace, QWidget *parent):
     setupModel();
 }
 
+RailStationModel::RailStationModel(std::shared_ptr<Railway> rail,
+                                   bool inplace, QWidget *parent):
+    QEMoveableModel(parent),commitInPlace(inplace)
+{
+    setRailway(rail);
+}
+
 
 void RailStationModel::setRailway(std::shared_ptr<Railway> rail)
 {

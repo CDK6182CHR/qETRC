@@ -38,11 +38,13 @@ SOURCES += \
     src/data/train/traintype.cpp \
     src/dialogs/importtraindialog.cpp \
     src/dialogs/printdiagramdialog.cpp \
+    src/dialogs/selectrailstationdialog.cpp \
     src/editors/basictrainwidget.cpp \
     src/editors/configdialog.cpp \
     src/editors/railstationwidget.cpp \
     src/editors/ruler/rulertabpy.cpp \
     src/editors/ruler/rulerwidget.cpp \
+    src/viewers/stationtimetablesettled.cpp \
     src/editors/trainlistwidget.cpp \
     src/kernel/diagramwidget.cpp \
     src/kernel/trainitem.cpp \
@@ -99,11 +101,13 @@ HEADERS += \
     src/data/train/traintype.h \
     src/dialogs/importtraindialog.h \
     src/dialogs/printdiagramdialog.h \
+    src/dialogs/selectrailstationdialog.h \
     src/editors/basictrainwidget.h \
     src/editors/configdialog.h \
     src/editors/railstationwidget.h \
     src/editors/ruler/rulertabpy.h \
     src/editors/ruler/rulerwidget.h \
+    src/viewers/stationtimetablesettled.h \
     src/editors/trainlistwidget.h \
     src/kernel/diagramwidget.h \
     src/kernel/trainitem.h \

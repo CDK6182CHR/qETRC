@@ -180,6 +180,11 @@ public:
     std::deque<AdapterStation>::const_iterator
         stationFromYValue(double y)const;
 
+    /**
+     * 线性查找  注意  不标注起点标签的线，首站不返回。
+     */
+    const AdapterStation* stationFromRail(std::shared_ptr<RailStation> rail)const;
+
 private:
 
     /**

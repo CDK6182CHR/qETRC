@@ -4,10 +4,11 @@
 
 #include <QtWidgets>
 
-RulerWidget::RulerWidget(std::shared_ptr<Ruler> ruler_, QWidget *parent) :
-    QWidget(parent),ruler(ruler_),model(new RulerModel(ruler_,this))
+RulerWidget::RulerWidget(std::shared_ptr<Ruler> ruler_,bool commitInPlace_, QWidget *parent) :
+    QWidget(parent),ruler(ruler_),model(new RulerModel(ruler_,this)),commitInPlace(commitInPlace_)
 {
     initUI();
+    refreshBasicData();
 }
 
 void RulerWidget::refreshData()
@@ -15,6 +16,16 @@ void RulerWidget::refreshData()
     updating = true;
     if (ruler) {
         model->refreshData();
+        edName->setText(ruler->name());
+        ckDiff->setChecked(ruler->different());
+    }
+    updating = false;
+}
+
+void RulerWidget::refreshBasicData()
+{
+    updating = true;
+    if (ruler) {
         edName->setText(ruler->name());
         ckDiff->setChecked(ruler->different());
     }
@@ -96,7 +107,14 @@ void RulerWidget::onDiffChanged(bool on)
     if (flag == QMessageBox::Yes) {
         auto t = ruler->clone();
         t->getRuler(0)->setDifferent(!ruler->different());
-        emit actChangeRulerData(ruler, t);
+        if (commitInPlace) {
+            qDebug() << "RulerWidget::onDiffChanged: INFO: change applied in-place.";
+            ruler->swap(*(t->getRuler(0)));
+        }
+        else {
+            emit actChangeRulerData(ruler, t);
+        }
+        
     }
        
 
@@ -105,7 +123,25 @@ void RulerWidget::onDiffChanged(bool on)
 
 void RulerWidget::actApply()
 {
-    //todo: NAME
+    const QString& name = edName->text();
+    if (name != ruler->name()) {
+        //更改名称！
+        if (commitInPlace) {
+            ruler->setName(name);
+        }
+        else {
+            emit actChangeRulerName(ruler, name);
+        }
+    }
+
+
     auto nr = model->appliedRuler();
-    emit actChangeRulerData(ruler, nr);
+    if (commitInPlace) {
+        qDebug() << "RulerWidget::actApply: INFO: change applied in-place.";
+        ruler->swap(*(nr->getRuler(0)));
+    }
+    else {
+        emit actChangeRulerData(ruler, nr);
+    }
+    
 }

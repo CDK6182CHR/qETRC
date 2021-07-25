@@ -31,6 +31,7 @@ public:
 
     inline const QString& name()const { return _name; }
     inline void setName(const QString& name) { _name = name; }
+    QString& nameRef() { return _name; }
 
     QJsonObject toJson()const;
 

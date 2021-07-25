@@ -64,6 +64,10 @@ public:
         return &_railway == &(another._railway);
     }
 
+    inline bool isInSameRailway(std::shared_ptr<const Railway> rail)const {
+        return &_railway == rail.get();
+    }
+
     /**
      * @brief listAdapterEvents 列出本次列车在本线的事件表
      * 逐段运行线计算。实际上只是个转发
@@ -99,6 +103,13 @@ public:
     Direction firstDirection()const;
 
     Direction lastDirection()const;
+
+    /**
+     * 所给车站是否是当前的第一运行线的第一站。不考虑始发站的问题
+     */
+    bool isFirstStation(const AdapterStation* st)const;
+
+    bool isLastStation(const AdapterStation* st)const;
 
 private:
 

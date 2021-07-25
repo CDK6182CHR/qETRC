@@ -83,6 +83,10 @@ private slots:
 
     void removeRulerWidgetAt(int i);
 
+    void actStationTrains();
+
+    void stationTrains(std::shared_ptr<RailStation> station);
+
 
 public slots:
     void actChangeRailName(std::shared_ptr<Railway> rail, const QString& name);
@@ -112,6 +116,11 @@ public slots:
     void removeRulerWidgetsForRailway(std::shared_ptr<Railway> rail);
 
     void removeRulerWidget(std::shared_ptr<Ruler> ruler);
+
+    /**
+     * 标尺名称改变后，由RulerContext直接调用
+     */
+    void onRulerNameChanged(std::shared_ptr<Ruler> ruler);
 
 };
 

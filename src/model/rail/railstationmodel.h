@@ -35,6 +35,9 @@ public:
     };
     explicit RailStationModel(bool inplace, QWidget *parent = nullptr);
 
+    explicit RailStationModel(std::shared_ptr<Railway> rail,bool inplace,
+                              QWidget* parent=nullptr);
+
     void setRailway(std::shared_ptr<Railway> rail);
 
     virtual void setupNewRow(int row)override;

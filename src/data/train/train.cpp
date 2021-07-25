@@ -498,6 +498,24 @@ void Train::jointTrain(Train&& train, bool former)
     }
 }
 
+bool Train::isStartingStation(const AdapterStation* st)const
+{
+    if (st->trainStation->name != _starting)return false;
+    for (auto adp : _adapters)
+        if (adp->isFirstStation(st))
+            return true;
+    return false;
+}
+
+bool Train::isTerminalStation(const AdapterStation* st)const
+{
+    if (st->trainStation->name != _terminal)return false;
+    for (auto adp : _adapters)
+        if (adp->isFirstStation(st))
+            return true;
+    return false;
+}
+
 void Train::show() const
 {
     _trainName.show();

@@ -37,6 +37,19 @@ void RulerContext::commitRulerChange(std::shared_ptr<Ruler> ruler)
     }
 }
 
+void RulerContext::actChangeRulerName(std::shared_ptr<Ruler> ruler, const QString& name)
+{
+    mw->getUndoStack()->push(new qecmd::ChangeRulerName(ruler, name, this));
+}
+
+void RulerContext::commitChangeRulerName(std::shared_ptr<Ruler> ruler)
+{
+    if (ruler == this->ruler) {
+        refreshData();
+    }
+    mw->getRailContext()->onRulerNameChanged(ruler);
+}
+
 void qecmd::UpdateRuler::undo()
 {
     ruler->swap(*(nr->getRuler(0)));
@@ -47,4 +60,16 @@ void qecmd::UpdateRuler::redo()
 {
     ruler->swap(*(nr->getRuler(0)));
     cont->commitRulerChange(ruler);
+}
+
+void qecmd::ChangeRulerName::undo()
+{
+    std::swap(ruler->nameRef(), name);
+    cont->commitChangeRulerName(ruler);
+}
+
+void qecmd::ChangeRulerName::redo()
+{
+    std::swap(ruler->nameRef(), name);
+    cont->commitChangeRulerName(ruler);
 }

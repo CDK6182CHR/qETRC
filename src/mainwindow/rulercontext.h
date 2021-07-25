@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QUndoCommand>
+#include <QString>
 #include <SARibbonContextCategory.h>
 
 #include "data/rail/rail.h"
@@ -54,6 +55,15 @@ public slots:
      */
     void commitRulerChange(std::shared_ptr<Ruler> ruler);
 
+    void actChangeRulerName(std::shared_ptr<Ruler> ruler, const QString& name);
+
+    /**
+     * 已经在undo里面修改过了；这里负责进行后续修改：
+     * （1）更新context；（2）更新相关的Widget；（3）更新相关的标题；（4）更新排图标尺那个表
+     * 其中1自己就能完成，2~4交给RailContext
+     */
+    void commitChangeRulerName(std::shared_ptr<Ruler> ruler);
+
 };
 
 
@@ -67,6 +77,19 @@ namespace qecmd {
             RulerContext* context, QUndoCommand* parent=nullptr):
             QUndoCommand(QObject::tr("更新标尺数据: ")+ruler_->name()),
             ruler(ruler_),nr(nr_), cont(context){}
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    class ChangeRulerName :public QUndoCommand {
+        std::shared_ptr<Ruler> ruler;
+        QString name;
+        RulerContext*const cont;
+    public:
+        ChangeRulerName(std::shared_ptr<Ruler> ruler_,const QString& name_,
+            RulerContext* context,QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("更改标尺名称: ")+name_,parent),
+            ruler(ruler_),name(name_),cont(context){}
         virtual void undo()override;
         virtual void redo()override;
     };

@@ -2,6 +2,8 @@
 #include "mainwindow.h"
 
 #include "viewers/sectioncountdialog.h"
+#include "dialogs/selectrailstationdialog.h"
+#include "viewers/stationtimetablesettled.h"
 
 #include <QtWidgets>
 
@@ -116,6 +118,13 @@ void RailContext::initUI()
 	connect(act, SIGNAL(triggered()), this, SLOT(showSectionCount()));
 	btn = panel->addLargeAction(act);
 	btn->setMinimumWidth(70);
+
+	act = new QAction(QIcon(":/icons/timetable.png"), tr("车站车次表"), this);
+	connect(act, SIGNAL(triggered()), this, SLOT(actStationTrains()));
+	act->setToolTip(tr("车站车次表\n显示指定车站的（pyETRC风格的）时刻表。"
+		"时刻表以车次为单位，只考虑图定时刻。"));
+	btn = panel->addLargeAction(act);
+	btn->setMinimumWidth(80);
 }
 
 void RailContext::updateRailWidget(std::shared_ptr<Railway> rail)
@@ -191,7 +200,7 @@ void RailContext::openRulerWidget(std::shared_ptr<Ruler> ruler)
 	int i = rulerWidgetIndex(ruler);
 	if (i == -1) {
 		//创建
-		auto* rw = new RulerWidget(ruler);
+		auto* rw = new RulerWidget(ruler, false);
 		auto* dock = new ads::CDockWidget(tr("标尺编辑 - %1 - %2").arg(ruler->name())
 			.arg(ruler->railway().name()));
 		dock->setWidget(rw);
@@ -200,6 +209,8 @@ void RailContext::openRulerWidget(std::shared_ptr<Ruler> ruler)
 		connect(rw, &RulerWidget::actChangeRulerData, mw->getRulerContext(),
 			&RulerContext::actChangeRulerData);
 		connect(rw, &RulerWidget::focusInRuler, mw, &MainWindow::focusInRuler);
+		connect(rw, &RulerWidget::actChangeRulerName, mw->getRulerContext(),
+			&RulerContext::actChangeRulerName);
 		mw->getManager()->addDockWidgetFloating(dock);
 	}
 	else {
@@ -221,9 +232,35 @@ void RailContext::removeRulerWidgetAt(int i)
 	dock->deleteDockWidget();
 }
 
+void RailContext::actStationTrains()
+{
+	if (!railway)return;
+	auto* dialog = new SelectRailStationDialog(railway, mw);
+	connect(dialog, &SelectRailStationDialog::stationSelected,
+		this, &RailContext::stationTrains);
+	dialog->open();
+}
+
+void RailContext::stationTrains(std::shared_ptr<RailStation> station)
+{
+	auto* dialog = new StationTimetableSettledDialog(diagram, railway, station, mw);
+	dialog->show();
+}
+
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
 {
 	updateRailWidget(rail);
+	if (rail == railway) {
+		refreshData();
+	}
+	//更新打开的窗口标题
+	for (int i = 0; i < mw->railStationWidgets.size(); i++) {
+		auto w = mw->railStationWidgets.at(i);
+		if (w->getRailway() == rail) {
+			mw->railStationDocks.at(i)->setWindowTitle(tr("基线编辑 - ") + rail->name());
+		}
+	}
+
 	emit railNameChanged(rail);
 }
 
@@ -278,6 +315,21 @@ void RailContext::removeRulerWidget(std::shared_ptr<Ruler> ruler)
 		}
 		else 
 			i++;
+	}
+}
+
+void RailContext::onRulerNameChanged(std::shared_ptr<Ruler> ruler)
+{
+	for (int i = 0; i < rulerWidgets.size(); i++) {
+		auto w = rulerWidgets.at(i);
+		if (w->getRuler() == ruler) {
+			w->refreshData();
+			rulerDocks.at(i)->setWindowTitle(tr("标尺编辑 - %1 - %2").arg(ruler->name())
+				.arg(ruler->railway().name()));
+		}
+	}
+	if (&(ruler->railway()) == railway.get()) {
+		cbRulers->setItemText(ruler->index()+1, ruler->name());
 	}
 }
 

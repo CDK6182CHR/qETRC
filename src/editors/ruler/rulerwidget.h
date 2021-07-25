@@ -22,11 +22,13 @@ class RulerWidget : public QWidget
     QLineEdit* edName;
     QCheckBox* ckDiff;
     QTableView* table;
+    const bool commitInPlace;
     bool updating = false;
 public:
-    explicit RulerWidget(std::shared_ptr<Ruler> ruler_,
+    explicit RulerWidget(std::shared_ptr<Ruler> ruler_, bool commitInPlace,
                          QWidget *parent = nullptr);
     void refreshData();
+    void refreshBasicData();
     //void setRuler(std::shared_ptr<Ruler> ruler);
     auto getRuler(){return ruler;}
     auto getModel(){return model;}
@@ -44,6 +46,7 @@ private slots:
 
 signals:
     void actChangeRulerData(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> nr);
+    void actChangeRulerName(std::shared_ptr<Ruler> ruler, const QString& name);
     void focusInRuler(std::shared_ptr<Ruler>ruler);
 
 };

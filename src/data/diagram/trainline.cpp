@@ -921,6 +921,18 @@ std::deque<AdapterStation>::const_iterator TrainLine::stationFromYValue(double y
 	}
 }
 
+const AdapterStation* TrainLine::stationFromRail(std::shared_ptr<RailStation> rail) const
+{
+	auto p = _stations.begin();
+	if (!startLabel())++p;
+	for (;p!=_stations.end();++p) {
+		if (p->railStation.lock() == rail) {
+			return &(*p);
+		}
+	}
+	return nullptr;
+}
+
 bool AdapterStation::operator<(double y) const
 {
 	return railStation.lock()->y_value.value() < y;

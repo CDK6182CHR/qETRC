@@ -296,6 +296,14 @@ public:
     }
 
     /**
+     * 用于判断时刻表中所给车站是否是始发（终到）站。
+     * 不仅要比较站名，还要考虑是否是某一个Adapter的首站
+     */
+    bool isStartingStation(const AdapterStation* st)const;
+
+    bool isTerminalStation(const AdapterStation* st)const;
+
+    /**
      * Train.intervalExchange() 区间换线
      * 注意start,end都包含在内
      */

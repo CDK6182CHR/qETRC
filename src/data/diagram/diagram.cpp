@@ -247,6 +247,32 @@ std::map<std::shared_ptr<RailInterval>, int> Diagram::sectionTrainCount(std::sha
     return res;
 }
 
+QList<QPair<std::shared_ptr<TrainLine>, const AdapterStation*>> 
+Diagram::stationTrainsSettled(std::shared_ptr<Railway> railway,
+    std::shared_ptr<RailStation> st) const
+{
+    QList<QPair<std::shared_ptr<TrainLine>, const AdapterStation*>> res;
+    for (auto train : _trainCollection.trains()) {
+        for (auto adp : train->adapters()) {
+            if (adp->isInSameRailway(railway)) {
+                for (auto line : adp->lines()) {
+                    auto* p = line->stationFromRail(st);
+                    if (p) {
+                        res.append(qMakePair(line, p));
+                    }
+                }
+            }
+        }
+    }
+    using PR = QPair<std::shared_ptr<TrainLine>, const AdapterStation*>;
+    //默认按照到达时刻排序
+    std::sort(res.begin(), res.end(), [](const PR& p1, const PR& p2) {
+        return qeutil::timeCompare(p1.second->trainStation->arrive,
+            p2.second->trainStation->arrive);
+        });
+    return res;
+}
+
 void Diagram::bindAllTrains()
 {
     for (auto p : railways()) {
