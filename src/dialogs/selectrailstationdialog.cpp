@@ -9,7 +9,7 @@ SelectRailStationDialog::SelectRailStationDialog(std::shared_ptr<Railway> rail,
     QDialog(parent), railway(rail), model(new RailStationModel(rail,true,this))
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    resize(400,400);
+    resize(500,600);
     initUI();
 }
 

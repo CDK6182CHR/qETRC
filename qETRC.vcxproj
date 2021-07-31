@@ -269,7 +269,7 @@
     <QtMoc Include="src\editors\ruler\rulertabpy.h" />
     <QtMoc Include="src\editors\ruler\rulerwidget.h" />
     <QtMoc Include="src\dialogs\selectrailstationdialog.h" />
-    <ClInclude Include="src\viewers\stationtimetablesettled.h" />
+    <QtMoc Include="src\viewers\stationtimetablesettled.h" />
     <ClInclude Include="src\mainwindow\version.h" />
     <QtMoc Include="src\navi\navitree.h" />
     <QtMoc Include="src\model\diagram\railtablemodel.h" />

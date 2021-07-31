@@ -45,6 +45,7 @@ public:
 class StationTimetableSettledDialog:
         public QDialog
 {
+    Q_OBJECT;
     Diagram& diagram;
     std::shared_ptr<Railway> rail;
     std::shared_ptr<RailStation> station;
@@ -62,6 +63,7 @@ private:
     void refreshData();
 
 private slots:
+
     void onHidePassChanged(bool on);
     void outputCsv();
 };

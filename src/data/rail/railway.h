@@ -237,10 +237,18 @@ public:
     /// </summary>
     bool isNewRuler()const;
 
-    /* 
+    /* *
      * Line.delRuler()
+     * 原标尺Ruler对象不受影响。但注意它只是个头结点！！
      */
     void removeRuler(std::shared_ptr<Ruler> ruler);
+
+    /**
+     * 插入标尺，用于撤销操作
+     * 下标由ruler自带；直接把这个当成头结点弄回去
+     * 也就是redo之后头结点地址不变
+     */
+    void undoRemoveRuler(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> data);
 
     /*
      * 一个个删除Ruler效率比较低，因此做一个一次性清空的

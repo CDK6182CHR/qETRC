@@ -333,6 +333,30 @@ void RailContext::onRulerNameChanged(std::shared_ptr<Ruler> ruler)
 	}
 }
 
+void RailContext::removeRulerAt(const Railway& rail, int i, bool isord)
+{
+	if (&rail == railway.get()) {
+		updating = true;
+		cbRulers->removeItem(i + 1);
+		if (isord) {
+			cbRulers->setCurrentIndex(0);
+		}
+		updating = false;
+	}
+}
+
+void RailContext::insertRulerAt(const Railway& rail, std::shared_ptr<Ruler> ruler, bool isord)
+{
+	if (&rail == railway.get()) {
+		updating = true;
+		cbRulers->insertItem(ruler->index() + 1, ruler->name());
+		if (isord) {
+			cbRulers->setCurrentIndex(ruler->index() + 1);
+		}
+		updating = false;
+	}
+}
+
 void RailContext::setRailway(std::shared_ptr<Railway> rail)
 {
 	railway = rail;

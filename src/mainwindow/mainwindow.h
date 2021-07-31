@@ -243,12 +243,7 @@ private slots:
      */
     void onStationTableChanged(std::shared_ptr<Railway> rail, bool equiv);
 
-    /**
-     * 更新所有包含指定线路的运行图。
-     */
-    void updateRailwayDiagrams(std::shared_ptr<Railway> rail);
-
-    void updateRailwayDiagrams(Railway& rail);
+   
 
     /**
      * 重新铺画所有运行图。
@@ -302,6 +297,13 @@ private slots:
     void useOfficeStyle();
 
 public slots:
+
+    /**
+    * 更新所有包含指定线路的运行图。
+    */
+    void updateRailwayDiagrams(std::shared_ptr<Railway> rail);
+
+    void updateRailwayDiagrams(Railway& rail);
 
     /**
      * 列车列表变化（添加或删除），提示相关更新

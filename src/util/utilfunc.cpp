@@ -1,7 +1,10 @@
 ﻿#include "utilfunc.h"
 #include <QList>
 #include <QMessageBox>
-
+#include <QFile>
+#include <QStandardItemModel>
+#include <QTextStream>
+#include <QFileDialog>
 
 
 //QTime qeutil::parseTime(const QString& tm)
@@ -46,3 +49,42 @@ QString qeutil::secsToString(const QTime& tm1, const QTime& tm2)
 
 const QString qeutil::fileFilter =
 	QObject::tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)");
+
+bool qeutil::tableToCsv(const QStandardItemModel* model, const QString& filename)
+{
+	QFile file(filename);
+	file.open(QFile::WriteOnly);
+	if (!file.isOpen())return false;
+	QTextStream s(&file);
+
+	//标题
+	for (int i = 0; i < model->columnCount(); i++) {
+		s << model->horizontalHeaderItem(i)->text() << ",";
+	}
+	s << Qt::endl;
+
+	//内容
+	for (int i = 0; i < model->rowCount(); i++) {
+		for (int j = 0; j < model->columnCount(); j++) {
+			s << model->item(i, j)->text() << ",";
+		}
+		s << Qt::endl;
+	}
+	file.close();
+	return true;
+}
+
+bool qeutil::exportTableToCsv(const QStandardItemModel* model, QWidget* parent, const QString& initName)
+{
+	QString fn = QFileDialog::getSaveFileName(parent, QObject::tr("导出列车事件表"), initName,
+		QObject::tr("逗号分隔文件 (*.csv)\n 所有文件 (*)"));
+	if (fn.isEmpty())return false;
+	bool flag = tableToCsv(model, fn);
+	if (flag) {
+		QMessageBox::information(parent, QObject::tr("提示"), QObject::tr("导出CSV文件成功"));
+	}
+	else {
+		QMessageBox::warning(parent, QObject::tr("提示"), QObject::tr("导出CSV文件失败"));
+	}
+	return flag;
+}

@@ -2,6 +2,7 @@
 #include <QtWidgets>
 
 #include "util/buttongroup.hpp"
+#include "util/utilfunc.h"
 
 StationTimetableSettledModel::StationTimetableSettledModel(
         Diagram& dia,
@@ -84,7 +85,8 @@ void StationTimetableSettledDialog::initUI()
     lab->setWordWrap(true);
     vlay->addWidget(lab);
     ckHidePass=new QCheckBox(tr("隐藏通过列车"));
-    connect(ckHidePass,SIGNAL(toggled(bool)),this,SLOT(onHidePassChanged(bool)));
+    connect(ckHidePass, &QCheckBox::toggled, this, 
+        &StationTimetableSettledDialog::onHidePassChanged);
     vlay->addWidget(ckHidePass);
     table=new QTableView;
     table->setModel(model);
@@ -99,10 +101,22 @@ void StationTimetableSettledDialog::initUI()
 
 void StationTimetableSettledDialog::onHidePassChanged(bool on)
 {
-    //todo...
+    if (on) {
+        for (int i = 0; i < model->rowCount(); i++) {
+            bool a = (model->item(i, StationTimetableSettledModel::ColStop)->text() ==
+                QObject::tr("通过"));
+            table->setRowHidden(i, a);
+        }
+    }
+    else {
+        for (int i = 0; i < model->rowCount(); i++) {
+            table->setRowHidden(i, false);
+        }
+    }
 }
 
 void StationTimetableSettledDialog::outputCsv()
 {
-    //todo...
+    QString iname = tr("%1图定时刻表.csv").arg(station->name.toSingleLiteral());
+    qeutil::exportTableToCsv(model, this, iname);
 }

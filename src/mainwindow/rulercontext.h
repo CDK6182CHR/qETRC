@@ -4,6 +4,7 @@
 #include <QUndoCommand>
 #include <QString>
 #include <SARibbonContextCategory.h>
+#include <QLineEdit>
 
 #include "data/rail/rail.h"
 #include "data/diagram/diagram.h"
@@ -21,6 +22,7 @@ class RulerContext : public QObject
     Diagram& diagram;
     SARibbonContextCategory*const cont;
     MainWindow* const mw;
+    QLineEdit* edRulerName, * edRailName;
 public:
     explicit RulerContext(Diagram& diagram, SARibbonContextCategory* context, MainWindow* mw_);
 
@@ -64,6 +66,24 @@ public slots:
      */
     void commitChangeRulerName(std::shared_ptr<Ruler> ruler);
 
+    /**
+     * 删除完毕后调用
+     */
+    void commitRemoveRuler(std::shared_ptr<Ruler> ruler, bool isord);
+
+    /**
+     * 恢复完数据后再调用！
+     */
+    void undoRemoveRuler(std::shared_ptr<Ruler> ruler, bool isord);
+
+private slots:
+
+    void actShowEditWidget();
+
+    void actSetAsOrdinate();
+
+    void actRemoveRuler();
+
 };
 
 
@@ -92,6 +112,22 @@ namespace qecmd {
             ruler(ruler_),name(name_),cont(context){}
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    class RemoveRuler :public QUndoCommand {
+        std::shared_ptr<Ruler> ruler;    //这只是个头结点
+        std::shared_ptr<Railway> data;
+        bool isOrd;
+        RulerContext* const cont;
+    public:
+        RemoveRuler(std::shared_ptr<Ruler> ruler_,
+            std::shared_ptr<Railway> data_,
+            bool ordinate, RulerContext* context,QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("删除标尺: ")+ruler_->name(),parent),
+            ruler(ruler_),data(data_),isOrd(ordinate),cont(context){}
+        virtual void undo()override;
+        virtual void redo()override;
+
     };
 }
 

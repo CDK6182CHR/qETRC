@@ -68,18 +68,13 @@ private slots:
     void actRemoveRailway();
 
     
-    /**
-     * 修改排图标尺，暂定立即生效
-     * 压栈cmd
-     */
-    void actChangeOrdinate(int i);
+    
 
     /**
      * 工具栏触发，编辑指定的标尺
      */
     void actSelectRuler();
 
-    void openRulerWidget(std::shared_ptr<Ruler> ruler);
 
     void removeRulerWidgetAt(int i);
 
@@ -89,6 +84,15 @@ private slots:
 
 
 public slots:
+
+    /**
+     * 修改排图标尺，暂定立即生效
+     * 压栈cmd
+     */
+    void actChangeOrdinate(int i);
+
+    void openRulerWidget(std::shared_ptr<Ruler> ruler);
+
     void actChangeRailName(std::shared_ptr<Railway> rail, const QString& name);
     void commitChangeRailName(std::shared_ptr<Railway> rail);
 
@@ -121,6 +125,16 @@ public slots:
      * 标尺名称改变后，由RulerContext直接调用
      */
     void onRulerNameChanged(std::shared_ptr<Ruler> ruler);
+
+    /**
+     * 删除标尺后，删除combo里面的东西
+     */
+    void removeRulerAt(const Railway& rail, int i, bool isord);
+
+    /**
+     * 撤销删除标尺
+     */
+    void insertRulerAt(const Railway& rail, std::shared_ptr<Ruler> ruler, bool isord);
 
 };
 

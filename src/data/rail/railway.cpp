@@ -357,6 +357,9 @@ bool Railway::rulerNameExisted(const QString& name, std::shared_ptr<const Ruler>
 void Railway::removeRuler(std::shared_ptr<Ruler> ruler)
 {
 	int index = ruler->index();
+	if (index == ordinateIndex()) {
+		resetOrdinate();
+	}
 	//首先从头结点里面抹掉
 	_rulers.removeAt(index);
 	//改后面的序号
@@ -367,6 +370,27 @@ void Railway::removeRuler(std::shared_ptr<Ruler> ruler)
 	auto p = firstDownInterval();
 	for (; p; p = nextIntervalCirc(p)) {
 		p->_rulerNodes.removeAt(index);
+	}
+}
+
+void Railway::undoRemoveRuler(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> data)
+{
+	int idx = ruler->index();
+	_rulers.insert(idx, ruler);
+	//修改序号
+	for (int i = idx + 1; i < _rulers.size(); i++) {
+		_rulers.at(i)->_index++;
+	}
+	auto r = data->getRuler(0);
+	auto p = firstDownInterval();
+	auto n = r->firstDownNode();
+	for (; p && n; p = nextIntervalCirc(p), n = n->nextNodeCirc()) {
+		//qDebug() << "addRulerFrom: "<<*p<<'\t' << p->_rulerNodes.last().get() << " @ " << p.get();
+		p->_rulerNodes.insert(idx,
+			std::make_shared<RulerNode>(*ruler, *p, n->interval, n->start, n->stop));
+	}
+	if (p || n) {
+		qDebug() << "Railway::undoRemoveRuler: unexpected early termination!";
 	}
 }
 

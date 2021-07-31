@@ -4,6 +4,7 @@
 #include <QString>
 
 class QWidget;
+class QStandardItemModel;
 
 namespace qeutil{
 
@@ -29,5 +30,15 @@ inline int secsTo(const QTime& tm1, const QTime& tm2) {
 QString secsToString(int secs);
 
 QString secsToString(const QTime& tm1, const QTime& tm2);
+
+/**
+ * 将StandardItemModel中的所有文字搞到CSV里面去
+ */
+bool tableToCsv(const QStandardItemModel* model, const QString& filename);
+
+/**
+ * 先显示选择文件的对话框，然后再导出到CSV
+ */
+bool exportTableToCsv(const QStandardItemModel* model, QWidget* parent, const QString& initName);
 
 }
