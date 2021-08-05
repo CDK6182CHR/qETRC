@@ -253,6 +253,22 @@ public:
         stationTrainsSettled(std::shared_ptr<Railway> railway, 
             std::shared_ptr<RailStation> st)const;
 
+    /**
+     * 2021.08.01  基于事件的车站时刻表
+     */
+    QList<QPair<std::shared_ptr<TrainLine>, RailStationEvent>>
+        stationEvents(std::shared_ptr<Railway> railway,
+            std::shared_ptr<RailStation> st)const;
+
+    using SectionEventList = QList<QPair<std::shared_ptr<TrainLine>, QTime>>;
+
+    /**
+     * 2021.08.05  区间某个位置的事件表  
+     * 注意入参为纵坐标，不是里程标！
+     */
+    QList<QPair<std::shared_ptr<TrainLine>, QTime>>
+        sectionEvents(std::shared_ptr<Railway> railway, double y)const;
+
 private:
     void bindAllTrains();
     QString validPageName(const QString& prefix)const;

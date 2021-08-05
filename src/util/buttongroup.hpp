@@ -41,6 +41,18 @@ public:
             QObject::connect(*bt, _signal, _target, *sl);
         }
     }
+
+    /**
+     * 将每个按钮的_signal都绑定到同一个_slot
+     */
+    template <typename _TySignal, typename _TySlot>
+    void connectAllTo(_TySignal _signal, QObject* _target, _TySlot _slot)
+    {
+        auto bt = buttons.begin();
+        for (; bt != buttons.end() ; ++bt) {
+            QObject::connect(*bt, _signal, _target, _slot);
+        }
+    }
 };
 
 //template<size_t _Num, typename _Layout, typename _Button>

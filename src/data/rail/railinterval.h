@@ -94,6 +94,10 @@ public:
 
     inline bool isDown()const{return _dir==Direction::Down;}
 
+    inline QString toString()const {
+        return QString("%1->%2").arg(fromStationNameLit()).arg(toStationNameLit());
+    }
+
     /**
      * @brief inverseInterval  当前区间的反向区间
      * 当且仅当当前区间的发站、到站皆为双向时，才有意义。

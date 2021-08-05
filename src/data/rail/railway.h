@@ -10,6 +10,7 @@
 #include <QtCore>
 #include <memory>
 #include <utility>
+#include <tuple>
 
 #include "railstation.h"
 #include "railinterval.h"
@@ -489,6 +490,23 @@ public:
      * 生成一个新的对象，仅包含基线数据，不包括标尺
      */
     std::shared_ptr<Railway> cloneBase()const;
+
+    // 断面信息：y坐标，下行区间，上行区间
+    using SectionInfo = std::optional<std::tuple<
+        double,
+        std::shared_ptr<RailInterval>,
+        std::shared_ptr<RailInterval>>>;
+
+    /**
+     * 由所给里程标获取所在断面的情况：y坐标，下行区间，上行区间 
+     * precondition: y坐标值已经正确计算出来
+     * 如果所给里程正好是一个站的里程标，则算入站前区间（小里程端区间）
+     * 如果不存在，则返回空。
+     * 允许给0点里程的；但对应区间指针都是空指针
+     * y坐标值一定有效，根据下行区间进行插值。如果下行区间找不到，直接返回空
+     * （特例是给首站的情况，直接返回首站的y坐标）
+     */
+    SectionInfo getSectionInfo(double mile);
 
 private:
     /**

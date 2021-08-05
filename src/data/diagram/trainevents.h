@@ -59,14 +59,33 @@ struct StationEvent {
                  const QString& note_=""):
         type(type_),time(time_),station(station_),another(another_),note(note_){}
 
-    StationEvent(StationEvent&&)noexcept = default;
-    StationEvent(const StationEvent&) = default;
+    //StationEvent(StationEvent&&)noexcept = default;
+    //StationEvent(const StationEvent&) = default;
 
     bool operator<(const StationEvent& another)const;
 
     /**
      * @brief ETRC风格的字符串描述 不带换行符
      */
+    QString toString()const;
+};
+
+/**
+ * 用于处理车站事件。比车次的事件多一个站前还是站后的标志位。
+ * another位置用来放相关车次，固定非null。
+ * pos: 1-站前事件（小里程端事件）; 2-站后；3-both
+ */
+struct RailStationEvent :
+    public StationEvent {
+    int pos;
+    RailStationEvent(TrainEventType type_,
+        const QTime& time_, std::weak_ptr<RailStation> station_,
+        std::reference_wrapper<const Train> train,
+        int pos_, const QString& note_ = "") :
+        StationEvent(type_, time_, station_, train, note_), pos(pos_) {}
+
+    QString posString()const;
+
     QString toString()const;
 };
 

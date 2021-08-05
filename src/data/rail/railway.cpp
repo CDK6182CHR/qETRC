@@ -939,6 +939,48 @@ std::shared_ptr<Railway> Railway::cloneBase() const
 	return res;
 }
 
+Railway::SectionInfo Railway::getSectionInfo(double mile)
+{
+	//按照里程进行二分搜索
+	auto p = std::lower_bound(_stations.begin(), _stations.end(), mile, RailStationMileLess());
+	if (p == _stations.end()) {
+		return std::nullopt;
+	}
+	std::shared_ptr<RailInterval> itDown, itUp;
+	//现在：p指向符合条件的区间后站。
+	//但需注意p所指站并不一定是上行（下行）通过的站；因此需要探查到一个合理的站
+	auto pr = p;
+	//根据区间后站的约定，应该往后找，然后用Prev
+	while (pr != _stations.end() && !(*pr)->isDownVia())
+		++pr;
+	if (pr != _stations.end()) {
+		itDown = (*pr)->downPrev;
+	}
+	//上行区间
+	auto po = p;
+	while (po != _stations.end() && !(*po)->isUpVia())
+		++po;
+	if (po != _stations.end()) {
+		itUp = (*po)->upNext;
+	}
+
+	//现在计算y坐标
+	if (itDown) {
+		//正常插值
+		double y0 = itDown->from.lock()->y_value.value();
+		double yn = itDown->to.lock()->y_value.value();
+		double scale = (mile - itDown->from.lock()->mile) / itDown->mile();
+		double yi = (yn - y0) * scale + y0;
+		return std::make_tuple(yi, itDown, itUp);
+	}
+	else if (p == _stations.begin() && (*p)->mile == mile) {
+		return std::make_tuple((*p)->y_value.value(), itDown, itUp);
+	}
+	else {
+		return std::nullopt;
+	}
+}
+
 void Railway::addMapInfo(const std::shared_ptr<RailStation>& st)
 {
 	//nameMap  直接添加

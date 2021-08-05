@@ -171,3 +171,17 @@ inline bool operator<(double mile, const RailStation& rs) {
     return mile < rs.mile;
 }
 
+class RailStationMileLess {
+public:
+    bool operator() (const std::shared_ptr<RailStation>& st, double mile)const {
+        return st->mile < mile;
+    }
+    bool operator() (double mile, const std::shared_ptr<RailStation>& st)const {
+        return mile < st->mile;
+    }
+    bool operator() (const std::shared_ptr<RailStation>& st1,
+        const std::shared_ptr<RailStation>& st2)const {
+        return st1->mile < st2->mile;
+    }
+};
+

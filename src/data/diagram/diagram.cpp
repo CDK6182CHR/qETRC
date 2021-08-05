@@ -265,10 +265,56 @@ Diagram::stationTrainsSettled(std::shared_ptr<Railway> railway,
         }
     }
     using PR = QPair<std::shared_ptr<TrainLine>, const AdapterStation*>;
-    //默认按照到达时刻排序
+    //默认按照到达时刻排序  注意这里按照绝对时刻排序就好
     std::sort(res.begin(), res.end(), [](const PR& p1, const PR& p2) {
-        return qeutil::timeCompare(p1.second->trainStation->arrive,
-            p2.second->trainStation->arrive);
+        return p1.second->trainStation->arrive <
+            p2.second->trainStation->arrive;
+        });
+    return res;
+}
+
+QList<QPair<std::shared_ptr<TrainLine>, RailStationEvent>> 
+    Diagram::stationEvents(std::shared_ptr<Railway> railway, 
+        std::shared_ptr<RailStation> st) const
+{
+    QList<QPair<std::shared_ptr<TrainLine>, RailStationEvent>> res;
+    for (auto train : _trainCollection.trains()) {
+        for (auto adp : train->adapters()) {
+            if (adp->isInSameRailway(railway)) {
+                for (auto line : adp->lines()) {
+                    const auto& lst = line->stationEventFromRail(st);
+                    for (auto p = lst.begin(); p != lst.end(); ++p) {
+                        res.append(qMakePair(line, *p));
+                    }
+                }
+            }
+        }
+    }
+    using PR = QPair<std::shared_ptr<TrainLine>, RailStationEvent>;
+    std::sort(res.begin(), res.end(), [](const PR& p1, const PR& p2) {
+        return p1.second.time < p2.second.time;
+        });
+    return res;
+}
+
+QList<QPair<std::shared_ptr<TrainLine>, QTime>> Diagram::sectionEvents(std::shared_ptr<Railway> railway, double y) const
+{
+    QList<QPair<std::shared_ptr<TrainLine>, QTime>> res;
+    for (auto train : _trainCollection.trains()) {
+        for (auto adp : train->adapters()) {
+            if (adp->isInSameRailway(railway)) {
+                for (auto line : adp->lines()) {
+                    auto t = line->sectionTime(y);
+                    if (t.has_value()) {
+                        res.append(qMakePair(line, t.value()));
+                    }
+                }
+            }
+        }
+    }
+    using PR = QPair<std::shared_ptr<TrainLine>, QTime>;
+    std::sort(res.begin(), res.end(), [](const PR& p1, const PR& p2) {
+        return p1.second< p2.second;
         });
     return res;
 }

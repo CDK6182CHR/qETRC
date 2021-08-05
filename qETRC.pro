@@ -44,6 +44,9 @@ SOURCES += \
     src/editors/railstationwidget.cpp \
     src/editors/ruler/rulertabpy.cpp \
     src/editors/ruler/rulerwidget.cpp \
+    src/viewers/railsectionevents.cpp \
+    src/viewers/railstationeventlist.cpp \
+    src/viewers/rulerrefdialog.cpp \
     src/viewers/stationtimetablesettled.cpp \
     src/editors/trainlistwidget.cpp \
     src/kernel/diagramwidget.cpp \
@@ -107,6 +110,9 @@ HEADERS += \
     src/editors/railstationwidget.h \
     src/editors/ruler/rulertabpy.h \
     src/editors/ruler/rulerwidget.h \
+    src/viewers/railsectionevents.h \
+    src/viewers/railstationeventlist.h \
+    src/viewers/rulerrefdialog.h \
     src/viewers/stationtimetablesettled.h \
     src/editors/trainlistwidget.h \
     src/kernel/diagramwidget.h \

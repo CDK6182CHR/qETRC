@@ -203,6 +203,9 @@
     <ClCompile Include="src\editors\railstationwidget.cpp" />
     <ClCompile Include="src\editors\ruler\rulertabpy.cpp" />
     <ClCompile Include="src\editors\ruler\rulerwidget.cpp" />
+    <ClCompile Include="src\viewers\railsectionevents.cpp" />
+    <ClCompile Include="src\viewers\railstationeventlist.cpp" />
+    <ClCompile Include="src\viewers\rulerrefdialog.cpp" />
     <ClCompile Include="src\viewers\stationtimetablesettled.cpp" />
     <ClCompile Include="src\mainwindow\mainwindow.cpp" />
     <ClCompile Include="src\mainwindow\pagecontext.cpp" />
@@ -253,6 +256,9 @@
     <ClCompile Include="src\viewers\traineventdialog.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="src\viewers\railsectionevents.h" />
+    <QtMoc Include="src\viewers\rulerrefdialog.h" />
+    <QtMoc Include="src\viewers\railstationeventlist.h" />
     <QtMoc Include="src\viewers\sectioncountdialog.h" />
     <QtMoc Include="src\viewers\traineventdialog.h" />
     <QtMoc Include="src\mainwindow\mainwindow.h" />

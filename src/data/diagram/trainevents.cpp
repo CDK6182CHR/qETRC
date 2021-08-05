@@ -122,3 +122,20 @@ QString qeutil::eventTypeString(TrainEventType t)
 		break;
 	}
 }
+
+QString RailStationEvent::posString() const
+{
+	switch (pos) {
+	case 1:return QObject::tr("站前");
+	case 2:return QObject::tr("站后");
+	case 3:return QObject::tr("前后");
+	default:return "INVALID POS";
+	}
+}
+
+QString RailStationEvent::toString() const
+{
+	return QStringLiteral("%1 %2 %3").arg(time.toString("hh:mm:ss "))
+		.arg(another->get().trainName().full())
+		.arg(qeutil::eventTypeString(type));
+}

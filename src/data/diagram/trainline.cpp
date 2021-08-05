@@ -912,26 +912,116 @@ bool TrainLine::isTerminalStation(ConstAdaPtr st) const
 	return endAtThis() && st == last;
 }
 
+int TrainLine::passStationPos(ConstAdaPtr st) const
+{
+	if (st == _stations.begin()) {
+		//第一站
+		return dir() == Direction::Down ? 2 : 1;
+	}
+	else if (st == std::prev(_stations.end())) {
+		return dir() == Direction::Down ? 1 : 2;
+	}
+	else return 3;
+}
+
 std::deque<AdapterStation>::const_iterator TrainLine::stationFromYValue(double y) const
 {
 	if (dir() == Direction::Down)
 		return std::lower_bound(_stations.begin(), _stations.end(), y);
 	else {
-		return std::lower_bound(_stations.rbegin(), _stations.rend(), y).base();
+		return std::upper_bound(_stations.rbegin(), _stations.rend(), y).base();
 	}
 }
 
 const AdapterStation* TrainLine::stationFromRail(std::shared_ptr<RailStation> rail) const
 {
-	auto p = _stations.begin();
-	if (!startLabel())++p;
-	for (;p!=_stations.end();++p) {
-		if (p->railStation.lock() == rail) {
-			return &(*p);
+	auto p = std::lower_bound(_stations.begin(), _stations.end(), rail->y_value.value());
+	if (p!=_stations.end()&& p->railStation.lock() == rail) {
+		return &(*p);
+	}
+	else return nullptr; 
+}
+
+QList<RailStationEvent> 
+	TrainLine::stationEventFromRail(std::shared_ptr<RailStation> rail) const
+{
+	auto p = stationFromYValue(rail->y_value.value());   //运行方向区间后站
+	if (p == _stations.end())
+		return {};
+	else if (p->railStation.lock() == rail) {
+		if (startLabel() || p != _stations.begin()) {
+			auto ts = p->trainStation;
+			if (ts->isStopped()) {
+				//只要有停车，一律按到达出发处理
+				return { RailStationEvent(TrainEventType::Arrive,ts->arrive,
+					p->railStation,std::cref(*train()),
+					dir() == Direction::Down ? 1 : 2,ts->note),
+					RailStationEvent(TrainEventType::Depart,ts->depart,
+					p->railStation,std::cref(*train()),
+					dir() == Direction::Down ? 2 : 1,ts->note) };
+			}
+			else if (isStartingStation(p)) {
+				//始发事件
+				return { RailStationEvent(TrainEventType::Origination,
+					ts->depart,p->railStation,std::cref(*train()),
+					dir() == Direction::Down ? 2 : 1,ts->note) };
+			}
+			else if (isTerminalStation(p)) {
+				return { RailStationEvent(TrainEventType::Destination,
+					ts->arrive,p->railStation,std::cref(*train()),
+					dir() == Direction::Down ? 1 : 2,ts->note) };
+			}
+			else {
+				//通过
+				return { RailStationEvent(TrainEventType::SettledPass,
+					ts->arrive,p->railStation,std::cref(*train()),
+					passStationPos(p),ts->note) };
+			}
+		}
+
+	}
+	else if (p == _stations.begin())
+		return {};
+	else {
+		//需要推定通过站时刻
+		auto p0 = std::prev(p);
+		double y0 = p0->yValue(), yn = p->yValue(), yi = rail->y_value.value();
+		double dsif = (qeutil::secsTo(p0->trainStation->depart,
+			p->trainStation->arrive)) * (yi - y0) / (yn - y0);
+		if (!std::isnan(dsif) && !std::isinf(dsif)) {
+			int dsi = int(std::round(dsif));
+			return { RailStationEvent(TrainEventType::CalculatedPass,
+				p0->trainStation->depart.addSecs(dsi), rail, std::cref(*train()),
+				3, QObject::tr("推算")) };
 		}
 	}
-	return nullptr;
+	return {};
 }
+
+std::optional<QTime> TrainLine::sectionTime(double y) const
+{
+	auto p = stationFromYValue(y);
+	if (p == _stations.end())
+		return std::nullopt;
+	else if (p == _stations.begin()) {
+		//首站的特殊处理
+		if (p->railStation.lock()->y_value.value() == y)
+			return dir() == Direction::Down ?
+			p->trainStation->arrive :
+			p->trainStation->depart;
+	}
+	else {
+		//正常的区间情况 根据y值计算  此时p是运行方向区间后站
+		auto q = std::prev(p);
+		double y0 = q->railStation.lock()->y_value.value();
+		double yn = p->railStation.lock()->y_value.value();
+		int dsn = q->trainStation->depart.secsTo(p->trainStation->arrive);
+		int dsi = std::round((y - y0) / (yn - y0) * dsn);
+		return q->trainStation->depart.addSecs(dsi);
+	}
+	return std::nullopt;
+}
+
 
 bool AdapterStation::operator<(double y) const
 {

@@ -4,6 +4,8 @@
 #include "viewers/sectioncountdialog.h"
 #include "dialogs/selectrailstationdialog.h"
 #include "viewers/stationtimetablesettled.h"
+#include "viewers/railstationeventlist.h"
+#include "viewers/railsectionevents.h"
 
 #include <QtWidgets>
 
@@ -125,6 +127,19 @@ void RailContext::initUI()
 		"时刻表以车次为单位，只考虑图定时刻。"));
 	btn = panel->addLargeAction(act);
 	btn->setMinimumWidth(80);
+
+	act = new QAction(QIcon(":/icons/electronic-clock.png"), tr("车站事件表"), this);
+	connect(act, SIGNAL(triggered()), this, SLOT(actStationEvents()));
+	act->setToolTip(tr("车站事件表\n显示指定车站的（基于事件的）时刻表。"
+		"时刻表以事件为单位，并考虑推定；如果存在停车，则到、开视为不同的事件。"));
+	btn = panel->addLargeAction(act);
+	btn->setMinimumWidth(80);
+
+	act = new QAction(QIcon(":/icons/diagram.png"), tr("断面事件表"), this);
+	connect(act, SIGNAL(triggered()), this, SLOT(actSectionEvents()));
+	act->setToolTip(tr("断面事件表\n显示本线（站间区间）给定里程标位置的列车（通过）时刻表。"));
+	btn = panel->addLargeAction(act);
+	btn->setMinimumWidth(80);
 }
 
 void RailContext::updateRailWidget(std::shared_ptr<Railway> rail)
@@ -244,6 +259,27 @@ void RailContext::actStationTrains()
 void RailContext::stationTrains(std::shared_ptr<RailStation> station)
 {
 	auto* dialog = new StationTimetableSettledDialog(diagram, railway, station, mw);
+	dialog->show();
+}
+
+void RailContext::actStationEvents()
+{
+	if (!railway)return;
+	auto* dialog = new SelectRailStationDialog(railway, mw);
+	connect(dialog, &SelectRailStationDialog::stationSelected,
+		this, &RailContext::stationEvents);
+	dialog->open();
+}
+
+void RailContext::stationEvents(std::shared_ptr<RailStation> station)
+{
+	auto* dialog = new RailStationEventListDialog(diagram, railway, station, mw);
+	dialog->show();
+}
+
+void RailContext::actSectionEvents()
+{
+	auto* dialog = new RailSectionEventsDialog(diagram, railway, mw);
 	dialog->show();
 }
 

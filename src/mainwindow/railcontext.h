@@ -82,6 +82,10 @@ private slots:
 
     void stationTrains(std::shared_ptr<RailStation> station);
 
+    void actStationEvents();
+    void stationEvents(std::shared_ptr<RailStation> station);
+
+    void actSectionEvents();
 
 public slots:
 

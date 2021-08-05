@@ -181,9 +181,24 @@ public:
         stationFromYValue(double y)const;
 
     /**
-     * 线性查找  注意  不标注起点标签的线，首站不返回。
+     * 注意  不标注起点标签的线，首站不返回。
+     * 2021.08.01  改为二分查找
      */
     const AdapterStation* stationFromRail(std::shared_ptr<RailStation> rail)const;
+
+    /**
+     * 基于事件的实现版本  二分查找
+     * 包含推定。到达、出发要拆开，因此返回QList
+     */
+    QList<RailStationEvent> 
+           stationEventFromRail(std::shared_ptr<RailStation> rail)const;
+
+    /**
+     * 计算通过指定纵坐标处的时刻；如果运行线不经过该点，返回空
+     * 如果指定纵坐标恰好是某一车站，则以【左区间】为准，
+     * 即下行列车到达时刻、上行列车出发时刻。
+     */
+    std::optional<QTime> sectionTime(double y)const;
 
 private:
 
@@ -351,6 +366,12 @@ private:
     inline bool isStartingOrTerminal(ConstAdaPtr st)const {
         return isStartingStation(st) || isTerminalStation(st);
     }
+
+    /**
+     * 判断所给的图定通过事件是站前，站后还是both
+     * 根据是否是首站、末站，以及行别
+     */
+    int passStationPos(ConstAdaPtr st)const;
 
 
 };
