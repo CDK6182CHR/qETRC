@@ -135,6 +135,31 @@ public:
             return std::shared_ptr<_Node>();
     }
 
+    /**
+     * 2021.08.09  返回指定车站沿指定方向上一近邻区间的数据
+     */
+    inline std::shared_ptr<_Node>
+        dirPrevNode(std::shared_ptr<RailStation> st, Direction dir)
+    {
+        auto t = st->dirPrevInterval(dir);
+        if (t) {
+            return t->template getDataAt<_Node>(_index);
+        }
+        else
+            return {};
+    }
+
+    inline std::shared_ptr<_Node>
+        dirNextNode(std::shared_ptr<RailStation> st, Direction dir)
+    {
+        auto t = st->dirNextInterval(dir);
+        if (t) {
+            return t->template getDataAt<_Node>(_index);
+        }
+        else
+            return {};
+    }
+
     inline auto& railway() { return _railway.get(); }
     inline const auto& railway()const { return _railway.get(); }
 

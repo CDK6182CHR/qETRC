@@ -135,6 +135,8 @@ private slots:
     void actRemoveCurrentTrain();
 
     void actShowTrainLineDialog();
+
+    void actRulerRef();
 };
 
 

@@ -32,6 +32,12 @@ QString secsToString(int secs);
 QString secsToString(const QTime& tm1, const QTime& tm2);
 
 /**
+ * 返回 xx:xx形式的时间字符串表示
+ * 支持负数
+ */
+QString secsDiffToString(int secs);
+
+/**
  * 将StandardItemModel中的所有文字搞到CSV里面去
  */
 bool tableToCsv(const QStandardItemModel* model, const QString& filename);

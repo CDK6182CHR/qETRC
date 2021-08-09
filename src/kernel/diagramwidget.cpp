@@ -14,6 +14,7 @@
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QTextBrowser>
+#include <QScroller>
 
 #ifdef _Q_OS_WIN32
 #include <QPrinter>
@@ -25,7 +26,7 @@ DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page
     _diagram(diagram),
     QGraphicsView(parent),_page(page),startTime(diagram.config().start_hour,0,0)
 {
-    //todo: menu...
+    QScroller::grabGesture(this, QScroller::TouchGesture);
     setRenderHint(QPainter::Antialiasing, true);
     setAlignment(Qt::AlignTop | Qt::AlignLeft);
 

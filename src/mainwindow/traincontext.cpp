@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "data/train/train.h"
 #include "viewers/trainlinedialog.h"
+#include "viewers/rulerrefdialog.h"
 
 #include <QtWidgets>
 
@@ -70,6 +71,13 @@ void TrainContext::initUI()
 		act = new QAction(QIcon(":/icons/line-manage.png"), tr("运行线一览"), this);
 		act->setToolTip(tr("运行线一览表\n显示本次列车所有运行线基础信息及其铺画情况"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actShowTrainLineDialog()));
+		btn = panel->addLargeAction(act);
+		btn->setMinimumWidth(80);
+
+		act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺对照"), this);
+		act->setToolTip(tr("标尺对照\n将本次列车运行情况与指定线路、标尺进行对照，"
+			"以确定本次列车是否符合指定标尺，或与指定标尺差异如何。"));
+		connect(act, SIGNAL(triggered()), this, SLOT(actRulerRef()));
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(80);
 	}
@@ -187,6 +195,8 @@ void TrainContext::initUI()
 		connect(act, SIGNAL(triggered()), this, SLOT(actRemoveCurrentTrain()));
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(70);
+
+		
 	}
 
 }
@@ -448,6 +458,12 @@ void TrainContext::actShowTrainLineDialog()
 {
 	auto* dialog = new TrainLineDialog(train, mw);
 	dialog->show();
+}
+
+void TrainContext::actRulerRef()
+{
+	auto* dialog = new RulerRefDialog(train, mw);
+	dialog->open();
 }
 
 void TrainContext::setTrain(std::shared_ptr<Train> train_)

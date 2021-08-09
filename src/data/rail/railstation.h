@@ -162,6 +162,17 @@ public:
         }
     }
 
+    inline std::shared_ptr<RailInterval> dirPrevInterval(Direction _dir) {
+        switch (_dir) {
+        case Direction::Down:
+            return downPrev;
+        case Direction::Up:
+            return upPrev;
+        default:
+            return nullptr;
+        }
+    }
+
     inline bool operator<(double mile_)const {
         return this->mile < mile_;
     }
