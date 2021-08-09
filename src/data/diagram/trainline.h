@@ -47,7 +47,8 @@ class TrainCollection;
  * 2021.06.22  增加绑定序列类
  * 原则上只允许TrainAdapter修改；外面的类只读。
  */
-class TrainLine
+class TrainLine:
+    public std::enable_shared_from_this<TrainLine>
 {
     friend class TrainAdapter;
     TrainAdapter& _adapter;
@@ -200,6 +201,11 @@ public:
      */
     std::optional<QTime> sectionTime(double y)const;
 
+    /**
+     * 返回指定时刻列车的运行状态。
+     */
+    SnapEventList getSnapEvents(const QTime& time)const;
+
 private:
 
     /**
@@ -344,6 +350,16 @@ private:
         const QString& note = "")const;
 
     /**
+     * SnapEvent使用 将former->latter这个区间压缩到实际的线路区间，线性探查。
+     * 首先要通过时间定为里程标。
+     * 
+     */
+    SnapEvent::pos_t compressSnapInterval(ConstAdaPtr former, ConstAdaPtr latter,
+        const QTime& time, double mile)const;
+
+    double snapEventMile(ConstAdaPtr former, ConstAdaPtr latter, const QTime& time)const;
+
+    /**
      * 判定st所示站是否在mile所示里程的运行方向前方或相等，即下行时里程比它小、上行时里程比它大
      * 简单地比较里程
      */
@@ -372,7 +388,6 @@ private:
      * 根据是否是首站、末站，以及行别
      */
     int passStationPos(ConstAdaPtr st)const;
-
 
 };
 

@@ -45,6 +45,7 @@ SOURCES += \
     src/editors/ruler/rulertabpy.cpp \
     src/editors/ruler/rulerwidget.cpp \
     src/viewers/railsectionevents.cpp \
+    src/viewers/railsnapevents.cpp \
     src/viewers/railstationeventlist.cpp \
     src/viewers/rulerrefdialog.cpp \
     src/viewers/stationtimetablesettled.cpp \
@@ -75,7 +76,8 @@ SOURCES += \
     src/util/qecontrolledtable.cpp \
     src/util/utilfunc.cpp \
     src/viewers/sectioncountdialog.cpp \
-    src/viewers/traineventdialog.cpp
+    src/viewers/traineventdialog.cpp \
+    src/viewers/trainlinedialog.cpp
 
 HEADERS += \
     src/data/common/direction.h \
@@ -111,6 +113,7 @@ HEADERS += \
     src/editors/ruler/rulertabpy.h \
     src/editors/ruler/rulerwidget.h \
     src/viewers/railsectionevents.h \
+    src/viewers/railsnapevents.h \
     src/viewers/railstationeventlist.h \
     src/viewers/rulerrefdialog.h \
     src/viewers/stationtimetablesettled.h \
@@ -144,7 +147,8 @@ HEADERS += \
     src/util/qeexceptions.h \
     src/util/utilfunc.h \
     src/viewers/sectioncountdialog.h \
-    src/viewers/traineventdialog.h
+    src/viewers/traineventdialog.h \
+    src/viewers/trainlinedialog.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

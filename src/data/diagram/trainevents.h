@@ -5,6 +5,7 @@
 #include <deque>
 #include <QList>
 #include <QString>
+#include <variant>
 
 #include "data/rail/railway.h"
 #include "data/train/train.h"
@@ -160,4 +161,32 @@ using AdapterEventList = LineEventList;
  */
 using TrainEventList=std::deque<QPair<std::shared_ptr<TrainAdapter>,AdapterEventList>>;
 
+class TrainLine;
 
+/**
+ * 列车在指定时刻运行状态的描述，包括：所在站或者所在区间，里程标
+ */
+struct SnapEvent {
+    std::shared_ptr<const TrainLine> line;
+    double mile;
+    using pos_t = std::variant<std::shared_ptr<RailStation>, std::shared_ptr<RailInterval>>;
+    pos_t pos;
+    bool isStopped;
+    QString note;
+    SnapEvent(std::shared_ptr<const TrainLine> line_,
+        double mile_,
+        std::variant<std::shared_ptr<RailStation>, std::shared_ptr<RailInterval>> pos_,
+        bool isStopped_,
+        const QString& note_=""):
+        line(line_),mile(mile_),pos(pos_),isStopped(isStopped_), note(note_){}
+
+    inline bool isStationEvent()const {
+        return std::holds_alternative<std::shared_ptr<RailStation>>(pos);
+    }
+
+    inline bool operator<(const SnapEvent& another)const {
+        return mile < another.mile;
+    }
+};
+
+using SnapEventList = QList<SnapEvent>;

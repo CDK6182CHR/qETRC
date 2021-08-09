@@ -875,6 +875,53 @@ void TrainLine::addIntervalEvent(LineEventList& res, int index, TrainEventType t
 	}
 }
 
+SnapEvent::pos_t 
+	TrainLine::compressSnapInterval(ConstAdaPtr former, ConstAdaPtr latter, 
+	const QTime& time, double mile) const
+{
+	auto rfor = former->railStation.lock(), rlat = latter->railStation.lock();
+	
+	if (rfor->dirAdjacent(dir()) != rlat) {
+		//非相邻站，收缩区间
+		//现在假定缺站情况不严重，线性地往中间搜索
+		auto r1 = rfor->dirAdjacent(dir());   //临时变量
+		while (r1 && mileBeforeEq(r1, mile)) {
+			rfor = r1; r1 = r1->dirAdjacent(dir());
+		}
+		auto invdir = DirFunc::reverse(dir());
+		r1 = rlat->dirAdjacent(invdir);
+		while (r1 && mileAfterEq(r1, mile)) {
+			rlat = r1; r1 = r1->dirAdjacent(invdir);
+		}
+		//现在：rfor, rlat是收缩后的区间界限
+	}
+	decltype(rfor) rin{};   //如果站内事件，用这个
+	if (rfor->mile == mile)
+		rin = rfor;
+	else if (rlat->mile == mile)
+		rin = rlat;
+	if (rin) {
+		//站内
+		return rin;
+	}
+	else {
+		//区间事件，返回这个区间
+		return rfor->dirNextInterval(dir());
+	}
+}
+
+double TrainLine::snapEventMile(ConstAdaPtr former, ConstAdaPtr latter, const QTime& time) const
+{
+	auto rfor = former->railStation.lock(), rlat = latter->railStation.lock();
+
+	//先算出里程
+	const QTime& t0 = former->trainStation->depart, tn = latter->trainStation->arrive;
+	double mile0 = rfor->mile, milen = rlat->mile;
+	int ds = qeutil::secsTo(t0, tn);
+	return mile0 +
+		static_cast<double>(qeutil::secsTo(t0, time)) / ds * (milen - mile0);
+}
+
 bool TrainLine::mileBeforeEq(std::shared_ptr<const RailStation> st, double mile) const
 {
 	return dir() == Direction::Down ?
@@ -1020,6 +1067,34 @@ std::optional<QTime> TrainLine::sectionTime(double y) const
 		return q->trainStation->depart.addSecs(dsi);
 	}
 	return std::nullopt;
+}
+
+SnapEventList TrainLine::getSnapEvents(const QTime& time) const
+{
+	SnapEventList res;
+	auto pr = _stations.begin();  //上一站迭代器
+	for (auto p = _stations.begin(); p != _stations.end(); ++p) {
+		//先判断前一区间  注意区间不包括端点
+		if (pr != p) {
+			// pr.depart < tm < p.arrive
+			if (qeutil::timeCompare(pr->trainStation->depart, time) &&
+				qeutil::timeCompare(time, p->trainStation->arrive)) {
+				//注意这俩不一定是相邻的...
+				double mile = snapEventMile(pr, p, time);
+				auto pos = compressSnapInterval(pr, p, time, mile);
+				res.append(SnapEvent(shared_from_this(), mile, pos, false,
+					std::holds_alternative<std::shared_ptr<RailStation>>(pos) ?
+					QObject::tr("推算") : ""));
+			}
+		}
+		if (p->trainStation->timeInStoppedRange(time.msecsSinceStartOfDay())) {
+			//恰好在站内
+			res.append(SnapEvent(shared_from_this(), p->railStation.lock()->mile,
+				p->railStation.lock(), p->trainStation->isStopped()));
+		}
+		pr = p;
+	}
+	return res;
 }
 
 

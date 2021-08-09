@@ -6,6 +6,7 @@
 #include "viewers/stationtimetablesettled.h"
 #include "viewers/railstationeventlist.h"
 #include "viewers/railsectionevents.h"
+#include "viewers/railsnapevents.h"
 
 #include <QtWidgets>
 
@@ -138,6 +139,13 @@ void RailContext::initUI()
 	act = new QAction(QIcon(":/icons/diagram.png"), tr("断面事件表"), this);
 	connect(act, SIGNAL(triggered()), this, SLOT(actSectionEvents()));
 	act->setToolTip(tr("断面事件表\n显示本线（站间区间）给定里程标位置的列车（通过）时刻表。"));
+	btn = panel->addLargeAction(act);
+	btn->setMinimumWidth(80);
+
+	act = new QAction(QIcon(":/icons/clock.png"), tr("运行快照"), this);
+	connect(act, SIGNAL(triggered()), this, SLOT(actSnapEvents()));
+	act->setToolTip(tr("运行快照\n显示本线指定时刻所有列车的运行状态"
+		"（如果运行线与指定时刻存在交点）。"));
 	btn = panel->addLargeAction(act);
 	btn->setMinimumWidth(80);
 }
@@ -280,6 +288,12 @@ void RailContext::stationEvents(std::shared_ptr<RailStation> station)
 void RailContext::actSectionEvents()
 {
 	auto* dialog = new RailSectionEventsDialog(diagram, railway, mw);
+	dialog->show();
+}
+
+void RailContext::actSnapEvents()
+{
+	auto* dialog = new RailSnapEventsDialog(diagram, railway, mw);
 	dialog->show();
 }
 

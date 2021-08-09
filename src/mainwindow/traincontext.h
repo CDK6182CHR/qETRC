@@ -133,6 +133,8 @@ private slots:
     void refreshData();
 
     void actRemoveCurrentTrain();
+
+    void actShowTrainLineDialog();
 };
 
 

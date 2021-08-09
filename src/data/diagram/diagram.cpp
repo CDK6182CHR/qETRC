@@ -319,6 +319,22 @@ QList<QPair<std::shared_ptr<TrainLine>, QTime>> Diagram::sectionEvents(std::shar
     return res;
 }
 
+SnapEventList Diagram::getSnapEvents(std::shared_ptr<Railway> railway, const QTime& time) const
+{
+    SnapEventList res;
+    for (auto train : _trainCollection.trains()) {
+        for (auto adp : train->adapters()) {
+            if (adp->isInSameRailway(railway)) {
+                for (auto line : adp->lines()) {
+                    res.append(line->getSnapEvents(time));
+                }
+            }
+        }
+    }
+    std::sort(res.begin(), res.end());   //按里程排序
+    return res;
+}
+
 void Diagram::bindAllTrains()
 {
     for (auto p : railways()) {

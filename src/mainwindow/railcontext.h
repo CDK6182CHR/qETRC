@@ -87,6 +87,8 @@ private slots:
 
     void actSectionEvents();
 
+    void actSnapEvents();
+
 public slots:
 
     /**

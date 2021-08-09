@@ -269,6 +269,8 @@ public:
     QList<QPair<std::shared_ptr<TrainLine>, QTime>>
         sectionEvents(std::shared_ptr<Railway> railway, double y)const;
 
+    SnapEventList getSnapEvents(std::shared_ptr<Railway> railway, const QTime& time)const;
+
 private:
     void bindAllTrains();
     QString validPageName(const QString& prefix)const;

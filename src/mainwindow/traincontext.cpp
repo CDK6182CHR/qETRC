@@ -3,6 +3,7 @@
 #include "viewers/traineventdialog.h"
 #include "mainwindow.h"
 #include "data/train/train.h"
+#include "viewers/trainlinedialog.h"
 
 #include <QtWidgets>
 
@@ -65,6 +66,12 @@ void TrainContext::initUI()
 		connect(act, SIGNAL(triggered()), this, SLOT(showTrainEvents()));
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(70);
+
+		act = new QAction(QIcon(":/icons/line-manage.png"), tr("运行线一览"), this);
+		act->setToolTip(tr("运行线一览表\n显示本次列车所有运行线基础信息及其铺画情况"));
+		connect(act, SIGNAL(triggered()), this, SLOT(actShowTrainLineDialog()));
+		btn = panel->addLargeAction(act);
+		btn->setMinimumWidth(80);
 	}
 
 	//编辑
@@ -435,6 +442,12 @@ void TrainContext::actRemoveCurrentTrain()
 			emit actRemoveTrain(idx);
 		}
 	}
+}
+
+void TrainContext::actShowTrainLineDialog()
+{
+	auto* dialog = new TrainLineDialog(train, mw);
+	dialog->show();
 }
 
 void TrainContext::setTrain(std::shared_ptr<Train> train_)
