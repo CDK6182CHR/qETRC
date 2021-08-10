@@ -195,6 +195,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\data\rail\railcategory.cpp" />
+    <ClCompile Include="src\dialogs\exchangeintervaldialog.cpp" />
     <ClCompile Include="src\dialogs\importtraindialog.cpp" />
     <ClCompile Include="src\dialogs\printdiagramdialog.cpp" />
     <ClCompile Include="src\dialogs\selectrailstationdialog.cpp" />
@@ -203,6 +204,7 @@
     <ClCompile Include="src\editors\railstationwidget.cpp" />
     <ClCompile Include="src\editors\ruler\rulertabpy.cpp" />
     <ClCompile Include="src\editors\ruler\rulerwidget.cpp" />
+    <ClCompile Include="src\util\selecttraincombo.cpp" />
     <ClCompile Include="src\viewers\railsectionevents.cpp" />
     <ClCompile Include="src\viewers\railsnapevents.cpp" />
     <ClCompile Include="src\viewers\railstationeventlist.cpp" />
@@ -280,6 +282,7 @@
     <QtMoc Include="src\editors\ruler\rulerwidget.h" />
     <QtMoc Include="src\dialogs\selectrailstationdialog.h" />
     <QtMoc Include="src\viewers\stationtimetablesettled.h" />
+    <QtMoc Include="src\dialogs\exchangeintervaldialog.h" />
     <ClInclude Include="src\mainwindow\version.h" />
     <QtMoc Include="src\navi\navitree.h" />
     <QtMoc Include="src\model\diagram\railtablemodel.h" />
@@ -330,6 +333,7 @@
     <ClInclude Include="src\data\train\trainname.h" />
     <ClInclude Include="src\data\train\trainstation.h" />
     <ClInclude Include="src\data\train\traintype.h" />
+    <QtMoc Include="src\util\selecttraincombo.h" />
     <ClInclude Include="src\util\utilfunc.h" />
   </ItemGroup>
   <ItemGroup>

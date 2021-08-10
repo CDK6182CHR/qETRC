@@ -36,6 +36,7 @@ SOURCES += \
     src/data/train/trainname.cpp \
     src/data/train/trainstation.cpp \
     src/data/train/traintype.cpp \
+    src/dialogs/exchangeintervaldialog.cpp \
     src/dialogs/importtraindialog.cpp \
     src/dialogs/printdiagramdialog.cpp \
     src/dialogs/selectrailstationdialog.cpp \
@@ -44,6 +45,7 @@ SOURCES += \
     src/editors/railstationwidget.cpp \
     src/editors/ruler/rulertabpy.cpp \
     src/editors/ruler/rulerwidget.cpp \
+    src/util/selecttraincombo.cpp \
     src/viewers/railsectionevents.cpp \
     src/viewers/railsnapevents.cpp \
     src/viewers/railstationeventlist.cpp \
@@ -104,6 +106,7 @@ HEADERS += \
     src/data/train/trainname.h \
     src/data/train/trainstation.h \
     src/data/train/traintype.h \
+    src/dialogs/exchangeintervaldialog.h \
     src/dialogs/importtraindialog.h \
     src/dialogs/printdiagramdialog.h \
     src/dialogs/selectrailstationdialog.h \
@@ -112,6 +115,7 @@ HEADERS += \
     src/editors/railstationwidget.h \
     src/editors/ruler/rulertabpy.h \
     src/editors/ruler/rulerwidget.h \
+    src/util/selecttraincombo.h \
     src/viewers/railsectionevents.h \
     src/viewers/railsnapevents.h \
     src/viewers/railstationeventlist.h \

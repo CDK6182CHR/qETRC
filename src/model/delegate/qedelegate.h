@@ -9,7 +9,7 @@ namespace qeutil {
 enum {
     DoubleDataRole=Qt::UserRole+100,
     IntervalRole,
-    TrainLineRole
+    TrainLineRole,
 };
 }
 

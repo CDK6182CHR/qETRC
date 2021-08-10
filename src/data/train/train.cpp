@@ -525,8 +525,15 @@ void Train::show() const
 }
 
 void Train::intervalExchange(Train& train2, StationPtr start1, StationPtr end1, 
-    StationPtr start2, StationPtr end2)
+    StationPtr start2, StationPtr end2, bool includeStart, bool includeEnd)
 {
+    if (!includeStart) {
+        std::swap(start1->arrive, start2->arrive);
+    }
+    if (!includeEnd) {
+        std::swap(end1->depart, end2->depart);
+    }
+
     auto& table2 = train2._timetable;
     ++end1; ++end2;
 

@@ -113,6 +113,13 @@ public:
      */
     std::shared_ptr<Train> findFirstSingleName(const QString& name);
 
+    /**
+     * pyETRC.Graph.multiSearch()  模糊查找车次
+     * 全车次或分方向车次包含目标串即可
+     */
+    QList<std::shared_ptr<Train>>
+        multiSearchTrain(const QString& name);
+
     auto& typeManager() { return _manager; }
     const auto& typeManager()const { return _manager; }
 

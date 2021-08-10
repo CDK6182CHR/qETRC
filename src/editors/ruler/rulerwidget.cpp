@@ -1,6 +1,7 @@
 ﻿#include "rulerwidget.h"
 #include "util/buttongroup.hpp"
 #include "model/delegate/postivespindelegate.h"
+#include "data/diagram/diagram.h"
 
 #include <QtWidgets>
 
@@ -59,6 +60,7 @@ void RulerWidget::initUI()
     connect(ckDiff,SIGNAL(toggled(bool)),this,SLOT(onDiffChanged(bool)));
 
     table=new QTableView;
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->setModel(model);
     table->resizeColumnsToContents();
     table->setEditTriggers(QTableView::CurrentChanged);

@@ -109,6 +109,16 @@ std::shared_ptr<Train> TrainCollection::findFirstSingleName(const QString& name)
 	return singleNameMap.value(name).first();
 }
 
+QList<std::shared_ptr<Train>> TrainCollection::multiSearchTrain(const QString& name)
+{
+	QList<std::shared_ptr<Train>> res;
+	for (auto t : _trains) {
+		if (t->trainName().contains(name))
+			res.append(t);
+	}
+	return res;
+}
+
 void TrainCollection::clear(const TypeManager& defaultManager)
 {
 	_trains.clear();

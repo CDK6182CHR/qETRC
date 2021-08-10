@@ -308,7 +308,7 @@ public:
      * 注意start,end都包含在内
      */
     void intervalExchange(Train& train2, StationPtr start1, StationPtr end1,
-        StationPtr start2, StationPtr end2);
+        StationPtr start2, StationPtr end2, bool includeStart, bool includeEnd);
 
     /**
      * @brief Train.detectPassStation()  推定通过站时刻

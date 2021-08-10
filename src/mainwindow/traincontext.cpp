@@ -5,6 +5,7 @@
 #include "data/train/train.h"
 #include "viewers/trainlinedialog.h"
 #include "viewers/rulerrefdialog.h"
+#include "dialogs/exchangeintervaldialog.h"
 
 #include <QtWidgets>
 
@@ -183,6 +184,12 @@ void TrainContext::initUI()
 		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(refreshData()));
 
+		panel = page->addPannel(tr("调整"));
+		act = new QAction(QIcon(":/icons/exchange.png"), tr("区间换线"), this);
+		act->setToolTip(tr("区间换线\n交换本次列车和另一列车在所选区间的运行线"));
+		connect(act, SIGNAL(triggered()), this, SLOT(actExchangeInterval()));
+		panel->addMediumAction(act);
+
 		panel = page->addPannel(tr(""));
 
 
@@ -277,6 +284,15 @@ void TrainContext::commitTimetableChange(std::shared_ptr<Train> train, std::shar
 	emit timetableChanged(train);
 }
 
+void TrainContext::afterTimetableChanged(std::shared_ptr<Train> train)
+{
+	QList<std::shared_ptr<TrainAdapter>> adps = std::move(train->adapters());
+	diagram.updateTrain(train);
+	updateTrainWidget(train);
+	mw->updateTrainLines(train, std::move(adps));
+	emit timetableChanged(train);
+}
+
 void TrainContext::commitTraininfoChange(std::shared_ptr<Train> train, std::shared_ptr<Train> info)
 {
 	train->swapBaseInfo(*info);
@@ -295,6 +311,12 @@ void TrainContext::removeAllTrainWidgets()
 	}
 	basicDocks.clear();
 	basicWidgets.clear();
+}
+
+void TrainContext::commitExchangeTrainInterval(std::shared_ptr<Train> train1, std::shared_ptr<Train> train2)
+{
+	afterTimetableChanged(train1);
+	afterTimetableChanged(train2);
 }
 
 void TrainContext::actShowTrainLine()
@@ -466,6 +488,24 @@ void TrainContext::actRulerRef()
 	dialog->open();
 }
 
+void TrainContext::actExchangeInterval()
+{
+	auto* dialog = new ExchangeIntervalDialog(diagram.trainCollection(), train, mw);
+	connect(dialog, &ExchangeIntervalDialog::exchangeApplied,
+		this, &TrainContext::actApplyExchangeInterval);
+	dialog->open();
+}
+
+void TrainContext::actApplyExchangeInterval(
+	std::shared_ptr<Train> train1, std::shared_ptr<Train> train2, 
+	Train::StationPtr start1, Train::StationPtr end1,
+	Train::StationPtr start2, Train::StationPtr end2, 
+	bool includeStart, bool includeEnd)
+{
+	mw->getUndoStack()->push(new qecmd::ExchangeTrainInterval(train1, train2,
+		start1, end1, start2, end2, includeStart, includeEnd, this));
+}
+
 void TrainContext::setTrain(std::shared_ptr<Train> train_)
 {
 	train = train_;
@@ -493,4 +533,22 @@ void qecmd::ChangeTimetable::undo()
 void qecmd::ChangeTimetable::redo()
 {
 	cont->commitTimetableChange(train, table);
+}
+
+void qecmd::ExchangeTrainInterval::undo()
+{
+	commit();
+}
+
+void qecmd::ExchangeTrainInterval::redo()
+{
+	commit();
+}
+
+void qecmd::ExchangeTrainInterval::commit()
+{
+	train1->intervalExchange(*train2, start1, end1, start2, end2, includeStart, includeEnd);
+	std::swap(start1, start2);
+	std::swap(end1, end2);
+	cont->commitExchangeTrainInterval(train1, train2);
 }

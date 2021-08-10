@@ -96,6 +96,11 @@ public slots:
     void commitTimetableChange(std::shared_ptr<Train> train, std::shared_ptr<Train> table);
 
     /**
+     * 列车时刻表变化后的操作，2021.08.10抽离出来
+     */
+    void afterTimetableChanged(std::shared_ptr<Train> train);
+
+    /**
      * 更新信息，重新铺画运行图（但不重新绑定）
      * 更新当前页面（目前只需要更新当前页面），通知列表页面更新
      * 似乎现在直接利用timetableChanged()信号就够了
@@ -113,6 +118,12 @@ public slots:
      * 清理运行图时，关闭所有既有的面板
      */
     void removeAllTrainWidgets();
+
+    /**
+     * 完成换线后操作，即重新铺画、更新等。
+     */
+    void commitExchangeTrainInterval(std::shared_ptr<Train> train1,
+        std::shared_ptr<Train> train2);
 
 private slots:
     void showTrainEvents();
@@ -137,6 +148,16 @@ private slots:
     void actShowTrainLineDialog();
 
     void actRulerRef();
+
+    void actExchangeInterval();
+
+    /**
+     * 压栈操作
+     */
+    void actApplyExchangeInterval(std::shared_ptr<Train> train1, std::shared_ptr<Train>train2,
+        Train::StationPtr start1, Train::StationPtr end1,
+        Train::StationPtr start2, Train::StationPtr end2, 
+        bool includeStart, bool includeEnd); 
 };
 
 
@@ -169,6 +190,31 @@ namespace qecmd {
         virtual void redo()override {
             cont->commitTraininfoChange(train, info);
         }
+    };
+
+    class ExchangeTrainInterval :
+        public QUndoCommand {
+        std::shared_ptr<Train> train1, train2;
+        Train::StationPtr start1, end1, start2, end2;
+        bool includeStart, includeEnd;
+        TrainContext* const cont;
+    public:
+        ExchangeTrainInterval(std::shared_ptr<Train> train1_, std::shared_ptr<Train> train2_,
+            Train::StationPtr start1_, Train::StationPtr end1_,
+            Train::StationPtr start2_, Train::StationPtr end2_,
+            bool includeStart_, bool includeEnd_, TrainContext* context,
+            QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("区间换线: %1 & %2").arg(train1_->trainName().full())
+            .arg(train2_->trainName().full()),parent),
+            train1(train1_),train2(train2_),start1(start1_),end1(end1_),start2(start2_),
+            end2(end2_),includeStart(includeStart_),includeEnd(includeEnd_),cont(context)
+        {}
+
+        virtual void undo()override;
+        virtual void redo()override;
+
+    private:
+        void commit();
     };
 }
 
