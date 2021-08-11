@@ -15,12 +15,12 @@ void SelectTrainCombo::initUI()
             "符合条件的车次。"));
     connect(edName,&QLineEdit::editingFinished,
             this,&SelectTrainCombo::onEditingFinished);
-    addWidget(edName,3);
+    addWidget(edName,2);
 
     cbTrains=new QComboBox;
     connect(cbTrains,SIGNAL(currentIndexChanged(int)),
             this,SLOT(onIndexChanged(int)));
-    addWidget(cbTrains,2);
+    addWidget(cbTrains,3);
 }
 
 void SelectTrainCombo::onEditingFinished()
@@ -28,7 +28,9 @@ void SelectTrainCombo::onEditingFinished()
     matched = coll.multiSearchTrain(edName->text());
     cbTrains->clear();
     for(auto t:matched){
-        cbTrains->addItem(t->trainName().full());
+        cbTrains->addItem(tr("%1 (%2->%3)").arg(t->trainName().full())
+                          .arg(t->starting().toSingleLiteral())
+                          .arg(t->terminal().toSingleLiteral()));
     }
     cbTrains->setFocus();
     if(cbTrains->count() > 1){

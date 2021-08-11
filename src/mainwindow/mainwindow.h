@@ -296,6 +296,8 @@ private slots:
     void useWpsStyle();
     void useOfficeStyle();
 
+    void actRulerPaint();
+
 public slots:
 
     /**

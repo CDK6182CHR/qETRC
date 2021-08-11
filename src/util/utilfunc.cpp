@@ -98,3 +98,8 @@ bool qeutil::exportTableToCsv(const QStandardItemModel* model, QWidget* parent, 
 	}
 	return flag;
 }
+
+bool qeutil::ltIndexRow(const QModelIndex &idx1, const QModelIndex &idx2)
+{
+    return idx1.row()<idx2.row();
+}

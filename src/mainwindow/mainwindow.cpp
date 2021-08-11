@@ -13,6 +13,7 @@
 #include "navi/navitree.h"
 #include "navi/addpagedialog.h"
 #include "editors/configdialog.h"
+#include "wizards/rulerpaint/rulerpaintwizard.h"
 
 #include "version.h"
 
@@ -240,6 +241,12 @@ void MainWindow::useWpsStyle()
 void MainWindow::useOfficeStyle()
 {
     ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);
+}
+
+void MainWindow::actRulerPaint()
+{
+    auto* wzd = new RulerPaintWizard(_diagram, this);
+    wzd->show();
 }
 
 
@@ -505,6 +512,15 @@ void MainWindow::initToolbar()
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(70);
         connect(act, SIGNAL(triggered()), naviView, SLOT(actAddTrain()));
+
+        act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("标尺排图"), this);
+        addAction(act);
+        act->setShortcut(Qt::CTRL + Qt::Key_R);
+        act->setToolTip(tr("标尺排图向导 (Ctrl+R)\n使用指定线路的指定标尺，"
+            "铺画新的列车运行线，或者重新铺画既有列车运行线的一部分。"));
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
+        connect(act, SIGNAL(triggered()), this, SLOT(actRulerPaint()));
 
         panel = cat->addPannel(tr("运行线控制"));
 

@@ -5,6 +5,7 @@
 
 class QWidget;
 class QStandardItemModel;
+class QModelIndex;
 
 namespace qeutil{
 
@@ -46,5 +47,7 @@ bool tableToCsv(const QStandardItemModel* model, const QString& filename);
  * 先显示选择文件的对话框，然后再导出到CSV
  */
 bool exportTableToCsv(const QStandardItemModel* model, QWidget* parent, const QString& initName);
+
+bool ltIndexRow(const QModelIndex& idx1,const QModelIndex& idx2);
 
 }

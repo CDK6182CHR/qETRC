@@ -79,7 +79,9 @@ SOURCES += \
     src/util/utilfunc.cpp \
     src/viewers/sectioncountdialog.cpp \
     src/viewers/traineventdialog.cpp \
-    src/viewers/trainlinedialog.cpp
+    src/viewers/trainlinedialog.cpp \
+    src/wizards/rulerpaint/rulerpaintpagestart.cpp \
+    src/wizards/rulerpaint/rulerpaintwizard.cpp
 
 HEADERS += \
     src/data/common/direction.h \
@@ -152,7 +154,9 @@ HEADERS += \
     src/util/utilfunc.h \
     src/viewers/sectioncountdialog.h \
     src/viewers/traineventdialog.h \
-    src/viewers/trainlinedialog.h
+    src/viewers/trainlinedialog.h \
+    src/wizards/rulerpaint/rulerpaintpagestart.h \
+    src/wizards/rulerpaint/rulerpaintwizard.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

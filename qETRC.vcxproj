@@ -258,8 +258,12 @@
     <ClCompile Include="src\viewers\sectioncountdialog.cpp" />
     <ClCompile Include="src\viewers\traineventdialog.cpp" />
     <ClCompile Include="src\viewers\trainlinedialog.cpp" />
+    <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagestart.cpp" />
+    <ClCompile Include="src\wizards\rulerpaint\rulerpaintwizard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="src\wizards\rulerpaint\rulerpaintwizard.h" />
+    <QtMoc Include="src\wizards\rulerpaint\rulerpaintpagestart.h" />
     <QtMoc Include="src\viewers\trainlinedialog.h" />
     <QtMoc Include="src\viewers\railsnapevents.h" />
     <QtMoc Include="src\viewers\railsectionevents.h" />
