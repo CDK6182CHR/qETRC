@@ -6,10 +6,13 @@
 #include <cstdint>
 #include <QString>
 #include <QObject>
+#include <QVariant>
 
 enum class Direction : std::int8_t {
 	Down, Up, Undefined
 };
+
+Q_DECLARE_METATYPE(Direction);
 
 namespace DirFunc {
 	inline constexpr Direction reverse(Direction d) {

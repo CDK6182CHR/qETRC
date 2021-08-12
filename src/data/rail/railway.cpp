@@ -610,6 +610,39 @@ std::shared_ptr<RailInterval> Railway::firstUpInterval() const
 	return std::shared_ptr<RailInterval>();
 }
 
+std::shared_ptr<const RailStation> Railway::firstDownStation() const
+{
+	for (auto p : _stations) {
+		if (p->isDownVia())
+			return p;
+	}
+	return nullptr;
+}
+
+std::shared_ptr<const RailStation> Railway::firstUpStation() const
+{
+	for (auto p = _stations.crbegin(); p != _stations.crend(); ++p) {
+		if ((*p)->isUpVia())
+			return *p;
+	}
+	return {};
+}
+
+std::shared_ptr<const RailStation> Railway::firstDirStation(Direction dir) const
+{
+	switch (dir)
+	{
+	case Direction::Down: return firstDownStation();
+		break;
+	case Direction::Up: return firstUpStation();
+		break;
+	default: return {};
+		break;
+	}
+}
+
+
+
 void Railway::showStations() const
 {
 	qDebug() << "Stations list for railway: " << _name << Qt::endl;

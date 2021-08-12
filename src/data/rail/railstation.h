@@ -173,6 +173,14 @@ public:
         }
     }
 
+    inline std::shared_ptr<const RailInterval> dirNextInterval(Direction _dir)const {
+        return const_cast<RailStation*>(this)->dirNextInterval(_dir);
+    }
+
+    inline std::shared_ptr<const RailInterval> dirPrevInterval(Direction _dir)const {
+        return const_cast<RailStation*>(this)->dirPrevInterval(_dir);
+    }
+
     inline bool operator<(double mile_)const {
         return this->mile < mile_;
     }

@@ -204,6 +204,7 @@
     <ClCompile Include="src\editors\railstationwidget.cpp" />
     <ClCompile Include="src\editors\ruler\rulertabpy.cpp" />
     <ClCompile Include="src\editors\ruler\rulerwidget.cpp" />
+    <ClCompile Include="src\util\railrulercombo.cpp" />
     <ClCompile Include="src\util\selecttraincombo.cpp" />
     <ClCompile Include="src\viewers\railsectionevents.cpp" />
     <ClCompile Include="src\viewers\railsnapevents.cpp" />
@@ -259,9 +260,13 @@
     <ClCompile Include="src\viewers\traineventdialog.cpp" />
     <ClCompile Include="src\viewers\trainlinedialog.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagestart.cpp" />
+    <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagestation.cpp" />
+    <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagetable.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintwizard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="src\wizards\rulerpaint\rulerpaintpagetable.h" />
+    <QtMoc Include="src\wizards\rulerpaint\rulerpaintpagestation.h" />
     <QtMoc Include="src\wizards\rulerpaint\rulerpaintwizard.h" />
     <QtMoc Include="src\wizards\rulerpaint\rulerpaintpagestart.h" />
     <QtMoc Include="src\viewers\trainlinedialog.h" />
@@ -338,6 +343,7 @@
     <ClInclude Include="src\data\train\trainstation.h" />
     <ClInclude Include="src\data\train\traintype.h" />
     <QtMoc Include="src\util\selecttraincombo.h" />
+    <QtMoc Include="src\util\railrulercombo.h" />
     <ClInclude Include="src\util\utilfunc.h" />
   </ItemGroup>
   <ItemGroup>

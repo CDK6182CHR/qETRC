@@ -45,6 +45,7 @@ SOURCES += \
     src/editors/railstationwidget.cpp \
     src/editors/ruler/rulertabpy.cpp \
     src/editors/ruler/rulerwidget.cpp \
+    src/util/railrulercombo.cpp \
     src/util/selecttraincombo.cpp \
     src/viewers/railsectionevents.cpp \
     src/viewers/railsnapevents.cpp \
@@ -81,6 +82,8 @@ SOURCES += \
     src/viewers/traineventdialog.cpp \
     src/viewers/trainlinedialog.cpp \
     src/wizards/rulerpaint/rulerpaintpagestart.cpp \
+    src/wizards/rulerpaint/rulerpaintpagestation.cpp \
+    src/wizards/rulerpaint/rulerpaintpagetable.cpp \
     src/wizards/rulerpaint/rulerpaintwizard.cpp
 
 HEADERS += \
@@ -117,6 +120,7 @@ HEADERS += \
     src/editors/railstationwidget.h \
     src/editors/ruler/rulertabpy.h \
     src/editors/ruler/rulerwidget.h \
+    src/util/railrulercombo.h \
     src/util/selecttraincombo.h \
     src/viewers/railsectionevents.h \
     src/viewers/railsnapevents.h \
@@ -156,6 +160,8 @@ HEADERS += \
     src/viewers/traineventdialog.h \
     src/viewers/trainlinedialog.h \
     src/wizards/rulerpaint/rulerpaintpagestart.h \
+    src/wizards/rulerpaint/rulerpaintpagestation.h \
+    src/wizards/rulerpaint/rulerpaintpagetable.h \
     src/wizards/rulerpaint/rulerpaintwizard.h
 
 # Default rules for deployment.

@@ -160,6 +160,28 @@ public:
             return {};
     }
 
+    inline std::shared_ptr<const _Node>
+        dirPrevNode(std::shared_ptr<const RailStation> st, Direction dir)const
+    {
+        auto t = st->dirPrevInterval(dir);
+        if (t) {
+            return t->template getDataAt<_Node>(_index);
+        }
+        else
+            return {};
+    }
+
+    inline std::shared_ptr<const _Node>
+        dirNextNode(std::shared_ptr<const RailStation> st, Direction dir)const
+    {
+        auto t = st->dirNextInterval(dir);
+        if (t) {
+            return t->template getDataAt<_Node>(_index);
+        }
+        else
+            return {};
+    }
+
     inline auto& railway() { return _railway.get(); }
     inline const auto& railway()const { return _railway.get(); }
 

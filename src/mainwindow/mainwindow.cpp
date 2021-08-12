@@ -943,6 +943,7 @@ void MainWindow::openRecentFile()
             else {
                 markUnchanged();
                 resetRecentActions();
+                updateWindowTitle();
             }
         }
     }

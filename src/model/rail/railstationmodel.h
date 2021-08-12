@@ -40,6 +40,12 @@ public:
 
     void setRailway(std::shared_ptr<Railway> rail);
 
+    /**
+     * @brief setRailwayForDir
+     * 为标尺排图向导等处提供的模式，按顺序列出上行或下行经过的所有站
+     */
+    void setRailwayForDir(std::shared_ptr<Railway> rail, Direction dir);
+
     virtual void setupNewRow(int row)override;
 
     /*
@@ -90,6 +96,8 @@ public slots:
 
 private:
     void setupModel();
+
+    void setStationRow(int row,std::shared_ptr<const RailStation> st);
 };
 
 

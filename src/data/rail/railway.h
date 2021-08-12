@@ -7,7 +7,9 @@
  */
 #pragma once
 
-#include <QtCore>
+#include <QVariant>
+#include <QList>
+#include <QJsonObject>
 #include <memory>
 #include <utility>
 #include <tuple>
@@ -345,6 +347,12 @@ public:
 
     std::shared_ptr<RailInterval> firstUpInterval()const;
 
+    std::shared_ptr<const RailStation> firstDownStation()const;
+
+    std::shared_ptr<const RailStation> firstUpStation()const;
+
+    std::shared_ptr<const RailStation> firstDirStation(Direction dir)const;
+
     inline const QString& name()const{
         return _name;
     }
@@ -626,5 +634,7 @@ private:
     void clearYValues();
 
 };
+
+Q_DECLARE_METATYPE(std::shared_ptr<Railway>);
 
 

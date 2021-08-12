@@ -34,16 +34,19 @@ bool RulerPaintPageStart::validatePage()
         return false;
     }
 
-    auto rg=table->selectionModel()->selectedRows();
-    if(rg.isEmpty()){
-        QMessageBox::warning(this,tr("错误"),tr("重排既有车次的部分运行线："
-            "请选择需要覆盖排图的范围！"));
-        return false;
-    }
+    if(m==PaintMode::Modify){
+        auto rg=table->selectionModel()->selectedRows();
+        if(rg.isEmpty()){
+            QMessageBox::warning(this,tr("错误"),tr("重排既有车次的部分运行线："
+                "请选择需要覆盖排图的范围！"));
+            return false;
+        }
 
-    _startRow=std::min_element(rg.begin(),rg.end(),&qeutil::ltIndexRow)->row();
-    _endRow=std::max_element(rg.begin(),rg.end(),&qeutil::ltIndexRow)->row();
+        _startRow=std::min_element(rg.begin(),rg.end(),&qeutil::ltIndexRow)->row();
+        _endRow=std::max_element(rg.begin(),rg.end(),&qeutil::ltIndexRow)->row();
+    }
     return true;
+
 }
 
 void RulerPaintPageStart::initUI()

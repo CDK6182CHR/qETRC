@@ -1,4 +1,5 @@
 ﻿#include "railstationmodel.h"
+#include "model/delegate/qedelegate.h"
 
 #include <QtWidgets>
 
@@ -6,6 +7,9 @@
 RailStationModel::RailStationModel(bool inplace, QWidget *parent):
     QEMoveableModel(parent),commitInPlace(inplace)
 {
+    setColumnCount(ColMAX);
+    setHorizontalHeaderLabels({ "站名","里程","对里程","等级","显示","单向站",
+        "办客","办货" });
     setupModel();
 }
 
@@ -21,6 +25,24 @@ void RailStationModel::setRailway(std::shared_ptr<Railway> rail)
 {
     railway = rail;
     setupModel();
+}
+
+void RailStationModel::setRailwayForDir(std::shared_ptr<Railway> rail, Direction dir)
+{
+    railway=rail;
+    beginResetModel();
+    if(railway){
+        setRowCount(rail->stationCount());
+        int row=0;
+        for(auto p=rail->firstDirStation(dir);p;p=p->dirAdjacent(dir)){
+            setStationRow(row++,p);
+        }
+        setRowCount(row);
+    }else{
+        setRowCount(0);
+    }
+
+    endResetModel();
 }
 
 void RailStationModel::setupNewRow(int i)
@@ -171,7 +193,7 @@ void RailStationModel::actCancel()
 void RailStationModel::setupModel()
 {
     beginResetModel();
-    setColumnCount(ColMAX);
+
     if (!railway) {
         setRowCount(0);
         return;
@@ -179,60 +201,67 @@ void RailStationModel::setupModel()
 
     setRowCount(railway->stationCount());
 
-    setHorizontalHeaderLabels({ "站名","里程","对里程","等级","显示","单向站",
-        "办客","办货" });
+
 
     for (int i = 0; i < rowCount(); i++) {
         //站名
         auto st = railway->stations().at(i);
-        QStandardItem* item = new QStandardItem(st->name.toSingleLiteral());
-        setItem(i, ColName, item);
-
-        //里程
-        item = new QStandardItem(QString::number(st->mile, 'f', 3));
-        item->setData(st->mile, Qt::EditRole);
-        setItem(i, ColMile, item);
-
-        //对里程
-        item = new QStandardItem;
-        if (st->counter.has_value())
-            item->setData(QString::number(st->counter.value(), 'f', 3), Qt::DisplayRole);
-        else
-            item->setData("", Qt::DisplayRole);
-        setItem(i, ColCounter, item);
-
-        //等级
-        item = new QStandardItem(QString::number(st->level));
-        item->setData(st->level, Qt::EditRole);
-        setItem(i, ColLevel, item);
-
-        //显示
-        item = new QStandardItem;
-        item->setCheckState(st->_show ? Qt::Checked : Qt::Unchecked);
-        item->setCheckable(true);
-        item->setEditable(false);
-        setItem(i, ColShow, item);
-
-        //单向站
-        item = new QStandardItem;
-        item->setData(static_cast<int>(st->direction), Qt::EditRole);
-        setItem(i, ColDir, item);
-
-        //办客
-        item = new QStandardItem;
-        item->setCheckable(true);
-        item->setEditable(false);
-        item->setCheckState(qeutil::boolToCheckState(st->passenger));
-        setItem(i, ColPassenger, item);
-
-        //办货
-        item = new QStandardItem;
-        item->setCheckable(true);
-        item->setEditable(false);
-        item->setCheckState(qeutil::boolToCheckState(st->freight));
-        setItem(i, ColFreight, item);
+        setStationRow(i,st);
     }
     endResetModel();
+}
+
+void RailStationModel::setStationRow(int i, std::shared_ptr<const RailStation> st)
+{
+    QStandardItem* item = new QStandardItem(st->name.toSingleLiteral());
+    QVariant v;
+    v.setValue(st);
+    item->setData(v,qeutil::RailStationRole);
+    setItem(i, ColName, item);
+
+    //里程
+    item = new QStandardItem(QString::number(st->mile, 'f', 3));
+    item->setData(st->mile, Qt::EditRole);
+    setItem(i, ColMile, item);
+
+    //对里程
+    item = new QStandardItem;
+    if (st->counter.has_value())
+        item->setData(QString::number(st->counter.value(), 'f', 3), Qt::DisplayRole);
+    else
+        item->setData("", Qt::DisplayRole);
+    setItem(i, ColCounter, item);
+
+    //等级
+    item = new QStandardItem(QString::number(st->level));
+    item->setData(st->level, Qt::EditRole);
+    setItem(i, ColLevel, item);
+
+    //显示
+    item = new QStandardItem;
+    item->setCheckState(st->_show ? Qt::Checked : Qt::Unchecked);
+    item->setCheckable(true);
+    item->setEditable(false);
+    setItem(i, ColShow, item);
+
+    //单向站
+    item = new QStandardItem;
+    item->setData(static_cast<int>(st->direction), Qt::EditRole);
+    setItem(i, ColDir, item);
+
+    //办客
+    item = new QStandardItem;
+    item->setCheckable(true);
+    item->setEditable(false);
+    item->setCheckState(qeutil::boolToCheckState(st->passenger));
+    setItem(i, ColPassenger, item);
+
+    //办货
+    item = new QStandardItem;
+    item->setCheckable(true);
+    item->setEditable(false);
+    item->setCheckState(qeutil::boolToCheckState(st->freight));
+    setItem(i, ColFreight, item);
 }
 
 

@@ -64,3 +64,5 @@ public:
 
 };
 
+Q_DECLARE_METATYPE(std::shared_ptr<Ruler>);
+
