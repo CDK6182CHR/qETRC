@@ -5,6 +5,7 @@
 
 #include <QJsonObject>
 #include <QString>
+#include <QVariant>
 
 class Ruler;
 class RailInterval;
@@ -43,3 +44,4 @@ public:
 };
 
 
+Q_DECLARE_METATYPE(std::shared_ptr<const RulerNode>);

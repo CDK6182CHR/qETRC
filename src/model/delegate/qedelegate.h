@@ -12,6 +12,7 @@ enum {
     IntervalRole,
     TrainLineRole,
     RailStationRole,
+    RulerNodeRole,
 };
 }
 

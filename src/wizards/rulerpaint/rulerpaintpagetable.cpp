@@ -6,6 +6,7 @@
 #include "data/diagram/diagram.h"
 #include "rulerpaintwizard.h"
 #include "model/delegate/qedelegate.h"
+#include "util/utilfunc.h"
 
 RulerPaintModel::RulerPaintModel(RulerPaintPageTable *page_, QObject *parent):
     QStandardItemModel(parent),page(page_),cbStart(new QComboBox),cbEnd(new QComboBox)
@@ -19,6 +20,10 @@ RulerPaintModel::RulerPaintModel(RulerPaintPageTable *page_, QObject *parent):
             SLOT(onStartChanged(int)));
     connect(cbEnd,SIGNAL(currentIndexChanged(int)),this,
             SLOT(onEndChanged(int)));
+    connect(this,
+        SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)),
+        this, SLOT(onDataChanged(const QModelIndex&, const QModelIndex&,
+            const QVector<int>&)));
 }
 
 void RulerPaintModel::setupModel(std::shared_ptr<Railway> railway_,
@@ -38,12 +43,13 @@ void RulerPaintModel::setupModel(std::shared_ptr<Railway> railway_,
 
     //先向前找能够插入的
     cbStart->clear();
+    std::shared_ptr<const RulerNode> node{};
     for(auto st=anchorStation;st;st=st->dirAdjacent(DirFunc::reverse(dir))){
         insertRow(0);
-        initRow(0, st);
+        initRow(0, st, node);
         cbStart->addItem(st->name.toSingleLiteral());   // 暂定倒序
-        auto n=ruler->dirPrevNode(st,dir);
-        if(!n||n->isNull())
+        node=ruler->dirPrevNode(st,dir);
+        if (!node || node->isNull())
             break;
     }
 
@@ -66,19 +72,24 @@ void RulerPaintModel::setupModel(std::shared_ptr<Railway> railway_,
         //现在 当前站有效且没有插入过
         cbEnd->addItem(st->name.toSingleLiteral());
         insertRow(row);
-        initRow(row++,st);
+        initRow(row++, st, n);
     }
     updateFromRow(_anchorRow);
 
+    startRow = endRow = _anchorRow;
     endResetModel();
     updating=false;
 }
 
-void RulerPaintModel::initRow(int row, std::shared_ptr<const RailStation> st)
+void RulerPaintModel::initRow(int row, std::shared_ptr<const RailStation> st,
+    std::shared_ptr<const RulerNode> node)
 {
     using SI=QStandardItem;
     auto* it=new SI(st->name.toSingleLiteral());
     it->setEditable(false);
+    QVariant v;
+    v.setValue(node);
+    it->setData(v, qeutil::RulerNodeRole);
     setItem(row,ColStation,it);
 
     it=new SI;
@@ -99,7 +110,12 @@ void RulerPaintModel::initRow(int row, std::shared_ptr<const RailStation> st)
     it->setEditable(false);
     setItem(row,ColDepart,it);
 
-    it=new SI(tr("通通"));
+    if (st == anchorStation) {
+        it = new SI(tr("--"));
+        it->setEnabled(false);
+    }
+    else
+        it=new SI(tr("通通"));
     it->setEditable(false);
     setItem(row,ColAppend,it);
 
@@ -121,7 +137,66 @@ void RulerPaintModel::initRow(int row, std::shared_ptr<const RailStation> st)
 
 void RulerPaintModel::updateFromRow(int row)
 {
-    //todo
+    if (row >= _anchorRow) {
+        //向后调整
+    }
+    else {
+        //向前调整
+    }
+
+    //下面才是正式的代码
+    int dr = (row >= _anchorRow ? 1 : -1);
+    int r = row;
+    
+    if (row == _anchorRow) {
+        //如果起始站为anchor，假定到达时刻正确，调整出发时刻
+        const QTime& arr = item(row, ColArrive)->data(Qt::EditRole).toTime();
+        item(row, ColDepart)->setData(arr.addSecs(getStopSecs(r)), Qt::EditRole);
+    }
+    else {
+        // 起始行非参考行，设置interval情况；当前的时刻要由上一区间来计算
+        //注意此时Prev行一定存在！
+        int pr = r - dr;
+        bool cu_stopped = bool(getStopSecs(r));
+        bool pr_stopped = bool(getStopSecs(pr));
+        QTime tm = (dr == 1 ?
+            item(pr, ColDepart)->data(Qt::EditRole) :
+            item(pr, ColArrive)->data(Qt::EditRole)
+            ).toTime();
+
+        calRowTime(r, dr, pr_stopped, cu_stopped, tm);
+    }
+
+    //循环准备
+    int prev = r;
+    bool prev_stopped = bool(getStopSecs(r));
+    bool cur_stopped;
+    
+    //循环的上一站的那个时刻
+    QTime prev_time = (dr == 1 ?
+        item(r, ColDepart)->data(Qt::EditRole).toTime() :
+        item(r, ColArrive)->data(Qt::EditRole).toTime());
+
+    //loop invariant: r是当前要处理的行，prev是上一个依赖的行；
+    //循环中一次性处理好一行的信息
+    //注意记录下来当前站、后一站是否停车等信息
+    //注意r不会是anchor那一行
+    for (r += dr; r >= 0 && r < rowCount(); prev = r, r += dr) {
+        cur_stopped = bool(getStopSecs(r));
+        QTime tm = prev_time;
+        bool flag = calRowTime(r, dr, prev_stopped, cur_stopped, tm);
+        if (flag)
+            break;
+
+        //循环结束操作：
+        prev_stopped = cur_stopped;
+        prev_time = tm;
+    }
+
+    if (row > 0 && row == _anchorRow) {
+        //对于要直接处理anchor变化的情况，前面那部分交给递归调用
+        updateFromRow(row - 1);
+    }
 }
 
 int RulerPaintModel::getStopSecs(int row) const
@@ -130,13 +205,81 @@ int RulerPaintModel::getStopSecs(int row) const
             item(row,ColSecond)->data(Qt::EditRole).toInt();
 }
 
+
+
+int RulerPaintModel::calRowAppendInterval(int r, int dr, bool prev_stopped, bool cur_stopped)
+{
+    auto node = qvariant_cast<std::shared_ptr<const RulerNode>>(
+        item(r, ColStation)->data(qeutil::RulerNodeRole));
+    int interval = node->interval;
+    interval += item(r, ColAdjust)->data(Qt::EditRole).toInt();
+    QString append;
+    if (cur_stopped) {
+        interval += (dr == 1 ?
+            node->stop : node->start);
+        append = tr("停");
+    }
+    else {
+        append = tr("通");
+    }
+    if (prev_stopped) {
+        if (dr == 1) {
+            interval += node->start;
+            append.prepend(tr("停"));
+        }
+        else {
+            interval += node->stop;
+            append.append(tr("停"));
+        }
+    }
+    else {
+        if (dr == 1) {
+            append.prepend(tr("通"));
+        }
+        else {
+            append.append(tr("通"));
+        }
+    }
+    item(r, ColAppend)->setText(append);
+    return interval;
+}
+
+bool RulerPaintModel::calRowTime(int r, int dr, bool prev_stopped, bool cur_stopped, QTime& tm0)
+{
+    int interval = calRowAppendInterval(r, dr, prev_stopped, cur_stopped);
+    item(r, ColInterval)->setText(qeutil::secsDiffToString(interval));
+
+    //下面：推时刻  1,2 分别表示接近和远离anchor的那个时刻
+    QTime tm = tm0.addSecs(dr * interval);  //正推的到达时刻，倒推的出发时刻
+    bool flag1, flag2;   //如果到达、出发时刻都没变，就可以提前结束了
+
+    int col1 = (dr == 1 ? ColArrive : ColDepart);
+    int col2 = (dr == 1 ? ColDepart : ColArrive);
+
+    flag1 = (item(r, col1)->data(Qt::EditRole).toTime() == tm);
+    if (!flag1) {
+        item(r, col1)->setData(tm, Qt::EditRole);
+    }
+    tm = tm.addSecs(dr * getStopSecs(r));
+    flag2 = (item(r, col2)->data(Qt::EditRole).toTime() == tm);
+    if (!flag2) {
+        item(r, col2)->setData(tm, Qt::EditRole);
+    }
+    tm0 = tm;
+
+    return flag1 && flag2;
+}
+
+
 void RulerPaintModel::onStartChanged(int i)
 {
+    if (updating)return;
     // todo
 }
 
 void RulerPaintModel::onEndChanged(int i)
 {
+    if (updating)return;
     // todo
 }
 
@@ -156,9 +299,43 @@ void RulerPaintModel::onAnchorTypeChanged()
     onAnchorTimeChanged(page->anchorTime());
 }
 
+void RulerPaintModel::onRowEditDataChanged(int row)
+{
+    if (row <= _anchorRow && (row < startRow||startRow==-1))
+        setStartRow(row);
+    if (row >= _anchorRow && row > endRow)
+        setEndRow(row);
+    updateFromRow(row);
+}
+
+void RulerPaintModel::setStartRow(int r)
+{
+    updating = true;
+    startRow = r;
+    cbStart->setCurrentIndex(_anchorRow - r);
+    updating = false;
+}
+
+void RulerPaintModel::setEndRow(int r)
+{
+    updating = true;
+    endRow = r;
+    cbEnd->setCurrentIndex(r - _anchorRow);
+    updating = false;
+}
+
 void RulerPaintModel::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
-    // todo
+    if (roles.contains(Qt::EditRole) || roles.contains(Qt::DisplayRole)) {
+        if (std::max(topLeft.column(), (int)ColMinute) <=
+            std::min(bottomRight.column(), (int)ColSecond) ||
+            (topLeft.column() <= ColAdjust && bottomRight.column() >= ColAdjust)) {
+            //此条件为：指定的三列之一被包括
+            for (int r = topLeft.row(); r <= bottomRight.row(); r++) {
+                onRowEditDataChanged(r);
+            }
+        }
+    }
 }
 
 RulerPaintPageTable::RulerPaintPageTable(RulerPaintPageStation* pgStation_, QWidget *parent):

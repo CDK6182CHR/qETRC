@@ -2,6 +2,7 @@
 #include <QWizardPage>
 #include <QStandardItemModel>
 #include <memory>
+#include <utility>
 
 #include "util/buttongroup.hpp"
 #include "data/train/train.h"
@@ -49,6 +50,7 @@ public:
      * 设置所有站停车时间为0，然后计算时刻。
      * 从Anchor车站开始，向前、向后插入车站，直到没有可用标尺数据。
      * 注意此时总的行数不一定是总站数。
+     * 注意：每一行的第0列保存RulerNode数据，除了参考行之外。
      */
     void setupModel(std::shared_ptr<Railway> railway_,
                     std::shared_ptr<Ruler> ruler_,
@@ -66,22 +68,53 @@ private:
      * @brief initRow
      * 初始化车站的行：填充空白数据
      */
-    void initRow(int row, std::shared_ptr<const RailStation> st);
+    void initRow(int row, std::shared_ptr<const RailStation> st, 
+        std::shared_ptr<const RulerNode> node);
 
     /**
      * @brief calculateRow
      * 根据相邻行的数据，计算单一行的数据。递推。
      */
-//    void calculateRow(int row);
+    //void calculateRow(int row);
 
     /**
      * @brief updateFromRow
      * 从指定行（包括）开始，向端点处调整数据。当数据不变时，可以提前结束。
-     * 注意若指定行为参考行，
+     * 注意若指定行为参考行，则需要递归一次，前后都调整。
+     * 从所给行的到达时刻（正推）或出发时刻（反推）开始计算。
+     * 但如果所给行是参考行，则认为到达时刻是正确的。
      */
     void updateFromRow(int row);
 
     int getStopSecs(int row)const;
+
+    inline bool rowInRange(int row)const {
+        return row >= 0 && row < rowCount();
+    }
+
+    /// <summary>
+    /// 计算所给行的附加情况（字符串），和所给行上一站至本站的区间历时。
+    /// 区间附加情况直接填表了
+    /// 注意prev, cur皆是指循环遍历方向的。
+    /// </summary>
+    /// <param name="r">当前行号。已知不是anchor</param>
+    /// <param name="dr">行数变更方向，1或-1</param>
+    /// <param name="prev_stopped">前一站是否停车</param>
+    /// <param name="cur_stopped">本站是否停车</param>
+    /// <returns>区间运行秒数</returns>
+    int calRowAppendInterval(int r, int dr, bool prev_stopped, bool cur_stopped);
+
+    /// <summary>
+    /// 完成所给行的interval, append, arrive, depart的计算和填写工作。
+    /// </summary>
+    /// <param name="r">当前行</param>
+    /// <param name="dr">循环行数变更方向 1/-1</param>
+    /// <param name="prev_stopped">前一站是否停车</param>
+    /// <param name="cur_stopped">本站是否停车</param>
+    /// <param name="tm">循环的时间，input/output</param>
+    /// <returns>是否能够终止循环</returns>
+    bool calRowTime(int r, int dr, bool prev_stopped, bool cur_stopped,
+        QTime& tm);
 
 public slots:
     /**
@@ -118,6 +151,18 @@ private slots:
     void onDataChanged(const QModelIndex &topLeft,
                        const QModelIndex &bottomRight,
                        const QVector<int> &roles = QVector<int>());
+
+    /**
+     * 指定行的停时或者调整时刻变了，因此更新数据
+     */
+    void onRowEditDataChanged(int row);
+
+    /**
+     * 设置起始行，且同时更新combo. 
+     * 保证数据有效。
+     */
+    void setStartRow(int r);
+    void setEndRow(int r);
 };
 
 
