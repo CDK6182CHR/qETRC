@@ -16,6 +16,7 @@ QWidget *PostiveSpinDelegate::createEditor(QWidget *parent,
     auto* spin=new QSpinBox(parent);
     spin->setRange(0,1000000);
     spin->setSingleStep(step);
+    connect(spin, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged()));
     return spin;
 }
 
@@ -30,4 +31,9 @@ void PostiveSpinDelegate::setModelData(QWidget *editor,
 {
     auto* sp=static_cast<QSpinBox*>(editor);
     model->setData(index,sp->value(),Qt::EditRole);
+}
+
+void PostiveSpinDelegate::onValueChanged()
+{
+    emit commitData(qobject_cast<QWidget*>(sender()));
 }

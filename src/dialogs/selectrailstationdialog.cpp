@@ -3,6 +3,7 @@
 
 #include "util/buttongroup.hpp"
 #include "data/diagram/diagram.h"
+#include "model/delegate/generaldoublespindelegate.h"
 
 SelectRailStationDialog::SelectRailStationDialog(std::shared_ptr<Railway> rail,
                                                  QWidget *parent):
@@ -24,6 +25,8 @@ void SelectRailStationDialog::initUI()
 
     table=new QTableView;
     table->setModel(model);
+    table->setItemDelegateForColumn(RailStationModel::ColMile,
+        new GeneralDoubleSpinDelegate(this));
     table->setEditTriggers(QTableView::NoEditTriggers);
     table->resizeColumnsToContents();
     table->setSelectionBehavior(QTableView::SelectRows);

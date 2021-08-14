@@ -4,6 +4,7 @@
 
 class PostiveSpinDelegate : public QStyledItemDelegate
 {
+    Q_OBJECT;
     int step;
 public:
     explicit PostiveSpinDelegate(int step_, QObject *parent = nullptr);
@@ -13,5 +14,8 @@ public:
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     void setModelData(QWidget *editor, QAbstractItemModel *model,
                       const QModelIndex &index) const override;
+
+private slots:
+    void onValueChanged();
 };
 

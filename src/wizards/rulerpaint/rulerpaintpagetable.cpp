@@ -6,7 +6,12 @@
 #include "data/diagram/diagram.h"
 #include "rulerpaintwizard.h"
 #include "model/delegate/qedelegate.h"
+#include "model/delegate/generalspindelegate.h"
+#include "model/delegate/postivespindelegate.h"
+#include "model/delegate/qetimedelegate.h"
 #include "util/utilfunc.h"
+#include "viewers/traintimetableplane.h"
+
 
 RulerPaintModel::RulerPaintModel(RulerPaintPageTable *page_, QObject *parent):
     QStandardItemModel(parent),page(page_),cbStart(new QComboBox),cbEnd(new QComboBox)
@@ -44,7 +49,8 @@ void RulerPaintModel::setupModel(std::shared_ptr<Railway> railway_,
     //先向前找能够插入的
     cbStart->clear();
     std::shared_ptr<const RulerNode> node{};
-    for(auto st=anchorStation;st;st=st->dirAdjacent(DirFunc::reverse(dir))){
+    //注意不能用dirAdjacent往回找，因为要找的不是反方向近邻，而是本方向的前序近邻
+    for(auto st=anchorStation;st; st = node->railInterval().fromStation()){
         insertRow(0);
         initRow(0, st, node);
         cbStart->addItem(st->name.toSingleLiteral());   // 暂定倒序
@@ -81,6 +87,28 @@ void RulerPaintModel::setupModel(std::shared_ptr<Railway> railway_,
     updating=false;
 }
 
+void RulerPaintModel::setAnchorStopSecs(int secs)
+{
+    item(_anchorRow,ColMinute)->setData(secs/60,Qt::EditRole);
+    item(_anchorRow,ColSecond)->setData(secs%60,Qt::EditRole);
+}
+
+std::shared_ptr<const RailStation> RulerPaintModel::getRowStation(int row) const
+{
+    return qvariant_cast<std::shared_ptr<const RailStation>> (
+        item(row, ColStation)->data(qeutil::RailStationRole));
+}
+
+QTime RulerPaintModel::getRowArrive(int row) const
+{
+    return item(row, ColArrive)->data(Qt::EditRole).toTime();
+}
+
+QTime RulerPaintModel::getRowDepart(int row) const
+{
+    return item(row, ColDepart)->data(Qt::EditRole).toTime();
+}
+
 void RulerPaintModel::initRow(int row, std::shared_ptr<const RailStation> st,
     std::shared_ptr<const RulerNode> node)
 {
@@ -88,8 +116,8 @@ void RulerPaintModel::initRow(int row, std::shared_ptr<const RailStation> st,
     auto* it=new SI(st->name.toSingleLiteral());
     it->setEditable(false);
     QVariant v;
-    v.setValue(node);
-    it->setData(v, qeutil::RulerNodeRole);
+    v.setValue(st);
+    it->setData(v, qeutil::RailStationRole);
     setItem(row,ColStation,it);
 
     it=new SI;
@@ -101,12 +129,12 @@ void RulerPaintModel::initRow(int row, std::shared_ptr<const RailStation> st,
     setItem(row,ColSecond,it);
 
     it=new SI;
-    it->setData(QTime(0,0),Qt::EditRole);
+    it->setData(page->anchorTime(),Qt::EditRole);   //时刻一律初始化为参考时刻
     it->setEditable(false);
     setItem(row,ColArrive,it);
 
     it=new SI;
-    it->setData(QTime(0,0),Qt::EditRole);
+    it->setData(page->anchorTime(),Qt::EditRole);
     it->setEditable(false);
     setItem(row,ColDepart,it);
 
@@ -132,6 +160,8 @@ void RulerPaintModel::initRow(int row, std::shared_ptr<const RailStation> st,
     if(st==anchorStation){
         it->setEnabled(false);
     }
+    v.setValue(node);
+    it->setData(v, qeutil::RulerNodeRole);
     setItem(row,ColInterval,it);
 }
 
@@ -185,8 +215,6 @@ void RulerPaintModel::updateFromRow(int row)
         cur_stopped = bool(getStopSecs(r));
         QTime tm = prev_time;
         bool flag = calRowTime(r, dr, prev_stopped, cur_stopped, tm);
-        if (flag)
-            break;
 
         //循环结束操作：
         prev_stopped = cur_stopped;
@@ -210,36 +238,73 @@ int RulerPaintModel::getStopSecs(int row) const
 int RulerPaintModel::calRowAppendInterval(int r, int dr, bool prev_stopped, bool cur_stopped)
 {
     auto node = qvariant_cast<std::shared_ptr<const RulerNode>>(
-        item(r, ColStation)->data(qeutil::RulerNodeRole));
+        item(r, ColInterval)->data(qeutil::RulerNodeRole));
     int interval = node->interval;
     interval += item(r, ColAdjust)->data(Qt::EditRole).toInt();
     QString append;
-    if (cur_stopped) {
-        interval += (dr == 1 ?
-            node->stop : node->start);
-        append = tr("停");
-    }
-    else {
-        append = tr("通");
-    }
-    if (prev_stopped) {
-        if (dr == 1) {
+
+    // 新版：直接分方向讨论
+    if (dr == 1) {
+        //正推
+        if (prev_stopped) {
             interval += node->start;
-            append.prepend(tr("停"));
+            append = tr("起");
         }
         else {
+            if (startRow == r - dr && page->startAtThis()) {
+                //始发
+                interval += node->start;
+                append = tr("始");
+            }
+            else {
+                append = tr("通");
+            }
+        }
+        if (cur_stopped) {
             interval += node->stop;
             append.append(tr("停"));
         }
+        else {
+            if (endRow == r && page->endAtThis()) {
+                //终到
+                interval += node->stop;
+                append.append(tr("终"));
+            }
+            else {
+                append.append(tr("通"));
+            }
+        }
     }
     else {
-        if (dr == 1) {
-            append.prepend(tr("通"));
+        //反推
+        if (cur_stopped) {
+            interval += node->start;
+            append = tr("起");
         }
         else {
-            append.append(tr("通"));
+            if (startRow == r && page->startAtThis()) {
+                interval += node->start;
+                append = tr("始");
+            }
+            else {
+                append = tr("通");
+            }
+        }
+        if (prev_stopped) {
+            interval += node->stop;
+            append.append(tr("停"));
+        }
+        else {
+            if (r - dr == endRow && page->endAtThis()) {
+                interval += node->stop;
+                append.append(tr("终"));
+            }
+            else {
+                append.append("通");
+            }
         }
     }
+
     item(r, ColAppend)->setText(append);
     return interval;
 }
@@ -270,17 +335,45 @@ bool RulerPaintModel::calRowTime(int r, int dr, bool prev_stopped, bool cur_stop
     return flag1 && flag2;
 }
 
+std::shared_ptr<Train> RulerPaintModel::toTrain() const
+{
+    auto t=std::make_shared<Train>(tr("铺画车次"));
+    for(int r=startRow;r<=endRow;r++){
+        t->appendStation(
+            StationName::fromSingleLiteral(item(r, ColStation)->text()),
+            item(r, ColArrive)->data(Qt::EditRole).toTime(),
+            item(r, ColDepart)->data(Qt::EditRole).toTime()
+        );
+    }
+    if (page->startAtThis()) {
+        t->setStarting(StationName::fromSingleLiteral(item(startRow, ColStation)->text()));
+    }
+    if (page->endAtThis()) {
+        t->setTerminal(StationName::fromSingleLiteral(item(endRow, ColStation)->text()));
+    }
+    return t;
+}
 
+
+// 注意这个入参i是指combo的下标
 void RulerPaintModel::onStartChanged(int i)
 {
     if (updating)return;
-    // todo
+    int r = std::max(startRow, _anchorRow - i);
+    startRow = _anchorRow - i;
+    updateFromRow(r);
+    if (page->instaneous())
+        paintTrain();
 }
 
 void RulerPaintModel::onEndChanged(int i)
 {
     if (updating)return;
-    // todo
+    int r = std::min(endRow, _anchorRow + i);
+    endRow = _anchorRow + i;
+    updateFromRow(r);
+    if (page->instaneous())
+        paintTrain();
 }
 
 void RulerPaintModel::onAnchorTimeChanged(const QTime &tm)
@@ -292,11 +385,21 @@ void RulerPaintModel::onAnchorTimeChanged(const QTime &tm)
                                             Qt::EditRole);
     }
     updateFromRow(_anchorRow);
+    if(page->instaneous())
+        paintTrain();
 }
 
 void RulerPaintModel::onAnchorTypeChanged()
 {
     onAnchorTimeChanged(page->anchorTime());
+}
+
+void RulerPaintModel::paintTrain()
+{
+    if (startRow < endRow) {
+        auto train = toTrain();
+        emit updateTrainLine(train);
+    }
 }
 
 void RulerPaintModel::onRowEditDataChanged(int row)
@@ -306,6 +409,9 @@ void RulerPaintModel::onRowEditDataChanged(int row)
     if (row >= _anchorRow && row > endRow)
         setEndRow(row);
     updateFromRow(row);
+    if (page->instaneous()) {
+        paintTrain();
+    }
 }
 
 void RulerPaintModel::setStartRow(int r)
@@ -338,8 +444,10 @@ void RulerPaintModel::onDataChanged(const QModelIndex &topLeft, const QModelInde
     }
 }
 
-RulerPaintPageTable::RulerPaintPageTable(RulerPaintPageStation* pgStation_, QWidget *parent):
-    QWizardPage(parent),pgStation(pgStation_), tmptrain(std::make_shared<Train>(tr("排图临时"))),
+RulerPaintPageTable::RulerPaintPageTable(Diagram& diagram_, 
+    RulerPaintPageStation* pgStation_, QWidget *parent):
+    QWizardPage(parent),diagram(diagram_),
+    pgStation(pgStation_),conflictDialog(new ConflictDialog(diagram_,this)),
     model(new RulerPaintModel(this,this))
 {
     initUI();
@@ -382,6 +490,25 @@ bool RulerPaintPageTable::instaneous() const
 QTime RulerPaintPageTable::anchorTime() const
 {
     return edAnTime->time();
+}
+
+void RulerPaintPageTable::setAnchorTime(const QTime &arr, const QTime &dep)
+{
+    int stopsec=qeutil::secsTo(arr,dep);
+    if(anchorAsArrive()){
+        edAnTime->setTime(arr);
+    }else{
+        edAnTime->setTime(dep);
+    }
+
+    if(!model->rowCount())
+        return;
+    model->setAnchorStopSecs(stopsec);
+}
+
+void RulerPaintPageTable::setRefTrain(std::shared_ptr<Train> train)
+{
+    timetableRef->setTrain(train);
 }
 
 void RulerPaintPageTable::initUI()
@@ -436,12 +563,62 @@ void RulerPaintPageTable::initUI()
     vlay->addLayout(flay);
 
     table=new QTableView;
-    table->setEditTriggers(QTableView::CurrentChanged);
+    table->setEditTriggers(QTableView::AllEditTriggers);
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->setModel(model);
     connect(table, &QTableView::doubleClicked,this,
             &RulerPaintPageTable::onDoubleClicked);
+
+    table->setItemDelegateForColumn(RulerPaintModel::ColMinute,
+        new PostiveSpinDelegate(1, this));
+    table->setItemDelegateForColumn(RulerPaintModel::ColSecond,
+        new PostiveSpinDelegate(10, this));
+    table->setItemDelegateForColumn(RulerPaintModel::ColAdjust,
+        new SteppedSpinDelegate(10, this));
+    table->setItemDelegateForColumn(RulerPaintModel::ColArrive,
+        new QETimeDelegate(this));
+    table->setItemDelegateForColumn(RulerPaintModel::ColDepart,
+        new QETimeDelegate(this));
+
+    // context menu
+    table->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+    auto* act = new QAction(tr("冲突检查"), table);
+    act->setShortcut(Qt::ALT + Qt::Key_X);
+    table->addAction(act);
+    connect(act, SIGNAL(triggered()), this, SLOT(showConflict()));
+
+    act = new QAction(tr("查看参考时刻表"), table);
+    act->setShortcut(Qt::ALT + Qt::Key_Y);
+    table->addAction(act);
+    connect(act, SIGNAL(triggered()), this, SLOT(showTimetable()));
+
     vlay->addWidget(table);
+
+    // 时刻表dialog
+    auto* t = new TrainTimetablePlane();
+    timetableRef = t;
+    t->resize(500, 500);
+    timeDialog = new DialogAdapter(t, this);
+    connect(timetableRef, &QWidget::windowTitleChanged,
+        timeDialog, &QWidget::setWindowTitle);
+    timeDialog->setAttribute(Qt::WA_DeleteOnClose, false);
+}
+
+void RulerPaintPageTable::showConflict()
+{
+    auto idx = table->currentIndex();
+    if (!idx.isValid())return;
+    conflictDialog->setData(railway, model->getRowStation(idx.row()),
+        model->getRowArrive(idx.row()), model->getRowDepart(idx.row()));
+    if (!conflictDialog->isVisible())
+        conflictDialog->show();
+}
+
+void RulerPaintPageTable::showTimetable()
+{
+    if (!timeDialog->isVisible())
+        timeDialog->show();
 }
 
 void RulerPaintPageTable::onDoubleClicked(const QModelIndex &idx)
@@ -458,4 +635,5 @@ void RulerPaintPageTable::onDoubleClicked(const QModelIndex &idx)
     }else{
         cbEnd->setCurrentIndex(r-anchorRow);
     }
+    model->paintTrain();
 }

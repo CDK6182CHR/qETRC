@@ -989,8 +989,18 @@ const AdapterStation* TrainLine::stationFromRail(std::shared_ptr<RailStation> ra
 	else return nullptr; 
 }
 
+const AdapterStation* TrainLine::stationByTrainLinear(Train::ConstStationPtr st) const
+{
+	for (const auto& p : _stations) {
+		if (p.trainStation == st) {
+			return &p;
+		}
+	}
+	return nullptr;
+}
+
 QList<RailStationEvent> 
-	TrainLine::stationEventFromRail(std::shared_ptr<RailStation> rail) const
+	TrainLine::stationEventFromRail(std::shared_ptr<const RailStation> rail) const
 {
 	auto p = stationFromYValue(rail->y_value.value());   //运行方向区间后站
 	if (p == _stations.end())

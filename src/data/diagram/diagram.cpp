@@ -275,7 +275,7 @@ Diagram::stationTrainsSettled(std::shared_ptr<Railway> railway,
 
 QList<QPair<std::shared_ptr<TrainLine>, RailStationEvent>> 
     Diagram::stationEvents(std::shared_ptr<Railway> railway, 
-        std::shared_ptr<RailStation> st) const
+        std::shared_ptr<const RailStation> st) const
 {
     QList<QPair<std::shared_ptr<TrainLine>, RailStationEvent>> res;
     for (auto train : _trainCollection.trains()) {

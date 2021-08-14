@@ -6,6 +6,9 @@
 
 #include "util/buttongroup.hpp"
 #include "data/train/train.h"
+#include "conflictdialog.h"
+#include "util/dialogadapter.h"
+#include "viewers/traintimetableplane.h"
 
 class RulerPaintPageTable;
 class QComboBox;
@@ -50,7 +53,8 @@ public:
      * 设置所有站停车时间为0，然后计算时刻。
      * 从Anchor车站开始，向前、向后插入车站，直到没有可用标尺数据。
      * 注意此时总的行数不一定是总站数。
-     * 注意：每一行的第0列保存RulerNode数据，除了参考行之外。
+     * 注意：每一行的区间列保存RulerNode数据，除了参考行之外。
+     * 每行的站名列保存RailStation指针。
      */
     void setupModel(std::shared_ptr<Railway> railway_,
                     std::shared_ptr<Ruler> ruler_,
@@ -61,6 +65,14 @@ public:
 
     auto* getComboStart(){return cbStart;}
     auto* getComboEnd(){return cbEnd;}
+
+    void setAnchorStopSecs(int secs);
+
+    std::shared_ptr<const RailStation> getRowStation(int row)const;
+
+    QTime getRowArrive(int row)const;
+
+    QTime getRowDepart(int row)const;
 
 private:
 
@@ -116,6 +128,19 @@ private:
     bool calRowTime(int r, int dr, bool prev_stopped, bool cur_stopped,
         QTime& tm);
 
+    /**
+     * @brief toTrain
+     * 将表格中信息填写到新建车次中
+     */
+    std::shared_ptr<Train> toTrain()const;
+
+signals:
+    /**
+     * @brief updateTrainLine
+     * 铺画运行图的信号
+     */
+    void updateTrainLine(std::shared_ptr<Train> table);
+
 public slots:
     /**
      * @brief onDoubleClicked
@@ -140,6 +165,12 @@ public slots:
      * Anchor作为到达还是出发的变化
      */
     void onAnchorTypeChanged();
+
+    /**
+     * @brief paintTrain
+     * 整理表格信息到车次，然后发射铺画的信号
+     */
+    void paintTrain();
 
 private slots:
 
@@ -190,15 +221,12 @@ class RulerPaintPageStation;
 class RulerPaintPageTable : public QWizardPage
 {
     Q_OBJECT;
+    Diagram& diagram;
     RulerPaintPageStation* const pgStation;
+    ConflictDialog* const conflictDialog;
     std::shared_ptr<Railway> railway{};
     std::shared_ptr<Ruler> ruler{};
     int anchorRow=-1;
-
-    /**
-     * 用于装载排图临时信息的列车对象，全程仅有一个对象
-     */
-    const std::shared_ptr<Train> tmptrain;
 
     QTimeEdit* edAnTime;
     RadioButtonGroup<2>* gpAnType;
@@ -208,10 +236,14 @@ class RulerPaintPageTable : public QWizardPage
 
     RulerPaintModel* const model;
     QTableView* table;
+    DialogAdapter* timeDialog;
+    TrainTimetablePlane* timetableRef;
 
 public:
-    RulerPaintPageTable(RulerPaintPageStation* pgStation_, QWidget* parent=nullptr);
+    RulerPaintPageTable(Diagram& diagram_, RulerPaintPageStation* pgStation_, QWidget* parent=nullptr);
     virtual void initializePage() override;
+
+    auto* getModel() { return model; }
 
     bool anchorAsArrive()const{
         return gpAnType->get(0)->isChecked();
@@ -227,9 +259,23 @@ public:
     bool instaneous()const;
 
     QTime anchorTime()const;
+
+    /**
+     * 从外部来调整锚点时间，触发相应的后续操作，只能在初始化完成后调用。
+     * 入参是到达和出发时刻，内部来调整anchor时刻以及该行的停时。
+     * 主要是由Wizard调用，进入本页面时，利用前面可能的信息。
+     */
+    void setAnchorTime(const QTime& arr,const QTime& dep);
+
+    /**
+     * 设置参考车次（只用来展示原来的时刻表；不保存）
+     */
+    void setRefTrain(std::shared_ptr<Train> train);
 private :
     void initUI();
 private slots:
     void onDoubleClicked(const QModelIndex& idx);
+    void showConflict();
+    void showTimetable();
 };
 

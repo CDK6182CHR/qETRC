@@ -59,8 +59,9 @@ class TypeManager{
 
     /**
      * 默认的版本。注意这个不应该是static，因为系统Config和默认Config指定的默认颜色可能不同。
+     * 2021.08.13  增加一个默认客车用的pen。如果能确定是客车，就先用这个
      */
-    QPen defaultPen;
+    QPen defaultPen, defaultPenPassenger;
     std::shared_ptr<TrainType> defaultType;
 
 public:
@@ -117,6 +118,11 @@ public:
      */
     std::shared_ptr<TrainType> findOrCreate(const QString& name);
 
+    /**
+     * 考虑是否为客车的版本
+     * 如果有信息指明为客车，则优先用客车pen
+     */
+    std::shared_ptr<TrainType> findOrCreate(const QString& name, bool passenger);
     /**
      * 如果找不到，返回空
      */

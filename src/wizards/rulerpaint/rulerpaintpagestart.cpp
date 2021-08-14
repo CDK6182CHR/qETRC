@@ -22,7 +22,9 @@ bool RulerPaintPageStart::validatePage()
                                  tr("铺画新车次：请输入一个非空并且不与既有冲突的全车次!"));
             return false;
         }else{
-            _train=std::make_shared<Train>(edName->text());
+            auto t = std::make_shared<Train>(edName->text());
+            t->setType(coll.typeManager().fromRegex(t->trainName()));
+            _train = t;
             return true;
         }
     }
@@ -45,6 +47,7 @@ bool RulerPaintPageStart::validatePage()
         _startRow=std::min_element(rg.begin(),rg.end(),&qeutil::ltIndexRow)->row();
         _endRow=std::max_element(rg.begin(),rg.end(),&qeutil::ltIndexRow)->row();
     }
+    _train=t;
     return true;
 
 }

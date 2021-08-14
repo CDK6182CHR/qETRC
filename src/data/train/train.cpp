@@ -689,6 +689,16 @@ void Train::swapBaseInfo(Train& other)
     SWAP(_pen);
 }
 
+std::shared_ptr<const TrainAdapter> Train::adapterFor(const Railway& railway)const
+{
+    for(auto adp:_adapters){
+        if(&(adp->railway())==&railway){
+            return adp;
+        }
+    }
+    return {};
+}
+
 bool Train::anyLineShown() const
 {
     for (auto adp : _adapters) {

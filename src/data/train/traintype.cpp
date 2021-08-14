@@ -5,7 +5,7 @@
 
 
 TypeManager::TypeManager():
-	defaultPen(QColor(0,128,0)),
+	defaultPen(QColor(0,128,0)),defaultPenPassenger(QColor(0,128,0),1.5),
 	defaultType(std::make_shared<TrainType>(QObject::tr("其他_"),defaultPen))
 {
 }
@@ -37,6 +37,10 @@ void TypeManager::readForDiagram(const QJsonObject& obj, const TypeManager& defa
 {
 	_types.clear();
 	_regs.clear();
+	if (!obj.contains("type_regex")) {
+		//没有regex的旧版图，先应用默认的，再在上面修改
+		operator=(defaultManager);
+	}
 	bool flag = fromJson(obj);
 	if (!flag||isNull()) {
 		qDebug() << "TypeManager::readForDiagram: WARNING: load type configuration for Diagram failed."
@@ -59,8 +63,7 @@ void TypeManager::appendRegex(const QRegExp& reg, const QString& name)
 
 std::shared_ptr<TrainType> TypeManager::appendRegex(const QRegExp& reg, const QString& name, bool passenger)
 {
-	auto t = findOrCreate(name);
-	t->setIsPassenger(passenger);
+	auto t = findOrCreate(name, passenger);
 	_regs.append(qMakePair(reg, t));
 	return t;
 }
@@ -80,6 +83,18 @@ std::shared_ptr<TrainType> TypeManager::findOrCreate(const QString& name)
 		return _types.value(name);
 	else {
 		auto t = std::make_shared<TrainType>(name, defaultPen);
+		_types.insert(name, t);
+		return t;
+	}
+}
+
+std::shared_ptr<TrainType> TypeManager::findOrCreate(const QString& name, bool passenger)
+{
+	if (_types.contains(name))
+		return _types.value(name);
+	else {
+		auto t = std::make_shared<TrainType>(name, passenger ?
+			defaultPenPassenger : defaultPen, passenger);
 		_types.insert(name, t);
 		return t;
 	}

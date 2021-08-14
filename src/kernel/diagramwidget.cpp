@@ -188,7 +188,7 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
 #endif
 }
 
-void DiagramWidget::removeTrain(Train& train)
+void DiagramWidget::removeTrain(const Train& train)
 {
     for (auto adp : train.adapters()) {
         for (auto p : adp->lines()) {

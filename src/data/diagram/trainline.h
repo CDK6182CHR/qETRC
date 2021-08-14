@@ -188,11 +188,17 @@ public:
     const AdapterStation* stationFromRail(std::shared_ptr<RailStation> rail)const;
 
     /**
+     * 标尺排图中，初始化选择起始站使用。
+     * 线性查找。
+     */
+    const AdapterStation* stationByTrainLinear(Train::ConstStationPtr st)const;
+
+    /**
      * 基于事件的实现版本  二分查找
      * 包含推定。到达、出发要拆开，因此返回QList
      */
     QList<RailStationEvent> 
-           stationEventFromRail(std::shared_ptr<RailStation> rail)const;
+           stationEventFromRail(std::shared_ptr<const RailStation> rail)const;
 
     /**
      * 计算通过指定纵坐标处的时刻；如果运行线不经过该点，返回空

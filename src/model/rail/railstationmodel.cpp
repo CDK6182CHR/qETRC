@@ -17,6 +17,9 @@ RailStationModel::RailStationModel(std::shared_ptr<Railway> rail,
                                    bool inplace, QWidget *parent):
     QEMoveableModel(parent),commitInPlace(inplace)
 {
+    setColumnCount(ColMAX);
+    setHorizontalHeaderLabels({ "站名","里程","对里程","等级","显示","单向站",
+        "办客","办货" });
     setRailway(rail);
 }
 
@@ -161,6 +164,12 @@ std::shared_ptr<Railway> RailStationModel::generateRailway() const
 
     }
     return rail;
+}
+
+std::shared_ptr<const RailStation> RailStationModel::getRowStation(int row)
+{
+    const QVariant& v = item(row, ColName)->data(qeutil::RailStationRole);
+    return qvariant_cast<std::shared_ptr<const RailStation>>(v);
 }
 
 bool RailStationModel::actApply()

@@ -3,6 +3,7 @@
 #include <QtWidgets>
 #include "data/diagram/diagram.h"
 #include "util/buttongroup.hpp"
+#include "model/delegate/qetimedelegate.h"
 
 
 BasicTrainWidget::BasicTrainWidget(TrainCollection &coll_, bool commitInPlace_,
@@ -43,6 +44,10 @@ void BasicTrainWidget::initUI()
     table->setEditTriggers(QTableView::CurrentChanged);
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->setItemDelegateForColumn(TimetableStdModel::ColArrive,
+        new QETimeDelegate(this));
+    table->setItemDelegateForColumn(TimetableStdModel::ColDepart,
+        new QETimeDelegate(this));
     vlay->addWidget(ctable);
 
     auto* g = new ButtonGroup<2>({ "确定","还原"});

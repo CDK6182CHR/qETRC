@@ -1,7 +1,7 @@
 ﻿#include "rulerpaintpagestation.h"
 
 #include "model/rail/railstationmodel.h"
-
+#include "model/delegate/generaldoublespindelegate.h"
 #include <QtWidgets>
 #include <QVariant>
 #include "util/railrulercombo.h"
@@ -9,9 +9,6 @@
 
 #include "rulerpaintwizard.h"
 
-//Q_DECLARE_METATYPE(std::shared_ptr<Railway>);
-//Q_DECLARE_METATYPE(std::shared_ptr<Ruler>);
-//Q_DECLARE_METATYPE(Direction);
 
 RulerPaintPageStation::RulerPaintPageStation(RailCategory &cat_, QWidget *parent):
     QWizardPage(parent),cat(cat_),model(new RailStationModel(false,this))
@@ -45,6 +42,24 @@ bool RulerPaintPageStation::validatePage()
     return true;
 }
 
+void RulerPaintPageStation::setDefaultAnchor(Direction dir, std::shared_ptr<const RailStation> st)
+{
+    if (dir == Direction::Down) {
+        gpDir->get(0)->setChecked(true);
+    }
+    else if (dir == Direction::Up) {
+        gpDir->get(1)->setChecked(true);
+    }
+
+    for (int i = 0; i < model->rowCount(); i++) {
+        if (model->getRowStation(i) == st) {
+            table->setCurrentIndex(model->index(i, 0));
+            break;
+        }
+    }
+
+}
+
 void RulerPaintPageStation::initUI()
 {
     setTitle(tr("排图参数"));
@@ -75,6 +90,8 @@ void RulerPaintPageStation::initUI()
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->setSelectionBehavior(QTableView::SelectRows);
     table->setSelectionMode(QTableView::SingleSelection);
+    table->setItemDelegateForColumn(RailStationModel::ColMile,
+        new GeneralDoubleSpinDelegate(this));
     table->setModel(model);
 
     onRailwayChanged(cbRuler->railway());     //此操作触发初始化表格！
@@ -88,6 +105,7 @@ void RulerPaintPageStation::onRailwayChanged(std::shared_ptr<Railway> railway)
     if(railway){
         model->setRailwayForDir(_railway,getDir());
         table->resizeColumnsToContents();
+        emit railwayChanged(railway);
     }
 }
 

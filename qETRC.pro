@@ -45,6 +45,9 @@ SOURCES += \
     src/editors/railstationwidget.cpp \
     src/editors/ruler/rulertabpy.cpp \
     src/editors/ruler/rulerwidget.cpp \
+    src/model/delegate/generaldoublespindelegate.cpp \
+    src/model/delegate/generalspindelegate.cpp \
+    src/model/delegate/qetimedelegate.cpp \
     src/util/railrulercombo.cpp \
     src/util/selecttraincombo.cpp \
     src/viewers/railsectionevents.cpp \
@@ -81,6 +84,8 @@ SOURCES += \
     src/viewers/sectioncountdialog.cpp \
     src/viewers/traineventdialog.cpp \
     src/viewers/trainlinedialog.cpp \
+    src/viewers/traintimetableplane.cpp \
+    src/wizards/rulerpaint/conflictdialog.cpp \
     src/wizards/rulerpaint/rulerpaintpagestart.cpp \
     src/wizards/rulerpaint/rulerpaintpagestation.cpp \
     src/wizards/rulerpaint/rulerpaintpagetable.cpp \
@@ -120,6 +125,9 @@ HEADERS += \
     src/editors/railstationwidget.h \
     src/editors/ruler/rulertabpy.h \
     src/editors/ruler/rulerwidget.h \
+    src/model/delegate/generaldoublespindelegate.h \
+    src/model/delegate/generalspindelegate.h \
+    src/model/delegate/qetimedelegate.h \
     src/util/railrulercombo.h \
     src/util/selecttraincombo.h \
     src/viewers/railsectionevents.h \
@@ -159,6 +167,8 @@ HEADERS += \
     src/viewers/sectioncountdialog.h \
     src/viewers/traineventdialog.h \
     src/viewers/trainlinedialog.h \
+    src/viewers/traintimetableplane.h \
+    src/wizards/rulerpaint/conflictdialog.h \
     src/wizards/rulerpaint/rulerpaintpagestart.h \
     src/wizards/rulerpaint/rulerpaintpagestation.h \
     src/wizards/rulerpaint/rulerpaintpagetable.h \

@@ -27,7 +27,7 @@ class RulerPaintPageStart : public QWizardPage
      * 注意不应该修改；后面铺画时，应该在另外的对象上操作
      * 如果是新建车次，则这里设置好车次名称，新建对象
      */
-    std::shared_ptr<const Train> _train{};
+    std::shared_ptr<Train> _train{};
 
     RadioButtonGroup<4,QVBoxLayout>* gpMode;
     TimetableStdModel* const model;
@@ -67,6 +67,8 @@ public:
     inline int endRow()const{return _endRow;}
 
     PaintMode getMode();
+
+    auto train()const{return _train;}
 
 private:
     void initUI();

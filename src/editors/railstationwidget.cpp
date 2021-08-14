@@ -1,6 +1,7 @@
 ﻿#include "railstationwidget.h"
 #include "util/buttongroup.hpp"
 #include "model/delegate/combodelegate.h"
+#include "model/delegate/generaldoublespindelegate.h"
 #include <QtWidgets>
 
 
@@ -48,6 +49,9 @@ void RailStationWidget::initUI()
 	auto* dele = new ComboDelegate({ tr("不通过"),tr("下行"),tr("上行"),tr("上下行") }, this);
 	ctable->table()->setItemDelegateForColumn(RailStationModel::ColDir, dele);
 	ctable->table()->setEditTriggers(QTableView::CurrentChanged);
+	ctable->table()->setItemDelegateForColumn(RailStationModel::ColMile,
+		new GeneralDoubleSpinDelegate(this));
+
 	vlay->addWidget(ctable);
 
 	auto* g = new ButtonGroup<2>({ "确定","还原" });

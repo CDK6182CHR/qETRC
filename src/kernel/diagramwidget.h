@@ -82,7 +82,7 @@ public:
      * 删除列车时调用
      * 移除和删除列车运行线  注意相关映射表的处理，对象的删除等
      */
-    void removeTrain(Train& train);
+    void removeTrain(const Train& train);
 
     /**
      * 删除由adps所指的原本属于某列车的运行线，用于更新列车运行线

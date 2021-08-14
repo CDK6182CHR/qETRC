@@ -67,8 +67,6 @@ private slots:
     void actOpenStationWidget();
     void actRemoveRailway();
 
-    
-    
 
     /**
      * 工具栏触发，编辑指定的标尺
@@ -89,6 +87,11 @@ private slots:
 
     void actSnapEvents();
 
+    /**
+     * 新建空白的标尺，操作压栈
+     */
+    void actAddNewRuler();
+
 public slots:
 
     /**
@@ -98,6 +101,7 @@ public slots:
     void actChangeOrdinate(int i);
 
     void openRulerWidget(std::shared_ptr<Ruler> ruler);
+
 
     void actChangeRailName(std::shared_ptr<Railway> rail, const QString& name);
     void commitChangeRailName(std::shared_ptr<Railway> rail);
@@ -142,6 +146,16 @@ public slots:
      */
     void insertRulerAt(const Railway& rail, std::shared_ptr<Ruler> ruler, bool isord);
 
+    /**
+     * 添加新标尺后的操作。将标尺添加到ordinate的选项列表中；同时自动创建编辑界面
+     */
+    void commitAddNewRuler(std::shared_ptr<Ruler> ruler);
+
+    /**
+     * 撤销添加标尺的操作。从ordinate中删除；如果有打开的窗口，关闭它；
+     * 注意此时不可能是Ordinate。
+     */
+    void undoAddNewRuler(std::shared_ptr<Ruler> ruler);
 };
 
 
@@ -190,6 +204,21 @@ namespace qecmd {
             cont(context_),rail(rail_),index(index_)
         {}
 
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    /**
+     * 添加空白标尺。注意只能处理空白标尺的情况，直接调用Railway添加空白标尺的方法。
+     */
+    class AddNewRuler :public QUndoCommand {
+        RailContext* const cont;
+        QString name;
+        std::shared_ptr<Railway> railway;
+        std::shared_ptr<Railway> theRuler{};   //这里保存标尺的数据
+    public:
+        AddNewRuler(const QString& name_, std::shared_ptr<Railway> railway_, RailContext* context, QUndoCommand* parent = nullptr):
+            QUndoCommand(parent),name(name_), cont(context), railway(railway_){}
         virtual void undo()override;
         virtual void redo()override;
     };

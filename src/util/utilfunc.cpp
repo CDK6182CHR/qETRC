@@ -103,3 +103,19 @@ bool qeutil::ltIndexRow(const QModelIndex &idx1, const QModelIndex &idx2)
 {
     return idx1.row()<idx2.row();
 }
+
+bool qeutil::timeInRange(const QTime& left, const QTime& right, const QTime& t)
+{
+	int tleft = left.msecsSinceStartOfDay(), tright = right.msecsSinceStartOfDay();
+	int tt = t.msecsSinceStartOfDay();
+	
+	if (tright < tleft)
+		tright += msecsOfADay;
+	if (tleft <= tt && tt <= tright)
+		return true;
+	//考虑一次平移
+	tt += msecsOfADay;
+	if (tleft <= tt && tt <= tright)
+		return true;
+	return false;
+}

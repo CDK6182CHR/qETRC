@@ -106,12 +106,18 @@ void RailContext::initUI()
 	connect(act, SIGNAL(triggered()), this, SLOT(actRemoveRailway()));
 
 	panel = page->addPannel(tr("标尺"));
-	act = new QAction(QIcon(":icons/ruler.png"), tr("标尺"), this);
+	act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺"), this);
 	auto* me = new SARibbonMenu;
 	act->setToolTip(tr("标尺编辑\n创建或者导航到本线标尺编辑的面板"));
 	meRulerWidgets = me;
 	act->setMenu(me);
 	connect(act, SIGNAL(triggered()), this, SLOT(actSelectRuler()));
+	btn = panel->addLargeAction(act);
+	btn->setMinimumWidth(70);
+
+	act = new QAction(QIcon(":/icons/add.png"), tr("新建标尺"), this);
+	act->setToolTip(tr("新建标尺\n新建本线的空白标尺"));
+	connect(act, SIGNAL(triggered()), this, SLOT(actAddNewRuler()));
 	btn = panel->addLargeAction(act);
 	btn->setMinimumWidth(70);
 
@@ -234,6 +240,7 @@ void RailContext::openRulerWidget(std::shared_ptr<Ruler> ruler)
 		connect(rw, &RulerWidget::focusInRuler, mw, &MainWindow::focusInRuler);
 		connect(rw, &RulerWidget::actChangeRulerName, mw->getRulerContext(),
 			&RulerContext::actChangeRulerName);
+		meRulerWidgets->addAction(dock->toggleViewAction());
 		mw->getManager()->addDockWidgetFloating(dock);
 	}
 	else {
@@ -295,6 +302,12 @@ void RailContext::actSnapEvents()
 {
 	auto* dialog = new RailSnapEventsDialog(diagram, railway, mw);
 	dialog->show();
+}
+
+void RailContext::actAddNewRuler()
+{
+	mw->getUndoStack()->push(new qecmd::AddNewRuler(railway->validRulerName(tr("新标尺")),
+		railway, this));
 }
 
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
@@ -407,6 +420,17 @@ void RailContext::insertRulerAt(const Railway& rail, std::shared_ptr<Ruler> rule
 	}
 }
 
+void RailContext::commitAddNewRuler(std::shared_ptr<Ruler> ruler)
+{
+	insertRulerAt(ruler->railway(), ruler, false);
+	openRulerWidget(ruler);
+}
+
+void RailContext::undoAddNewRuler(std::shared_ptr<Ruler> ruler)
+{
+	mw->getRulerContext()->commitRemoveRuler(ruler, false);
+}
+
 void RailContext::setRailway(std::shared_ptr<Railway> rail)
 {
 	railway = rail;
@@ -503,4 +527,24 @@ void qecmd::ChangeOrdinate::redo()
 	rail->setOrdinateIndex(index);
 	index = idx;
 	cont->commitOrdinateChange(rail);
+}
+
+void qecmd::AddNewRuler::undo()
+{
+	auto r = railway->takeLastRuler();
+	cont->undoAddNewRuler(r);
+}
+
+void qecmd::AddNewRuler::redo()
+{
+	if (!theRuler) {
+		// 第一次执行时，需要新建
+		auto r = railway->addEmptyRuler(name, true);
+		theRuler = r->clone();
+		setText(QObject::tr("新建空白标尺: %1").arg(r->name()));
+	}
+	else {
+		railway->addRulerFrom(theRuler->getRuler(0));
+	}
+	cont->commitAddNewRuler(railway->rulers().last());
 }

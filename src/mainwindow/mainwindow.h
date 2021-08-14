@@ -164,12 +164,7 @@ private:
      */
     bool openGraph(const QString& filename);
 
-    /**
-     * 向所有运行图窗口添加指定运行线。
-     * （简单封装）
-     */
-    void addTrainLine(Train& train);
-    void removeTrainLine(Train& train);
+    
 
     void updateWindowTitle();
 
@@ -265,6 +260,8 @@ private slots:
      */
     void undoAddNewRailway(std::shared_ptr<Railway> rail);
 
+    void onNewTrainAdded(std::shared_ptr<Train> train);
+
     void undoAddNewTrain(std::shared_ptr<Train> train);
 
     void onActRailwayRemoved(std::shared_ptr<Railway> rail);
@@ -297,6 +294,13 @@ private slots:
     void useOfficeStyle();
 
     void actRulerPaint();
+
+    /**
+     * 向所有运行图窗口添加指定运行线。
+     * （简单封装）
+     */
+    void addTrainLine(Train& train);
+    void removeTrainLine(const Train& train);
 
 public slots:
 

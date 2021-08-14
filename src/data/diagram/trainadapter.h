@@ -111,6 +111,13 @@ public:
 
     bool isLastStation(const AdapterStation* st)const;
 
+    /**
+     * 标尺排图中，初始化选择起始站使用。
+     * 线性查找
+     */
+    std::pair<const AdapterStation*,std::shared_ptr<TrainLine>>
+        stationByTrainLinear(Train::ConstStationPtr st)const;
+
 private:
 
     /**

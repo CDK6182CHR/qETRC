@@ -51,11 +51,11 @@ namespace qeutil {
 struct StationEvent {
     TrainEventType type;
     QTime time;
-    std::weak_ptr<RailStation> station;
+    std::weak_ptr<const RailStation> station;
     std::optional<std::reference_wrapper<const Train>> another;
     QString note;
     StationEvent(TrainEventType type_,
-                 const QTime& time_, std::weak_ptr<RailStation> station_,
+                 const QTime& time_, std::weak_ptr<const RailStation> station_,
                  std::optional<std::reference_wrapper<const Train>> another_,
                  const QString& note_=""):
         type(type_),time(time_),station(station_),another(another_),note(note_){}
@@ -80,7 +80,7 @@ struct RailStationEvent :
     public StationEvent {
     int pos;
     RailStationEvent(TrainEventType type_,
-        const QTime& time_, std::weak_ptr<RailStation> station_,
+        const QTime& time_, std::weak_ptr<const RailStation> station_,
         std::reference_wrapper<const Train> train,
         int pos_, const QString& note_ = "") :
         StationEvent(type_, time_, station_, train, note_), pos(pos_) {}

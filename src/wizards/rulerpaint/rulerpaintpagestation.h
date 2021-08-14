@@ -40,6 +40,15 @@ public:
     auto ruler()const{return _ruler;}
     auto anchorStation()const{return _anchorStation;}
     virtual bool validatePage()override;
+
+    /**
+     * 初始化完成后，根据已有信息，尽可能的设置正确的行别和初始站
+     * 如果初始站不存在，不做任何事。
+     */
+    void setDefaultAnchor(Direction dir, 
+        std::shared_ptr<const RailStation> st);
+signals:
+    void railwayChanged(std::shared_ptr<Railway>);
 private:
     void initUI();
 private slots:

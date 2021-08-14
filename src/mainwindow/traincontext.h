@@ -90,6 +90,12 @@ public slots:
     void onTrainTimetableChanged(std::shared_ptr<Train> train, std::shared_ptr<Train> table);
 
     /**
+     * 2021.08.13  压栈操作
+     * 由RulerPaint调用，主要是始发终到站的更新
+     */
+    void onTrainInfoChanged(std::shared_ptr<Train> train, std::shared_ptr<Train> info);
+
+    /**
      * 实际更新时刻表。undo/redo调用。
      * 更新数据，重新绑定数据，更新时刻表页面，更新列表页面（可能有里程等数据的变化），铺画运行图
      */

@@ -45,6 +45,10 @@ public:
      */
     bool operator==(const StationName& name)const;
 
+    inline bool operator!=(const StationName& name)const {
+        return !operator==(name);
+    }
+
     bool operator<(const StationName& name)const;
 
     bool operator>(const StationName& name)const;

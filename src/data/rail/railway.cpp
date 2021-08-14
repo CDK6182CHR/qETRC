@@ -353,6 +353,17 @@ bool Railway::rulerNameExisted(const QString& name, std::shared_ptr<const Ruler>
 	return false;
 }
 
+QString Railway::validRulerName(const QString& prefix) const
+{
+	for (int i = 0;; i++) {
+		QString name = prefix;
+		if (i)
+			name += QString::number(i);
+		if (!rulerNameExisted(name))
+			return name;
+	}
+}
+
 
 void Railway::removeRuler(std::shared_ptr<Ruler> ruler)
 {
@@ -371,6 +382,13 @@ void Railway::removeRuler(std::shared_ptr<Ruler> ruler)
 	for (; p; p = nextIntervalCirc(p)) {
 		p->_rulerNodes.removeAt(index);
 	}
+}
+
+std::shared_ptr<Ruler> Railway::takeLastRuler()
+{
+	auto t = _rulers.last();
+	removeRuler(t);
+	return t;
 }
 
 void Railway::undoRemoveRuler(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> data)

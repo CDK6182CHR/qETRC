@@ -97,6 +97,7 @@ void RulerContext::commitRemoveRuler(std::shared_ptr<Ruler> ruler, bool isord)
     auto& rail = ruler->railway();
 
     mw->getRailContext()->removeRulerAt(ruler->railway(), ruler->index(), isord);
+    mw->getRailContext()->removeRulerWidget(ruler);
 
     if (isord) {
         //重新排图

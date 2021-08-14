@@ -71,6 +71,12 @@ public:
      */
     std::shared_ptr<Railway> generateRailway()const;
 
+    /**
+     * 站名列保存的站点指针信息。
+     * 如果表格不是只读的（i.e. 允许新增行），则返回不一定安全。
+     */
+    std::shared_ptr<const RailStation> getRowStation(int row);
+
 signals:
 
     /**

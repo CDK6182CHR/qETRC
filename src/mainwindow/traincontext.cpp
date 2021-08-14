@@ -272,6 +272,11 @@ void TrainContext::onTrainTimetableChanged(std::shared_ptr<Train> train, std::sh
 	mw->getUndoStack()->push(new qecmd::ChangeTimetable(train, table, this));
 }
 
+void TrainContext::onTrainInfoChanged(std::shared_ptr<Train> train, std::shared_ptr<Train> info)
+{
+	mw->getUndoStack()->push(new qecmd::UpdateTrainInfo(train, info, this));
+}
+
 void TrainContext::commitTimetableChange(std::shared_ptr<Train> train, std::shared_ptr<Train> table)
 {
 	//以前的adapters，拿出来做删除的索引

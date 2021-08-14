@@ -235,6 +235,8 @@ public:
     bool rulerNameExisted(const QString& name, 
         std::shared_ptr<const Ruler> ignore=nullptr)const;
 
+    QString validRulerName(const QString& prefix)const;
+
     /// <summary>
     /// 签名形式未确定
     /// </summary>
@@ -245,6 +247,12 @@ public:
      * 原标尺Ruler对象不受影响。但注意它只是个头结点！！
      */
     void removeRuler(std::shared_ptr<Ruler> ruler);
+
+    /**
+     * 删除并返回最后一个Ruler。
+     * 注意返回的只是个头结点！ seealso: removeRuler
+     */
+    std::shared_ptr<Ruler> takeLastRuler();
 
     /**
      * 插入标尺，用于撤销操作
@@ -515,6 +523,7 @@ public:
      * （特例是给首站的情况，直接返回首站的y坐标）
      */
     SectionInfo getSectionInfo(double mile);
+
 
 private:
     /**

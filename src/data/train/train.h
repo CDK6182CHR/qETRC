@@ -402,6 +402,13 @@ public:
      */
     void swapBaseInfo(Train& other);
 
+    inline bool empty()const { return _timetable.empty(); }
+
+    /**
+     * 线性遍历
+     */
+    std::shared_ptr<const TrainAdapter> adapterFor(const Railway& railway)const;
+
 
     //static比较函数 用来排序
     static bool ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);

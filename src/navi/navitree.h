@@ -78,6 +78,12 @@ public slots:
     void actAddRailway();
     void actAddTrain();
 
+    /**
+     * 2021.08.13  与标尺排图向导连接
+     * 采用标尺排图的方式添加新列车，压栈
+     */
+    void actAddPaintedTrain(std::shared_ptr<Train> train);
+
     void importRailways();
     void addNewPage();
     
@@ -135,7 +141,7 @@ namespace qecmd {
     public:
         AddNewTrain(DiagramNaviModel* navi_,std::shared_ptr<Train> train_,
             QUndoCommand* parent=nullptr):
-            QUndoCommand(QObject::tr("新建车次"),parent),
+            QUndoCommand(QObject::tr("新建车次: ")+train_->trainName().full(),parent),
             navi(navi_),train(train_){}
         virtual void undo()override {
             navi->undoAddTrain();

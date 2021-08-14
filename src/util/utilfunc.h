@@ -50,4 +50,12 @@ bool exportTableToCsv(const QStandardItemModel* model, QWidget* parent, const QS
 
 bool ltIndexRow(const QModelIndex& idx1,const QModelIndex& idx2);
 
+static constexpr int msecsOfADay = 24 * 3600 * 1000;
+
+/**
+ * 判断是否满足： left <= t <= right
+ * 注意PBC
+ */
+bool timeInRange(const QTime& left, const QTime& right, const QTime& t);
+
 }

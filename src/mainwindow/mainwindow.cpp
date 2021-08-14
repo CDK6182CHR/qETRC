@@ -145,9 +145,16 @@ void MainWindow::undoAddNewRailway(std::shared_ptr<Railway> rail)
     removeRailStationWidget(rail);
 }
 
+void MainWindow::onNewTrainAdded(std::shared_ptr<Train> train)
+{
+    contextTrain->showBasicWidget(train);
+    addTrainLine(*train);
+}
+
 void MainWindow::undoAddNewTrain(std::shared_ptr<Train> train)
 {
     contextTrain->removeTrainWidget(train);
+    removeTrainLine(*train);
     if (train == contextTrain->getTrain())
         focusOutTrain();
 }
@@ -246,6 +253,16 @@ void MainWindow::useOfficeStyle()
 void MainWindow::actRulerPaint()
 {
     auto* wzd = new RulerPaintWizard(_diagram, this);
+    connect(wzd, &RulerPaintWizard::removeTmpTrainLine,
+        this, &MainWindow::removeTrainLine);
+    connect(wzd, &RulerPaintWizard::paintTmpTrainLine,
+        this, &MainWindow::addTrainLine);
+    connect(wzd, &RulerPaintWizard::trainAdded,
+        naviView, &NaviTree::actAddPaintedTrain);
+    connect(wzd, &RulerPaintWizard::trainTimetableModified,
+        contextTrain, &TrainContext::onTrainTimetableChanged);
+    connect(wzd, &RulerPaintWizard::trainInfoModified,
+        contextTrain, &TrainContext::onTrainInfoChanged);
     wzd->show();
 }
 
@@ -580,7 +597,7 @@ void MainWindow::initToolbar()
             contextTrain, &TrainContext::actShowBasicWidget);
 
         connect(naviModel, &DiagramNaviModel::newTrainAdded,
-            contextTrain, &TrainContext::showBasicWidget);
+            this, &MainWindow::onNewTrainAdded);
         connect(naviModel, &DiagramNaviModel::undoneAddTrain,
             this, &MainWindow::undoAddNewTrain);
     }
@@ -739,7 +756,7 @@ void MainWindow::addTrainLine(Train& train)
         p->paintTrain(train);
 }
 
-void MainWindow::removeTrainLine(Train& train)
+void MainWindow::removeTrainLine(const Train& train)
 {
     for (auto p : diagramWidgets)
         p->removeTrain(train);

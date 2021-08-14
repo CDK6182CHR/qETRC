@@ -176,7 +176,7 @@ public:
 
     /**
      * @brief updateTrain  铺画准备
-     * @param t  更新的车次，与所有线路重新绑定
+     * @param t  更新的车次，与所有线路重新绑定  并不要求属于本运行图的TrainCollection
      */
     void updateTrain(std::shared_ptr<Train> t);
 
@@ -258,7 +258,7 @@ public:
      */
     QList<QPair<std::shared_ptr<TrainLine>, RailStationEvent>>
         stationEvents(std::shared_ptr<Railway> railway,
-            std::shared_ptr<RailStation> st)const;
+            std::shared_ptr<const RailStation> st)const;
 
     using SectionEventList = QList<QPair<std::shared_ptr<TrainLine>, QTime>>;
 

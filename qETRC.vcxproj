@@ -204,6 +204,9 @@
     <ClCompile Include="src\editors\railstationwidget.cpp" />
     <ClCompile Include="src\editors\ruler\rulertabpy.cpp" />
     <ClCompile Include="src\editors\ruler\rulerwidget.cpp" />
+    <ClCompile Include="src\model\delegate\generaldoublespindelegate.cpp" />
+    <ClCompile Include="src\model\delegate\generalspindelegate.cpp" />
+    <ClCompile Include="src\model\delegate\qetimedelegate.cpp" />
     <ClCompile Include="src\util\railrulercombo.cpp" />
     <ClCompile Include="src\util\selecttraincombo.cpp" />
     <ClCompile Include="src\viewers\railsectionevents.cpp" />
@@ -259,12 +262,16 @@
     <ClCompile Include="src\viewers\sectioncountdialog.cpp" />
     <ClCompile Include="src\viewers\traineventdialog.cpp" />
     <ClCompile Include="src\viewers\trainlinedialog.cpp" />
+    <ClCompile Include="src\viewers\traintimetableplane.cpp" />
+    <ClCompile Include="src\wizards\rulerpaint\conflictdialog.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagestart.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagestation.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagetable.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintwizard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="src\viewers\traintimetableplane.h" />
+    <QtMoc Include="src\wizards\rulerpaint\conflictdialog.h" />
     <QtMoc Include="src\wizards\rulerpaint\rulerpaintpagetable.h" />
     <QtMoc Include="src\wizards\rulerpaint\rulerpaintpagestation.h" />
     <QtMoc Include="src\wizards\rulerpaint\rulerpaintwizard.h" />
@@ -299,11 +306,14 @@
     <QtMoc Include="src\model\rail\railstationmodel.h" />
     <QtMoc Include="src\model\delegate\combodelegate.h" />
     <QtMoc Include="src\mainwindow\viewcategory.h" />
-    <ClInclude Include="src\model\delegate\postivespindelegate.h" />
+    <ClInclude Include="src\model\delegate\generaldoublespindelegate.h" />
+    <ClInclude Include="src\model\delegate\generalspindelegate.h" />
+    <QtMoc Include="src\model\delegate\postivespindelegate.h" />
     <ClInclude Include="src\model\delegate\qedelegate.h" />
     <QtMoc Include="src\model\train\timetablestdmodel.h" />
     <QtMoc Include="src\model\general\qemoveablemodel.h" />
     <QtMoc Include="src\model\rail\rulermodel.h" />
+    <ClInclude Include="src\model\delegate\qetimedelegate.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <ClInclude Include="src\model\diagram\componentitems.h" />
     <ClInclude Include="src\data\diagram\config.h" />

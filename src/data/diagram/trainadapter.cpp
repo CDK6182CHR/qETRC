@@ -124,6 +124,17 @@ bool TrainAdapter::isLastStation(const AdapterStation* st) const
 		st == &(p->stations().back());
 }
 
+std::pair<const AdapterStation*, std::shared_ptr<TrainLine>>
+	TrainAdapter::stationByTrainLinear(Train::ConstStationPtr st) const
+{
+	const AdapterStation* p = nullptr;
+	for (auto line : _lines) {
+		if ((p = line->stationByTrainLinear(st)))
+			return std::make_pair(p, line);
+	}
+	return std::make_pair(nullptr, nullptr);
+}
+
 void TrainAdapter::autoLines(const Config& config)
 {
 	//命名规则：前缀r表示rail，t表示train
