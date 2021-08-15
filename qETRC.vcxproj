@@ -195,6 +195,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\data\rail\railcategory.cpp" />
+    <ClCompile Include="src\dialogs\changestationnamedialog.cpp" />
     <ClCompile Include="src\dialogs\exchangeintervaldialog.cpp" />
     <ClCompile Include="src\dialogs\importtraindialog.cpp" />
     <ClCompile Include="src\dialogs\printdiagramdialog.cpp" />
@@ -299,6 +300,7 @@
     <QtMoc Include="src\dialogs\selectrailstationdialog.h" />
     <QtMoc Include="src\viewers\stationtimetablesettled.h" />
     <QtMoc Include="src\dialogs\exchangeintervaldialog.h" />
+    <QtMoc Include="src\dialogs\changestationnamedialog.h" />
     <ClInclude Include="src\mainwindow\version.h" />
     <QtMoc Include="src\navi\navitree.h" />
     <QtMoc Include="src\model\diagram\railtablemodel.h" />

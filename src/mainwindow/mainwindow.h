@@ -14,6 +14,7 @@
 #include "editors/trainlistwidget.h"
 #include "editors/railstationwidget.h"
 #include "navi/navitree.h"
+#include "dialogs/changestationnamedialog.h"
 
 //for SARibbon
 #include "SARibbonMainWindow.h"
@@ -74,7 +75,6 @@ class MainWindow : public SARibbonMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
 
 
     /**
@@ -302,6 +302,8 @@ private slots:
     void addTrainLine(Train& train);
     void removeTrainLine(const Train& train);
 
+    void actChangeStationName();
+
 public slots:
 
     /**
@@ -333,6 +335,16 @@ public slots:
      * 触发重新绑定、排图、铺画操作
      */
     void commitPassedStationChange(int n);
+
+    /**
+     * 全局刷新：重新绑定线路，重新铺画运行图，更新所有打开的窗口
+     */
+    void refreshAll();
+
+    /**
+     * 应用更改站名。操作压栈。
+     */
+    void applyChangeStationName(const ChangeStationNameData& data);
 
 };
 

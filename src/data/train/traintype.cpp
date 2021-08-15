@@ -90,8 +90,12 @@ std::shared_ptr<TrainType> TypeManager::findOrCreate(const QString& name)
 
 std::shared_ptr<TrainType> TypeManager::findOrCreate(const QString& name, bool passenger)
 {
-	if (_types.contains(name))
-		return _types.value(name);
+	if (_types.contains(name)) {
+		auto t = _types.value(name);
+		t->setIsPassenger(passenger);
+		return t;
+	}
+		
 	else {
 		auto t = std::make_shared<TrainType>(name, passenger ?
 			defaultPenPassenger : defaultPen, passenger);

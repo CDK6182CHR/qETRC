@@ -60,7 +60,13 @@ void TrainLine::print() const
 	qDebug() << train()->trainName().full() << " @ " << _adapter.railway().name() << Qt::endl;
 	for (const auto& p : _stations) {
 		qDebug() << *p.trainStation << " -> " << p.railStation.lock()->name << Qt::endl;
-	}
+    }
+}
+
+void TrainLine::setIsShow(bool on)
+{
+    _show=on;
+    train()->checkLinesShow();
 }
 
 std::shared_ptr<Train> TrainLine::train()

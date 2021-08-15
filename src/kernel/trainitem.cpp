@@ -62,7 +62,7 @@ void TrainItem::highlight()
     QPen pen = path->pen();
     pen.setWidth(pen.width() + 1);
     path->setPen(pen);
-    path->setZValue(1);
+    path->setZValue(2);
 
     QPen rectPen(pen.color());
     QBrush brush(pen.color());
@@ -72,19 +72,19 @@ void TrainItem::highlight()
         //起点标签
         startRect = new QGraphicsRectItem(startLabelText->boundingRect(), this);
         startRect->setPos(startLabelText->pos());
-        startRect->setZValue(0.5);
+        startRect->setZValue(1);
         startRect->setPen(rectPen);
         startRect->setBrush(brush);
-        startLabelText->setZValue(1);
+        startLabelText->setZValue(2);
         startLabelText->setBrush(Qt::white);
     }
     if (endLabelText) {
         endRect = new QGraphicsRectItem(endLabelText->boundingRect(), this);
         endRect->setPos(endLabelText->pos());
-        endRect->setZValue(0.5);
+        endRect->setZValue(1);
         endRect->setPen(rectPen);
         endRect->setBrush(brush);
-        endLabelText->setZValue(1);
+        endLabelText->setZValue(2);
         endLabelText->setBrush(Qt::white);
     }
 

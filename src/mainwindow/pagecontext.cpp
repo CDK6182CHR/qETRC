@@ -31,6 +31,11 @@ void PageContext::refreshData()
     }
 }
 
+void PageContext::refreshAllData()
+{
+    refreshData();
+}
+
 void PageContext::initUI()
 {
     auto* page = cont->addCategoryPage(tr("管理"));

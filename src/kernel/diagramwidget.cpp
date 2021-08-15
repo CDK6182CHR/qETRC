@@ -15,10 +15,8 @@
 #include <QVBoxLayout>
 #include <QTextBrowser>
 #include <QScroller>
-
-#ifdef _Q_OS_WIN32
 #include <QPrinter>
-#endif
+
 
 #include "mainwindow/version.h"
 
@@ -99,8 +97,6 @@ void DiagramWidget::paintGraph()
     marginItems.left->setZValue(15);
     marginItems.right = scene()->createItemGroup(rightItems);
     marginItems.right->setZValue(15);
-
-    //todo: labelSpan
     
     //todo: 绘制提示进度条
     for (auto p : _diagram.trainCollection().trains()) {
@@ -128,7 +124,7 @@ void DiagramWidget::clearGraph()
 
 bool DiagramWidget::toPdf(const QString& filename, const QString& title, const QString& note)
 {
-#ifndef _Q_OS_WIN32
+#if 0
     Q_UNUSED(filename);
     Q_UNUSED(title);
     Q_UNUSED(note)
@@ -677,7 +673,7 @@ void DiagramWidget::paintTrain(Train& train)
                         qDebug() << "DiagramWidget::paintTrain: WARNING: " <<
                             "Unexpected null TrainLine! " << train.trainName().full() << Qt::endl;
                     }
-                    else {
+                    else if(line->show()) {
                         auto* item = new TrainItem(_diagram, line, adp->railway(), *_page,
                             _page->startYs().at(i));
                         _page->addItemMap(line.get(), item);

@@ -41,6 +41,14 @@ void RailContext::refreshData()
 	updating = false;
 }
 
+void RailContext::refreshAllData()
+{
+	refreshData();
+	for (auto p : rulerWidgets) {
+		p->refreshData();
+	}
+}
+
 void RailContext::initUI()
 {
 	auto* page = cont->addCategoryPage(tr("数据"));
@@ -312,13 +320,16 @@ void RailContext::actAddNewRuler()
 
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
 {
-	updateRailWidget(rail);
+	//2021.08.15取消：更改站名时不必刷新页面
+	//否则同时更改的线路信息就没了！
+	//updateRailWidget(rail);
 	if (rail == railway) {
 		refreshData();
 	}
 	//更新打开的窗口标题
 	for (int i = 0; i < mw->railStationWidgets.size(); i++) {
 		auto w = mw->railStationWidgets.at(i);
+		w->refreshBasicData();
 		if (w->getRailway() == rail) {
 			mw->railStationDocks.at(i)->setWindowTitle(tr("基线编辑 - ") + rail->name());
 		}
@@ -386,7 +397,8 @@ void RailContext::onRulerNameChanged(std::shared_ptr<Ruler> ruler)
 	for (int i = 0; i < rulerWidgets.size(); i++) {
 		auto w = rulerWidgets.at(i);
 		if (w->getRuler() == ruler) {
-			w->refreshData();
+			//2021.08.15  这里不能更新全局，否则数据更新就没了
+			w->refreshBasicData();
 			rulerDocks.at(i)->setWindowTitle(tr("标尺编辑 - %1 - %2").arg(ruler->name())
 				.arg(ruler->railway().name()));
 		}

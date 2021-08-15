@@ -20,6 +20,11 @@ void RailStationWidget::setRailway(std::shared_ptr<Railway> rail)
 	edName->setText(railway->name());
 }
 
+void RailStationWidget::refreshBasicData()
+{
+	edName->setText(railway->name());
+}
+
 void RailStationWidget::refreshData()
 {
 	model->refreshData();
@@ -48,7 +53,7 @@ void RailStationWidget::initUI()
 	ctable->table()->setModel(model);
 	auto* dele = new ComboDelegate({ tr("不通过"),tr("下行"),tr("上行"),tr("上下行") }, this);
 	ctable->table()->setItemDelegateForColumn(RailStationModel::ColDir, dele);
-	ctable->table()->setEditTriggers(QTableView::CurrentChanged);
+	ctable->table()->setEditTriggers(QTableView::AllEditTriggers);
 	ctable->table()->setItemDelegateForColumn(RailStationModel::ColMile,
 		new GeneralDoubleSpinDelegate(this));
 

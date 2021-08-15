@@ -699,6 +699,11 @@ std::shared_ptr<const TrainAdapter> Train::adapterFor(const Railway& railway)con
     return {};
 }
 
+void Train::checkLinesShow()
+{
+    _show=anyLineShown();
+}
+
 bool Train::anyLineShown() const
 {
     for (auto adp : _adapters) {

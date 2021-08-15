@@ -430,15 +430,22 @@ void Railway::clearForbids()
 	_forbids.clear();
 }
 
-void Railway::changeStationName(const StationName& oldname,
-	const StationName& newname)
-{
-	auto p = stationByName(oldname);
-	p->name = newname;
+//void Railway::changeStationName(const StationName& oldname,
+//	const StationName& newname)
+//{
+//	auto p = stationByName(oldname);
+//	p->name = newname;
+//
+//	//更新映射表
+//	removeMapInfo(oldname);
+//	addMapInfo(p);
+//}
 
-	//更新映射表
-	removeMapInfo(oldname);
-	addMapInfo(p);
+void Railway::swapStationName(std::shared_ptr<RailStation> station, StationName& name)
+{
+	std::swap(station->name, name);
+	removeMapInfo(name);    //现在这是旧的站名！
+	addMapInfo(station);
 }
 
 double Railway::counterLength() const

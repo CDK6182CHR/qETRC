@@ -109,6 +109,8 @@ public:
     inline TrainName& trainName(){ return _trainName; }
     inline const StationName& starting()const{return _starting;}
     inline const StationName& terminal()const{return _terminal;}
+    inline StationName& startingRef() { return _starting; }
+    inline StationName& terminalRef() { return _terminal; }
     inline auto type()const{return _type;}
     inline TrainPassenger passenger()const{return _passenger;}
     inline bool isShow()const { return _show; }
@@ -408,6 +410,14 @@ public:
      * 线性遍历
      */
     std::shared_ptr<const TrainAdapter> adapterFor(const Railway& railway)const;
+
+    /**
+     * 注意只由TrainLine调用
+     * Train与TrainLine显示条件同步的临时解决方案
+     * Train的显示与否定义为：是否存在至少一个TrainLine为显示的
+     * 这个效率大概比较低
+     */
+    void checkLinesShow();
 
 
     //static比较函数 用来排序

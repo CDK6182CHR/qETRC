@@ -35,6 +35,7 @@ public:
     void resetPage();
     auto getPage(){return page;}
     void refreshData();
+    void refreshAllData();
     auto context() { return cont; }
 
 private:

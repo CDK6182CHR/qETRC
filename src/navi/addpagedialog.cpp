@@ -61,6 +61,10 @@ void AddPageDialog::preview(const QItemSelection& )
     auto* sel = table->selectionModel();
     auto lst = sel->selectedRows();
     auto p = lst.begin();
+    if (lst.empty()) {
+        editPrev->setText("");
+        return;
+    }
     QString res = diagram.railwayAt(p->row())->name();
     for (++p; p != lst.end(); ++p) {
         res += " - " + diagram.railwayAt(p->row())->name();

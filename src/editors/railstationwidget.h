@@ -29,6 +29,11 @@ public:
 
     void setRailway(std::shared_ptr<Railway> rail);
 
+    /**
+     * 刷新基本数据（即不包含表格）
+     */
+    void refreshBasicData();
+
     void refreshData();
 
     auto getRailway() { return railway; }

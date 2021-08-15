@@ -15,8 +15,14 @@ void RulerContext::setRuler(std::shared_ptr<Ruler> ruler)
 
 void RulerContext::refreshData()
 {
+    if (!ruler)return;
     edRulerName->setText(ruler->name());
     edRailName->setText(ruler->railway().name());
+}
+
+void RulerContext::refreshAllData()
+{
+    refreshData();
 }
 
 void RulerContext::initUI()

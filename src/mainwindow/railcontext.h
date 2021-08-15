@@ -48,6 +48,8 @@ public:
 
     void refreshData();
 
+    void refreshAllData();
+
 private:
     void initUI();
 

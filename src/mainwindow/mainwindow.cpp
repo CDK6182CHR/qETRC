@@ -387,7 +387,7 @@ void MainWindow::initToolbar()
 
     }
 
-    QAction* actTrainList;
+    QAction* actTrainList, * qactChangeStationName;
     //开始
     if constexpr (true) {
         SARibbonCategory* cat = ribbon->addCategoryPage(QObject::tr("开始"));
@@ -461,6 +461,24 @@ void MainWindow::initToolbar()
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
+        panel = cat->addPannel(tr("更新"));
+        act = new QAction(QIcon(":/icons/refresh.png"), tr("刷新"), this);
+        act->setToolTip(tr("刷新 (F5)\n重新铺画运行图，更新所有数据面板的信息。"));
+        act->setShortcut(Qt::Key_F5);
+        addAction(act);
+        connect(act, SIGNAL(triggered()), this, SLOT(refreshAll()));
+        btn = panel->addLargeAction(act);
+
+        act = new QAction(QIcon(":/icons/brush.png"), tr("更改站名"), this);
+        act->setToolTip(tr("全局站名修改 (Ctrl+U)\n"
+            "在整个运行图的所有线路、所有车次中，将旧站名改为新站名。"));
+        qactChangeStationName = act;
+        act->setShortcut(Qt::CTRL + Qt::Key_U);
+        addAction(act);
+        connect(act, SIGNAL(triggered()), this, SLOT(actChangeStationName()));
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
+
         panel = cat->addPannel(tr("系统"));
         act = new QAction(QIcon(":/icons/info.png"), tr("关于"), this);
         connect(act, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
@@ -496,6 +514,10 @@ void MainWindow::initToolbar()
         act = new QAction(QIcon(":/icons/new-file.png"), tr("新建线路"), this);
         connect(act, SIGNAL(triggered()), naviView, SLOT(actAddRailway()));
         act->setToolTip(tr("新建线路\n新建空白的铁路线路"));
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
+
+        panel = cat->addPannel(tr("调整"));
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
     }
@@ -762,6 +784,14 @@ void MainWindow::removeTrainLine(const Train& train)
         p->removeTrain(train);
 }
 
+void MainWindow::actChangeStationName()
+{
+    auto* dialog = new ChangeStationNameDialog(_diagram, this);
+    connect(dialog, &ChangeStationNameDialog::nameChangeApplied,
+        this, &MainWindow::applyChangeStationName);
+    dialog->show();
+}
+
 void MainWindow::updateWindowTitle()
 {
     QString filename = _diagram.filename();
@@ -865,6 +895,29 @@ void MainWindow::commitPassedStationChange(int n)
     _diagram.rebindAllTrains();
     trainListWidget->getModel()->updateAllMileSpeed();
     updateAllDiagrams();
+}
+
+void MainWindow::refreshAll()
+{
+    _diagram.rebindAllTrains();
+    updateAllDiagrams();
+    //直接由Main管理的子页面
+    naviModel->resetModel();
+    trainListWidget->refreshData();
+    for (auto p : railStationWidgets) {
+        p->refreshData();
+    }
+    catView->refreshTypeGroup();
+    //更新各个context，由context负责更新自己管理的widget的数据
+    contextTrain->refreshAllData();
+    contextRail->refreshAllData();
+    contextRuler->refreshAllData();
+    contextPage->refreshAllData();
+}
+
+void MainWindow::applyChangeStationName(const ChangeStationNameData& data)
+{
+    undoStack->push(new qecmd::ChangeStationNameGlobal(data, this));
 }
 
 void MainWindow::updateTrainLines(std::shared_ptr<Train> train, QList<std::shared_ptr<TrainAdapter>>&& adps)

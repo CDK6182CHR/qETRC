@@ -273,8 +273,15 @@ public:
     /// 但所做的事情更多一些
     /// 更改站名并更新映射
     /// 新增约定：oldName必须是完整站名！！
+    /// 2021.08.15：用不到了。现在用 swapStationName 以支持撤销
     /// </summary>
-    void changeStationName(const StationName& oldname, const StationName& newname);
+    //void changeStationName(const StationName& oldname, const StationName& newname);
+
+    /**
+     * 2021.08.15 执行站名更改的操作
+     * 将站名与`name`交换，同时更新映射表，用以支持撤销重做
+     */
+    void swapStationName(std::shared_ptr<RailStation> station, StationName& name);
 
     /// <summary>
     /// Line.lineLength()  线路长度
@@ -293,11 +300,11 @@ public:
     inline bool empty()const { return _stations.empty(); }
 
     inline StationName firstStationName()const {
-        return empty() ? StationName() : _stations.first()->name;
+        return empty() ? StationName::nullName : _stations.first()->name;
     }
 
     inline StationName lastStationName()const {
-        return empty() ? StationName() : _stations.last()->name;
+        return empty() ? StationName::nullName : _stations.last()->name;
     }
 
     /// <summary>

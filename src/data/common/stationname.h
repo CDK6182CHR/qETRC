@@ -15,9 +15,20 @@
 class StationName
 {
     QString _station, _field;
+
+    /**
+     * 2021.08.15：这个双参数的构造函数似乎没用过
+     */
+    explicit StationName(const QString& station, const QString& field);
 public:
+    StationName() = default;
+
+    /**
+     * 2021.08.15
+     * 原有的fromSingleLiteral，重写为构造函数，方便进行隐式转换
+     */
+    StationName(const QString& singleLiteral);
     static const StationName& nullName;
-    explicit StationName(const QString& station="",const QString& field="");
 
     StationName(const StationName&)=default;
     StationName(StationName&&)=default;

@@ -82,6 +82,11 @@ private:
 public slots:
     void setTrain(std::shared_ptr<Train> train_);
 
+    /**
+     * 更新所有数据，包括自己的数据和下设的widget
+     */
+    void refreshAllData();
+
     void removeTrainWidget(std::shared_ptr<Train> train);
 
     /**

@@ -262,6 +262,14 @@ void TrainContext::updateTrainWidgetTitles(std::shared_ptr<Train> t)
 	}
 }
 
+void TrainContext::refreshAllData()
+{
+	refreshData();
+	for (auto p : basicWidgets) {
+		p->refreshData();
+	}
+}
+
 void TrainContext::removeTrainWidget(std::shared_ptr<Train> train)
 {
 	removeBasicDockAt(getBasicWidgetIndex(train));

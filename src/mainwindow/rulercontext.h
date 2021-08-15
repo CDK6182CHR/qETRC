@@ -30,6 +30,7 @@ public:
     void resetRuler() { ruler.reset(); }
     auto getRuler(){return ruler;}
     void refreshData();
+    void refreshAllData();
     auto* context() { return cont; }
 
 private:
