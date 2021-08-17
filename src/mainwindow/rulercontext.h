@@ -85,6 +85,8 @@ private slots:
 
     void actRemoveRuler();
 
+    void actReadFromSingleTrain();
+
 };
 
 

@@ -212,6 +212,10 @@ public:
      */
     SnapEventList getSnapEvents(const QTime& time)const;
 
+    bool isStartingStation(ConstAdaPtr st)const;
+
+    bool isTerminalStation(ConstAdaPtr st)const;
+
 private:
 
     /**
@@ -380,10 +384,6 @@ private:
      * 如果存在始发终到，则不允许发生越行。
      */
     bool notStartOrEnd(const TrainLine& another, ConstAdaPtr pme, ConstAdaPtr phe)const;
-
-    bool isStartingStation(ConstAdaPtr st)const;
-
-    bool isTerminalStation(ConstAdaPtr st)const;
 
     inline bool isStartingOrTerminal(ConstAdaPtr st)const {
         return isStartingStation(st) || isTerminalStation(st);

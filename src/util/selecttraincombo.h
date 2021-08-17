@@ -26,6 +26,14 @@ class SelectTrainCombo : public QHBoxLayout
 public:
     SelectTrainCombo(TrainCollection& coll_, QWidget* parent=nullptr);
     auto train(){return _train;}
+
+    /**
+     * 弹出对话框，选择列车。
+     * 如果取消了，返回空
+     */
+    static std::shared_ptr<Train> dialogGetTrain(TrainCollection& coll_, QWidget* parent,
+        const QString& title = tr("选择车次"), const QString& prompt = "");
+
 private :
     void initUI();
 signals:

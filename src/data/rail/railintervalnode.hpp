@@ -33,11 +33,12 @@ public:
     const RailInterval& railInterval()const{return _railint;}
     RailInterval& railInterval(){return _railint;}
 
-    inline std::shared_ptr<_Node> nextNode(){
-        auto t=_railint.nextInterval();
-        if(t){
+    inline std::shared_ptr<_Node> nextNode() {
+        auto t = _railint.nextInterval();
+        if (t) {
             return t->getDataAt<_Node>(_data.index());
-        }else{
+        }
+        else {
             return std::shared_ptr<_Node>();
         }
     }

@@ -148,6 +148,14 @@ public:
         return downAdjacent() == another || upAdjacent() == another;
     }
 
+    /**
+     * Returns `RailInterval` between `this` and `another` if this is adjacent with another,
+     * otherwise null.
+     * Seealso `isAdjacentWith()`.
+     */
+    std::shared_ptr<RailInterval>
+        adjacentIntervalTo(std::shared_ptr<const RailStation> another);
+
     inline bool hasDownAdjacent()const{return downNext.get();}
     inline bool hasUpAdjacent()const{return upNext.get();}
 

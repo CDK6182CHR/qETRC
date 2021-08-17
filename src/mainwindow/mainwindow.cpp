@@ -14,6 +14,7 @@
 #include "navi/addpagedialog.h"
 #include "editors/configdialog.h"
 #include "wizards/rulerpaint/rulerpaintwizard.h"
+#include "util/railrulercombo.h"
 
 #include "version.h"
 
@@ -511,6 +512,15 @@ void MainWindow::initToolbar()
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
+        act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺编辑"), this);
+        act->setToolTip("标尺编辑 (Ctrl+B)\n"
+            "打开全局任意线路中的任意一个标尺的编辑面板。");
+        connect(act, SIGNAL(triggered()), this, SLOT(actNaviToRuler()));
+        act->setShortcut(Qt::CTRL + Qt::Key_B);
+        addAction(act);
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
+
         act = new QAction(QIcon(":/icons/new-file.png"), tr("新建线路"), this);
         connect(act, SIGNAL(triggered()), naviView, SLOT(actAddRailway()));
         act->setToolTip(tr("新建线路\n新建空白的铁路线路"));
@@ -790,6 +800,15 @@ void MainWindow::actChangeStationName()
     connect(dialog, &ChangeStationNameDialog::nameChangeApplied,
         this, &MainWindow::applyChangeStationName);
     dialog->show();
+}
+
+void MainWindow::actNaviToRuler()
+{
+    auto r = RailRulerCombo::dialogGetRuler(_diagram.railCategory(), this,
+        tr("导航到标尺"), tr("请选择标尺，系统将打开或切换到该标尺编辑页面"));
+    if (r) {
+        contextRail->openRulerWidget(r);
+    }
 }
 
 void MainWindow::updateWindowTitle()

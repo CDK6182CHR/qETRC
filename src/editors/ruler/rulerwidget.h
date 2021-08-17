@@ -33,8 +33,7 @@ public:
     auto getRuler(){return ruler;}
     auto getModel(){return model;}
 
-protected:
-    virtual void focusInEvent(QFocusEvent* e)override;
+    virtual bool event(QEvent* e)override;
 
 private:
     void initUI();

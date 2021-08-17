@@ -85,6 +85,9 @@ public:
         return _rulerNodes.at(i);
     }
 
+    /**
+     * equivalent to `getDataAt<RulerNode>(int i);`
+     */
     inline std::shared_ptr<RulerNode> rulerNodeAt(int i){
         return _rulerNodes.at(i);
     }

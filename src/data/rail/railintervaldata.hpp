@@ -46,28 +46,36 @@ public:
      */
     inline void setDifferent(bool d) {
         if (_different && !d) {
-            for (auto p = _railway.get().firstUpInterval(); p; p = p->nextInterval()) {
-                auto pinv = p->inverseInterval();
-                if (pinv) {
-                    auto d = p->template getDataAt<_Node>(_index);
-                    auto dinv = pinv->template getDataAt<_Node>(_index);
-                    d->operator=(*dinv);
-                }
-                else {
-                    qDebug() << "RailIntervalData::setDifferent: WARNING: "
-                        << "Unexpected null inverse interval: " << *p << Qt::endl;
-                }
-            }
+            copyDownToUp();
         }
         _different = d; 
-
     }
 
-    inline std::shared_ptr<_Node> firstDownNode(){
-        auto t=railway().firstDownInterval();
-        if(t){
+    /**
+     * 将下行数据复制给上行，用于设置different=false时
+     * precondition: 不存在上下行分设站
+     */
+    inline void copyDownToUp() {
+        for (auto p = _railway.get().firstUpInterval(); p; p = p->nextInterval()) {
+            auto pinv = p->inverseInterval();
+            if (pinv) {
+                auto d = p->template getDataAt<_Node>(_index);
+                auto dinv = pinv->template getDataAt<_Node>(_index);
+                d->operator=(*dinv);
+            }
+            else {
+                qDebug() << "RailIntervalData::setDifferent: WARNING: "
+                    << "Unexpected null inverse interval: " << *p << Qt::endl;
+            }
+        }
+    }
+
+    inline std::shared_ptr<_Node> firstDownNode() {
+        auto t = railway().firstDownInterval();
+        if (t) {
             return t->template getDataAt<_Node>(_index);
-        }else{
+        }
+        else {
             return std::shared_ptr<_Node>();
         }
     }

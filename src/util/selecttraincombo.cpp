@@ -8,6 +8,34 @@ SelectTrainCombo::SelectTrainCombo(TrainCollection &coll_, QWidget *parent):
     initUI();
 }
 
+std::shared_ptr<Train> SelectTrainCombo::dialogGetTrain(TrainCollection& coll_, 
+    QWidget* parent, const QString& title,const QString& prompt)
+{
+    QDialog* dialog=new QDialog(parent);
+    dialog->setWindowTitle(title);
+    auto* vlay = new QVBoxLayout(dialog);
+    if (!prompt.isEmpty()) {
+        auto* lab = new QLabel(prompt);
+        lab->setWordWrap(true);
+        vlay->addWidget(lab);
+    }
+
+    auto* cb = new SelectTrainCombo(coll_);
+    vlay->addLayout(cb);
+    auto* box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    vlay->addWidget(box);
+    connect(box, SIGNAL(accepted()), dialog, SLOT(accept()));
+    connect(box, SIGNAL(rejected()), dialog, SLOT(reject()));
+    auto t = dialog->exec();
+    std::shared_ptr<Train> res{};
+    if (t) {
+        res = cb->train();
+    }
+    dialog->setParent(nullptr);
+    delete dialog;
+    return res;
+}
+
 void SelectTrainCombo::initUI()
 {
     edName=new QLineEdit;
@@ -15,12 +43,12 @@ void SelectTrainCombo::initUI()
             "符合条件的车次。"));
     connect(edName,&QLineEdit::editingFinished,
             this,&SelectTrainCombo::onEditingFinished);
-    addWidget(edName,2);
+    addWidget(edName,1);
 
     cbTrains=new QComboBox;
     connect(cbTrains,SIGNAL(currentIndexChanged(int)),
             this,SLOT(onIndexChanged(int)));
-    addWidget(cbTrains,3);
+    addWidget(cbTrains,2);
 }
 
 void SelectTrainCombo::onEditingFinished()

@@ -40,6 +40,7 @@ SOURCES += \
     src/dialogs/exchangeintervaldialog.cpp \
     src/dialogs/importtraindialog.cpp \
     src/dialogs/printdiagramdialog.cpp \
+    src/dialogs/rulerfromtraindialog.cpp \
     src/dialogs/selectrailstationdialog.cpp \
     src/editors/basictrainwidget.cpp \
     src/editors/configdialog.cpp \
@@ -121,6 +122,7 @@ HEADERS += \
     src/dialogs/exchangeintervaldialog.h \
     src/dialogs/importtraindialog.h \
     src/dialogs/printdiagramdialog.h \
+    src/dialogs/rulerfromtraindialog.h \
     src/dialogs/selectrailstationdialog.h \
     src/editors/basictrainwidget.h \
     src/editors/configdialog.h \

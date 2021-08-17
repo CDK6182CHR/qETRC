@@ -1,6 +1,8 @@
 ﻿#include "rulercontext.h"
 #include "mainwindow.h"
 
+#include "dialogs/rulerfromtraindialog.h"
+
 RulerContext::RulerContext(Diagram& diagram_, SARibbonContextCategory *context, MainWindow *mw_):
     QObject(mw_),diagram(diagram_), cont(context),mw(mw_)
 {
@@ -53,7 +55,11 @@ void RulerContext::initUI()
     auto* btn = panel->addLargeAction(act);
     btn->setMinimumWidth(70);
 
-    //todo: 标尺推导；从车次读取等
+    act = new QAction(QIcon(":/icons/identify.png"), tr("从车次提取"), this);
+    act->setToolTip(tr("从单车次提取标尺\n"
+        "从单个车次在本线的运行情况提取标尺数据，并覆盖到本标尺中。"));
+    connect(act, SIGNAL(triggered()), this, SLOT(actReadFromSingleTrain()));
+    btn = panel->addMediumAction(act);
 
     panel = page->addPannel(tr("设置"));
     act = new QAction(QIcon(":/icons/ruler.png"), tr("排图标尺"), this);
@@ -132,6 +138,16 @@ void RulerContext::actRemoveRuler()
     auto r = ruler->clone();
     mw->getUndoStack()->push(new qecmd::RemoveRuler(ruler, r, ruler->isOrdinateRuler(),
         this));
+}
+
+void RulerContext::actReadFromSingleTrain()
+{
+    if (!ruler)
+        return;
+    auto* dialog = new RulerFromTrainDialog(diagram.trainCollection(), ruler, mw);
+    connect(dialog, &RulerFromTrainDialog::rulerUpdated,
+        this, &RulerContext::actChangeRulerData);
+    dialog->show();
 }
 
 void RulerContext::actShowEditWidget()

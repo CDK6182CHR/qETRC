@@ -3,6 +3,8 @@
 #include "railway.h"
 #include "rulernode.h"
 #include "railintervaldata.hpp"
+#include "data/diagram/trainadapter.h"
+#include "util/utilfunc.h"
 #include <QDebug>
 
 Ruler::Ruler(Railway &railway, const QString &name, bool different, int index):
@@ -77,4 +79,37 @@ void Ruler::swap(Ruler& other)
     {
         n1->swap(*n2);
     }
+}
+
+int Ruler::fromSingleTrain(std::shared_ptr<const TrainAdapter> adp, int start, int stop)
+{
+    int cnt = 0;
+    for (auto line : adp->lines()) {
+        if (line->isNull())
+            continue;
+        auto pr = line->stations().begin();
+        for (auto p = std::next(pr); p != line->stations().end();
+            pr = p, ++p)
+        {
+            auto it = pr->railStation.lock()->adjacentIntervalTo(p->railStation.lock());
+            if (it) {
+                //近邻区间存在  更新Node
+                auto node = it->getRulerNode(*this);
+                int real = qeutil::secsTo(pr->trainStation->depart, 
+                    p->trainStation->arrive);
+                if (pr->trainStation->isStopped() ||
+                    line->isStartingStation(pr)) {
+                    real -= start;
+                }
+                if (p->trainStation->isStopped() || line->isTerminalStation(p)) {
+                    real -= stop;
+                }
+                node->interval = std::max(real, 0);
+                node->start = start;
+                node->stop = stop;
+                ++cnt;
+            }
+        }
+    }
+    return cnt;
 }

@@ -1,6 +1,7 @@
 ﻿#include "railrulercombo.h"
 
 #include <QComboBox>
+#include <QtWidgets>
 #include "data/rail/railcategory.h"
 #include "data/rail/rail.h"
 
@@ -8,6 +9,33 @@ RailRulerCombo::RailRulerCombo(RailCategory &cat_, QWidget *parent):
     QHBoxLayout(parent),cat(cat_)
 {
     initUI();
+}
+
+std::shared_ptr<Ruler> RailRulerCombo::dialogGetRuler(RailCategory& cat_, 
+    QWidget* parent, const QString& title, const QString& prompt)
+{
+    QDialog*dialog=new QDialog(parent);
+    dialog->setWindowTitle(title);
+    auto* vlay = new QVBoxLayout(dialog);
+    if (!prompt.isEmpty()) {
+        auto* lab = new QLabel(prompt);
+        lab->setWordWrap(true);
+        vlay->addWidget(lab);
+    }
+    auto* cb = new RailRulerCombo(cat_);
+    vlay->addLayout(cb);
+    auto* box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    vlay->addWidget(box);
+    connect(box, SIGNAL(accepted()), dialog, SLOT(accept()));
+    connect(box, SIGNAL(rejected()), dialog, SLOT(reject()));
+    auto t = dialog->exec();
+    std::shared_ptr<Ruler> res{};
+    if (t) {
+        res = cb->ruler();
+    }
+    dialog->setParent(nullptr);
+    delete dialog;
+    return res;
 }
 
 void RailRulerCombo::initUI()

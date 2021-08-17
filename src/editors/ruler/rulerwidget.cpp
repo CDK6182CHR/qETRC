@@ -40,11 +40,14 @@ void RulerWidget::refreshBasicData()
 //    refreshData();
 //}
 
-void RulerWidget::focusInEvent(QFocusEvent* e)
+bool RulerWidget::event(QEvent* e)
 {
-    QWidget::focusInEvent(e);
-    if (ruler)
-        emit focusInRuler(ruler);
+    if (e->type() == QEvent::WindowActivate) {
+        if(ruler)
+            emit focusInRuler(ruler);
+        return true;
+    }
+    return QWidget::event(e);
 }
 
 void RulerWidget::initUI()

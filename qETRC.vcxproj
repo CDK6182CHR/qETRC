@@ -199,6 +199,7 @@
     <ClCompile Include="src\dialogs\exchangeintervaldialog.cpp" />
     <ClCompile Include="src\dialogs\importtraindialog.cpp" />
     <ClCompile Include="src\dialogs\printdiagramdialog.cpp" />
+    <ClCompile Include="src\dialogs\rulerfromtraindialog.cpp" />
     <ClCompile Include="src\dialogs\selectrailstationdialog.cpp" />
     <ClCompile Include="src\editors\basictrainwidget.cpp" />
     <ClCompile Include="src\editors\configdialog.cpp" />
@@ -301,6 +302,7 @@
     <QtMoc Include="src\viewers\stationtimetablesettled.h" />
     <QtMoc Include="src\dialogs\exchangeintervaldialog.h" />
     <QtMoc Include="src\dialogs\changestationnamedialog.h" />
+    <QtMoc Include="src\dialogs\rulerfromtraindialog.h" />
     <ClInclude Include="src\mainwindow\version.h" />
     <QtMoc Include="src\navi\navitree.h" />
     <QtMoc Include="src\model\diagram\railtablemodel.h" />

@@ -23,6 +23,13 @@ public:
     auto railway(){return _railway;}
     auto ruler(){return _ruler;}
 
+    /**
+     * 弹出对话框，选择标尺。如果没有选择，那么返回空
+     */
+    static std::shared_ptr<Ruler>
+        dialogGetRuler(RailCategory& cat_, QWidget* parent, 
+            const QString& title = tr("选择标尺"),const QString& prompt=tr(""));
+
 private:
     void initUI();
 

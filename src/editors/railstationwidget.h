@@ -41,7 +41,7 @@ public:
     auto* getModel() { return model; }
 
 protected:
-    void focusInEvent(QFocusEvent* e)override;
+    bool event(QEvent* e)override;
 
 private:
     void initUI();

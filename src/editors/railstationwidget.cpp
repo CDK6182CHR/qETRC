@@ -9,6 +9,7 @@ RailStationWidget::RailStationWidget(RailCategory& cat_, bool inplace, QWidget* 
 	QWidget(parent), cat(cat_), commitInPlace(inplace), model(new RailStationModel(inplace, this))
 {
 	//暂定Model的Parent就是自己！
+	//setFocusPolicy(Qt::ClickFocus);
 	initUI();
 }
 
@@ -32,11 +33,14 @@ void RailStationWidget::refreshData()
 	edName->setText(railway->name());
 }
 
-void RailStationWidget::focusInEvent(QFocusEvent* e)
+bool RailStationWidget::event(QEvent* e)
 {
-	Q_UNUSED(e);
-	if (railway)
-		emit focusInRailway(railway);
+	if (e->type() == QEvent::WindowActivate) {
+		if (railway)
+			emit focusInRailway(railway);
+		return true;
+	}
+	return QWidget::event(e);
 }
 
 void RailStationWidget::initUI()

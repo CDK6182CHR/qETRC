@@ -9,6 +9,7 @@
 #include "railintervaldata.hpp"
 
 class Railway;
+class TrainAdapter;
 
 /**
  * 与标尺有关的数据结构，以及标尺封装（代理）类
@@ -60,6 +61,16 @@ public:
      * 交换数据（但不交换对Railway的引用以及index）
      */
     void swap(Ruler& other);
+
+    /**
+     * pyETRC传统功能，从单一车次读取标尺。注意输入TrainAdapter
+     * 将指定车次的区间运行数据直接读入本标尺，直接覆盖
+     * 返回成功读取的区间数量
+     * ！！注意：写入的区间实际上与this没啥关系，
+     * 是从TrainAdapter里面直接读的区间
+     */
+    int fromSingleTrain(std::shared_ptr<const TrainAdapter> adp,
+        int start, int stop);
 
 
 };

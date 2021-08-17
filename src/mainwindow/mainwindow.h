@@ -304,6 +304,8 @@ private slots:
 
     void actChangeStationName();
 
+    void actNaviToRuler();
+
 public slots:
 
     /**
@@ -345,6 +347,8 @@ public slots:
      * 应用更改站名。操作压栈。
      */
     void applyChangeStationName(const ChangeStationNameData& data);
+
+    
 
 };
 
