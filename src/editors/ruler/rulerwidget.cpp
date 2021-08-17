@@ -18,7 +18,6 @@ void RulerWidget::refreshData()
     if (ruler) {
         model->refreshData();
         edName->setText(ruler->name());
-        ckDiff->setChecked(ruler->different());
     }
     updating = false;
 }
@@ -28,7 +27,6 @@ void RulerWidget::refreshBasicData()
     updating = true;
     if (ruler) {
         edName->setText(ruler->name());
-        ckDiff->setChecked(ruler->different());
     }
     updating = false;
 }
@@ -56,17 +54,13 @@ void RulerWidget::initUI()
     auto* form=new QFormLayout;
     edName=new QLineEdit;
     form->addRow(tr("标尺名称"),edName);
-    ckDiff=new QCheckBox;
-    if(ruler)ckDiff->setChecked(ruler->different());
-    form->addRow(tr("上下行分设"),ckDiff);
     vlay->addLayout(form);
-    connect(ckDiff,SIGNAL(toggled(bool)),this,SLOT(onDiffChanged(bool)));
 
     table=new QTableView;
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->setModel(model);
     table->resizeColumnsToContents();
-    table->setEditTriggers(QTableView::CurrentChanged);
+    table->setEditTriggers(QTableView::AllEditTriggers);
 
     table->setItemDelegateForColumn(RulerModel::ColMinute,
         new PostiveSpinDelegate(1, this));
@@ -76,6 +70,16 @@ void RulerWidget::initUI()
         new PostiveSpinDelegate(10, this));
     table->setItemDelegateForColumn(RulerModel::ColStop,
         new PostiveSpinDelegate(10, this));
+
+    //actions...
+    auto* act = new QAction(tr("将下行数据复制为上行"), table);
+    connect(act, SIGNAL(triggered()), this, SLOT(copyFromDownToUp()));
+    table->addAction(act);
+    act = new QAction(tr("将上行数据复制为下行"), table);
+    connect(act, SIGNAL(triggered()), this, SLOT(copyFromUpToDown()));
+    table->addAction(act);
+    table->setContextMenuPolicy(Qt::ActionsContextMenu);
+
 
     vlay->addWidget(table);
 
@@ -102,7 +106,6 @@ void RulerWidget::onDiffChanged(bool on)
     if (!on && ruler->railway().isSplitted()) {
         QMessageBox::warning(this, tr("错误"),
             tr("本线路存在上下行分设车站，标尺必须设置为上下行分设。"));
-        ckDiff->setChecked(true);
         updating = false;
         return;
     }
@@ -124,6 +127,24 @@ void RulerWidget::onDiffChanged(bool on)
        
 
     updating = false;
+}
+
+void RulerWidget::copyFromDownToUp()
+{
+    auto t = QMessageBox::question(this, tr("标尺编辑"),
+        tr("将（表中当前显示的）下行每个区间的标尺数据复制到上行对应区间，"
+            "如果存在上下行分设站，则有关的区间数据不变。是否确认？"));
+    if (t == QMessageBox::Yes)
+        model->copyFromDownToUp();
+}
+
+void RulerWidget::copyFromUpToDown()
+{
+    auto t = QMessageBox::question(this, tr("标尺编辑"),
+        tr("将（表中当前显示的）上行每个区间的标尺数据复制到下行对应区间，"
+            "如果存在上下行分设站，则有关的区间数据不变。是否确认？"));
+    if (t == QMessageBox::Yes)
+        model->copyFromUpToDown();
 }
 
 void RulerWidget::actApply()

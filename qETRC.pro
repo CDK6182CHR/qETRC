@@ -50,6 +50,7 @@ SOURCES += \
     src/model/delegate/generaldoublespindelegate.cpp \
     src/model/delegate/generalspindelegate.cpp \
     src/model/delegate/qetimedelegate.cpp \
+    src/model/rail/intervaldatamodel.cpp \
     src/util/railrulercombo.cpp \
     src/util/selecttraincombo.cpp \
     src/viewers/railsectionevents.cpp \
@@ -132,6 +133,7 @@ HEADERS += \
     src/model/delegate/generaldoublespindelegate.h \
     src/model/delegate/generalspindelegate.h \
     src/model/delegate/qetimedelegate.h \
+    src/model/rail/intervaldatamodel.h \
     src/util/railrulercombo.h \
     src/util/selecttraincombo.h \
     src/viewers/railsectionevents.h \

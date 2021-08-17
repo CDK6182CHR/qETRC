@@ -1,0 +1,62 @@
+﻿#pragma once
+
+#include <QStandardItemModel>
+#include <memory>
+#include <functional>
+
+#include "data/rail/railintervaldata.hpp"
+
+
+/**
+ * @brief The IntervalDataModel class
+ * 区间数据（标尺、天窗）model的共性部分，包括初始化、上下行之间复制等。
+ * 避免引入模版，只保存Railway对象进行流程控制。
+ * 注意Railway可能变，因此采用reference_wrapper
+ */
+class IntervalDataModel : public QStandardItemModel
+{
+    std::reference_wrapper<Railway> _railway;
+protected:
+    bool updating=false;
+public:
+    explicit IntervalDataModel(Railway& railway, QObject *parent = nullptr);
+protected:
+    Railway& railway(){return _railway.get();}
+    void setRailway(Railway& r){_railway=std::ref(r);}
+
+    /**
+     * @brief setupModel
+     * 重置整个Model，注意不在构造函数调用。
+     * 采用setupRow()模版方法进行具体的初始化工作。
+     */
+    virtual void setupModel();
+
+    /**
+     * @brief setupRow 模版方法，设置一行的数据。
+     * 默认的实现：设置第0列为区间名称。
+     */
+    virtual void setupRow(int row,std::shared_ptr<RailInterval> railint);
+
+    QString intervalString(const RailInterval& railint)const;
+
+    /**
+     * @brief copyRowData  复制表格中的行数据
+     * 由copyFromDownToUp和copyFromUpToDown调用
+     * 默认实现为空白
+     */
+    virtual void copyRowData(int from,int to);
+
+    /**
+     * @brief checkRowInterval
+     * 检查指定行是否对应于所给的区间数据，暂定直接通过字符串比较。
+     * 如果不符合，输出警告。
+     * Precondition: 第0列是区间名称
+     */
+    bool checkRowInterval(std::shared_ptr<RailInterval> railint,int row)const;
+
+public:
+    void copyFromDownToUp();
+
+    void copyFromUpToDown();
+};
+

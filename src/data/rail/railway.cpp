@@ -754,6 +754,12 @@ std::shared_ptr<Ruler> Railway::addRuler(const QJsonObject& obj)
 			it->rulerNodeAt(ruler->index())->fromJson(node);
 		}
 	}
+	if (!ruler->different()) {
+		qDebug() << "Railway::addRuler(const QJsonObject&): INFO: " <<
+			"Ruler with different=false from old version is set to different." << Qt::endl;
+		ruler->setDifferent(true);
+		ruler->copyDownToUp();
+	}
 	return ruler;
 }
 

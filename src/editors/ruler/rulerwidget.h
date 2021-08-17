@@ -20,7 +20,6 @@ class RulerWidget : public QWidget
     RulerModel* model;
 
     QLineEdit* edName;
-    QCheckBox* ckDiff;
     QTableView* table;
     const bool commitInPlace;
     bool updating = false;
@@ -42,6 +41,9 @@ private slots:
     void actApply();
     void actCancel();
     void onDiffChanged(bool on);
+
+    void copyFromDownToUp();   //主要是询问一下  操作在model里面
+    void copyFromUpToDown();
 
 signals:
     void actChangeRulerData(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> nr);

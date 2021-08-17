@@ -209,6 +209,7 @@
     <ClCompile Include="src\model\delegate\generaldoublespindelegate.cpp" />
     <ClCompile Include="src\model\delegate\generalspindelegate.cpp" />
     <ClCompile Include="src\model\delegate\qetimedelegate.cpp" />
+    <ClCompile Include="src\model\rail\intervaldatamodel.cpp" />
     <ClCompile Include="src\util\railrulercombo.cpp" />
     <ClCompile Include="src\util\selecttraincombo.cpp" />
     <ClCompile Include="src\viewers\railsectionevents.cpp" />
@@ -318,6 +319,7 @@
     <QtMoc Include="src\model\general\qemoveablemodel.h" />
     <QtMoc Include="src\model\rail\rulermodel.h" />
     <ClInclude Include="src\model\delegate\qetimedelegate.h" />
+    <ClInclude Include="src\model\rail\intervaldatamodel.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <ClInclude Include="src\model\diagram\componentitems.h" />
     <ClInclude Include="src\data\diagram\config.h" />

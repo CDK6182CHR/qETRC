@@ -1,18 +1,18 @@
 ﻿#pragma once
 
-#include <QStandardItemModel>
 #include <memory>
 #include "data/rail/ruler.h"
+#include "intervaldatamodel.h"
 
 /**
  * @brief The RulerModel class
  * 标尺编辑表格的模型  采用StandardItem暂存
+ * 注意  构造传入的对象非空！！
  */
-class RulerModel : public QStandardItemModel
+class RulerModel : public IntervalDataModel
 {
     Q_OBJECT;
     std::shared_ptr<Ruler> ruler;
-    bool updating=false;
 public:
     enum{
         ColInterval=0,
@@ -34,8 +34,14 @@ public:
      */
     std::shared_ptr<Railway> appliedRuler();
 private:
-    void setupModel();
+    void setupModel()override;
+
+    void setupRow(int row, std::shared_ptr<RailInterval> railint)override;
+
     int rowIntervalSecs(int row)const;
+    QString intervalString(const RailInterval& railint)const;
+protected:
+    void copyRowData(int from, int to)override;
 
 private slots:
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);

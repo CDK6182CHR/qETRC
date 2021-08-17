@@ -8,7 +8,7 @@
 #include "model/delegate/qedelegate.h"
 
 RulerModel::RulerModel(std::shared_ptr<Ruler> ruler_, QObject* parent) :
-	QStandardItemModel(parent), ruler(ruler_)
+	IntervalDataModel(ruler_->railway(), parent), ruler(ruler_)
 {
 	setColumnCount(ColMAX);
 	setHorizontalHeaderLabels({
@@ -55,6 +55,16 @@ void RulerModel::setupModel()
 		setRowCount(0);
 		return;
 	}
+	if (!ruler->different()) {
+		qDebug() << "RulerModel::setupModel: WARNING: ruler not `different`: " <<
+			ruler->name() << ". It will be set to `different`." << Qt::endl;
+		ruler->setDifferent(true);
+	}
+
+	IntervalDataModel::setupModel();
+
+	//后面的都可以删掉
+
 	updating = true;
 	beginResetModel();
 	using SI = QStandardItem;
@@ -62,52 +72,56 @@ void RulerModel::setupModel()
 	setRowCount(rail.stationCount() * 2);
 
 	int row = 0;
-	QString spliter = ruler->different() ? QStringLiteral("->") : QStringLiteral("<->");
 
 	for (auto n = ruler->firstDownNode(); n; n = n->nextNodeDiffCirc(), row++) {
 		auto& railint = n->railInterval();
-		QString s = tr("%1%2%3").arg(railint.fromStationNameLit())
-			.arg(spliter).arg(railint.toStationNameLit());
+		QString s = intervalString(railint);
 
-		auto* it = new SI(s);
-		it->setEditable(false);
-		setItem(row, ColInterval, it);
-
-		it = new SI;
-		it->setData(n->interval / 60, Qt::EditRole);
-		setItem(row, ColMinute, it);
-
-		it = new SI;
-		it->setData(n->interval % 60, Qt::EditRole);
-		setItem(row, ColSeconds, it);
-
-		it = new SI;
-		it->setData(n->start, Qt::EditRole);
-		setItem(row, ColStart, it);
-
-		it = new SI;
-		it->setData(n->stop, Qt::EditRole);
-		setItem(row, ColStop, it);
-
-		it = new SI(QString::number(railint.mile(), 'f', 3));
-		it->setEditable(false);
-		it->setData(railint.mile(), qeutil::DoubleDataRole);
-		setItem(row, ColMile, it);
-
-		it = new SI;
-		it->setEditable(false);
-		if (n->interval) {
-			double spd = railint.mile() / n->interval * 3600.0;
-			it->setText(QString::number(spd, 'f', 3));
-		}
-		else {
-			it->setText("NA");
-		}
-		setItem(row, ColSpeed, it);
+		
 	}
 	setRowCount(row);
 	endResetModel();
 	updating = false;
+}
+
+void RulerModel::setupRow(int row, std::shared_ptr<RailInterval> railint)
+{
+	using SI = QStandardItem;
+	IntervalDataModel::setupRow(row, railint);
+	
+	auto n = railint->getRulerNode(ruler);
+
+	auto* it = new SI;
+	it->setData(n->interval / 60, Qt::EditRole);
+	setItem(row, ColMinute, it);
+
+	it = new SI;
+	it->setData(n->interval % 60, Qt::EditRole);
+	setItem(row, ColSeconds, it);
+
+	it = new SI;
+	it->setData(n->start, Qt::EditRole);
+	setItem(row, ColStart, it);
+
+	it = new SI;
+	it->setData(n->stop, Qt::EditRole);
+	setItem(row, ColStop, it);
+
+	it = new SI(QString::number(railint->mile(), 'f', 3));
+	it->setEditable(false);
+	it->setData(railint->mile(), qeutil::DoubleDataRole);
+	setItem(row, ColMile, it);
+
+	it = new SI;
+	it->setEditable(false);
+	if (n->interval) {
+		double spd = railint->mile() / n->interval * 3600.0;
+		it->setText(QString::number(spd, 'f', 3));
+	}
+	else {
+		it->setText("NA");
+	}
+	setItem(row, ColSpeed, it);
 }
 
 int RulerModel::rowIntervalSecs(int row) const
@@ -115,6 +129,21 @@ int RulerModel::rowIntervalSecs(int row) const
 	return item(row, ColMinute)->data(Qt::EditRole).toInt() * 60 +
 		item(row, ColSeconds)->data(Qt::EditRole).toInt();
 }
+
+QString RulerModel::intervalString(const RailInterval& railint) const
+{
+	return tr("%1->%3").arg(railint.fromStationNameLit())
+		.arg(railint.toStationNameLit());
+}
+
+void RulerModel::copyRowData(int from, int to)
+{
+	item(to, ColMinute)->setData(item(from, ColMinute)->data(Qt::EditRole), Qt::EditRole);
+	item(to, ColSeconds)->setData(item(from, ColSeconds)->data(Qt::EditRole), Qt::EditRole);
+	item(to, ColStart)->setData(item(from, ColStart)->data(Qt::EditRole), Qt::EditRole);
+	item(to, ColStop)->setData(item(from, ColStop)->data(Qt::EditRole), Qt::EditRole);
+}
+
 
 void RulerModel::actCancel()
 {
