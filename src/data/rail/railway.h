@@ -432,6 +432,12 @@ public:
     inline const auto& rulers()const { return _rulers; }
     inline const auto& forbids()const { return _forbids; }
 
+    /**
+     * 返回第一个天窗对象；
+     * 如果不存在，创建然后返回
+     */
+    std::shared_ptr<Forbid> firstForbid();
+
     inline auto& forbids() { return _forbids; }
 
     inline std::shared_ptr<Ruler> ordinate(){return _ordinate;}

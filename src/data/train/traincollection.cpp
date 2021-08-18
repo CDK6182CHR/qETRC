@@ -63,6 +63,23 @@ QJsonObject TrainCollection::toJson() const
 	};
 }
 
+QJsonObject TrainCollection::toLocalJson(std::shared_ptr<Railway> rail, bool localOnly) const
+{
+	QJsonArray artrains;
+	for (const auto& p : _trains) {
+		if(!localOnly || p->adapterFor(*rail))
+			artrains.append(p->toJson());
+	}
+	QJsonArray arrouting;
+	for (auto p : _routings) {
+		arrouting.append(p->toJson());
+	}
+	return QJsonObject{
+		{"trains",artrains},
+		{"circuits",arrouting}
+	};
+}
+
 void TrainCollection::appendTrain(std::shared_ptr<Train> train)
 {
 	_trains.append(train);

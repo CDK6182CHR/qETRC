@@ -1,6 +1,8 @@
 ﻿#include "routing.h"
 #include "data/train/traincollection.h"
 
+#include <algorithm>
+
 
 void RoutingNode::setName(const QString &name)
 {
@@ -256,4 +258,11 @@ void Routing::setNodeTrain(std::shared_ptr<Train> train, std::list<RoutingNode>:
 {
     node->setTrain(train);
     train->setRouting(shared_from_this(), node);
+}
+
+int Routing::trainIndex(std::shared_ptr<Train> train) const
+{
+    if (train->hasRouting() && train->routing().lock().get() == this) {
+        return std::distance(_order.cbegin(), static_cast<CNodePtr>(train->routingNode().value()));
+    }
 }

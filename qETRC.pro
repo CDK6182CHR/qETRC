@@ -39,6 +39,7 @@ SOURCES += \
     src/dialogs/changestationnamedialog.cpp \
     src/dialogs/exchangeintervaldialog.cpp \
     src/dialogs/importtraindialog.cpp \
+    src/dialogs/outputsubdiagramdialog.cpp \
     src/dialogs/printdiagramdialog.cpp \
     src/dialogs/rulerfromtraindialog.cpp \
     src/dialogs/selectrailstationdialog.cpp \
@@ -52,6 +53,7 @@ SOURCES += \
     src/model/delegate/qetimedelegate.cpp \
     src/model/rail/intervaldatamodel.cpp \
     src/util/railrulercombo.cpp \
+    src/util/selectrailwaycombo.cpp \
     src/util/selecttraincombo.cpp \
     src/viewers/railsectionevents.cpp \
     src/viewers/railsnapevents.cpp \
@@ -122,6 +124,7 @@ HEADERS += \
     src/dialogs/changestationnamedialog.h \
     src/dialogs/exchangeintervaldialog.h \
     src/dialogs/importtraindialog.h \
+    src/dialogs/outputsubdiagramdialog.h \
     src/dialogs/printdiagramdialog.h \
     src/dialogs/rulerfromtraindialog.h \
     src/dialogs/selectrailstationdialog.h \
@@ -135,6 +138,7 @@ HEADERS += \
     src/model/delegate/qetimedelegate.h \
     src/model/rail/intervaldatamodel.h \
     src/util/railrulercombo.h \
+    src/util/selectrailwaycombo.h \
     src/util/selecttraincombo.h \
     src/viewers/railsectionevents.h \
     src/viewers/railsnapevents.h \

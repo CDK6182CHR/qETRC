@@ -306,6 +306,8 @@ private slots:
 
     void actNaviToRuler();
 
+    void actToSingleFile();
+
 public slots:
 
     /**

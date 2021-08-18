@@ -170,5 +170,11 @@ public:
      * 此操作由ImportTrain调用。不放在Train或者Node里面，是因为shared_from_this总是出错
      */
     void setNodeTrain(std::shared_ptr<Train> train, std::list<RoutingNode>::iterator node);
+
+    /**
+     * 返回列车在本交路中的索引编号。线性复杂度。
+     * 如果列车不在本交路中，返回-1
+     */
+    int trainIndex(std::shared_ptr<Train> train)const;
 };
 

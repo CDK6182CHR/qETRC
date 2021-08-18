@@ -59,6 +59,11 @@ public:
      */
     QJsonObject toJson()const;
 
+    /**
+     * 导出与rail有交集的车次
+     */
+    QJsonObject toLocalJson(std::shared_ptr<Railway> rail, bool localOnly)const;
+
     auto& trains(){return _trains;}
     const auto& trains()const{return _trains;}
     auto& routings() { return _routings; }

@@ -852,6 +852,13 @@ QList<std::shared_ptr<RailInterval>>
 	}
 }
 
+std::shared_ptr<Forbid> Railway::firstForbid()
+{
+	if (_forbids.empty())
+		addEmptyForbid();
+	return _forbids.at(0);
+}
+
 int Railway::ordinateIndex() const
 {
 	return _ordinate ? _ordinate->index() : -1;

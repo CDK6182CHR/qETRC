@@ -2,6 +2,7 @@
 #include "railstation.h"
 #include "ruler.h"
 #include "rulernode.h"
+#include "forbid.h"
 
 #include <cassert>
 
@@ -96,6 +97,11 @@ std::shared_ptr<RulerNode> RailInterval::getRulerNode(std::shared_ptr<Ruler> rul
 std::shared_ptr<RulerNode> RailInterval::getRulerNode(const Ruler& ruler)
 {
     return rulerNodeAt(ruler.index());
+}
+
+std::shared_ptr<ForbidNode> RailInterval::getForbidNode(std::shared_ptr<Forbid> forbid)
+{
+    return _forbidNodes.at(forbid->index());
 }
 
 std::shared_ptr<RailInterval> RailInterval::inverseInterval()

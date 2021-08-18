@@ -198,6 +198,7 @@
     <ClCompile Include="src\dialogs\changestationnamedialog.cpp" />
     <ClCompile Include="src\dialogs\exchangeintervaldialog.cpp" />
     <ClCompile Include="src\dialogs\importtraindialog.cpp" />
+    <ClCompile Include="src\dialogs\outputsubdiagramdialog.cpp" />
     <ClCompile Include="src\dialogs\printdiagramdialog.cpp" />
     <ClCompile Include="src\dialogs\rulerfromtraindialog.cpp" />
     <ClCompile Include="src\dialogs\selectrailstationdialog.cpp" />
@@ -211,6 +212,7 @@
     <ClCompile Include="src\model\delegate\qetimedelegate.cpp" />
     <ClCompile Include="src\model\rail\intervaldatamodel.cpp" />
     <ClCompile Include="src\util\railrulercombo.cpp" />
+    <ClCompile Include="src\util\selectrailwaycombo.cpp" />
     <ClCompile Include="src\util\selecttraincombo.cpp" />
     <ClCompile Include="src\viewers\railsectionevents.cpp" />
     <ClCompile Include="src\viewers\railsnapevents.cpp" />
@@ -304,6 +306,7 @@
     <QtMoc Include="src\dialogs\exchangeintervaldialog.h" />
     <QtMoc Include="src\dialogs\changestationnamedialog.h" />
     <QtMoc Include="src\dialogs\rulerfromtraindialog.h" />
+    <QtMoc Include="src\dialogs\outputsubdiagramdialog.h" />
     <ClInclude Include="src\mainwindow\version.h" />
     <QtMoc Include="src\navi\navitree.h" />
     <QtMoc Include="src\model\diagram\railtablemodel.h" />
@@ -360,6 +363,7 @@
     <ClInclude Include="src\data\train\traintype.h" />
     <QtMoc Include="src\util\selecttraincombo.h" />
     <QtMoc Include="src\util\railrulercombo.h" />
+    <QtMoc Include="src\util\selectrailwaycombo.h" />
     <ClInclude Include="src\util\utilfunc.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,8 @@
 ﻿#include "diagram.h"
 #include "data/rail/railway.h"
 #include "trainadapter.h"
+#include "util/utilfunc.h"
+#include "data/train/routing.h"
 
 #include <QFile>
 #include <QJsonObject>
@@ -373,6 +375,187 @@ void Diagram::sectionTrainCount(std::map<std::shared_ptr<RailInterval>, int>& re
         
 }
 
+#define TRC_WARNING qDebug()<<"Diagram::fromTrc: WARNING: "
+
+namespace etrc_consts {
+    static const QString
+        SPLIT_CIRCUIT = "***Circuit***",
+        SPLIT_TRAIN = "===Train===",
+        SPLIT_COLOR = "---Color---",
+        SPLIT_LINETYPE = "---LineType---",
+        SPLIT_SETUP = "...Setup...";
+    static const QString
+        TRUE = "true", FALSE = "false", NA = "NA";
+
+    enum class Status {
+        Invalid,
+        Circuit,
+        Train,
+        Color,
+        LineType,
+        Setup
+    };
+}
+
+bool Diagram::fromTrc(QTextStream& fin)
+{
+    QString line;
+    fin.setCodec("utf-8");
+
+    clear();
+    trainCollection().typeManager().operator=(_defaultManager);
+
+    using namespace etrc_consts;
+    Status status = Status::Invalid;
+
+    std::shared_ptr<Railway> railway;
+    std::shared_ptr<Train> train;
+    QMap<QString, QList<QPair<int, std::shared_ptr<Train>>>> rout_map;   //交路信息
+
+    while (!fin.atEnd()) {
+        fin.readLineInto(&line);
+        line = line.trimmed();
+        //状态判断，同时读取头部几行信息
+        if (line == SPLIT_CIRCUIT) {
+            status = Status::Circuit;
+            fin.readLineInto(&line);    //线名
+            railway = std::make_shared<Railway>(line);
+            fin.readLineInto(nullptr);   //总里程
+            continue;
+        }
+        else if (line == SPLIT_TRAIN) {
+            status = Status::Train;
+            fin.readLineInto(&line);    //车次头
+            auto s = line.split(",");
+            if (s.size() < 4) {
+                TRC_WARNING << "Invalid train header: " << line << Qt::endl;
+                status = Status::Invalid;
+            }
+            else {
+                const QString& star = fin.readLine(), term = fin.readLine();
+                train = std::make_shared<Train>(TrainName(s.at(1), s.at(2), s.at(3)),
+                    star, term);
+                trainCollection().appendTrain(train);
+                train->setType(_trainCollection.typeManager().fromRegex(train->trainName()));
+                if (s.size() >= 5 && !s.at(4).isEmpty() && s.at(4) != NA) {
+                    //交路
+                    auto rt = s.at(4).split("_");
+                    if (rt.size() != 2) {
+                        TRC_WARNING << "Invalid train routing info: " << s.at(4) << ", " <<
+                            "for train " << train->trainName().full() << Qt::endl;
+                    }
+                    else {
+                        rout_map[rt.at(0)].append(qMakePair(rt.at(1).toInt(), train));
+                    }
+                }
+            }
+            continue;
+        }
+        else if (line == SPLIT_COLOR) {
+            status = Status::Color;
+            continue;
+        }
+        else if (line == SPLIT_LINETYPE) {
+            status = Status::LineType;
+            continue;
+        }
+        else if (line == SPLIT_SETUP) {
+            status = Status::Setup;
+            continue;
+        }
+
+        //下面：读取内容部分
+        if (status == Status::Circuit) {
+            auto t = line.split(",");
+            // 集宁南,0,2,false,,false,4,0,0,
+            // 站名, 里程, 等级, 隐藏, 
+            if (t.size() < 3) {
+                qDebug() << "Diagram::fromTrc: WARNING: Invalid circuit line: "
+                    << line << Qt::endl;
+                continue;
+            }
+            bool show = true;
+            if (t.size() >= 4) {
+                show = (t.at(3) == FALSE);   //ETRC中是隐藏
+            }
+            railway->appendStation(t.at(0), t.at(1).toDouble(), t.at(2).toInt(),
+                std::nullopt, PassedDirection::BothVia, show);
+            if (t.size() >= 10 && !t.at(9).isEmpty()
+                && railway->stationCount() >= 2) {
+                //at(9)是天窗信息
+                auto s = t.at(9).split("-");
+                if (s.size() >= 2) {
+                    QTime start = qeutil::parseTime(s.at(0)),
+                        end = qeutil::parseTime(s.at(1));
+                    auto forbid = railway->firstForbid();
+                    auto node = railway->firstUpInterval()->getForbidNode(forbid);
+                    node->beginTime = start;
+                    node->endTime = end;
+                }
+                else {
+                    qDebug() << "Diagram::fromTrc: WARNING: Invalid forbid time: " <<
+                        t.at(9) << Qt::endl;
+                }
+            }
+        }
+        else if (status == Status::Train) {
+            //天津南,12:31,12:33,true,NA,0
+            //站名, 到点, 开点, 营业, <不读取>, 站台
+            auto t = line.split(",");
+            if (t.size() >= 3) {
+                bool business = true;
+                if (t.size() >= 4) {
+                    business = (t.at(3) == TRUE);
+                }
+                QString track;
+                if (t.size() >= 6)
+                    track = t.at(5);
+                train->appendStation(t.at(0), qeutil::parseTime(t.at(1)),
+                    qeutil::parseTime(t.at(2)), business, track);
+            }
+            else {
+                TRC_WARNING << "Invalid train station line: " << line << Qt::endl;
+            }
+        }
+        else if (status == Status::Color) {
+            auto t = line.split(",");
+            if (t.size() == 4) {
+                auto train = _trainCollection.findFullName(t.at(0));
+                if (train) {
+                    QPen pen = train->pen();
+                    pen.setColor(QColor(t.at(1).toInt(), t.at(2).toInt(), t.at(3).toInt()));
+                    train->setPen(pen);
+                }
+                else {
+                    TRC_WARNING << "Train not found for color: " << t.at(0) << Qt::endl;
+                }
+            }
+            else {
+                TRC_WARNING << "Invalid color line: " << line << Qt::endl;
+            }
+        }
+        else {
+            continue;
+        }
+    }
+    //最后：线路插入处理
+    railway->firstForbid()->copyUpToDown();
+    addRailway(railway);
+    
+    using PR = QPair<int, std::shared_ptr<Train>>;
+    for (auto p = rout_map.begin(); p != rout_map.end(); ++p) {
+        auto rt = std::make_shared<Routing>(_trainCollection);
+        std::stable_sort(p.value().begin(), p.value().end(), [](const PR& p1, const PR& p2) {
+            return p1.first < p2.first;
+            });
+        for (const auto& r : p.value()) {
+            rt->appendTrain(r.second, true);
+        }
+        _trainCollection.routings().append(rt);
+    }
+
+    return !isNull();   //只要读入了数据，就算成功
+}
 
 bool Diagram::readDefaultConfigs(const QString& filename)
 {
@@ -401,9 +584,17 @@ bool Diagram::fromJson(const QString& filename)
     auto contents = f.readAll();
     QJsonDocument doc = QJsonDocument::fromJson(contents);
     bool flag = fromJson(doc.object());
-    f.close();
     if (flag)
         _filename = filename;
+
+    //2021.08.18：增加从trc读取的算法
+    if (!flag) {
+        f.seek(0);
+        QTextStream fin(&f);
+        flag = fromTrc(fin);
+    }
+
+    f.close();
     return flag;
 }
 
@@ -480,6 +671,116 @@ QJsonObject Diagram::toJson() const
     obj.insert("markdown", _note);
     obj.insert("version", _version);
     return obj;
+}
+
+QJsonObject Diagram::toSingleJson(std::shared_ptr<Railway> rail, bool localOnly) const
+{
+    //车次信息表
+    QJsonObject obj = _trainCollection.toLocalJson(rail,localOnly);
+    //线路信息
+    obj.insert("line", rail->toJson());
+
+    //配置信息
+    QJsonObject objconfig = _config.toJson();
+    _trainCollection.typeManager().toJson(objconfig);
+    obj.insert("config", objconfig);
+    obj.insert("markdown", _note);
+    obj.insert("version", _version);
+    return obj;
+}
+
+#undef TRC_WARNING
+#define TRC_WARNING qDebug()<<"Diagram::toTrc: WARNING: "
+
+bool Diagram::toTrc(const QString& filename, std::shared_ptr<Railway> rail, bool localOnly) const
+{
+    QFile file(filename);
+    file.open(QFile::WriteOnly | QFile::Text);
+    if (!file.isOpen()) {
+        TRC_WARNING << "open file " << filename << " failed." << Qt::endl;
+        return false;
+    }
+    QTextStream fout(&file);
+    fout.setCodec("utf-8");
+    using namespace etrc_consts;
+    //线路
+    fout << SPLIT_CIRCUIT << Qt::endl;
+    fout << rail->name() << Qt::endl;
+    fout << int(std::round(rail->railLength())) << Qt::endl;
+    std::shared_ptr<RailStation> prev{};
+    std::shared_ptr<Forbid> forbid;
+    if (!rail->forbids().isEmpty()) forbid = rail->getForbid(0);
+    for (auto p : rail->stations()) {
+        fout << p->name.toSingleLiteral() << "," << int(std::round(p->mile)) << "," <<
+            p->level << "," << !p->_show << ",,true,4,1440,1440,";
+        // todo: 天窗...
+        if (forbid && prev) {
+            //检索区间是否有天窗数据
+            auto n = forbid->getNode(prev->name, p->name);
+            if (!n->isNull()) {
+                fout << n->beginTime.toString("hh:mm") << "-" <<
+                    n->endTime.toString("hh:mm");
+            }
+        }
+        fout << Qt::endl;
+
+        prev = p;
+    }
+
+    //列车
+    for (auto train : _trainCollection.trains()) {
+        if (localOnly && !train->adapterFor(*rail))continue;
+        fout << SPLIT_TRAIN << Qt::endl;
+        fout << "trf2," << train->trainName().full() << "," << train->trainName().down() <<
+            "," << train->trainName().up() << ",";
+        if (train->hasRouting()) {
+            auto rt = train->routing().lock();
+            QString name = rt->name();
+            name.replace("_", "-");
+            fout << name << "_" << rt->trainIndex(train);
+        }
+        fout << Qt::endl;
+        fout << train->starting().toSingleLiteral() << Qt::endl;
+        fout << train->terminal().toSingleLiteral() << Qt::endl;
+        for (const auto& t : train->timetable()) {
+            //站名，到点，开点，true, NA, track
+            fout << t.name.toSingleLiteral() << "," << t.arrive.toString("hh:mm:ss") << ","
+                << t.depart.toString("hh:mm:ss") << ",true,NA," << t.track << Qt::endl;
+        }
+    }
+
+    // Color
+    fout << SPLIT_COLOR << Qt::endl;
+    for (auto train : _trainCollection.trains()) {
+        if (localOnly && !train->adapterFor(*rail))continue;
+        const auto& color = train->pen().color();
+        fout << train->trainName().full() << "," << color.red() << "," << color.green() << ","
+            << color.blue() << Qt::endl;
+    }
+    fout << SPLIT_LINETYPE << Qt::endl;
+    for (auto train : _trainCollection.trains()) {
+        if (localOnly && !train->adapterFor(*rail))continue;
+        // LineStyle 暂时不知道怎么转换，只管粗细
+        fout << train->trainName().full() << ",0," << train->pen().widthF() << Qt::endl;
+    }
+    file.close();
+    return true;
+}
+
+bool Diagram::toSinglePyetrc(const QString& filename, 
+    std::shared_ptr<Railway> rail, bool localOnly) const
+{
+    QFile file(_filename);
+    file.open(QFile::WriteOnly);
+    if (!file.isOpen()) {
+        qDebug() << "Diagram::toSinglePyetrc: WARNING: open file " << _filename << " failed. Nothing todo."
+            << Qt::endl;
+        return false;
+    }
+    QJsonDocument doc(toSingleJson(rail,localOnly));
+    file.write(doc.toJson());
+    file.close();
+    return true;
 }
 
 bool Diagram::saveAs(const QString& filename)

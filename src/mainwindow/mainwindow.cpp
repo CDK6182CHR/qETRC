@@ -15,6 +15,7 @@
 #include "editors/configdialog.h"
 #include "wizards/rulerpaint/rulerpaintwizard.h"
 #include "util/railrulercombo.h"
+#include "dialogs/outputsubdiagramdialog.h"
 
 #include "version.h"
 
@@ -363,7 +364,7 @@ void MainWindow::initToolbar()
 {
     SARibbonBar* ribbon = ribbonBar();
     ribbon->applicationButton()->setText(QStringLiteral("文件"));
-
+    ribbon->showMinimumModeButton();
 
     //顶上的工具条
     if constexpr (true) {
@@ -417,6 +418,14 @@ void MainWindow::initToolbar()
         panel->addLargeAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(actSaveGraph()));
         sharedActions.save = act;
+
+        act = new QAction(QIcon(":/icons/ETRC-dynamic.png"), tr("导出为.."), this);
+        act->setToolTip(tr("导出为单线路运行图 (Ctrl+M)\n"
+            "导出为单一线路的pyETRC或ETRC运行图文件格式。"));
+        act->setShortcut(Qt::CTRL + Qt::Key_M);
+        connect(act, SIGNAL(triggered()), this, SLOT(actToSingleFile()));
+        addAction(act);
+        panel->addMediumAction(act);
 
         panel = cat->addPannel(tr("窗口"));
         act = naviDock->toggleViewAction();
@@ -809,6 +818,12 @@ void MainWindow::actNaviToRuler()
     if (r) {
         contextRail->openRulerWidget(r);
     }
+}
+
+void MainWindow::actToSingleFile()
+{
+    auto* dialog = new OutputSubDiagramDialog(_diagram, this);
+    dialog->show();
 }
 
 void MainWindow::updateWindowTitle()

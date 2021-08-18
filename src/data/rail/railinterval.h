@@ -11,6 +11,7 @@ class RailStation;
 class RulerNode;
 class ForbidNode;
 class Ruler;
+class Forbid;
 
 /**
  * 新增针对线路区间的抽象
@@ -94,6 +95,7 @@ public:
 
     std::shared_ptr<RulerNode> getRulerNode(std::shared_ptr<Ruler> ruler);
     std::shared_ptr<RulerNode> getRulerNode(const Ruler& ruler);
+    std::shared_ptr<ForbidNode> getForbidNode(std::shared_ptr<Forbid> forbid);
 
     inline bool isDown()const{return _dir==Direction::Down;}
 

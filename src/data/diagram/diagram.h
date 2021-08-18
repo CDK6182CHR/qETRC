@@ -115,6 +115,24 @@ public:
     QJsonObject toJson()const;
 
     /**
+     * 导出单条线路的JSON。
+     * localOnly这个筛选，仅作用于车次（不管Routing）
+     */
+    QJsonObject toSingleJson(std::shared_ptr<Railway> rail, bool localOnly)const;
+
+    /**
+     * 导出到Trc文件。因为trc仅支持一条线路，需要先选择哪一条线路导出。
+     * localOnly: 是否仅导出在指定线路有Adapter的列车
+     */
+    bool toTrc(const QString& filename,std::shared_ptr<Railway> rail, bool localOnly)const;
+
+    /**
+     * 导出单条线路的pyETRC文件
+     */
+    bool toSinglePyetrc(const QString& filename, 
+        std::shared_ptr<Railway> rail, bool localOnly)const;
+
+    /**
      * 另存为 （同时记录文件名）
      */
     bool saveAs(const QString& filename);
@@ -277,6 +295,8 @@ private:
 
     void sectionTrainCount(std::map<std::shared_ptr<RailInterval>, int>& res,
         std::shared_ptr<TrainLine> line)const;
+
+    bool fromTrc(QTextStream& fin);
 };
 
 

@@ -70,6 +70,21 @@ public:
         }
     }
 
+    inline void copyUpToDown() {
+        for (auto p = _railway.get().firstDownInterval(); p; p = p->nextInterval()) {
+            auto pinv = p->inverseInterval();
+            if (pinv) {
+                auto d = p->template getDataAt<_Node>(_index);
+                auto dinv = pinv->template getDataAt<_Node>(_index);
+                d->operator=(*dinv);
+            }
+            else {
+                qDebug() << "RailIntervalData::setDifferent: WARNING: "
+                    << "Unexpected null inverse interval: " << *p << Qt::endl;
+            }
+        }
+    }
+
     inline std::shared_ptr<_Node> firstDownNode() {
         auto t = railway().firstDownInterval();
         if (t) {
