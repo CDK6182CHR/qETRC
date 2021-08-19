@@ -195,9 +195,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\data\rail\railcategory.cpp" />
+    <ClCompile Include="src\dialogs\batchcopytraindialog.cpp" />
     <ClCompile Include="src\dialogs\changestationnamedialog.cpp" />
     <ClCompile Include="src\dialogs\exchangeintervaldialog.cpp" />
     <ClCompile Include="src\dialogs\importtraindialog.cpp" />
+    <ClCompile Include="src\dialogs\modifytimetabledialog.cpp" />
     <ClCompile Include="src\dialogs\outputsubdiagramdialog.cpp" />
     <ClCompile Include="src\dialogs\printdiagramdialog.cpp" />
     <ClCompile Include="src\dialogs\rulerfromtraindialog.cpp" />
@@ -307,6 +309,8 @@
     <QtMoc Include="src\dialogs\changestationnamedialog.h" />
     <QtMoc Include="src\dialogs\rulerfromtraindialog.h" />
     <QtMoc Include="src\dialogs\outputsubdiagramdialog.h" />
+    <QtMoc Include="src\dialogs\modifytimetabledialog.h" />
+    <QtMoc Include="src\dialogs\batchcopytraindialog.h" />
     <ClInclude Include="src\mainwindow\version.h" />
     <QtMoc Include="src\navi\navitree.h" />
     <QtMoc Include="src\model\diagram\railtablemodel.h" />

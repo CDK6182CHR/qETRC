@@ -272,6 +272,13 @@ public:
     Train translation(TrainName name, int sec);
 
     /**
+     * pyETRC.Train.setStationDeltaTime()
+     * 调整指定范围车站的时刻表，前移或后移指定的秒数。
+     */
+    void adjustTimetable(int startIndex, int endIndex,
+        bool includeFirst, bool includeLast, int secs);
+
+    /**
      * Train.delNonLocal()
      * 删除非本线车站 
      */
@@ -445,6 +452,8 @@ private:
      * 是否存在至少一条运行线是显示的
      */
     bool anyLineShown()const;
+
+    bool indexValid(int i)const;
 
 };
 

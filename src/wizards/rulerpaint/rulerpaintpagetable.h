@@ -172,6 +172,10 @@ public slots:
      */
     void paintTrain();
 
+    void onStartAtThisChanged();
+
+    void onEndAtThisChanged();
+
 private slots:
 
     /**

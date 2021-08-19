@@ -5,6 +5,7 @@
 #include <QPoint>
 #include <QUndoStack>
 #include <QUndoCommand>
+#include <QVector>
 
 #include "data/diagram/diagrampage.h"
 #include "model/diagram/diagramnavimodel.h"
@@ -84,6 +85,11 @@ public slots:
      */
     void actAddPaintedTrain(std::shared_ptr<Train> train);
 
+    /**
+     * 批量复制车次，操作压栈
+     */
+    void actBatchAddTrains(const QVector<std::shared_ptr<Train>>& trains);
+
     void importRailways();
     void addNewPage();
     
@@ -148,6 +154,23 @@ namespace qecmd {
         }
         virtual void redo()override {
             navi->commitAddTrain(train);
+        }
+    };
+
+    class BatchAddTrain : public QUndoCommand {
+        DiagramNaviModel* const navi;
+        QVector<std::shared_ptr<Train>> trains;
+    public:
+        BatchAddTrain(DiagramNaviModel* navi_, const QVector<std::shared_ptr<Train>>& trains_,
+            QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("批量添加%1个车次").arg(trains_.size()),parent),
+            navi(navi_),trains(trains_){}
+
+        virtual void undo()override {
+            navi->undoBatchAddTrains(trains.size());
+        }
+        virtual void redo()override {
+            navi->commitBatchAddTrains(trains);
         }
     };
 

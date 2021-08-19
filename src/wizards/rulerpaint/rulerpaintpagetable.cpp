@@ -402,6 +402,20 @@ void RulerPaintModel::paintTrain()
     }
 }
 
+void RulerPaintModel::onStartAtThisChanged()
+{
+    updateFromRow(_anchorRow);
+    if (page->instaneous())
+        paintTrain();
+}
+
+void RulerPaintModel::onEndAtThisChanged()
+{
+    updateFromRow(_anchorRow);
+    if (page->instaneous())
+        paintTrain();
+}
+
 void RulerPaintModel::onRowEditDataChanged(int row)
 {
     if (row <= _anchorRow && (row < startRow||startRow==-1))
@@ -532,9 +546,12 @@ void RulerPaintPageTable::initUI()
     gpAnType->connectAllTo(SIGNAL(toggled(bool)),model,SLOT(onAnchorTypeChanged()));
     flay->addRow(tr("锚点时刻"),hlay);
 
-    gpChecks=new ButtonGroup<3,QHBoxLayout,QCheckBox>({"在本线始发","在本线终到","即时铺画"});
+    gpChecks=new ButtonGroup<3,QHBoxLayout,QCheckBox>({"在本段运行线始发","在本段运行线终到","即时铺画"});
     gpChecks->get(2)->setChecked(true);
     flay->addRow(tr("选项"),gpChecks);
+
+    connect(gpChecks->get(0), SIGNAL(toggled(bool)), model, SLOT(onStartAtThisChanged()));
+    connect(gpChecks->get(1), SIGNAL(toggled(bool)), model, SLOT(onEndAtThisChanged()));
 
     hlay=new QHBoxLayout;
     cbStart=model->getComboStart();

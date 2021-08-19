@@ -92,6 +92,16 @@ bool TrainStation::operator==(const TrainStation& other) const
         business == other.business;
 }
 
+QString TrainStation::timeStringCompressed() const
+{
+    if (isStopped()) {
+        return QString("%1/%2").arg(arrive.toString("hh:mm:ss"), depart.toString("hh:mm:ss"));
+    }
+    else {
+        return QString("%1/...").arg(arrive.toString("hh:mm:ss"));
+    }
+}
+
 QDebug operator<<(QDebug debug, const TrainStation& ts)
 {
     debug << ts.name << " " <<

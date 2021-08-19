@@ -25,6 +25,8 @@ class SelectTrainCombo : public QHBoxLayout
     QComboBox* cbTrains;
 public:
     SelectTrainCombo(TrainCollection& coll_, QWidget* parent=nullptr);
+    SelectTrainCombo(TrainCollection& coll_, std::shared_ptr<Train> train,
+                     QWidget* parent=nullptr);
     auto train(){return _train;}
 
     /**
@@ -34,8 +36,22 @@ public:
     static std::shared_ptr<Train> dialogGetTrain(TrainCollection& coll_, QWidget* parent,
         const QString& title = tr("选择车次"), const QString& prompt = "");
 
+    /**
+     * @brief setTrain
+     * 从外部设置列车。要同时更新参数以及设置Combo的数据。
+     * 同时发射信号。
+     */
+    void setTrain(std::shared_ptr<Train> train);
+
 private :
     void initUI();
+    void addTrainItem(std::shared_ptr<Train> t);
+
+    /**
+     * @brief updateCombo
+     * 根据match的数据，更新combo
+     */
+    void updateCombo();
 signals:
     void currentTrainChanged(std::shared_ptr<Train>);
 private slots:

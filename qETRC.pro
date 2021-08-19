@@ -36,9 +36,11 @@ SOURCES += \
     src/data/train/trainname.cpp \
     src/data/train/trainstation.cpp \
     src/data/train/traintype.cpp \
+    src/dialogs/batchcopytraindialog.cpp \
     src/dialogs/changestationnamedialog.cpp \
     src/dialogs/exchangeintervaldialog.cpp \
     src/dialogs/importtraindialog.cpp \
+    src/dialogs/modifytimetabledialog.cpp \
     src/dialogs/outputsubdiagramdialog.cpp \
     src/dialogs/printdiagramdialog.cpp \
     src/dialogs/rulerfromtraindialog.cpp \
@@ -121,9 +123,11 @@ HEADERS += \
     src/data/train/trainname.h \
     src/data/train/trainstation.h \
     src/data/train/traintype.h \
+    src/dialogs/batchcopytraindialog.h \
     src/dialogs/changestationnamedialog.h \
     src/dialogs/exchangeintervaldialog.h \
     src/dialogs/importtraindialog.h \
+    src/dialogs/modifytimetabledialog.h \
     src/dialogs/outputsubdiagramdialog.h \
     src/dialogs/printdiagramdialog.h \
     src/dialogs/rulerfromtraindialog.h \

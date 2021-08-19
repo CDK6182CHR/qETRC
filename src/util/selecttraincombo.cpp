@@ -8,6 +8,14 @@ SelectTrainCombo::SelectTrainCombo(TrainCollection &coll_, QWidget *parent):
     initUI();
 }
 
+SelectTrainCombo::SelectTrainCombo(TrainCollection &coll_, std::shared_ptr<Train> train,
+                                   QWidget *parent):
+    QHBoxLayout(parent), coll(coll_)
+{
+    initUI();
+    setTrain(train);
+}
+
 std::shared_ptr<Train> SelectTrainCombo::dialogGetTrain(TrainCollection& coll_, 
     QWidget* parent, const QString& title,const QString& prompt)
 {
@@ -36,6 +44,15 @@ std::shared_ptr<Train> SelectTrainCombo::dialogGetTrain(TrainCollection& coll_,
     return res;
 }
 
+void SelectTrainCombo::setTrain(std::shared_ptr<Train> train)
+{
+    if(train){
+        matched.clear();
+        matched.append(train);
+        updateCombo();
+    }
+}
+
 void SelectTrainCombo::initUI()
 {
     edName=new QLineEdit;
@@ -51,19 +68,29 @@ void SelectTrainCombo::initUI()
     addWidget(cbTrains,2);
 }
 
-void SelectTrainCombo::onEditingFinished()
+void SelectTrainCombo::addTrainItem(std::shared_ptr<Train> t)
 {
-    matched = coll.multiSearchTrain(edName->text());
+    cbTrains->addItem(tr("%1 (%2->%3)").arg(t->trainName().full())
+                      .arg(t->starting().toSingleLiteral())
+                      .arg(t->terminal().toSingleLiteral()));
+}
+
+void SelectTrainCombo::updateCombo()
+{
     cbTrains->clear();
     for(auto t:matched){
-        cbTrains->addItem(tr("%1 (%2->%3)").arg(t->trainName().full())
-                          .arg(t->starting().toSingleLiteral())
-                          .arg(t->terminal().toSingleLiteral()));
+        addTrainItem(t);
     }
     cbTrains->setFocus();
     if(cbTrains->count() > 1){
         cbTrains->showPopup();
     }
+}
+
+void SelectTrainCombo::onEditingFinished()
+{
+    matched = coll.multiSearchTrain(edName->text());
+    updateCombo();
 }
 
 void SelectTrainCombo::onIndexChanged(int i)

@@ -189,6 +189,11 @@ void NaviTree::actAddPaintedTrain(std::shared_ptr<Train> train)
     _undo->push(new qecmd::AddNewTrain(_model, train));
 }
 
+void NaviTree::actBatchAddTrains(const QVector<std::shared_ptr<Train>>& trains)
+{
+    _undo->push(new qecmd::BatchAddTrain(_model, trains));
+}
+
 void NaviTree::importRailways()
 {
     QString res = QFileDialog::getOpenFileName(this, tr("导入线路"), QString(),

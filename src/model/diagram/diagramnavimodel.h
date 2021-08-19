@@ -3,6 +3,7 @@
 #include <QAbstractItemModel>
 #include <QObject>
 #include <QWidget>
+#include <QVector>
 #include <QModelIndex>
 
 #include "data/diagram/diagram.h"
@@ -101,6 +102,10 @@ public slots:
     void commitAddTrain(std::shared_ptr<Train> train);
 
     void undoAddTrain();
+
+    void commitBatchAddTrains(const QVector<std::shared_ptr<Train>> trains);
+
+    void undoBatchAddTrains(int count);
 
     void onTrainDataChanged(const QModelIndex& topleft, const QModelIndex& botright);
 

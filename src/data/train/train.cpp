@@ -66,7 +66,8 @@ void Train::fromJson(const QJsonObject &obj, TypeManager& manager)
     }
     const QJsonObject ui = obj.value("UI").toObject();
     if (!ui.isEmpty()) {
-        QPen pen = QPen(QColor(ui.value("Color").toString()), ui.value("LineWidth").toDouble(1.0),
+        QPen pen = QPen(QColor(ui.value("Color").toString()), 
+            ui.value("LineWidth").toDouble(type()->pen().widthF()),
             static_cast<Qt::PenStyle>(ui.value("LineStyle").toInt(Qt::SolidLine)));
         if (pen.width() == 0) {
             //线宽为0表示采用默认
@@ -422,6 +423,27 @@ Train Train::translation(TrainName name, int sec)
     return train;
 }
 
+void Train::adjustTimetable(int startIndex, int endIndex, bool includeFirst,
+                            bool includeLast, int secs)
+{
+    if (!indexValid(startIndex) || !indexValid(endIndex) || startIndex > endIndex) {
+        qDebug() << "Train::adjustTimetable: WARNING: invalid index: "
+            << startIndex << ", " << endIndex << Qt::endl;
+        return;
+    }
+    auto itstart = _timetable.begin(); std::advance(itstart, startIndex);
+    auto itend = _timetable.begin(); std::advance(itend, endIndex);  // 右闭区间
+    for (auto p = itstart; p != std::next(itend); ++p) {
+        if(includeFirst || p!=itstart){
+            //调整到达时刻
+            p->arrive = p->arrive.addSecs(secs);
+        }
+        if (includeLast || p != itend) {
+            p->depart = p->depart.addSecs(secs);
+        }
+    }
+}
+
 #if 0
 void Train::removeNonLocal()
 {
@@ -713,6 +735,11 @@ bool Train::anyLineShown() const
         }
     }
     return false;
+}
+
+bool Train::indexValid(int i) const
+{
+    return 0 <= i && i < _timetable.size();
 }
 
 

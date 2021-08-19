@@ -16,6 +16,7 @@
 #include "wizards/rulerpaint/rulerpaintwizard.h"
 #include "util/railrulercombo.h"
 #include "dialogs/outputsubdiagramdialog.h"
+#include "dialogs/batchcopytraindialog.h"
 
 #include "version.h"
 
@@ -43,7 +44,13 @@ MainWindow::MainWindow(QWidget* parent)
     connect(undoStack, SIGNAL(indexChanged(int)), this, SLOT(markChanged()));
 
     initUI();
-    loadInitDiagram();
+
+    QString cmdFile;
+    if (QCoreApplication::arguments().size() > 1) {
+        cmdFile = QCoreApplication::arguments().at(1);
+    }
+
+    loadInitDiagram(cmdFile);
     updateWindowTitle();
 }
 
@@ -149,7 +156,8 @@ void MainWindow::undoAddNewRailway(std::shared_ptr<Railway> rail)
 
 void MainWindow::onNewTrainAdded(std::shared_ptr<Train> train)
 {
-    contextTrain->showBasicWidget(train);
+    if(train->empty())
+        contextTrain->showBasicWidget(train);
     addTrainLine(*train);
 }
 
@@ -238,7 +246,8 @@ void MainWindow::showAboutDialog()
         .arg(qespec::RELEASE.data())
         .arg(qespec::DATE.data());
     text += tr("六方车迷会谈  萧迩珀  保留一切权利\nmxy0268@qq.com\n");
-    text += tr("QQ群：865211882\nhttps://github.com/CDK6182CHR/qETRC");
+    text += tr("QQ群：865211882\nhttps://github.com/CDK6182CHR/qETRC\n"
+        "https://gitee.com/xep0268/qETRC");
     QMessageBox::about(this, tr("关于"), text);
 }
 
@@ -571,15 +580,6 @@ void MainWindow::initToolbar()
         btn->setMinimumWidth(70);
         connect(act, SIGNAL(triggered()), naviView, SLOT(actAddTrain()));
 
-        act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("标尺排图"), this);
-        addAction(act);
-        act->setShortcut(Qt::CTRL + Qt::Key_R);
-        act->setToolTip(tr("标尺排图向导 (Ctrl+R)\n使用指定线路的指定标尺，"
-            "铺画新的列车运行线，或者重新铺画既有列车运行线的一部分。"));
-        btn = panel->addLargeAction(act);
-        btn->setMinimumWidth(80);
-        connect(act, SIGNAL(triggered()), this, SLOT(actRulerPaint()));
-
         panel = cat->addPannel(tr("运行线控制"));
 
         if constexpr (true) {
@@ -602,9 +602,23 @@ void MainWindow::initToolbar()
             btn = panel->addLargeAction(act);
             btn->setMinimumWidth(80);
         }
-       
 
+        panel = cat->addPannel(tr("排图"));
 
+        act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("标尺排图"), this);
+        addAction(act);
+        act->setShortcut(Qt::CTRL + Qt::Key_R);
+        act->setToolTip(tr("标尺排图向导 (Ctrl+R)\n使用指定线路的指定标尺，"
+            "铺画新的列车运行线，或者重新铺画既有列车运行线的一部分。"));
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
+        connect(act, SIGNAL(triggered()), this, SLOT(actRulerPaint()));
+        
+        act = new QAction(QIcon(":/icons/copy.png"), tr("批量复制"), this);
+        act->setToolTip(tr("批量复制运行线\n"
+            "将指定车次的运行线按照其起始时刻复制若干个（车次不同的）副本。"));
+        connect(act, SIGNAL(triggered()), this, SLOT(actBatchCopyTrain()));
+        panel->addMediumAction(act);
     }
 
     //显示
@@ -682,6 +696,7 @@ void MainWindow::initAppMenu()
     menu->addAction(sharedActions.save);
 
     auto* act = new QAction(QIcon(":/icons/saveas.png"), tr("另存为"), this);
+    connect(act, SIGNAL(triggered()), this, SLOT(actSaveGraphAs()));
     menu->addAction(act);
 
     menu->addSeparator();
@@ -691,16 +706,21 @@ void MainWindow::initAppMenu()
     resetRecentActions();
 }
 
-void MainWindow::loadInitDiagram()
+void MainWindow::loadInitDiagram(const QString& cmdFile)
 {
-    if (!openGraph(SystemJson::instance.last_file))
-        openGraph(SystemJson::instance.default_file);
+    do {
+        if (!cmdFile.isEmpty() && openGraph(cmdFile))
+            break;
+        if (openGraph(SystemJson::instance.last_file))
+            break;
+        if (openGraph(SystemJson::instance.default_file))
+            break;
+    } while (false);
     markUnchanged();
 }
 
 bool MainWindow::clearDiagram()
 {
-    //todo: 询问是否保存
     clearDiagramUnchecked();
     return true;
 }
@@ -759,6 +779,8 @@ void MainWindow::endResetGraph()
     catView->refreshTypeGroup();
 
     spPassedStations->setValue(_diagram.config().max_passed_stations);
+
+    updateWindowTitle();
 }
 
 void MainWindow::resetDiagramPages()
@@ -823,6 +845,15 @@ void MainWindow::actNaviToRuler()
 void MainWindow::actToSingleFile()
 {
     auto* dialog = new OutputSubDiagramDialog(_diagram, this);
+    dialog->show();
+}
+
+void MainWindow::actBatchCopyTrain()
+{
+    auto* dialog = new BatchCopyTrainDialog(_diagram,
+        contextTrain->getTrain(), this);
+    connect(dialog, &BatchCopyTrainDialog::applied,
+        naviView, &NaviTree::actBatchAddTrains);
     dialog->show();
 }
 
@@ -947,6 +978,7 @@ void MainWindow::refreshAll()
     contextRail->refreshAllData();
     contextRuler->refreshAllData();
     contextPage->refreshAllData();
+    updateWindowTitle();
 }
 
 void MainWindow::applyChangeStationName(const ChangeStationNameData& data)
@@ -1003,6 +1035,7 @@ void MainWindow::actSaveGraphAs()
         markUnchanged();
         undoStack->setClean();
         addRecentFile(res);
+        updateWindowTitle();
     }
 }
 

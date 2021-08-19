@@ -6,6 +6,7 @@
 #include "viewers/trainlinedialog.h"
 #include "viewers/rulerrefdialog.h"
 #include "dialogs/exchangeintervaldialog.h"
+#include "dialogs/modifytimetabledialog.h"
 
 #include <QtWidgets>
 
@@ -188,6 +189,11 @@ void TrainContext::initUI()
 		act = new QAction(QIcon(":/icons/exchange.png"), tr("区间换线"), this);
 		act->setToolTip(tr("区间换线\n交换本次列车和另一列车在所选区间的运行线"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actExchangeInterval()));
+		panel->addMediumAction(act);
+
+		act = new QAction(QIcon(":/icons/adjust.png"), tr("时刻平移"), this);
+		act->setToolTip(tr("时刻平移\n将本车次部分或全部车站时刻前移或后移一段时间"));
+		connect(act, SIGNAL(triggered()), this, SLOT(actAdjustTimetable()));
 		panel->addMediumAction(act);
 
 		panel = page->addPannel(tr(""));
@@ -517,6 +523,14 @@ void TrainContext::actApplyExchangeInterval(
 {
 	mw->getUndoStack()->push(new qecmd::ExchangeTrainInterval(train1, train2,
 		start1, end1, start2, end2, includeStart, includeEnd, this));
+}
+
+void TrainContext::actAdjustTimetable()
+{
+	auto* dialog = new ModifyTimetableDialog(train, mw);
+	connect(dialog, &ModifyTimetableDialog::trainUpdated,
+		this, &TrainContext::onTrainTimetableChanged);
+	dialog->show();
 }
 
 void TrainContext::setTrain(std::shared_ptr<Train> train_)

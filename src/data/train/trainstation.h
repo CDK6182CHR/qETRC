@@ -64,6 +64,11 @@ public:
     bool operator==(const TrainStation& other)const;
 
     inline bool operator!=(const TrainStation& other)const { return !(*this == other); }
+
+    /**
+     * 时间标记。如果不停车，用...替代
+     */
+    QString timeStringCompressed()const;
 };
 
 QDebug operator<<(QDebug debug, const TrainStation& ts);

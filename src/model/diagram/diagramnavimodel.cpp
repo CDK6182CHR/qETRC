@@ -222,6 +222,21 @@ void DiagramNaviModel::undoAddTrain()
     emit trainRowsRemoved(r, r);
 }
 
+void DiagramNaviModel::commitBatchAddTrains(const QVector<std::shared_ptr<Train>> trains)
+{
+    //暂定一个个加，最简单..
+    for (auto train : trains) {
+        commitAddTrain(train);
+    }
+}
+
+void DiagramNaviModel::undoBatchAddTrains(int count)
+{
+    for (int i = 0; i < count; i++) {
+        undoAddTrain();
+    }
+}
+
 void DiagramNaviModel::onTrainDataChanged(const QModelIndex& topleft, const QModelIndex& botright)
 {
     QModelIndex par = index(navi::DiagramItem::RowTrains, 0);

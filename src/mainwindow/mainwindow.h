@@ -128,7 +128,7 @@ private:
     /**
      * 程序启动，依次尝试读取上次打开的和默认文件
      */
-    void loadInitDiagram();
+    void loadInitDiagram(const QString& cmdFile);
 
     /**
      * 打开新的运行图、重置运行图等之前执行。
@@ -307,6 +307,8 @@ private slots:
     void actNaviToRuler();
 
     void actToSingleFile();
+
+    void actBatchCopyTrain();
 
 public slots:
 

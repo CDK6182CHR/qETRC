@@ -169,6 +169,8 @@ private slots:
         Train::StationPtr start1, Train::StationPtr end1,
         Train::StationPtr start2, Train::StationPtr end2, 
         bool includeStart, bool includeEnd); 
+
+    void actAdjustTimetable();
 };
 
 
