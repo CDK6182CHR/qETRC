@@ -57,7 +57,7 @@ void BatchCopyTrainDialog::initUI()
     auto* box = new QGroupBox(tr("生成阵列"));
     flay = new QFormLayout;
     edFormat = new QLineEdit;
-    edFormat->setToolTip(tr("生成车次阵列的格式，采用[%%1]表示待填充的数字。例如G712%1。"));
+    edFormat->setToolTip(tr("生成车次阵列的格式，采用[%1]表示待填充的数字。例如G712%1。"));
     flay->addRow(tr("车次格式"), edFormat);
     spStartNumber = new QSpinBox;
     spStartNumber->setRange(0, 100000000);

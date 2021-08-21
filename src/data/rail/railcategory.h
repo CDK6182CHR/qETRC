@@ -25,6 +25,8 @@ public:
 
     bool railNameIsValid(const QString& name, std::shared_ptr<Railway> rail)const;
 
-    int getRailwayIndex(std::shared_ptr<Railway> rail)const;
+    int getRailwayIndex(std::shared_ptr<const Railway> rail)const;
+
+    int getRailwayIndex(const Railway& rail)const;
 };
 

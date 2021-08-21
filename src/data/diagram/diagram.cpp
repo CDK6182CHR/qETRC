@@ -85,7 +85,7 @@ QJsonObject SystemJson::toJson() const
 void Diagram::addRailway(std::shared_ptr<Railway> rail)
 {
     railways().append(rail);
-    for (auto p : trains()) {
+    foreach (auto p , trains()) {
         p->bindToRailway(*rail, _config);
     }
 }
@@ -104,7 +104,7 @@ void Diagram::addTrains(const TrainCollection& coll)
 
 std::shared_ptr<Railway> Diagram::railwayByName(const QString &name)
 {
-    for(const auto& p:railways()){
+    foreach(const auto& p,railways()){
         if(p->name() == name)
             return p;
     }
@@ -113,14 +113,14 @@ std::shared_ptr<Railway> Diagram::railwayByName(const QString &name)
 
 void Diagram::updateRailway(std::shared_ptr<Railway> r)
 {
-    for (const auto& p:_trainCollection.trains()){
+    foreach (const auto& p, _trainCollection.trains()){
         p->updateBoundRailway(*r, _config);
     }
 }
 
 void Diagram::updateTrain(std::shared_ptr<Train> t)
 {
-    for(const auto& r:railways()){
+    foreach(const auto& r, railways()){
         t->updateBoundRailway(*r, _config);
     }
 }
@@ -128,7 +128,7 @@ void Diagram::updateTrain(std::shared_ptr<Train> t)
 TrainEventList Diagram::listTrainEvents(const Train& train) const
 {
     TrainEventList res;
-    for (auto p : train.adapters()) {
+    foreach (auto p , train.adapters()) {
         res.push_back(qMakePair(p, p->listAdapterEvents(_trainCollection)));
     }
     return res;
@@ -144,7 +144,7 @@ std::shared_ptr<DiagramPage> Diagram::createDefaultPage()
 
 bool Diagram::pageNameExisted(const QString& name) const
 {
-    for (auto p : _pages) {
+    foreach (auto p , _pages) {
         if (p->name() == name)
             return true;
     }
@@ -154,7 +154,7 @@ bool Diagram::pageNameExisted(const QString& name) const
 bool Diagram::pageNameIsValid(const QString& name, std::shared_ptr<DiagramPage> page)
 {
     if (name.isEmpty())return false;
-    for (auto p : _pages) {
+    foreach (auto p , _pages) {
         if (p->name() == name && p != page)
             return false;
     }
@@ -182,7 +182,7 @@ QString Diagram::validRailwayName(const QString& prefix) const
 
 void Diagram::applyBindOn(TrainCollection& coll)
 {
-    for (auto p : railways()) {
+    foreach (auto p , railways()) {
         for (auto t : coll.trains()) {
             t->bindToRailway(*p, _config);
         }
@@ -193,7 +193,7 @@ bool Diagram::isValidRailName(const QString& name, std::shared_ptr<Railway> rail
 {
     if (name.isEmpty())
         return false;
-    for (auto r : railways()) {
+    foreach (auto r , railways()) {
         if (r != rail && r->name() == name)
             return false;
     }
@@ -221,16 +221,16 @@ void Diagram::removeRailwayAt(int i)
             ++it;
     }
     //与列车解除绑定
-    for (auto p : _trainCollection.trains()) {
+    foreach (auto p , _trainCollection.trains()) {
         p->unbindToRailway(*rail);
     }
 }
 
 void Diagram::rebindAllTrains()
 {
-    for (auto t : _trainCollection.trains()) {
+    foreach (auto t , _trainCollection.trains()) {
         t->clearBoundRailways();
-        for (auto p : railways()) {
+        foreach (auto p , railways()) {
             t->bindToRailway(*p, _config);
         }
     }
@@ -240,10 +240,12 @@ std::map<std::shared_ptr<RailInterval>, int> Diagram::sectionTrainCount(std::sha
 {
     std::map<std::shared_ptr<RailInterval>, int> res;
     for (auto train : _trainCollection.trains()) {
-        for (auto adp : train->adapters()) {
-            if(&(adp->railway())==railway.get())
-                for(auto line:adp->lines())
+        foreach (auto adp , train->adapters()) {
+            if(&(adp->railway())==railway.get()){
+                foreach(auto line,adp->lines()){
                     sectionTrainCount(res, line);
+                }
+            }
         }
     }
     return res;
@@ -254,8 +256,8 @@ Diagram::stationTrainsSettled(std::shared_ptr<Railway> railway,
     std::shared_ptr<RailStation> st) const
 {
     QList<QPair<std::shared_ptr<TrainLine>, const AdapterStation*>> res;
-    for (auto train : _trainCollection.trains()) {
-        for (auto adp : train->adapters()) {
+    foreach(auto train , _trainCollection.trains()) {
+        foreach (auto adp , train->adapters()) {
             if (adp->isInSameRailway(railway)) {
                 for (auto line : adp->lines()) {
                     auto* p = line->stationFromRail(st);

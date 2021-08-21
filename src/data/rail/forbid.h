@@ -2,7 +2,7 @@
  * 天窗相关的都放这里
  * 初期和pyETRC行为一致：总是有且仅有两套天窗
  */
-
+#pragma once
 #include <QTime>
 #include <QJsonObject>
 #include "railintervaldata.hpp"
@@ -37,6 +37,8 @@ public:
     inline bool isNull()const { 
         return beginTime.isNull() || endTime.isNull() || beginTime == endTime; 
     }
+
+    void swap(ForbidNode& other);
 };
 
 
@@ -51,7 +53,7 @@ class Forbid:
     Forbid(Forbid&&) = delete;
 
 public:
-
+    static constexpr int FORBID_COUNT = 2;
     inline bool isDownShow()const{return downShow;}
     inline bool isUpShow()const{return upShow;}
     inline bool isDirShow(Direction dir)const { return dir == Direction::Down ? downShow : upShow; }
@@ -59,4 +61,14 @@ public:
     QJsonObject toJson()const;
 
     void _show()const;
+
+    std::shared_ptr<Railway> clone()const;
+
+    /**
+     * @brief name
+     * 和一般的`name()`概念不同，是直接根据Index确定的。
+     */
+    QString name()const;
+
+    void swap(Forbid& other);
 };

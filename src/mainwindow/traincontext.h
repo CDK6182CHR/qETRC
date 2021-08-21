@@ -229,5 +229,25 @@ namespace qecmd {
     private:
         void commit();
     };
+
+    struct StartingTerminalData {
+        std::deque<std::pair<std::shared_ptr<Train>, StationName>> startings;
+        std::deque<std::pair<std::shared_ptr<Train>, StationName>> terminals;
+        void commit();
+    };
+
+    class AutoStartingTerminal :public QUndoCommand {
+        StartingTerminalData data;
+        MainWindow* const mw;
+    public:
+        AutoStartingTerminal(StartingTerminalData&& data_,
+            MainWindow* mw_,QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("自动始发终到站适配"), parent),
+            data(data_),mw(mw_){}
+        virtual void undo()override { commit(); }
+        virtual void redo()override { commit(); }
+    private :
+        void commit();
+    };
 }
 

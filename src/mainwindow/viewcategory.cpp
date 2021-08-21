@@ -110,7 +110,6 @@ void ViewCategory::initUI()
 void ViewCategory::setDirTrainsShow(Direction dir, bool show)
 {
     QList<std::shared_ptr<TrainLine>> lines;
-    const auto& mana = diagram.trainCollection().typeManager();
 
     auto addline = [&lines, show, this](std::shared_ptr<TrainLine> line,
         std::shared_ptr<Train> train) {
@@ -286,12 +285,11 @@ void ViewCategory::commitConfigChange(Config& cfg, bool repaint)
 void ViewCategory::refreshTypeGroup()
 {
     auto& coll = diagram.trainCollection();
-    const TypeManager& manager = coll.typeManager();
     auto* model = group->groupModel();
     auto& cfg = diagram.config();
     model->clear();
     int row = 0;
-    for (auto p = coll.typeCount().begin(); p != coll.typeCount().end(); ++p) {
+    for (auto p = coll.typeCount().cbegin(); p != coll.typeCount().cend(); ++p) {
         if (p.value() <= 0)
             continue;
         auto* act = new QAction(p.key()->name(), this);

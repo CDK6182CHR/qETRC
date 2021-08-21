@@ -52,6 +52,7 @@ protected:
      * 如果不符合，输出警告。
      * Precondition: 第0列是区间名称
      */
+    bool checkRowInterval(const RailInterval& railint, int row)const;
     bool checkRowInterval(std::shared_ptr<RailInterval> railint,int row)const;
 
 public:

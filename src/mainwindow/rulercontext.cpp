@@ -101,6 +101,7 @@ void RulerContext::commitChangeRulerName(std::shared_ptr<Ruler> ruler)
         refreshData();
     }
     mw->getRailContext()->onRulerNameChanged(ruler);
+    emit rulerNameChanged(ruler);
 }
 
 void RulerContext::commitRemoveRuler(std::shared_ptr<Ruler> ruler, bool isord)
@@ -126,6 +127,13 @@ void RulerContext::undoRemoveRuler(std::shared_ptr<Ruler> ruler, bool isord)
         mw->updateRailwayDiagrams(ruler->railway());
     }
     mw->getRailContext()->insertRulerAt(ruler->railway(), ruler, isord);
+}
+
+void RulerContext::actRemoveRulerNavi(std::shared_ptr<Ruler> ruler)
+{
+    auto r = ruler->clone();
+    mw->getUndoStack()->push(new qecmd::RemoveRuler(ruler, r, ruler->isOrdinateRuler(),
+        this));
 }
 
 void RulerContext::actSetAsOrdinate()

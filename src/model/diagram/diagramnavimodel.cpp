@@ -119,6 +119,31 @@ navi::AbstractComponentItem* DiagramNaviModel::getItem(const QModelIndex& idx) c
     return parentItem;
 }
 
+typename navi::RailwayItem* 
+    DiagramNaviModel::getRailItem(const Railway& rail)
+{
+    int i = _diagram.railCategory().getRailwayIndex(rail);
+    const auto& idxRailList = index(navi::DiagramItem::RowRailways, 0);
+    if (i >= 0) {
+        const auto& idxRail = index(i, 0, idxRailList);
+        return static_cast<navi::RailwayItem*>(idxRail.internalPointer());
+    }
+    else {
+        return nullptr;
+    }
+}
+
+QModelIndex DiagramNaviModel::getRailIndex(const Railway& rail)
+{
+    int i = _diagram.railCategory().getRailwayIndex(rail);
+    const auto& idxRailList = index(navi::DiagramItem::RowRailways, 0);
+    if (i >= 0) {
+        const auto& idxRail = index(i, 0, idxRailList);
+        return idxRail;
+    }
+    return {};
+}
+
 void DiagramNaviModel::resetTrainList()
 {
     beginResetModel();
@@ -278,6 +303,33 @@ void DiagramNaviModel::removeRailwayAt(int i)
     item->removeRailwayAt(i);
     endRemoveRows();
     emit railwayRemoved(rail);
+}
+
+void DiagramNaviModel::insertRulerAt(const Railway& rail, int i)
+{
+    auto&& idx = getRailIndex(rail);
+    beginInsertRows(idx, i, i);
+    auto* item = static_cast<navi::RailwayItem*>(idx.internalPointer());
+    item->onRulerInsertedAt(i);
+    endInsertRows();
+}
+
+void DiagramNaviModel::removeRulerAt(const Railway& rail, int i)
+{
+    auto&& idx = getRailIndex(rail);
+    beginRemoveRows(idx, i, i);
+    auto* item = static_cast<navi::RailwayItem*>(idx.internalPointer());
+    item->onRulerRemovedAt(i);
+    endRemoveRows();
+}
+
+void DiagramNaviModel::onRulerNameChanged(std::shared_ptr<const Ruler> ruler)
+{
+    auto&& idx = getRailIndex(ruler->railway());
+    auto* item = static_cast<navi::RailwayItem*>(idx.internalPointer());
+    int i = item->getRulerRow(ruler);
+    auto&& idxruler = index(i, 0, idx);
+    emit dataChanged(idxruler, idxruler);
 }
 
 

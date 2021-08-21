@@ -49,6 +49,8 @@ signals:
      */
     void focusOutRuler();
 
+    void rulerNameChanged(std::shared_ptr<Ruler>);
+
 public slots:
 
     void actChangeRulerData(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> nr);
@@ -77,6 +79,11 @@ public slots:
      */
     void undoRemoveRuler(std::shared_ptr<Ruler> ruler, bool isord);
 
+    /**
+     * 由Navi那边的context menu 调起的删除标尺命令
+     */
+    void actRemoveRulerNavi(std::shared_ptr<Ruler> ruler);
+
 private slots:
 
     void actShowEditWidget();
@@ -98,7 +105,7 @@ namespace qecmd {
     public:
         UpdateRuler(std::shared_ptr<Ruler> ruler_,std::shared_ptr<Railway> nr_,
             RulerContext* context, QUndoCommand* parent=nullptr):
-            QUndoCommand(QObject::tr("更新标尺数据: ")+ruler_->name()),
+            QUndoCommand(QObject::tr("更新标尺数据: ")+ruler_->name(),parent),
             ruler(ruler_),nr(nr_), cont(context){}
         virtual void undo()override;
         virtual void redo()override;

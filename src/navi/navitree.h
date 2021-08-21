@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <QTreeView>
+#include <QWidget>
 #include <QMenu>
 #include <QPoint>
 #include <QUndoStack>
@@ -10,26 +10,29 @@
 #include "data/diagram/diagrampage.h"
 #include "model/diagram/diagramnavimodel.h"
 
+class QTreeView;
+
 /**
  * @brief The NaviTree class  系统导航那个TreeView
  * 注意这个类暂定只有主程序才用 （i.e. 不给数据库预留），因此持有主程序的undoStack指针
  */
-class NaviTree : public QTreeView
+class NaviTree : public QWidget
 {
     Q_OBJECT;
 
     QMenu* mePageList, * meRailList, * meTrainList, * mePage, * meTrain, * meRailway;
+    QMenu* meRuler, * meForbid;
     DiagramNaviModel* _model;
     QUndoStack* const _undo;
+    QTreeView* tree;
 public:
     NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget* parent = nullptr);
 
     DiagramNaviModel* naviModel() { return _model; }
-
-protected:
-    virtual void currentChanged(const QModelIndex& cur, const QModelIndex& prev)override;
+  
 
 private:
+    void initUI();
     void initContextMenus();
     using ACI = navi::AbstractComponentItem;
     ACI* getItem(const QModelIndex& idx);
@@ -45,8 +48,11 @@ signals:
     void focusInTrain(std::shared_ptr<Train> train);
     void focusOutTrain();
     void focusInRailway(std::shared_ptr<Railway>);
+    void focusInRuler(std::shared_ptr<Ruler>);
     void editRailway(std::shared_ptr<Railway>);
     void editTrain(std::shared_ptr<Train>);
+    void editRuler(std::shared_ptr<Ruler>);
+    void editForbid(std::shared_ptr<Forbid>, std::shared_ptr<Railway>);
     void focusOutRailway();
     void railwayListChanged();   //只是通知主窗口更新数据  其实都不见得有必要
 
@@ -54,6 +60,8 @@ signals:
      * 转发给主窗口去画图  所有页面重新铺画
      */
     void trainsImported();
+
+    void removeRulerNavi(std::shared_ptr<Ruler>);
 
 private slots:
     void showContextMenu(const QPoint& pos);
@@ -71,9 +79,17 @@ private slots:
 
     void onRemoveRailwayContext();
 
+    void onRemoveRulerContext();
+
     void onEditRailwayContext();
 
     void onEditTrainContext();
+
+    void onEditRulerContext();
+
+    void onEditForbidContext();
+
+    void onCurrentChanged(const QModelIndex& cur, const QModelIndex& prev);
     
 public slots:
     void actAddRailway();

@@ -208,4 +208,14 @@ public:
     inline auto& railway() { return _railway.get(); }
     inline const auto& railway()const { return _railway.get(); }
 
+protected:
+    void swap(RailIntervalData<_Node, _Data>& other) {
+        std::swap(_different, other._different);
+        for (auto n1 = firstDownNode(), n2 = other.firstDownNode();
+            n1 && n2; n1 = n1->nextNodeCirc(), n2 = n2->nextNodeCirc())
+        {
+            n1->swap(*n2);
+        }
+    }
+
 };

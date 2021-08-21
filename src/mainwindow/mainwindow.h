@@ -42,7 +42,7 @@ class MainWindow : public SARibbonMainWindow
     //窗口，Model的指针
     DiagramNaviModel* naviModel;
     NaviTree* naviView;
-    SARibbonMenu* pageMenu, * railMenu, *appMenu;
+    SARibbonMenu* pageMenu, * railMenu, * appMenu, * forbidMenu;
     QList<ads::CDockWidget*> diagramDocks;
     QList<DiagramWidget*> diagramWidgets;
     ads::CDockWidget* naviDock, * trainListDock;
@@ -306,9 +306,16 @@ private slots:
 
     void actNaviToRuler();
 
+    void actNaviToForbid();
+
     void actToSingleFile();
 
     void actBatchCopyTrain();
+
+    /**
+     * 自动始发终到站适配  cmd写在TrainContext里面
+     */
+    void actAutoStartingTerminal();
 
 public slots:
 

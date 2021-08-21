@@ -137,14 +137,28 @@ void navi::PageListItem::removePageAt(int i)
 
 navi::AbstractComponentItem* navi::RailwayItem::child(int i)
 {
-    Q_UNUSED(i);
-	return nullptr;
+    if(i<static_cast<int>( _rulers.size()))
+        return _rulers.at(i).get();
+    else
+        return _forbids.at(i-_rulers.size()).get();
+}
+
+int navi::RailwayItem::childCount() const
+{
+    return static_cast<int>(_rulers.size()+_forbids.size());
 }
 
 navi::RailwayItem::RailwayItem(std::shared_ptr<Railway> rail, int row, RailwayListItem* parent):
 	AbstractComponentItem(row,parent),_railway(rail)
 {
-
+    int i=0;
+    foreach(auto ruler,_railway->rulers()){
+        _rulers.emplace_back(std::make_unique<RulerItem>(ruler,i++,this));
+    }
+    rail->ensureForbids(Forbid::FORBID_COUNT);
+    foreach(auto forbid,_railway->forbids()){
+        _forbids.emplace_back(std::make_unique<ForbidItem>(forbid,_railway,i++,this));
+    }
 }
 
 QString navi::RailwayItem::data(int i) const
@@ -152,7 +166,37 @@ QString navi::RailwayItem::data(int i) const
 	switch (i) {
 	case ColItemName:return _railway->name();
 	default:return "";
-	}
+    }
+}
+
+void navi::RailwayItem::onRulerInsertedAt(int i)
+{
+    auto p=_rulers.begin();
+    std::advance(p,i);
+    p=_rulers.emplace(p, std::make_unique<RulerItem>(_railway->getRuler(i),i,this));
+    for(++p;p!=_rulers.end();++p){
+        (*p)->rowRef()++;
+    }
+}
+
+void navi::RailwayItem::onRulerRemovedAt(int i)
+{
+    auto p=_rulers.begin();
+    std::advance(p,i);
+    p=_rulers.erase(p);
+    for(;p!=_rulers.end();++p){
+        (*p)->rowRef()--;
+    }
+}
+
+int navi::RailwayItem::getRulerRow(std::shared_ptr<const Ruler> ruler)
+{
+    return ruler->index();
+}
+
+int navi::RailwayItem::getForbidRow(std::shared_ptr<const Forbid> forbid)
+{
+    return static_cast<int>( _rulers.size() + forbid->index());
 }
 
 navi::PageItem::PageItem(std::shared_ptr<DiagramPage> page, int row, PageListItem* parent):
@@ -229,13 +273,13 @@ void navi::TrainListItem::undoAddNewTrain()
 void navi::TrainListItem::addNewTrain(std::shared_ptr<Train> train)
 {
 	_coll.appendTrain(train);
-	int row = _trains.size();
+    int row = static_cast<int>( _trains.size());
 	_trains.emplace_back(std::make_unique<TrainModelItem>(train, row, this));
 }
 
 navi::AbstractComponentItem* navi::TrainListItem::child(int i)
 {
-	if (i >= 0 && i < _trains.size())
+    if (i >= 0 && i < static_cast<int>( _trains.size()))
 		return _trains[i].get();
 	return nullptr;
 }
@@ -252,4 +296,33 @@ QString navi::TrainModelItem::data(int i) const
 	case ColDescription:return _train->startEndString();
 	default:return {};
 	}
+}
+
+navi::RulerItem::RulerItem(std::shared_ptr<Ruler> ruler, int row, RailwayItem *parent):
+    AbstractComponentItem(row, parent), _ruler(ruler)
+{
+
+}
+
+QString navi::RulerItem::data(int i) const
+{
+    switch (i){
+    case ColItemName: return QObject::tr("标尺|%1").arg(_ruler->name());
+    default:return {};
+    }
+}
+
+navi::ForbidItem::ForbidItem(std::shared_ptr<Forbid> forbid,std::shared_ptr<Railway> railway,
+                             int row, RailwayItem *parent):
+    AbstractComponentItem(row, parent), _railway(railway),_forbid(forbid)
+{
+
+}
+
+QString navi::ForbidItem::data(int i) const
+{
+    switch (i){
+    case ColItemName: return QObject::tr("%1天窗").arg(_forbid->name());
+    default:return {};
+    }
 }

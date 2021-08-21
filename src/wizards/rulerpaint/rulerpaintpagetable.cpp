@@ -214,7 +214,7 @@ void RulerPaintModel::updateFromRow(int row)
     for (r += dr; r >= 0 && r < rowCount(); prev = r, r += dr) {
         cur_stopped = bool(getStopSecs(r));
         QTime tm = prev_time;
-        bool flag = calRowTime(r, dr, prev_stopped, cur_stopped, tm);
+        calRowTime(r, dr, prev_stopped, cur_stopped, tm);
 
         //循环结束操作：
         prev_stopped = cur_stopped;

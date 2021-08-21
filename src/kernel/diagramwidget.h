@@ -211,6 +211,10 @@ private:
      */
     void showForbid(std::shared_ptr<Forbid> forbid, Direction dir);
 
+    /**
+     * 删除旧天窗数据（总是），显示新的天窗数据（如果要求显示）。
+     * 实际上起到了更新的作用。
+     */
     void showForbid(std::shared_ptr<Forbid> forbid, Direction dir, int index);
 
     void removeForbid(std::shared_ptr<Forbid> forbid, Direction dir);
@@ -253,5 +257,10 @@ public slots:
      * 由MainWindow那边调用，避免递归的信号。
      */
     void highlightTrain(std::shared_ptr<Train> train);
+
+    /**
+     * 当天窗数据变化时，更新
+     */
+    void updateForbid(std::shared_ptr<Forbid> forbid, Direction dir);
 };
 

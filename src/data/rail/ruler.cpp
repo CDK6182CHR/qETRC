@@ -72,13 +72,8 @@ std::shared_ptr<Railway> Ruler::clone() const
 
 void Ruler::swap(Ruler& other)
 {
-    std::swap(_different, other._different);
+    RailIntervalData::swap(other);
     std::swap(_name, other._name);
-    for (auto n1 = firstDownNode(), n2 = other.firstDownNode();
-        n1 && n2; n1 = n1->nextNodeCirc(), n2 = n2->nextNodeCirc()) 
-    {
-        n1->swap(*n2);
-    }
 }
 
 int Ruler::fromSingleTrain(std::shared_ptr<const TrainAdapter> adp, int start, int stop)

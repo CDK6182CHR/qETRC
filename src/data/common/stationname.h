@@ -89,6 +89,8 @@ public:
                 (field()==another.field() || another.isBare());
     }
 
+    inline bool isSingleName()const { return _field.isEmpty(); }
+
 };
 
 inline uint qHash(const StationName& sn, uint seed)

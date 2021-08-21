@@ -100,7 +100,7 @@ public:
     inline bool isDown()const{return _dir==Direction::Down;}
 
     inline QString toString()const {
-        return QString("%1->%2").arg(fromStationNameLit()).arg(toStationNameLit());
+        return QString("%1->%2").arg(fromStationNameLit(), toStationNameLit());
     }
 
     /**

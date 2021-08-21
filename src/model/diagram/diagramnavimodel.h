@@ -33,10 +33,6 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     inline Diagram& diagram() { return _diagram; }
 
-    /**
-     * 发生了打开新运行图等操作，直接暴力重新加载Item
-     */
-    void resetModel();
 
     /**
      * 试验：导入线路，缀加到尾部。
@@ -51,6 +47,9 @@ private:
     using ACI = navi::AbstractComponentItem;
     using pACI = navi::AbstractComponentItem*;
     pACI getItem(const QModelIndex& idx)const;
+
+    navi::RailwayItem* getRailItem(const Railway& rail);
+    QModelIndex getRailIndex(const Railway& rail);
 
 signals:
     
@@ -84,6 +83,12 @@ signals:
     void trainRowsRemoved(int start, int end);
 
 public slots:
+
+    /**
+     * 发生了打开新运行图等操作，直接暴力重新加载Item
+     */
+    void resetModel();
+
     void resetTrainList();
     //void resetRailwayList();
     void resetPageList();
@@ -118,6 +123,16 @@ public slots:
      * 由NaviTree调用。注意此操作不支持撤销，因此直接执行
      */
     void removeRailwayAt(int i);
+
+    /**
+     * 已知在指定索引处增加标尺，更新model。
+     * 不进行实际的操作。
+     */
+    void insertRulerAt(const Railway& rail, int i);
+
+    void removeRulerAt(const Railway& rail, int i);
+
+    void onRulerNameChanged(std::shared_ptr<const Ruler> ruler);
 };
 
 

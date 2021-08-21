@@ -38,6 +38,7 @@ namespace navi {
 		inline AbstractComponentItem* parent() { return _parent; }
         inline int row()const { return _row; }
         inline void setRow(int r){_row=r;}
+        inline int& rowRef(){return _row;}
 	};
 
 	class RailwayListItem;
@@ -83,7 +84,7 @@ namespace navi {
 		enum { Type = 2 };
 		RailwayListItem(Diagram& diagram, DiagramItem* parent);
 		virtual AbstractComponentItem* child(int i) override;
-		inline virtual int childCount()const override { return _rails.size(); }
+        inline virtual int childCount()const override {return static_cast<int>( _rails.size()); }
 		virtual QString data(int i)const override;
 		inline virtual int type()const override { return Type; }
 		
@@ -112,7 +113,7 @@ namespace navi {
 		enum { Type = 3 };
 		PageListItem(Diagram& diagram, DiagramItem* parent);
 		virtual AbstractComponentItem* child(int i) override;
-		inline virtual int childCount()const override { return _pages.size(); }
+        inline virtual int childCount()const override { return static_cast<int>( _pages.size()); }
 		virtual QString data(int i)const override;
 		inline virtual int type()const override { return Type; }
         void resetChildren();
@@ -124,18 +125,38 @@ namespace navi {
 		void removePageAt(int i);
 	};
 
+    class RulerItem;
+    class ForbidItem;
 
+    /**
+     * @brief The RailwayItem class
+     * 标尺、天窗放在同一个级别下面。注意行数和index可能不等，所有的行数计算应该由本类完成。
+     */
 	class RailwayItem :public AbstractComponentItem
 	{
 		std::shared_ptr<Railway> _railway;
+        std::deque<std::unique_ptr<RulerItem>> _rulers;
+        std::deque<std::unique_ptr<ForbidItem>> _forbids;
 	public:
 		enum { Type = 4 };
 		RailwayItem(std::shared_ptr<Railway> rail, int row, RailwayListItem* parent);
 		virtual AbstractComponentItem* child(int i)override;
-		inline virtual int childCount()const override { return 0; }
+        virtual int childCount()const override;
 		virtual QString data(int i)const override;
 		inline virtual int type()const override { return Type; }
 		inline auto railway()const { return _railway; }
+
+        /**
+         * @brief onRulerInsertedAt
+         * 在指定位置添加标尺；并不执行实际的添加，而仅仅是更新item
+         */
+        void onRulerInsertedAt(int i);
+
+        void onRulerRemovedAt(int i);
+
+        int getRulerRow(std::shared_ptr<const Ruler> ruler);
+
+        int getForbidRow(std::shared_ptr<const Forbid> forbid);
 	};
 
 	class PageItem :public AbstractComponentItem
@@ -160,7 +181,7 @@ namespace navi {
 		enum { Type = 6 };
 		TrainListItem(TrainCollection& coll, DiagramItem* parent);
 		inline virtual AbstractComponentItem* child(int i)override;
-		inline virtual int childCount()const override { return _trains.size(); }
+        inline virtual int childCount()const override { return static_cast<int>( _trains.size()); }
 		virtual QString data(int i)const override;
 		inline virtual int type()const override { return Type; }
 		void resetChildren();
@@ -187,6 +208,35 @@ namespace navi {
 		inline virtual int type()const override { return Type; }
 		inline auto train() { return _train; }
 	};
+
+    class RulerItem: public AbstractComponentItem
+    {
+        std::shared_ptr<Ruler> _ruler;
+	public:
+        enum {Type=8};
+        RulerItem(std::shared_ptr<Ruler> ruler, int row, RailwayItem* parent);
+        inline virtual AbstractComponentItem* child(int)override {return nullptr; }
+        inline virtual int childCount()const override {return 0;}
+        virtual QString data(int i)const override;
+        inline virtual int type()const override {return Type;}
+        inline auto ruler() {return _ruler;}
+    };
+
+    class ForbidItem: public AbstractComponentItem
+    {
+        std::shared_ptr<Railway> _railway;
+        std::shared_ptr<Forbid> _forbid;
+    public:
+        enum {Type=9};
+        ForbidItem(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> railway,
+                   int row, RailwayItem* parent);
+        inline virtual AbstractComponentItem* child(int )override{return nullptr;}
+        inline virtual int childCount() const override{return 0;}
+        virtual QString data(int i) const override;
+        inline virtual int type()const override {return Type;}
+        inline auto forbid(){return _forbid;}
+        inline auto railway(){return _railway;}
+    };
 
 }
 

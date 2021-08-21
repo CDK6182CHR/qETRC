@@ -856,7 +856,14 @@ std::shared_ptr<Forbid> Railway::firstForbid()
 {
 	if (_forbids.empty())
 		addEmptyForbid();
-	return _forbids.at(0);
+    return _forbids.at(0);
+}
+
+void Railway::ensureForbids(int count)
+{
+    while(_forbids.size()<count){
+        addEmptyForbid(true);
+    }
 }
 
 int Railway::ordinateIndex() const
@@ -1338,11 +1345,18 @@ std::shared_ptr<RailInterval> Railway::nextIntervalCirc(std::shared_ptr<RailInte
 
 std::shared_ptr<Forbid> Railway::addForbidFrom(std::shared_ptr<Forbid> other)
 {
+	return addForbidFrom(*other);
+}
+
+std::shared_ptr<Forbid> Railway::addForbidFrom(const Forbid& other)
+{
 	int idx = _forbids.count();
-	auto forbid = std::shared_ptr<Forbid>(new Forbid(*this, other->different(), idx));
+	auto forbid = std::shared_ptr<Forbid>(new Forbid(*this, other.different(), idx));
+	forbid->downShow = other.downShow;
+	forbid->upShow = other.upShow;
 	_forbids.append(forbid);
 	auto p = firstDownInterval();
-	auto n = other->firstDownNode();
+	auto n = other.firstDownNode();
 	for (; p && n; p = nextIntervalCirc(p), n = n->nextNodeCirc()) {
 		p->_forbidNodes.append(std::make_shared<ForbidNode>(*forbid, *p, n->beginTime, n->endTime));
 	}

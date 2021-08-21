@@ -579,3 +579,24 @@ void qecmd::ExchangeTrainInterval::commit()
 	std::swap(end1, end2);
 	cont->commitExchangeTrainInterval(train1, train2);
 }
+
+void qecmd::StartingTerminalData::commit()
+{
+	for (auto& p : startings) {
+		std::swap(p.first->startingRef(), p.second);
+	}
+	for (auto& p : terminals) {
+		std::swap(p.first->terminalRef(), p.second);
+	}
+}
+
+void qecmd::AutoStartingTerminal::commit()
+{
+	data.commit();
+	for (auto& p : data.startings) {
+		mw->repaintTrainLines(p.first);
+	}
+	for (auto& p : data.terminals) {
+		mw->repaintTrainLines(p.first);
+	}
+}

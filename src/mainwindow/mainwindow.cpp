@@ -321,6 +321,7 @@ void MainWindow::initDockWidgets()
         //connect(tree, &NaviTree::focusOutRailway, this, &MainWindow::focusOutRailway);
         connect(tree, &NaviTree::editRailway, this, &MainWindow::actOpenRailStationWidget);
         connect(tree, &NaviTree::trainsImported, this, &MainWindow::onTrainsImported);
+        connect(tree, &NaviTree::focusInRuler, this, &MainWindow::focusInRuler);
 
         connect(naviModel, &DiagramNaviModel::newRailwayAdded,
             this, &MainWindow::actOpenRailStationWidget);
@@ -531,11 +532,19 @@ void MainWindow::initToolbar()
         btn->setMinimumWidth(80);
 
         act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺编辑"), this);
-        act->setToolTip("标尺编辑 (Ctrl+B)\n"
-            "打开全局任意线路中的任意一个标尺的编辑面板。");
+        act->setToolTip(tr("标尺编辑 (Ctrl+B)\n"
+            "打开全局任意线路中的任意一个标尺的编辑面板。"));
         connect(act, SIGNAL(triggered()), this, SLOT(actNaviToRuler()));
         act->setShortcut(Qt::CTRL + Qt::Key_B);
         addAction(act);
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
+
+        act = new QAction(QIcon(":/icons/forbid.png"), tr("天窗编辑"), this);
+        act->setToolTip(tr("天窗编辑\n打开或导航到任意一基线的天窗编辑面板。"));
+        connect(act, SIGNAL(triggered()), this, SLOT(actNaviToForbid()));
+        forbidMenu = new SARibbonMenu(this);
+        act->setMenu(forbidMenu);
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
@@ -562,9 +571,13 @@ void MainWindow::initToolbar()
         connect(actsub, SIGNAL(triggered()), this, SLOT(removeAllTrains()));
         menu->addAction(actsub);
 
+        actsub = new QAction(tr("自动始发终到站适配"), this);
+        menu->addAction(actsub);
+        connect(actsub, SIGNAL(triggered()), this, SLOT(actAutoStartingTerminal()));
+
         act->setMenu(menu);
         auto* btn = panel->addLargeAction(act);
-        btn->setMinimumWidth(70);
+        btn->setMinimumWidth(80);
 
         act = new QAction(QIcon(":/icons/add_train.png"), tr("导入车次"), this);
         act->setToolTip(tr("导入车次 (Ctrl+D)\n从既有运行图或者车次数据库文件中导入部分或全部的车次。"));
@@ -667,6 +680,12 @@ void MainWindow::initToolbar()
             this, &MainWindow::onStationTableChanged);
         connect(contextRail, &RailContext::selectRuler,
             this, &MainWindow::focusInRuler);
+        connect(contextRail, &RailContext::rulerInsertedAt,
+            naviModel, &DiagramNaviModel::insertRulerAt);
+        connect(contextRail, &RailContext::rulerRemovedAt,
+            naviModel, &DiagramNaviModel::removeRulerAt);
+        connect(naviView, &NaviTree::editForbid,
+            contextRail, &RailContext::openForbidWidgetTab);
     }
 
     //context: ruler
@@ -677,6 +696,12 @@ void MainWindow::initToolbar()
             this, SLOT(updateRailwayDiagrams(Railway&)));
         connect(contextRuler, &RulerContext::focusOutRuler,
             this, &MainWindow::focusOutRuler);
+        connect(contextRuler, &RulerContext::rulerNameChanged,
+            naviModel, &DiagramNaviModel::onRulerNameChanged);
+        connect(naviView, &NaviTree::editRuler,
+            contextRail, &RailContext::openRulerWidget);
+        connect(naviView, &NaviTree::removeRulerNavi,
+            contextRuler, &RulerContext::actRemoveRulerNavi);
     }
 
     //ApplicationMenu的初始化放在最后，因为可能用到前面的..
@@ -842,6 +867,11 @@ void MainWindow::actNaviToRuler()
     }
 }
 
+void MainWindow::actNaviToForbid()
+{
+    // todo..
+}
+
 void MainWindow::actToSingleFile()
 {
     auto* dialog = new OutputSubDiagramDialog(_diagram, this);
@@ -855,6 +885,53 @@ void MainWindow::actBatchCopyTrain()
     connect(dialog, &BatchCopyTrainDialog::applied,
         naviView, &NaviTree::actBatchAddTrains);
     dialog->show();
+}
+
+void MainWindow::actAutoStartingTerminal()
+{
+    QString text = tr("遍历所有车次，当车次满足以下条件时，将该车次的始发站调整为在本线的第一个车站，终到站调整为" \
+        "在本线的最后一个车站。\n" 
+        "（1）该车次在时刻表中的第一个（最后一个）站铺画在运行图上；\n" 
+        "（2）该车次时刻表中第一个（最后一个）站站名以始发（终到）站站名开头，" 
+        "“场”字结尾；\n"
+        "（3）始发（终到）站及时刻表中第一个（最后一个）站站名不含域解析符（::）。\n"
+        "是否继续？");
+    auto flag = QMessageBox::question(this, tr("自动始发终到站适配"), text);
+    if (flag != QMessageBox::Yes)
+        return;
+    qecmd::StartingTerminalData data;
+    for (auto train : _diagram.trains()) {
+        if (train->empty())
+            continue;
+        auto* first = train->boundStarting();
+        if (first) {
+            const auto& firstname = first->trainStation->name;
+            const auto& starting = train->starting();
+            if (firstname.isSingleName() && starting.isSingleName() &&
+                firstname.station().startsWith(starting.station()) &&
+                firstname.station().endsWith(tr("场"))) {
+                data.startings.emplace_back(std::make_pair(train, firstname));
+            }
+        }
+        auto* last = train->boundTerminal();
+        if (last) {
+            const auto& lastname = last->trainStation->name;
+            const auto& terminal = train->terminal();
+            if(lastname.isSingleName()&&terminal.isSingleName() && 
+                lastname.station().startsWith(terminal.station()) &&
+                lastname.station().endsWith(tr("场"))) {
+                data.terminals.emplace_back(std::make_pair(train, lastname));
+            }
+        }
+    }
+    if (data.startings.empty() && data.terminals.empty()) {
+        QMessageBox::information(this, tr("提示"), tr("没有车次受到影响。"));
+    }
+    else {
+        QMessageBox::information(this, tr("提示"), tr("设置成功。影响%1个车次的始发站和"
+            "%2个车次的终到站。").arg(data.startings.size()).arg(data.terminals.size()));
+        undoStack->push(new qecmd::AutoStartingTerminal(std::move(data), this));
+    }
 }
 
 void MainWindow::updateWindowTitle()

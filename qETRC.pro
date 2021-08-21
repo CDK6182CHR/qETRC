@@ -47,12 +47,14 @@ SOURCES += \
     src/dialogs/selectrailstationdialog.cpp \
     src/editors/basictrainwidget.cpp \
     src/editors/configdialog.cpp \
+    src/editors/forbidwidget.cpp \
     src/editors/railstationwidget.cpp \
     src/editors/ruler/rulertabpy.cpp \
     src/editors/ruler/rulerwidget.cpp \
     src/model/delegate/generaldoublespindelegate.cpp \
     src/model/delegate/generalspindelegate.cpp \
     src/model/delegate/qetimedelegate.cpp \
+    src/model/rail/forbidmodel.cpp \
     src/model/rail/intervaldatamodel.cpp \
     src/util/railrulercombo.cpp \
     src/util/selectrailwaycombo.cpp \
@@ -134,12 +136,14 @@ HEADERS += \
     src/dialogs/selectrailstationdialog.h \
     src/editors/basictrainwidget.h \
     src/editors/configdialog.h \
+    src/editors/forbidwidget.h \
     src/editors/railstationwidget.h \
     src/editors/ruler/rulertabpy.h \
     src/editors/ruler/rulerwidget.h \
     src/model/delegate/generaldoublespindelegate.h \
     src/model/delegate/generalspindelegate.h \
     src/model/delegate/qetimedelegate.h \
+    src/model/rail/forbidmodel.h \
     src/model/rail/intervaldatamodel.h \
     src/util/railrulercombo.h \
     src/util/selectrailwaycombo.h \

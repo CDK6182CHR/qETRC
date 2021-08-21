@@ -265,4 +265,5 @@ int Routing::trainIndex(std::shared_ptr<Train> train) const
     if (train->hasRouting() && train->routing().lock().get() == this) {
         return std::distance(_order.cbegin(), static_cast<CNodePtr>(train->routingNode().value()));
     }
+    return -1;
 }

@@ -38,16 +38,22 @@ void IntervalDataModel::copyRowData(int from, int to)
 
 }
 
-bool IntervalDataModel::checkRowInterval(std::shared_ptr<RailInterval> railint, int row) const
+bool IntervalDataModel::checkRowInterval(const RailInterval& railint, int row) const
 {
-    if(intervalString(*railint)==item(row,0)->text()){
+    if (intervalString(railint) == item(row, 0)->text()) {
         return true;
-    }else{
-        qDebug()<<"IntervalDataModel::checkRowInterval: WARNING: "<<
-                  "Interval not complicated: expected "<<item(row,0)->text()<<", "<<
-                  "get "<<*railint<<Qt::endl;
+    }
+    else {
+        qDebug() << "IntervalDataModel::checkRowInterval: WARNING: " <<
+            "Interval not complicated: expected " << item(row, 0)->text() << ", " <<
+            "get " << railint << Qt::endl;
         return false;
     }
+}
+
+bool IntervalDataModel::checkRowInterval(std::shared_ptr<RailInterval> railint, int row) const
+{
+    return checkRowInterval(*railint, row);
 }
 
 void IntervalDataModel::copyFromDownToUp()

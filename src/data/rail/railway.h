@@ -438,6 +438,12 @@ public:
      */
     std::shared_ptr<Forbid> firstForbid();
 
+    /**
+     * @brief ensureForbids
+     * 保证天窗数量不少于指定。
+     */
+    void ensureForbids(int count);
+
     inline auto& forbids() { return _forbids; }
 
     inline std::shared_ptr<Ruler> ordinate(){return _ordinate;}
@@ -536,6 +542,14 @@ public:
      * （特例是给首站的情况，直接返回首站的y坐标）
      */
     SectionInfo getSectionInfo(double mile);
+
+    /**
+     * 从已有的Forbid中复制数据。
+     * precondition: 两线路topo等价，否则引发UB
+     */
+    std::shared_ptr<Forbid> addForbidFrom(std::shared_ptr<Forbid> other);
+
+    std::shared_ptr<Forbid> addForbidFrom(const Forbid& forbid);
 
 
 private:
@@ -637,11 +651,7 @@ private:
      */
     std::shared_ptr<Forbid> addForbid(const QJsonObject& obj);
 
-    /**
-     * 从已有的Forbid中复制数据。
-     * precondition: 两线路topo等价，否则引发UB
-     */
-    std::shared_ptr<Forbid> addForbidFrom(std::shared_ptr<Forbid> other);
+
 
     /**
      * @brief calStationYValueByMile  强制按里程计算每个站的坐标。

@@ -12,6 +12,8 @@
 #include "data/diagram/diagram.h"
 #include "editors/ruler/rulerwidget.h"
 
+class ForbidTabWidget;
+
 class MainWindow;
 /**
  * @brief The RailContext class
@@ -33,6 +35,8 @@ class RailContext : public QObject
     //全局所有的ruler都放这里
     QList<RulerWidget*> rulerWidgets;
     QList<ads::CDockWidget*> rulerDocks;
+    QList<ForbidTabWidget*> forbidWidgets;
+    QList<ads::CDockWidget*> forbidDocks;
 public:
     explicit RailContext(Diagram& diagram_, SARibbonContextCategory* context,
         MainWindow* mw_,
@@ -50,6 +54,11 @@ public:
 
     void refreshAllData();
 
+    /**
+     * 更新天窗。遍历所有Diagram，在每张运行图上更新。
+     */
+    void updateForbidDiagrams(std::shared_ptr<Forbid> forbid, Direction dir);
+
 private:
     void initUI();
 
@@ -60,13 +69,25 @@ private:
      */
     int rulerWidgetIndex(std::shared_ptr<Ruler> ruler);
 
+    int forbidWidgetIndex(std::shared_ptr<Railway> railway);
+    int forbidWidgetIndex(const Railway& railway);
+
+    ForbidTabWidget* getOpenForbidWidget(std::shared_ptr<Railway> railway);
+
 signals:
     void railNameChanged(std::shared_ptr<Railway> rail);
     void stationTableChanged(std::shared_ptr<Railway> rail, bool equiv);
     void selectRuler(std::shared_ptr<Ruler> ruler);
 
+    /**
+     * 标尺增删之后，通告navi那边更改数据
+     */
+    void rulerInsertedAt(const Railway& rail, int i);
+    void rulerRemovedAt(const Railway& rail, int i);
+
 private slots:
     void actOpenStationWidget();
+    void actOpenForbidWidget();
     void actRemoveRailway();
 
 
@@ -94,6 +115,17 @@ private slots:
      */
     void actAddNewRuler();
 
+    /**
+     * 更新天窗面板的显示部分
+     */
+    void refreshForbidWidgetBasic(std::shared_ptr<Forbid> forbid);
+
+    /**
+     * 更新天窗面板的table部分
+     */
+    void refreshForbidBasicTable(std::shared_ptr<Forbid> forbid);
+
+
 public slots:
 
     /**
@@ -104,12 +136,24 @@ public slots:
 
     void openRulerWidget(std::shared_ptr<Ruler> ruler);
 
+    void openForbidWidget(std::shared_ptr<Railway> railway);
+
+    /**
+     * seealso openForbidWidget()
+     * 多一个设定到指定index()的逻辑。
+     */
+    void openForbidWidgetTab(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> railway);
 
     void actChangeRailName(std::shared_ptr<Railway> rail, const QString& name);
     void commitChangeRailName(std::shared_ptr<Railway> rail);
 
     void actUpdateTimetable(std::shared_ptr<Railway> railway, std::shared_ptr<Railway> newtable,
         bool equiv);
+
+    /**
+     * 标尺变化，操作压栈
+     */
+    void actUpdadteForbidData(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> data);
 
     /**
      * 时刻表更新的执行，
@@ -140,11 +184,13 @@ public slots:
 
     /**
      * 删除标尺后，删除combo里面的东西
+     * 注意所有的标尺删除操作都应该经过这里，去通知navi更改！
      */
     void removeRulerAt(const Railway& rail, int i, bool isord);
 
     /**
      * 撤销删除标尺
+     * 注意所有的标尺增加操作都要经过这里，通知navi的更改
      */
     void insertRulerAt(const Railway& rail, std::shared_ptr<Ruler> ruler, bool isord);
 
@@ -158,6 +204,8 @@ public slots:
      * 注意此时不可能是Ordinate。
      */
     void undoAddNewRuler(std::shared_ptr<Ruler> ruler);
+
+    void commitForbidChange(std::shared_ptr<Forbid> forbid);
 };
 
 
@@ -194,6 +242,21 @@ namespace qecmd {
     };
 
 
+    class UpdateForbidData :public QUndoCommand {
+        std::shared_ptr<Forbid> forbid;
+        std::shared_ptr<Railway> data;
+        RailContext* const cont;
+    public:
+        UpdateForbidData(std::shared_ptr<Forbid> forbid_, std::shared_ptr<Railway> data_,
+            RailContext* context, QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("更新天窗: %1 - %2").arg(forbid_->name(), 
+                forbid_->railway().name()),parent),
+            forbid(forbid_),data(data_),cont(context){}
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+
     class ChangeOrdinate :public QUndoCommand {
         RailContext* const cont;
         std::shared_ptr<Railway> rail;
@@ -224,4 +287,6 @@ namespace qecmd {
         virtual void undo()override;
         virtual void redo()override;
     };
+
+
 }

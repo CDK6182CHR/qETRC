@@ -62,26 +62,6 @@ void RulerModel::setupModel()
 	}
 
 	IntervalDataModel::setupModel();
-
-	//后面的都可以删掉
-
-	updating = true;
-	beginResetModel();
-	using SI = QStandardItem;
-	const auto& rail = ruler->railway();
-	setRowCount(rail.stationCount() * 2);
-
-	int row = 0;
-
-	for (auto n = ruler->firstDownNode(); n; n = n->nextNodeDiffCirc(), row++) {
-		auto& railint = n->railInterval();
-		QString s = intervalString(railint);
-
-		
-	}
-	setRowCount(row);
-	endResetModel();
-	updating = false;
 }
 
 void RulerModel::setupRow(int row, std::shared_ptr<RailInterval> railint)

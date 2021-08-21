@@ -37,6 +37,29 @@ void Forbid::_show() const
     }
 }
 
+std::shared_ptr<Railway> Forbid::clone() const
+{
+    auto r = railway().cloneBase();
+    r->addForbidFrom(*this);
+    return r;
+}
+
+QString Forbid::name() const
+{
+    switch(index()){
+    case 0:return QObject::tr("综合维修");
+    case 1:return QObject::tr("综合施工");
+    default:return QObject::tr("天窗%1").arg(index());
+    }
+}
+
+void Forbid::swap(Forbid& other)
+{
+    RailIntervalData::swap(other);
+    std::swap(downShow, other.downShow);
+    std::swap(upShow, other.upShow);
+}
+
 ForbidNode::ForbidNode(Forbid& forbid, RailInterval& railint, const QTime& beginTime_ ,
     const QTime& endTime_) :
     RailIntervalNode<ForbidNode, Forbid>(forbid, railint),beginTime(beginTime_),
@@ -78,6 +101,12 @@ int ForbidNode::durationSec() const
 int ForbidNode::durationMin() const
 {
     return durationSec() / 60;
+}
+
+void ForbidNode::swap(ForbidNode& other)
+{
+    std::swap(beginTime, other.beginTime);
+    std::swap(endTime, other.endTime);
 }
 
 

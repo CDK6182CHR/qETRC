@@ -349,6 +349,7 @@ public:
      * @brief 如果终到站是已经绑定到线路的车站，返回它；
      * 否则返回空
      * 注意需要遍历所有的Adapter （Adapter并不一定是按顺序的）
+     * 与始发终到站设定项的那个starting/terminal没关系，只是时刻表的第一/最后一站
      */
     const AdapterStation* boundTerminal()const;
 

@@ -4,21 +4,42 @@
 #include "model/diagram/diagramnavimodel.h"
 #include "addpagedialog.h"
 #include "dialogs/importtraindialog.h"
+#include "util/buttongroup.hpp"
 
 
-NaviTree::NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget *parent):
-    QTreeView(parent),mePageList(new QMenu(this)),meRailList(new QMenu(this)),
-    meTrainList(new QMenu(this)),mePage(new QMenu(this)),meTrain(new QMenu(this)),
-    meRailway(new QMenu(this)),
-    _model(model_),_undo(undo)
+NaviTree::NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget* parent) :
+    QWidget(parent), mePageList(new QMenu(this)), meRailList(new QMenu(this)),
+    meTrainList(new QMenu(this)), mePage(new QMenu(this)), meTrain(new QMenu(this)),
+    meRailway(new QMenu(this)), meRuler(new QMenu(this)), meForbid(new QMenu(this)),
+    _model(model_), _undo(undo)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
+    initUI();
     connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
         this, SLOT(showContextMenu(const QPoint&)));
-    connect(this, &QAbstractItemView::doubleClicked, this, &NaviTree::onDoubleClicked);
+
     initContextMenus();
-    setModel(_model);
-    expandAll();
+}
+
+void NaviTree::initUI()
+{
+    //setContentsMargins(0, 0, 0, 0);
+    auto* vlay = new QVBoxLayout(this);
+    auto* g = new ButtonGroup<3>({ "展开","折叠","刷新" });
+    g->setMinimumWidth(50);
+    vlay->addLayout(g);
+    tree = new QTreeView;
+    vlay->addWidget(tree);
+
+    connect(tree, &QAbstractItemView::doubleClicked, this, &NaviTree::onDoubleClicked);
+    tree->setModel(_model);
+    tree->setColumnWidth(0, 200);
+    tree->setColumnWidth(1, 50);
+    connect(tree->selectionModel(), &QItemSelectionModel::currentChanged,
+        this, &NaviTree::onCurrentChanged);
+    connect(g->get(0), SIGNAL(clicked()), tree, SLOT(expandAll()));
+    connect(g->get(1), SIGNAL(clicked()), tree, SLOT(collapseAll()));
+    connect(g->get(2), SIGNAL(clicked()), _model, SLOT(resetModel()));
 }
 
 void NaviTree::initContextMenus()
@@ -54,6 +75,16 @@ void NaviTree::initContextMenus()
     connect(act, SIGNAL(triggered()), this, SLOT(onEditRailwayContext()));
     act = meRailway->addAction(tr("删除基线"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemoveRailwayContext()));
+
+    //Ruler
+    act = meRuler->addAction(tr("编辑标尺"));
+    connect(act, SIGNAL(triggered()), this, SLOT(onEditRulerContext()));
+    act = meRuler->addAction(tr("删除标尺"));
+    connect(act, SIGNAL(triggered()), this, SLOT(onRemoveRulerContext()));
+
+    //Forbid
+    act = meForbid->addAction(tr("编辑天窗"));
+    connect(act, SIGNAL(triggered()), this, SLOT(onEditForbidContext()));
 }
 
 NaviTree::ACI* NaviTree::getItem(const QModelIndex& idx)
@@ -70,7 +101,7 @@ void NaviTree::addNewPageApply(std::shared_ptr<DiagramPage> page)
 
 void NaviTree::onRemovePageContext()
 {
-    auto idx = currentIndex();
+    auto idx = tree->currentIndex();
     ACI* item = getItem(idx);
     if (item && item->type() == navi::PageItem::Type) {
         removePage(idx.row());
@@ -79,7 +110,7 @@ void NaviTree::onRemovePageContext()
 
 void NaviTree::onRemoveSingleTrainContext()
 {
-    auto idx = currentIndex();
+    auto idx = tree->currentIndex();
     ACI* item = getItem(idx);
     if (item && item->type() == navi::TrainModelItem::Type) {
         removeSingleTrain(idx.row());
@@ -93,16 +124,25 @@ void NaviTree::onRemoveRailwayContext()
             "请注意此操作关涉较广且不可撤销。是否继续？"));
     if (res != QMessageBox::Yes)
         return;
-    auto idx = currentIndex();
+    auto idx = tree->currentIndex();
     ACI* item = getItem(idx);
     if (item && item->type() == navi::RailwayItem::Type) {
         _model->removeRailwayAt(idx.row());
     }
 }
 
+void NaviTree::onRemoveRulerContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::RulerItem::Type) {
+        emit removeRulerNavi(static_cast<navi::RulerItem*>(item)->ruler());
+    }
+}
+
 void NaviTree::onEditRailwayContext()
 {
-    auto idx = currentIndex();
+    auto idx = tree->currentIndex();
     ACI* item = getItem(idx);
     if (item && item->type() == navi::RailwayItem::Type) {
         emit editRailway(static_cast<navi::RailwayItem*>(item)->railway());
@@ -111,10 +151,29 @@ void NaviTree::onEditRailwayContext()
 
 void NaviTree::onEditTrainContext()
 {
-    auto idx = currentIndex();
+    auto idx = tree->currentIndex();
     ACI* item = getItem(idx);
     if (item && item->type() == navi::TrainModelItem::Type) {
         emit editTrain(static_cast<navi::TrainModelItem*>(item)->train());
+    }
+}
+
+void NaviTree::onEditRulerContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::RulerItem::Type) {
+        emit editRuler(static_cast<navi::RulerItem*>(item)->ruler());
+    }
+}
+
+void NaviTree::onEditForbidContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::ForbidItem::Type) {
+        emit editForbid(static_cast<navi::ForbidItem*>(item)->forbid(),
+            static_cast<navi::ForbidItem*>(item)->railway());
     }
 }
 
@@ -225,13 +284,17 @@ void NaviTree::onDoubleClicked(const QModelIndex& index)
         emit editRailway(static_cast<navi::RailwayItem*>(item)->railway()); break;
     case navi::TrainModelItem::Type:
         emit editTrain(static_cast<navi::TrainModelItem*>(item)->train()); break;
+    case navi::RulerItem::Type:
+        emit editRuler(static_cast<navi::RulerItem*>(item)->ruler()); break;
+    case navi::ForbidItem::Type:
+        emit editForbid(static_cast<navi::ForbidItem*>(item)->forbid(),
+            static_cast<navi::ForbidItem*>(item)->railway()); break;
     }
 }
 
-void NaviTree::currentChanged(const QModelIndex& cur, const QModelIndex& prev)
+void NaviTree::onCurrentChanged(const QModelIndex& cur, const QModelIndex& prev)
 {
     ACI* ipre = getItem(prev), *icur = getItem(cur);
-    QTreeView::currentChanged(cur, prev);
     //先处理取消选择的
     if (ipre&&(!icur||ipre->type()!=icur->type())) {
         switch (ipre->type()) {
@@ -249,6 +312,8 @@ void NaviTree::currentChanged(const QModelIndex& cur, const QModelIndex& prev)
             emit focusInTrain(static_cast<navi::TrainModelItem*>(icur)->train()); break;
         case navi::RailwayItem::Type:
             emit focusInRailway(static_cast<navi::RailwayItem*>(icur)->railway()); break;
+        case navi::RulerItem::Type:
+            emit focusInRuler(static_cast<navi::RulerItem*>(icur)->ruler()); break;
         }
     }
 }
@@ -256,7 +321,7 @@ void NaviTree::currentChanged(const QModelIndex& cur, const QModelIndex& prev)
 
 void NaviTree::showContextMenu(const QPoint& pos)
 {
-    QModelIndex idx = currentIndex();
+    QModelIndex idx = tree->currentIndex();
     if (!idx.isValid())return;
     auto* item = static_cast<navi::AbstractComponentItem*>(idx.internalPointer());
 
@@ -269,6 +334,8 @@ void NaviTree::showContextMenu(const QPoint& pos)
     case navi::PageItem::Type:mePage->popup(p); break;
     case navi::TrainModelItem::Type:meTrain->popup(p); break;
     case navi::RailwayItem::Type:meRailway->popup(p); break;
+    case navi::RulerItem::Type:meRuler->popup(p); break;
+    case navi::ForbidItem::Type:meForbid->popup(p); break;
     }
     
 }

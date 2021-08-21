@@ -842,6 +842,12 @@ void DiagramWidget::showAllForbids()
     }
 }
 
+
+void DiagramWidget::updateForbid(std::shared_ptr<Forbid> forbid, Direction dir)
+{
+    showForbid(forbid, dir);
+}
+
 void DiagramWidget::showForbid(std::shared_ptr<Forbid> forbid, Direction dir)
 {
     int idx = _page->railwayIndex(forbid->railway());
@@ -852,8 +858,11 @@ void DiagramWidget::showForbid(std::shared_ptr<Forbid> forbid, Direction dir)
 
 void DiagramWidget::showForbid(std::shared_ptr<Forbid> forbid, Direction dir, int index)
 {
-    double starty = _page->startYs().at(index);
     removeForbid(forbid, dir);
+    if (!forbid->isDirShow(dir)) {
+        return;
+    }
+    double starty = _page->startYs().at(index);
     QPen pen(Qt::transparent);
     bool isService = (forbid->index() == 0);
     QColor color;
@@ -1029,6 +1038,7 @@ void DiagramWidget::highlightTrain(std::shared_ptr<Train> train)
 
     nowItem->setText(_selectedTrain->trainName().full());
 }
+
 
 void DiagramWidget::showTrainEventText()
 {

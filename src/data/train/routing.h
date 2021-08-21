@@ -115,7 +115,7 @@ public:
     inline auto& order(){return _order;}
     inline const auto& order()const{return _order;}
 
-    inline int count()const{return _order.size();}
+    inline int count()const { return static_cast<int>(_order.size()); }
 
     /**
      * @brief 添加列车

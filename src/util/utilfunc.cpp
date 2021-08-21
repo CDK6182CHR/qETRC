@@ -47,6 +47,11 @@ QString qeutil::secsToString(const QTime& tm1, const QTime& tm2)
 	return secsToString(secsTo(tm1, tm2));
 }
 
+QString qeutil::minsToStringHM(int mins)
+{
+	return QString::asprintf("%d:%02d", mins / 60, mins % 60);
+}
+
 QString qeutil::secsDiffToString(int secs)
 {
 	if (secs >= 0) {

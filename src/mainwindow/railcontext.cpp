@@ -7,6 +7,7 @@
 #include "viewers/railstationeventlist.h"
 #include "viewers/railsectionevents.h"
 #include "viewers/railsnapevents.h"
+#include "editors/forbidwidget.h"
 
 #include <QtWidgets>
 
@@ -46,6 +47,15 @@ void RailContext::refreshAllData()
 	refreshData();
 	for (auto p : rulerWidgets) {
 		p->refreshData();
+	}
+}
+
+void RailContext::updateForbidDiagrams(std::shared_ptr<Forbid> forbid, Direction dir)
+{
+	foreach(auto p, mw->diagramWidgets) {
+		if (p->page()->containsRailway(forbid->railway())) {
+			p->updateForbid(forbid, dir);
+		}
 	}
 }
 
@@ -107,6 +117,13 @@ void RailContext::initUI()
 	auto* btn = panel->addLargeAction(act);
 	btn->setMinimumWidth(70);
 	connect(act, SIGNAL(triggered()), this, SLOT(actOpenStationWidget()));
+
+	act = new QAction(QIcon(":/icons/forbid.png"), tr("天窗编辑"), this);
+	act->setToolTip(tr("天窗编辑\n打开或切换到到当前线路的天窗编辑面板"));
+	connect(act, SIGNAL(triggered()), this, SLOT(actOpenForbidWidget()));
+	act->setMenu(mw->forbidMenu);
+	btn = panel->addLargeAction(act);
+	btn->setMinimumWidth(80);
 
 	act = new QAction(QIcon(":/icons/close.png"), tr("删除基线"), this);
 	btn = panel->addLargeAction(act);
@@ -180,6 +197,24 @@ int RailContext::rulerWidgetIndex(std::shared_ptr<Ruler> ruler)
             return i;
     }
     return -1;
+}
+
+int RailContext::forbidWidgetIndex(std::shared_ptr<Railway> railway)
+{
+	for (int i = 0; i < forbidWidgets.size(); i++) {
+		if (forbidWidgets.at(i)->getRailway() == railway)
+			return i;
+	}
+	return -1;
+}
+
+int RailContext::forbidWidgetIndex(const Railway& railway)
+{
+	for (int i = 0; i < forbidWidgets.size(); i++) {
+		if (forbidWidgets.at(i)->getRailway().get() == &railway)
+			return i;
+	}
+	return -1;
 }
 
 void RailContext::actChangeOrdinate(int i)
@@ -263,6 +298,40 @@ void RailContext::openRulerWidget(std::shared_ptr<Ruler> ruler)
 	}
 }
 
+ForbidTabWidget* RailContext::getOpenForbidWidget(std::shared_ptr<Railway> railway)
+{
+	int i = forbidWidgetIndex(railway);
+	if (i == -1) {
+		//创建
+		auto* rw = new ForbidTabWidget(railway, false);
+		auto* dock = new ads::CDockWidget(tr("标尺天窗编辑 - %1").arg(railway->name()));
+		dock->setWidget(rw);
+		forbidWidgets.append(rw);
+		forbidDocks.append(dock);
+		connect(rw, &ForbidTabWidget::forbidChanged,
+			this, &RailContext::actUpdadteForbidData);
+		mw->forbidMenu->addAction(dock->toggleViewAction());
+		mw->getManager()->addDockWidgetFloating(dock);
+		return rw;
+	}
+	else {
+		//显示
+		auto* dock = forbidDocks.at(i);
+		if (dock->isClosed()) {
+			dock->toggleView(true);
+		}
+		else {
+			dock->setAsCurrentTab();
+		}
+		return forbidWidgets.at(i);
+	}
+}
+
+void RailContext::openForbidWidget(std::shared_ptr<Railway> railway)
+{
+	getOpenForbidWidget(railway);
+}
+
 void RailContext::removeRulerWidgetAt(int i)
 {
 	auto dock = rulerDocks.takeAt(i);
@@ -318,6 +387,24 @@ void RailContext::actAddNewRuler()
 		railway, this));
 }
 
+void RailContext::refreshForbidWidgetBasic(std::shared_ptr<Forbid> forbid)
+{
+	int i = forbidWidgetIndex(forbid->railway());
+	if (i != -1) {
+		auto* w = forbidWidgets.at(i);
+		w->refreshBasicData(forbid);
+	}
+}
+
+void RailContext::refreshForbidBasicTable(std::shared_ptr<Forbid> forbid)
+{
+	int i = forbidWidgetIndex(forbid->railway());
+	if (i != -1) {
+		auto* w = forbidWidgets.at(i);
+		w->refreshData(forbid);
+	}
+}
+
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
 {
 	//2021.08.15取消：更改站名时不必刷新页面
@@ -341,6 +428,11 @@ void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
 void RailContext::actUpdateTimetable(std::shared_ptr<Railway> railway, std::shared_ptr<Railway> newtable, bool equiv)
 {
 	mw->getUndoStack()->push(new qecmd::UpdateRailStations(this, railway, newtable, equiv));
+}
+
+void RailContext::actUpdadteForbidData(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> data)
+{
+	mw->getUndoStack()->push(new qecmd::UpdateForbidData(forbid, data, this));
 }
 
 void RailContext::commitUpdateTimetable(std::shared_ptr<Railway> railway, bool equiv)
@@ -418,6 +510,7 @@ void RailContext::removeRulerAt(const Railway& rail, int i, bool isord)
 		}
 		updating = false;
 	}
+	emit rulerRemovedAt(rail, i);
 }
 
 void RailContext::insertRulerAt(const Railway& rail, std::shared_ptr<Ruler> ruler, bool isord)
@@ -430,6 +523,7 @@ void RailContext::insertRulerAt(const Railway& rail, std::shared_ptr<Ruler> rule
 		}
 		updating = false;
 	}
+	emit rulerInsertedAt(rail, ruler->index());
 }
 
 void RailContext::commitAddNewRuler(std::shared_ptr<Ruler> ruler)
@@ -443,6 +537,13 @@ void RailContext::undoAddNewRuler(std::shared_ptr<Ruler> ruler)
 	mw->getRulerContext()->commitRemoveRuler(ruler, false);
 }
 
+void RailContext::commitForbidChange(std::shared_ptr<Forbid> forbid)
+{
+	updateForbidDiagrams(forbid, Direction::Down);
+	updateForbidDiagrams(forbid, Direction::Up);
+	refreshForbidBasicTable(forbid);
+}
+
 void RailContext::setRailway(std::shared_ptr<Railway> rail)
 {
 	railway = rail;
@@ -453,6 +554,12 @@ void RailContext::actOpenStationWidget()
 {
 	if(railway)
         mw->actOpenRailStationWidget(railway);
+}
+
+void RailContext::actOpenForbidWidget()
+{
+	if (railway)
+		openForbidWidget(railway);
 }
 
 void RailContext::actRemoveRailway()
@@ -471,7 +578,12 @@ void RailContext::actRemoveRailway()
 	}
 }
 
-
+void RailContext::openForbidWidgetTab(std::shared_ptr<Forbid> forbid, 
+	std::shared_ptr<Railway> railway)
+{
+	auto* w = getOpenForbidWidget(railway); 
+	w->setCurrentIndex(forbid->index());
+}
 
 void RailContext::actChangeRailName(std::shared_ptr<Railway> rail, const QString &name)
 {
@@ -559,4 +671,16 @@ void qecmd::AddNewRuler::redo()
 		railway->addRulerFrom(theRuler->getRuler(0));
 	}
 	cont->commitAddNewRuler(railway->rulers().last());
+}
+
+void qecmd::UpdateForbidData::undo()
+{
+	forbid->swap(*(data->getForbid(0)));
+	cont->commitForbidChange(forbid);
+}
+
+void qecmd::UpdateForbidData::redo()
+{
+	forbid->swap(*(data->getForbid(0)));
+	cont->commitForbidChange(forbid);
 }
