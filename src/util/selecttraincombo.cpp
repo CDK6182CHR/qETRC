@@ -78,7 +78,7 @@ void SelectTrainCombo::addTrainItem(std::shared_ptr<Train> t)
 void SelectTrainCombo::updateCombo()
 {
     cbTrains->clear();
-    for(auto t:matched){
+    foreach(auto t, matched){
         addTrainItem(t);
     }
     cbTrains->setFocus();
@@ -89,7 +89,11 @@ void SelectTrainCombo::updateCombo()
 
 void SelectTrainCombo::onEditingFinished()
 {
-    matched = coll.multiSearchTrain(edName->text());
+    const QString& text = edName->text();
+    if (text.isEmpty())
+        matched = coll.trains();    //copy contruct!
+    else
+        matched = coll.multiSearchTrain(text);
     updateCombo();
 }
 

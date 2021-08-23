@@ -58,6 +58,11 @@ public:
     inline bool isUpShow()const{return upShow;}
     inline bool isDirShow(Direction dir)const { return dir == Direction::Down ? downShow : upShow; }
 
+    /**
+     * 反转指定方向的是否显示设定
+     */
+    void toggleDirShow(Direction dir);
+
     QJsonObject toJson()const;
 
     void _show()const;

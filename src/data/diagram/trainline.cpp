@@ -885,6 +885,7 @@ SnapEvent::pos_t
 	TrainLine::compressSnapInterval(ConstAdaPtr former, ConstAdaPtr latter, 
 	const QTime& time, double mile) const
 {
+    Q_UNUSED(time);
 	auto rfor = former->railStation.lock(), rlat = latter->railStation.lock();
 	
 	if (rfor->dirAdjacent(dir()) != rlat) {
@@ -963,6 +964,24 @@ bool TrainLine::isTerminalStation(ConstAdaPtr st) const
 {
 	ConstAdaPtr last = _stations.end(); --last;
 	return endAtThis() && st == last;
+}
+
+QString TrainLine::appStringShort(ConstAdaPtr prev, ConstAdaPtr cur) const
+{
+	QString res;
+	if (prev->trainStation->isStopped()) {
+		res += QObject::tr("起");
+	}
+	else if( isStartingStation(prev)) {
+		res += QObject::tr("始");
+	}
+	if (cur->trainStation->isStopped()) {
+		res += QObject::tr("停");
+	}
+	else if (isTerminalStation(cur)) {
+		res += QObject::tr("终");
+	}
+	return res;
 }
 
 int TrainLine::passStationPos(ConstAdaPtr st) const

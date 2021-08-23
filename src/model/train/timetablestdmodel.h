@@ -58,6 +58,8 @@ private:
      */
     std::shared_ptr<Train> getTimetableTrain();
 
+    void updateRowStopTime(int row);
+
 public slots:
 
     /**

@@ -125,6 +125,11 @@ private slots:
      */
     void refreshForbidBasicTable(std::shared_ptr<Forbid> forbid);
 
+    /**
+     * 线路反排。操作压栈。
+     */
+    void actInverseRail();
+
 
 public slots:
 
@@ -154,6 +159,8 @@ public slots:
      * 标尺变化，操作压栈
      */
     void actUpdadteForbidData(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> data);
+
+    void actToggleForbidShow(std::shared_ptr<Forbid> forbid, Direction dir);
 
     /**
      * 时刻表更新的执行，
@@ -206,6 +213,13 @@ public slots:
     void undoAddNewRuler(std::shared_ptr<Ruler> ruler);
 
     void commitForbidChange(std::shared_ptr<Forbid> forbid);
+
+    void commitToggleForbidShow(std::shared_ptr<Forbid> forbid, Direction dir);
+
+    /**
+     * 关闭运行图时，同时关闭Ruler和Forbid的Dock
+     */
+    void removeAllDocks();
 };
 
 
@@ -252,6 +266,17 @@ namespace qecmd {
             QUndoCommand(QObject::tr("更新天窗: %1 - %2").arg(forbid_->name(), 
                 forbid_->railway().name()),parent),
             forbid(forbid_),data(data_),cont(context){}
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    class ToggleForbidShow :public QUndoCommand {
+        std::shared_ptr<Forbid> forbid;
+        Direction dir;
+        RailContext* const cont;
+    public:
+        ToggleForbidShow(std::shared_ptr<Forbid> forbid_, Direction dir_, RailContext* context,
+            QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
     };

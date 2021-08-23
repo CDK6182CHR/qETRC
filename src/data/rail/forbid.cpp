@@ -9,6 +9,20 @@ Forbid::Forbid(Railway& railway, bool different, int index) :
 
 }
 
+
+void Forbid::toggleDirShow(Direction dir)
+{
+    switch (dir)
+    {
+    case Direction::Down: downShow = !downShow;
+        break;
+    case Direction::Up:upShow = !upShow;
+        break;
+    default:
+        break;
+    }
+}
+
 QJsonObject Forbid::toJson() const
 {
     QJsonObject obj{

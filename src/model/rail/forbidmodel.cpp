@@ -54,11 +54,15 @@ void ForbidModel::setupRow(int row, std::shared_ptr<RailInterval> railint)
     using SI=QStandardItem;
 
     auto* it=new SI;
-    it->setData(node->beginTime,Qt::EditRole);
+    auto tm = node->beginTime;
+    if (!tm.isValid())tm = QTime(0, 0);
+    it->setData(tm,Qt::EditRole);
     setItem(row,ColStart,it);
 
     it=new SI;
-    it->setData(node->endTime,Qt::EditRole);
+    tm = node->endTime;
+    if (!tm.isValid())tm = QTime(0, 0);
+    it->setData(tm,Qt::EditRole);
     setItem(row,ColEnd,it);
 
     it=new SI(qeutil::minsToStringHM(node->durationMin()));
@@ -92,4 +96,39 @@ void ForbidModel::updateDuration(int row)
     it->setEditable(false);
     setItem(row,ColLength,it);
 }
+
+
+void ForbidModel::copyToNextRow(int row)
+{
+    if (row < rowCount() - 1) {
+        item(row + 1, ColStart)->setData(item(row, ColStart)->data(Qt::EditRole), Qt::EditRole);
+        item(row + 1, ColEnd)->setData(item(row, ColEnd)->data(Qt::EditRole), Qt::EditRole);
+    }
+}
+
+void ForbidModel::calculateBegin(int row, int mins)
+{
+    item(row, ColStart)->setData(
+        item(row, ColEnd)->data(Qt::EditRole).toTime().addSecs(-mins * 60), Qt::EditRole);
+}
+
+void ForbidModel::calculateEnd(int row, int mins)
+{
+    item(row, ColEnd)->setData(
+        item(row, ColStart)->data(Qt::EditRole).toTime().addSecs(mins * 60), Qt::EditRole);
+}
+
+void ForbidModel::calculateAllBegin(int mins)
+{
+    for (int i = 0; i < rowCount(); i++)
+        calculateBegin(i, mins);
+}
+
+void ForbidModel::calculateAllEnd(int mins)
+{
+    for (int i = 0; i < rowCount(); i++)
+        calculateEnd(i, mins);
+}
+
+
 

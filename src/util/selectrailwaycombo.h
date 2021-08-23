@@ -16,6 +16,8 @@ public:
     SelectRailwayCombo(RailCategory& cat_, QWidget* parent=nullptr);
     void refresh();
     auto railway(){return _railway;}
+    static std::shared_ptr<Railway> dialogGetRailway(RailCategory& cat, QWidget* parent,
+        const QString& title = tr("选择线路"), const QString& prompt = "");
 signals:
     void currentRailwayChanged(std::shared_ptr<Railway>);
 private slots:

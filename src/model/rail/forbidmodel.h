@@ -25,5 +25,11 @@ protected:
 private slots:
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
     void updateDuration(int row);
+public slots:
+    void copyToNextRow(int row);
+    void calculateBegin(int row, int mins);
+    void calculateEnd(int row, int mins);
+    void calculateAllBegin(int mins);
+    void calculateAllEnd(int mins);
 };
 

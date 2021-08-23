@@ -216,6 +216,11 @@ public:
 
     bool isTerminalStation(ConstAdaPtr st)const;
 
+    /**
+     * 所给区间的附加情况，例如起，始停之类的；不包含“通”。
+     */
+    QString appStringShort(ConstAdaPtr prev, ConstAdaPtr cur)const;
+
 private:
 
     /**

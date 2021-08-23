@@ -17,6 +17,8 @@
 #include "util/railrulercombo.h"
 #include "dialogs/outputsubdiagramdialog.h"
 #include "dialogs/batchcopytraindialog.h"
+#include "viewers/traindiffdialog.h"
+#include "wizards/readruler/readrulerwizard.h"
 
 #include "version.h"
 
@@ -557,6 +559,15 @@ void MainWindow::initToolbar()
         panel = cat->addPannel(tr("调整"));
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
+
+        act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("标尺综合"), this);
+        act->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_B);
+        addAction(act);
+        act->setToolTip(tr("标尺综合 (Ctrl+Shift+B)\n"
+            "从一组选定的车次中，读取一套标尺数据，用于建立新标尺，或更新既有标尺。"));
+        connect(act, SIGNAL(triggered()), this, SLOT(actReadRulerWizard()));
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
     }
 
     //列车
@@ -615,6 +626,12 @@ void MainWindow::initToolbar()
             btn = panel->addLargeAction(act);
             btn->setMinimumWidth(80);
         }
+
+        panel = cat->addPannel(tr("分析"));
+        act = new QAction(QIcon(":/icons/compare.png"), tr("车次对照"), this);
+        act->setToolTip(tr("两车次运行对照\n在指定线路上，对比两个选定车次的运行情况。"));
+        connect(act, SIGNAL(triggered()), this, SLOT(actTrainDiff()));
+        panel->addMediumAction(act);
 
         panel = cat->addPannel(tr("排图"));
 
@@ -773,6 +790,7 @@ void MainWindow::clearDiagramUnchecked()
 
     contextTrain->removeAllTrainWidgets();
     focusOutTrain();
+    contextRail->removeAllDocks();
 
     undoStack->clear();
     undoStack->resetClean();
@@ -869,7 +887,11 @@ void MainWindow::actNaviToRuler()
 
 void MainWindow::actNaviToForbid()
 {
-    // todo..
+    auto r = SelectRailwayCombo::dialogGetRailway(_diagram.railCategory(), this,
+        tr("选择线路"), tr("请选择要编辑天窗的基线数据"));
+    if (r) {
+        contextRail->openForbidWidget(r);
+    }
 }
 
 void MainWindow::actToSingleFile()
@@ -932,6 +954,18 @@ void MainWindow::actAutoStartingTerminal()
             "%2个车次的终到站。").arg(data.startings.size()).arg(data.terminals.size()));
         undoStack->push(new qecmd::AutoStartingTerminal(std::move(data), this));
     }
+}
+
+void MainWindow::actTrainDiff()
+{
+    auto* dialog = new TrainDiffDialog(_diagram, this);
+    dialog->open();
+}
+
+void MainWindow::actReadRulerWizard()
+{
+    auto* wzd = new ReadRulerWizard(_diagram, this);
+    wzd->show();
 }
 
 void MainWindow::updateWindowTitle()

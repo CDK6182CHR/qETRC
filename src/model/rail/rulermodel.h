@@ -40,8 +40,11 @@ private:
 
     int rowIntervalSecs(int row)const;
     QString intervalString(const RailInterval& railint)const;
+    void updateRowSpeed(int row);
 protected:
     void copyRowData(int from, int to)override;
+
+    void updateEquivRailIntRow(int row, std::shared_ptr<RailInterval> railint)override;
 
 private slots:
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);

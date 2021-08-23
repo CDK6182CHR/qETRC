@@ -1363,6 +1363,20 @@ std::shared_ptr<Forbid> Railway::addForbidFrom(const Forbid& other)
 	return forbid;
 }
 
+std::shared_ptr<RailInterval> Railway::intervalCircByIndex(int index)
+{
+	auto p = firstDownInterval();
+	for (int i = 0; i < index; i++) {
+		p = nextIntervalCirc(p);
+		if (!p) {
+			qDebug() << "Railway::intervalCircByIndex: WARNING: invalid index: "
+				<< index << ", early terminate. " << Qt::endl;
+			break;
+		}
+	}
+	return p;
+}
+
 double Railway::calStationYValueByMile(const Config& config)
 {
 	for (auto& p : _stations) {

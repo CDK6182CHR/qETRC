@@ -317,6 +317,10 @@ private slots:
      */
     void actAutoStartingTerminal();
 
+    void actTrainDiff();
+
+    void actReadRulerWizard();
+
 public slots:
 
     /**

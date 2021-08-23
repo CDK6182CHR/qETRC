@@ -50,7 +50,7 @@ void TimetableStdModel::setupModel()
     }
     updating = true;
     using SI=QStandardItem;
-    setRowCount(_train->timetable().size());
+    setRowCount(static_cast<int>( _train->timetable().size()));
     setColumnCount(ColMAX);
     int row=0;
 
@@ -112,6 +112,20 @@ std::shared_ptr<Train> TimetableStdModel::getTimetableTrain()
     return t;
 }
 
+void TimetableStdModel::updateRowStopTime(int row)
+{
+    const QTime& arr = qvariant_cast<QTime>(item(row, ColArrive)->data(Qt::EditRole));
+    const QTime& dep = qvariant_cast<QTime>(item(row, ColDepart)->data(Qt::EditRole));
+    if (arr != dep) {
+        auto* it = new QStandardItem(qeutil::secsToString(arr, dep));
+        it->setEditable(false);
+        setItem(row, ColStopTime, it);
+    }
+    else {
+        takeItem(row, ColStopTime);
+    }
+}
+
 void TimetableStdModel::actCancel()
 {
     refreshData();
@@ -127,16 +141,7 @@ void TimetableStdModel::onDataChanged(const QModelIndex& leftTop, const QModelIn
     if (std::max(col1, static_cast<int>(ColArrive)) <= 
         std::min(col2, static_cast<int>(ColDepart))) {
         for (int i = std::max(row1,0); i <= std::min(row2,rowCount()-1); i++) {
-            const QTime& arr = qvariant_cast<QTime>(item(i, ColArrive)->data(Qt::EditRole));
-            const QTime& dep = qvariant_cast<QTime>(item(i, ColDepart)->data(Qt::EditRole));
-            if (arr != dep) {
-                auto* it = new QStandardItem(qeutil::secsToString(arr, dep));
-                it->setEditable(false);
-                setItem(i, ColStopTime, it);
-            }
-            else {
-                takeItem(i, ColStopTime);
-            }
+            updateRowStopTime(i);
         }
     }
 }

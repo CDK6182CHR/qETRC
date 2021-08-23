@@ -33,7 +33,7 @@ QString IntervalDataModel::intervalString(const RailInterval& railint)const
     return tr("%1->%3").arg(railint.fromStationNameLit(),railint.toStationNameLit());
 }
 
-void IntervalDataModel::copyRowData(int from, int to)
+void IntervalDataModel::copyRowData(int , int )
 {
 
 }
@@ -104,5 +104,28 @@ void IntervalDataModel::copyFromUpToDown()
             }
         }
     }
+}
+
+void IntervalDataModel::updateRailIntervals(std::shared_ptr<Railway> railway, bool equiv)
+{
+    if (railway.get() != &(_railway.get()))
+        return;
+    if (equiv) {
+        int row = 0;
+        for (auto p = railway->firstDownInterval(); 
+            p; p = railway->nextIntervalCirc(p)) {
+            updateEquivRailIntRow(row++, p);
+        }
+    }
+    else {
+        setupModel();
+    }
+}
+
+void IntervalDataModel::updateEquivRailIntRow(int row, std::shared_ptr<RailInterval> railint)
+{
+    auto it = new QStandardItem(railint->toString());
+    it->setEditable(false);
+    setItem(row, 0, it);
 }
 

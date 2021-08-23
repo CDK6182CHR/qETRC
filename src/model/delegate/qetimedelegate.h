@@ -10,6 +10,7 @@ class QTimeEdit;
  */
 class QETimeDelegate : public QStyledItemDelegate
 {
+    Q_OBJECT
     QString _format;
 public:
     explicit QETimeDelegate(QObject *parent = nullptr,
@@ -25,5 +26,7 @@ public:
 
 protected:
     virtual void setupEditor(QTimeEdit* ed)const;
+private slots:
+    void onTimeChanged();
 };
 

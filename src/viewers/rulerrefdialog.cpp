@@ -23,7 +23,7 @@ void RulerRefModel::setupModel()
     int row = 0;
     setRowCount(0);
     for (auto line : adp->lines()) {
-        setRowCount(row + line->count() - 1);
+        setRowCount(row + static_cast<int>( line->count()) - 1);
         auto pr = line->stations().begin();
         auto p = std::next(pr);
         for (; p != line->stations().end(); pr = p, ++p,++row) {

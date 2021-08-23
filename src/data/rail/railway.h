@@ -551,6 +551,13 @@ public:
 
     std::shared_ptr<Forbid> addForbidFrom(const Forbid& forbid);
 
+    /**
+     * 从下行第一个区间开始，数到第i区间，返回。
+     * 用于IntervalDataModel行数对应的interval。
+     * 线性算法。
+     */
+    std::shared_ptr<RailInterval> intervalCircByIndex(int i);
+
 
 private:
     /**

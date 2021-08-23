@@ -6,7 +6,13 @@
 #include "data/rail/rail.h"
 
 RailRulerCombo::RailRulerCombo(RailCategory &cat_, QWidget *parent):
-    QHBoxLayout(parent),cat(cat_)
+    QHBoxLayout(parent),cat(cat_),withEmptyRuler(false)
+{
+    initUI();
+}
+
+RailRulerCombo::RailRulerCombo(RailCategory& cat_, const QString& emptyName_, QWidget* parent):
+    QHBoxLayout(parent),cat(cat_),emptyName(emptyName_),withEmptyRuler(true)
 {
     initUI();
 }
@@ -62,14 +68,12 @@ void RailRulerCombo::onRailIndexChanged(int i)
     if (i>=0 && i<cat.railways().size()){
         _railway=cat.railways().at(i);
         cbRuler->clear();
-        for(auto p:_railway->rulers()){
+        if (withEmptyRuler)
+            cbRuler->addItem(emptyName);
+        foreach(auto p, _railway->rulers()){
             cbRuler->addItem(p->name());
         }
         emit railwayChagned(_railway);
-    }
-    else{
-//        qDebug()<<"RailRulerCombo::onRailIndexChanged: WARNING: "<<
-//                  "Invalid index: "<<i<<Qt::endl;
     }
 }
 
@@ -77,8 +81,14 @@ void RailRulerCombo::onRulerIndexChanged(int i)
 {
     _ruler.reset();
     if(_railway){
-        if(i>=0&&i<_railway->rulers().size()){
-            _ruler=_railway->getRuler(i);
+        if (withEmptyRuler)
+            i--;
+        if (i >= 0 && i < _railway->rulers().size()) {
+            _ruler = _railway->getRuler(i);
+            emit rulerChanged(_ruler);
+        }
+        else if (withEmptyRuler) {
+            _ruler.reset();
             emit rulerChanged(_ruler);
         }
     }
@@ -87,8 +97,11 @@ void RailRulerCombo::onRulerIndexChanged(int i)
 void RailRulerCombo::refreshRulerList()
 {
     cbRuler->clear();
+    if (withEmptyRuler) {
+        cbRuler->addItem(emptyName);
+    }
     if(_railway){
-        for(auto p:_railway->rulers()){
+        foreach(auto p,_railway->rulers()){
             cbRuler->addItem(p->name());
         }
     }

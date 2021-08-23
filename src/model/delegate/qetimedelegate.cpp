@@ -15,6 +15,7 @@ QWidget *QETimeDelegate::createEditor(QWidget *parent,
     Q_UNUSED(option);
     Q_UNUSED(index);
      auto* ed=new QTimeEdit(parent);
+     connect(ed, SIGNAL(timeChanged(QTime)), this, SLOT(onTimeChanged()));
      setupEditor(ed);
      return ed;
 }
@@ -43,4 +44,9 @@ void QETimeDelegate::setupEditor(QTimeEdit *ed) const
 {
     ed->setDisplayFormat(_format);
     ed->setWrapping(true);
+}
+
+void QETimeDelegate::onTimeChanged()
+{
+    emit commitData(qobject_cast<QWidget*>(sender()));
 }

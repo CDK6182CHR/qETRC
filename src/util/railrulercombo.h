@@ -18,8 +18,12 @@ class RailRulerCombo : public QHBoxLayout
     QComboBox* cbRail,*cbRuler;
     std::shared_ptr<Railway> _railway;
     std::shared_ptr<Ruler> _ruler;
+    bool withEmptyRuler;
+    QString emptyName;
 public:
     RailRulerCombo(RailCategory& cat_, QWidget* parent=nullptr );
+    RailRulerCombo(RailCategory& cat_, const QString& emptyName_,
+        QWidget* parent = nullptr);
     auto railway(){return _railway;}
     auto ruler(){return _ruler;}
 

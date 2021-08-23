@@ -16,7 +16,7 @@ void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaul
 
 	//Train类型的正确设置依赖于TypeManager的正确初始化
 	const QJsonArray& artrains = obj.value("trains").toArray();
-	for (const auto& p : artrains) {
+	foreach (const auto& p , artrains) {
 		_trains.append(std::make_shared<Train>(p.toObject(), _manager));
 	}
 	
@@ -129,7 +129,7 @@ std::shared_ptr<Train> TrainCollection::findFirstSingleName(const QString& name)
 QList<std::shared_ptr<Train>> TrainCollection::multiSearchTrain(const QString& name)
 {
 	QList<std::shared_ptr<Train>> res;
-	for (auto t : _trains) {
+	foreach (auto t , _trains) {
 		if (t->trainName().contains(name))
 			res.append(t);
 	}

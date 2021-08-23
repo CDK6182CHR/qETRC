@@ -91,9 +91,12 @@ SOURCES += \
     src/util/qecontrolledtable.cpp \
     src/util/utilfunc.cpp \
     src/viewers/sectioncountdialog.cpp \
+    src/viewers/traindiffdialog.cpp \
     src/viewers/traineventdialog.cpp \
     src/viewers/trainlinedialog.cpp \
     src/viewers/traintimetableplane.cpp \
+    src/wizards/readruler/readrulerpageinterval.cpp \
+    src/wizards/readruler/readrulerwizard.cpp \
     src/wizards/rulerpaint/conflictdialog.cpp \
     src/wizards/rulerpaint/rulerpaintpagestart.cpp \
     src/wizards/rulerpaint/rulerpaintpagestation.cpp \
@@ -183,9 +186,12 @@ HEADERS += \
     src/util/qeexceptions.h \
     src/util/utilfunc.h \
     src/viewers/sectioncountdialog.h \
+    src/viewers/traindiffdialog.h \
     src/viewers/traineventdialog.h \
     src/viewers/trainlinedialog.h \
     src/viewers/traintimetableplane.h \
+    src/wizards/readruler/readrulerpageinterval.h \
+    src/wizards/readruler/readrulerwizard.h \
     src/wizards/rulerpaint/conflictdialog.h \
     src/wizards/rulerpaint/rulerpaintpagestart.h \
     src/wizards/rulerpaint/rulerpaintpagestation.h \

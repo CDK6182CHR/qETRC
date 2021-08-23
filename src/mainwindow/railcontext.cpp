@@ -146,6 +146,11 @@ void RailContext::initUI()
 	btn = panel->addLargeAction(act);
 	btn->setMinimumWidth(70);
 
+	panel = page->addPannel(tr("调整"));
+	act = new QAction(QIcon(":/icons/exchange1.png"), tr("线路反排"), this);
+	connect(act, SIGNAL(triggered()), this, SLOT(actInverseRail()));
+	panel->addMediumAction(act);
+
 	panel = page->addPannel(tr("分析"));
 
 	act = new QAction(QIcon(":/icons/counter.png"), tr("断面对数"), this);
@@ -304,12 +309,14 @@ ForbidTabWidget* RailContext::getOpenForbidWidget(std::shared_ptr<Railway> railw
 	if (i == -1) {
 		//创建
 		auto* rw = new ForbidTabWidget(railway, false);
-		auto* dock = new ads::CDockWidget(tr("标尺天窗编辑 - %1").arg(railway->name()));
+		auto* dock = new ads::CDockWidget(tr("天窗编辑 - %1").arg(railway->name()));
 		dock->setWidget(rw);
 		forbidWidgets.append(rw);
 		forbidDocks.append(dock);
 		connect(rw, &ForbidTabWidget::forbidChanged,
 			this, &RailContext::actUpdadteForbidData);
+		connect(rw, &ForbidTabWidget::forbidShowToggled,
+			this, &RailContext::actToggleForbidShow);
 		mw->forbidMenu->addAction(dock->toggleViewAction());
 		mw->getManager()->addDockWidgetFloating(dock);
 		return rw;
@@ -405,6 +412,14 @@ void RailContext::refreshForbidBasicTable(std::shared_ptr<Forbid> forbid)
 	}
 }
 
+void RailContext::actInverseRail()
+{
+	auto rail = railway->cloneBase();
+	rail->mergeIntervalData(*railway);
+	rail->reverse();
+	mw->getUndoStack()->push(new qecmd::UpdateRailStations(this, railway, rail, false));
+}
+
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
 {
 	//2021.08.15取消：更改站名时不必刷新页面
@@ -435,10 +450,21 @@ void RailContext::actUpdadteForbidData(std::shared_ptr<Forbid> forbid, std::shar
 	mw->getUndoStack()->push(new qecmd::UpdateForbidData(forbid, data, this));
 }
 
+void RailContext::actToggleForbidShow(std::shared_ptr<Forbid> forbid, Direction dir)
+{
+	mw->getUndoStack()->push(new qecmd::ToggleForbidShow(forbid, dir, this));
+}
+
 void RailContext::commitUpdateTimetable(std::shared_ptr<Railway> railway, bool equiv)
 {
 	updateRailWidget(railway);
 	emit stationTableChanged(railway, equiv);
+	foreach(auto p, rulerWidgets) {
+		p->getModel()->updateRailIntervals(railway, equiv);
+	}
+	foreach(auto p, forbidWidgets) {
+		p->updateAllRailIntervals(railway, equiv);
+	}
 }
 
 void RailContext::commitOrdinateChange(std::shared_ptr<Railway> railway)
@@ -542,6 +568,26 @@ void RailContext::commitForbidChange(std::shared_ptr<Forbid> forbid)
 	updateForbidDiagrams(forbid, Direction::Down);
 	updateForbidDiagrams(forbid, Direction::Up);
 	refreshForbidBasicTable(forbid);
+}
+
+void RailContext::commitToggleForbidShow(std::shared_ptr<Forbid> forbid, Direction dir)
+{
+	updateForbidDiagrams(forbid, dir);
+	refreshForbidWidgetBasic(forbid);
+}
+
+void RailContext::removeAllDocks()
+{
+	foreach(auto p, rulerDocks) {
+		p->deleteDockWidget();
+	}
+	rulerDocks.clear();
+	rulerWidgets.clear();
+	foreach(auto p, forbidDocks) {
+		p->deleteDockWidget();
+	}
+	forbidDocks.clear();
+	forbidWidgets.clear();
 }
 
 void RailContext::setRailway(std::shared_ptr<Railway> rail)
@@ -684,3 +730,24 @@ void qecmd::UpdateForbidData::redo()
 	forbid->swap(*(data->getForbid(0)));
 	cont->commitForbidChange(forbid);
 }
+
+qecmd::ToggleForbidShow::ToggleForbidShow(std::shared_ptr<Forbid> forbid_,
+	Direction dir_, RailContext* context, QUndoCommand* parent):
+	QUndoCommand(parent),forbid(forbid_),dir(dir_),cont(context)
+{
+	QString s = (forbid->isDirShow(dir) ? QObject::tr("隐藏") : QObject::tr("显示"));
+	setText(QObject::tr("%1%2天窗-%3").arg(s, forbid->name(), DirFunc::dirToString(dir)));
+}
+
+void qecmd::ToggleForbidShow::undo()
+{
+	forbid->toggleDirShow(dir);
+	cont->commitToggleForbidShow(forbid, dir);
+}
+
+void qecmd::ToggleForbidShow::redo()
+{
+	forbid->toggleDirShow(dir);
+	cont->commitToggleForbidShow(forbid, dir);
+}
+

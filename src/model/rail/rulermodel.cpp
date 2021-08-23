@@ -116,12 +116,37 @@ QString RulerModel::intervalString(const RailInterval& railint) const
 		.arg(railint.toStationNameLit());
 }
 
+void RulerModel::updateRowSpeed(int row)
+{
+	int interv = item(row, ColMinute)->data(Qt::EditRole).toInt() * 60 +
+		item(row, ColSeconds)->data(Qt::EditRole).toInt();
+	if (interv) {
+		double m = item(row, ColMile)->data(qeutil::DoubleDataRole).toDouble();
+		double spd = m / interv * 3600.0;
+		item(row, ColSpeed)->setText(QString::number(spd, 'f', 3));
+	}
+	else {
+		item(row, ColSpeed)->setText("NA");
+	}
+}
+
 void RulerModel::copyRowData(int from, int to)
 {
 	item(to, ColMinute)->setData(item(from, ColMinute)->data(Qt::EditRole), Qt::EditRole);
 	item(to, ColSeconds)->setData(item(from, ColSeconds)->data(Qt::EditRole), Qt::EditRole);
 	item(to, ColStart)->setData(item(from, ColStart)->data(Qt::EditRole), Qt::EditRole);
 	item(to, ColStop)->setData(item(from, ColStop)->data(Qt::EditRole), Qt::EditRole);
+}
+
+void RulerModel::updateEquivRailIntRow(int row, std::shared_ptr<RailInterval> railint)
+{
+	IntervalDataModel::updateEquivRailIntRow(row, railint);
+
+	double m = railint->mile();
+	item(row, ColMile)->setText(QString::number(m, 'f', 3));
+	item(row, ColMile)->setData(m, qeutil::DoubleDataRole);
+
+	updateRowSpeed(row);
 }
 
 
@@ -138,16 +163,7 @@ void RulerModel::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bo
 	if (std::max(static_cast<int>(ColMinute), topLeft.column()) <=
 		std::min(static_cast<int>(ColSeconds), bottomRight.column())) {
 		for (int r = topLeft.row(); r <= bottomRight.row(); r++) {
-			int interv = item(r, ColMinute)->data(Qt::EditRole).toInt() * 60 +
-				item(r, ColSeconds)->data(Qt::EditRole).toInt();
-			if (interv) {
-				double m = item(r, ColMile)->data(qeutil::DoubleDataRole).toDouble();
-				double spd = m / interv * 3600.0;
-				item(r, ColSpeed)->setText(QString::number(spd, 'f', 3));
-			}
-			else {
-				item(r, ColSpeed)->setText("NA");
-			}
+			updateRowSpeed(r);
 		}
 	}
 }
