@@ -26,6 +26,14 @@ void ViewCategory::commitTrainsShow(const QList<std::shared_ptr<TrainLine>>& lin
     onTrainShowChanged();
 }
 
+void ViewCategory::commitSingleTrainShow(const QList<std::shared_ptr<TrainLine>>& lines, bool show)
+{
+    for (auto line : lines) {
+        line->setIsShow(show);
+        setTrainShow(line, show);
+    }
+}
+
 void ViewCategory::commitTypeShow(const QList<std::shared_ptr<TrainLine>>& lines)
 {
     for (auto line : lines) {
@@ -170,8 +178,7 @@ bool ViewCategory::typeIsShow(std::shared_ptr<Train> train) const
 
 void ViewCategory::onTrainShowChanged()
 {
-    //TODO: 暂定暴力更新
-    mw->trainListWidget->refreshData();
+    mw->trainListWidget->getModel()->updateAllTrainShow();
 }
 
 void ViewCategory::showDown()
@@ -282,6 +289,21 @@ void ViewCategory::commitConfigChange(Config& cfg, bool repaint)
     mw->updateAllDiagrams();
 }
 
+void ViewCategory::actChangeSingleTrainShow(std::shared_ptr<Train> train, bool show)
+{
+    QList<std::shared_ptr<TrainLine>> lines;
+    foreach(auto p, train->adapters()) {
+        foreach(auto line, p->lines()) {
+            if (line->show() != show) {
+                lines.push_back(line);
+            }
+        }
+    }
+    if (!lines.empty()) {
+        mw->getUndoStack()->push(new qecmd::ChangeSingleTrainShow(train, show, lines, this));
+    }
+}
+
 void ViewCategory::refreshTypeGroup()
 {
     auto& coll = diagram.trainCollection();
@@ -345,4 +367,25 @@ void qecmd::ChangeTypeShow::redo()
 {
     std::swap(cfg.not_show_types, notShowTypes);
     cat->commitTypeShow(lines);
+}
+
+qecmd::ChangeSingleTrainShow::ChangeSingleTrainShow(std::shared_ptr<Train> train_, 
+    bool show_, const QList<std::shared_ptr<TrainLine>>& lines_, 
+    ViewCategory* cat_, QUndoCommand* parent):
+   QUndoCommand(parent),train(train_),show(show_),lines(lines_),cat(cat_)
+{
+    QString s = (show ? QObject::tr("显示") : QObject::tr("隐藏"));
+    setText(QObject::tr("%1列车运行线: %2").arg(s, train->trainName().full()));
+}
+
+void qecmd::ChangeSingleTrainShow::undo()
+{
+    train->setIsShow(!show);
+    cat->commitSingleTrainShow(lines, !show);
+}
+
+void qecmd::ChangeSingleTrainShow::redo()
+{
+    train->setIsShow(show);
+    cat->commitSingleTrainShow(lines, show);
 }

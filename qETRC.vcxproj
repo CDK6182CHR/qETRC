@@ -144,7 +144,7 @@
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4577;4467;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ObjectFileName>debug\</ObjectFileName>
@@ -215,6 +215,7 @@
     <ClCompile Include="src\model\delegate\qetimedelegate.cpp" />
     <ClCompile Include="src\model\rail\forbidmodel.cpp" />
     <ClCompile Include="src\model\rail\intervaldatamodel.cpp" />
+    <ClCompile Include="src\model\train\trainlistreadmodel.cpp" />
     <ClCompile Include="src\util\railrulercombo.cpp" />
     <ClCompile Include="src\util\selectrailwaycombo.cpp" />
     <ClCompile Include="src\util\selecttraincombo.cpp" />
@@ -273,7 +274,10 @@
     <ClCompile Include="src\viewers\traineventdialog.cpp" />
     <ClCompile Include="src\viewers\trainlinedialog.cpp" />
     <ClCompile Include="src\viewers\traintimetableplane.cpp" />
+    <ClCompile Include="src\wizards\readruler\readrulerpageconfig.cpp" />
     <ClCompile Include="src\wizards\readruler\readrulerpageinterval.cpp" />
+    <ClCompile Include="src\wizards\readruler\readrulerpagepreview.cpp" />
+    <ClCompile Include="src\wizards\readruler\readrulerpagetrain.cpp" />
     <ClCompile Include="src\wizards\readruler\readrulerwizard.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\conflictdialog.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagestart.cpp" />
@@ -282,6 +286,10 @@
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintwizard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="src\wizards\readruler\readrulerpagepreview.h" />
+    <QtMoc Include="src\wizards\readruler\readrulerpageconfig.h" />
+    <QtMoc Include="src\wizards\readruler\readrulerpagetrain.h" />
+    <QtMoc Include="src\model\train\trainlistreadmodel.h" />
     <ClInclude Include="src\viewers\traindiffdialog.h" />
     <QtMoc Include="src\wizards\readruler\readrulerpageinterval.h" />
     <QtMoc Include="src\wizards\readruler\readrulerwizard.h" />

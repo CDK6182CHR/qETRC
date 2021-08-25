@@ -59,6 +59,38 @@ private:
 class Train;
 class Railway;
 
+namespace readruler {
+    /**
+     * 每个区间的每一种（四种附加情况）数据的描述：
+     * 数据数值 -> 数据量
+     */
+    using IntervalTypeCount =
+        std::map<int, int>;
+
+    struct IntervalTypeReport {
+        IntervalTypeCount count;  
+        int tot;        // 最终的总数据量
+        bool used;      // 是否使用本类数据
+        double value;   // 本类计算结果
+    };
+
+    /**
+     * 标尺综合的返回值类型中属于每个区间的数据部分
+     * 与pyETRC基本一致
+     *
+     */
+    struct IntervalReport {
+        int interval = 0, start = 0, stop = 0;
+        std::map<std::shared_ptr<Train>, std::pair<int, TrainLine::IntervalAttachType>> raw;
+        std::map<TrainLine::IntervalAttachType, IntervalTypeReport> types;
+        bool isValid()const { return interval || start || stop; }
+    };
+}
+
+using ReadRulerReport = std::map<std::shared_ptr<RailInterval>, readruler::IntervalReport>;
+
+
+
 /**
  * @brief The Diagram class  运行图基础数据的最高层次抽象
  * pyETRC.Graph的扩展
@@ -289,6 +321,30 @@ public:
 
     SnapEventList getSnapEvents(std::shared_ptr<Railway> railway, const QTime& time)const;
 
+    /**
+     * @brief rulerFromMultiTrains  pyETRC.graph.rulerFromMultiTrains() 标尺综合
+     * 参数、返回值、算法、函数名等基本照搬pyETRC。
+     * @param railway  qETRC新增  要读取的线路
+     * @param intervals  要计算的区间
+     * @param trains  用来计算的列车
+     * @param useAverage   是否采用均值
+     * @param defaultStart   默认起步附加
+     * @param defaultStop    默认停车附加
+     * @param cutStd  截断标准差倍数
+     * @param cutSec  截断秒数
+     * @param prec  精度/数据粒度
+     * @param cutCount  最少类数据量
+     * @return  计算结果和相关的报告数据 详见类定义
+     */
+    ReadRulerReport rulerFromMultiTrains(
+            std::shared_ptr<Railway> railway,
+            const QVector<std::shared_ptr<RailInterval>> intervals,
+            const QList<std::shared_ptr<Train>> trains,
+            bool useAverage, int defaultStart, int defaultStop,
+            int cutStd=1, int cutSec=10, int prec=1,
+            int cutCount=1
+            );
+
 private:
     void bindAllTrains();
     QString validPageName(const QString& prefix)const;
@@ -297,6 +353,32 @@ private:
         std::shared_ptr<TrainLine> line)const;
 
     bool fromTrc(QTextStream& fin);
+
+    /**
+     * pyETRC.data.Graph.__intervalFt()  区间数据统计
+     * 对四种起停附加情况，统计频数
+     */
+    void __intervalFt(readruler::IntervalReport& itrep);
+
+    /**
+     * 众数模式下的计算
+     */
+    void __intervalRulerMode(readruler::IntervalReport& itrep, int defaultStart,
+        int defaultStop, int prec, int cutCount);
+
+    /**
+     * 均值模式下的计算
+     * cutSec, cutStd皆用0表示不启用。
+     */
+    void __intervalRulerMean(readruler::IntervalReport& itrep,
+        int defaultStart, int defaultStop, int prec, int cutStd, int cutSec, int cutCount);
+
+    /**
+     * 解方程计算区间标尺。返回tuple，以避免修改。
+     */
+    std::tuple<int, int, int>
+        __computeIntervalRuler(const std::map<TrainLine::IntervalAttachType,double>& values,
+            int defaultStart, int defaultStop, int prec);
 };
 
 

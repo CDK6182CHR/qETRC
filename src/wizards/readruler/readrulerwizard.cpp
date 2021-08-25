@@ -3,7 +3,7 @@
 #include <QtWidgets>
 #include "data/diagram/diagram.h"
 
-ReadRulerWizard::ReadRulerWizard(Diagram &diagram_, QWidget *parent):
+ReadRulerWizard::ReadRulerWizard(Diagram& diagram_, QWidget* parent) :
     QWizard(parent), diagram(diagram_)
 {
     setWindowTitle(tr("标尺综合"));
@@ -12,11 +12,28 @@ ReadRulerWizard::ReadRulerWizard(Diagram &diagram_, QWidget *parent):
     initUI();
 }
 
+void ReadRulerWizard::initializePage(int id)
+{
+    QWizard::initializePage(id);
+    if (id == PagePreview) {
+        calculate();
+    }
+}
+
 void ReadRulerWizard::initUI()
 {
-    initStartPage();
-    pgInterval=new ReadRulerPageInterval(diagram.railCategory());
-    addPage(pgInterval);
+    setButtonText(NextButton, tr("下一步"));
+    setButtonText(FinishButton, tr("完成"));
+    setButtonText(CancelButton, tr("取消"));
+    initStartPage();   
+    pgInterval = new ReadRulerPageInterval(diagram.railCategory());
+    addPage(pgInterval); 
+    pgTrain = new ReadRulerPageTrain(diagram.trainCollection());
+    addPage(pgTrain);
+    pgConfig = new ReadRulerPageConfig();
+    addPage(pgConfig);
+    pgPreview = new ReadRulerPagePreview();
+    addPage(pgPreview);
 }
 
 void ReadRulerWizard::initStartPage()
@@ -52,4 +69,38 @@ void ReadRulerWizard::initStartPage()
     lab->setWordWrap(true);
     vlay->addWidget(lab);
     addPage(page);
+}
+
+void ReadRulerWizard::calculate()
+{
+    auto res = diagram.rulerFromMultiTrains(
+        pgInterval->railway(),
+        pgInterval->getIntervals(),
+        pgTrain->trains(),
+        pgConfig->gpMode->get(1)->isChecked(),
+        pgConfig->spStart->value(),
+        pgConfig->spStop->value(),
+        pgConfig->gpFilt->button(2)->isChecked() ? pgConfig->spCutStd->value() : 0,
+        pgConfig->gpFilt->button(1)->isChecked() ? pgConfig->spCutSec->value() : 0,
+        pgConfig->cbPrec->currentData(Qt::UserRole).toInt(),
+        pgConfig->spCutCount->value()
+    );
+    pgPreview->setData(std::move(res), pgInterval->getIntervals());
+}
+
+void ReadRulerWizard::accept()
+{
+    QWizard::accept();
+    //todo
+}
+
+void ReadRulerWizard::reject()
+{
+    if(currentId() > 1){
+        auto flag=QMessageBox::question(this,tr("标尺综合"),
+                                        tr("是否确认退出标尺综合向导？已设置的内容将不会保存。"));
+        if(flag!=QMessageBox::Yes)
+            return;
+    }
+    QWizard::reject();
 }

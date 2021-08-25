@@ -99,6 +99,7 @@ public:
 
     auto* getRulerContext() { return contextRuler; }
     auto* getRailContext() { return contextRail; }
+    auto* getViewCategory() { return catView; }
 
     /**
      * 列车信息变化，更新指定车次的所有运行线

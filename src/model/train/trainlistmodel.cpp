@@ -51,7 +51,6 @@ bool TrainListModel::setData(const QModelIndex& index, const QVariant& value, in
 			Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
 			bool show = (state == Qt::Checked);
 			if (show != t->isShow()) {
-				t->setIsShow(show);
 				emit trainShowChanged(t, show);
 				return true;
 			}
@@ -76,25 +75,25 @@ void TrainListModel::sort(int column, Qt::SortOrder order)
 	auto& lst = coll.trains();
 	if (order == Qt::AscendingOrder) {
 		switch (column) {
-		case ColTrainName:std::sort(lst.begin(), lst.end(), &Train::ltName); break;
-		case ColStarting:std::sort(lst.begin(), lst.end(), &Train::ltStarting); break;
-		case ColTerminal:std::sort(lst.begin(), lst.end(), &Train::ltTerminal); break;
-		case ColType:std::sort(lst.begin(), lst.end(), &Train::ltType); break;
-		case ColShow:std::sort(lst.begin(), lst.end(), &Train::ltShow); break;
-		case ColMile:std::sort(lst.begin(), lst.end(), &Train::ltMile); break;
-		case ColSpeed:std::sort(lst.begin(), lst.end(), &Train::ltTravSpeed); break;
+        case ColTrainName:std::stable_sort(lst.begin(), lst.end(), &Train::ltName); break;
+        case ColStarting:std::stable_sort(lst.begin(), lst.end(), &Train::ltStarting); break;
+        case ColTerminal:std::stable_sort(lst.begin(), lst.end(), &Train::ltTerminal); break;
+        case ColType:std::stable_sort(lst.begin(), lst.end(), &Train::ltType); break;
+        case ColShow:std::stable_sort(lst.begin(), lst.end(), &Train::ltShow); break;
+        case ColMile:std::stable_sort(lst.begin(), lst.end(), &Train::ltMile); break;
+        case ColSpeed:std::stable_sort(lst.begin(), lst.end(), &Train::ltTravSpeed); break;
 		default:break;
 		}
 	}
 	else {
 		switch (column) {
-		case ColTrainName:std::sort(lst.begin(), lst.end(), &Train::gtName); break;
-		case ColStarting:std::sort(lst.begin(), lst.end(), &Train::gtStarting); break;
-		case ColTerminal:std::sort(lst.begin(), lst.end(), &Train::gtTerminal); break;
-		case ColType:std::sort(lst.begin(), lst.end(), &Train::gtType); break;
-		case ColShow:std::sort(lst.begin(), lst.end(), &Train::gtShow); break;
-		case ColMile:std::sort(lst.begin(), lst.end(), &Train::gtMile); break;
-		case ColSpeed:std::sort(lst.begin(), lst.end(), &Train::gtTravSpeed); break;
+        case ColTrainName:std::stable_sort(lst.begin(), lst.end(), &Train::gtName); break;
+        case ColStarting:std::stable_sort(lst.begin(), lst.end(), &Train::gtStarting); break;
+        case ColTerminal:std::stable_sort(lst.begin(), lst.end(), &Train::gtTerminal); break;
+        case ColType:std::stable_sort(lst.begin(), lst.end(), &Train::gtType); break;
+        case ColShow:std::stable_sort(lst.begin(), lst.end(), &Train::gtShow); break;
+        case ColMile:std::stable_sort(lst.begin(), lst.end(), &Train::gtMile); break;
+        case ColSpeed:std::stable_sort(lst.begin(), lst.end(), &Train::gtTravSpeed); break;
 		default:break;
 		}
 	}
@@ -166,11 +165,11 @@ void TrainListModel::onTrainChanged(std::shared_ptr<Train> train)
 void TrainListModel::updateAllMileSpeed()
 {
 	//coll.invalidateAllTempData();
-	emit dataChanged(index(0, ColMile), index(coll.trainCount()-1, ColSpeed));
+	emit dataChanged(index(0, ColMile), index(coll.trainCount() - 1, ColSpeed));
 }
 
-void TrainListModel::commitSetTrainShow(std::shared_ptr<Train> train, bool on)
+void TrainListModel::updateAllTrainShow()
 {
-	//todo...
+	emit dataChanged(index(0, ColShow), index(coll.trainCount() - 1, ColShow));
 }
 

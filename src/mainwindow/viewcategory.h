@@ -44,6 +44,13 @@ public:
     void commitTrainsShow(const QList<std::shared_ptr<TrainLine>>& lines, bool show);
 
     /**
+     * 执行单车次的显示状态变化
+     * seealso: commitTrainsShow
+     * 区别在于不更新TrainList的显示状态。
+     */
+    void commitSingleTrainShow(const QList<std::shared_ptr<TrainLine>>& lines, bool show);
+
+    /**
      * 执行由显示类型设置变化发起的列车显示情况变化。
      * 每条运行线的显示状态都取反
      */
@@ -108,6 +115,11 @@ public slots:
      * 实际执行结束，只负责重新铺图
      */
     void commitConfigChange(Config& cfg, bool repaint);
+
+    /**
+     * 由TrainListModel调起，设置显示状态，操作压栈
+     */
+    void actChangeSingleTrainShow(std::shared_ptr<Train> train, bool show);
 };
 
 
@@ -127,6 +139,23 @@ namespace qecmd {
     public:
         ChangeTrainShow(const QList<std::shared_ptr<TrainLine>>& lines_, bool show_,
             ViewCategory* cat_, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    /**
+     * 单一列车显示状态的变更，主要由TrainListModel那边调起
+     */
+    class ChangeSingleTrainShow :public QUndoCommand
+    {
+        std::shared_ptr<Train> train;
+        bool show;
+        QList<std::shared_ptr<TrainLine>> lines;
+        ViewCategory*const cat;
+    public:
+        ChangeSingleTrainShow(std::shared_ptr<Train> train_, bool show_,
+            const QList<std::shared_ptr<TrainLine>>& lines_, ViewCategory* cat_,
+            QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
     };

@@ -655,6 +655,8 @@ void MainWindow::initToolbar()
     if constexpr (true) {
         auto* cat = ribbon->addCategoryPage(tr("显示"));
         catView = new ViewCategory(this, cat, this);
+        connect(trainListWidget->getModel(), &TrainListModel::trainShowChanged,
+            catView, &ViewCategory::actChangeSingleTrainShow);
     }
 
     //context: page

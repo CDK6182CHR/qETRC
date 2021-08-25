@@ -7,6 +7,7 @@
 class RailCategory;
 class QStandardItemModel;
 class QListView;
+class RailInterval;
 
 /**
  * @brief The ReadRulerPageInterval class

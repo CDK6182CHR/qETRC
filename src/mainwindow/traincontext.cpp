@@ -340,6 +340,8 @@ void TrainContext::commitExchangeTrainInterval(std::shared_ptr<Train> train1, st
 
 void TrainContext::actShowTrainLine()
 {
+	//强制显示列车运行线。如果已经全部显示了也没关系，没有任何效果
+	mw->getViewCategory()->actChangeSingleTrainShow(train, true);
 	emit highlightTrainLine(train);
 }
 

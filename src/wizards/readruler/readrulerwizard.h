@@ -2,6 +2,9 @@
 #include <QWizard>
 
 #include "readrulerpageinterval.h"
+#include "readrulerpagetrain.h"
+#include "readrulerpageconfig.h"
+#include "readrulerpagepreview.h"
 
 class Diagram;
 
@@ -14,10 +17,27 @@ class ReadRulerWizard : public QWizard
     Q_OBJECT;
     Diagram& diagram;
     ReadRulerPageInterval* pgInterval;
+    ReadRulerPageTrain* pgTrain;
+    ReadRulerPageConfig* pgConfig;
+    ReadRulerPagePreview* pgPreview;
 public:
+    enum {
+        PageStart = 0,
+        PageInterval,
+        PageTrain,
+        PageConfig,
+        PagePreview,
+        PageMAX
+    };
     ReadRulerWizard(Diagram& diagram_, QWidget* parent=nullptr);
+    virtual void initializePage(int id)override;
+
 private :
     void initUI();
     void initStartPage();
+    void calculate();
+public slots:
+    virtual void accept()override;
+    virtual void reject()override;
 };
 

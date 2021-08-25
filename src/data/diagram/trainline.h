@@ -69,6 +69,14 @@ class TrainLine:
     using ConstAdaPtr = std::deque<AdapterStation>::const_iterator;
 
 public:
+
+    enum IntervalAttachType {
+        AttachNone = 0b00,
+        AttachStart = 0b01,
+        AttachStop = 0b10,
+        AttachBoth = 0b11
+    };
+
     /**
      * 构造空的运行线，默认显示Item和双标签
      */
@@ -221,6 +229,11 @@ public:
      */
     QString appStringShort(ConstAdaPtr prev, ConstAdaPtr cur)const;
 
+    /**
+     * 所给区间附加情况，始发视作起步。
+     */
+    IntervalAttachType getIntervalAttachType(ConstAdaPtr prev, ConstAdaPtr cur)const;
+
 private:
 
     /**
@@ -312,26 +325,18 @@ private:
     }
 
     /**
-     * @brief getPrevousPassedTime 推定前一站通过的时刻。
+     * @brief getPreviousPassedTime 推定前一站通过的时刻。
      * 用在同向事件表生成时，判定是否有区间越行情况。按照y值计算
      * @param st 跨越区间后的一站。这一站到其前序的区间，包含目标站。保证不是begin()
      * @param target 要推定时刻的目标车站。
      * @return 目标站的时刻，以【毫秒数】表示！！
      */
-    template <typename BidirIter>
-    inline int getPrevousPassedTime(BidirIter st, std::shared_ptr<RailStation> target)const {
-        static constexpr int msecsOfADay = 24 * 3600 * 1000;
-        auto prev = st; --prev;
-        double y0 = prev->railStation.lock()->y_value.value();
-        double yn = st->railStation.lock()->y_value.value();
-        double yi = target->y_value.value();
+    //template <typename BidirIter>
+    int getPreviousPassedTime(ConstAdaPtr st, std::shared_ptr<RailStation> target)const;
+    
 
-        int x0 = prev->trainStation->depart.msecsSinceStartOfDay();
-        int xn = st->trainStation->arrive.msecsSinceStartOfDay();
-
-        if (xn < x0) xn += msecsOfADay;
-        return int(std::round((yi - y0) / (yn - y0) * (xn - x0) + x0)) % msecsOfADay;
-    }
+    int getPreviousPassedTime(std::deque<AdapterStation>::const_reverse_iterator st,
+        std::shared_ptr<RailStation> target)const; 
 
     /**
      * @brief findIntervalIntersectionSameDIr 判断同向区间交点。

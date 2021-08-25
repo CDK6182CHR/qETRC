@@ -56,6 +56,7 @@ SOURCES += \
     src/model/delegate/qetimedelegate.cpp \
     src/model/rail/forbidmodel.cpp \
     src/model/rail/intervaldatamodel.cpp \
+    src/model/train/trainlistreadmodel.cpp \
     src/util/railrulercombo.cpp \
     src/util/selectrailwaycombo.cpp \
     src/util/selecttraincombo.cpp \
@@ -95,7 +96,10 @@ SOURCES += \
     src/viewers/traineventdialog.cpp \
     src/viewers/trainlinedialog.cpp \
     src/viewers/traintimetableplane.cpp \
+    src/wizards/readruler/readrulerpageconfig.cpp \
     src/wizards/readruler/readrulerpageinterval.cpp \
+    src/wizards/readruler/readrulerpagepreview.cpp \
+    src/wizards/readruler/readrulerpagetrain.cpp \
     src/wizards/readruler/readrulerwizard.cpp \
     src/wizards/rulerpaint/conflictdialog.cpp \
     src/wizards/rulerpaint/rulerpaintpagestart.cpp \
@@ -148,6 +152,7 @@ HEADERS += \
     src/model/delegate/qetimedelegate.h \
     src/model/rail/forbidmodel.h \
     src/model/rail/intervaldatamodel.h \
+    src/model/train/trainlistreadmodel.h \
     src/util/railrulercombo.h \
     src/util/selectrailwaycombo.h \
     src/util/selecttraincombo.h \
@@ -190,7 +195,10 @@ HEADERS += \
     src/viewers/traineventdialog.h \
     src/viewers/trainlinedialog.h \
     src/viewers/traintimetableplane.h \
+    src/wizards/readruler/readrulerpageconfig.h \
     src/wizards/readruler/readrulerpageinterval.h \
+    src/wizards/readruler/readrulerpagepreview.h \
+    src/wizards/readruler/readrulerpagetrain.h \
     src/wizards/readruler/readrulerwizard.h \
     src/wizards/rulerpaint/conflictdialog.h \
     src/wizards/rulerpaint/rulerpaintpagestart.h \

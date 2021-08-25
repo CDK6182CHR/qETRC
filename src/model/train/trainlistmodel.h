@@ -56,7 +56,7 @@ public:
 
 signals:
     /**
-     * 此信号通告实际的变化发生
+     * 操作压栈  发送给viewCategory处理
      */
     void trainShowChanged(std::shared_ptr<Train> train, bool show);
 
@@ -111,18 +111,7 @@ public slots:
      */
     void updateAllMileSpeed();
 
-    /**
-     * 实施改变数据操作。实际上就是发射信号
-     */
-    void commitSetTrainShow(std::shared_ptr<Train> train, bool on);
+    void updateAllTrainShow();
 };
 
-namespace qecmd {
-    class ChangeSingleTrainShow :public QUndoCommand
-    {
-        std::shared_ptr<Train> train;
-        bool on;
-        QList<std::shared_ptr<TrainLine>> lines;
-    };
-}
 

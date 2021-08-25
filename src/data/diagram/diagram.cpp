@@ -6,7 +6,7 @@
 
 #include <QFile>
 #include <QJsonObject>
-
+#include <numeric>
 
 SystemJson SystemJson::instance;   //默认构造
 
@@ -339,6 +339,57 @@ SnapEventList Diagram::getSnapEvents(std::shared_ptr<Railway> railway, const QTi
     return res;
 }
 
+
+
+ReadRulerReport Diagram::rulerFromMultiTrains(std::shared_ptr<Railway> railway, 
+    const QVector<std::shared_ptr<RailInterval>> intervals,
+    const QList<std::shared_ptr<Train>> trains,
+    bool useAverage, int defaultStart, int defaultStop, 
+    int cutStd, int cutSec, int prec, int cutCount)
+{
+    ReadRulerReport res;
+    //先直接把要计算的区间都加进去，免得多搞个set
+    foreach(auto p, intervals) {
+        res.insert({ p,{} });
+    }
+    decltype(res.begin()) itr;
+
+    foreach(auto train, trains) {
+        auto adp = train->adapterFor(*railway);
+        if (!adp)continue;
+        foreach(auto line, adp->lines()) {
+            if (line->count() < 2)continue;
+            auto pr = line->stations().begin();
+            for (auto p = std::next(pr); p != line->stations().end(); pr = p, ++p) {
+                if (pr->railStation.lock()->dirAdjacent(line->dir()) ==
+                    p->railStation.lock()) {
+                    // pr->p是合法的区间
+                    auto it = pr->railStation.lock()->dirNextInterval(line->dir());
+                    if ((itr = res.find(it)) != res.end()) {
+                        //此区间是要计算的区间
+                        int secs = qeutil::secsTo(pr->trainStation->depart,
+                            p->trainStation->arrive);
+                        auto att = line->getIntervalAttachType(pr, p);
+                        itr->second.raw.emplace(train, std::make_pair(secs, att));
+                    }
+                }
+            }
+        }
+    }
+
+    for (auto p = res.begin(); p != res.end(); ++p) {
+        __intervalFt(p->second);
+        if (useAverage) {
+            __intervalRulerMean(p->second, defaultStart, defaultStop, 
+                prec, cutStd, cutSec, cutCount);
+        }
+        else {
+            __intervalRulerMode(p->second, defaultStart, defaultStop, prec, cutCount);
+        }
+    }
+    return res;
+}
+
 void Diagram::bindAllTrains()
 {
     for (auto p : railways()) {
@@ -558,6 +609,253 @@ bool Diagram::fromTrc(QTextStream& fin)
 
     return !isNull();   //只要读入了数据，就算成功
 }
+
+void Diagram::__intervalFt(readruler::IntervalReport& itrep)
+{
+    for (auto p = itrep.raw.begin(); p != itrep.raw.end(); ++p) {
+        itrep.types[p->second.second].count[p->second.first]++;
+    }
+}
+
+
+namespace readruler {
+
+    int typeCount(const IntervalTypeCount& cnt) 
+    {
+        return std::accumulate(cnt.begin(), cnt.end(), 0,
+            [](auto x, auto y) { return x + y.second; });
+    }
+
+    /**
+     * pyETRC.Graph.__intervalRulerMean.<lambda>moment()
+     * 计算样本均值和标准差  保证输入非空
+     */
+    std::pair<double, double> moment(const IntervalTypeCount& rep)
+    {
+        if (rep.size() == 1) {
+            return std::make_pair(rep.begin()->first + 0.0, 0.0);
+        }
+        int n = typeCount(rep);
+        double ave = std::accumulate(rep.begin(), rep.end(), 0.0,
+            [](auto x, auto y) {return x + y.first * y.second; }) / n;
+        double s2 = std::accumulate(rep.begin(), rep.end(), 0.0,
+            [=](auto x, auto y) {return x + std::pow(y.first - ave, 2) * y.second; })
+            / (n - 1);
+        return std::make_pair(ave, std::sqrt(s2));
+    }
+
+    /**
+     * pyETRC.data.Graph.__intervalRulerMean.<lambda>furthest
+     * 返回离均值最远的那个数据的迭代器，实际上只能是首末之一。
+     * 保证rep的元素数量大于1.
+     */
+    IntervalTypeCount::iterator furthest(IntervalTypeCount& rep, double ave)
+    {
+        return std::fabs(rep.begin()->first - ave) > std::fabs(rep.rbegin()->first - ave) ?
+            rep.begin() : std::prev(rep.end());
+    }
+
+    using _valCompTy = const std::map<int, int>::value_type&;
+    bool valueCountComp(_valCompTy x, _valCompTy y) {
+        if (x.second == y.second) {
+            return x.first > y.first;
+        }
+        else {
+            return x.second < y.second;
+        }
+    }
+}
+
+void Diagram::__intervalRulerMode(readruler::IntervalReport& itrep,
+    int defaultStart, int defaultStop, int prec, int cutCount)
+{
+    std::map<TrainLine::IntervalAttachType, double> modes;
+    for (auto tp = itrep.types.begin(); tp != itrep.types.end(); ++tp) {
+        auto& tpcnt = tp->second.count;
+        using _ty = std::map<int, int>::value_type;
+        // 所选的数据迭代器  一定存在
+        auto sel = std::max_element(tpcnt.begin(), tpcnt.end(), readruler::valueCountComp);
+        tp->second.value = sel->first;
+        tp->second.tot = sel->first;     //众数模式下的数据量就是最大的那个数据的数据量
+        if (sel->second >= cutCount) {
+            modes.emplace(tp->first, sel->first);
+            tp->second.used = true;
+        }
+        else {
+            tp->second.used = false;
+        }
+    }
+    if (modes.size() == 4) {
+        std::vector<std::pair<int, TrainLine::IntervalAttachType>> tycount;
+        for (auto p = itrep.types.begin(); p != itrep.types.end(); ++p)
+            tycount.emplace_back(p->second.tot, p->first);
+        std::sort(tycount.begin(), tycount.end());
+        if (tycount[0].first != tycount[1].first) {
+            // 最少的那个的数值是唯一的，直接删了就行了
+            modes.erase(tycount[0].second);
+            itrep.types.at(tycount[0].second).used = false;
+        }
+        else {
+            int n = 1; // n 是简并数
+            while (tycount[n].first == tycount[0].first)
+                n++;
+            // 剔除不同数据导致的通通时分的打表
+            std::vector<std::pair<int, TrainLine::IntervalAttachType>> trials;
+            for (int i = 0; i < n; i++) {
+                auto modes_copy = modes;    //copy construct
+                modes_copy.erase(tycount[i].second);
+                trials.emplace_back(
+                    std::get<0>(__computeIntervalRuler(modes_copy, defaultStart, defaultStop, prec)),
+                    tycount[i].second);
+            }
+            auto p = std::min_element(trials.begin(), trials.end());
+            modes.erase(p->second);
+            itrep.types.at(p->second).used = false;
+        }
+    }
+    auto [x, y, z] = __computeIntervalRuler(modes, defaultStart, defaultStop, prec);
+    itrep.interval = x;
+    itrep.start = y;
+    itrep.stop = z;
+}
+
+
+void Diagram::__intervalRulerMean(readruler::IntervalReport& itrep, 
+    int defaultStart, int defaultStop, int prec, 
+    int cutStd, int cutSec, int cutCount)
+{
+    std::map<TrainLine::IntervalAttachType, double> means;   //每种情况的采信数据 
+    for (auto tp = itrep.types.begin(); tp != itrep.types.end(); ++tp) {
+        // 注意：IntervalTypeReport是天然按照数值排列的
+        auto& tpcnt = tp->second.count;
+        if (cutSec) {
+            while (tpcnt.size() > 1) {
+                auto [ave, sigma] = readruler::moment(tpcnt);
+                auto f = readruler::furthest(tpcnt, ave);
+                if (std::abs(f->first - ave) > cutSec) {
+                    tpcnt.erase(f);
+                }
+                else break;
+            }
+        }
+        else if (cutStd) {
+            while (tpcnt.size() > 1) {
+                auto [ave, sigma] = readruler::moment(tpcnt);
+                auto f = readruler::furthest(tpcnt, ave);
+                if (sigma && std::fabs(f->first - ave) / sigma > cutStd) {
+                    tpcnt.erase(f);
+                }
+                else break;
+            }
+        }
+        tp->second.tot = readruler::typeCount(tpcnt);
+        double ave = readruler::moment(tpcnt).first;
+        tp->second.value = ave;
+        
+        //检查各类的最终数据量是否符合要求
+        if (tp->second.tot >= cutCount) {
+            means.emplace(tp->first,ave );
+            tp->second.used = true;
+        }
+        else {
+            tp->second.used = false;
+        }
+    }
+    auto [x, y, z] = __computeIntervalRuler(means, defaultStart, defaultStop, prec);
+    itrep.interval = x;
+    itrep.start = y;
+    itrep.stop = z;
+}
+
+namespace readruler {
+    void getTypeValue(const std::map<TrainLine::IntervalAttachType, double>& values,
+        TrainLine::IntervalAttachType tp, double& v) 
+    {
+        if (auto p = values.find(tp); p != values.end())
+            v = p->second;
+    }
+
+    /**
+     * 根据prec进行类似四舍五入的数值修约
+     */
+    int __round(int value, int prec)
+    {
+        if (value < 0)value = 0;
+        int q = value % prec;
+        if (q == 0)
+            return value;
+        else if (q >= prec / 2)  //int div
+            return value + prec - q;
+        else return value - q;
+    }
+}
+
+std::tuple<int, int, int> 
+    Diagram::__computeIntervalRuler(const std::map<TrainLine::IntervalAttachType, double>& values,
+        int defaultStart, int defaultStop, int prec)
+{
+    double a = 0, b = 0, c = 0, d = 0;
+    double x = 0, y = 0, z = 0;
+    readruler::getTypeValue(values, TrainLine::AttachNone, a);
+    readruler::getTypeValue(values, TrainLine::AttachStart, b);
+    readruler::getTypeValue(values, TrainLine::AttachStop, c);
+    readruler::getTypeValue(values, TrainLine::AttachBoth, d);
+    if (values.size() == 4) {
+        //伪逆求解
+        x = 0.75 * a + 0.25 * b + 0.25 * c - 0.25 * d;
+        y = -0.5 * a + 0.50 * b - 0.50 * c + 0.50 * d;
+        z = -0.5 * a - 0.50 * b + 0.50 * c + 0.50 * d;
+    }
+    else if (values.size() == 3) {
+        // 三个数据，唯一解
+        if (!a) {
+            x = b + c - d; y = -c + d; z = -b + d;
+        }
+        else if (!b) {
+            x = a; y = -c + d; z = -a + c;
+        }
+        else if (!c) {
+            x = a; y = -a + b; z = -b + d;
+        }
+        else {
+            x = a; y = -a + b; z = -a + c;
+        }
+    }
+    else if (values.size() == 2) {
+        if (a) {
+            if (b) {
+                x = a; y = b - a; z = defaultStop;
+            }
+            else if (c) {
+                x = a; y = defaultStart; z = c - a;
+            }
+            else {
+                x = a; y = defaultStart; z = d - a - defaultStart;
+            }
+        }
+        else {  // !a
+            if (!b) {
+                x = c - defaultStop; y = d - c; z = defaultStop;
+            }
+            else if (!c) {
+                x = b - defaultStart; y = defaultStart; z = d - b;
+            }
+            else {
+                x = b - defaultStart; y = defaultStart; z = c - b + defaultStart;
+            }
+        }
+    }
+    else {   // 只有一个数据
+        y = defaultStart; z = defaultStop;
+        if (a) x = a;
+        else if (b) x = b - defaultStart;
+        else if (c) x = c - defaultStop;
+        else x = d - defaultStart - defaultStop;
+    }
+    return std::make_tuple(readruler::__round(x, prec), readruler::__round(y, prec),
+        readruler::__round(z, prec));
+}
+
 
 bool Diagram::readDefaultConfigs(const QString& filename)
 {
