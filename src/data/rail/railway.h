@@ -393,6 +393,17 @@ public:
     std::shared_ptr<Ruler> addRulerFrom(const Ruler& r);
 
     /**
+     * 使用head作为头结点（Ruler对象），从data中添加数据。
+     * 用于undo/redo过程中，保证Ruler地址不变
+     * precondition: head中的数据都是对的，不进行更改
+     */
+    std::shared_ptr<Ruler> restoreRulerFrom(std::shared_ptr<Ruler> head,
+        const Ruler& data);
+
+    std::shared_ptr<Ruler> restoreRulerFrom(std::shared_ptr<Ruler> head,
+        std::shared_ptr<const Ruler> data);
+
+    /**
      * 替代Ruler的构造函数
      * 目前兼容pyETRC 3.3的文件，构造效率比较低
      */

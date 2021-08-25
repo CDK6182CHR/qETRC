@@ -1020,6 +1020,28 @@ TrainLine::IntervalAttachType
     return res;
 }
 
+QString TrainLine::attachTypeString(IntervalAttachType type)
+{
+    QString res;
+    if (type & AttachStart)
+        res += QObject::tr("起");
+    if (type & AttachStop)
+        res += QObject::tr("停");
+    return res;
+}
+
+QString TrainLine::attachTypeStringFull(IntervalAttachType type)
+{
+    QString res;
+    if (type & AttachStart)
+        res += QObject::tr("起");
+    else res += QObject::tr("通");
+    if (type & AttachStop)
+        res += QObject::tr("停");
+    else res += QObject::tr("通");
+    return res;
+}
+
 int TrainLine::passStationPos(ConstAdaPtr st) const
 {
     if (st == _stations.begin()) {

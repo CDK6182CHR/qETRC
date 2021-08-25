@@ -5,6 +5,7 @@
 #include <QList>
 
 #include "data/diagram/diagram.h"
+#include "util/dialogadapter.h"
 
 class QTableView;
 
@@ -26,7 +27,43 @@ public:
     ReadRulerPreviewModel(const ReadRulerReport& data_, 
 		const QVector<std::shared_ptr<RailInterval>>& intervals,
 		QObject* parent=nullptr);
-	void setData();
+	void refreshData();
+};
+
+/**
+ * 计算细节表格
+ */
+class ReadRulerDetailModel : public QStandardItemModel
+{
+public:
+	enum {
+		ColTrainName = 0,
+		ColAttach,
+		ColStd,
+		ColReal,
+		ColDiff,
+		ColDiffAbs,
+		ColMark,
+		ColMAX
+	};
+	ReadRulerDetailModel(QObject* parent = nullptr);
+	void setupModel(std::shared_ptr<RailInterval> railint,
+		const readruler::IntervalReport& itrep, bool useAverage);
+};
+
+class ReadRulerSummaryModel : public QStandardItemModel
+{
+public:
+	enum {
+		ColType = 0,
+		ColValue,
+		ColCount,
+		ColUsed,
+		ColMAX
+	};
+
+	ReadRulerSummaryModel(QObject* parent = nullptr);
+	void setupModel(const readruler::IntervalReport& itrep);
 };
 
 
@@ -40,14 +77,27 @@ class ReadRulerPagePreview : public QWizardPage
     QTableView* table;
 	ReadRulerReport data;
 	QVector<std::shared_ptr<RailInterval>> intervals;
-    friend class ReadRulerWizard;
+	bool useAverage;
+    
+	ReadRulerDetailModel* mdDetail;
+	ReadRulerSummaryModel* mdSummary;
+	QTableView* tbDetail, * tbSummary;
+	DialogAdapter* dlgDetail, * dlgSummary;
+
 public:
     ReadRulerPagePreview(QWidget* parent=nullptr);
 	auto* getModel() { return model; }
 	void setData(ReadRulerReport&& report, 
-		const QVector<std::shared_ptr<RailInterval>>& intervals);
+		const QVector<std::shared_ptr<RailInterval>>& intervals,
+		bool useAverage);
+	auto& getData() { return data; }
 private:
     void initUI();
+
+private slots:
+	void actShowDetail();
+	void actShowSummary();
+	void onDoubleClicked(const QModelIndex& idx);
 };
 
 

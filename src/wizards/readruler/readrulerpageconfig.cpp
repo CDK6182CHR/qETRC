@@ -71,7 +71,7 @@ void ReadRulerPageConfig::initUI()
     chl->addWidget(rd);
     spCutStd=new QSpinBox;
     spCutStd->setRange(1,100000);
-    spCutStd->setValue(30);
+    spCutStd->setValue(2);
     spCutStd->setSuffix(tr(" 倍标准差"));
     spCutStd->setEnabled(false);
     chl->addWidget(spCutStd);

@@ -676,7 +676,7 @@ void Diagram::__intervalRulerMode(readruler::IntervalReport& itrep,
         // 所选的数据迭代器  一定存在
         auto sel = std::max_element(tpcnt.begin(), tpcnt.end(), readruler::valueCountComp);
         tp->second.value = sel->first;
-        tp->second.tot = sel->first;     //众数模式下的数据量就是最大的那个数据的数据量
+        tp->second.tot = sel->second;     //众数模式下的数据量就是最大的那个数据的数据量
         if (sel->second >= cutCount) {
             modes.emplace(tp->first, sel->first);
             tp->second.used = true;
@@ -854,6 +854,26 @@ std::tuple<int, int, int>
     }
     return std::make_tuple(readruler::__round(x, prec), readruler::__round(y, prec),
         readruler::__round(z, prec));
+}
+
+int readruler::IntervalReport::satisfiedCount()const
+{
+    int cnt = 0;
+    for (auto p=raw.begin();p!=raw.end();++p) {
+        if (p->second.first == stdInterval(p->second.second))
+            cnt++;
+    }
+    return cnt;
+}
+
+int readruler::IntervalReport::stdInterval(TrainLine::IntervalAttachType type)const
+{
+    int res = interval;
+    if (type & TrainLine::AttachStart)
+        res += start;
+    if (type & TrainLine::AttachStop)
+        res += stop;
+    return res;
 }
 
 

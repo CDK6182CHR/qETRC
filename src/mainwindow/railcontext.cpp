@@ -636,6 +636,11 @@ void RailContext::actChangeRailName(std::shared_ptr<Railway> rail, const QString
     mw->getUndoStack()->push(new qecmd::ChangeRailName(rail,name,this));
 }
 
+void RailContext::actAddNamedNewRuler(std::shared_ptr<Railway> railway, const QString& name)
+{
+	mw->getUndoStack()->push(new qecmd::AddNewRuler(name, railway, this));
+}
+
 
 qecmd::ChangeRailName::ChangeRailName(std::shared_ptr<Railway> rail_,
 	const QString& name, RailContext* context, QUndoCommand* parent) :
@@ -709,12 +714,12 @@ void qecmd::AddNewRuler::redo()
 {
 	if (!theRuler) {
 		// 第一次执行时，需要新建
-		auto r = railway->addEmptyRuler(name, true);
-		theRuler = r->clone();
-		setText(QObject::tr("新建空白标尺: %1").arg(r->name()));
+		theRuler = railway->addEmptyRuler(name, true);
+		theData = theRuler->clone();
+		setText(QObject::tr("新建空白标尺: %1").arg(theRuler->name()));
 	}
 	else {
-		railway->addRulerFrom(theRuler->getRuler(0));
+		railway->restoreRulerFrom(theRuler, theData->getRuler(0));
 	}
 	cont->commitAddNewRuler(railway->rulers().last());
 }

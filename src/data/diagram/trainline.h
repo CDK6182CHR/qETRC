@@ -234,6 +234,16 @@ public:
      */
     IntervalAttachType getIntervalAttachType(ConstAdaPtr prev, ConstAdaPtr cur)const;
 
+    /**
+     * 附加类型转字符串；不考虑始发终到，不包括“通”
+     */
+    static QString attachTypeString(IntervalAttachType type);
+
+    /**
+     * 附加类型转字符串；不考虑始发终到，包括“通”
+     */
+    static QString attachTypeStringFull(IntervalAttachType type);
+
 private:
 
     /**

@@ -734,6 +734,28 @@ std::shared_ptr<Ruler> Railway::addRulerFrom(const Ruler& r)
 	return ruler;
 }
 
+std::shared_ptr<Ruler> Railway::restoreRulerFrom(std::shared_ptr<Ruler> head, const Ruler& data)
+{
+	int idx = _rulers.count();
+	auto ruler = head;
+	_rulers.append(ruler);
+	auto p = firstDownInterval();
+	auto n = data.firstDownNode();
+	for (; p && n; p = nextIntervalCirc(p), n = n->nextNodeCirc()) {
+		//qDebug() << "addRulerFrom: "<<*p<<'\t' << p->_rulerNodes.last().get() << " @ " << p.get();
+		p->_rulerNodes.append(std::make_shared<RulerNode>(*ruler, *p, n->interval, n->start, n->stop));
+	}
+	if (p || n) {
+		qDebug() << "Railway::addRulerFrom: unexpected early termination!";
+	}
+	return ruler;
+}
+
+std::shared_ptr<Ruler> Railway::restoreRulerFrom(std::shared_ptr<Ruler> head, std::shared_ptr<const Ruler> data)
+{
+	return restoreRulerFrom(head, *data);
+}
+
 std::shared_ptr<Ruler> Railway::addRuler(const QJsonObject& obj)
 {
 	const QString& name = obj.value("name").toString();

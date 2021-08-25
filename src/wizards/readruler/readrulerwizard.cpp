@@ -85,13 +85,48 @@ void ReadRulerWizard::calculate()
         pgConfig->cbPrec->currentData(Qt::UserRole).toInt(),
         pgConfig->spCutCount->value()
     );
-    pgPreview->setData(std::move(res), pgInterval->getIntervals());
+    pgPreview->setData(std::move(res), pgInterval->getIntervals(),
+        pgConfig->gpMode->get(1)->isChecked());
 }
 
 void ReadRulerWizard::accept()
 {
+    auto ruler = pgInterval->ruler();
+    if (!ruler) {
+        //先创建一个标尺
+        auto railway = pgInterval->railway();
+        QString name;
+        do {
+            bool ok;
+            name = QInputDialog::getText(this, tr("标尺名称"),
+                tr("请输入新读取的标尺名称，或点击[取消]以自动命名"), QLineEdit::Normal,
+                {}, &ok);
+            if (!name.isEmpty() && !railway->rulerNameExisted(name))
+                break;
+            else if (!ok) {
+                name = railway->validRulerName(tr("新标尺"));
+                break;
+            }
+            QMessageBox::warning(this, tr("错误"),
+                tr("请输入一个不与现有重复并且非空的有效标尺名称！"));
+        } while (true);
+        emit rulerAdded(railway, name);    // 采用Direct方式连接，保证后面调用时，新加的标尺已经存在
+        ruler = railway->rulers().last();
+    }
+    auto r = ruler->clone();
+    auto nr = r->getRuler(0);
+
+    auto& data = pgPreview->getData();
+    for (auto p = data.begin(); p != data.end(); ++p) {
+        auto it = p->first;
+        auto node = it->getRulerNode(ruler);   //注意这里是直接操作在原标尺上了
+        node->interval = p->second.interval;
+        node->start = p->second.start;
+        node->stop = p->second.stop;
+    }
+    ruler->swap(*nr);
+    emit rulerUpdated(ruler, r);
     QWizard::accept();
-    //todo
 }
 
 void ReadRulerWizard::reject()

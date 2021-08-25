@@ -115,6 +115,7 @@ private slots:
      */
     void actAddNewRuler();
 
+
     /**
      * 更新天窗面板的显示部分
      */
@@ -220,6 +221,11 @@ public slots:
      * 关闭运行图时，同时关闭Ruler和Forbid的Dock
      */
     void removeAllDocks();
+
+    /**
+     * 由标尺综合调用：添加空白的命名标尺
+     */
+    void actAddNamedNewRuler(std::shared_ptr<Railway> railway, const QString& name);
 };
 
 
@@ -305,7 +311,8 @@ namespace qecmd {
         RailContext* const cont;
         QString name;
         std::shared_ptr<Railway> railway;
-        std::shared_ptr<Railway> theRuler{};   //这里保存标尺的数据
+        std::shared_ptr<Ruler> theRuler;      //标尺头结点
+        std::shared_ptr<Railway> theData{};   //这里保存标尺的数据
     public:
         AddNewRuler(const QString& name_, std::shared_ptr<Railway> railway_, RailContext* context, QUndoCommand* parent = nullptr):
             QUndoCommand(parent),name(name_), cont(context), railway(railway_){}

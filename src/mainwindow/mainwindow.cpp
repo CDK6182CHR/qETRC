@@ -967,6 +967,10 @@ void MainWindow::actTrainDiff()
 void MainWindow::actReadRulerWizard()
 {
     auto* wzd = new ReadRulerWizard(_diagram, this);
+    connect(wzd, &ReadRulerWizard::rulerAdded,
+        contextRail, &RailContext::actAddNamedNewRuler, Qt::DirectConnection);
+    connect(wzd, &ReadRulerWizard::rulerUpdated,
+        contextRuler, &RulerContext::actChangeRulerData);
     wzd->show();
 }
 

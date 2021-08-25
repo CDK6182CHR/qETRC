@@ -36,6 +36,10 @@ private :
     void initUI();
     void initStartPage();
     void calculate();
+signals:
+    void rulerAdded(std::shared_ptr<Railway>, const QString& name);
+    void rulerUpdated(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> data);
+
 public slots:
     virtual void accept()override;
     virtual void reject()override;

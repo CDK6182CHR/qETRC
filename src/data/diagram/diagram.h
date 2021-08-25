@@ -84,6 +84,13 @@ namespace readruler {
         std::map<std::shared_ptr<Train>, std::pair<int, TrainLine::IntervalAttachType>> raw;
         std::map<TrainLine::IntervalAttachType, IntervalTypeReport> types;
         bool isValid()const { return interval || start || stop; }
+
+        /**
+         * 计算严格满足标尺的车次总数。
+         */
+        int satisfiedCount()const;
+
+        int stdInterval(TrainLine::IntervalAttachType type)const;
     };
 }
 
