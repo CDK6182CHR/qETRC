@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <cstdint>
-#include <QList>
+#include <QVector>
 #include <QJsonObject>
 #include <QPen>
 #include <list>
@@ -71,7 +71,7 @@ class Train:
      * Train对象持有TrainAdapter的所有权。暂定这些信息不写入JSON
      * 注意：仅考虑数量很少的情况，因此一切查找皆为线性
      */
-    QList<std::shared_ptr<TrainAdapter>> _adapters;
+    QVector<std::shared_ptr<TrainAdapter>> _adapters;
 
     std::weak_ptr<Routing> _routing;
     std::optional<std::list<RoutingNode>::iterator> _routingNode;

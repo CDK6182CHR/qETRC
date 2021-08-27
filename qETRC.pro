@@ -51,6 +51,7 @@ SOURCES += \
     src/editors/forbidwidget.cpp \
     src/editors/railstationwidget.cpp \
     src/editors/routing/addroutingnodedialog.cpp \
+    src/editors/routing/parseroutingdialog.cpp \
     src/editors/routing/routingedit.cpp \
     src/editors/routing/routingwidget.cpp \
     src/editors/ruler/rulertabpy.cpp \
@@ -154,6 +155,7 @@ HEADERS += \
     src/editors/forbidwidget.h \
     src/editors/railstationwidget.h \
     src/editors/routing/addroutingnodedialog.h \
+    src/editors/routing/parseroutingdialog.h \
     src/editors/routing/routingedit.h \
     src/editors/routing/routingwidget.h \
     src/editors/ruler/rulertabpy.h \

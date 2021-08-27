@@ -9,7 +9,7 @@
 class Routing;
 class MainWindow;
 class Diagram;
-
+class QLineEdit;
 
 /**
  * @brief The RoutingContext class
@@ -25,6 +25,8 @@ class RoutingContext : public QObject
     QList<ads::CDockWidget*> routingDocks;
     bool updating = false;
     SARibbonToolButton* btnHighlight;
+
+    QLineEdit* edName;
 public:
     explicit RoutingContext(Diagram& diagram, SARibbonContextCategory* context, MainWindow* mw_);
     auto routing(){return _routing;}
@@ -46,11 +48,15 @@ private slots:
 
     void removeRoutingEdit();
 
+    void actParseText();
+
 public slots:
     void refreshData();
     void refreshAllData();
     void setRouting(std::shared_ptr<Routing> routing);
     void openRoutingEditWidget(std::shared_ptr<Routing> routing);
+    void removeRoutingEditWidget(std::shared_ptr<Routing> routing);
+    void removeRoutingEditWidgetAt(int i);
 
     /**
      * 这时实际的操作。这个操作不需要undo。
@@ -71,6 +77,11 @@ public slots:
     void commitRoutingOrderChange(std::shared_ptr<Routing> routing, 
         QSet<std::shared_ptr<Train>> takenTrains);
 
+    /**
+     * 指定交路被删除
+     * 关闭Widget，focusout，必要时重绘运行线
+     */
+    void onRoutingRemoved(std::shared_ptr<Routing> routing);
 
 };
 
@@ -98,5 +109,7 @@ namespace qecmd {
     private:
         void commit();
     };
+
+
 }
 

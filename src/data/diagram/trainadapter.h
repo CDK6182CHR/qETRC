@@ -1,8 +1,7 @@
 ﻿#pragma once
 
 #include <memory>
-#include <QList>
-#include <list>
+#include <QVector>
 
 #include "data/train/train.h"
 #include "data/rail/railway.h"
@@ -28,7 +27,7 @@ class TrainAdapter
      * Item部分好好考虑，特别是I/O (暂时不实现手动Item的IO)
      * 注意默认的拷贝行为是不正确的
      */
-    QList<std::shared_ptr<TrainLine>> _lines;
+    QVector<std::shared_ptr<TrainLine>> _lines;
 public:
 
     /**

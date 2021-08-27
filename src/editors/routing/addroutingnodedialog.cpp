@@ -70,6 +70,10 @@ void AddRoutingNodeDialog::virtualToggled(bool on)
     cbTrain->setEnabled(!on);
     if (on) {
         onTrainChanged(nullptr);
+        edName->setFocus();
+    }
+    else {
+        cbTrain->focusIn();
     }
 }
 
@@ -106,11 +110,20 @@ void AddRoutingNodeDialog::actApply()
             return;
         }
     }
+    clearPage();
     done(Accepted);
+}
+
+void AddRoutingNodeDialog::clearPage()
+{
+    cbTrain->resetTrain();
+    onTrainChanged(nullptr);
+    edName->clear();
 }
 
 void AddRoutingNodeDialog::openForRow(int row)
 {
     this->row=row;
+    virtualToggled(rdVirtual->isChecked());
     open();
 }

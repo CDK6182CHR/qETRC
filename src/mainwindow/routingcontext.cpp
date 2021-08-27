@@ -2,6 +2,10 @@
 #include "mainwindow.h"
 
 #include "data/train/routing.h"
+#include "editors/routing/parseroutingdialog.h"
+
+#include <QLabel>
+#include <QLineEdit>
 
 RoutingContext::RoutingContext(Diagram &diagram, SARibbonContextCategory *context,
                                MainWindow *mw_):
@@ -16,6 +20,20 @@ void RoutingContext::initUI()
 
     auto* panel=page->addPannel(tr("基本信息"));
 
+    auto* w = new QWidget;
+    auto* vlay = new QVBoxLayout(w);
+
+    auto* lab = new QLabel(tr("当前交路"));
+    vlay->addWidget(lab);
+    lab->setAlignment(Qt::AlignCenter);
+
+    edName = new QLineEdit;
+    edName->setFocusPolicy(Qt::NoFocus);
+    edName->setAlignment(Qt::AlignCenter);
+    edName->setFixedWidth(150);
+    vlay->addWidget(edName);
+    panel->addWidget(w, SARibbonPannelItem::Large);
+
     auto* act = new QAction(QIcon(":/icons/trainline.png"), tr("高亮显示"), this);
     act->setCheckable(true);
     connect(act, &QAction::triggered, this, &RoutingContext::toggleHighlight);
@@ -28,6 +46,13 @@ void RoutingContext::initUI()
     connect(act,SIGNAL(triggered()),this,SLOT(actEdit()));
     btn=panel->addLargeAction(act);
     btn->setMinimumWidth(80);
+
+    panel = page->addPannel(tr("工具"));
+    act = new QAction(QIcon(":/icons/text.png"), tr("文本解析"), this);
+    act->setToolTip(tr("单交路文本解析\n"
+        "输入车次套用的文本，从中解析交路序列，并直接应用于当前交路。"));
+    connect(act, &QAction::triggered, this, &RoutingContext::actParseText);
+    panel->addMediumAction(act);
 }
 
 int RoutingContext::getRoutingWidgetIndex(std::shared_ptr<Routing> routing)
@@ -79,7 +104,9 @@ void RoutingContext::actEdit()
 
 void RoutingContext::refreshData()
 {
-    //todo..
+    if (_routing) {
+        edName->setText(_routing->name());
+    }
 }
 
 void RoutingContext::toggleHighlight(bool on)
@@ -99,6 +126,15 @@ void RoutingContext::removeRoutingEdit()
         routingEdits.removeAt(i);
         dock->deleteDockWidget();
     }
+}
+
+void RoutingContext::actParseText()
+{
+    auto* dialog = new ParseRoutingDialog(_diagram.trainCollection(), true,
+        _routing, mw);
+    connect(dialog, &ParseRoutingDialog::routingParsed, this,
+        &RoutingContext::actRoutingOrderChange);
+    dialog->show();
 }
 
 void RoutingContext::refreshAllData()
@@ -129,7 +165,8 @@ void RoutingContext::openRoutingEditWidget(std::shared_ptr<Routing> routing)
             &RoutingContext::actRoutingInfoChange);
         connect(w, &RoutingEdit::routingOrderChanged, this,
             &RoutingContext::actRoutingOrderChange);
-
+        connect(w, &RoutingEdit::focusInRouting,
+            mw, &MainWindow::focusInRouting);
     }
     else {
         auto dock = routingDocks.at(i);
@@ -140,6 +177,22 @@ void RoutingContext::openRoutingEditWidget(std::shared_ptr<Routing> routing)
             dock->setAsCurrentTab();
         }
     }
+}
+
+void RoutingContext::removeRoutingEditWidget(std::shared_ptr<Routing> routing)
+{
+    for (int i = 0; i < routingEdits.size();) {
+        if (routingEdits.at(i)->getRouting() == routing)
+            removeRoutingEditWidgetAt(i);
+        else i++;
+    }
+}
+
+void RoutingContext::removeRoutingEditWidgetAt(int i)
+{
+    auto* dock = routingDocks.takeAt(i);
+    routingEdits.removeAt(i);
+    dock->deleteDockWidget();
 }
 
 void RoutingContext::onRoutingHighlightChanged(std::shared_ptr<Routing> routing, bool on)
@@ -183,11 +236,25 @@ void RoutingContext::commitRoutingOrderChange(std::shared_ptr<Routing> routing,
     foreach(auto p, takenTrains) {
         mw->repaintTrainLines(p);
     }
+
     if (routing == _routing) {
         refreshData();
     }
     updateRoutingEdit(routing);
     emit routingInfoChanged(routing);
+}
+
+void RoutingContext::onRoutingRemoved(std::shared_ptr<Routing> routing)
+{
+    auto s = routing->trainSet();
+    if (!s.empty()) {
+        mw->repaintTrainLines(s);
+    }
+    removeRoutingEditWidget(routing);
+    if (routing == _routing) {
+        _routing.reset();
+        mw->focusOutRouting();
+    }
 }
 
 
@@ -211,7 +278,7 @@ void qecmd::ChangeRoutingInfo::undo()
 
 qecmd::ChangeRoutingOrder::ChangeRoutingOrder(std::shared_ptr<Routing> routing_, 
     std::shared_ptr<Routing> info_, RoutingContext* context, QUndoCommand* parent):
-    QUndoCommand(QObject::tr("更新交路序列: %1").arg(info_->name())),
+    QUndoCommand(QObject::tr("更新交路序列: %1").arg(info_->name()),parent),
     routing(routing_),data(info_),cont(context)
 {
 }

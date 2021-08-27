@@ -94,6 +94,22 @@ void RoutingCollectionModel::onRoutingInfoChanged(std::shared_ptr<Routing> routi
     emit dataChanged(index(i, ColName), index(i, ColMAX - 1), { Qt::DisplayRole });
 }
 
+void RoutingCollectionModel::addRoutingAt(std::shared_ptr<Routing> routing, int i)
+{
+    beginInsertRows({}, i, i);
+    routing->updateTrainHooks();
+    coll.routings().insert(i, routing);
+    endInsertRows();
+}
+
+void RoutingCollectionModel::removeRoutingAt(int i)
+{
+    beginRemoveRows({}, i, i);
+    auto r = coll.routings().takeAt(i);
+    r->resetTrainHooks();
+    endRemoveRows();
+}
+
 void RoutingCollectionModel::onHighlightChangedByContext(std::shared_ptr<Routing> routing)
 {
     int i= coll.getRoutingIndex(routing);

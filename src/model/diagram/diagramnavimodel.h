@@ -139,6 +139,13 @@ public slots:
      */
     void onRoutingChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight,
         const QVector<int>& roles);
+
+    /**
+     * 交路添加完成后，更新Item信息
+     */
+    void onRoutingInserted(const QModelIndex&, int first, int last);
+
+    void onRoutingRemoved(const QModelIndex&, int first, int last);
 };
 
 

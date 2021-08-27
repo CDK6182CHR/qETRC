@@ -2,6 +2,7 @@
 
 #include "viewers/traineventdialog.h"
 #include "mainwindow.h"
+#include "viewcategory.h"
 #include "data/train/train.h"
 #include "viewers/trainlinedialog.h"
 #include "viewers/rulerrefdialog.h"
@@ -295,7 +296,7 @@ void TrainContext::commitTimetableChange(std::shared_ptr<Train> train, std::shar
 {
 	//以前的adapters，拿出来做删除的索引
 	//注意不能用引用，因为后面数据会被搞掉
-	QList<std::shared_ptr<TrainAdapter>> adps = std::move(train->adapters());
+	QVector<std::shared_ptr<TrainAdapter>> adps = std::move(train->adapters());
 	train->swapTimetable(*table);
 	diagram.updateTrain(train);
 	updateTrainWidget(train);
@@ -305,7 +306,7 @@ void TrainContext::commitTimetableChange(std::shared_ptr<Train> train, std::shar
 
 void TrainContext::afterTimetableChanged(std::shared_ptr<Train> train)
 {
-	QList<std::shared_ptr<TrainAdapter>> adps = std::move(train->adapters());
+	QVector<std::shared_ptr<TrainAdapter>> adps = std::move(train->adapters());
 	diagram.updateTrain(train);
 	updateTrainWidget(train);
 	mw->updateTrainLines(train, std::move(adps));

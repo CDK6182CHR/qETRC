@@ -43,6 +43,11 @@ public:
      */
     void setTrain(std::shared_ptr<Train> train);
 
+    /**
+     * 清空输入，不发射信号
+     */
+    void resetTrain();
+
 private :
     void initUI();
     void addTrainItem(std::shared_ptr<Train> t);
@@ -59,5 +64,6 @@ private slots:
     void onIndexChanged(int i);
 public slots:
     void setEnabled(bool on);
+    void focusIn();
 };
 

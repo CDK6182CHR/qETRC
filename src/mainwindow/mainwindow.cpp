@@ -20,6 +20,14 @@
 #include "viewers/traindiffdialog.h"
 #include "wizards/readruler/readrulerwizard.h"
 
+
+#include "traincontext.h"
+#include "railcontext.h"
+#include "viewcategory.h"
+#include "pagecontext.h"
+#include "rulercontext.h"
+#include "routingcontext.h"
+
 #include "version.h"
 
 #include "SARibbonBar.h"
@@ -262,11 +270,13 @@ void MainWindow::showAboutDialog()
 void MainWindow::useWpsStyle()
 {
     ribbonBar()->setRibbonStyle(SARibbonBar::WpsLiteStyle);
+    SystemJson::instance.ribbon_style = SARibbonBar::WpsLiteStyle;
 }
 
 void MainWindow::useOfficeStyle()
 {
     ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);
+    SystemJson::instance.ribbon_style = SARibbonBar::OfficeStyle;
 }
 
 void MainWindow::actRulerPaint()
@@ -376,7 +386,7 @@ void MainWindow::initDockWidgets()
 
     // 交路管理
     if constexpr (true) {
-        auto* rw = new RoutingWidget(_diagram.trainCollection());
+        auto* rw = new RoutingWidget(_diagram.trainCollection(), undoStack);
         dock = new ads::CDockWidget(tr("交路管理"));
         dock->setWidget(rw);
         manager->addDockWidget(ads::LeftDockWidgetArea, dock);
@@ -388,6 +398,10 @@ void MainWindow::initDockWidgets()
             this, &MainWindow::focusInRouting);
         connect(rw->getModel(), &RoutingCollectionModel::dataChanged,
             naviModel, &DiagramNaviModel::onRoutingChanged);
+        connect(rw->getModel(), &RoutingCollectionModel::rowsInserted,
+            naviModel, &DiagramNaviModel::onRoutingInserted);
+        connect(rw->getModel(), &RoutingCollectionModel::rowsRemoved,
+            naviModel, &DiagramNaviModel::onRoutingRemoved);
     }
 }
 
@@ -767,6 +781,10 @@ void MainWindow::initToolbar()
             routingWidget->getModel(), &RoutingCollectionModel::onHighlightChangedByContext);
         connect(contextRouting, &RoutingContext::routingInfoChanged,
             routingWidget->getModel(), &RoutingCollectionModel::onRoutingInfoChanged);
+        connect(routingWidget, &RoutingWidget::nonEmptyRoutingAdded,
+            this, &MainWindow::repaintRoutingTrainLines);
+        connect(routingWidget, &RoutingWidget::routingRemoved,
+            contextRouting, &RoutingContext::onRoutingRemoved);
     }
 
     //ApplicationMenu的初始化放在最后，因为可能用到前面的..
@@ -774,7 +792,8 @@ void MainWindow::initToolbar()
     connect(ribbon->applicationButton(), SIGNAL(clicked()), this,
         SLOT(actPopupAppButton()));
 
-    ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
+    ribbon->setRibbonStyle(
+        static_cast<SARibbonBar::RibbonStyle>(SystemJson::instance.ribbon_style));
 }
 
 void MainWindow::initAppMenu()
@@ -1157,6 +1176,7 @@ void MainWindow::setRoutingHighlight(std::shared_ptr<Routing> routing, bool on)
             w->highlightRouting(routing);
         }
     }
+
     else {
         foreach(auto * w, diagramWidgets) {
             w->unhighlightRouting(routing);
@@ -1165,7 +1185,8 @@ void MainWindow::setRoutingHighlight(std::shared_ptr<Routing> routing, bool on)
 
 }
 
-void MainWindow::updateTrainLines(std::shared_ptr<Train> train, QList<std::shared_ptr<TrainAdapter>>&& adps)
+void MainWindow::updateTrainLines(std::shared_ptr<Train> train, 
+    QVector<std::shared_ptr<TrainAdapter>>&& adps)
 {
     for (auto p : diagramWidgets) {
         p->updateTrain(train, std::move(adps));
@@ -1376,6 +1397,21 @@ void MainWindow::focusInRouting(std::shared_ptr<Routing> routing)
 void MainWindow::focusOutRouting()
 {
     ribbonBar()->hideContextCategory(contextRouting->context());
+}
+
+void MainWindow::repaintRoutingTrainLines(std::shared_ptr<Routing> routing)
+{
+    for (const auto& p : routing->order()) {
+        if (!p.isVirtual()) {
+            repaintTrainLines(p.train());
+        }
+    }
+}
+void MainWindow::repaintTrainLines(const QSet<std::shared_ptr<Train>> trains)
+{
+    foreach(auto p, trains) {
+        repaintTrainLines(p);
+    }
 }
 
 

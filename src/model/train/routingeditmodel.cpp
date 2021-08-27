@@ -52,8 +52,17 @@ bool RoutingEditModel::getAppliedOrder(std::shared_ptr<Routing> res)
                         "参见第[%3]行。").arg(i + 1).arg(train->trainName().full()).arg(prev + 1));
                 return false;
             }
-            //现在可以放心添加
             res->appendTrainSimple(train, link);
+            if (int idx = res->trainNameIndexLinear(res->order().back().name());
+                idx >= 0 && idx < res->count() - 1) {
+                // 车次重复
+                QMessageBox::warning(par, tr("错误"),
+                    tr("第[%1]行：车次名[%2]已经在本次交路编辑中添加过了，不能重复添加。"
+                        "参见第[%3]行。\n"
+                        "注：无论是否为虚拟车次，交路的车次名不能重复。").arg(i + 1)
+                    .arg(res->order().back().name()).arg(idx + 1));
+                return false;
+            }
         }
     }
     return true;
@@ -122,11 +131,13 @@ void RoutingEditModel::insertRealRow(int row, std::shared_ptr<Train> train, bool
 {
     insertRow(row);
     setRealRow(row, train, link);
+    emit routingInserted(row);
 }
 
 void RoutingEditModel::insertVirtualRow(int row, const QString& name, bool link)
 {
     insertRow(row);
     setVirtualRow(row, name, link);
+    emit routingInserted(row);
 }
 

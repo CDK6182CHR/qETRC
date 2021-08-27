@@ -253,6 +253,8 @@ namespace navi {
         virtual int childCount()const override {return static_cast<int>(_routings.size()) ;}
         virtual QString data(int i)const override;
         virtual int type()const override {return Type;}
+        void onRoutingInsertedAt(int first,int last);
+        void onRoutingRemovedAt(int first,int last);
     };
 
     class RoutingItem: public AbstractComponentItem

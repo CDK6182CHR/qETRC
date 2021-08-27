@@ -199,7 +199,7 @@ void DiagramWidget::removeTrain(const Train& train)
         _selectedTrain.reset();
 }
 
-void DiagramWidget::removeTrain(QList<std::shared_ptr<TrainAdapter>>&& adps)
+void DiagramWidget::removeTrain(QVector<std::shared_ptr<TrainAdapter>>&& adps)
 {
     for (auto adp : adps) {
         for (auto p : adp->lines()) {
@@ -212,7 +212,8 @@ void DiagramWidget::removeTrain(QList<std::shared_ptr<TrainAdapter>>&& adps)
     }
 }
 
-void DiagramWidget::updateTrain(std::shared_ptr<Train> train, QList<std::shared_ptr<TrainAdapter>>&& adps)
+void DiagramWidget::updateTrain(std::shared_ptr<Train> train, 
+    QVector<std::shared_ptr<TrainAdapter>>&& adps)
 {
     removeTrain(std::move(adps));
     paintTrain(train);

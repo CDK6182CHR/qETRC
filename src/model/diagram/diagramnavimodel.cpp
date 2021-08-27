@@ -342,5 +342,23 @@ void DiagramNaviModel::onRoutingChanged(const QModelIndex& topLeft,
         index(bottomRight.row(), navi::DiagramItem::ColMaxNumber - 1, par), roles);
 }
 
+void DiagramNaviModel::onRoutingInserted(const QModelIndex&, int first, int last)
+{
+    auto&& par = index(navi::DiagramItem::RowRoutings, 0);
+    beginInsertRows(par, first, last);
+    auto* item = static_cast<navi::RoutingListItem*>(par.internalPointer());
+    item->onRoutingInsertedAt(first, last);
+    endInsertRows();
+}
+
+void DiagramNaviModel::onRoutingRemoved(const QModelIndex&, int first, int last)
+{
+    auto&& par = index(navi::DiagramItem::RowRoutings, 0);
+    beginRemoveRows(par, first, last);
+    auto* item = static_cast<navi::RoutingListItem*>(par.internalPointer());
+    item->onRoutingRemovedAt(first, last);
+    endRemoveRows();
+}
+
 
 

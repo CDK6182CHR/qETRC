@@ -352,6 +352,35 @@ QString navi::RoutingListItem::data(int i) const
     }
 }
 
+void navi::RoutingListItem::onRoutingInsertedAt(int first, int last)
+{
+    int cnt=last-first+1;
+    auto p=_routings.begin();
+    std::advance(p,first);
+    for(int i=0;i<cnt;i++){
+        p=_routings.emplace(p,std::make_unique<RoutingItem>(coll.routingAt(i+first),
+                                                            i+first,this));
+        ++p;
+    }
+    //现在p指向第一个要更新行数的item
+    for(;p!=_routings.end();++p){
+        (*p)->setRow((*p)->row()+cnt);
+    }
+}
+
+void navi::RoutingListItem::onRoutingRemovedAt(int first, int last)
+{
+    int cnt=last-first+1;
+    auto p=_routings.begin();
+    std::advance(p,first);
+    for(int i=0;i<cnt;i++){
+        p=_routings.erase(p);
+    }
+    for(;p!=_routings.end();++p){
+        (*p)->setRow((*p)->row()-cnt);
+    }
+}
+
 navi::RoutingItem::RoutingItem(std::shared_ptr<Routing> routing,
                                int row, RoutingListItem *parent):
     AbstractComponentItem(row,parent),_routing(routing)

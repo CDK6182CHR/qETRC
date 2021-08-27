@@ -89,14 +89,14 @@ public:
      * 注意对adp只允许使用其中TrainLine的地址信息，用作删除索引。
      * 右值引用，强调xvalue语义
      */
-    void removeTrain(QList<std::shared_ptr<TrainAdapter>>&& adps);
+    void removeTrain(QVector<std::shared_ptr<TrainAdapter>>&& adps);
 
     /**
      * 当指定列车时刻更新时调用。
      * 暂定为先删除再重新铺画
      * adps作为旧运行线的索引,xvalue语义
      */
-    void updateTrain(std::shared_ptr<Train>, QList<std::shared_ptr<TrainAdapter>>&& adps);
+    void updateTrain(std::shared_ptr<Train>, QVector<std::shared_ptr<TrainAdapter>>&& adps);
 
     /**
      * 在列车没有重新执行绑定的情况下，重新铺画

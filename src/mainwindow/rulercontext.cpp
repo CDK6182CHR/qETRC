@@ -1,5 +1,6 @@
 ﻿#include "rulercontext.h"
 #include "mainwindow.h"
+#include "railcontext.h"
 
 #include "dialogs/rulerfromtraindialog.h"
 

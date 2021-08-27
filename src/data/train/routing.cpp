@@ -2,6 +2,8 @@
 #include "data/train/traincollection.h"
 
 #include <algorithm>
+#include <QVector>
+#include <QString>
 
 
 void RoutingNode::setName(const QString &name)
@@ -94,6 +96,15 @@ void Routing::updateTrainHooks()
     }
 }
 
+void Routing::resetTrainHooks()
+{
+    for (auto p = _order.begin(); p != _order.end(); ++p) {
+        if (!p->isVirtual()) {
+            p->train()->resetRoutingSimple();
+        }
+    }
+}
+
 void Routing::swapOrder(Routing& other)
 {
     std::swap(_order, other._order);
@@ -134,6 +145,70 @@ void Routing::swap(Routing& other)
 {
     swapBase(other);
     swapOrder(other);
+}
+
+void Routing::parse(TrainCollection& coll, const QString& str, const QString& splitter,
+    bool fullOnly, QString& report, const Routing* ignore)
+{
+    static const QVector<QString> initSplitters{ "-","~","—","～" };
+    auto sp = splitter;
+    if (sp.isEmpty()) {
+        foreach(const auto & t, initSplitters) {
+            if (str.contains(t)) {
+                sp = t; break;
+            }
+        }
+
+    }
+    //都不包含，选第一个
+    if (sp.isEmpty()) sp = initSplitters.at(0);
+    auto names = str.split(sp);
+    foreach(const auto & _t, names) {
+        QString t = _t.simplified();
+        if (t.isEmpty())
+            continue;
+        parseTrainName(coll, t, fullOnly, report, ignore);
+    }
+}
+
+void Routing::parseTrainName(TrainCollection& coll, const QString& t, 
+    bool fullOnly, QString& report, const Routing* ignore)
+{
+    if (int idx = trainNameIndexLinear(t); idx != -1) {
+        report.append(QObject::tr("[ERROR] 车次[%1]已存在于本交路第[%2]位，不予添加\n")
+            .arg(t).arg(idx + 1));
+    }
+    else {
+        auto train = coll.findFullName(t);
+        if (!train && !fullOnly) {
+            train = coll.findFirstSingleName(t);
+        }
+        if (train) {
+            //找到车次，判定是否属于其他交路
+            if (auto idx = trainIndexLinear(train); idx != -1) {
+                report.append(QObject::tr("[ERROR] 车次[%1]已经在本次识别中添加到第%2位，"
+                    "不能重复添加。\n").arg(train->trainName().full()).arg(idx + 1));
+            }
+            else if (train->hasRouting() && train->routing().lock().get() != ignore) {
+                report.append(QObject::tr("[WARNING] 车次[%1]已经属于交路[%2]，"
+                    "设置为虚拟车次。\n").arg(train->trainName().full())
+                    .arg(train->routing().lock()->name()));
+                appendVirtualTrain(train->trainName().full(), true);
+            }
+            else {
+                //实体车次添加成功
+                report.append(QObject::tr("[INFO] 车次[%1]成功识别为实体车次。\n")
+                    .arg(train->trainName().full()));
+                appendTrainSimple(train, true);
+            }
+        }
+        else {
+            //找不到车次
+            report.append(QObject::tr("[WARNING] 找不到车次[%1]，设置为虚拟车次。\n")
+                .arg(t));
+            appendVirtualTrain(t, true);
+        }
+    }
 }
 
 #undef ATTR_SWAP
@@ -379,7 +454,17 @@ int Routing::trainIndexLinear(std::shared_ptr<Train> train) const
 {
     int i = 0;
     for (auto p = _order.begin(); p != _order.end(); ++p, ++i) {
-        if (p->train() == train)
+        if (!p->isVirtual()&& p->train() == train)
+            return i;
+    }
+    return -1;
+}
+
+int Routing::trainNameIndexLinear(const QString& trainName) const
+{
+    int i = 0;
+    for (auto p = _order.begin(); p != _order.end(); ++p, ++i) {
+        if (p->name() == trainName)
             return i;
     }
     return -1;

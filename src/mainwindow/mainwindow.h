@@ -24,12 +24,14 @@
 
 #include "DockManager.h"
 
-#include "traincontext.h"
-#include "railcontext.h"
-#include "viewcategory.h"
-#include "pagecontext.h"
-#include "rulercontext.h"
-#include "routingcontext.h"
+
+class RoutingContext;
+class RulerContext;
+class PageContext;
+class ViewCategory;
+class RailContext;
+class TrainContext;
+class QSpinBox;
 
 /**
  * @brief The MainWindow class
@@ -73,6 +75,7 @@ class MainWindow : public SARibbonMainWindow
     friend class ViewCategory;
     friend class PageContext;
     friend class RailContext;
+    friend class RoutingContext;
 
     bool changed = false;
 
@@ -111,7 +114,8 @@ public:
      * adps: 旧的Adapter，用来做索引删除以前的运行线
      * 右值引用似乎不能作为slot，因此不做slot
      */
-    void updateTrainLines(std::shared_ptr<Train> train, QList<std::shared_ptr<TrainAdapter>>&& adps);
+    void updateTrainLines(std::shared_ptr<Train> train,
+        QVector<std::shared_ptr<TrainAdapter>>&& adps);
 
     /**
      * 在不进行重新绑定的情况下，更新列车运行线
@@ -372,6 +376,16 @@ public slots:
     void applyChangeStationName(const ChangeStationNameData& data);
 
     void setRoutingHighlight(std::shared_ptr<Routing> routing, bool on);
+
+    /**
+     * 交路信息变化时，重新铺画交路内所有车次运行线
+     */
+    void repaintRoutingTrainLines(std::shared_ptr<Routing> routing);
+
+    /**
+     * 重绘一组车次的运行线。主要也是交路变更时使用。
+     */
+    void repaintTrainLines(const QSet<std::shared_ptr<Train>> trains);
 
 };
 

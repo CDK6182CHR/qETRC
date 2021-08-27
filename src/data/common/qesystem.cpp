@@ -54,6 +54,7 @@ void SystemJson::fromJson(const QJsonObject& obj)
     default_file = obj.value("default_file").toString(default_file);
     table_row_height = obj.value("table_row_height").toInt(table_row_height);
     show_train_tooltip = obj.value("show_train_tooltip").toBool(show_train_tooltip);
+    ribbon_style = obj.value("ribbon_style").toInt(1);
 
     const QJsonArray& arhis = obj.value("history").toArray();
     for (const auto& p : arhis) {
@@ -69,6 +70,7 @@ QJsonObject SystemJson::toJson() const
     return QJsonObject{
         {"last_file",last_file},
         {"default_file",default_file},
+        {"ribbon_style",ribbon_style},
         {"history",ar},
         {"table_row_height",table_row_height},
         {"show_train_tooltip",show_train_tooltip}

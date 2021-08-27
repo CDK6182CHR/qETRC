@@ -210,6 +210,7 @@
     <ClCompile Include="src\editors\forbidwidget.cpp" />
     <ClCompile Include="src\editors\railstationwidget.cpp" />
     <ClCompile Include="src\editors\routing\addroutingnodedialog.cpp" />
+    <ClCompile Include="src\editors\routing\parseroutingdialog.cpp" />
     <ClCompile Include="src\editors\routing\routingedit.cpp" />
     <ClCompile Include="src\editors\routing\routingwidget.cpp" />
     <ClCompile Include="src\editors\ruler\rulertabpy.cpp" />
@@ -304,6 +305,7 @@
     <QtMoc Include="src\model\train\routingeditmodel.h" />
     <QtMoc Include="src\mainwindow\routingcontext.h" />
     <QtMoc Include="src\editors\routing\addroutingnodedialog.h" />
+    <QtMoc Include="src\editors\routing\parseroutingdialog.h" />
     <ClInclude Include="src\viewers\traindiffdialog.h" />
     <QtMoc Include="src\wizards\readruler\readrulerpageinterval.h" />
     <QtMoc Include="src\wizards\readruler\readrulerwizard.h" />

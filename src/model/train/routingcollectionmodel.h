@@ -48,5 +48,15 @@ public slots:
      */
     void onHighlightChangedByContext(std::shared_ptr<Routing> routing);
     void onRoutingInfoChanged(std::shared_ptr<Routing> routing);
+
+    /**
+     * 插入交路到指定位置，同时与train进行关联。
+     */
+    void addRoutingAt(std::shared_ptr<Routing> routing, int i);
+
+    /**
+     * 删除指定行的交路（实际从coll中删除），并且解除与train的关联。
+     */
+    void removeRoutingAt(int i);
 };
 

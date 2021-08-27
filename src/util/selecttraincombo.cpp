@@ -53,6 +53,14 @@ void SelectTrainCombo::setTrain(std::shared_ptr<Train> train)
     }
 }
 
+void SelectTrainCombo::resetTrain()
+{
+    matched.clear();
+    cbTrains->clear();
+    _train.reset();
+    edName->clear();
+}
+
 void SelectTrainCombo::initUI()
 {
     edName=new QLineEdit;
@@ -99,15 +107,21 @@ void SelectTrainCombo::onEditingFinished()
 
 void SelectTrainCombo::onIndexChanged(int i)
 {
-    if (i>=0 && i<matched.size()){
-        if(_train!=matched.at(i)){
-            _train=matched.at(i);
+    if (i >= 0 && i < matched.size()) {
+        if (_train != matched.at(i)) {
+            _train = matched.at(i);
             emit currentTrainChanged(_train);
         }
-    }else{
-        qDebug()<<"SelectTrainCombo::onIndexChanged: WARNING: invalid index "
-                <<i<<Qt::endl;
     }
+    else {
+        //qDebug()<<"SelectTrainCombo::onIndexChanged: WARNING: invalid index "
+        //        <<i<<Qt::endl;
+    }
+}
+
+void SelectTrainCombo::focusIn()
+{
+    edName->setFocus();
 }
 
 void SelectTrainCombo::setEnabled(bool on)

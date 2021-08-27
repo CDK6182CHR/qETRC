@@ -36,6 +36,7 @@ private slots:
     void virtualToggled(bool on);
     void onTrainChanged(std::shared_ptr<Train> train);
     void actApply();
+    void clearPage();
 public slots:
     void openForRow(int row);
 };

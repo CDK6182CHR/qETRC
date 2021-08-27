@@ -20,7 +20,6 @@ void RoutingEdit::refreshData()
     if(!routing)return;
     refreshBasicData();
     model->refreshData();
-    table->resizeColumnsToContents();
 }
 
 void RoutingEdit::refreshBasicData()
@@ -29,6 +28,15 @@ void RoutingEdit::refreshBasicData()
     edModel->setText(routing->model());
     edOwner->setText(routing->owner());
     edNote->setText(routing->note());
+}
+
+bool RoutingEdit::event(QEvent* e)
+{
+    if (e->type() == QEvent::WindowActivate && routing) {
+        emit focusInRouting(routing);
+        return true;
+    }
+    return QWidget::event(e);
 }
 
 void RoutingEdit::initUI()
@@ -53,6 +61,14 @@ void RoutingEdit::initUI()
     table->setModel(model);
     table->setEditTriggers(QTableView::NoEditTriggers);
     vlay->addWidget(table);
+    connect(model, &RoutingEditModel::routingInserted,
+        this, &RoutingEdit::rowInserted);
+
+    // 列宽手动给定
+    int r = 0;
+    for (int i : {140, 40, 80, 80, 40}) {
+        table->setColumnWidth(r++, i);
+    }
 
     vlay->addWidget(new QLabel(tr("备注或说明")));
     edNote=new QTextEdit;
@@ -158,6 +174,11 @@ void RoutingEdit::actApply()
 void RoutingEdit::actCancel()
 {
     refreshData();
+}
+
+void RoutingEdit::rowInserted(int row)
+{
+    table->setCurrentIndex(model->index(row, 0));
 }
 
 

@@ -1,5 +1,6 @@
 ﻿#include "railcontext.h"
 #include "mainwindow.h"
+#include "rulercontext.h"
 
 #include "viewers/sectioncountdialog.h"
 #include "dialogs/selectrailstationdialog.h"

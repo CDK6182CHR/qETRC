@@ -19,6 +19,8 @@ public:
 
     bool show_train_tooltip = true;
 
+    int ribbon_style = 1;
+
     //todo: dock show..
 
     /**

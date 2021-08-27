@@ -197,6 +197,11 @@ public:
      */
     int trainIndexLinear(std::shared_ptr<Train> train)const;
 
+    /**
+     * 线性查找车次；虚拟、实体都查找
+     */
+    int trainNameIndexLinear(const QString& trainName)const;
+
 
     /**
      * 仅仅是维护状态。这个状态不写入文件。
@@ -224,6 +229,12 @@ public:
     void updateTrainHooks();
 
     /**
+     * 删除列车中指向自身的引用。
+     * 用于删除（撤销添加）交路的操作。
+     */
+    void resetTrainHooks();
+
+    /**
      * 交换套跑次序信息
      * 暂定直接交换；RoutingNode的地址会变化
      * 注意没有更新列车的所有权 （列车中对交路的反向指针不变！！）
@@ -248,5 +259,19 @@ public:
     QSet<std::shared_ptr<Train>> takenTrains(const Routing& previous)const;
 
     void swap(Routing& other);
+
+    bool empty()const { return _order.empty(); }
+
+    /**
+     * 解析字符串，然后附加到最后。
+     */
+    void parse(TrainCollection& coll, const QString& str, const QString& splitter,
+        bool fullOnly, QString& report, const Routing* ignore);
+
+    /**
+     * 用在解析字符串以及识别车次中，识别指定的单个车次
+     */
+    void parseTrainName(TrainCollection& coll, const QString& name, bool fullOnly,
+        QString& report, const Routing* ignore);
 };
 

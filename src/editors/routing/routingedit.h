@@ -35,6 +35,7 @@ public:
     auto* getModel(){return model;}
     void refreshData();
     void refreshBasicData();
+    virtual bool event(QEvent* e)override;
 private:
     void initUI();
 
@@ -47,6 +48,8 @@ signals:
      */
     void routingOrderChanged(std::shared_ptr<Routing> routing, std::shared_ptr<Routing> info);
 
+    void focusInRouting(std::shared_ptr<Routing>);
+
 private slots:
     void actAddBefore();
     void actAddAfter();
@@ -58,6 +61,7 @@ private slots:
     void actDetect();
     void actApply();
     void actCancel();
+    void rowInserted(int row);
 
 };
 
