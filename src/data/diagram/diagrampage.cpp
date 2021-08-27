@@ -124,6 +124,28 @@ void DiagramPage::unhighlightTrainItems(const Train& train)
     }
 }
 
+void DiagramPage::highlightTrainItemsWithLink(const Train& train)
+{
+    for (auto adp : train.adapters()) {
+        for (auto p : adp->lines()) {
+            if (_itemMap.contains(p.get())) {
+                _itemMap.value(p.get())->highlightWithLink();
+            }
+        }
+    }
+}
+
+void DiagramPage::unhighlightTrainItemsWithLink(const Train& train)
+{
+    for (auto adp : train.adapters()) {
+        for (auto p : adp->lines()) {
+            if (_itemMap.contains(p.get())) {
+                _itemMap.value(p.get())->unhighlightWithLink();
+            }
+        }
+    }
+}
+
 QList<QGraphicsRectItem*>& DiagramPage::dirForbidItem(const Forbid* forbid, Direction dir)
 {
     return dir == Direction::Down ?

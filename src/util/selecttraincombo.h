@@ -57,5 +57,7 @@ signals:
 private slots:
     void onEditingFinished();
     void onIndexChanged(int i);
+public slots:
+    void setEnabled(bool on);
 };
 

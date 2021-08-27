@@ -2,9 +2,9 @@
 
 #include <QDialog>
 #include <QStandardItemModel>
-
+#include <vector>
+#include <utility>
 #include "data/diagram/diagram.h"
-
 
 
 

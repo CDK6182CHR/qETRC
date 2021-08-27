@@ -34,7 +34,7 @@ class TrainItem : public QGraphicsItem
     QGraphicsPathItem* startLabelItem = nullptr, * endLabelItem = nullptr;
     QGraphicsSimpleTextItem* startLabelText = nullptr, * endLabelText = nullptr;
     QGraphicsRectItem* startRect = nullptr, * endRect = nullptr;
-    bool _isHighlighted = false;
+    bool _isHighlighted = false, _linkHighlighted = false;
     bool _startAtThis, _endAtThis;
 
     QPointF startPoint, endPoint;
@@ -101,6 +101,8 @@ public:
 
     void highlight();
     void unhighlight();
+    void highlightWithLink();
+    void unhighlightWithLink();
 
     virtual bool contains(const QPointF& f)const override;
 

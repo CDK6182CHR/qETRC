@@ -13,48 +13,7 @@
 #include "data/diagram/trainline.h"
 #include "diagrampage.h"
 
-
-/**
- * PyETRC中system.json 默认配置文件的抽象
- */
-class SystemJson {
-public:
-    static constexpr int history_count = 20;
-    static SystemJson instance;
-
-    QString last_file;
-    QString default_file = "sample.pyetgr";
-    int table_row_height = 25;
-
-    bool show_train_tooltip = true;
-
-    //todo: dock show..
-
-    /**
-     * 新增  历史记录  从front加，back出
-     */
-    QList<QString> history;
-
-    void saveFile();
-
-    /**
-     * 添加历史记录文件；同时记录为上一次的文件
-     */
-    void addHistoryFile(const QString& name);
-
-    ~SystemJson();
-
-private:
-    /**
-     * 构造函数直接读文件
-     */
-    SystemJson();
-
-    void fromJson(const QJsonObject& obj);
-
-    QJsonObject toJson()const;
-};
-
+#include "data/common/qesystem.h"
 
 class Train;
 class Railway;
@@ -306,24 +265,24 @@ public:
      * 2021.07.25  pyETRC风格的车站时刻表
      * 按照列车组织，给出每一列车的到点、开点等信息。注意只包含图定，不包含推断时刻
      */
-    QList<QPair<std::shared_ptr<TrainLine>, const AdapterStation*>>
+    std::vector<std::pair<std::shared_ptr<TrainLine>, const AdapterStation*>>
         stationTrainsSettled(std::shared_ptr<Railway> railway, 
             std::shared_ptr<RailStation> st)const;
 
     /**
      * 2021.08.01  基于事件的车站时刻表
      */
-    QList<QPair<std::shared_ptr<TrainLine>, RailStationEvent>>
+    std::vector<std::pair<std::shared_ptr<TrainLine>, RailStationEvent>>
         stationEvents(std::shared_ptr<Railway> railway,
             std::shared_ptr<const RailStation> st)const;
 
-    using SectionEventList = QList<QPair<std::shared_ptr<TrainLine>, QTime>>;
+    using SectionEventList = std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>>;
 
     /**
      * 2021.08.05  区间某个位置的事件表  
      * 注意入参为纵坐标，不是里程标！
      */
-    QList<QPair<std::shared_ptr<TrainLine>, QTime>>
+    SectionEventList
         sectionEvents(std::shared_ptr<Railway> railway, double y)const;
 
     SnapEventList getSnapEvents(std::shared_ptr<Railway> railway, const QTime& time)const;

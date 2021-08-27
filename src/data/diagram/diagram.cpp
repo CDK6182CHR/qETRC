@@ -8,79 +8,6 @@
 #include <QJsonObject>
 #include <numeric>
 
-SystemJson SystemJson::instance;   //默认构造
-
-void SystemJson::saveFile()
-{
-    static const QString filename = "system.json";
-    QFile file(filename);
-    file.open(QFile::WriteOnly);
-    if (!file.isOpen()) {
-        qDebug() << "SystemJson::saveFile: WARNING: open file " << filename << " failed." << Qt::endl;
-        return;
-    }
-    QJsonDocument doc(toJson());
-    file.write(doc.toJson());
-    file.close();
-}
-
-void SystemJson::addHistoryFile(const QString& name)
-{
-    history.removeAll(name);
-    if (history.size() >= history_count)
-        history.pop_back();
-    history.push_front(name);
-    last_file = name;
-}
-
-SystemJson::~SystemJson()
-{
-    saveFile();
-}
-
-SystemJson::SystemJson()
-{
-    static const QString filename = "system.json";
-    QFile file(filename);
-    file.open(QFile::ReadOnly);
-    if (!file.isOpen()) {
-        qDebug() << "SystemJson::SystemJson: WARNING: system configuration file " << filename <<
-            " not read. Use default." << Qt::endl;
-        return;
-    }
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-    fromJson(doc.object());
-    file.close();
-}
-
-void SystemJson::fromJson(const QJsonObject& obj)
-{
-    last_file = obj.value("last_file").toString();
-    default_file = obj.value("default_file").toString(default_file);
-    table_row_height = obj.value("table_row_height").toInt(table_row_height);
-    show_train_tooltip = obj.value("show_train_tooltip").toBool(show_train_tooltip);
-
-    const QJsonArray& arhis = obj.value("history").toArray();
-    for (const auto& p : arhis) {
-        history.append(p.toString());
-    }
-}
-
-QJsonObject SystemJson::toJson() const
-{
-    QJsonArray ar;
-    for (const auto& p : history)
-        ar.append(p);
-    return QJsonObject{
-        {"last_file",last_file},
-        {"default_file",default_file},
-        {"history",ar},
-        {"table_row_height",table_row_height},
-        {"show_train_tooltip",show_train_tooltip}
-    };
-}
-
-
 
 void Diagram::addRailway(std::shared_ptr<Railway> rail)
 {
@@ -251,24 +178,25 @@ std::map<std::shared_ptr<RailInterval>, int> Diagram::sectionTrainCount(std::sha
     return res;
 }
 
-QList<QPair<std::shared_ptr<TrainLine>, const AdapterStation*>> 
+std::vector<std::pair<std::shared_ptr<TrainLine>, const AdapterStation*>> 
 Diagram::stationTrainsSettled(std::shared_ptr<Railway> railway,
     std::shared_ptr<RailStation> st) const
 {
-    QList<QPair<std::shared_ptr<TrainLine>, const AdapterStation*>> res;
+    std::vector<std::pair<std::shared_ptr<TrainLine>, const AdapterStation*>> res;
     foreach(auto train , _trainCollection.trains()) {
         foreach (auto adp , train->adapters()) {
             if (adp->isInSameRailway(railway)) {
                 for (auto line : adp->lines()) {
                     auto* p = line->stationFromRail(st);
                     if (p) {
-                        res.append(qMakePair(line, p));
+                        //res.append(qMakePair(line, p));
+                        res.emplace_back(line, p);
                     }
                 }
             }
         }
     }
-    using PR = QPair<std::shared_ptr<TrainLine>, const AdapterStation*>;
+    using PR = std::pair<std::shared_ptr<TrainLine>, const AdapterStation*>;
     //默认按照到达时刻排序  注意这里按照绝对时刻排序就好
     std::sort(res.begin(), res.end(), [](const PR& p1, const PR& p2) {
         return p1.second->trainStation->arrive <
@@ -277,46 +205,46 @@ Diagram::stationTrainsSettled(std::shared_ptr<Railway> railway,
     return res;
 }
 
-QList<QPair<std::shared_ptr<TrainLine>, RailStationEvent>> 
+std::vector<std::pair<std::shared_ptr<TrainLine>, RailStationEvent>> 
     Diagram::stationEvents(std::shared_ptr<Railway> railway, 
         std::shared_ptr<const RailStation> st) const
 {
-    QList<QPair<std::shared_ptr<TrainLine>, RailStationEvent>> res;
-    for (auto train : _trainCollection.trains()) {
-        for (auto adp : train->adapters()) {
+    std::vector<std::pair<std::shared_ptr<TrainLine>, RailStationEvent>> res;
+    foreach (auto train , _trainCollection.trains()) {
+        foreach (auto adp , train->adapters()) {
             if (adp->isInSameRailway(railway)) {
-                for (auto line : adp->lines()) {
+                foreach (auto line , adp->lines()) {
                     const auto& lst = line->stationEventFromRail(st);
                     for (auto p = lst.begin(); p != lst.end(); ++p) {
-                        res.append(qMakePair(line, *p));
+                        res.emplace_back(line, *p);
                     }
                 }
             }
         }
     }
-    using PR = QPair<std::shared_ptr<TrainLine>, RailStationEvent>;
+    using PR = std::pair<std::shared_ptr<TrainLine>, RailStationEvent>;
     std::sort(res.begin(), res.end(), [](const PR& p1, const PR& p2) {
         return p1.second.time < p2.second.time;
         });
     return res;
 }
 
-QList<QPair<std::shared_ptr<TrainLine>, QTime>> Diagram::sectionEvents(std::shared_ptr<Railway> railway, double y) const
+std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>> Diagram::sectionEvents(std::shared_ptr<Railway> railway, double y) const
 {
-    QList<QPair<std::shared_ptr<TrainLine>, QTime>> res;
+    SectionEventList res;
     for (auto train : _trainCollection.trains()) {
         for (auto adp : train->adapters()) {
             if (adp->isInSameRailway(railway)) {
                 for (auto line : adp->lines()) {
                     auto t = line->sectionTime(y);
                     if (t.has_value()) {
-                        res.append(qMakePair(line, t.value()));
+                        res.emplace_back(line, t.value());
                     }
                 }
             }
         }
     }
-    using PR = QPair<std::shared_ptr<TrainLine>, QTime>;
+    using PR = std::pair<std::shared_ptr<TrainLine>, QTime>;
     std::sort(res.begin(), res.end(), [](const PR& p1, const PR& p2) {
         return p1.second< p2.second;
         });
@@ -597,7 +525,8 @@ bool Diagram::fromTrc(QTextStream& fin)
     
     using PR = QPair<int, std::shared_ptr<Train>>;
     for (auto p = rout_map.begin(); p != rout_map.end(); ++p) {
-        auto rt = std::make_shared<Routing>(_trainCollection);
+        auto rt = std::make_shared<Routing>();
+        rt->setName(p.key());
         std::stable_sort(p.value().begin(), p.value().end(), [](const PR& p1, const PR& p2) {
             return p1.first < p2.first;
             });

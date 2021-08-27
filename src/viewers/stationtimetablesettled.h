@@ -3,8 +3,14 @@
 #include <QDialog>
 #include <QCheckBox>
 #include <QTableView>
+#include <vector>
+#include <utility>
 
-#include "data/diagram/diagram.h"
+class Diagram;
+class Railway;
+class RailStation;
+class TrainLine;
+struct AdapterStation;
 
 class StationTimetableSettledModel:
         public QStandardItemModel
@@ -12,7 +18,7 @@ class StationTimetableSettledModel:
     Diagram& diagram;
     std::shared_ptr<Railway> rail;
     std::shared_ptr<RailStation> station;
-    QList<QPair<std::shared_ptr<TrainLine>,const AdapterStation*>> lst;
+    std::vector<std::pair<std::shared_ptr<TrainLine>,const AdapterStation*>> lst;
 public:
     enum{
         ColTrainName=0,

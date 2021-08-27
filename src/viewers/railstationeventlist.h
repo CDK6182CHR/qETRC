@@ -6,16 +6,20 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <functional>
+#include <vector>
+#include <utility>
 
-#include "data/rail/rail.h"
-#include "data/diagram/diagram.h"
+#include "data/diagram/trainevents.h"
+class Diagram;
+class Railway;
+class RailStation;
 
 class RailStationEventListModel:public QStandardItemModel
 {
     Diagram& diagram;
     std::shared_ptr<Railway> rail;
     std::shared_ptr<RailStation> station;
-    QList<QPair<std::shared_ptr<TrainLine>, RailStationEvent>> lst;
+    std::vector<std::pair<std::shared_ptr<TrainLine>, RailStationEvent>> lst;
 public:
     enum {
         ColTrainName = 0,

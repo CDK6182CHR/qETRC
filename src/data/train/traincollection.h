@@ -70,6 +70,7 @@ public:
     const auto& routings()const { return _routings; }
     auto& typeCount() { return _typeCount; }
     const auto& typeCount()const { return _typeCount; }
+    auto routingAt(int i) { return _routings.at(i); }
 
     /**
      * @brief appendTrain 添加车次
@@ -177,7 +178,7 @@ public:
 
     inline bool isNull()const { return _trains.isEmpty(); }
 
-    bool routingNameExisted(const QString& name)const;
+    bool routingNameExisted(const QString& name, std::shared_ptr<Routing> ignore = {})const;
 
     QString validRoutingName(const QString& prefix);
 
@@ -188,6 +189,11 @@ public:
      * 线性查找
      */
     int getTrainIndex(std::shared_ptr<Train> train)const;
+
+    /**
+     * 指定交路的序号，线性查找
+     */
+    int getRoutingIndex(std::shared_ptr<const Routing> routing)const;
 
     TrainName validTrainFullName(const QString& prefix)const;
 

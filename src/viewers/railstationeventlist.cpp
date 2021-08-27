@@ -4,6 +4,8 @@
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"
 
+#include "data/diagram/diagram.h"
+
 RailStationEventListModel::RailStationEventListModel(Diagram& diagram, const std::shared_ptr<Railway>& rail, const std::shared_ptr<RailStation>& station, QObject* parent) : QStandardItemModel(parent),
 diagram(diagram),
 rail(rail),

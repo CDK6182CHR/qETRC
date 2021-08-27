@@ -332,5 +332,15 @@ void DiagramNaviModel::onRulerNameChanged(std::shared_ptr<const Ruler> ruler)
     emit dataChanged(idxruler, idxruler);
 }
 
+void DiagramNaviModel::onRoutingChanged(const QModelIndex& topLeft, 
+    const QModelIndex& bottomRight, const QVector<int>& roles)
+{
+    if (!roles.contains(Qt::DisplayRole))
+        return;
+    auto&& par = index(navi::DiagramItem::RowRoutings, 0);
+    emit dataChanged(index(topLeft.row(), 0, par),
+        index(bottomRight.row(), navi::DiagramItem::ColMaxNumber - 1, par), roles);
+}
+
 
 

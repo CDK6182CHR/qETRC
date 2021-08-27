@@ -24,28 +24,29 @@ void RailSectionEventsModel::setY(double y)
 
 void RailSectionEventsModel::setupModel()
 {
-    using SI=QStandardItem;
-    lst=diagram.sectionEvents(railway,y);
+    using SI = QStandardItem;
+    lst = diagram.sectionEvents(railway, y);
 
     beginResetModel();
     setRowCount(lst.size());
-    for(int i=0;i<lst.size();i++){
-        const auto& p=lst.at(i);
-        auto line=p.first;
-        auto train=line->train();
-        setItem(i,ColTrainName,new SI(train->trainName().full()));
-        setItem(i,ColTime,new SI(p.second.toString("hh:mm:ss")));
-        setItem(i,ColType,new SI(train->type()->name()));
+    for (int i = 0; i < lst.size(); i++) {
+        const auto& p = lst.at(i);
+        auto line = p.first;
+        auto train = line->train();
+        setItem(i, ColTrainName, new SI(train->trainName().full()));
+        setItem(i, ColTime, new SI(p.second.toString("hh:mm:ss")));
+        setItem(i, ColType, new SI(train->type()->name()));
         setItem(i, ColDir, new SI(DirFunc::dirToString(line->dir())));
-        setItem(i,ColStarting,new SI(train->starting().toSingleLiteral()));
-        setItem(i,ColTerminal,new SI(train->terminal().toSingleLiteral()));
-        if(train->hasRouting()){
-            auto rt=train->routing().lock();
-            setItem(i,ColModel,new SI(rt->model()));
-            setItem(i,ColOwner,new SI(rt->owner()));
-        }else{
-            setItem(i,ColModel,new SI("-"));
-            setItem(i,ColOwner,new SI("-"));
+        setItem(i, ColStarting, new SI(train->starting().toSingleLiteral()));
+        setItem(i, ColTerminal, new SI(train->terminal().toSingleLiteral()));
+        if (train->hasRouting()) {
+            auto rt = train->routing().lock();
+            setItem(i, ColModel, new SI(rt->model()));
+            setItem(i, ColOwner, new SI(rt->owner()));
+        }
+        else {
+            setItem(i, ColModel, new SI("-"));
+            setItem(i, ColOwner, new SI("-"));
         }
     }
     endResetModel();

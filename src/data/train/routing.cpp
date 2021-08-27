@@ -33,6 +33,111 @@ QString RoutingNode::toString() const
     return res;
 }
 
+bool RoutingNode::operator==(const RoutingNode& other) const
+{
+    if (_virtual != other._virtual || _link != other._link)
+        return false;
+    if (_virtual) {
+        return _name == other._name;
+    }
+    else {
+        return _train == other._train;
+    }
+}
+
+bool RoutingNode::operator!=(const RoutingNode& other) const
+{
+    return !operator==(other);
+}
+
+void Routing::setHighlight(bool on)
+{
+    _highlighted = on;
+}
+
+std::shared_ptr<Routing> Routing::copyBase() const
+{
+    auto res = std::make_shared<Routing>();
+    res->_name = _name;
+    res->_model = _model;
+    res->_owner = _owner;
+    res->_note = _note;
+    res->_highlighted = _highlighted;
+    return res;
+}
+
+#define ATTR_SWAP(__name) std::swap(__name,other.__name);
+
+void Routing::swapBase(Routing& other)
+{
+    ATTR_SWAP(_name);
+    ATTR_SWAP(_model);
+    ATTR_SWAP(_owner);
+    ATTR_SWAP(_note);
+    //ATTR_SWAP(_highlighted);
+}
+
+bool Routing::baseEqual(const Routing& other) const
+{
+    return _name == other._name &&
+        _model == other._model &&
+        _owner == other._owner &&
+        _note == other._note;
+}
+
+void Routing::updateTrainHooks()
+{
+    for (auto p = _order.begin(); p != _order.end(); ++p) {
+        if (!p->isVirtual()) {
+            p->train()->setRoutingSimple(shared_from_this(), p);
+        }
+    }
+}
+
+void Routing::swapOrder(Routing& other)
+{
+    std::swap(_order, other._order);
+}
+
+bool Routing::orderEqual(const Routing& other) const
+{
+    if (_order.size() != other._order.size())
+        return false;
+    for (auto p1 = _order.begin(), p2 = other._order.begin();
+        p1 != _order.end(); ++p1, ++p2) {
+        if (p1->operator!=(*p2))
+            return false;
+    }
+    return true;
+}
+
+QSet<std::shared_ptr<Train>> Routing::trainSet() const
+{
+    QSet<std::shared_ptr<Train>> res;
+    for (const auto& p : _order) {
+        if (!p.isVirtual()) {
+            res.insert(p.train());
+        }
+    }
+    return res;
+}
+
+QSet<std::shared_ptr<Train>> Routing::takenTrains(const Routing& previous) const
+{
+    auto s1 = previous.trainSet();
+    auto s2 = trainSet();
+    s1 -= s2;
+    return s1;
+}
+
+void Routing::swap(Routing& other)
+{
+    swapBase(other);
+    swapOrder(other);
+}
+
+#undef ATTR_SWAP
+
 RoutingNode::RoutingNode(const QString &name, bool link):
     _name(name),_virtual(true),_link(link)
 {
@@ -80,29 +185,25 @@ const QString &RoutingNode::name() const
     return _virtual?_name:_train->trainName().full();
 }
 
-Routing::Routing(TrainCollection& coll):
-    _coll(coll)
-{
-}
 
-Routing& Routing::operator=(Routing&& other) noexcept
-{
-    _order = std::move(other._order);
-    _name = std::move(other._name);
-    _note = std::move(other._note);
-    _model = std::move(other._model);
-    _owner = std::move(other._owner);
-    //安全起见，检查一下
-    for (auto p =_order.begin();p!=_order.end();++p) {
-        if (!p->isVirtual()) {
-            qDebug() << "Routing::operator=: WARNING: Unexpected non-virtual node: "
-                << p->name() << " in " << _name << Qt::endl;
-        }
-    }
-    return *this;
-}
+//Routing& Routing::operator=(Routing&& other) noexcept
+//{
+//    _order = std::move(other._order);
+//    _name = std::move(other._name);
+//    _note = std::move(other._note);
+//    _model = std::move(other._model);
+//    _owner = std::move(other._owner);
+//    //安全起见，检查一下
+//    for (auto p =_order.begin();p!=_order.end();++p) {
+//        if (!p->isVirtual()) {
+//            qDebug() << "Routing::operator=: WARNING: Unexpected non-virtual node: "
+//                << p->name() << " in " << _name << Qt::endl;
+//        }
+//    }
+//    return *this;
+//}
 
-void Routing::fromJson(const QJsonObject& obj)
+void Routing::fromJson(const QJsonObject& obj, TrainCollection& coll)
 {
     _name = obj.value("name").toString();
     _note = obj.value("note").toString();
@@ -120,7 +221,7 @@ void Routing::fromJson(const QJsonObject& obj)
             appendVirtualTrain(obn.value("checi").toString(), link);
         }
         else {
-            appendTrainFromName(obn.value("checi").toString(), link);
+            appendTrainFromName(obn.value("checi").toString(), link, coll);
         }
     }
 }
@@ -150,7 +251,13 @@ bool Routing::appendTrain(std::shared_ptr<Train> train, bool link)
     return true;
 }
 
-bool Routing::appendTrainFromName(const QString& trainName, bool link)
+void Routing::appendTrainSimple(std::shared_ptr<Train> train, bool link)
+{
+    _order.emplace_back(train, link);
+}
+
+bool Routing::appendTrainFromName(const QString& trainName, bool link, 
+    TrainCollection& _coll)
 {
     auto t = _coll.findFullName(trainName);
     if (!t) {
@@ -267,3 +374,15 @@ int Routing::trainIndex(std::shared_ptr<Train> train) const
     }
     return -1;
 }
+
+int Routing::trainIndexLinear(std::shared_ptr<Train> train) const
+{
+    int i = 0;
+    for (auto p = _order.begin(); p != _order.end(); ++p, ++i) {
+        if (p->train() == train)
+            return i;
+    }
+    return -1;
+}
+
+

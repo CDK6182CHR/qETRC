@@ -3,6 +3,7 @@
 
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"
+#include "data/diagram/diagram.h"
 
 StationTimetableSettledModel::StationTimetableSettledModel(
         Diagram& dia,

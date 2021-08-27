@@ -4,7 +4,8 @@ navi::DiagramItem::DiagramItem(Diagram& diagram) :
 	AbstractComponentItem(0), _diagram(diagram),
 	railList(std::make_unique<RailwayListItem>(diagram, this)),
 	pageList(std::make_unique<PageListItem>(diagram, this)),
-	trainList(std::make_unique<TrainListItem>(diagram.trainCollection(), this))
+    trainList(std::make_unique<TrainListItem>(diagram.trainCollection(), this)),
+    routingList(std::make_unique<RoutingListItem>(diagram.trainCollection(),this))
 {
 }
 
@@ -14,6 +15,7 @@ navi::AbstractComponentItem* navi::DiagramItem::child(int i)
 	case RowRailways:return railList.get();
 	case RowPages:return pageList.get();
 	case RowTrains:return trainList.get();
+    case RowRoutings:return routingList.get();
 	default:return nullptr;
 	}
 }
@@ -29,7 +31,7 @@ navi::RailwayListItem::RailwayListItem(Diagram& diagram, DiagramItem* parent):
 
 navi::AbstractComponentItem* navi::RailwayListItem::child(int i)
 {
-	if (i >= 0 && i < _rails.size())
+    if (i >= 0 && i < (int) _rails.size())
 		return _rails.at(i).get();
 	return nullptr;
 }
@@ -82,14 +84,14 @@ navi::PageListItem::PageListItem(Diagram& diagram, DiagramItem* parent):
 	AbstractComponentItem(1,parent),_diagram(diagram)
 {
 	int row = 0;
-	for (auto p: _diagram.pages()) {
+    foreach (auto p, _diagram.pages()) {
 		_pages.emplace_back(std::make_unique<PageItem>(p, row++, this));
 	}
 }
 
 navi::AbstractComponentItem* navi::PageListItem::child(int i)
 {
-	if (i >= 0 && i < _pages.size())
+    if (i >= 0 && i < (int) _pages.size())
 		return _pages.at(i).get();
 	return nullptr;
 }
@@ -107,7 +109,7 @@ void navi::PageListItem::resetChildren()
 {
     _pages.clear();
     int row=0;
-    for(auto p:_diagram.pages()){
+    foreach(auto p, _diagram.pages()){
         _pages.emplace_back(std::make_unique<PageItem>(p,row++,this));
     }
 }
@@ -219,7 +221,7 @@ navi::TrainListItem::TrainListItem(TrainCollection& coll, DiagramItem* parent):
 	AbstractComponentItem(2,parent),_coll(coll)
 {
 	int row = 0;
-	for (auto p : _coll.trains()) {
+    foreach (auto p , _coll.trains()) {
 		_trains.emplace_back(std::make_unique<TrainModelItem>(p, row++, this));
 	}
 }
@@ -237,7 +239,7 @@ void navi::TrainListItem::resetChildren()
 {
 	_trains.clear();   //删除child
 	int row = 0;
-	for (auto p : _coll.trains()) {
+    foreach (auto p , _coll.trains()) {
 		_trains.emplace_back(std::make_unique<TrainModelItem>(p, row++, this));
     }
 }
@@ -323,6 +325,46 @@ QString navi::ForbidItem::data(int i) const
 {
     switch (i){
     case ColItemName: return QObject::tr("%1天窗").arg(_forbid->name());
+    default:return {};
+    }
+}
+
+navi::RoutingListItem::RoutingListItem(TrainCollection &coll_, DiagramItem *parent):
+    AbstractComponentItem(3, parent),coll(coll_)
+{
+    int row=0;
+    foreach(auto p, coll.routings()){
+        _routings.emplace_back(std::make_unique<RoutingItem>(p,row++,this));
+    }
+}
+
+navi::AbstractComponentItem *navi::RoutingListItem::child(int i)
+{
+    return _routings.at(i).get();
+}
+
+QString navi::RoutingListItem::data(int i) const
+{
+    switch(i){
+    case ColItemName: return QObject::tr("交路");
+    case ColItemNumber:return QString::number(_routings.size());
+    default:return {};
+    }
+}
+
+navi::RoutingItem::RoutingItem(std::shared_ptr<Routing> routing,
+                               int row, RoutingListItem *parent):
+    AbstractComponentItem(row,parent),_routing(routing)
+{
+
+}
+
+QString navi::RoutingItem::data(int i) const
+{
+    switch(i){
+    case ColItemName:return _routing->name();
+    case ColItemNumber:return QString::number(_routing->count());
+    case ColDescription:return _routing->orderString();
     default:return {};
     }
 }

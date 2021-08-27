@@ -573,12 +573,24 @@ void Train::setRouting(std::weak_ptr<Routing> rout, std::list<RoutingNode>::iter
     //这里如果用shared_from_this会出错，不知道为什么
 }
 
+void Train::setRoutingSimple(std::weak_ptr<Routing> rout, std::list<RoutingNode>::iterator node)
+{
+    _routing=rout;
+    _routingNode=node;
+}
+
 void Train::resetRouting()
 {
     if (_routingNode.has_value()) {
         _routingNode.value()->makeVirtual();
         _routingNode.reset();
     }
+    _routing.reset();
+}
+
+void Train::resetRoutingSimple()
+{
+    _routingNode.reset();
     _routing.reset();
 }
 

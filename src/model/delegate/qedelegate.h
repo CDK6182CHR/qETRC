@@ -13,6 +13,8 @@ enum {
     TrainLineRole,
     RailStationRole,
     RulerNodeRole,
+    TrainRole,
+    BoolDataRole,
 };
 }
 

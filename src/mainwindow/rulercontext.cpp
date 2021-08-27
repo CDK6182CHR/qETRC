@@ -29,7 +29,7 @@ void RulerContext::refreshAllData()
 
 void RulerContext::initUI()
 {
-    auto* page = cont->addCategoryPage(tr("标尺"));
+    auto* page = cont->addCategoryPage(tr("标尺管理"));
     auto* panel = page->addPannel(tr("当前标尺"));
 
     auto* ed = new QLineEdit;

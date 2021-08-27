@@ -44,6 +44,7 @@ namespace navi {
 	class RailwayListItem;
 	class PageListItem;
 	class TrainListItem;
+    class RoutingListItem;
 
 	/**
 	 * @brief The DiagramItem class 运行图结点，也就是根节点 （可能不会显示）
@@ -55,6 +56,7 @@ namespace navi {
 		std::unique_ptr<RailwayListItem> railList;
 		std::unique_ptr<PageListItem> pageList;
 		std::unique_ptr<TrainListItem> trainList;
+        std::unique_ptr<RoutingListItem> routingList;
 
 	public:
 		enum { Type = 1 };
@@ -62,6 +64,7 @@ namespace navi {
 			RowRailways = 0,
 			RowPages,
 			RowTrains,
+            RowRoutings,
 			MaxDiagramRows
 		};
 		DiagramItem(Diagram& diagram);
@@ -236,6 +239,33 @@ namespace navi {
         inline virtual int type()const override {return Type;}
         inline auto forbid(){return _forbid;}
         inline auto railway(){return _railway;}
+    };
+
+    class RoutingItem;
+    class RoutingListItem: public AbstractComponentItem
+    {
+        TrainCollection& coll;
+        std::deque<std::unique_ptr<RoutingItem>> _routings;
+    public:
+        enum {Type=10};
+        RoutingListItem(TrainCollection& coll_, DiagramItem* parent);
+        virtual AbstractComponentItem* child(int i)override;
+        virtual int childCount()const override {return static_cast<int>(_routings.size()) ;}
+        virtual QString data(int i)const override;
+        virtual int type()const override {return Type;}
+    };
+
+    class RoutingItem: public AbstractComponentItem
+    {
+        std::shared_ptr<Routing> _routing;
+    public:
+        enum {Type=11};
+        RoutingItem(std::shared_ptr<Routing> routing, int row, RoutingListItem* parent);
+        virtual AbstractComponentItem* child(int)override {return nullptr;}
+        virtual int childCount()const override{return 0;}
+        virtual QString data(int i)const override;
+        virtual int type()const override {return Type;}
+        auto routing()const{return _routing;}
     };
 
 }

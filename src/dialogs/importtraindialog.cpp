@@ -139,7 +139,7 @@ void ImportTrainDialog::actApply()
         bool coverRouting = rdRouting->get(1)->isChecked();
         for (auto routing : other.routings()) {
             //有反向引用，必须创建新对象
-            auto newRouting = std::make_shared<Routing>(coll);
+            auto newRouting = std::make_shared<Routing>();
             //Move。注意此时原来交路的所有Node都应该为虚拟
             newRouting->operator=(std::move(*routing));
             newRouting->setName(coll.validRoutingName(newRouting->name()));

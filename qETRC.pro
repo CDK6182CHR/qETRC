@@ -15,6 +15,7 @@ include(../site-packages/ads/ads.pri)
 INCLUDEPATH += src
 
 SOURCES += \
+    src/data/common/qesystem.cpp \
     src/data/common/stationname.cpp \
     src/data/diagram/config.cpp \
     src/data/diagram/diagram.cpp \
@@ -49,13 +50,19 @@ SOURCES += \
     src/editors/configdialog.cpp \
     src/editors/forbidwidget.cpp \
     src/editors/railstationwidget.cpp \
+    src/editors/routing/addroutingnodedialog.cpp \
+    src/editors/routing/routingedit.cpp \
+    src/editors/routing/routingwidget.cpp \
     src/editors/ruler/rulertabpy.cpp \
     src/editors/ruler/rulerwidget.cpp \
+    src/mainwindow/routingcontext.cpp \
     src/model/delegate/generaldoublespindelegate.cpp \
     src/model/delegate/generalspindelegate.cpp \
     src/model/delegate/qetimedelegate.cpp \
     src/model/rail/forbidmodel.cpp \
     src/model/rail/intervaldatamodel.cpp \
+    src/model/train/routingcollectionmodel.cpp \
+    src/model/train/routingeditmodel.cpp \
     src/model/train/trainlistreadmodel.cpp \
     src/util/railrulercombo.cpp \
     src/util/selectrailwaycombo.cpp \
@@ -109,6 +116,7 @@ SOURCES += \
 
 HEADERS += \
     src/data/common/direction.h \
+    src/data/common/qesystem.h \
     src/data/common/stationname.h \
     src/data/diagram/config.h \
     src/data/diagram/diagram.h \
@@ -145,13 +153,19 @@ HEADERS += \
     src/editors/configdialog.h \
     src/editors/forbidwidget.h \
     src/editors/railstationwidget.h \
+    src/editors/routing/addroutingnodedialog.h \
+    src/editors/routing/routingedit.h \
+    src/editors/routing/routingwidget.h \
     src/editors/ruler/rulertabpy.h \
     src/editors/ruler/rulerwidget.h \
+    src/mainwindow/routingcontext.h \
     src/model/delegate/generaldoublespindelegate.h \
     src/model/delegate/generalspindelegate.h \
     src/model/delegate/qetimedelegate.h \
     src/model/rail/forbidmodel.h \
     src/model/rail/intervaldatamodel.h \
+    src/model/train/routingcollectionmodel.h \
+    src/model/train/routingeditmodel.h \
     src/model/train/trainlistreadmodel.h \
     src/util/railrulercombo.h \
     src/util/selectrailwaycombo.h \

@@ -133,6 +133,12 @@ public slots:
     void removeRulerAt(const Railway& rail, int i);
 
     void onRulerNameChanged(std::shared_ptr<const Ruler> ruler);
+
+    /**
+     * 交路改变：这个直接由RoutingCollectionModel调起
+     */
+    void onRoutingChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight,
+        const QVector<int>& roles);
 };
 
 

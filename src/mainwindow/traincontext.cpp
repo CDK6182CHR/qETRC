@@ -28,7 +28,7 @@ void TrainContext::initUI()
 {
 	//审阅
 	if constexpr (true) {
-		auto* page = cont->addCategoryPage(tr("审阅"));
+		auto* page = cont->addCategoryPage(tr("列车审阅"));
 
 		auto* panel = page->addPannel(tr("基本信息"));
 
@@ -86,7 +86,7 @@ void TrainContext::initUI()
 
 	//编辑
 	if constexpr (true) {
-		auto* page = cont->addCategoryPage(tr("编辑"));
+		auto* page = cont->addCategoryPage(tr("列车编辑"));
 		auto* panel = page->addPannel(tr("基本信息"));
 
 		auto* w = new QWidget;

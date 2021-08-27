@@ -122,6 +122,9 @@ public:
 
     void unhighlightTrainItems(const Train& train);
 
+    void highlightTrainItemsWithLink(const Train& train);
+    void unhighlightTrainItemsWithLink(const Train& train);
+
     QList<QGraphicsRectItem*>& dirForbidItem(const Forbid* forbid, Direction dir);
 
     void addForbidItem(const Forbid* forbid, Direction dir, QGraphicsRectItem* item);

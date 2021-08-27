@@ -338,12 +338,26 @@ public:
     void setRouting(std::weak_ptr<Routing> rout, std::list<RoutingNode>::iterator node);
 
     /**
+     * 将交路的数据更新到指定的对象上面。
+     * @seealso: setRouting
+     * 区别在于，不会将原有的设为virtual
+     */
+    void setRoutingSimple(std::weak_ptr<Routing> rout, std::list<RoutingNode>::iterator node);
+
+    /**
      * 清除交路数据
      * 2021.07.04实现，用于导入车次时清除所引入图中的交路信息
      * 同时将RoutingNode那边的数据清理掉 （设置为虚拟）
      * 不考虑撤销
      */
     void resetRouting();
+
+    /**
+     * 2021.08.26清除交路数据，用于交路更新那边的操作，只是去掉这边的引用。
+     * seealso: resetRouting
+     * 区别在，不会将原来的设成virtual
+     */
+    void resetRoutingSimple();
 
     /**
      * @brief 如果终到站是已经绑定到线路的车站，返回它；
@@ -458,4 +472,11 @@ private:
 
 };
 
+template <typename _Ty>
+uint qHash(const std::shared_ptr<_Ty>& key, uint seed)
+{
+    return qHash(key.get(), seed);
+}
+
+Q_DECLARE_METATYPE(std::shared_ptr<Train>);
 

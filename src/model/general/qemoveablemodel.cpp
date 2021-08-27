@@ -37,6 +37,20 @@ bool QEMoveableModel::insertRows(int row, int count, const QModelIndex& parent)
 	return flag;
 }
 
+void QEMoveableModel::moveUp(int row)
+{
+	if (row > 0 && row < rowCount()) {
+		moveRow(QModelIndex(), row, QModelIndex(), row - 1);
+	}
+}
+
+void QEMoveableModel::moveDown(int row)
+{
+	if (row >= 0 && row < rowCount()-1) {
+		moveUp(row + 1);
+	}
+}
+
 void QEMoveableModel::setupNewRow(int row)
 {
     Q_UNUSED(row);

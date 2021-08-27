@@ -60,14 +60,14 @@ void TrainItem::highlight()
 
     //运行线加粗显示
     QPen pen = path->pen();
-    pen.setWidth(pen.width() + 1);
+    pen.setWidthF(pen.widthF() + 1);
     path->setPen(pen);
     path->setZValue(2);
 
     QPen rectPen(pen.color());
     QBrush brush(pen.color());
-    rectPen.setWidth(0.5);
-    pen.setWidth(2);
+    rectPen.setWidthF(0.5);
+    pen.setWidthF(2);
     if (startLabelText) {
         //起点标签
         startRect = new QGraphicsRectItem(startLabelText->boundingRect(), this);
@@ -120,7 +120,7 @@ void TrainItem::unhighlight()
 
     //取消运行线加粗
     QPen pen = path->pen();
-    pen.setWidth(pen.width() - 1);
+    pen.setWidthF(pen.widthF() - 1);
     path->setPen(pen);
     path->setZValue(0);
 
@@ -159,6 +159,36 @@ void TrainItem::unhighlight()
 
     //todo: link
     _isHighlighted = false;
+}
+
+void TrainItem::highlightWithLink()
+{
+    highlight();
+    if (!_linkHighlighted) {
+        QPen pen = trainPen();
+        pen.setWidthF(pen.widthF() + 1);
+        pen.setStyle(Qt::DashLine);
+        if (linkItem1)
+            linkItem1->setPen(pen);
+        if (linkItem2) {
+            linkItem2->setPen(pen);
+        }
+        _linkHighlighted = true;
+    }
+}
+
+void TrainItem::unhighlightWithLink()
+{
+    unhighlight();
+    if (_linkHighlighted) {
+        QPen pen = trainPen();
+        pen.setStyle(Qt::DashLine);
+        if (linkItem1)
+            linkItem1->setPen(pen);
+        if (linkItem2)
+            linkItem2->setPen(pen);
+        _linkHighlighted = false;
+    }
 }
 
 bool TrainItem::contains(const QPointF& f) const

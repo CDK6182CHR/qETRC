@@ -61,6 +61,12 @@ MainWindow::~MainWindow()
 
 }
 
+void MainWindow::initUI()
+{
+    initDockWidgets();
+    initToolbar();
+}
+
 void MainWindow::undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains)
 {
     //重新添加运行线
@@ -289,11 +295,6 @@ void MainWindow::actRulerPaint()
 //    informPageListChanged();
 //}
 
-void MainWindow::initUI()
-{
-    initDockWidgets();
-    initToolbar();
-}
 
 void MainWindow::initDockWidgets()
 {
@@ -339,6 +340,9 @@ void MainWindow::initDockWidgets()
 
         connect(naviModel, &DiagramNaviModel::railwayRemoved,
             this, &MainWindow::onActRailwayRemoved);
+
+        connect(naviView, &NaviTree::focusInRouting,
+            this, &MainWindow::focusInRouting);
     }
 
     //列车管理
@@ -370,6 +374,21 @@ void MainWindow::initDockWidgets()
             tw->getModel(), &TrainListModel::onEndRemoveRows);
     }
 
+    // 交路管理
+    if constexpr (true) {
+        auto* rw = new RoutingWidget(_diagram.trainCollection());
+        dock = new ads::CDockWidget(tr("交路管理"));
+        dock->setWidget(rw);
+        manager->addDockWidget(ads::LeftDockWidgetArea, dock);
+        dock->closeDockWidget();
+        routingWidget = rw;
+        routingDock = dock;
+
+        connect(rw, &RoutingWidget::focusInRouting,
+            this, &MainWindow::focusInRouting);
+        connect(rw->getModel(), &RoutingCollectionModel::dataChanged,
+            naviModel, &DiagramNaviModel::onRoutingChanged);
+    }
 }
 
 void MainWindow::initToolbar()
@@ -627,6 +646,16 @@ void MainWindow::initToolbar()
             btn->setMinimumWidth(80);
         }
 
+        panel = cat->addPannel(tr("交路"));
+        act = routingDock->toggleViewAction();
+        act->setIcon(QIcon(":/icons/polyline.png"));
+
+        routingMenu = new SARibbonMenu(tr("打开的交路编辑"), this);
+        act->setMenu(routingMenu);
+
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
+
         panel = cat->addPannel(tr("分析"));
         act = new QAction(QIcon(":/icons/compare.png"), tr("车次对照"), this);
         act->setToolTip(tr("两车次运行对照\n在指定线路上，对比两个选定车次的运行情况。"));
@@ -661,7 +690,7 @@ void MainWindow::initToolbar()
 
     //context: page
     if constexpr (true) {
-        auto* cat = ribbon->addContextCategory(tr("运行图"));
+        auto* cat = ribbon->addContextCategory(tr(""));
         contextPage = new PageContext(_diagram, cat, this);
         connect(contextPage, &PageContext::pageRemoved,
             naviView, &NaviTree::removePage);
@@ -671,7 +700,7 @@ void MainWindow::initToolbar()
 
     //context: train
     if constexpr (true) {
-        auto* cat = ribbon->addContextCategory(tr("当前列车"));
+        auto* cat = ribbon->addContextCategory(tr(""));
         contextTrain = new TrainContext(_diagram, cat, this);
 
         connect(contextTrain, &TrainContext::timetableChanged,
@@ -691,7 +720,7 @@ void MainWindow::initToolbar()
 
     //context: rail
     if constexpr (true) {
-        auto* cat = ribbon->addContextCategory(tr("当前线路"));
+        auto* cat = ribbon->addContextCategory(tr(""));
         contextRail = new RailContext(_diagram, cat, this, this);
         connect(contextRail, &RailContext::railNameChanged,
             naviModel, &DiagramNaviModel::onRailNameChanged);
@@ -709,7 +738,7 @@ void MainWindow::initToolbar()
 
     //context: ruler
     if constexpr (true) {
-        auto* cat = ribbon->addContextCategory(tr("当前标尺"));
+        auto* cat = ribbon->addContextCategory(tr(""));
         contextRuler = new RulerContext(_diagram, cat, this);
         connect(contextRuler, SIGNAL(ordinateRulerModified(Railway&)),
             this, SLOT(updateRailwayDiagrams(Railway&)));
@@ -723,12 +752,29 @@ void MainWindow::initToolbar()
             contextRuler, &RulerContext::actRemoveRulerNavi);
     }
 
+    //context: routing
+    if constexpr (true) {
+        auto* cat = ribbon->addContextCategory(tr(""));
+        contextRouting = new RoutingContext(_diagram, cat, this);
+        
+        connect(naviView, &NaviTree::editRouting,
+            contextRouting, &RoutingContext::openRoutingEditWidget);
+        connect(routingWidget, &RoutingWidget::editRouting,
+            contextRouting, &RoutingContext::openRoutingEditWidget);
+        connect(routingWidget->getModel(), &RoutingCollectionModel::routingHighlightChanged,
+            contextRouting, &RoutingContext::onRoutingHighlightChanged);
+        connect(contextRouting, &RoutingContext::routingHighlightChanged,
+            routingWidget->getModel(), &RoutingCollectionModel::onHighlightChangedByContext);
+        connect(contextRouting, &RoutingContext::routingInfoChanged,
+            routingWidget->getModel(), &RoutingCollectionModel::onRoutingInfoChanged);
+    }
+
     //ApplicationMenu的初始化放在最后，因为可能用到前面的..
     initAppMenu();
     connect(ribbon->applicationButton(), SIGNAL(clicked()), this,
         SLOT(actPopupAppButton()));
 
-    ribbon->setRibbonStyle(SARibbonBar::OfficeStyle);
+    ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
 }
 
 void MainWindow::initAppMenu()
@@ -821,6 +867,7 @@ void MainWindow::endResetGraph()
     //导航窗口
     naviModel->resetModel();
     trainListWidget->refreshData();
+    routingWidget->refreshData();
     catView->refreshTypeGroup();
 
     spPassedStations->setValue(_diagram.config().max_passed_stations);
@@ -1103,6 +1150,21 @@ void MainWindow::applyChangeStationName(const ChangeStationNameData& data)
     undoStack->push(new qecmd::ChangeStationNameGlobal(data, this));
 }
 
+void MainWindow::setRoutingHighlight(std::shared_ptr<Routing> routing, bool on)
+{
+    if (on) {
+        foreach(auto * w, diagramWidgets) {
+            w->highlightRouting(routing);
+        }
+    }
+    else {
+        foreach(auto * w, diagramWidgets) {
+            w->unhighlightRouting(routing);
+        }
+    }
+
+}
+
 void MainWindow::updateTrainLines(std::shared_ptr<Train> train, QList<std::shared_ptr<TrainAdapter>>&& adps)
 {
     for (auto p : diagramWidgets) {
@@ -1303,6 +1365,17 @@ void MainWindow::focusInRuler(std::shared_ptr<Ruler> ruler)
 void MainWindow::focusOutRuler()
 {
     ribbonBar()->hideContextCategory(contextRuler->context());
+}
+
+void MainWindow::focusInRouting(std::shared_ptr<Routing> routing)
+{
+    contextRouting->setRouting(routing);
+    ribbonBar()->showContextCategory(contextRouting->context());
+}
+
+void MainWindow::focusOutRouting()
+{
+    ribbonBar()->hideContextCategory(contextRouting->context());
 }
 
 

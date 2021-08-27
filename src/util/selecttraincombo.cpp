@@ -109,3 +109,9 @@ void SelectTrainCombo::onIndexChanged(int i)
                 <<i<<Qt::endl;
     }
 }
+
+void SelectTrainCombo::setEnabled(bool on)
+{
+    edName->setEnabled(on);
+    cbTrains->setEnabled(on);
+}

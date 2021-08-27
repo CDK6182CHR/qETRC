@@ -1039,6 +1039,24 @@ void DiagramWidget::highlightTrain(std::shared_ptr<Train> train)
     nowItem->setText(_selectedTrain->trainName().full());
 }
 
+void DiagramWidget::highlightRouting(std::shared_ptr<Routing> routing)
+{
+    for (auto& p : routing->order()) {
+        if (p.isVirtual())
+            continue;
+        _page->highlightTrainItemsWithLink(*(p.train()));
+    }
+}
+
+void DiagramWidget::unhighlightRouting(std::shared_ptr<Routing> routing)
+{
+    for (auto& p : routing->order()) {
+        if (p.isVirtual())
+            continue;
+        _page->unhighlightTrainItemsWithLink(*(p.train()));
+    }
+}
+
 
 void DiagramWidget::showTrainEventText()
 {

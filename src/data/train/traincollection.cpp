@@ -24,9 +24,9 @@ void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaul
 
 	//注意Routing的读取依赖车次查找
 	const QJsonArray& arrouting = obj.value("circuits").toArray();
-	for (auto p = arrouting.begin(); p != arrouting.end(); ++p) {
-		auto r = std::make_shared<Routing>(*this);
-		r->fromJson(p->toObject());
+	for (auto p = arrouting.cbegin(); p != arrouting.cend(); ++p) {
+		auto r = std::make_shared<Routing>();
+		r->fromJson(p->toObject(), *this);
 		_routings.append(r);
 	}
     
@@ -204,10 +204,11 @@ void TrainCollection::removeUnboundTrains()
 	}
 }
 
-bool TrainCollection::routingNameExisted(const QString& name) const
+bool TrainCollection::routingNameExisted(const QString& name, 
+	std::shared_ptr<Routing> ignore) const
 {
 	for (auto p : _routings)
-		if (p->name() == name)
+		if (p->name() == name && p!=ignore)
 			return true;
 	return false;
 }
@@ -228,7 +229,16 @@ int TrainCollection::getTrainIndex(std::shared_ptr<Train> train) const
 	if (p == _trains.end())
 		return -1;
 	else
-		return std::distance(_trains.begin(), p);
+        return std::distance(_trains.begin(), p);
+}
+
+int TrainCollection::getRoutingIndex(std::shared_ptr<const Routing> routing) const
+{
+    for(int i=0;i<_routings.size();i++){
+        if(_routings.at(i) == routing)
+            return i;
+    }
+    return -1;
 }
 
 TrainName TrainCollection::validTrainFullName(const QString& prefix) const

@@ -27,6 +27,9 @@ public:
 	virtual bool insertRows(int row, int count,
 		const QModelIndex& parent = QModelIndex()) override;
 
+	void moveUp(int row);
+	void moveDown(int row);
+
 protected:
 	/**
 	 * @brief setupNewRow  模版方法

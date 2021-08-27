@@ -259,6 +259,13 @@ public slots:
     void highlightTrain(std::shared_ptr<Train> train);
 
     /**
+     * 高亮显示交路，但不设置列车为当前列车，也不发送信号。
+     */
+    void highlightRouting(std::shared_ptr<Routing> routing);
+
+    void unhighlightRouting(std::shared_ptr<Routing> routing);
+
+    /**
      * 当天窗数据变化时，更新
      */
     void updateForbid(std::shared_ptr<Forbid> forbid, Direction dir);

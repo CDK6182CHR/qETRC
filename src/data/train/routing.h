@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <list>
+#include <QSet>
 #include <QJsonObject>
 #include "train.h"
 
@@ -59,6 +60,12 @@ public:
     void setLink(bool link);
 
     QString toString()const;
+
+    /**
+     * 信息等价判定，virtual时只考虑name，否则只考虑train
+     */
+    bool operator==(const RoutingNode& other)const;
+    bool operator!=(const RoutingNode& other)const;
 };
 
 
@@ -67,13 +74,14 @@ class TrainCollection;
 /**
  * @brief Routing 车底交路类 pyETRC.data.Circuit
  * 使用std::list，列车那边持有这里面的迭代器
+ * 2021.08.26：取消对coll的反向引用。
  */
 class Routing:
     public std::enable_shared_from_this<Routing>
 {
-    TrainCollection& _coll;
     std::list<RoutingNode> _order;
     QString _name, _note, _model, _owner;
+    bool _highlighted = false;
 
 public:
 
@@ -84,9 +92,9 @@ public:
      * @brief Routing
      * 注意不能从构造函数读JSON，因为涉及到shared_from_this
      */
-    Routing(TrainCollection& coll);
+    Routing() = default;
 
-    Routing(const Routing&)=default;
+    Routing(const Routing&)=delete;   // 似乎用不到？
     Routing(Routing&&)noexcept=default;
     Routing& operator=(const Routing&)=delete;
 
@@ -94,13 +102,14 @@ public:
      * 2021.07.04 准备实现  导入交路时使用
      * 在不同的交路间拷贝。注意这个时候原则上应该全都是虚拟车次。
      * 相当于原来的coverBaseData
+     * 2021.08.26 删除collection反向引用之后，可以使用默认的移动
      */
-    Routing& operator=(Routing&& other)noexcept;
+    Routing& operator=(Routing&& other)noexcept = default;
 
     /**
      * 接受pyETRC格式的circuits数组元素
      */
-    void fromJson(const QJsonObject& obj);
+    void fromJson(const QJsonObject& obj, TrainCollection& coll);
     QJsonObject toJson()const;
 
     inline const QString& name()const{return _name;}
@@ -125,10 +134,17 @@ public:
     bool appendTrain(std::shared_ptr<Train> train, bool link);
 
     /**
+     * 添加列车，用在交路编辑的提交页面，生成临时对象。
+     * 只添加列车的引用到本类，不更新列车中对交路的引用。
+     * 由外界保证合法性。
+     */
+    void appendTrainSimple(std::shared_ptr<Train> train, bool link);
+
+    /**
      * 读JSON的操作  返回是否成功
      * 如果失败，直接加虚拟结点
      */
-    bool appendTrainFromName(const QString& trainName, bool link);
+    bool appendTrainFromName(const QString& trainName, bool link, TrainCollection& coll);
 
     bool appendVirtualTrain(const QString& trainName, bool link);
 
@@ -172,9 +188,65 @@ public:
     void setNodeTrain(std::shared_ptr<Train> train, std::list<RoutingNode>::iterator node);
 
     /**
-     * 返回列车在本交路中的索引编号。线性复杂度。
-     * 如果列车不在本交路中，返回-1
+     * 返回列车在本交路中的索引编号。利用了Train中的Hook信息，常数复杂度
      */
     int trainIndex(std::shared_ptr<Train> train)const;
+    
+    /**
+     * 线性查找。 
+     */
+    int trainIndexLinear(std::shared_ptr<Train> train)const;
+
+
+    /**
+     * 仅仅是维护状态。这个状态不写入文件。
+     */
+    void setHighlight(bool on);
+
+    bool isHighlighted()const { return _highlighted; }
+
+    /**
+     * 复制基础数据（不包括序列）
+     */
+    std::shared_ptr<Routing> copyBase()const;
+
+    void swapBase(Routing& other);
+
+    /**
+     * 对比基本信息是否一致
+     */
+    bool baseEqual(const Routing& other)const;
+
+    /**
+     * 更新所管理的所有列车中，对自身（以及迭代器）的引用。
+     * 用在应用order更改后。
+     */
+    void updateTrainHooks();
+
+    /**
+     * 交换套跑次序信息
+     * 暂定直接交换；RoutingNode的地址会变化
+     * 注意没有更新列车的所有权 （列车中对交路的反向指针不变！！）
+     * seealso: updateTrainHooks()
+     */
+    void swapOrder(Routing& other);
+
+    /**
+     * 判定套跑次序是否一致
+     */
+    bool orderEqual(const Routing& other)const;
+
+    /**
+     * 所有包含列车的集合
+     */
+    QSet<std::shared_ptr<Train>> trainSet()const;
+
+    /**
+     * 与此前的版本相比，被拿掉的列车的集合
+     * 这些列车运行线需要单独更新。
+     */
+    QSet<std::shared_ptr<Train>> takenTrains(const Routing& previous)const;
+
+    void swap(Routing& other);
 };
 

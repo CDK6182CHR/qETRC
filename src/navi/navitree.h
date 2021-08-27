@@ -21,7 +21,7 @@ class NaviTree : public QWidget
     Q_OBJECT;
 
     QMenu* mePageList, * meRailList, * meTrainList, * mePage, * meTrain, * meRailway;
-    QMenu* meRuler, * meForbid;
+    QMenu* meRuler, * meForbid, * meRouting;
     DiagramNaviModel* _model;
     QUndoStack* const _undo;
     QTreeView* tree;
@@ -49,10 +49,12 @@ signals:
     void focusOutTrain();
     void focusInRailway(std::shared_ptr<Railway>);
     void focusInRuler(std::shared_ptr<Ruler>);
+    void focusInRouting(std::shared_ptr<Routing>);
     void editRailway(std::shared_ptr<Railway>);
     void editTrain(std::shared_ptr<Train>);
     void editRuler(std::shared_ptr<Ruler>);
     void editForbid(std::shared_ptr<Forbid>, std::shared_ptr<Railway>);
+    void editRouting(std::shared_ptr<Routing>);
     void focusOutRailway();
     void railwayListChanged();   //只是通知主窗口更新数据  其实都不见得有必要
 
@@ -88,6 +90,8 @@ private slots:
     void onEditRulerContext();
 
     void onEditForbidContext();
+
+    void onEditRoutingContext();
 
     void onCurrentChanged(const QModelIndex& cur, const QModelIndex& prev);
     

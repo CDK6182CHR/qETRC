@@ -15,6 +15,7 @@
 #include "editors/railstationwidget.h"
 #include "navi/navitree.h"
 #include "dialogs/changestationnamedialog.h"
+#include "editors/routing/routingwidget.h"
 
 //for SARibbon
 #include "SARibbonMainWindow.h"
@@ -28,6 +29,7 @@
 #include "viewcategory.h"
 #include "pagecontext.h"
 #include "rulercontext.h"
+#include "routingcontext.h"
 
 /**
  * @brief The MainWindow class
@@ -42,18 +44,20 @@ class MainWindow : public SARibbonMainWindow
     //窗口，Model的指针
     DiagramNaviModel* naviModel;
     NaviTree* naviView;
-    SARibbonMenu* pageMenu, * railMenu, * appMenu, * forbidMenu;
+    SARibbonMenu* pageMenu, * railMenu, * appMenu, * forbidMenu, * routingMenu;
     QList<ads::CDockWidget*> diagramDocks;
     QList<DiagramWidget*> diagramWidgets;
-    ads::CDockWidget* naviDock, * trainListDock;
+    ads::CDockWidget* naviDock, * trainListDock, * routingDock;
     TrainListWidget* trainListWidget;
     QList<RailStationWidget*> railStationWidgets;
     QList<ads::CDockWidget*> railStationDocks;
+    RoutingWidget* routingWidget;
 
     PageContext* contextPage;
     TrainContext* contextTrain;
     RailContext* contextRail;
     RulerContext* contextRuler;
+    RoutingContext* contextRouting;
     ViewCategory* catView;
 
     QSpinBox* spPassedStations;
@@ -100,6 +104,7 @@ public:
     auto* getRulerContext() { return contextRuler; }
     auto* getRailContext() { return contextRail; }
     auto* getViewCategory() { return catView; }
+    auto* getRoutingMenu() { return routingMenu; }
 
     /**
      * 列车信息变化，更新指定车次的所有运行线
@@ -226,6 +231,8 @@ private slots:
     void focusOutRailway();
     void focusInRuler(std::shared_ptr<Ruler> ruler);
     void focusOutRuler();
+    void focusInRouting(std::shared_ptr<Routing> routing);
+    void focusOutRouting();
 
     void undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains);
     void redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains);
@@ -364,7 +371,7 @@ public slots:
      */
     void applyChangeStationName(const ChangeStationNameData& data);
 
-    
+    void setRoutingHighlight(std::shared_ptr<Routing> routing, bool on);
 
 };
 
