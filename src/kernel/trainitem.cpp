@@ -157,7 +157,6 @@ void TrainItem::unhighlight()
     if (config().show_time_mark == 1)
         hideTimeMarks();
 
-    //todo: link
     _isHighlighted = false;
 }
 
@@ -285,8 +284,6 @@ void TrainItem::setPathItem(const QString& trainName)
         auto rs = p->railStation.lock();
         double ycur = rs->y_value.value();
         double xarr = calXFromStart(ts->arrive), xdep = calXFromStart(ts->depart);
-
-        //todo: mark time label
 
         //首先处理到达点
         if (xarr <= width) {
@@ -429,10 +426,6 @@ void TrainItem::setPathItem(const QString& trainName)
         spanItems.append(item);
         //_bounding |= item->boundingRect();
     }
-
-   
-    
-    //todo  self.addLinkLine()
 }
 
 void TrainItem::setStartItem(const QString& text,const QPen& pen)

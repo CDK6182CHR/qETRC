@@ -132,11 +132,6 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
         "无法使用导出PDF功能"));
     return false;
 #else
-    marginItems.left->setX(0);
-    marginItems.right->setX(0);
-    marginItems.top->setY(0);
-    marginItems.bottom->setY(0);
-    nowItem->setPos(0, 0);
     QPrinter printer(QPrinter::HighResolution);
     printer.setOutputFormat(QPrinter::PdfFormat);
     printer.setOutputFileName(filename);
@@ -154,6 +149,20 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
         return false;
     }
     painter.scale(printer.width() / scene()->width(), printer.width() / scene()->width());
+
+    paintToFile(painter, title, note);
+
+    return true;
+#endif
+}
+
+void DiagramWidget::paintToFile(QPainter& painter, const QString& title, const QString& note)
+{
+    marginItems.left->setX(0);
+    marginItems.right->setX(0);
+    marginItems.top->setY(0);
+    marginItems.bottom->setY(0);
+    nowItem->setPos(0, 0);
     painter.setPen(QPen(config().text_color));
     QFont font;
     font.setPixelSize(40);
@@ -175,13 +184,24 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
 
     QString mark = tr("由 %1_%2 导出").arg(qespec::TITLE.data()).arg(qespec::VERSION.data());
     painter.drawText(scene()->width() - 400, scene()->height() + 100 + 40, mark);
+    painter.setRenderHint(QPainter::Antialiasing);
     scene()->render(&painter, QRectF(0, 100, scene()->width(), scene()->height()));
     painter.end();
 
     updateDistanceAxis();
     updateTimeAxis();
-    return true;
-#endif
+}
+
+bool DiagramWidget::toPng(const QString& filename, const QString& title, const QString& note)
+{
+    constexpr int note_apdx = 80;
+    QImage image(scene()->width(), scene()->height() + 100 + note_apdx,
+        QImage::Format_ARGB32);
+    image.fill(Qt::white);
+    QPainter painter;
+    painter.begin(&image);
+    paintToFile(painter, title, note);
+    return image.save(filename);
 }
 
 void DiagramWidget::removeTrain(const Train& train)

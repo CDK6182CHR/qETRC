@@ -110,6 +110,27 @@ void RoutingCollectionModel::removeRoutingAt(int i)
     endRemoveRows();
 }
 
+void RoutingCollectionModel::appendRoutings(const QList<std::shared_ptr<Routing>>& routings)
+{
+    int r = coll.routings().size();
+    beginInsertRows({}, r, r + routings.size() - 1);
+    coll.routings().append(routings);
+    foreach(auto t, routings) {
+        t->updateTrainHooks();
+    }
+    endInsertRows();
+}
+
+void RoutingCollectionModel::removeTailRoutings(int count)
+{
+    beginRemoveRows({}, coll.routings().size() - count, coll.routings().size()-1);
+    for (int i = 0; i < count; i++) {
+        auto t = coll.routings().takeLast();
+        t->resetTrainHooks();
+    }
+    endRemoveRows();
+}
+
 void RoutingCollectionModel::onHighlightChangedByContext(std::shared_ptr<Routing> routing)
 {
     int i= coll.getRoutingIndex(routing);

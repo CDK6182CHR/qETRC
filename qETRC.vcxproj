@@ -210,6 +210,8 @@
     <ClCompile Include="src\editors\forbidwidget.cpp" />
     <ClCompile Include="src\editors\railstationwidget.cpp" />
     <ClCompile Include="src\editors\routing\addroutingnodedialog.cpp" />
+    <ClCompile Include="src\editors\routing\batchparseroutingdialog.cpp" />
+    <ClCompile Include="src\editors\routing\detectroutingdialog.cpp" />
     <ClCompile Include="src\editors\routing\parseroutingdialog.cpp" />
     <ClCompile Include="src\editors\routing\routingedit.cpp" />
     <ClCompile Include="src\editors\routing\routingwidget.cpp" />
@@ -223,6 +225,7 @@
     <ClCompile Include="src\model\rail\intervaldatamodel.cpp" />
     <ClCompile Include="src\model\train\routingcollectionmodel.cpp" />
     <ClCompile Include="src\model\train\routingeditmodel.cpp" />
+    <ClCompile Include="src\model\train\routinglistmodel.cpp" />
     <ClCompile Include="src\model\train\trainlistreadmodel.cpp" />
     <ClCompile Include="src\util\railrulercombo.cpp" />
     <ClCompile Include="src\util\selectrailwaycombo.cpp" />
@@ -306,6 +309,9 @@
     <QtMoc Include="src\mainwindow\routingcontext.h" />
     <QtMoc Include="src\editors\routing\addroutingnodedialog.h" />
     <QtMoc Include="src\editors\routing\parseroutingdialog.h" />
+    <QtMoc Include="src\editors\routing\detectroutingdialog.h" />
+    <QtMoc Include="src\model\train\routinglistmodel.h" />
+    <QtMoc Include="src\editors\routing\batchparseroutingdialog.h" />
     <ClInclude Include="src\viewers\traindiffdialog.h" />
     <QtMoc Include="src\wizards\readruler\readrulerpageinterval.h" />
     <QtMoc Include="src\wizards\readruler\readrulerwizard.h" />

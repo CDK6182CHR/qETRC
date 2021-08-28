@@ -68,6 +68,27 @@ bool RoutingEditModel::getAppliedOrder(std::shared_ptr<Routing> res)
     return true;
 }
 
+void RoutingEditModel::setupModelWith(std::shared_ptr<Routing> tmp)
+{
+    if (!tmp) {
+        setRowCount(0);
+        return;
+    }
+
+    setRowCount(tmp->count());
+
+    int row = 0;
+    for (const auto& p : tmp->order()) {
+        if (p.isVirtual()) {
+            setVirtualRow(row, p.name(), p.link());
+        }
+        else {
+            setRealRow(row, p.train(), p.link());
+        }
+        row++;
+    }
+}
+
 void RoutingEditModel::setupModel()
 {
     if(!routing){

@@ -32,6 +32,12 @@ public:
      * 如果不成功，这里直接报错。
      */
     bool getAppliedOrder(std::shared_ptr<Routing> res);
+
+    /**
+     * 用指定交路的数据填充表格，不一定是当前交路。
+     * 用在detect完毕之后。
+     */
+    void setupModelWith(std::shared_ptr<Routing> tmp);
     
 private:
     void setupModel();

@@ -69,6 +69,10 @@ public:
 
     bool toPdf(const QString& filename, const QString& title, const QString& note);
 
+    bool toPng(const QString& filename, const QString& title, const QString& note);
+
+    
+
     void paintTrain(std::shared_ptr<Train> train);
     void paintTrain(Train& train);
 
@@ -235,6 +239,10 @@ private:
     void intervalToolTip(std::deque<AdapterStation>::const_iterator former,
         std::deque<AdapterStation>::const_iterator latter, const TrainLine& line);
 
+    /**
+     * 输出PDF和PNG的公共操作
+     */
+    void paintToFile(QPainter& painter, const QString& title, const QString& note);
 
 signals:
     void showNewStatus(QString);

@@ -28,6 +28,9 @@ public:
 private:
     void initUI();
 
+    //操作压栈，根据有无undo操作
+    void removeRouting(int row, std::shared_ptr<Routing> routing);
+
 signals:
     void focusInRouting(std::shared_ptr<Routing>);
     void editRouting(std::shared_ptr<Routing>);
@@ -43,14 +46,13 @@ signals:
     void routingRemoved(std::shared_ptr<Routing>);
 private slots:
     void actEdit();
-    void actAdd();
     void actRemove();
-
     void actDoubleClicked(const QModelIndex& idx);
-
     void onCurrentRowChanged(const QModelIndex& idx);
 
 public slots:
+
+    void actAdd();
 
     /**
      * 实施添加交路的操作，保证添加到最后一个。
@@ -68,6 +70,20 @@ public slots:
 
     void undoRemoveRouting(int row, std::shared_ptr<Routing> routing);
 
+    void onRemoveRoutingFromContext(std::shared_ptr<Routing> routing);
+
+    void onRemoveRoutingFromNavi(int row);
+
+    /**
+     * 操作压栈。目前用于批量解析。
+     */
+    void onRoutingsAdded(const QList<std::shared_ptr<Routing>> routings);
+
+    void commitAppendRoutings(const QList<std::shared_ptr<Routing>> routings);
+    void undoAppendRoutings(const QList<std::shared_ptr<Routing>> routings);
+
+    
+
 };
 
 namespace qecmd {
@@ -82,6 +98,16 @@ namespace qecmd {
     public:
         AddRouting(std::shared_ptr<Routing> routing_, RoutingWidget* const rw,
             QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    class BatchAddRoutings :public QUndoCommand {
+        QList<std::shared_ptr<Routing>> routings;
+        RoutingWidget* const rw;
+    public:
+        BatchAddRoutings(const QList<std::shared_ptr<Routing>> routings_,
+            RoutingWidget* rw, QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
     };

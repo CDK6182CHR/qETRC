@@ -3,9 +3,11 @@
 
 #include "data/train/routing.h"
 #include "editors/routing/parseroutingdialog.h"
+#include "editors/routing/detectroutingdialog.h"
 
 #include <QLabel>
 #include <QLineEdit>
+#include <QApplication>
 
 RoutingContext::RoutingContext(Diagram &diagram, SARibbonContextCategory *context,
                                MainWindow *mw_):
@@ -47,12 +49,33 @@ void RoutingContext::initUI()
     btn=panel->addLargeAction(act);
     btn->setMinimumWidth(80);
 
+    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
+        tr("删除交路"), this);
+    connect(act, &QAction::triggered, this, &RoutingContext::actRemoveRouting);
+    btn = panel->addLargeAction(act);
+    btn->setMinimumWidth(80);
+
     panel = page->addPannel(tr("工具"));
     act = new QAction(QIcon(":/icons/text.png"), tr("文本解析"), this);
     act->setToolTip(tr("单交路文本解析\n"
         "输入车次套用的文本，从中解析交路序列，并直接应用于当前交路。"));
     connect(act, &QAction::triggered, this, &RoutingContext::actParseText);
     panel->addMediumAction(act);
+
+    act = new QAction(QIcon(":/icons/identify.png"), tr("识别车次"), this);
+    act->setToolTip(tr("单交路车次识别\n"
+        "识别当前交路中的虚拟车次，尝试改变为实体车次，并直接应用结果。"));
+    connect(act, &QAction::triggered, this, &RoutingContext::actDetectTrain);
+
+    panel->addMediumAction(act);
+
+    panel = page->addPannel("");
+    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
+        tr("关闭面板"), this);
+    act->setToolTip(tr("关闭面板\n关闭当前的交路编辑上下文工具栏面板。"));
+    connect(act, &QAction::triggered, mw, &MainWindow::focusOutRouting);
+    btn = panel->addLargeAction(act);
+    btn->setMinimumWidth(80);
 }
 
 int RoutingContext::getRoutingWidgetIndex(std::shared_ptr<Routing> routing)
@@ -106,6 +129,7 @@ void RoutingContext::refreshData()
 {
     if (_routing) {
         edName->setText(_routing->name());
+        btnHighlight->setChecked(_routing->isHighlighted());
     }
 }
 
@@ -135,6 +159,20 @@ void RoutingContext::actParseText()
     connect(dialog, &ParseRoutingDialog::routingParsed, this,
         &RoutingContext::actRoutingOrderChange);
     dialog->show();
+}
+
+void RoutingContext::actDetectTrain()
+{
+    auto* d = new DetectRoutingDialog(_diagram.trainCollection(), _routing, true, mw);
+    connect(d, &DetectRoutingDialog::routingDetected, this,
+        &RoutingContext::actRoutingOrderChange);
+    d->show();
+}
+
+void RoutingContext::actRemoveRouting()
+{
+    if (_routing)
+        emit removeRouting(_routing);
 }
 
 void RoutingContext::refreshAllData()
@@ -257,6 +295,35 @@ void RoutingContext::onRoutingRemoved(std::shared_ptr<Routing> routing)
     }
 }
 
+void RoutingContext::actBatchRoutingUpdate(const QVector<int>& indexes, 
+    const QVector<std::shared_ptr<Routing>>& data)
+{
+    mw->getUndoStack()->push(new qecmd::BatchChangeRoutings(indexes, data, this));
+}
+
+void RoutingContext::commitBatchRoutingUpdate(const QVector<int>& indexes, 
+    const QVector<std::shared_ptr<Routing>>& data)
+{
+    QSet<std::shared_ptr<Train>> takenTrains; 
+    for (int i = 0; i < indexes.size(); i++) {
+        int index = indexes.at(i);
+        auto r = _diagram.trainCollection().routingAt(i);
+        auto rd = data.at(i);
+        r->swap(*rd);
+        r->updateTrainHooks();
+        takenTrains |= r->takenTrains(*rd);
+        mw->repaintRoutingTrainLines(r);
+        updateRoutingEdit(r);
+        if (r == _routing)
+            refreshData();
+        emit routingInfoChangedAt(index);
+    }
+    foreach(auto p, takenTrains) {
+        p->resetRoutingSimple();
+    }
+    mw->repaintTrainLines(takenTrains);
+}
+
 
 qecmd::ChangeRoutingInfo::ChangeRoutingInfo(std::shared_ptr<Routing> routing_,
     std::shared_ptr<Routing> info_,
@@ -302,4 +369,14 @@ void qecmd::ChangeRoutingOrder::commit()
         p->resetRoutingSimple();
     }
     cont->commitRoutingOrderChange(routing, std::move(s));
+}
+
+void qecmd::BatchChangeRoutings::undo()
+{
+    cont->commitBatchRoutingUpdate(indexes, routings);
+}
+
+void qecmd::BatchChangeRoutings::redo()
+{
+    cont->commitBatchRoutingUpdate(indexes, routings);
 }

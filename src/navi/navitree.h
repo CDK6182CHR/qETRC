@@ -21,7 +21,7 @@ class NaviTree : public QWidget
     Q_OBJECT;
 
     QMenu* mePageList, * meRailList, * meTrainList, * mePage, * meTrain, * meRailway;
-    QMenu* meRuler, * meForbid, * meRouting;
+    QMenu* meRuler, * meForbid, * meRouting, * meRoutingList;
     DiagramNaviModel* _model;
     QUndoStack* const _undo;
     QTreeView* tree;
@@ -42,7 +42,6 @@ signals:
     void pageInserted(std::shared_ptr<DiagramPage> page, int index);
     void pageRemoved(int index);
 
-
     void focusInPage(std::shared_ptr<DiagramPage> page);
     void focusOutPage();
     void focusInTrain(std::shared_ptr<Train> train);
@@ -62,8 +61,12 @@ signals:
      * 转发给主窗口去画图  所有页面重新铺画
      */
     void trainsImported();
-
     void removeRulerNavi(std::shared_ptr<Ruler>);
+    void removeRoutingNavi(int row);
+
+    void actAddRouting();
+    void actBatchParseRouting();
+    void actBatchDetectRouting();
 
 private slots:
     void showContextMenu(const QPoint& pos);
@@ -82,6 +85,8 @@ private slots:
     void onRemoveRailwayContext();
 
     void onRemoveRulerContext();
+
+    void onRemoveRoutingContext();
 
     void onEditRailwayContext();
 

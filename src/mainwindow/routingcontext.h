@@ -42,6 +42,8 @@ private:
 signals:
     void routingHighlightChanged(std::shared_ptr<Routing> routing);
     void routingInfoChanged(std::shared_ptr<Routing> routing);
+    void routingInfoChangedAt(int index);
+    void removeRouting(std::shared_ptr<Routing> routing);
 private slots:
     void actEdit();
     void toggleHighlight(bool on);
@@ -49,6 +51,10 @@ private slots:
     void removeRoutingEdit();
 
     void actParseText();
+
+    void actDetectTrain();
+
+    void actRemoveRouting();
 
 public slots:
     void refreshData();
@@ -83,6 +89,16 @@ public slots:
      */
     void onRoutingRemoved(std::shared_ptr<Routing> routing);
 
+    void actBatchRoutingUpdate(const QVector<int>& indexes,
+        const QVector<std::shared_ptr<Routing>>& data);
+
+    /**
+     * 批量交路识别之后的应用操作
+     * 在这里执行操作
+     */
+    void commitBatchRoutingUpdate(const QVector<int>& indexes,
+        const QVector<std::shared_ptr<Routing>>& data);
+
 };
 
 namespace qecmd {
@@ -108,6 +124,21 @@ namespace qecmd {
         virtual void redo()override;
     private:
         void commit();
+    };
+
+    class BatchChangeRoutings :public QUndoCommand
+    {
+        QVector<int> indexes;
+        QVector<std::shared_ptr<Routing>> routings;
+        RoutingContext* const cont;
+    public:
+        BatchChangeRoutings(const QVector<int>& indexes_,
+            const QVector<std::shared_ptr<Routing>>& routings_, RoutingContext* context,
+            QUndoCommand* parent = nullptr):
+            QUndoCommand(QObject::tr("批量更改%1个交路").arg(indexes_.size()),parent),
+            indexes(indexes_),routings(routings_),cont(context){}
+        virtual void undo()override;
+        virtual void redo()override;
     };
 
 

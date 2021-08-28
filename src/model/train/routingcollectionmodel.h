@@ -58,5 +58,15 @@ public slots:
      * 删除指定行的交路（实际从coll中删除），并且解除与train的关联。
      */
     void removeRoutingAt(int i);
+
+    /**
+     * 将新的交路添加到最后面
+     */
+    void appendRoutings(const QList<std::shared_ptr<Routing>>& routings);
+
+    /**
+     * 删除尾部的最后几个交路，即撤销添加操作
+     */
+    void removeTailRoutings(int count);
 };
 

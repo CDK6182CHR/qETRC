@@ -7,6 +7,8 @@
 #include "util/buttongroup.hpp"
 #include "data/common/qesystem.h"
 #include "data/train/traincollection.h"
+#include "parseroutingdialog.h"
+#include "detectroutingdialog.h"
 
 RoutingEdit::RoutingEdit(TrainCollection& coll_, std::shared_ptr<Routing> routing_, QWidget *parent) :
     QWidget(parent),coll(coll_), routing(routing_),model(new RoutingEditModel(routing,this))
@@ -55,6 +57,10 @@ void RoutingEdit::initUI()
     vlay->addLayout(g);
     g->connectAll(SIGNAL(clicked()),this,{SLOT(actAddBefore()),SLOT(actAddAfter()),
       SLOT(actRemove()),SLOT(actMoveUp()),SLOT(actMoveDown()) });
+    g->setMinimumWidth(80);
+    auto* g1 = new ButtonGroup<2>({ "解析文本","识别车次" });
+    g1->connectAll(SIGNAL(clicked()), this, { SLOT(actParse()),SLOT(actDetect()) });
+    vlay->addLayout(g1);
 
     table=new QTableView;
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
@@ -133,12 +139,18 @@ void RoutingEdit::actMoveDown()
 
 void RoutingEdit::actParse()
 {
-    // todo..
+    auto* d = new ParseRoutingDialog(coll, false, routing, this);
+    connect(d, &ParseRoutingDialog::routingParsed,
+        this, &RoutingEdit::onParseDone);
+    d->show();
 }
 
 void RoutingEdit::actDetect()
 {
-    // todo..
+    auto* d = new DetectRoutingDialog(coll, routing, false, this);
+    connect(d, &DetectRoutingDialog::routingDetected,
+        this, &RoutingEdit::onDetectDone);
+    d->show();
 }
 
 
@@ -179,6 +191,36 @@ void RoutingEdit::actCancel()
 void RoutingEdit::rowInserted(int row)
 {
     table->setCurrentIndex(model->index(row, 0));
+}
+
+void RoutingEdit::onParseDone(std::shared_ptr<Routing> original, std::shared_ptr<Routing> tmp)
+{
+    if (original == routing) {
+        int row = model->rowCount();
+        for (const auto& p : tmp->order()) {
+            if (p.isVirtual()) {
+                model->insertVirtualRow(row++, p.name(), p.link());
+            }
+            else {
+                model->insertRealRow(row++, p.train(), p.link());
+            }
+        }
+    }
+    else {
+        qDebug() << "RoutingEdit::onParseDone: WARNING: incompatible Routing ?" << Qt::endl;
+    }
+}
+
+void RoutingEdit::onDetectDone(std::shared_ptr<const Routing> origin, 
+    std::shared_ptr<Routing> tmp)
+{
+    if (origin == routing) {
+        model->setupModelWith(tmp);
+        tmp.reset();    //析构掉
+    }
+    else {
+        qDebug() << "RoutingEdit::onDetectDone: WARNING: incompatible Routing ?" << Qt::endl;
+    }
 }
 
 

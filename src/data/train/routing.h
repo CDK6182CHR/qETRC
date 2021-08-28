@@ -94,7 +94,12 @@ public:
      */
     Routing() = default;
 
-    Routing(const Routing&)=delete;   // 似乎用不到？
+    /**
+     * 2021.08.28给出实现，深拷贝语义。
+     * 用于交路车次识别。当前对象【不获得】车次管理权（车次那边的引用不变）
+     */
+    Routing(const Routing& other);
+
     Routing(Routing&&)noexcept=default;
     Routing& operator=(const Routing&)=delete;
 
@@ -270,8 +275,22 @@ public:
 
     /**
      * 用在解析字符串以及识别车次中，识别指定的单个车次
+     * 返回：是否识别为real train
      */
-    void parseTrainName(TrainCollection& coll, const QString& name, bool fullOnly,
+    bool parseTrainName(TrainCollection& coll, const QString& name, bool fullOnly,
         QString& report, const Routing* ignore);
+
+    /**
+     * 识别车次：对本交路所有虚拟车次，尝试找出Train。采用简单添加（不更新hook）的算法
+     * `ignore` 给出允许重复的交路，也就是this本身对应的那个交路。
+     * 同时检查非虚拟车次是否有问题
+     * 如果列车属于该交路，那么不报错
+     * 返回：是否改变
+     */
+    bool detectTrains(TrainCollection& coll, bool fullOnly, QString& report,
+        const Routing* ignore);
+
+    int virtualCount()const;
+    int realCount()const;
 };
 

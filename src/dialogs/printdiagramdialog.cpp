@@ -43,20 +43,32 @@ void PrintDiagramDialog::initUI()
 
 void PrintDiagramDialog::onSavePdf()
 {
-    QString fn=QFileDialog::getSaveFileName(this,tr("导出PDF"),edName->text(),
-         tr("PDF文档 (*.pdf)"));
-    if(fn.isEmpty())
+    QString fn = QFileDialog::getSaveFileName(this, tr("导出PDF"), edName->text(),
+        tr("PDF文档 (*.pdf)"));
+    if (fn.isEmpty())
         return;
-    bool flag=dw->toPdf(fn,edName->text(),edNote->toPlainText());
-    if(flag){
-        QMessageBox::information(this,tr("提示"),tr("导出PDF文档成功"));
+    bool flag = dw->toPdf(fn, edName->text(), edNote->toPlainText());
+    if (flag) {
+        QMessageBox::information(this, tr("提示"), tr("导出PDF文档成功"));
         done(QDialog::Accepted);
-    }else{
-        QMessageBox::warning(this,tr("错误"),tr("导出PDF文档失败，可能因为文件占用。"));
+    }
+    else {
+        QMessageBox::warning(this, tr("错误"), tr("导出PDF文档失败，可能因为文件占用。"));
     }
 }
 
 void PrintDiagramDialog::onSavePng()
 {
-    QMessageBox::warning(this,tr("错误"),tr("PNG导出尚未实现，请使用导出PDF功能。"));
+    QString fn = QFileDialog::getSaveFileName(this, tr("导出PNG"), edName->text(),
+        tr("PNG图形 (*.png)"));
+    if (fn.isEmpty())
+        return;
+    bool flag = dw->toPng(fn, edName->text(), edNote->toPlainText());
+    if (flag) {
+        QMessageBox::information(this, tr("提示"), tr("导出PNG图片成功"));
+        done(QDialog::Accepted);
+    }
+    else {
+        QMessageBox::warning(this, tr("错误"), tr("导出PNG图片失败，可能因为文件占用。"));
+    }
 }

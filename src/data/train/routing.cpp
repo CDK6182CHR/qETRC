@@ -150,6 +150,7 @@ void Routing::swap(Routing& other)
 void Routing::parse(TrainCollection& coll, const QString& str, const QString& splitter,
     bool fullOnly, QString& report, const Routing* ignore)
 {
+    report.append("-------------------\n");
     static const QVector<QString> initSplitters{ "-","~","—","～" };
     auto sp = splitter;
     if (sp.isEmpty()) {
@@ -171,9 +172,10 @@ void Routing::parse(TrainCollection& coll, const QString& str, const QString& sp
     }
 }
 
-void Routing::parseTrainName(TrainCollection& coll, const QString& t, 
+bool Routing::parseTrainName(TrainCollection& coll, const QString& t, 
     bool fullOnly, QString& report, const Routing* ignore)
 {
+    bool flag = false;
     if (int idx = trainNameIndexLinear(t); idx != -1) {
         report.append(QObject::tr("[ERROR] 车次[%1]已存在于本交路第[%2]位，不予添加\n")
             .arg(t).arg(idx + 1));
@@ -186,7 +188,7 @@ void Routing::parseTrainName(TrainCollection& coll, const QString& t,
         if (train) {
             //找到车次，判定是否属于其他交路
             if (auto idx = trainIndexLinear(train); idx != -1) {
-                report.append(QObject::tr("[ERROR] 车次[%1]已经在本次识别中添加到第%2位，"
+                report.append(QObject::tr("[ERROR]   车次[%1]已经在本次识别中添加到第%2位，"
                     "不能重复添加。\n").arg(train->trainName().full()).arg(idx + 1));
             }
             else if (train->hasRouting() && train->routing().lock().get() != ignore) {
@@ -197,9 +199,10 @@ void Routing::parseTrainName(TrainCollection& coll, const QString& t,
             }
             else {
                 //实体车次添加成功
-                report.append(QObject::tr("[INFO] 车次[%1]成功识别为实体车次。\n")
+                report.append(QObject::tr("[INFO]    车次[%1]成功识别为实体车次。\n")
                     .arg(train->trainName().full()));
                 appendTrainSimple(train, true);
+                flag = true;
             }
         }
         else {
@@ -209,6 +212,83 @@ void Routing::parseTrainName(TrainCollection& coll, const QString& t,
             appendVirtualTrain(t, true);
         }
     }
+    return flag;
+}
+
+bool Routing::detectTrains(TrainCollection& coll, bool fullOnly, QString& report, 
+    const Routing* ignore)
+{
+    report += QObject::tr("\n[INFO]    现在在交路[%1]中进行车次识别\n").arg(name());
+    bool flag = false;
+    for (auto& p : _order) {
+        if (p.isVirtual()) {
+            // 搜索车次
+            auto train = coll.findFullName(p.name());
+            if (!train && !fullOnly) {
+                train = coll.findFirstSingleName(p.name());
+            }
+            if (train) {
+                if (int idx = trainIndexLinear(train); idx != -1) {
+                    report += QObject::tr("[WARNING] 车次[%1]已经在本次识别的交路第[%2]位"
+                        "出现过，不能重复，仍为虚拟。\n").arg(train->trainName().full())
+                        .arg(idx + 1);
+                }
+                else if (train->hasRouting()) {
+                    auto t = train->routing().lock();
+                    report += QObject::tr("[WARNING] 车次[%1]已经属于交路[%2]，仍为虚拟。\n")
+                        .arg(train->trainName().full(), t->name());
+                }
+                else {
+                    report += QObject::tr("[INFO]    车次[%1]成功识别为实体车次。\n")
+                        .arg(train->trainName().full());
+                    p.setTrain(train);
+                    flag = true;
+                }
+            }
+            else {
+                report += QObject::tr("[WARNING] 找不到车次[%1]，该车次仍为虚拟。\n")
+                    .arg(p.name());
+            }
+        }
+        else {  // not virtual
+            //实体车次检查一下
+            auto t = p.train();
+            if (!t->hasRouting()) {
+                report += QObject::tr("[ERROR]   车次[%1]列车端没有交路信息，与交路端数据冲突。"
+                    "车次被改置为虚拟。这可能是由于程序内部错误。\n").arg(t->trainName().full());
+                p.makeVirtual();
+                flag = true;
+            }
+            else if (auto rt = t->routing().lock();
+                rt && rt.get() != this && rt.get() != ignore) {
+                report += QObject::tr("[ERROR]   车次[%1]列车端的交路信息指向交路[%2]，"
+                    "与当前交路不一致，在当前交路中被设置为虚拟。这可能由于程序内部错误。\n")
+                    .arg(t->trainName().full(), rt->name());
+                flag = true;
+            }
+        }
+    }
+    return flag;
+}
+
+int Routing::virtualCount() const
+{
+    int cnt = 0;
+    for (const auto& p : _order) {
+        if (p.isVirtual())
+            ++cnt;
+    }
+    return cnt;
+}
+
+int Routing::realCount() const
+{
+    int cnt = 0;
+    for (const auto& p : _order) {
+        if (!p.isVirtual())
+            ++cnt;
+    }
+    return cnt;
 }
 
 #undef ATTR_SWAP
@@ -277,6 +357,18 @@ const QString &RoutingNode::name() const
 //    }
 //    return *this;
 //}
+
+Routing::Routing(const Routing& other)
+{
+    _name = other._name;
+    _model = other._model;
+    _owner = other._owner;
+    _note = other._note;
+    _highlighted = other._highlighted;
+    for (const auto& p : other._order) {
+        _order.emplace_back(p);    // copy contruct;
+    }
+}
 
 void Routing::fromJson(const QJsonObject& obj, TrainCollection& coll)
 {

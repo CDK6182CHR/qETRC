@@ -62,6 +62,7 @@ private slots:
     void actApply();
     void actCancel();
     void rowInserted(int row);
-
+    void onParseDone(std::shared_ptr<Routing>original, std::shared_ptr<Routing> tmp);
+    void onDetectDone(std::shared_ptr<const Routing> origin, std::shared_ptr<Routing> tmp);
 };
 

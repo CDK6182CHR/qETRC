@@ -4,6 +4,8 @@
 #include <memory>
 #include <deque>
 #include <QList>
+#include <vector>
+#include <QVector>
 #include <QString>
 #include <variant>
 
@@ -189,4 +191,4 @@ struct SnapEvent {
     }
 };
 
-using SnapEventList = QList<SnapEvent>;
+using SnapEventList = QVector<SnapEvent>;

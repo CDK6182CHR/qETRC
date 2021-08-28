@@ -45,6 +45,17 @@ void RoutingWidget::initUI()
     setLayout(vlay);
 }
 
+void RoutingWidget::removeRouting(int row, std::shared_ptr<Routing> routing)
+{
+    if (_undo) {
+        _undo->push(new qecmd::RemoveRouting(row, routing, this));
+    }
+    else {
+        qDebug() << "RoutingWidget::actRemove: commit inplace." << Qt::endl;
+        commitRemoveRouting(row, routing);
+    }
+}
+
 void RoutingWidget::actEdit()
 {
     actDoubleClicked(table->currentIndex());
@@ -115,6 +126,55 @@ void RoutingWidget::undoRemoveRouting(int row, std::shared_ptr<Routing> routing)
     }
 }
 
+void RoutingWidget::onRemoveRoutingFromContext(std::shared_ptr<Routing> routing)
+{
+    int i = coll.getRoutingIndex(routing);
+    if (i == -1)return;
+    if (_undo) {
+        _undo->push(new qecmd::RemoveRouting(i, routing, this));
+    }
+    else {
+        qDebug() << "RoutingWidget::onRemoveRoutingFromContext: INFO: " <<
+            "commit in-place. " << Qt::endl;
+        commitRemoveRouting(i, routing);
+    }
+}
+
+void RoutingWidget::onRemoveRoutingFromNavi(int row)
+{
+    auto t = coll.routingAt(row);
+    removeRouting(row, t);
+}
+
+void RoutingWidget::onRoutingsAdded(const QList<std::shared_ptr<Routing>> routings)
+{
+    if (_undo) {
+        _undo->push(new qecmd::BatchAddRoutings(routings, this));
+    }
+    else {
+        qDebug() << "RoutingWidget::onRoutingsAdded: INFO: commit in-place" << Qt::endl;
+        commitAppendRoutings(routings);
+    }
+}
+
+void RoutingWidget::commitAppendRoutings(const QList<std::shared_ptr<Routing>> routings)
+{
+    model->appendRoutings(routings);
+    //暂定一个个发射信号
+    foreach(auto p, routings) {
+        if (p->anyValidTrains())
+            emit nonEmptyRoutingAdded(p);
+    }
+}
+
+void RoutingWidget::undoAppendRoutings(const QList<std::shared_ptr<Routing>> routings)
+{
+    model->removeTailRoutings(routings.size());
+    foreach(auto p, routings) {
+        emit routingRemoved(p);
+    }
+}
+
 
 void RoutingWidget::commitAddRouting(std::shared_ptr<Routing> routing)
 {
@@ -159,4 +219,21 @@ void qecmd::RemoveRouting::undo()
 void qecmd::RemoveRouting::redo()
 {
     rw->commitRemoveRouting(row, routing);
+}
+
+qecmd::BatchAddRoutings::BatchAddRoutings(const QList<std::shared_ptr<Routing>> routings_, 
+    RoutingWidget* rw_, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("批量添加%1个交路").arg(routings_.size()),parent),
+    routings(routings_),rw(rw_)
+{
+}
+
+void qecmd::BatchAddRoutings::undo()
+{
+    rw->undoAppendRoutings(routings);
+}
+
+void qecmd::BatchAddRoutings::redo()
+{
+    rw->commitAppendRoutings(routings);
 }

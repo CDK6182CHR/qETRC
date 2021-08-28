@@ -333,6 +333,10 @@ private slots:
 
     void actReadRulerWizard();
 
+    void actBatchParseRouting();
+
+    void actBatchDetectRouting();
+
 public slots:
 
     /**

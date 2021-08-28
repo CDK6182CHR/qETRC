@@ -19,7 +19,8 @@
 #include "dialogs/batchcopytraindialog.h"
 #include "viewers/traindiffdialog.h"
 #include "wizards/readruler/readrulerwizard.h"
-
+#include "editors/routing/batchparseroutingdialog.h"
+#include "editors/routing/detectroutingdialog.h"
 
 #include "traincontext.h"
 #include "railcontext.h"
@@ -353,6 +354,11 @@ void MainWindow::initDockWidgets()
 
         connect(naviView, &NaviTree::focusInRouting,
             this, &MainWindow::focusInRouting);
+
+        connect(naviView, &NaviTree::actBatchDetectRouting,
+            this, &MainWindow::actBatchDetectRouting);
+        connect(naviView, &NaviTree::actBatchParseRouting,
+            this, &MainWindow::actBatchParseRouting);
     }
 
     //列车管理
@@ -402,6 +408,10 @@ void MainWindow::initDockWidgets()
             naviModel, &DiagramNaviModel::onRoutingInserted);
         connect(rw->getModel(), &RoutingCollectionModel::rowsRemoved,
             naviModel, &DiagramNaviModel::onRoutingRemoved);
+        connect(naviView, &NaviTree::removeRoutingNavi,
+            rw, &RoutingWidget::onRemoveRoutingFromNavi);
+        connect(naviView, &NaviTree::actAddRouting,
+            rw, &RoutingWidget::actAdd);
     }
 }
 
@@ -670,6 +680,16 @@ void MainWindow::initToolbar()
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
+        act = new QAction(QIcon(":/icons/text.png"), tr("批量解析"), this);
+        connect(act, &QAction::triggered, this, &MainWindow::actBatchParseRouting);
+        act->setToolTip(tr("批量文本解析\n批量地从车次套用顺序文本中解析出交路数据"));
+        panel->addMediumAction(act);
+
+        act = new QAction(QIcon(":/icons/identify.png"), tr("批量识别"), this);
+        connect(act, &QAction::triggered, this, &MainWindow::actBatchDetectRouting);
+        act->setToolTip(tr("批量识别车次\n对所有交路，尝试识别车次，使得虚拟车次转变为实体车次。"));
+        panel->addMediumAction(act);
+
         panel = cat->addPannel(tr("分析"));
         act = new QAction(QIcon(":/icons/compare.png"), tr("车次对照"), this);
         act->setToolTip(tr("两车次运行对照\n在指定线路上，对比两个选定车次的运行情况。"));
@@ -785,6 +805,8 @@ void MainWindow::initToolbar()
             this, &MainWindow::repaintRoutingTrainLines);
         connect(routingWidget, &RoutingWidget::routingRemoved,
             contextRouting, &RoutingContext::onRoutingRemoved);
+        connect(contextRouting, &RoutingContext::removeRouting,
+            routingWidget, &RoutingWidget::onRemoveRoutingFromContext);
     }
 
     //ApplicationMenu的初始化放在最后，因为可能用到前面的..
@@ -1038,6 +1060,22 @@ void MainWindow::actReadRulerWizard()
     connect(wzd, &ReadRulerWizard::rulerUpdated,
         contextRuler, &RulerContext::actChangeRulerData);
     wzd->show();
+}
+
+void MainWindow::actBatchParseRouting()
+{
+    auto* dialog = new BatchParseRoutingDialog(_diagram.trainCollection(), this);
+    connect(dialog, &BatchParseRoutingDialog::routingsParsed,
+        routingWidget, &RoutingWidget::onRoutingsAdded);
+    dialog->show();
+}
+
+void MainWindow::actBatchDetectRouting()
+{
+    auto* dialog = new BatchDetectRoutingDialog(_diagram.trainCollection(), this);
+    connect(dialog, &BatchDetectRoutingDialog::detectApplied,
+        contextRouting, &RoutingContext::actBatchRoutingUpdate);
+    dialog->open();
 }
 
 void MainWindow::updateWindowTitle()

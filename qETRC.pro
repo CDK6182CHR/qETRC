@@ -51,6 +51,8 @@ SOURCES += \
     src/editors/forbidwidget.cpp \
     src/editors/railstationwidget.cpp \
     src/editors/routing/addroutingnodedialog.cpp \
+    src/editors/routing/batchparseroutingdialog.cpp \
+    src/editors/routing/detectroutingdialog.cpp \
     src/editors/routing/parseroutingdialog.cpp \
     src/editors/routing/routingedit.cpp \
     src/editors/routing/routingwidget.cpp \
@@ -64,6 +66,7 @@ SOURCES += \
     src/model/rail/intervaldatamodel.cpp \
     src/model/train/routingcollectionmodel.cpp \
     src/model/train/routingeditmodel.cpp \
+    src/model/train/routinglistmodel.cpp \
     src/model/train/trainlistreadmodel.cpp \
     src/util/railrulercombo.cpp \
     src/util/selectrailwaycombo.cpp \
@@ -155,6 +158,8 @@ HEADERS += \
     src/editors/forbidwidget.h \
     src/editors/railstationwidget.h \
     src/editors/routing/addroutingnodedialog.h \
+    src/editors/routing/batchparseroutingdialog.h \
+    src/editors/routing/detectroutingdialog.h \
     src/editors/routing/parseroutingdialog.h \
     src/editors/routing/routingedit.h \
     src/editors/routing/routingwidget.h \
@@ -168,6 +173,7 @@ HEADERS += \
     src/model/rail/intervaldatamodel.h \
     src/model/train/routingcollectionmodel.h \
     src/model/train/routingeditmodel.h \
+    src/model/train/routinglistmodel.h \
     src/model/train/trainlistreadmodel.h \
     src/util/railrulercombo.h \
     src/util/selectrailwaycombo.h \

@@ -11,7 +11,7 @@ NaviTree::NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget* parent) 
     QWidget(parent), mePageList(new QMenu(this)), meRailList(new QMenu(this)),
     meTrainList(new QMenu(this)), mePage(new QMenu(this)), meTrain(new QMenu(this)),
     meRailway(new QMenu(this)), meRuler(new QMenu(this)), meForbid(new QMenu(this)),
-    meRouting(new QMenu(this)),
+    meRouting(new QMenu(this)),meRoutingList(new QMenu(this)),
     _model(model_), _undo(undo)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -90,6 +90,16 @@ void NaviTree::initContextMenus()
     //Routing
     act = meRouting->addAction(tr("编辑交路"));
     connect(act, qOverload<bool>(&QAction::triggered), this, &NaviTree::onEditRoutingContext);
+    act = meRouting->addAction(tr("删除交路"));
+    connect(act, &QAction::triggered, this, &NaviTree::onRemoveRoutingContext);
+
+    //RoutingList
+    act = meRoutingList->addAction(tr("添加交路"));
+    connect(act, &QAction::triggered, this, &NaviTree::actAddRouting);
+    act = meRoutingList->addAction(tr("批量解析"));
+    connect(act, &QAction::triggered, this, &NaviTree::actBatchParseRouting);
+    act = meRoutingList->addAction(tr("批量识别车次"));
+    connect(act, &QAction::triggered, this, &NaviTree::actBatchDetectRouting);
 }
 
 NaviTree::ACI* NaviTree::getItem(const QModelIndex& idx)
@@ -142,6 +152,15 @@ void NaviTree::onRemoveRulerContext()
     ACI* item = getItem(idx);
     if (item && item->type() == navi::RulerItem::Type) {
         emit removeRulerNavi(static_cast<navi::RulerItem*>(item)->ruler());
+    }
+}
+
+void NaviTree::onRemoveRoutingContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::RoutingItem::Type) {
+        emit removeRoutingNavi(item->row());
     }
 }
 
@@ -354,6 +373,8 @@ void NaviTree::showContextMenu(const QPoint& pos)
     case navi::RailwayItem::Type:meRailway->popup(p); break;
     case navi::RulerItem::Type:meRuler->popup(p); break;
     case navi::ForbidItem::Type:meForbid->popup(p); break;
+    case navi::RoutingItem::Type:meRouting->popup(p); break;
+    case navi::RoutingListItem::Type:meRoutingList->popup(p); break;
     }
     
 }
