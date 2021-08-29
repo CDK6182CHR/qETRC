@@ -7,7 +7,8 @@
 #include <SARibbonPannelItem.h>
 #include <SARibbonGallery.h>
 #include <SARibbonGalleryGroup.h>
-
+#include <QApplication>
+#include <QStyle>
 
 
 ViewCategory::ViewCategory(MainWindow *mw_,
@@ -80,7 +81,8 @@ void ViewCategory::initUI()
     //类型显示控制
     panel = cat->addPannel(tr("类型显示控制"));
 
-    act = new QAction(QIcon(":/icons/refresh.png"), tr("刷新类型表"), this);
+    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_BrowserReload),
+        tr("刷新类型表"), this);
     btn = panel->addLargeAction(act);
     btn->setMinimumWidth(80);
     connect(act, SIGNAL(triggered()), this, SLOT(refreshTypeGroup()));
@@ -93,7 +95,8 @@ void ViewCategory::initUI()
     connect(act, SIGNAL(triggered()), this, SLOT(selectReversed()));
     panel->addMediumAction(act);
 
-    act = new QAction(QIcon(":/icons/tick.png"), tr("应用"), this);
+    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogApplyButton),
+        tr("应用"), this);
     connect(act, SIGNAL(triggered()), this, SLOT(applyTypeShow()));
     panel->addLargeAction(act);
 

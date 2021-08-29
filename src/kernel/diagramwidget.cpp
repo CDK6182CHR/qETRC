@@ -192,6 +192,32 @@ void DiagramWidget::paintToFile(QPainter& painter, const QString& title, const Q
     updateTimeAxis();
 }
 
+void DiagramWidget::showWeakenItem()
+{
+    if (!SystemJson::instance.weaken_unselected)
+        return;
+    if (!weakItem) {
+        //weakItem = new QGraphicsRectItem(margins().left, margins().up,
+        //    scene()->width() - margins().left - margins().right,
+        //    scene()->height() - margins().up - margins().down
+        //);
+        weakItem = new QGraphicsRectItem(0, 0, scene()->width(), scene()->height());
+        scene()->addItem(weakItem);
+        weakItem->setBrush(QColor(255, 255, 255, 150));
+        weakItem->setZValue(9);
+        weakItem->setPen(QPen(Qt::transparent));
+    }
+    else {
+        weakItem->setVisible(true);
+    }
+}
+
+void DiagramWidget::hideWeakenItem()
+{
+    if (weakItem)
+        weakItem->setVisible(false);
+}
+
 bool DiagramWidget::toPng(const QString& filename, const QString& title, const QString& note)
 {
     constexpr int note_apdx = 80;
@@ -838,6 +864,7 @@ void DiagramWidget::selectTrain(TrainItem* item)
 
     nowItem->setText(_selectedTrain->trainName().full());
 
+    showWeakenItem();
     emit trainSelected(_selectedTrain);
 }
 
@@ -850,6 +877,7 @@ void DiagramWidget::unselectTrain()
         _selectedTrain = nullptr;
         nowItem->setText(" ");
     }
+    hideWeakenItem();
 }
 
 void DiagramWidget::showAllForbids()
@@ -1058,6 +1086,7 @@ void DiagramWidget::highlightTrain(std::shared_ptr<Train> train)
     _page->highlightTrainItems(*_selectedTrain);
 
     nowItem->setText(_selectedTrain->trainName().full());
+    showWeakenItem();
 }
 
 void DiagramWidget::highlightRouting(std::shared_ptr<Routing> routing)
@@ -1067,6 +1096,7 @@ void DiagramWidget::highlightRouting(std::shared_ptr<Routing> routing)
             continue;
         _page->highlightTrainItemsWithLink(*(p.train()));
     }
+    showWeakenItem();
 }
 
 void DiagramWidget::unhighlightRouting(std::shared_ptr<Routing> routing)
@@ -1076,6 +1106,7 @@ void DiagramWidget::unhighlightRouting(std::shared_ptr<Routing> routing)
             continue;
         _page->unhighlightTrainItemsWithLink(*(p.train()));
     }
+    hideWeakenItem();
 }
 
 

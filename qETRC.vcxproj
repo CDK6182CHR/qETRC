@@ -230,6 +230,7 @@
     <ClCompile Include="src\util\railrulercombo.cpp" />
     <ClCompile Include="src\util\selectrailwaycombo.cpp" />
     <ClCompile Include="src\util\selecttraincombo.cpp" />
+    <ClCompile Include="src\viewers\diagnosisdialog.cpp" />
     <ClCompile Include="src\viewers\railsectionevents.cpp" />
     <ClCompile Include="src\viewers\railsnapevents.cpp" />
     <ClCompile Include="src\viewers\railstationeventlist.cpp" />
@@ -312,6 +313,7 @@
     <QtMoc Include="src\editors\routing\detectroutingdialog.h" />
     <QtMoc Include="src\model\train\routinglistmodel.h" />
     <QtMoc Include="src\editors\routing\batchparseroutingdialog.h" />
+    <QtMoc Include="src\viewers\diagnosisdialog.h" />
     <ClInclude Include="src\viewers\traindiffdialog.h" />
     <QtMoc Include="src\wizards\readruler\readrulerpageinterval.h" />
     <QtMoc Include="src\wizards\readruler\readrulerwizard.h" />

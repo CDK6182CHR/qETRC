@@ -61,6 +61,26 @@ TrainEventList Diagram::listTrainEvents(const Train& train) const
     return res;
 }
 
+DiagnosisList Diagram::diagnoseTrain(const Train& train, bool withIntMeet) const
+{
+    DiagnosisList res;
+    foreach(auto adp, train.adapters()) {
+        foreach(auto line, adp->lines()) {
+            res.append(line->diagnoseLine(_trainCollection, withIntMeet));
+        }
+    }
+    return res;
+}
+
+DiagnosisList Diagram::diagnoseAllTrains(bool withIntMeet) const
+{
+    DiagnosisList res;
+    foreach(auto t, _trainCollection.trains()) {
+        res.append(diagnoseTrain(*t, withIntMeet));
+    }
+    return res;
+}
+
 std::shared_ptr<DiagramPage> Diagram::createDefaultPage()
 {
     auto t = std::make_shared<DiagramPage>(railways(),
@@ -1019,10 +1039,10 @@ bool Diagram::toTrc(const QString& filename, std::shared_ptr<Railway> rail, bool
 bool Diagram::toSinglePyetrc(const QString& filename, 
     std::shared_ptr<Railway> rail, bool localOnly) const
 {
-    QFile file(_filename);
+    QFile file(filename);
     file.open(QFile::WriteOnly);
     if (!file.isOpen()) {
-        qDebug() << "Diagram::toSinglePyetrc: WARNING: open file " << _filename << " failed. Nothing todo."
+        qDebug() << "Diagram::toSinglePyetrc: WARNING: open file " << filename << " failed. Nothing todo."
             << Qt::endl;
         return false;
     }

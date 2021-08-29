@@ -72,19 +72,19 @@ void TrainItem::highlight()
         //起点标签
         startRect = new QGraphicsRectItem(startLabelText->boundingRect(), this);
         startRect->setPos(startLabelText->pos());
-        startRect->setZValue(1);
+        startRect->setZValue(5);
         startRect->setPen(rectPen);
         startRect->setBrush(brush);
-        startLabelText->setZValue(2);
+        startLabelText->setZValue(6);
         startLabelText->setBrush(Qt::white);
     }
     if (endLabelText) {
         endRect = new QGraphicsRectItem(endLabelText->boundingRect(), this);
         endRect->setPos(endLabelText->pos());
-        endRect->setZValue(1);
+        endRect->setZValue(5);
         endRect->setPen(rectPen);
         endRect->setBrush(brush);
-        endLabelText->setZValue(2);
+        endLabelText->setZValue(6);
         endLabelText->setBrush(Qt::white);
     }
 
@@ -107,6 +107,7 @@ void TrainItem::highlight()
         else
             addTimeMarks();
     }
+    setZValue(10);
     _isHighlighted = true;
 }
 
@@ -152,7 +153,7 @@ void TrainItem::unhighlight()
             p->setFont(font);
         }
     }
-    setZValue(5);
+    setZValue(5); 
 
     if (config().show_time_mark == 1)
         hideTimeMarks();

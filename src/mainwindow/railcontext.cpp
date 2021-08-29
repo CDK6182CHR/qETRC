@@ -11,6 +11,7 @@
 #include "editors/forbidwidget.h"
 
 #include <QtWidgets>
+#include <QStyle>
 
 RailContext::RailContext(Diagram& diagram_, SARibbonContextCategory* context, 
 	MainWindow* mw_, QObject* parent):
@@ -126,11 +127,6 @@ void RailContext::initUI()
 	btn = panel->addLargeAction(act);
 	btn->setMinimumWidth(80);
 
-	act = new QAction(QIcon(":/icons/close.png"), tr("删除基线"), this);
-	btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(70);
-	connect(act, SIGNAL(triggered()), this, SLOT(actRemoveRailway()));
-
 	panel = page->addPannel(tr("标尺"));
 	act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺"), this);
 	auto* me = new SARibbonMenu;
@@ -185,6 +181,22 @@ void RailContext::initUI()
 		"（如果运行线与指定时刻存在交点）。"));
 	btn = panel->addLargeAction(act);
 	btn->setMinimumWidth(80);
+
+	panel = page->addPannel("");
+	act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
+		tr("删除基线"), this);
+	act->setToolTip(tr("删除基线\n删除当前基线，并且从所有运行图中移除（空白运行图将被删除）。"
+		"\n此操作波及面较广且不可撤销，请谨慎操作。"));
+	btn = panel->addLargeAction(act);
+	btn->setMinimumWidth(70);
+	connect(act, SIGNAL(triggered()), this, SLOT(actRemoveRailway()));
+
+	act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
+		tr("关闭面板"), this);
+	connect(act, &QAction::triggered, mw, &MainWindow::focusOutRailway);
+	act->setToolTip(tr("关闭面板\n关闭当前的基线上下文工具栏页面。"));
+	btn = panel->addLargeAction(act);
+	btn->setMinimumWidth(70);
 }
 
 void RailContext::updateRailWidget(std::shared_ptr<Railway> rail)

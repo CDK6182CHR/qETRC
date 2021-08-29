@@ -63,4 +63,11 @@ static constexpr int msecsOfADay = 24 * 3600 * 1000;
  */
 bool timeInRange(const QTime& left, const QTime& right, const QTime& t);
 
+/**
+ * 两个时间范围是否存在交叉。包含边界。
+ * seealso: TrainStation::stopRangeIntersected
+ */
+bool timeRangeIntersected(const QTime& start1, const QTime& end1, const QTime& start2,
+	const QTime& end2);
+
 }

@@ -21,6 +21,8 @@ public:
 
     int ribbon_style = 1;
 
+    bool weaken_unselected = true;
+
     //todo: dock show..
 
     /**

@@ -3,6 +3,8 @@
 #include "railcontext.h"
 
 #include "dialogs/rulerfromtraindialog.h"
+#include <QApplication>
+#include <QStyle>
 
 RulerContext::RulerContext(Diagram& diagram_, SARibbonContextCategory *context, MainWindow *mw_):
     QObject(mw_),diagram(diagram_), cont(context),mw(mw_)
@@ -69,12 +71,20 @@ void RulerContext::initUI()
     btn->setMinimumWidth(80);
     connect(act, SIGNAL(triggered()), this, SLOT(actSetAsOrdinate()));
 
-    act = new QAction(QIcon(":/icons/close.png"), tr("删除标尺"), this);
+    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
+        tr("删除标尺"), this);
     act->setToolTip(tr("删除标尺\n删除当前标尺。如果当前标尺同时是排图标尺，"
         "则同时将本线设置为按里程排图。"));
     btn = panel->addLargeAction(act);
     btn->setMinimumWidth(70);
     connect(act, SIGNAL(triggered()), this, SLOT(actRemoveRuler()));
+
+    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
+        tr("关闭面板"), this);
+    act->setToolTip(tr("关闭面板\n关闭当前的标尺上下文工具栏页面"));
+    btn = panel->addLargeAction(act);
+    btn->setMinimumWidth(70);
+    connect(act, &QAction::triggered, this, &RulerContext::focusOutRuler);
     
 }
 

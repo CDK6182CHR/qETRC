@@ -58,5 +58,6 @@
         <file>icons/tick.png</file>
         <file>icons/trainline.png</file>
         <file>icons/line-manage.png</file>
+        <file>icons/weaken.png</file>
     </qresource>
 </RCC>

@@ -35,10 +35,10 @@ void RailSnapEventsModel::setupModel()
         setItem(i,ColTrainName,new SI(train->trainName().full()));
         setItem(i,ColMile,new SI(QString::number(e.mile,'f',3)));
         if(e.isStationEvent()){
-            auto st=std::get<std::shared_ptr<RailStation>>(e.pos);
+            auto st=std::get<std::shared_ptr<const RailStation>>(e.pos);
             setItem(i,ColPos,new SI(st->name.toSingleLiteral()));
         }else{
-            auto it=std::get<std::shared_ptr<RailInterval>>(e.pos);
+            auto it=std::get<std::shared_ptr<const RailInterval>>(e.pos);
             setItem(i,ColPos,new SI(it->toString()));
         }
         setItem(i,ColType,new SI(train->type()->name()));

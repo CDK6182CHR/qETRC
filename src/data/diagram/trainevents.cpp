@@ -139,3 +139,50 @@ QString RailStationEvent::toString() const
 		.arg(another->get().trainName().full())
 		.arg(qeutil::eventTypeString(type));
 }
+
+QString qeutil::diagnoLevelString(DiagnosisLevel level)
+{
+	switch (level)
+	{
+	case qeutil::Information: return "INFO";
+		break;
+	case qeutil::Warning: return "WARNING";
+		break;
+	case qeutil::Error:return "ERROR";
+		break;
+	default:return {};
+		break;
+	}
+}
+
+QString qeutil::diagnoTypeString(DiagnosisType type)
+{
+	switch (type)
+	{
+	case DiagnosisType::StopTooLong1:
+	case DiagnosisType::StopTooLong2:return QObject::tr("停时过长");
+		break;
+	case DiagnosisType::IntervalTooLong1:
+	case DiagnosisType::IntervalTooLong2:return QObject::tr("区间过长");
+		break;
+	case DiagnosisType::IntervalMeet:return QObject::tr("区间交会");
+		break;
+	case DiagnosisType::IntervalOverTaking:return QObject::tr("区间越行");
+		break;
+	case DiagnosisType::CollidForbid:return QObject::tr("天窗冲突");
+		break;
+	case DiagnosisType::SystemError:return QObject::tr("系统错误");
+	default:return {};
+		break;
+	}
+}
+
+QString DiagnosisIssue::posString() const
+{
+	if (std::holds_alternative<std::shared_ptr<const RailStation>>(pos)) {
+		return std::get<std::shared_ptr<const RailStation>>(pos)->name.toSingleLiteral();
+	}
+	else {
+		return std::get<std::shared_ptr<const RailInterval>>(pos)->toString();
+	}
+}

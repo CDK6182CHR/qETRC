@@ -104,6 +104,11 @@ std::shared_ptr<ForbidNode> RailInterval::getForbidNode(std::shared_ptr<Forbid> 
     return _forbidNodes.at(forbid->index());
 }
 
+std::shared_ptr<const ForbidNode> RailInterval::getForbidNode(std::shared_ptr<const Forbid> forbid) const
+{
+    return _forbidNodes.at(forbid->index());
+}
+
 std::shared_ptr<RailInterval> RailInterval::inverseInterval()
 {
     if (fromStation()->direction == PassedDirection::BothVia &&

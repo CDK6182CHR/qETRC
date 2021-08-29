@@ -212,6 +212,11 @@ public:
      */
     TrainEventList listTrainEvents(const Train& train)const;
 
+    DiagnosisList diagnoseTrain(const Train& train, bool withIntMeet)const;
+
+    DiagnosisList diagnoseAllTrains(bool withIntMeet)const;
+
+
     /**
      * 创建默认的运行图视图，即按顺序包含本线的所有线路
      */

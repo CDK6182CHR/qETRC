@@ -73,10 +73,21 @@ void PageContext::initUI()
     btn->setMinimumWidth(70);
     connect(act, SIGNAL(triggered()), this, SLOT(actPrint()));
 
+    panel = page->addPannel("");
 
-    act = new QAction(QIcon(":/icons/close.png"), tr("删除"), this);
+    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
+        tr("删除"), this);
+    act->setToolTip(tr("删除运行图\n删除当前运行图页面，"
+        "但线路、车次信息不会被删除。"));
     panel->addLargeAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(actRemovePage()));
+
+    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
+        tr("关闭面板"), this);
+    act->setToolTip(tr("关闭面板\n关闭当前的运行图页面上下文工具栏页面"));
+    connect(act, &QAction::triggered, mw, &MainWindow::focusOutPage);
+    btn = panel->addLargeAction(act);
+    btn->setMinimumWidth(80);
 }
 
 void PageContext::actEdit()

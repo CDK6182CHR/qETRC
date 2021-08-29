@@ -171,6 +171,8 @@ private slots:
         bool includeStart, bool includeEnd); 
 
     void actAdjustTimetable();
+
+    void actDiagnose();
 };
 
 

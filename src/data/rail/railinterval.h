@@ -96,6 +96,7 @@ public:
     std::shared_ptr<RulerNode> getRulerNode(std::shared_ptr<Ruler> ruler);
     std::shared_ptr<RulerNode> getRulerNode(const Ruler& ruler);
     std::shared_ptr<ForbidNode> getForbidNode(std::shared_ptr<Forbid> forbid);
+    std::shared_ptr<const ForbidNode> getForbidNode(std::shared_ptr<const Forbid> forbid)const;
 
     inline bool isDown()const{return _dir==Direction::Down;}
 

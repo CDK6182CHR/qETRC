@@ -152,6 +152,12 @@ public:
      */
     LineEventList listLineEvents(const TrainCollection& coll)const;
 
+    /**
+     * 列车运行情况诊断，判断可能存在的问题。
+     * 采用和`listLineEvents`类似的框架。
+     */
+    DiagnosisList diagnoseLine(const TrainCollection& coll, bool withIntMeet)const;
+
     inline const AdapterStation* lastStation()const {
         return _stations.empty() ? nullptr : &(_stations.back());
     }
@@ -244,6 +250,8 @@ public:
      */
     static QString attachTypeStringFull(IntervalAttachType type);
 
+    const Railway& railway()const;
+
 private:
 
     /**
@@ -271,6 +279,14 @@ private:
      * 反向列车用反向迭代器，这样保证y的方向是单向变化的
      */
     void eventsWithCounter(LineEventList& res, const TrainLine& another, const Train& antrain)const;
+
+    void diagnoWithSameDir(DiagnosisList& res, const TrainLine& another, const Train& antrain)const;
+
+    /**
+     * @brief eventsWithCounter 反向列车事件表：主要是交会
+     * 反向列车用反向迭代器，这样保证y的方向是单向变化的
+     */
+    void diagnoWithCounter(DiagnosisList& res, const TrainLine& another, const Train& antrain)const;
 
     /**
      * @brief 当前运行线的y最小值，等于首站或者末站（取决于行别）的y值
@@ -385,7 +401,7 @@ private:
      * 
      */
     SnapEvent::pos_t compressSnapInterval(ConstAdaPtr former, ConstAdaPtr latter,
-        const QTime& time, double mile)const;
+        double mile)const;
 
     double snapEventMile(ConstAdaPtr former, ConstAdaPtr latter, const QTime& time)const;
 
@@ -414,6 +430,20 @@ private:
      * 根据是否是首站、末站，以及行别
      */
     int passStationPos(ConstAdaPtr st)const;
+
+    /**
+     * 单车次问题诊断，即自己时刻表直接能看出的问题
+     * 停时过长以及天窗冲突
+     */
+    void diagnoseSelf(DiagnosisList& res)const;
+
+    /**
+     * 在各个小区间依次判定  注意需要推定各个中间站的通过时刻
+     */
+    void diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr cur)const;
+
+    void diagnoForbid(DiagnosisList& res, std::shared_ptr<const RailInterval> railint,
+        const QTime& in, const QTime& out)const;
 
 };
 

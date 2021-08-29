@@ -8,6 +8,7 @@
 #include <QVector>
 #include <QString>
 #include <variant>
+#include <type_traits>
 
 #include "data/rail/railway.h"
 #include "data/train/train.h"
@@ -171,19 +172,20 @@ class TrainLine;
 struct SnapEvent {
     std::shared_ptr<const TrainLine> line;
     double mile;
-    using pos_t = std::variant<std::shared_ptr<RailStation>, std::shared_ptr<RailInterval>>;
+    using pos_t = std::variant<std::shared_ptr<const RailStation>, 
+        std::shared_ptr<const RailInterval>>;
     pos_t pos;
     bool isStopped;
     QString note;
     SnapEvent(std::shared_ptr<const TrainLine> line_,
         double mile_,
-        std::variant<std::shared_ptr<RailStation>, std::shared_ptr<RailInterval>> pos_,
+        pos_t pos_,
         bool isStopped_,
         const QString& note_=""):
         line(line_),mile(mile_),pos(pos_),isStopped(isStopped_), note(note_){}
 
     inline bool isStationEvent()const {
-        return std::holds_alternative<std::shared_ptr<RailStation>>(pos);
+        return std::holds_alternative<std::shared_ptr<const RailStation>>(pos);
     }
 
     inline bool operator<(const SnapEvent& another)const {
@@ -192,3 +194,51 @@ struct SnapEvent {
 };
 
 using SnapEventList = QVector<SnapEvent>;
+
+
+enum class DiagnosisType {
+    StopTooLong1,   // 停时超过12小时
+    StopTooLong2,   // 停时超过20小时
+    IntervalTooLong1,   //区间超过12小时
+    IntervalTooLong2,   //区间超过20小时
+    IntervalMeet,       //区间会车（可选项）
+    IntervalOverTaking, //区间越行
+    CollidForbid,       //与天窗冲突
+    SystemError,        //内部数据问题
+};
+
+namespace qeutil {
+    enum DiagnosisLevel {
+        Information = 1,
+        Warning = 2,
+        Error = 3
+    };
+
+    QString diagnoLevelString(DiagnosisLevel level);
+    QString diagnoTypeString(DiagnosisType type);
+}
+
+
+struct DiagnosisIssue {
+    DiagnosisType type;
+    qeutil::DiagnosisLevel level;
+
+    using pos_t = std::variant<std::shared_ptr<const RailStation>,
+        std::shared_ptr<const RailInterval>>;
+    pos_t pos;
+    std::shared_ptr<const TrainLine> line;
+    QString description;
+        
+    DiagnosisIssue(DiagnosisType type_,
+        qeutil::DiagnosisLevel level_,
+        pos_t pos_, std::shared_ptr<const TrainLine> line_, const QString& description_ ):
+        type(type_),level(level_),pos(pos_),line(line_),
+        description(description_){}
+
+    QString posString()const;
+};
+
+static_assert(std::is_same_v<SnapEvent::pos_t, DiagnosisIssue::pos_t>, "");
+
+using DiagnosisList = QVector<DiagnosisIssue>;
+

@@ -124,3 +124,27 @@ bool qeutil::timeInRange(const QTime& left, const QTime& right, const QTime& t)
 		return true;
 	return false;
 }
+
+
+bool qeutil::timeRangeIntersected(const QTime& start1, const QTime& end1, const QTime& start2,
+	const QTime& end2)
+{
+	int xm1 = start1.msecsSinceStartOfDay(), xm2 = end1.msecsSinceStartOfDay();
+	int xh1 = start2.msecsSinceStartOfDay(), xh2 = end2.msecsSinceStartOfDay();
+	bool flag1 = (xm2 < xm1), flag2 = (xh2 < xh1);
+	if (flag1)xm2 += msecsOfADay;
+	if (flag2)xh2 += msecsOfADay;
+	bool res1 = (std::max(xm1, xh1) <= std::min(xm2, xh2));   //不另加PBC下的比较
+	if (res1 || flag1 == flag2) {
+		// 如果都加了或者都没加PBC，这就是结果
+		return res1;
+	}
+	//如果只有一边加了PBC，那么应考虑把另一边也加上PBC再试试
+	if (flag1) {
+		xh1 += msecsOfADay; xh2 += msecsOfADay;
+	}
+	else {
+		xm1 += msecsOfADay; xm2 += msecsOfADay;
+	}
+	return (std::max(xm1, xh1) <= std::min(xm2, xh2));
+}

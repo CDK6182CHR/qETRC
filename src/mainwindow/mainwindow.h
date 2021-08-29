@@ -76,6 +76,7 @@ class MainWindow : public SARibbonMainWindow
     friend class PageContext;
     friend class RailContext;
     friend class RoutingContext;
+    friend class TrainContext;
 
     bool changed = false;
 
@@ -336,6 +337,10 @@ private slots:
     void actBatchParseRouting();
 
     void actBatchDetectRouting();
+
+    void actDiagnose();
+
+    void actToggleWeakenUnselected(bool on);
 
 public slots:
 

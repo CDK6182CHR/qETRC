@@ -72,9 +72,22 @@ bool TrainStation::stopRangeIntersected(const TrainStation& another) const
 {
     int xm1 = arrive.msecsSinceStartOfDay(), xm2 = depart.msecsSinceStartOfDay();
     int xh1 = another.arrive.msecsSinceStartOfDay(), xh2 = another.depart.msecsSinceStartOfDay();
-    if (xm2 < xm1)xm2 += msecsOfADay;
-    if (xh2 < xh1)xh2 += msecsOfADay;
-    return std::max(xm1, xh1) <= std::min(xm2, xh2);
+    bool flag1 = (xm2 < xm1), flag2 = (xh2 < xh1);
+    if (flag1)xm2 += msecsOfADay;
+    if (flag2)xh2 += msecsOfADay;
+    bool res1 = (std::max(xm1, xh1) <= std::min(xm2, xh2));   //不另加PBC下的比较
+    if (res1 || flag1 == flag2) {
+        // 如果都加了或者都没加PBC，这就是结果
+        return res1;
+    }
+    //如果只有一边加了PBC，那么应考虑把另一边也加上PBC再试试
+    if (flag1) {
+        xh1 += msecsOfADay; xh2 += msecsOfADay;
+    }
+    else {
+        xm1 += msecsOfADay; xm2 += msecsOfADay;
+    }
+    return (std::max(xm1, xh1) <= std::min(xm2, xh2));
 }
 
 QString TrainStation::stopString() const

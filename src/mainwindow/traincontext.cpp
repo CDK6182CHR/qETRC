@@ -8,6 +8,7 @@
 #include "viewers/rulerrefdialog.h"
 #include "dialogs/exchangeintervaldialog.h"
 #include "dialogs/modifytimetabledialog.h"
+#include "viewers/diagnosisdialog.h"
 
 #include <QtWidgets>
 
@@ -81,6 +82,13 @@ void TrainContext::initUI()
 		act->setToolTip(tr("标尺对照\n将本次列车运行情况与指定线路、标尺进行对照，"
 			"以确定本次列车是否符合指定标尺，或与指定标尺差异如何。"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actRulerRef()));
+		btn = panel->addLargeAction(act);
+		btn->setMinimumWidth(80);
+
+		act = new QAction(QIcon(":/icons/identify.png"), tr("时刻诊断"), this);
+		act->setToolTip(tr("列车时刻表诊断\n检查本次列车时刻表可能存在的问题，"
+			"例如到开时刻填反等。"));
+		connect(act, &QAction::triggered, this, &TrainContext::actDiagnose);
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(80);
 	}
@@ -178,11 +186,13 @@ void TrainContext::initUI()
 		w->setFixedWidth(150);
 		panel->addWidget(w, SARibbonPannelItem::Large);
 
-		act = new QAction(QIcon(":/icons/tick.png"), tr("应用"), this);
+		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogApplyButton), 
+			tr("应用"), this);
 		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actApply()));
 
-		act = new QAction(QIcon(":/icons/refresh.png"), tr("还原"), this);
+		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCancelButton),
+			tr("还原"), this);
 		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(refreshData()));
 
@@ -205,11 +215,18 @@ void TrainContext::initUI()
 		btn->setMinimumWidth(80);
 		connect(act, SIGNAL(triggered()), this, SLOT(actShowBasicWidget()));
 
-		act = new QAction(QIcon(":/icons/close.png"), tr("删除"), this);
+		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
+			tr("删除"), this);
 		connect(act, SIGNAL(triggered()), this, SLOT(actRemoveCurrentTrain()));
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(70);
 
+		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
+			tr("关闭面板"), this);
+		act->setToolTip(tr("关闭面板\n关闭当前的列车上下文工具栏页面"));
+		connect(act, &QAction::triggered, mw, &MainWindow::focusOutTrain);
+		btn = panel->addLargeAction(act);
+		btn->setMinimumWidth(80);
 		
 	}
 
@@ -534,6 +551,12 @@ void TrainContext::actAdjustTimetable()
 	connect(dialog, &ModifyTimetableDialog::trainUpdated,
 		this, &TrainContext::onTrainTimetableChanged);
 	dialog->show();
+}
+
+void TrainContext::actDiagnose()
+{
+	auto* d = new DiagnosisDialog(diagram, train, mw);
+	d->show();
 }
 
 void TrainContext::setTrain(std::shared_ptr<Train> train_)

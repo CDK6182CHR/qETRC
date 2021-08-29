@@ -120,6 +120,31 @@ LineEventList TrainLine::listLineEvents(const TrainCollection& coll) const
     return res;
 }
 
+DiagnosisList TrainLine::diagnoseLine(const TrainCollection& coll, bool withIntMeet) const
+{
+    DiagnosisList res;
+    
+    diagnoseSelf(res);
+
+    foreach(auto t, coll.trains()) {
+        if (t != train()) {
+            foreach(auto adp, t->adapters()) {
+                if (_adapter.isInSameRailway(*adp)) {
+                    foreach(auto line, adp->lines()) {
+                        if (line->dir() == dir()) {
+                            diagnoWithSameDir(res, *line, *t);
+                        }
+                        else if (withIntMeet) {
+                            diagnoWithCounter(res, *line, *t);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return res;
+}
+
 int TrainLine::totalSecs() const
 {
     if (isNull())
@@ -252,6 +277,114 @@ void TrainLine::listStationEvents(LineEventList& res) const
             res[i].emplace(StationEvent(
                 TrainEventType::SettledPass, ts->depart, rs, std::nullopt
             ));
+        }
+    }
+}
+
+void TrainLine::diagnoseSelf(DiagnosisList& res) const
+{
+    ConstAdaPtr pr = _stations.begin();
+    for (auto p = _stations.begin(); p != _stations.end(); pr = p, ++p) {
+        // 上一区间问题  注意这里暂时判定为本站的问题
+        if (p != pr) {
+            diagnoInterval(res, pr, p);
+            int secs = qeutil::secsTo(pr->trainStation->depart, p->trainStation->arrive);
+            if (secs > 20 * 3600) {
+                res.push_back(DiagnosisIssue(DiagnosisType::StopTooLong2,
+                    qeutil::Information, p->railStation.lock(), shared_from_this(),
+                    QObject::tr("上一区间运行时长为[%1]，超过20小时，应考虑到开时刻是否填反。")\
+                    .arg(qeutil::secsToString(secs))));
+            }
+            else if (secs > 12 * 3600) {
+                res.push_back(DiagnosisIssue(DiagnosisType::StopTooLong1,
+                    qeutil::Warning, p->railStation.lock(), shared_from_this(),
+                    QObject::tr("上一区间运行时长为[%1]，超过12小时，可能导致事件前后顺序判断出错。")\
+                    .arg(qeutil::secsToString(secs))));
+            }
+        }
+        int secs = qeutil::secsTo(p->trainStation->arrive, p->trainStation->depart);
+        if (secs > 20 * 3600) {
+            res.push_back(DiagnosisIssue(DiagnosisType::StopTooLong2,
+                qeutil::Information, p->railStation.lock(), shared_from_this(),
+                QObject::tr("本站停车时长为[%1]，超过20小时，应考虑到开时刻是否填反。")\
+                .arg(qeutil::secsToString(secs))));
+        }
+        else if (secs > 12 * 3600) {
+            res.push_back(DiagnosisIssue(DiagnosisType::StopTooLong1,
+                qeutil::Warning, p->railStation.lock(), shared_from_this(),
+                QObject::tr("本站停车时长为[%1]，超过12小时，可能导致事件前后顺序判断出错。")\
+                .arg(qeutil::secsToString(secs))));
+        }
+    }
+}
+
+void TrainLine::diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr cur) const
+{
+    auto rprev = prev->railStation.lock(), rcur = cur->railStation.lock();
+    auto tprev = prev->trainStation, tcur = cur->trainStation;
+    if (rprev->dirAdjacent(dir()) == rcur) {
+        // 没有中间站
+        diagnoForbid(res, rprev->dirNextInterval(dir()), tprev->depart, tcur->arrive);
+    }
+    else {
+        // 中间站一个个来搞
+        int ds = qeutil::secsTo(tprev->depart, tcur->arrive);
+        double dy = rcur->y_value.value() - rprev->y_value.value();
+        if (!dy) {
+            // 区间里程为0
+            res.append(DiagnosisIssue(DiagnosisType::SystemError, qeutil::Error,
+                rcur, shared_from_this(), QObject::tr("区间[%1-%2]的纵坐标变化为0，"
+                    "无法推定中间站时刻。").arg(rprev->name, rcur->name)));
+        }
+        else {
+            double scale = ds / dy;
+            QTime tm_prev = tprev->depart;
+            auto p = rprev->dirNextInterval(dir());
+            for (;
+                p; p = p->nextInterval()) {
+                auto ri = p->toStation();
+                double dyi = ri->y_value.value() - rprev->y_value.value();
+                int dsi = dyi * scale;
+                QTime tm = tprev->depart.addSecs(dsi);
+
+                diagnoForbid(res, p, tm_prev, tm);
+
+                if (p->toStation() == rcur) {
+                    break;
+                }
+                else {
+                    tm_prev = tm;
+                }
+            }
+            if (!p) {
+                res.append(DiagnosisIssue(DiagnosisType::SystemError, qeutil::Error,
+                    rcur, shared_from_this(), QObject::tr("非预期的区间终止：在匹配站表的"
+                        "[%1-%2]区间。可能是运行线行别出现问题。")
+                    .arg(rprev->name, rcur->name)));
+            }
+        }
+    }
+}
+
+void TrainLine::diagnoForbid(DiagnosisList& res, std::shared_ptr<const RailInterval> railint,
+    const QTime& in, const QTime& out) const
+{
+    const auto& rail = _adapter.railway();
+    if (rail.forbids().size() != Forbid::FORBID_COUNT) {
+        qDebug() << "TrainLine::diagnoForbid: WARNING: unexpeted forbid count: " <<
+            rail.forbids().size() << ", expected " << Forbid::FORBID_COUNT << Qt::endl;
+    }
+    foreach(auto f, rail.forbids()) {
+        auto n = railint->getForbidNode(f);
+        if (!n->isNull()) {
+            if (qeutil::timeRangeIntersected(n->beginTime, n->endTime,
+                in, out)) {
+                res.push_back(DiagnosisIssue(DiagnosisType::CollidForbid,
+                    qeutil::Error, railint, shared_from_this(), QObject::tr("与天窗[%1]冲突，"
+                        "天窗时间是[%2-%3]，区间运行时间（可能包含推定）是[%4-%5]。")
+                    .arg(f->name(), n->beginTime.toString("hh:mm"), n->endTime.toString("hh:mm"),
+                        in.toString("hh:mm:ss"), out.toString("hh:mm:ss"))));
+            }
         }
     }
 }
@@ -556,6 +689,96 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
                 }
                 
             }
+        }
+        sameDirStep(ycond, pme, phe, mylast, hislast, index);
+    }
+}
+
+void TrainLine::diagnoWithSameDir(DiagnosisList& res, const TrainLine& another, const Train& antrain) const
+{
+    if (std::max(yMin(), another.yMin()) >= std::min(yMax(), another.yMax())) {
+        //提前终止条件，y范围根本不相交，不用搞
+        return;
+    }
+
+    auto pme = _stations.begin(), phe = another._stations.begin();
+    ConstAdaPtr mylast = _stations.begin(), hislast = another._stations.begin();   //上一站的迭代器
+    int index = 0;   //自己的站序下标，用来插入结果的
+
+    while (pme != _stations.end() && phe != another._stations.end()) {
+        int ycond = yComp(pme, phe);
+        //先判定上一个区间有没有发生什么事情。注意此时两个都必定是直线段
+        if (pme != mylast && phe != hislast) {
+            auto pint = findIntervalIntersectionSameDir(mylast, pme, hislast, phe);
+            if (pint.has_value()) {
+                //区间越行  todo
+                auto pos = compressSnapInterval(mylast, pme, std::get<0>(*pint));
+                res.push_back(DiagnosisIssue(DiagnosisType::IntervalOverTaking,
+                    qeutil::Error, pos, shared_from_this(), QObject::tr("在里程[%1]，时刻"
+                        "[%2]与车次[%3]发生[%4]").arg(std::get<0>(*pint)).arg(
+                            std::get<1>(*pint).toString("hh:mm:ss"),
+                            antrain.trainName().full(),
+                            qeutil::eventTypeString(std::get<2>(*pint)))));
+            }
+        }
+
+        auto tme = pme->trainStation, the = phe->trainStation;
+        auto rme = pme->railStation.lock(), rhe = phe->railStation.lock();
+        //判断站内有没有发生什么事情 这个复杂一点
+        //麻烦在：可能出现一趟车站内停车，另一趟车通过但这里没有停点的情况
+        if (ycond == 0 && (index != 0 || startLabel())) {
+            // 同站事件（A类） 暂时无需处理
+        }
+        else {
+            // 对方站内事件（C类） 暂时无需处理
+        }
+        sameDirStep(ycond, pme, phe, mylast, hislast, index);
+    }
+}
+
+void TrainLine::diagnoWithCounter(DiagnosisList& res, const TrainLine& another, const Train& antrain) const
+{
+    //!!注意counter的xcond意义和同向的不同
+    if (std::max(yMin(), another.yMin()) >= std::min(yMax(), another.yMax())) {
+        //提前终止条件，y范围根本不相交，不用搞
+        return;
+    }
+
+
+    auto pme = _stations.begin();
+    auto phe = another._stations.rbegin();  //反迭代器
+    ConstAdaPtr mylast = _stations.begin();
+    auto hislast = another._stations.rbegin();   //上一站的迭代器
+    int index = 0;   //自己的站序下标，用来插入结果的
+
+    //后面的站 类似merge过程
+    while (pme != _stations.end() && phe != another._stations.rend()) {
+        int ycond = yComp(pme, phe);
+
+        //先判定上一个区间有没有发生什么事情。注意此时两个都必定是直线段
+        if (pme != _stations.begin() && phe != another._stations.rbegin()) {
+            auto pint = findIntervalIntersectionCounter(mylast, pme, hislast, phe);
+            // 区间会车
+            if (pint.has_value()) {
+                auto pos = compressSnapInterval(mylast, pme, std::get<0>(*pint));
+                res.push_back(DiagnosisIssue(DiagnosisType::IntervalMeet, qeutil::Warning,
+                    pos, shared_from_this(), QObject::tr("在里程标[%1]，时刻[%2]与"
+                        "车次[%3]发生[%4]事件").arg(std::get<0>(*pint))
+                    .arg(std::get<1>(*pint).toString("hh:mm:ss"), antrain.trainName().full(),
+                        qeutil::eventTypeString(std::get<2>(*pint)))
+                ));
+            }
+        }
+
+        auto tme = pme->trainStation, the = phe->trainStation;
+        auto rme = pme->railStation.lock(), rhe = phe->railStation.lock();
+        //判断站内有没有发生什么事情 这个复杂一点
+        //麻烦在：可能出现一趟车站内停车，另一趟车通过但这里没有停点的情况
+        if (ycond == 0 && (index != 0 || startLabel())) {
+            // A类事件 暂时无需处理
+        }
+        else {
+            // C类事件 暂时无需处理
         }
         sameDirStep(ycond, pme, phe, mylast, hislast, index);
     }
@@ -908,9 +1131,8 @@ void TrainLine::addIntervalEvent(LineEventList& res, int index, TrainEventType t
 
 SnapEvent::pos_t 
     TrainLine::compressSnapInterval(ConstAdaPtr former, ConstAdaPtr latter, 
-    const QTime& time, double mile) const
+    double mile) const
 {
-    Q_UNUSED(time);
     auto rfor = former->railStation.lock(), rlat = latter->railStation.lock();
     
     if (rfor->dirAdjacent(dir()) != rlat) {
@@ -1040,6 +1262,11 @@ QString TrainLine::attachTypeStringFull(IntervalAttachType type)
         res += QObject::tr("停");
     else res += QObject::tr("通");
     return res;
+}
+
+const Railway& TrainLine::railway() const
+{
+    return _adapter.railway();
 }
 
 int TrainLine::passStationPos(ConstAdaPtr st) const
@@ -1174,9 +1401,9 @@ SnapEventList TrainLine::getSnapEvents(const QTime& time) const
                 qeutil::timeCompare(time, p->trainStation->arrive)) {
                 //注意这俩不一定是相邻的...
                 double mile = snapEventMile(pr, p, time);
-                auto pos = compressSnapInterval(pr, p, time, mile);
+                auto pos = compressSnapInterval(pr, p, mile);
                 res.append(SnapEvent(shared_from_this(), mile, pos, false,
-                    std::holds_alternative<std::shared_ptr<RailStation>>(pos) ?
+                    std::holds_alternative<std::shared_ptr<const RailStation>>(pos) ?
                     QObject::tr("推算") : ""));
             }
         }

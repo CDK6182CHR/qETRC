@@ -21,6 +21,7 @@
 #include "wizards/readruler/readrulerwizard.h"
 #include "editors/routing/batchparseroutingdialog.h"
 #include "editors/routing/detectroutingdialog.h"
+#include "viewers/diagnosisdialog.h"
 
 #include "traincontext.h"
 #include "railcontext.h"
@@ -450,7 +451,8 @@ void MainWindow::initToolbar()
         SARibbonCategory* cat = ribbon->addCategoryPage(QObject::tr("开始"));
         SARibbonPannel* panel = cat->addPannel(QObject::tr("文件"));
 
-        QAction* act = new QAction(QIcon(":/icons/new-file.png"), QObject::tr("新建"), this);
+        QAction* act = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileIcon),
+            QObject::tr("新建"), this);
         panel->addLargeAction(act);
         act->setShortcut(Qt::CTRL + Qt::Key_N);
         act->setToolTip(tr("新建 (Ctrl+N)\n关闭当前运行图文件，并新建空白运行图文件。"));
@@ -458,7 +460,8 @@ void MainWindow::initToolbar()
         connect(act, SIGNAL(triggered()), this, SLOT(actNewGraph()));
         sharedActions.newfile = act;
 
-        act = new QAction(QIcon(":/icons/open.png"), QObject::tr("打开"), this);
+        act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogOpenButton),
+            QObject::tr("打开"), this);
         addAction(act);
         act->setToolTip(tr("打开 (Ctrl+O)\n关闭当前运行图文件，并打开新的既有运行图文件。"));
         act->setShortcut(Qt::CTRL + Qt::Key_O);
@@ -466,7 +469,8 @@ void MainWindow::initToolbar()
         connect(act, SIGNAL(triggered()), this, SLOT(actOpenGraph()));
         sharedActions.open = act;
 
-        act = new QAction(QIcon(":/icons/save1.png"), QObject::tr("保存"), this);
+        act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogSaveButton),
+            QObject::tr("保存"), this);
         act->setToolTip(tr("保存 (Ctrl+S)\n保存当前运行图。如果是新运行图，则需要先选择文件。"));
         act->setShortcut(Qt::CTRL + Qt::Key_S);
         addAction(act);
@@ -527,7 +531,8 @@ void MainWindow::initToolbar()
         btn->setMinimumWidth(80);
 
         panel = cat->addPannel(tr("更新"));
-        act = new QAction(QIcon(":/icons/refresh.png"), tr("刷新"), this);
+        act = new QAction(QApplication::style()->standardIcon(QStyle::SP_BrowserReload),
+            tr("刷新"), this);
         act->setToolTip(tr("刷新 (F5)\n重新铺画运行图，更新所有数据面板的信息。"));
         act->setShortcut(Qt::Key_F5);
         addAction(act);
@@ -545,11 +550,13 @@ void MainWindow::initToolbar()
         btn->setMinimumWidth(80);
 
         panel = cat->addPannel(tr("系统"));
-        act = new QAction(QIcon(":/icons/info.png"), tr("关于"), this);
+        act = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation),
+            tr("关于"), this);
         connect(act, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
         panel->addLargeAction(act);
 
-        act = new QAction(QIcon(":/icons/close.png"), tr("退出"), this);
+        act = new QAction(QApplication::style()->standardIcon(QStyle::SP_BrowserStop),
+            tr("退出"), this);
         connect(act, SIGNAL(triggered()), this, SLOT(close()));
         panel->addLargeAction(act);
 
@@ -600,7 +607,6 @@ void MainWindow::initToolbar()
         btn->setMinimumWidth(80);
 
         panel = cat->addPannel(tr("调整"));
-        btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
         act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("标尺综合"), this);
@@ -664,11 +670,23 @@ void MainWindow::initToolbar()
 
             panel->addWidget(w, SARibbonPannelItem::Large);
 
-            act = new QAction(QIcon(":/icons/tick.png"), tr("应用"), this);
+            act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogApplyButton),
+                tr("应用"), this);
             connect(act, SIGNAL(triggered()), this, SLOT(actChangePassedStations()));
             btn = panel->addLargeAction(act);
             btn->setMinimumWidth(80);
         }
+
+        panel = cat->addPannel(tr("选项"));
+        act = new QAction(QIcon(":/icons/weaken.png"), tr("背景虚化"), this);
+        act->setToolTip(tr("背景虚化\n若启用，则在选中列车运行线时，自动虚化其他列车运行线。"
+            "点击空白处取消选择则取消虚化。\n"
+            "若此功能出现问题，请刷新运行图。"));
+        act->setCheckable(true);
+        act->setChecked(SystemJson::instance.weaken_unselected);
+        connect(act, &QAction::triggered, this, &MainWindow::actToggleWeakenUnselected);
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
 
         panel = cat->addPannel(tr("交路"));
         act = routingDock->toggleViewAction();
@@ -694,6 +712,12 @@ void MainWindow::initToolbar()
         act = new QAction(QIcon(":/icons/compare.png"), tr("车次对照"), this);
         act->setToolTip(tr("两车次运行对照\n在指定线路上，对比两个选定车次的运行情况。"));
         connect(act, SIGNAL(triggered()), this, SLOT(actTrainDiff()));
+        panel->addMediumAction(act);
+
+        act = new QAction(QIcon(":/icons/identify.png"), tr("时刻诊断"), this);
+        act->setToolTip(tr("车次时刻诊断\n诊断指定车次或所有车次的时刻表是否存在"
+            "可能的问题，例如到开时刻填反。"));
+        connect(act, &QAction::triggered, this, &MainWindow::actDiagnose);
         panel->addMediumAction(act);
 
         panel = cat->addPannel(tr("排图"));
@@ -826,7 +850,8 @@ void MainWindow::initAppMenu()
     menu->addAction(sharedActions.open);
     menu->addAction(sharedActions.save);
 
-    auto* act = new QAction(QIcon(":/icons/saveas.png"), tr("另存为"), this);
+    auto* act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogSaveAllButton),
+        tr("另存为"), this);
     connect(act, SIGNAL(triggered()), this, SLOT(actSaveGraphAs()));
     menu->addAction(act);
 
@@ -1076,6 +1101,17 @@ void MainWindow::actBatchDetectRouting()
     connect(dialog, &BatchDetectRoutingDialog::detectApplied,
         contextRouting, &RoutingContext::actBatchRoutingUpdate);
     dialog->open();
+}
+
+void MainWindow::actDiagnose()
+{
+    auto* d = new DiagnosisDialog(_diagram, this);
+    d->show();
+}
+
+void MainWindow::actToggleWeakenUnselected(bool on)
+{
+    SystemJson::instance.weaken_unselected = on;
 }
 
 void MainWindow::updateWindowTitle()

@@ -11,6 +11,15 @@
 /**
  * @brief The DiagramWidget class  运行图绘图窗口
  * pyETRC.GraphicsWidget
+ * 关于ZValue的约定（pyETRC的注释）
+ * 2019年4月27日批注，自2.0.2版本开始规范化图形空间的z_value。分配如下
+ * 0：基本层。包含底图框线。
+ * [1,5) 区间安排底图上的修饰内容。目前仅有天窗。天窗为1.
+ * [5,10)区间安排列车运行线。目前统一安排为5.
+ * （2021.08.29增加）9：weakItem  用于遮蔽其他运行线的。
+ * 10：选中车次运行线层。
+ * [10,15)预留。
+ * [15,20)软件悬浮层。目前安排距离轴、时间轴15，选中车次名称16.
  */
 class DiagramWidget : public QGraphicsView
 {
@@ -36,6 +45,7 @@ class DiagramWidget : public QGraphicsView
     } marginItems;
     //显示当前车次的Item
     QGraphicsSimpleTextItem* nowItem;
+    QGraphicsRectItem* weakItem = nullptr;
 
     bool updating = false;
 
@@ -244,6 +254,13 @@ private:
      */
     void paintToFile(QPainter& painter, const QString& title, const QString& note);
 
+    /**
+     * 显示用于虚化非选择车次的蒙板
+     */
+    void showWeakenItem();
+
+    void hideWeakenItem();
+
 signals:
     void showNewStatus(QString);
     void trainSelected(std::shared_ptr<Train> train);
@@ -277,5 +294,6 @@ public slots:
      * 当天窗数据变化时，更新
      */
     void updateForbid(std::shared_ptr<Forbid> forbid, Direction dir);
+
 };
 
