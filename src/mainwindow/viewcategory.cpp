@@ -2,7 +2,8 @@
 #include "mainwindow.h"
 #include "data/diagram/trainadapter.h"
 #include "editors/configdialog.h"
-
+#include "editors/typeconfigdialog.h"
+#include "data/train/traintype.h"
 
 #include <SARibbonPannelItem.h>
 #include <SARibbonGallery.h>
@@ -116,6 +117,11 @@ void ViewCategory::initUI()
     connect(act, SIGNAL(triggered()), this, SLOT(actShowConfig()));
     btn = panel->addLargeAction(act);
     btn->setMinimumWidth(80);
+
+    act = new QAction(QIcon(":/icons/settings.png"), tr("类型管理"), this);
+    connect(act, &QAction::triggered, this, &ViewCategory::actTypeConfig);
+    act->setToolTip(tr("类型管理\n管理[当前运行图文件]的列车类型，及各种类型的颜色、线形等。"));
+    panel->addMediumAction(act);
 }
 
 void ViewCategory::setDirTrainsShow(Direction dir, bool show)
@@ -285,6 +291,14 @@ void ViewCategory::onActConfigApplied(Config& cfg, const Config& newcfg, bool re
     mw->getUndoStack()->push(new qecmd::ChangeConfig(cfg, newcfg, repaint, this));
 }
 
+void ViewCategory::actTypeConfig()
+{
+    auto* dialog = new TypeConfigDialog(diagram.trainCollection().typeManager(), mw);
+    connect(dialog, &TypeConfigDialog::typeSetApplied,
+        this, &ViewCategory::actCollTypeSetChanged);
+    dialog->show();
+}
+
 void ViewCategory::commitConfigChange(Config& cfg, bool repaint)
 {
     Q_UNUSED(cfg);
@@ -327,6 +341,42 @@ void ViewCategory::refreshTypeGroup()
         }
         row++;
     }
+}
+
+void ViewCategory::actCollTypeSetChanged(TypeManager& manager, 
+    const QMap<QString, std::shared_ptr<TrainType>>& types, 
+    const QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>>& modified)
+{
+    if (&manager != &(diagram.trainCollection().typeManager())) {
+        qDebug() << "ViewCategory::actCollTypeSetChanged: incompatible manager! nothing todo."
+            << Qt::endl;
+        return;
+    }
+
+    QSet<std::shared_ptr<TrainType>> typesInSet;
+    foreach(auto t, types) {
+        typesInSet.insert(t);
+    }
+
+    auto typesCopy = types;    // copy construct
+
+    foreach(auto train, diagram.trainCollection().trains()) {
+        auto tp = train->type();
+        if (!tp) {
+            qDebug() << "ViewCategory::actCollTypeSetChanged: WARNING: " <<
+                "train type is null! " << train->trainName().full() << Qt::endl;
+        }
+        else {
+            if (!typesInSet.contains(tp)) {
+                qDebug() << "ViewCategory::actCollTypeSetChanged: INFO: " <<
+                    "add type " << tp->name() << " to set. " << Qt::endl;
+                typesInSet.insert(tp);
+                typesCopy.insert(tp->name(), tp);
+            }
+        }
+    }
+
+    mw->getUndoStack()->push(new qecmd::ChangeTypeSet(manager, typesCopy, modified, this));
 }
 
 qecmd::ChangeTrainShow::ChangeTrainShow(const QList<std::shared_ptr<TrainLine>>& lines_,
@@ -391,4 +441,22 @@ void qecmd::ChangeSingleTrainShow::redo()
 {
     train->setIsShow(show);
     cat->commitSingleTrainShow(lines, show);
+}
+
+void qecmd::ChangeTypeSet::undo()
+{
+    commit();
+}
+
+void qecmd::ChangeTypeSet::redo()
+{
+    commit();
+}
+
+void qecmd::ChangeTypeSet::commit()
+{
+    foreach(auto & p, modified) {
+        p.first->swap(*p.second);
+    }
+    std::swap(manager.typesRef(), types);
 }

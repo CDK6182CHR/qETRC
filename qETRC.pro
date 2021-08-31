@@ -58,10 +58,13 @@ SOURCES += \
     src/editors/routing/routingwidget.cpp \
     src/editors/ruler/rulertabpy.cpp \
     src/editors/ruler/rulerwidget.cpp \
+    src/editors/typeconfigdialog.cpp \
     src/mainwindow/routingcontext.cpp \
     src/model/delegate/generaldoublespindelegate.cpp \
     src/model/delegate/generalspindelegate.cpp \
+    src/model/delegate/linestyledelegate.cpp \
     src/model/delegate/qetimedelegate.cpp \
+    src/model/train/typemodel.cpp \
     src/model/rail/forbidmodel.cpp \
     src/model/rail/intervaldatamodel.cpp \
     src/model/train/routingcollectionmodel.cpp \
@@ -166,10 +169,13 @@ HEADERS += \
     src/editors/routing/routingwidget.h \
     src/editors/ruler/rulertabpy.h \
     src/editors/ruler/rulerwidget.h \
+    src/editors/typeconfigdialog.h \
     src/mainwindow/routingcontext.h \
     src/model/delegate/generaldoublespindelegate.h \
     src/model/delegate/generalspindelegate.h \
+    src/model/delegate/linestyledelegate.h \
     src/model/delegate/qetimedelegate.h \
+    src/model/train/typemodel.h \
     src/model/rail/forbidmodel.h \
     src/model/rail/intervaldatamodel.h \
     src/model/train/routingcollectionmodel.h \

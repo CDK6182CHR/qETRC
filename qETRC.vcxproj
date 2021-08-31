@@ -217,9 +217,11 @@
     <ClCompile Include="src\editors\routing\routingwidget.cpp" />
     <ClCompile Include="src\editors\ruler\rulertabpy.cpp" />
     <ClCompile Include="src\editors\ruler\rulerwidget.cpp" />
+    <ClCompile Include="src\editors\typeconfigdialog.cpp" />
     <ClCompile Include="src\mainwindow\routingcontext.cpp" />
     <ClCompile Include="src\model\delegate\generaldoublespindelegate.cpp" />
     <ClCompile Include="src\model\delegate\generalspindelegate.cpp" />
+    <ClCompile Include="src\model\delegate\linestyledelegate.cpp" />
     <ClCompile Include="src\model\delegate\qetimedelegate.cpp" />
     <ClCompile Include="src\model\rail\forbidmodel.cpp" />
     <ClCompile Include="src\model\rail\intervaldatamodel.cpp" />
@@ -227,6 +229,7 @@
     <ClCompile Include="src\model\train\routingeditmodel.cpp" />
     <ClCompile Include="src\model\train\routinglistmodel.cpp" />
     <ClCompile Include="src\model\train\trainlistreadmodel.cpp" />
+    <ClCompile Include="src\model\train\typemodel.cpp" />
     <ClCompile Include="src\util\railrulercombo.cpp" />
     <ClCompile Include="src\util\selectrailwaycombo.cpp" />
     <ClCompile Include="src\util\selecttraincombo.cpp" />
@@ -314,6 +317,9 @@
     <QtMoc Include="src\model\train\routinglistmodel.h" />
     <QtMoc Include="src\editors\routing\batchparseroutingdialog.h" />
     <QtMoc Include="src\viewers\diagnosisdialog.h" />
+    <QtMoc Include="src\editors\typeconfigdialog.h" />
+    <QtMoc Include="src\model\train\typemodel.h" />
+    <ClInclude Include="src\model\delegate\linestyledelegate.h" />
     <ClInclude Include="src\viewers\traindiffdialog.h" />
     <QtMoc Include="src\wizards\readruler\readrulerpageinterval.h" />
     <QtMoc Include="src\wizards\readruler\readrulerwizard.h" />

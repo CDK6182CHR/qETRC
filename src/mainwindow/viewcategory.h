@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QAction>
 #include <QUndoCommand>
-
+#include <QVector>
 #include "SARibbonCategory.h"
 #include <SARibbonGalleryGroup.h>
 
@@ -13,6 +13,7 @@
 
 
 class MainWindow;
+class TypeManager;
 
 /**
  * @brief The ViewCategory class
@@ -103,6 +104,7 @@ private slots:
      */
     void onActConfigApplied(Config& cfg, const Config& newcfg, bool repaint);
 
+    void actTypeConfig();
 
 public slots:
     
@@ -120,6 +122,14 @@ public slots:
      * 由TrainListModel调起，设置显示状态，操作压栈
      */
     void actChangeSingleTrainShow(std::shared_ptr<Train> train, bool show);
+
+    /**
+     * 仅针对TrainCollection所属的TypeManager的情况...
+     * 操作压栈，但还包含前处理，即把所有列车中存在的type对象弄进去
+     */
+    void actCollTypeSetChanged(TypeManager& manager,
+        const QMap<QString, std::shared_ptr<TrainType>>& types,
+        const QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>>& modified);
 };
 
 
@@ -179,5 +189,26 @@ namespace qecmd {
             QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    class ChangeTypeSet : public QUndoCommand
+    {
+        TypeManager& manager;
+        QMap<QString, std::shared_ptr<TrainType>> types;
+        QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>> modified;
+        ViewCategory* const cat;
+    public:
+        ChangeTypeSet(TypeManager& manager_, 
+            const QMap<QString, std::shared_ptr<TrainType>>& types_,
+            const QVector<QPair<std::shared_ptr<TrainType>,
+            std::shared_ptr<TrainType>>>& modified_,
+            ViewCategory* cat_, QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("更新类型表")),manager(manager_),
+            types(types_),modified(modified_),
+            cat(cat_){}
+        virtual void undo()override;
+        virtual void redo()override;
+    private:
+        void commit();
     };
 }

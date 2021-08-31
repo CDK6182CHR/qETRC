@@ -34,6 +34,11 @@ public:
     void setIsPassenger(bool p) { _passenger = p; }
 
     const QString& name()const { return _name; }
+
+    bool operator==(const TrainType& other)const;
+    bool operator!=(const TrainType& other)const;
+
+    void swap(TrainType& other);
 };
 
 
@@ -43,6 +48,8 @@ public:
  * 列车类型集合，包含判定类型，判定UI信息等
  */
 class TypeManager{
+
+    using TypeSet=QMap<QString,std::shared_ptr<TrainType>>;
 
     /**
      * @brief _types
@@ -67,16 +74,17 @@ class TypeManager{
 public:
     TypeManager();
     TypeManager(const TypeManager&)=delete;
-    TypeManager(TypeManager&&)=default;
+    TypeManager(TypeManager&&)noexcept=default;
 
     /**
      * 拷贝赋值 手写 复制所有类型对象。
      */
     TypeManager& operator=(const TypeManager& another);
 
-    TypeManager& operator=(TypeManager&&)=default;
+    TypeManager& operator=(TypeManager&&)noexcept=default;
 
     const auto& types()const { return _types; }
+    auto& typesRef() { return _types; }
 
     /**
      * 读取系统默认配置 config.json
@@ -130,6 +138,10 @@ public:
 
     inline bool isNull()const { return _types.isEmpty(); }
 
+    const QPen& getDefaultPen()const{return defaultPen;}
+
+    auto getDefaultType()const{return defaultType;}
+
 private:
     /**
      * 输入格式是pyETRC的config.json或者graph中config对象
@@ -139,5 +151,7 @@ private:
 
     
 };
+
+Q_DECLARE_METATYPE(std::shared_ptr<TrainType>);
 
 

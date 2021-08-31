@@ -15,6 +15,7 @@ enum {
     RulerNodeRole,
     TrainRole,
     BoolDataRole,
+    TrainTypeRole,
 };
 }
 
