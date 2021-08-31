@@ -121,6 +121,11 @@ public:
     inline void setType(std::shared_ptr<TrainType> t){_type=t;}
     inline void setPassenger(TrainPassenger t){_passenger=t;}
     inline void setIsShow(bool  s) { _show = s; }
+
+    /**
+     * 强制判断是否为客车；如果设置为自动，根据类型
+     */
+    bool getIsPassenger()const;
     
     /**
      * 2021.07.15  对所有运行线设置
@@ -360,14 +365,22 @@ public:
     void resetRoutingSimple();
 
     /**
+     * 绑定到线路的最后一站。
+     * 如果时刻表最后一站没有绑定到线路，返回空
+     */
+    const AdapterStation* boundLast()const;
+
+    /**
      * @brief 如果终到站是已经绑定到线路的车站，返回它；
      * 否则返回空
      * 注意需要遍历所有的Adapter （Adapter并不一定是按顺序的）
-     * 与始发终到站设定项的那个starting/terminal没关系，只是时刻表的第一/最后一站
+     * 2021.08.30：改为必须是终到站；不要求是终到站的版本，改为boundLast
      */
     const AdapterStation* boundTerminal()const;
 
     std::shared_ptr<RailStation> boundTerminalRail()const;
+
+    const AdapterStation* boundFirst()const;
 
     const AdapterStation* boundStarting()const;
 

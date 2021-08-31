@@ -262,9 +262,17 @@ public:
      * 重新绑定所有列车与所有线路
      */
     void rebindAllTrains();
+
+    using sec_cnt_t = std::map<std::shared_ptr<RailInterval>, int>;
     
     std::map<std::shared_ptr<RailInterval>, int>
         sectionTrainCount(std::shared_ptr<Railway> railway)const;
+
+    /**
+     * 区分客货的断面对数表
+     */
+    std::pair<sec_cnt_t, sec_cnt_t>
+        sectionPassenFreighCount(std::shared_ptr<Railway> railway)const;
 
     /**
      * 2021.07.25  pyETRC风格的车站时刻表

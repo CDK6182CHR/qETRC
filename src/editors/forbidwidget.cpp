@@ -80,7 +80,7 @@ void ForbidWidget::initContextMenu()
     context = new QMenu(this);
 
     using key_t = decltype(Qt::CTRL + Qt::Key_K);
-    using slot_t = decltype(SLOT(calculateBegin()));
+    using slot_t = std::decay< decltype(SLOT(calculateBegin()))>::type;
 
     std::initializer_list<std::tuple<QString, key_t, QObject*, slot_t>> acts = {
         {tr("复制当前数据到下一行"),(Qt::ALT + Qt::Key_C),this,SLOT(copyToNextRow())},

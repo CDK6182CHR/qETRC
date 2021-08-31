@@ -198,6 +198,28 @@ std::map<std::shared_ptr<RailInterval>, int> Diagram::sectionTrainCount(std::sha
     return res;
 }
 
+std::pair<Diagram::sec_cnt_t, Diagram::sec_cnt_t>
+    Diagram::sectionPassenFreighCount(std::shared_ptr<Railway> railway)const
+{
+    sec_cnt_t passen, freigh;
+    foreach (auto train , _trainCollection.trains()) {
+        bool ispas = train->getIsPassenger();
+        foreach(auto adp, train->adapters()) {
+            if (&(adp->railway()) == railway.get()) {
+                foreach(auto line, adp->lines()) {
+                    if (ispas) {
+                        sectionTrainCount(passen, line);
+                    }
+                    else {
+                        sectionTrainCount(freigh, line);
+                    }
+                }
+            }
+        }
+    }
+    return std::make_pair(passen, freigh);
+}
+
 std::vector<std::pair<std::shared_ptr<TrainLine>, const AdapterStation*>> 
 Diagram::stationTrainsSettled(std::shared_ptr<Railway> railway,
     std::shared_ptr<RailStation> st) const

@@ -99,6 +99,10 @@ private slots:
     void onEditRoutingContext();
 
     void onCurrentChanged(const QModelIndex& cur, const QModelIndex& prev);
+
+    void actExpand();
+
+    void actCollapse();
     
 public slots:
     void actAddRailway();

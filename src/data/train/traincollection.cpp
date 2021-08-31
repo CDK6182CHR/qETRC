@@ -123,7 +123,9 @@ QList<std::shared_ptr<Train>> TrainCollection::findAllSingleName(const QString& 
 
 std::shared_ptr<Train> TrainCollection::findFirstSingleName(const QString& name)
 {
-	return singleNameMap.value(name).first();
+	const auto& p = singleNameMap.value(name);
+	if (p.isEmpty())return {};
+	else return p.first();
 }
 
 QList<std::shared_ptr<Train>> TrainCollection::multiSearchTrain(const QString& name)

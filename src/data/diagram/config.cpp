@@ -92,6 +92,10 @@ bool Config::fromJson(const QJsonObject& obj)
 
     FROM_OBJ_NAME(end_label_name, end_label_checi, Bool);
 
+    FROM_OBJ(show_mile_bar, Bool);
+    FROM_OBJ(show_ruler_bar, Bool);
+    FROM_OBJ(show_count_bar, Bool);
+
     margins.fromJson(obj.value("margins").toObject());
 
     not_show_types.clear();
@@ -136,6 +140,9 @@ QJsonObject Config::toJson() const
         TO_OBJ(bold_grid_width)
         TO_OBJ(valid_width)
         TO_OBJ_NAME(end_label_name,end_label_checi)
+        TO_OBJ(show_mile_bar)
+        TO_OBJ(show_ruler_bar)
+        TO_OBJ(show_count_bar)
     };
     obj.insert("grid_color", grid_color.name());
     obj.insert("text_color", text_color.name());
@@ -153,5 +160,67 @@ double Config::diagramWidth() const
     int he = end_hour;
     if (he <= start_hour)he += 24;
     return (he - start_hour) * 3600.0 / seconds_per_pix;
+}
+
+double Config::totalLeftMargin() const
+{
+    double res = margins.left;
+    if (!show_ruler_bar)
+        res -= margins.ruler_label_width;
+    if (!show_mile_bar)
+        res -= margins.mile_label_width;
+    return res;
+}
+
+double Config::rulerBarX() const
+{
+    return margins.left_white;
+}
+
+double Config::mileBarX() const
+{
+    double res = margins.left_white;
+    if (show_ruler_bar)res += margins.ruler_label_width;
+    return res;
+}
+
+double Config::totalRightMargin() const
+{
+    double res = margins.right;
+    if (!show_count_bar)res -= margins.count_label_width;
+    return res;
+}
+
+double Config::leftRectWidth() const
+{
+    double res = margins.label_width;
+    if (show_ruler_bar)res += margins.ruler_label_width;
+    if (show_mile_bar)res += margins.mile_label_width;
+    return res;
+}
+
+double Config::rightRectWidth() const
+{
+    double res = margins.label_width;
+    if (show_count_bar)res += margins.count_label_width;
+    return res;
+}
+
+double Config::leftTitleRectWidth() const
+{
+    double res = 0;
+    if (show_mile_bar)res += margins.mile_label_width;
+    if (show_ruler_bar)res += margins.ruler_label_width;
+    return res;
+}
+
+double Config::leftStationBarX() const
+{
+    double res = margins.left_white;
+    if (show_mile_bar)
+        res += margins.mile_label_width;
+    if (show_ruler_bar)
+        res += margins.ruler_label_width;
+    return res;
 }
 

@@ -28,7 +28,7 @@ class TrainContext : public QObject
     SARibbonContextCategory* const cont;
     MainWindow* const mw;
 
-    SARibbonLineEdit* edName, * edStart, * edEnd;
+    SARibbonLineEdit* edName, * edStart, * edEnd, * edRouting;
 
     //后缀m表示可修改的控件
     SARibbonLineEdit *edNamem,*edStartm,*edEndm;
@@ -36,7 +36,7 @@ class TrainContext : public QObject
     SARibbonComboBox* comboType;
     PenStyleCombo* comboLs;
     SARibbonCheckBox *checkPassen;
-    SARibbonToolButton* btnColor, * btnAutoUI;
+    SARibbonToolButton* btnColor, * btnAutoUI, * btnToRouting;
     QDoubleSpinBox* spWidth;
     QColor tmpColor;
 
@@ -52,6 +52,7 @@ signals:
     void highlightTrainLine(std::shared_ptr<Train> train);
     void timetableChanged(std::shared_ptr<Train> train);
     void actRemoveTrain(int index);
+    void focusInRouting(std::shared_ptr<Routing>);
     
 private:
     void initUI();
@@ -173,6 +174,8 @@ private slots:
     void actAdjustTimetable();
 
     void actDiagnose();
+
+    void actToRouting();
 };
 
 

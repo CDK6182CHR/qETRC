@@ -16,7 +16,7 @@
 #include <QTextBrowser>
 #include <QScroller>
 #include <QPrinter>
-
+#include <QMenu>
 
 #include "mainwindow/version.h"
 
@@ -73,7 +73,7 @@ void DiagramWidget::paintGraph()
     }
     const QColor& gridColor = cfg.grid_color;
     
-    scene()->setSceneRect(0, 0, width + cfg.margins.left + cfg.margins.right,
+    scene()->setSceneRect(0, 0, width + cfg.totalLeftMargin() + cfg.totalRightMargin(),
         height + cfg.margins.up + cfg.margins.down);
 
     double ystart = margins.up;
@@ -86,12 +86,18 @@ void DiagramWidget::paintGraph()
         auto p = _page->railways().at(i);
         _page->startYs().append(ystart);
         setHLines(p, ystart, width, leftItems, rightItems);
-        scene()->addRect(margins.left, ystart, width, p->diagramHeight(), gridColor);
+        scene()->addRect(cfg.totalLeftMargin(), ystart, width, p->diagramHeight(), gridColor);
         railYRanges.append(qMakePair(ystart, ystart + p->diagramHeight()));
         ystart += p->diagramHeight() + margins.gap_between_railways;
     }
 
     setVLines(width, hour_count, railYRanges);
+
+    //foreach(auto it, leftItems) {
+    //    auto r = it->boundingRect();
+    //    auto itt = scene()->addRect(r);
+    //    itt->setPos(it->pos());
+    //}
 
     marginItems.left = scene()->createItemGroup(leftItems);
     marginItems.left->setZValue(15);
@@ -118,6 +124,7 @@ void DiagramWidget::paintGraph()
 
 void DiagramWidget::clearGraph()
 {
+    weakItem = nullptr;
     _page->clearGraphics();
     scene()->clear();
 }
@@ -169,7 +176,7 @@ void DiagramWidget::paintToFile(QPainter& painter, const QString& title, const Q
     font.setBold(true);
     painter.setFont(font);
 
-    painter.drawText(margins().left, 80, title);
+    painter.drawText(config().totalLeftMargin(), 80, title);
 
     font.setPixelSize(20);
     font.setBold(false);
@@ -179,7 +186,7 @@ void DiagramWidget::paintToFile(QPainter& painter, const QString& title, const Q
         QString s(note);
         s.replace("\n", " ");
         s = QString("备注：") + s;
-        painter.drawText(margins().left, scene()->height() + 100 + 40, s);
+        painter.drawText(config().totalLeftMargin(), scene()->height() + 100 + 40, s);
     }
 
     QString mark = tr("由 %1_%2 导出").arg(qespec::TITLE.data()).arg(qespec::VERSION.data());
@@ -318,6 +325,50 @@ void DiagramWidget::setTrainShow(std::shared_ptr<TrainLine> line, bool show)
     }
 }
 
+void DiagramWidget::setupMenu(const SharedActions& actions)
+{
+    if (!contextMenu) {
+        contextMenu = new QMenu(this);
+        auto* m = contextMenu;
+        auto* act = new QAction(tr("重新铺画当前运行图"));
+        act->setShortcut(Qt::SHIFT + Qt::Key_F5);
+        act->setShortcutContext(Qt::WidgetShortcut);
+        connect(act, &QAction::triggered, this, &DiagramWidget::paintGraph);
+        addAction(act);
+        contextMenu->addAction(act);
+
+        act = new QAction(tr("放大视图"));
+        act->setShortcut(Qt::CTRL + Qt::Key_Equal);
+        act->setShortcutContext(Qt::WidgetShortcut);
+        addAction(act);
+        m->addAction(act);
+        connect(act, &QAction::triggered, this, &DiagramWidget::zoomIn);
+
+        act = new QAction(tr("缩小视图"));
+        act->setShortcut(Qt::CTRL + Qt::Key_Minus);
+        act->setShortcutContext(Qt::WidgetShortcut);
+        addAction(act);
+        m->addAction(act);
+        connect(act, &QAction::triggered, this, &DiagramWidget::zoomOut);
+
+        m->addSeparator();
+        m->addAction(actions.refreshAll);
+        m->addSeparator();
+
+        m->addAction(actions.search);
+        m->addAction(actions.rulerRef);
+        m->addAction(actions.trainRef);
+        m->addAction(actions.eventList);
+        m->addSeparator();
+        m->addAction(actions.timeAdjust);
+        m->addAction(actions.batchCopy);
+        m->addAction(actions.intervalExchange);
+        m->addSeparator();
+        m->addAction(actions.addTrain);
+        m->addAction(actions.rulerPaint);
+    }
+}
+
 void DiagramWidget::mousePressEvent(QMouseEvent* e)
 {
     QGraphicsView::mousePressEvent(e);
@@ -397,6 +448,13 @@ void DiagramWidget::focusInEvent(QFocusEvent* e)
     emit pageFocussedIn(_page);
 }
 
+void DiagramWidget::contextMenuEvent(QContextMenuEvent* e)
+{
+    if (contextMenu) {
+        contextMenu->popup(mapToGlobal(e->pos()));
+    }
+}
+
 void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, double width,
     QList<QGraphicsItem*>& leftItems, QList<QGraphicsItem*>& rightItems)
 {
@@ -405,13 +463,13 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     const QColor& textColor = cfg.text_color;
     QColor brushColor(Qt::white);
     brushColor.setAlpha(200);
-    double label_start_x = margins.mile_label_width + margins.ruler_label_width;
+    double label_start_x = cfg.leftStationBarX();
 
     double height = rail->diagramHeight();   //注意这只是当前线路的高度
 
     auto* rectLeft = scene()->addRect(0,
         start_y - margins.title_row_height - margins.first_row_append,
-        margins.label_width + margins.ruler_label_width + margins.mile_label_width + margins.left_white,
+        cfg.leftRectWidth() + margins.left_white,
         height + 2 * margins.first_row_append + margins.title_row_height
     );
     rectLeft->setBrush(QBrush(brushColor));
@@ -420,9 +478,9 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     leftItems.append(rectLeft);
 
     auto* rectRight = scene()->addRect(
-        scene()->width() - margins.label_width - margins.right_white,
+        scene()->width() - cfg.rightRectWidth() - margins.right_white,
         start_y - margins.title_row_height - margins.first_row_append,
-        margins.label_width,
+        cfg.rightRectWidth(),
         height + 2 * margins.first_row_append + margins.title_row_height
     );
     rectRight->setBrush(brushColor);
@@ -434,44 +492,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
         boldPen(gridColor, cfg.bold_grid_width);
 
     double rect_start_y = start_y - margins.title_row_height - margins.first_row_append;
-    auto* rulerRect = scene()->addRect(
-        margins.left_white, rect_start_y,
-        margins.mile_label_width + margins.ruler_label_width,
-        height + margins.title_row_height + margins.first_row_append*2,
-        defaultPen
-    );
-    rulerRect->setPen(defaultPen);
-    leftItems.append(rulerRect);
 
-    //标尺栏纵向界限
-    auto* line = scene()->addLine(
-        margins.ruler_label_width + margins.left_white,
-        rect_start_y,
-        margins.ruler_label_width + margins.left_white,
-        height + start_y + margins.first_row_append,
-        defaultPen
-    );
-    leftItems.append(line);
-
-    //标尺栏横向界限
-    line = scene()->addLine(
-        margins.left_white,
-        rect_start_y + margins.title_row_height / 2.0,
-        margins.ruler_label_width + margins.left_white,
-        rect_start_y + margins.title_row_height / 2.0,
-        defaultPen
-    );
-    leftItems.append(line);
-
-    //表头下横分界线
-    line = scene()->addLine(
-        margins.left_white,
-        rect_start_y + margins.title_row_height,
-        margins.ruler_label_width + margins.mile_label_width + margins.left_white,
-        rect_start_y + margins.title_row_height,
-        defaultPen
-    );
-    leftItems.append(line);
 
     QFont nowFont;
     nowFont.setPointSize(12);
@@ -482,35 +503,136 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     QFont textFont;
     //textFont.setBold(true);
 
-    const char* s0 = rail->ordinate() ? "排图标尺" : "区间距离";
-    leftItems.append(addLeftTableText(
-        s0, textFont, 0, rect_start_y, margins.ruler_label_width, margins.title_row_height / 2.0
-    ));
+    if (cfg.show_ruler_bar || cfg.show_mile_bar) {
+        auto* rulerRect = scene()->addRect(
+            margins.left_white, rect_start_y,
+            cfg.leftTitleRectWidth(),
+            height + margins.title_row_height + margins.first_row_append * 2,
+            defaultPen
+        );
+        leftItems.append(rulerRect);
 
-    leftItems.append(addLeftTableText(
-        "下行", textFont, 0, rect_start_y + margins.title_row_height / 2.0,
-        margins.ruler_label_width / 2.0, margins.title_row_height / 2.0
-    ));
+        //表头下横分界线
+        leftItems.append(scene()->addLine(
+            margins.left_white,
+            rect_start_y + margins.title_row_height,
+            cfg.leftTitleRectWidth() + margins.left_white,
+            rect_start_y + margins.title_row_height,
+            defaultPen
+        ));
 
-    leftItems.append(addLeftTableText(
-        "上行", textFont, margins.ruler_label_width / 2.0,
-        rect_start_y + margins.title_row_height / 2.0, margins.ruler_label_width / 2.0,
-        margins.title_row_height / 2.0
-    ));
+        if (cfg.show_mile_bar && cfg.show_ruler_bar) {
+            //标尺栏纵向界限
+            auto* line = scene()->addLine(
+                margins.ruler_label_width + margins.left_white,
+                rect_start_y,
+                margins.ruler_label_width + margins.left_white,
+                height + start_y + margins.first_row_append,
+                defaultPen
+            );
+            leftItems.append(line);
+        }
 
-    leftItems.append(addLeftTableText(
-        "延长公里", textFont, margins.ruler_label_width, rect_start_y,
-        margins.mile_label_width, margins.title_row_height
-    ));
+        if (cfg.show_ruler_bar) {
 
-    //改为无条件上下行分开标注
-    leftItems.append(scene()->addLine(
-        margins.ruler_label_width / 2.0 + margins.left_white,
-        rect_start_y + margins.title_row_height / 2.0,
-        margins.ruler_label_width / 2.0 + margins.left_white,
-        start_y + height + margins.first_row_append,
-        defaultPen
-    ));
+            //标尺栏横向界限
+            leftItems.append(scene()->addLine(
+                margins.left_white,
+                rect_start_y + margins.title_row_height / 2.0,
+                margins.ruler_label_width + margins.left_white,
+                rect_start_y + margins.title_row_height / 2.0,
+                defaultPen
+            ));
+
+            const char* s0 = rail->ordinate() ? "排图标尺" : "区间距离";
+            leftItems.append(addLeftTableText(
+                s0, textFont, margins.left_white, rect_start_y, margins.ruler_label_width, margins.title_row_height / 2.0
+            ));
+
+            leftItems.append(addLeftTableText(
+                "下行", textFont, margins.left_white, rect_start_y + margins.title_row_height / 2.0,
+                margins.ruler_label_width / 2.0, margins.title_row_height / 2.0
+            ));
+
+            leftItems.append(addLeftTableText(
+                "上行", textFont, margins.left_white+ margins.ruler_label_width / 2.0,
+                rect_start_y + margins.title_row_height / 2.0, margins.ruler_label_width / 2.0,
+                margins.title_row_height / 2.0
+            ));
+
+            //改为无条件上下行分开标注
+            leftItems.append(scene()->addLine(
+                margins.ruler_label_width / 2.0 + margins.left_white,
+                rect_start_y + margins.title_row_height / 2.0,
+                margins.ruler_label_width / 2.0 + margins.left_white,
+                start_y + height + margins.first_row_append,
+                defaultPen
+            ));
+        }
+
+        if (cfg.show_mile_bar) {
+            leftItems.append(addLeftTableText(
+                "延长公里", textFont, cfg.mileBarX(), rect_start_y,
+                margins.mile_label_width, margins.title_row_height
+            ));
+        }
+
+    }
+
+    if (cfg.show_count_bar) {
+        auto* countRect = scene()->addRect(
+            scene()->width() - margins.right_white - margins.count_label_width,
+            rect_start_y,
+            margins.count_label_width,
+            height + margins.title_row_height + margins.first_row_append * 2,
+            defaultPen
+        );
+        rightItems.append(countRect);
+
+        // 右侧
+        rightItems.append(scene()->addLine(
+            scene()->width() - margins.count_label_width - margins.right_white,
+            rect_start_y + margins.title_row_height / 2.0,
+            scene()->width() - margins.right_white,
+            rect_start_y + margins.title_row_height / 2.0,
+            defaultPen
+        ));
+
+        rightItems.append(scene()->addLine(
+            scene()->width() - margins.right_white - margins.count_label_width,
+            rect_start_y + margins.title_row_height,
+            scene()->width() - margins.right_white,
+            rect_start_y + margins.title_row_height,
+            defaultPen
+        ));
+
+        rightItems.append(scene()->addLine(
+            scene()->width() - margins.right_white - margins.count_label_width / 2.0,
+            rect_start_y + margins.title_row_height / 2.0,
+            scene()->width() - margins.right_white - margins.count_label_width / 2.0,
+            start_y + height + margins.first_row_append,
+            defaultPen
+        ));
+
+        rightItems.append(addLeftTableText(tr("客货对数"),
+            textFont, scene()->width() - margins.right_white - margins.count_label_width,
+            rect_start_y, margins.count_label_width,
+            margins.title_row_height / 2.0
+        ));
+
+        rightItems.append(addLeftTableText(tr("下行"),
+            textFont, scene()->width() - margins.right_white - margins.count_label_width,
+            rect_start_y + margins.title_row_height / 2.0,
+            margins.count_label_width / 2.0, margins.title_row_height / 2.0
+        ));
+
+        rightItems.append(addLeftTableText(tr("上行"),
+            textFont, scene()->width() - margins.right_white - margins.count_label_width / 2.0,
+            rect_start_y + margins.title_row_height / 2.0,
+            margins.count_label_width / 2.0, margins.title_row_height / 2.0
+        ));
+
+    }
     
 
     //铺画车站。以前已经完成了绑定，这里只需要简单地把所有有y坐标的全画出来就好
@@ -521,12 +643,19 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
             double h = start_y + p->y_value.value();
             drawSingleHLine(textFont, h, p->name.toDisplayLiteral(),
                 pen, width, leftItems, rightItems, label_start_x);
-            leftItems.append(addStationTableText(
-                QString::number(p->mile, 'f', 1), textFont,
-                margins.ruler_label_width, h, margins.mile_label_width
-            ));
+            //延长公里
+            if (cfg.show_mile_bar) {
+                leftItems.append(addStationTableText(
+                    QString::number(p->mile, 'f', 1), textFont,
+                    cfg.mileBarX() , h, margins.mile_label_width
+                ));
+            }
+
         }
     }
+
+    if (!cfg.show_ruler_bar && !cfg.show_count_bar)
+        return;
 
     auto ruler = rail->ordinate();
     auto upFirst = rail->firstUpInterval();
@@ -536,18 +665,35 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     double lasty = start_y, cummile = 0.0;
     int cuminterval = 0;
     bool cumvalid = true;
+    int maxpassen = 0, maxfreigh = 0;
 
+    // 区间对数表
+    Diagram::sec_cnt_t passencnt, freighcnt;
+    if (cfg.show_count_bar) {
+        auto&& p = _diagram.sectionPassenFreighCount(rail);
+        passencnt = std::forward<Diagram::sec_cnt_t>(p.first);
+        freighcnt = std::forward<Diagram::sec_cnt_t>(p.second);
+    }
 
     //标注区间数据  每个区间标注带上区间【终点】的界限
     for (auto p = rail->firstDownInterval(); p; p = rail->nextIntervalCirc(p)) {
         //标注区间终点分划线
         double x = margins.left_white;
         if (!p->isDown()) x += margins.ruler_label_width / 2.0;
+        double xright = scene()->width() - margins.right_white - margins.count_label_width;
+        if (!p->isDown())xright += margins.count_label_width / 2.0;
         double y = p->toStation()->y_value.value() + start_y;
-        if (p->toStation()->_show)
-            leftItems.append(scene()->addLine(
-                x, y, x + margins.ruler_label_width / 2.0, y, defaultPen
-            ));
+        if (p->toStation()->_show) {
+            if (cfg.show_ruler_bar)
+                leftItems.append(scene()->addLine(
+                    x, y, x + margins.ruler_label_width / 2.0, y, defaultPen
+                ));
+            if (cfg.show_count_bar)
+                rightItems.append(scene()->addLine(
+                    xright, y, xright + margins.count_label_width / 2.0, y, defaultPen
+                ));
+        }
+            
         //标注数据
         if (p == upFirst) {
             //方向转换，清理旧数据
@@ -556,7 +702,6 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
             cuminterval = 0;
         }
         if (ruler) {
-            
             if (p->getRulerNode(ruler)->isNull()) {
                 if (p->direction() == Direction::Up && !ruler->different())
                     cuminterval += p->inverseInterval()->getRulerNode(ruler)->interval;
@@ -571,31 +716,62 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
         else {
             cummile += p->mile();
         }
+        if (auto itr = passencnt.find(p); itr != passencnt.end()) {
+            maxpassen = std::max(itr->second, maxpassen);
+        }
+        if (auto itr = freighcnt.find(p); itr != freighcnt.end()) {
+            maxfreigh = std::max(itr->second, maxfreigh);
+        }
         if (p->toStation()->_show) {
-            const QString& text = ruler ?
-                cumvalid ? QString::asprintf("%d:%02d", cuminterval / 60, cuminterval % 60) : "NA" :
-                QString::number(cummile, 'f', 1);
-            leftItems.append(alignedTextItem(
-                text, textFont,
-                margins.ruler_label_width / 2.0, x,
-                (lasty + y) / 2, false
-            ));
+            if (cfg.show_ruler_bar) {
+                const QString& text = ruler ?
+                    cumvalid ? QString::asprintf("%d:%02d", cuminterval / 60, cuminterval % 60) : "NA" :
+                    QString::number(cummile, 'f', 1);
+                leftItems.append(alignedTextItem(
+                    text, textFont,
+                    margins.ruler_label_width / 2.0, x,
+                    (lasty + y) / 2, false
+                ));
+            }
+            if (cfg.show_count_bar) {
+                rightItems.append(alignedTextItem(
+                    tr("%1/%2").arg(maxpassen).arg(maxfreigh), textFont,
+                    margins.count_label_width / 2.0, xright,
+                    (lasty + y) / 2, false
+                ));
+            }
+
             lasty = y;
             cummile = 0.0;
             cuminterval = 0;
             cumvalid = true;
+            maxpassen = 0; maxfreigh = 0;
         }
         
     }
     //补充起点的下行和终点的上行边界
-    leftItems.append(scene()->addLine(
-        margins.left_white, start_y, margins.left_white + margins.ruler_label_width / 2.0, start_y,
-        defaultPen
-    ));
-    leftItems.append(scene()->addLine(
-        margins.left_white + margins.ruler_label_width / 2.0,
-        start_y + height, margins.left_white + margins.ruler_label_width, start_y + height,defaultPen
-    ));
+    if (cfg.show_ruler_bar) {
+        leftItems.append(scene()->addLine(
+            margins.left_white, start_y, margins.left_white + margins.ruler_label_width / 2.0, start_y,
+            defaultPen
+        ));
+        leftItems.append(scene()->addLine(
+            margins.left_white + margins.ruler_label_width / 2.0,
+            start_y + height, margins.left_white + margins.ruler_label_width, start_y + height, defaultPen
+        ));
+    }
+    if (cfg.show_count_bar) {
+        rightItems.append(scene()->addLine(
+            scene()->width() - margins.right_white - margins.count_label_width, start_y,
+            scene()->width() - margins.right_white - margins.count_label_width / 2.0, start_y,
+            defaultPen
+        ));
+        rightItems.append(scene()->addLine(
+            scene()->width() - margins.right_white - margins.count_label_width / 2.0,
+            start_y + height,
+            scene()->width() - margins.right_white, start_y + height, defaultPen
+        ));
+    }
 }
 
 void DiagramWidget::setVLines(double width, int hour_count, 
@@ -619,20 +795,22 @@ void DiagramWidget::setVLines(double width, int hour_count,
     color.setAlpha(200);
 
     topItems.append(scene()->addRect(
-        margins().left - 15, 0,
-        width + margins().left + 30, 35, QPen(Qt::transparent), color
+        config().totalLeftMargin() - 15, 0,
+        width + config().totalLeftMargin() + 30, 35, QPen(Qt::transparent), color
     ));
     topItems.append(scene()->addLine(
-        margins().left - 15, 35, width + margins().left + 15, 35, QPen(config().grid_color, 2)
+        config().totalLeftMargin() - 15, 35,
+        width + config().totalLeftMargin() + 15, 35, QPen(config().grid_color, 2)
     ));
 
     bottomItems.append(scene()->addRect(
-        margins().left - 15, scene()->height() - 35,
-        width + margins().left + 30, 35, QPen(Qt::transparent), color
+        config().totalLeftMargin() - 15, scene()->height() - 35,
+        width + config().totalLeftMargin() + 30, 35, QPen(Qt::transparent), color
     ));
     bottomItems.append(scene()->addLine(
-        margins().left - 15, scene()->height() - 35,
-        width + margins().left + 15, scene()->height() - 35, QPen(config().grid_color, 2)
+        config().totalLeftMargin() - 15, scene()->height() - 35,
+        width + config().totalLeftMargin() + 15,
+        scene()->height() - 35, QPen(config().grid_color, 2)
     ));
 
     QFont font;
@@ -644,7 +822,7 @@ void DiagramWidget::setVLines(double width, int hour_count,
     fontmin.setBold(true);
 
     for (int i = 0; i < hour_count + 1; i++) {
-        double x = margins().left + i * 3600 / config().seconds_per_pix;
+        double x = config().totalLeftMargin() + i * 3600 / config().seconds_per_pix;
         int hour = (i + config().start_hour) % 24;
         auto* textItem1 = addTimeAxisMark(hour, font, x);
         textItem1->setY(30 - textItem1->boundingRect().height());
@@ -760,7 +938,6 @@ QGraphicsSimpleTextItem* DiagramWidget::addLeftTableText(const QString& str,
 {
     const QColor& textColor = config().text_color;
     const auto& margins = config().margins;
-    start_x += margins.left_white;
 
     auto* text = scene()->addSimpleText(str);
     QFont font(textFont);   //copy
@@ -782,7 +959,7 @@ QGraphicsSimpleTextItem* DiagramWidget::addStationTableText(const QString& str,
 {
     const QColor& textColor = config().text_color;
     const auto& margins = config().margins;
-    start_x += margins.left_white;
+    //start_x += margins.left_white;
 
     auto* text = scene()->addSimpleText(str);
     QFont font(textFont);   //copy
@@ -804,13 +981,13 @@ void DiagramWidget::drawSingleHLine(const QFont& textFont, double y,
     QList<QGraphicsItem*>& leftItems, 
     QList<QGraphicsItem*>& rightItems, double label_start_x)
 {
-    scene()->addLine(margins().left, y, width + margins().left, y, pen);
+    scene()->addLine(config().totalLeftMargin(), y, width + config().totalLeftMargin(), y, pen);
 
     leftItems.append(alignedTextItem(name, textFont, margins().label_width - 5,
-        label_start_x + margins().left_white + 5, y));
+        label_start_x + 5, y));
     
     rightItems.append(alignedTextItem(name, textFont, margins().label_width,
-        scene()->width() - margins().label_width - margins().right_white, y));
+        scene()->width() - config().rightRectWidth()-5 - margins().right_white , y));
 }
 
 QGraphicsSimpleTextItem* DiagramWidget::alignedTextItem(const QString& text, 
@@ -897,6 +1074,16 @@ void DiagramWidget::updateForbid(std::shared_ptr<Forbid> forbid, Direction dir)
     showForbid(forbid, dir);
 }
 
+void DiagramWidget::zoomIn()
+{
+    scale(1.25, 1.25);
+}
+
+void DiagramWidget::zoomOut()
+{
+    scale(0.80, 0.80);
+}
+
 void DiagramWidget::showForbid(std::shared_ptr<Forbid> forbid, Direction dir)
 {
     int idx = _page->railwayIndex(forbid->railway());
@@ -975,7 +1162,8 @@ void DiagramWidget::addForbidNode(std::shared_ptr<Forbid> forbid,
         if (xstart <= width) {
             //存在界内部分
             xend = std::min(xend, width);
-            auto* item = scene()->addRect(xstart + margins().left, y1 + start_y, xend - xstart, y2 - y1,
+            auto* item = scene()->addRect(xstart + config().totalLeftMargin(),
+                y1 + start_y, xend - xstart, y2 - y1,
                 pen, brush);
             _page->addForbidItem(forbid.get(), railint.direction(), item);
         }
@@ -984,12 +1172,12 @@ void DiagramWidget::addForbidNode(std::shared_ptr<Forbid> forbid,
         //存在跨界的情况  先处理右半部分
         if (xstart <= width) {
             _page->addForbidItem(forbid.get(),railint.direction(), scene()->addRect(
-                xstart + margins().left, y1 + start_y, width - xstart, y2 - y1, pen, brush
+                xstart + config().totalLeftMargin(), y1 + start_y, width - xstart, y2 - y1, pen, brush
             ));
         }
         //左半部分  一定有
         _page->addForbidItem(forbid.get(), railint.direction(), scene()->addRect(
-            margins().left, y1 + start_y, xend, y2 - y1, pen, brush
+            config().totalLeftMargin(), y1 + start_y, xend, y2 - y1, pen, brush
         ));
     }
 }
@@ -1007,6 +1195,11 @@ TrainItem* DiagramWidget::posTrainItem(const QPointF& pos)
     auto* item = scene()->itemAt(pos, transform());
     if (!item)
         return nullptr;
+    //qDebug() << "item: " << item->type() << Qt::endl;
+    //if (item == marginItems.left) {
+    //    qDebug() << "left!!" << Qt::endl;
+    //    //scene()->addRect(item->boundingRect());
+    //}
     while (item->parentItem())
         item = item->parentItem();
     if (item->type() == TrainItem::Type)

@@ -114,6 +114,17 @@ QJsonObject Train::toJson() const
     return obj;
 }
 
+bool Train::getIsPassenger()const
+{
+    switch (_passenger)
+    {
+    case TrainPassenger::True:return true;
+    case TrainPassenger::False:return true;
+    case TrainPassenger::Auto:return type()->isPassenger();
+    default: return false;
+    }
+}
+
 void Train::setLineShow(bool on)
 {
     for (auto adp : _adapters) {
@@ -594,13 +605,26 @@ void Train::resetRoutingSimple()
     _routing.reset();
 }
 
-const AdapterStation* Train::boundTerminal() const
+const AdapterStation* Train::boundLast() const
 {
     if (_timetable.empty())return nullptr;
     auto lastIter = _timetable.end(); --lastIter;
     for (auto p : _adapters) {
         auto* last = p->lastStation();
         if (last && last->trainStation == lastIter)
+            return last;
+    }
+    return nullptr;
+}
+
+const AdapterStation* Train::boundTerminal() const
+{
+    if (_timetable.empty())return nullptr;
+    auto lastIter = _timetable.end(); --lastIter;
+    for (auto p : _adapters) {
+        auto* last = p->lastStation();
+        if (last && last->trainStation == lastIter &&
+            isTerminalStation(last->trainStation->name))
             return last;
     }
     return nullptr;
@@ -614,13 +638,26 @@ std::shared_ptr<RailStation> Train::boundTerminalRail() const
     return nullptr;
 }
 
-const AdapterStation* Train::boundStarting() const
+const AdapterStation* Train::boundFirst() const
 {
     if (_timetable.empty())
         return nullptr;
     for (auto p : _adapters) {
         auto* first = p->firstStation();
         if (first && first->trainStation == _timetable.begin())
+            return first;
+    }
+    return nullptr;
+}
+
+const AdapterStation* Train::boundStarting() const
+{
+    if (_timetable.empty())
+        return nullptr;
+    for (auto p : _adapters) {
+        auto* first = p->firstStation();
+        if (first && first->trainStation == _timetable.begin() 
+            && isStartingStation(first->trainStation->name))
             return first;
     }
     return nullptr;

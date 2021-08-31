@@ -71,6 +71,7 @@ void TrainContext::initUI()
 		connect(act, SIGNAL(triggered()), this, SLOT(showTrainEvents()));
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(70);
+		mw->diaActions.eventList = act;
 
 		act = new QAction(QIcon(":/icons/line-manage.png"), tr("运行线一览"), this);
 		act->setToolTip(tr("运行线一览表\n显示本次列车所有运行线基础信息及其铺画情况"));
@@ -84,6 +85,7 @@ void TrainContext::initUI()
 		connect(act, SIGNAL(triggered()), this, SLOT(actRulerRef()));
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(80);
+		mw->diaActions.rulerRef = act;
 
 		act = new QAction(QIcon(":/icons/identify.png"), tr("时刻诊断"), this);
 		act->setToolTip(tr("列车时刻表诊断\n检查本次列车时刻表可能存在的问题，"
@@ -91,6 +93,21 @@ void TrainContext::initUI()
 		connect(act, &QAction::triggered, this, &TrainContext::actDiagnose);
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(80);
+
+		panel = page->addPannel(tr("交路"));
+		edRouting = new SARibbonLineEdit;
+		edRouting->setAlignment(Qt::AlignCenter);
+		edRouting->setFocusPolicy(Qt::NoFocus);
+		edRouting->setFixedWidth(120);
+
+		auto* w = new QWidget;
+		auto* vlay = new QVBoxLayout(w);
+		vlay->addWidget(edRouting);
+		act = new QAction(tr("转到交路"), this);
+		connect(act, &QAction::triggered, this, &TrainContext::actToRouting);
+		btnToRouting = new SARibbonToolButton(act);
+		vlay->addWidget(btnToRouting);
+		panel->addWidget(w, SARibbonPannelItem::Large);
 	}
 
 	//编辑
@@ -201,11 +218,13 @@ void TrainContext::initUI()
 		act->setToolTip(tr("区间换线\n交换本次列车和另一列车在所选区间的运行线"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actExchangeInterval()));
 		panel->addMediumAction(act);
+		mw->diaActions.intervalExchange = act;
 
 		act = new QAction(QIcon(":/icons/adjust.png"), tr("时刻平移"), this);
 		act->setToolTip(tr("时刻平移\n将本车次部分或全部车站时刻前移或后移一段时间"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actAdjustTimetable()));
 		panel->addMediumAction(act);
+		mw->diaActions.timeAdjust = act;
 
 		panel = page->addPannel(tr(""));
 
@@ -488,6 +507,14 @@ void TrainContext::refreshData()
 		edName->setText(train->trainName().full());
 		edStart->setText(train->starting().toSingleLiteral());
 		edEnd->setText(train->terminal().toSingleLiteral());
+		if (train->hasRouting()) {
+			edRouting->setText(train->routing().lock()->name());
+			btnToRouting->setEnabled(true);
+		}
+		else {
+			edRouting->setText(tr("(无交路)"));
+			btnToRouting->setEnabled(false);
+		}
 		edNamem->setText(train->trainName().full());
 		edStartm->setText(train->starting().toSingleLiteral());
 		edEndm->setText(train->terminal().toSingleLiteral());
@@ -523,12 +550,20 @@ void TrainContext::actShowTrainLineDialog()
 
 void TrainContext::actRulerRef()
 {
+	if (!train) {
+		QMessageBox::warning(mw, tr("错误"), tr("标尺对照：当前没有选中车次！"));
+		return;
+	}
 	auto* dialog = new RulerRefDialog(train, mw);
 	dialog->open();
 }
 
 void TrainContext::actExchangeInterval()
 {
+	if (!train) {
+		QMessageBox::warning(mw, tr("错误"), tr("区间换线：当前没有选中车次！"));
+		return;
+	}
 	auto* dialog = new ExchangeIntervalDialog(diagram.trainCollection(), train, mw);
 	connect(dialog, &ExchangeIntervalDialog::exchangeApplied,
 		this, &TrainContext::actApplyExchangeInterval);
@@ -547,6 +582,10 @@ void TrainContext::actApplyExchangeInterval(
 
 void TrainContext::actAdjustTimetable()
 {
+	if (!train) {
+		QMessageBox::warning(mw, tr("错误"), tr("时刻表调整：当前没有选中车次！"));
+		return;
+	}
 	auto* dialog = new ModifyTimetableDialog(train, mw);
 	connect(dialog, &ModifyTimetableDialog::trainUpdated,
 		this, &TrainContext::onTrainTimetableChanged);
@@ -559,6 +598,13 @@ void TrainContext::actDiagnose()
 	d->show();
 }
 
+void TrainContext::actToRouting()
+{
+	if (train && train->hasRouting()) {
+		emit focusInRouting(train->routing().lock());
+	}
+}
+
 void TrainContext::setTrain(std::shared_ptr<Train> train_)
 {
 	train = train_;
@@ -567,6 +613,10 @@ void TrainContext::setTrain(std::shared_ptr<Train> train_)
 
 void TrainContext::showTrainEvents()
 {
+	if (!train) {
+		QMessageBox::warning(mw, tr("错误"), tr("列车事件表：没有选中车次！"));
+		return;
+	}
 	auto* dialog = new TrainEventDialog(diagram, train, mw);
 	dialog->show();
 }

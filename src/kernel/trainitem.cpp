@@ -13,7 +13,7 @@ TrainItem::TrainItem(Diagram& diagram, std::shared_ptr<TrainLine> line,
     QGraphicsItem(parent),_diagram(diagram),
     _line(line),_railway(railway),_page(page),
     startTime(diagram.config().start_hour,0,0),
-    start_x(diagram.config().margins.left),start_y(startY)
+    start_x(diagram.config().totalLeftMargin()),start_y(startY)
 {
     _startAtThis = train()->isStartingStation(_line->firstStationName());
     _endAtThis = train()->isTerminalStation(_line->lastStationName());
@@ -767,7 +767,8 @@ void TrainItem::addLinkLine()
         //无需跨界
         if (xpre <= width) {
             linkItem1 = new QGraphicsLineItem(
-                margins().left + xpre, y, margins().left + std::min(width, xcur), y, this
+                config().totalLeftMargin() + xpre, y, 
+                config().totalLeftMargin() + std::min(width, xcur), y, this
             );
             linkItem1->setPen(pen);
         }
@@ -776,13 +777,14 @@ void TrainItem::addLinkLine()
         //跨界
         //左边的 一定存在
         linkItem1 = new QGraphicsLineItem(
-            margins().left, y, margins().left + xcur, y, this
+            config().totalLeftMargin(), y, config().totalLeftMargin() + xcur, y, this
         );
         linkItem1->setPen(pen);
         //右边的
         if (xpre <= width) {
             linkItem2 = new QGraphicsLineItem(
-                margins().left + xpre, y, margins().left + width, y, this
+                config().totalLeftMargin() + xpre, y, 
+                config().totalLeftMargin() + width, y, this
             );
             linkItem2->setPen(pen);
         }

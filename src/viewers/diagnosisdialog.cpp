@@ -139,7 +139,7 @@ void DiagnosisDialog::actApply()
     else {
         model->setupForAll(ckIntMeet->isChecked());
     }
-    if (model->rowCount())
+    if (model->rowCount() == 0)
         QMessageBox::information(this, tr("提示"), tr("当前所选范围内未发现问题。"));
     else
         table->resizeColumnsToContents();

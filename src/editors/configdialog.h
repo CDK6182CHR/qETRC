@@ -1,12 +1,14 @@
 ﻿#pragma once
 
 #include <QDialog>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QCheckBox>
-#include <QComboBox>
 #include <QUndoCommand>
 #include "data/diagram/config.h"
+
+class QSpinBox;
+class QDoubleSpinBox;
+class QCheckBox;
+class QComboBox;
+class QPushButton;
 
 /**
  * @brief The ConfigDialog class
@@ -26,14 +28,18 @@ class ConfigDialog : public QDialog
     bool repaint=false;
 
     QSpinBox* spStartHour, * spEndHour, * spVLines, * spMinMarkInter;
-    QSpinBox *spMarginUp,*spMarginDown,*spRulerWidth,
-            *spMileWidth,*spHWhite,*spStationWidth,*spInterval;
+    QSpinBox* spMarginUp, * spMarginDown, * spRulerWidth,
+        * spMileWidth, * spHWhite, * spStationWidth, * spInterval, * spCountWidth;
     QSpinBox *spValidWidth,*spStartLabelHeight,*spEndLabelHeight,
             *spBaseHeight,*spStepHeight;
     QDoubleSpinBox* sdScaleX, * sdSlimWidth, * sdBoldWidth, *sdScaleYdist,
             *sdScaleYsec;
     QComboBox* cbShowTimeMark;
     QCheckBox *ckFullName,*ckEndLabel,*ckAvoidCollid;
+    QCheckBox* ckShowRuler, * ckShowMile, * ckShowCount;
+    QPushButton* btnGridColor, * btnTextColor;
+
+    QColor gridColor, textColor;
 
 public:
     ConfigDialog(Config& cfg,QWidget* parent=nullptr);
@@ -63,6 +69,10 @@ private slots:
     void actApply();
 
     void onAvoidCollidChanged(bool on);
+
+    void actGridColor();
+
+    void actTextColor();
 };
 
 class ViewCategory;

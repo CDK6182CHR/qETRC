@@ -80,6 +80,8 @@ class MainWindow : public SARibbonMainWindow
 
     bool changed = false;
 
+    DiagramWidget::SharedActions diaActions;
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -395,6 +397,11 @@ public slots:
      * 重绘一组车次的运行线。主要也是交路变更时使用。
      */
     void repaintTrainLines(const QSet<std::shared_ptr<Train>> trains);
+
+    /**
+     * 弹出对话框搜索车次
+     */
+    void actSearchTrain();
 
 };
 

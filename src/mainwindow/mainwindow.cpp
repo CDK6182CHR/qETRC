@@ -498,7 +498,7 @@ void MainWindow::initToolbar()
         actTrainList = act;
         act->setText(tr("列车管理"));
         act->setToolTip(tr("列车管理\n打开或关闭（pyETRC风格的）列车管理列表面板。"));
-        act->setIcon(QIcon(":/icons/list.png"));
+        act->setIcon(QApplication::style()->standardIcon(QStyle::SP_FileDialogListView));
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
@@ -535,6 +535,7 @@ void MainWindow::initToolbar()
             tr("刷新"), this);
         act->setToolTip(tr("刷新 (F5)\n重新铺画运行图，更新所有数据面板的信息。"));
         act->setShortcut(Qt::Key_F5);
+        diaActions.refreshAll = act;
         addAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(refreshAll()));
         btn = panel->addLargeAction(act);
@@ -647,10 +648,21 @@ void MainWindow::initToolbar()
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(70);
 
+        act = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileDialogContentsView),
+            tr("搜索车次"), this);
+        act->setToolTip(tr("搜索车次 (Ctrl+F)\n搜索车次，将车次设定为当前车次，并高亮运行线。"));
+        connect(act, &QAction::triggered, this, &MainWindow::actSearchTrain);
+        act->setShortcut(Qt::CTRL + Qt::Key_F);
+        addAction(act);
+        panel->addMediumAction(act);
+        diaActions.search = act;
+
         act = new QAction(QIcon(":/icons/add.png"), tr("新建车次"), this);
-        act->setToolTip(tr("新建车次\n新建空白车次"));
-        btn = panel->addLargeAction(act);
-        btn->setMinimumWidth(70);
+        act->setToolTip(tr("新建车次 (Ctrl+Shift+C)\n新建空白车次"));
+        act->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_C);
+        addAction(act);
+        diaActions.addTrain = act;
+        btn = panel->addMediumAction(act);
         connect(act, SIGNAL(triggered()), naviView, SLOT(actAddTrain()));
 
         panel = cat->addPannel(tr("运行线控制"));
@@ -713,6 +725,7 @@ void MainWindow::initToolbar()
         act->setToolTip(tr("两车次运行对照\n在指定线路上，对比两个选定车次的运行情况。"));
         connect(act, SIGNAL(triggered()), this, SLOT(actTrainDiff()));
         panel->addMediumAction(act);
+        diaActions.trainRef = act;
 
         act = new QAction(QIcon(":/icons/identify.png"), tr("时刻诊断"), this);
         act->setToolTip(tr("车次时刻诊断\n诊断指定车次或所有车次的时刻表是否存在"
@@ -730,11 +743,13 @@ void MainWindow::initToolbar()
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
         connect(act, SIGNAL(triggered()), this, SLOT(actRulerPaint()));
+        diaActions.rulerPaint = act;
         
         act = new QAction(QIcon(":/icons/copy.png"), tr("批量复制"), this);
         act->setToolTip(tr("批量复制运行线\n"
             "将指定车次的运行线按照其起始时刻复制若干个（车次不同的）副本。"));
         connect(act, SIGNAL(triggered()), this, SLOT(actBatchCopyTrain()));
+        diaActions.batchCopy = act;
         panel->addMediumAction(act);
     }
 
@@ -774,6 +789,8 @@ void MainWindow::initToolbar()
             this, &MainWindow::onNewTrainAdded);
         connect(naviModel, &DiagramNaviModel::undoneAddTrain,
             this, &MainWindow::undoAddNewTrain);
+        connect(contextTrain, &TrainContext::focusInRouting,
+            this, &MainWindow::focusInRouting);
     }
 
     //context: rail
@@ -1040,7 +1057,7 @@ void MainWindow::actAutoStartingTerminal()
     for (auto train : _diagram.trains()) {
         if (train->empty())
             continue;
-        auto* first = train->boundStarting();
+        auto* first = train->boundFirst();
         if (first) {
             const auto& firstname = first->trainStation->name;
             const auto& starting = train->starting();
@@ -1050,7 +1067,7 @@ void MainWindow::actAutoStartingTerminal()
                 data.startings.emplace_back(std::make_pair(train, firstname));
             }
         }
-        auto* last = train->boundTerminal();
+        auto* last = train->boundLast();
         if (last) {
             const auto& lastname = last->trainStation->name;
             const auto& terminal = train->terminal();
@@ -1377,6 +1394,7 @@ void MainWindow::insertPageWidget(std::shared_ptr<DiagramPage> page, int index)
     pageMenu->addAction(act);
     diagramDocks.insert(index, dock);
     diagramWidgets.insert(index, dw);
+    dw->setupMenu(diaActions);
     //informPageListChanged();
     connect(dw, &DiagramWidget::trainSelected, this, &MainWindow::focusInTrain);
     connect(contextTrain, &TrainContext::highlightTrainLine, dw, &DiagramWidget::highlightTrain);
@@ -1485,6 +1503,16 @@ void MainWindow::repaintTrainLines(const QSet<std::shared_ptr<Train>> trains)
 {
     foreach(auto p, trains) {
         repaintTrainLines(p);
+    }
+}
+
+void MainWindow::actSearchTrain()
+{
+    auto train = SelectTrainCombo::dialogGetTrain(_diagram.trainCollection(), this, tr("搜索车次"),
+        tr("请先输入搜索内容，然后按Tab键选择车次"));
+    if (train) {
+        focusInTrain(train);
+        contextTrain->highlightTrainLine(train);
     }
 }
 

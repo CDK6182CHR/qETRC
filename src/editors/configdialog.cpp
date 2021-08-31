@@ -107,6 +107,13 @@ void ConfigDialog::initUI()
         form->addRow(tr("站名栏宽度"),sp);
         spStationWidth=sp;
 
+        sp = new QSpinBox;
+        sp->setToolTip(tr("运行图右侧显示客货断面对数栏的宽度"));
+        sp->setRange(0, 10000);
+        sp->setSingleStep(5);
+        form->addRow(tr("断面对数栏宽度"), sp);
+        spCountWidth = sp;
+
         sp=new QSpinBox;
         sp->setToolTip(tr("运行图左右边界值站名栏边界的宽度"));
         sp->setRange(0,10000);
@@ -125,7 +132,7 @@ void ConfigDialog::initUI()
         vlay->addWidget(gb);
     }
 
-    // 4. 线宽
+    // 4. 格线控制
     if constexpr (true) {
         gb = new QGroupBox(tr("格线控制"));
         form = new QFormLayout;
@@ -143,6 +150,16 @@ void ConfigDialog::initUI()
         sd->setToolTip(tr("设置水平和垂直粗格线宽度"));
         sdBoldWidth = sd;
         form->addRow(tr("粗格线宽度"), sd);
+
+        auto* btn = new QPushButton;
+        btnGridColor = btn;
+        connect(btn, &QPushButton::clicked, this, &ConfigDialog::actGridColor);
+        form->addRow(tr("格线颜色"), btn);
+
+        btn = new QPushButton;
+        btnTextColor = btn;
+        connect(btn, &QPushButton::clicked, this, &ConfigDialog::actTextColor);
+        form->addRow(tr("字体颜色"), btn);
 
         gb->setLayout(form);
         vlay->addWidget(gb);
@@ -168,6 +185,21 @@ void ConfigDialog::initUI()
             "数值越大，纵轴比例越小"));
         form->addRow(tr("纵轴每秒像素数"),sd);
         sdScaleYsec=sd;
+
+        auto* ck = new QCheckBox(tr("显示"));
+        ckShowRuler = ck;
+        ck->setToolTip(tr("控制运行图左侧的[排图标尺]或者[区间距离]栏是否显示"));
+        form->addRow(tr("排图标尺栏"), ck);
+
+        ck = new QCheckBox(tr("显示"));
+        ckShowMile = ck;
+        ck->setToolTip(tr("控制运行图左侧的[延长公里]栏是否显示"));
+        form->addRow(tr("延长公里栏"), ck);
+
+        ck = new QCheckBox(tr("显示"));
+        ckShowCount = ck;
+        ck->setToolTip(tr("控制运行图右侧的[客货对数]栏是否显示"));
+        form->addRow(tr("客货对数栏"), ck);
 
         gb->setLayout(form);
         vlay->addWidget(gb);
@@ -267,6 +299,7 @@ void ConfigDialog::initUI()
 
 #define _SET_VALUE(_spin,_key) _spin->setValue(_cfg._key)
 #define _SET_MARGIN(_spin,_key) _spin->setValue(_cfg.margins._key)
+#define _SET_CHECK(_check,_key) _check->setChecked(_cfg._key)
 
 void ConfigDialog::refreshData()
 {
@@ -283,7 +316,9 @@ void ConfigDialog::refreshData()
     _SET_MARGIN(spRulerWidth,ruler_label_width);
     _SET_MARGIN(spMileWidth, mile_label_width);
     _SET_MARGIN(spStationWidth, label_width);
-    spHWhite->setValue(_cfg.margins.right - _cfg.margins.right_white - _cfg.margins.label_width);
+    _SET_MARGIN(spCountWidth, count_label_width);
+    spHWhite->setValue(_cfg.margins.right - _cfg.margins.right_white - _cfg.margins.label_width
+        - _cfg.margins.count_label_width);
     _SET_MARGIN(spInterval, gap_between_railways);
 
     //格线控制
@@ -293,6 +328,9 @@ void ConfigDialog::refreshData()
     //空间轴
     _SET_VALUE(sdScaleYdist, pixels_per_km);
     _SET_VALUE(sdScaleYsec, seconds_per_pix_y);
+    _SET_CHECK(ckShowRuler, show_ruler_bar);
+    _SET_CHECK(ckShowMile, show_mile_bar);
+    _SET_CHECK(ckShowCount, show_count_bar);
 
     //运行线控制
     _SET_VALUE(spValidWidth, valid_width);
@@ -306,6 +344,17 @@ void ConfigDialog::refreshData()
     _SET_VALUE(spEndLabelHeight, end_label_height);
     _SET_VALUE(spBaseHeight, base_label_height);
     _SET_VALUE(spStepHeight, step_label_height);
+
+    gridColor = _cfg.grid_color;
+    textColor = _cfg.text_color;
+    btnGridColor->setText(gridColor.name().toUpper());
+    btnGridColor->setStyleSheet(QStringLiteral(
+        "QPushButton { background-color: rgb(%1, %2, %3); }").arg(gridColor.red())
+        .arg(gridColor.green()).arg(gridColor.blue()));
+    btnTextColor->setText(gridColor.name().toUpper());
+    btnTextColor->setStyleSheet(QStringLiteral(
+        "QPushButton { background-color: rgb(%1, %2, %3); }").arg(textColor.red())
+        .arg(textColor.green()).arg(textColor.blue()));
 }
 
 #undef _SET_VALUE
@@ -313,6 +362,7 @@ void ConfigDialog::refreshData()
 
 #define _GET_VALUE(_spin,_key) cnew._key=_spin->value()
 #define _GET_MARGIN(_spin,_key) cnew.margins._key=_spin->value()
+#define _GET_CHECK(_check,_key) cnew._key=_check->isChecked()
 
 void ConfigDialog::actApply()
 {
@@ -333,7 +383,11 @@ void ConfigDialog::actApply()
     _GET_MARGIN(spRulerWidth, ruler_label_width);
     _GET_MARGIN(spMileWidth, mile_label_width);
     _GET_MARGIN(spStationWidth, label_width);
-    cnew.margins.right = spHWhite->value() + _cfg.margins.right_white + _cfg.margins.label_width;
+    _GET_MARGIN(spCountWidth, count_label_width);
+    cnew.margins.left = spHWhite->value() + cnew.margins.ruler_label_width +
+        cnew.margins.mile_label_width + cnew.margins.label_width + cnew.margins.left_white;
+    cnew.margins.right = spHWhite->value() + cnew.margins.right_white +
+        cnew.margins.label_width + cnew.margins.count_label_width;
     _GET_MARGIN(spInterval, gap_between_railways);
 
     //格线控制
@@ -343,6 +397,9 @@ void ConfigDialog::actApply()
     //空间轴
     _GET_VALUE(sdScaleYdist, pixels_per_km);
     _GET_VALUE(sdScaleYsec, seconds_per_pix_y);
+    _GET_CHECK(ckShowRuler, show_ruler_bar);
+    _GET_CHECK(ckShowMile, show_mile_bar);
+    _GET_CHECK(ckShowCount, show_count_bar);
 
     //运行线控制
     _GET_VALUE(spValidWidth, valid_width);
@@ -356,6 +413,9 @@ void ConfigDialog::actApply()
     _GET_VALUE(spEndLabelHeight, end_label_height);
     _GET_VALUE(spBaseHeight, base_label_height);
     _GET_VALUE(spStepHeight, step_label_height);
+    
+    cnew.grid_color = gridColor;
+    cnew.text_color = textColor;
 
     emit onConfigApplied(_cfg, cnew, repaint);
     done(QDialog::Accepted);
@@ -367,6 +427,32 @@ void ConfigDialog::onAvoidCollidChanged(bool on)
     spEndLabelHeight->setEnabled(!on);
     spBaseHeight->setEnabled(on);
     spStepHeight->setEnabled(on);
+}
+
+void ConfigDialog::actGridColor()
+{
+    auto color = QColorDialog::getColor(gridColor, this, tr("格线颜色"));
+    if (color.isValid()) {
+        gridColor = color;
+        btnGridColor->setText(color.name());
+        btnGridColor->setText(gridColor.name().toUpper());
+        btnGridColor->setStyleSheet(QStringLiteral(
+            "QPushButton { background-color: rgb(%1, %2, %3); }").arg(gridColor.red())
+            .arg(gridColor.green()).arg(gridColor.blue()));
+    }
+}
+
+void ConfigDialog::actTextColor()
+{
+    auto color = QColorDialog::getColor(textColor, this, tr("字体颜色"));
+    if (color.isValid()) {
+        textColor = color;
+        btnTextColor->setText(color.name());
+        btnTextColor->setText(gridColor.name().toUpper());
+        btnTextColor->setStyleSheet(QStringLiteral(
+            "QPushButton { background-color: rgb(%1, %2, %3); }").arg(textColor.red())
+            .arg(textColor.green()).arg(textColor.blue()));
+    }
 }
 
 void qecmd::ChangeConfig::undo()

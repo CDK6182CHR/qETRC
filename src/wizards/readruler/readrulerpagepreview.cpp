@@ -163,7 +163,7 @@ void ReadRulerDetailModel::setupModel(std::shared_ptr<RailInterval> railint,
     const readruler::IntervalReport& itrep, bool useAverage)
 {
     using SI = QStandardItem;
-    setRowCount(itrep.raw.size());
+    setRowCount(static_cast<int>(itrep.raw.size()));
     int row = 0;
     for (auto p = itrep.raw.begin(); p != itrep.raw.end(); ++p) {
         TrainLine::IntervalAttachType tp = p->second.second;
@@ -209,7 +209,7 @@ ReadRulerSummaryModel::ReadRulerSummaryModel(QObject* parent):
 void ReadRulerSummaryModel::setupModel(const readruler::IntervalReport& itrep)
 {
     using SI = QStandardItem;
-    setRowCount(itrep.types.size());
+    setRowCount(static_cast<int>( itrep.types.size()));
     int row = 0;
     for (auto p = itrep.types.begin(); p != itrep.types.end(); ++p) {
         setItem(row, ColType, new SI(TrainLine::attachTypeStringFull(p->first)));

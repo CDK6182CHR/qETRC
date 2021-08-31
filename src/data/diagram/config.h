@@ -15,14 +15,20 @@ struct MarginConfig {
     int
         left_white = 15,
         right_white = 10,
-        left = 275,
         up = 90,
         down = 90,
-        right = 150,
         label_width = 80,
         mile_label_width = 40,
-        ruler_label_width = 80;
+        ruler_label_width = 80,
+        count_label_width = 60;
+private:
+    int left = 275,
+        right = 230;
 
+    friend struct Config;
+    friend class ConfigDialog;
+
+public:
     //这两项从pyETRC.GraphicsWidget中来
     int
         title_row_height = 40,
@@ -106,6 +112,10 @@ struct Config
      */
     int end_label_name = true;
 
+    bool show_ruler_bar = true,
+        show_mile_bar = true,
+        show_count_bar = true;
+
     MarginConfig margins{};
 
     //排图标尺，现在改为Railway的性质
@@ -115,10 +125,53 @@ struct Config
     bool fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;
 
+    /**
+     * 图幅总宽度 （第一至最后的时间线之间的距离）
+     */
     double diagramWidth()const;
 
+    /**
+     * 24小时的完整图幅宽度 （0点至24点时间线总宽度）
+     */
     inline double fullWidth()const {
         return 24 * 3600.0 / seconds_per_pix;
     }
 
+    /**
+     * 图幅左边界（最左侧时间线）与图边的总距离
+     * 取代margins.left
+     */
+    double totalLeftMargin()const;
+
+    /**
+     * 排图标尺栏的开始坐标
+     */
+    double rulerBarX()const;
+
+    /**
+     * 延长公里栏开始坐标
+     */
+    double mileBarX()const;
+
+    /**
+     * 最后一条时间线至右侧边界的距离
+     * 取代margins.right
+     */
+    double totalRightMargin()const;
+
+    /**
+     * 左侧站名栏开始的横坐标
+     */
+    double leftStationBarX()const;
+
+    /**
+     * 左侧表头总宽度，就是半透明rect的宽度
+     */
+    double leftRectWidth()const;
+    double rightRectWidth()const;
+
+    /**
+     * 左侧排图标尺和延长公里栏的总宽度
+     */
+    double leftTitleRectWidth()const;
 };

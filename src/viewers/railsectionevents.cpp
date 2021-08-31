@@ -28,8 +28,8 @@ void RailSectionEventsModel::setupModel()
     lst = diagram.sectionEvents(railway, y);
 
     beginResetModel();
-    setRowCount(lst.size());
-    for (int i = 0; i < lst.size(); i++) {
+    setRowCount(static_cast<int>(lst.size()));
+    for (int i = 0; i < (int)lst.size(); i++) {
         const auto& p = lst.at(i);
         auto line = p.first;
         auto train = line->train();

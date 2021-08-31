@@ -307,7 +307,7 @@ void RoutingContext::commitBatchRoutingUpdate(const QVector<int>& indexes,
     QSet<std::shared_ptr<Train>> takenTrains; 
     for (int i = 0; i < indexes.size(); i++) {
         int index = indexes.at(i);
-        auto r = _diagram.trainCollection().routingAt(i);
+        auto r = _diagram.trainCollection().routingAt(index);
         auto rd = data.at(i);
         r->swap(*rd);
         r->updateTrainHooks();

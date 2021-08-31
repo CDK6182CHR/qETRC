@@ -23,7 +23,7 @@
  */
 class DiagramWidget : public QGraphicsView
 {
-    Q_OBJECT
+    Q_OBJECT;
 
     /**
      * @brief _diagram  运行图基础数据，全程采用同一个对象
@@ -51,7 +51,18 @@ class DiagramWidget : public QGraphicsView
 
     QTime startTime;
 
+    QMenu* contextMenu = nullptr;
+
 public:
+    struct SharedActions {
+        QAction* refreshAll;
+        QAction* search,* rulerRef, * trainRef, * eventList;
+        QAction* timeAdjust, * batchCopy, * intervalExchange;
+        QAction* addTrain, * rulerPaint;
+        SharedActions() = default;
+        SharedActions(const SharedActions&) = delete;
+    };
+
     DiagramWidget(Diagram& daigram, std::shared_ptr<DiagramPage> page, QWidget* parent = nullptr);
     ~DiagramWidget()noexcept;
 
@@ -130,6 +141,8 @@ public:
 
     auto page()const { return _page; }
 
+    void setupMenu(const SharedActions& actions);
+
 protected:
     virtual void mousePressEvent(QMouseEvent* e)override;
 
@@ -140,6 +153,8 @@ protected:
     virtual void resizeEvent(QResizeEvent* e)override;
 
     virtual void focusInEvent(QFocusEvent* e)override;
+
+    virtual void contextMenuEvent(QContextMenuEvent* e)override;
 
 private:
 
@@ -294,6 +309,10 @@ public slots:
      * 当天窗数据变化时，更新
      */
     void updateForbid(std::shared_ptr<Forbid> forbid, Direction dir);
+
+    void zoomIn();
+
+    void zoomOut();
 
 };
 

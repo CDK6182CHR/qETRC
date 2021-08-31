@@ -45,17 +45,28 @@ void NaviTree::initUI()
 
 void NaviTree::initContextMenus()
 {
+    QAction* actExpand = new QAction(tr("展开"),this);
+    connect(actExpand, &QAction::triggered, this, &NaviTree::actExpand);
+    QAction* actCollapse = new QAction(tr("折叠"),this);
+    connect(actCollapse, &QAction::triggered, this, &NaviTree::actCollapse);
+    QAction* actSep = new QAction();
+    actSep->setSeparator(true);
+    QList<QAction*> common{ actExpand,actCollapse,actSep };
+
     //PageList
+    mePageList->addActions(common);
     QAction* act = mePageList->addAction(tr("添加运行图视窗"));
     connect(act, SIGNAL(triggered()), this, SLOT(addNewPage()));
 
     //RailList
+    meRailList->addActions(common);
     act = meRailList->addAction(tr("导入线路"));
     connect(act, SIGNAL(triggered()), this, SLOT(importRailways()));
     act = meRailList->addAction(tr("添加空白线路"));
     connect(act, SIGNAL(triggered()), this, SLOT(actAddRailway()));
 
     //TrainList
+    meTrainList->addActions(common);
     act = meTrainList->addAction(tr("导入车次"));
     connect(act, SIGNAL(triggered()), this, SLOT(importTrains()));
     act = meTrainList->addAction(tr("新建空白车次"));
@@ -72,6 +83,7 @@ void NaviTree::initContextMenus()
     connect(act, SIGNAL(triggered()), this, SLOT(onRemoveSingleTrainContext()));
 
     //Railway
+    meRailway->addActions(common);
     act = meRailway->addAction(tr("编辑基线"));
     connect(act, SIGNAL(triggered()), this, SLOT(onEditRailwayContext()));
     act = meRailway->addAction(tr("删除基线"));
@@ -94,6 +106,7 @@ void NaviTree::initContextMenus()
     connect(act, &QAction::triggered, this, &NaviTree::onRemoveRoutingContext);
 
     //RoutingList
+    meRoutingList->addActions(common);
     act = meRoutingList->addAction(tr("添加交路"));
     connect(act, &QAction::triggered, this, &NaviTree::actAddRouting);
     act = meRoutingList->addAction(tr("批量解析"));
@@ -353,6 +366,16 @@ void NaviTree::onCurrentChanged(const QModelIndex& cur, const QModelIndex& prev)
             emit focusInRouting(static_cast<navi::RoutingItem*>(icur)->routing()); break;
         }
     }
+}
+
+void NaviTree::actExpand()
+{
+    tree->expand(tree->currentIndex());
+}
+
+void NaviTree::actCollapse()
+{
+    tree->collapse(tree->currentIndex());
 }
 
 
