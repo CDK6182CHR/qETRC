@@ -59,6 +59,7 @@ SOURCES += \
     src/editors/ruler/rulertabpy.cpp \
     src/editors/ruler/rulerwidget.cpp \
     src/editors/typeconfigdialog.cpp \
+    src/editors/typeregexdialog.cpp \
     src/mainwindow/routingcontext.cpp \
     src/model/delegate/generaldoublespindelegate.cpp \
     src/model/delegate/generalspindelegate.cpp \
@@ -170,6 +171,7 @@ HEADERS += \
     src/editors/ruler/rulertabpy.h \
     src/editors/ruler/rulerwidget.h \
     src/editors/typeconfigdialog.h \
+    src/editors/typeregexdialog.h \
     src/mainwindow/routingcontext.h \
     src/model/delegate/generaldoublespindelegate.h \
     src/model/delegate/generalspindelegate.h \

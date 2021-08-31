@@ -23,15 +23,14 @@ class TypeConfigDialog : public QDialog
     Q_OBJECT;
     TypeManager& manager;
     TypeConfigModel* const model;
+    const bool forDefault;
 
     QEControlledTable* ctab;
     QTableView* table;
 
 public:
-    explicit TypeConfigDialog(TypeManager& manager_, QWidget *parent = nullptr);
+    explicit TypeConfigDialog(TypeManager& manager_,bool forDefault_, QWidget *parent = nullptr);
 
-protected:
-    virtual void setupLabel(QLabel *label);
 private:
     void initUI();
 

@@ -3,6 +3,7 @@
 #include "data/diagram/trainadapter.h"
 #include "editors/configdialog.h"
 #include "editors/typeconfigdialog.h"
+#include "editors/typeregexdialog.h"
 #include "data/train/traintype.h"
 
 #include <SARibbonPannelItem.h>
@@ -122,6 +123,25 @@ void ViewCategory::initUI()
     connect(act, &QAction::triggered, this, &ViewCategory::actTypeConfig);
     act->setToolTip(tr("类型管理\n管理[当前运行图文件]的列车类型，及各种类型的颜色、线形等。"));
     panel->addMediumAction(act);
+
+    auto* m = new SARibbonMenu(cat);
+    auto* ma = m->addAction(tr("默认类型管理"));
+    connect(ma, &QAction::triggered, this, &ViewCategory::actTypeConfigDefault);
+    ma->setToolTip(tr("默认类型管理\n配置[系统默认设置]的类型管理部分，"
+        "将用于缺省的新运行图。"));
+    act->setMenu(m);
+
+    act = new QAction(QIcon(":/icons/filter.png"), tr("类型规则"), this);
+    connect(act, &QAction::triggered, this, &ViewCategory::actTypeRegex);
+    act->setToolTip(tr("类型判定规则\n编辑[当前运行图文件]的由正则表达式判定车次所属类型的规则。"));
+    panel->addMediumAction(act);
+
+    m = new SARibbonMenu(cat);
+    ma = m->addAction(tr("默认类型规则"));
+    connect(ma, &QAction::triggered, this, &ViewCategory::actTypeRegexDefault);
+    ma->setToolTip(tr("默认类型规则\n配置[系统默认设置]的正则表达式判定车次所述类型规则，"
+        "将用于缺省的新运行图。"));
+    act->setMenu(m);
 }
 
 void ViewCategory::setDirTrainsShow(Direction dir, bool show)
@@ -173,12 +193,6 @@ void ViewCategory::setTrainShow(std::shared_ptr<TrainLine> line, bool show)
     for (auto p : mw->diagramWidgets)
         p->setTrainShow(line, show);
 }
-
-//void ViewCategory::setTrainShow(std::shared_ptr<TrainAdapter> adp, bool show)
-//{
-//    for (auto p : mw->diagramWidgets)
-//        p->setTrainShow(adp, show);
-//}
 
 bool ViewCategory::typeIsShow(std::shared_ptr<Train> train) const
 {
@@ -293,9 +307,33 @@ void ViewCategory::onActConfigApplied(Config& cfg, const Config& newcfg, bool re
 
 void ViewCategory::actTypeConfig()
 {
-    auto* dialog = new TypeConfigDialog(diagram.trainCollection().typeManager(), mw);
+    auto* dialog = new TypeConfigDialog(diagram.trainCollection().typeManager(),false, mw);
     connect(dialog, &TypeConfigDialog::typeSetApplied,
         this, &ViewCategory::actCollTypeSetChanged);
+    dialog->show();
+}
+
+void ViewCategory::actTypeConfigDefault()
+{
+    auto* dialog = new TypeConfigDialog(diagram.defaultTypeManager(), true, mw);
+    connect(dialog, &TypeConfigDialog::typeSetApplied,
+        this, &ViewCategory::actDefaultTypeSetChanged);
+    dialog->show();
+}
+
+void ViewCategory::actTypeRegex()
+{
+    auto* dialog = new TypeRegexDialog(diagram.trainCollection().typeManager(),false, mw);
+    connect(dialog, &TypeRegexDialog::typeRegexApplied,
+        this, &ViewCategory::actCollTypeRegexChanged);
+    dialog->show();
+}
+
+void ViewCategory::actTypeRegexDefault()
+{
+    auto* dialog = new TypeRegexDialog(diagram.defaultTypeManager(), true, mw);
+    connect(dialog, &TypeRegexDialog::typeRegexApplied,
+        this, &ViewCategory::actDefaultTypeRegexChanged);
     dialog->show();
 }
 
@@ -376,7 +414,32 @@ void ViewCategory::actCollTypeSetChanged(TypeManager& manager,
         }
     }
 
-    mw->getUndoStack()->push(new qecmd::ChangeTypeSet(manager, typesCopy, modified, this));
+    mw->getUndoStack()->push(new qecmd::ChangeTypeSet(manager,
+        typesCopy, modified, this, false));
+}
+
+void ViewCategory::actDefaultTypeSetChanged(TypeManager& manager,
+    const QMap<QString, std::shared_ptr<TrainType>>& types,
+    const QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>>& modified)
+{
+    mw->getUndoStack()->push(new qecmd::ChangeTypeSet(manager, types, modified, this, true));
+}
+
+
+void ViewCategory::actCollTypeRegexChanged(TypeManager& manager,
+    std::shared_ptr<TypeManager> data)
+{
+    mw->getUndoStack()->push(new qecmd::ChangeTypeRegex(manager, data,this,false));
+}
+
+void ViewCategory::actDefaultTypeRegexChanged(TypeManager& manager, std::shared_ptr<TypeManager> data)
+{
+    mw->getUndoStack()->push(new qecmd::ChangeTypeRegex(manager, data,this,true));
+}
+
+void ViewCategory::saveDefaultConfigs()
+{
+    mw->saveDefaultConfig();
 }
 
 qecmd::ChangeTrainShow::ChangeTrainShow(const QList<std::shared_ptr<TrainLine>>& lines_,
@@ -459,4 +522,17 @@ void qecmd::ChangeTypeSet::commit()
         p.first->swap(*p.second);
     }
     std::swap(manager.typesRef(), types);
+    if (forDefault) cat->saveDefaultConfigs();
+}
+
+void qecmd::ChangeTypeRegex::undo()
+{
+    manager.swapForRegex(*data);
+    if (forDefault) cat->saveDefaultConfigs();
+}
+
+void qecmd::ChangeTypeRegex::redo()
+{
+    manager.swapForRegex(*data);
+    if (forDefault) cat->saveDefaultConfigs();
 }

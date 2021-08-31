@@ -730,14 +730,14 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
                 leftItems.append(alignedTextItem(
                     text, textFont,
                     margins.ruler_label_width / 2.0, x,
-                    (lasty + y) / 2, false
+                    (lasty + y) / 2, false, 0.9
                 ));
             }
             if (cfg.show_count_bar) {
                 rightItems.append(alignedTextItem(
                     tr("%1/%2").arg(maxpassen).arg(maxfreigh), textFont,
                     margins.count_label_width / 2.0, xright,
-                    (lasty + y) / 2, false
+                    (lasty + y) / 2, false, 0.9
                 ));
             }
 
@@ -991,15 +991,16 @@ void DiagramWidget::drawSingleHLine(const QFont& textFont, double y,
 }
 
 QGraphicsSimpleTextItem* DiagramWidget::alignedTextItem(const QString& text, 
-    const QFont& baseFont, double label_width, double start_x, double center_y, bool use_stretch)
+    const QFont& baseFont, double label_width, double start_x, double center_y, 
+    bool use_stretch,double scale)
 {
     auto* textItem = scene()->addSimpleText(text, baseFont);
     textItem->setBrush(config().text_color);
     textItem->setY(center_y - textItem->boundingRect().height() / 2);
     double textWidth = textItem->boundingRect().width();
     QFont font(baseFont);
-    if (textWidth > label_width) {
-        int stretch = 100 * label_width / textWidth;
+    if (textWidth > label_width*scale) {
+        int stretch = 100 * label_width*scale / textWidth;
         font.setStretch(stretch);
         textItem->setFont(font);
     }

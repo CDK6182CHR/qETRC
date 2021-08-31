@@ -105,6 +105,10 @@ private slots:
     void onActConfigApplied(Config& cfg, const Config& newcfg, bool repaint);
 
     void actTypeConfig();
+    void actTypeConfigDefault();
+
+    void actTypeRegex();
+    void actTypeRegexDefault();
 
 public slots:
     
@@ -130,6 +134,24 @@ public slots:
     void actCollTypeSetChanged(TypeManager& manager,
         const QMap<QString, std::shared_ptr<TrainType>>& types,
         const QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>>& modified);
+
+    /**
+     * 默认配置变化：不需要检查列车情况，直接压栈
+     */
+    void actDefaultTypeSetChanged(TypeManager& manager,
+        const QMap<QString, std::shared_ptr<TrainType>>& types,
+        const QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>>& modified);
+
+    /**
+     * 类型正则表达式变更
+     */
+    void actCollTypeRegexChanged(TypeManager& manager,
+        std::shared_ptr<TypeManager> data);
+
+    void actDefaultTypeRegexChanged(TypeManager& manager,
+        std::shared_ptr<TypeManager> data);
+
+    void saveDefaultConfigs();
 };
 
 
@@ -197,18 +219,34 @@ namespace qecmd {
         QMap<QString, std::shared_ptr<TrainType>> types;
         QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>> modified;
         ViewCategory* const cat;
+        const bool forDefault;
     public:
         ChangeTypeSet(TypeManager& manager_, 
             const QMap<QString, std::shared_ptr<TrainType>>& types_,
             const QVector<QPair<std::shared_ptr<TrainType>,
             std::shared_ptr<TrainType>>>& modified_,
-            ViewCategory* cat_, QUndoCommand* parent=nullptr):
-            QUndoCommand(QObject::tr("更新类型表")),manager(manager_),
+            ViewCategory* cat_, bool forDefault_,
+            QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("更新类型表"),parent),manager(manager_),
             types(types_),modified(modified_),
-            cat(cat_){}
+            cat(cat_),forDefault(forDefault_){}
         virtual void undo()override;
         virtual void redo()override;
     private:
         void commit();
+    };
+
+    class ChangeTypeRegex :public QUndoCommand {
+        TypeManager& manager;
+        std::shared_ptr<TypeManager> data;
+        ViewCategory* const cat;
+        const bool forDefault;
+    public:
+        ChangeTypeRegex(TypeManager& manager_, std::shared_ptr<TypeManager> data_,
+            ViewCategory* cat_,bool forDefault_, QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("更新类型判定规则"),parent),
+            manager(manager_),data(data_),cat(cat_),forDefault(forDefault_){}
+        virtual void undo()override;
+        virtual void redo()override;
     };
 }

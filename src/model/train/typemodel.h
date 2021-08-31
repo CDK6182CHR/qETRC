@@ -46,3 +46,28 @@ protected:
 
 };
 
+
+/**
+ * @brief The TypeRegexModel class
+ * 类型正则表达式的表。与pyETRC不同的是，这里不规定是否客车。
+ */
+class TypeRegexModel: public QEMoveableModel
+{
+    Q_OBJECT
+    TypeManager& manager;
+public:
+
+    enum {
+        ColRegex=0,
+        ColType=1,
+        ColMAX
+    };
+    TypeRegexModel(TypeManager& manager_, QWidget* parent=nullptr);
+    void refreshData();
+    bool appliedData(TypeManager& data);
+protected:
+    void setupNewRow(int row)override;
+private:
+    void setupModel();
+};
+

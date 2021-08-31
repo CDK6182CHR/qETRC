@@ -200,13 +200,9 @@ private slots:
     void actOpenGraph();
     void actSaveGraph();
     void actSaveGraphAs();
-
     void actPopupAppButton();
-
     void addRecentFile(const QString& filename);
-
     void resetRecentActions();
-
     void openRecentFile();
     
 
@@ -402,6 +398,11 @@ public slots:
      * 弹出对话框搜索车次
      */
     void actSearchTrain();
+
+    /**
+     * 系统默认配置改变后立即保存
+     */
+    void saveDefaultConfig();
 
 };
 

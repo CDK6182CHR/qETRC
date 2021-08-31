@@ -91,6 +91,7 @@ public:
 
     auto& railCategory() { return _railcat; }
     const auto& railCategory()const { return _railcat; }
+    auto& defaultTypeManager(){ return _defaultManager; }
 
     /**
      * 读取默认配置文件 config.json
@@ -100,10 +101,14 @@ public:
      */
     bool readDefaultConfigs(const QString& filename= "config.json");
 
+    bool saveDefaultConfigs(const QString& filename = "config.json")const;
+
     /**
      * @brief fromJson  清空既有数据，从文件读取，同时保存文件名
      */
     bool fromJson(const QString& filename);
+
+    
 
     /**
      * @brief fromJson  读入数据后绑定车次和线路

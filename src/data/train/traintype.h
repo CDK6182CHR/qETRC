@@ -3,6 +3,7 @@
 #include <QString>
 #include <QMap>
 #include <QList>
+#include <QVector>
 #include <memory>
 #include <Qt>
 #include <QRegExp>
@@ -62,7 +63,7 @@ class TypeManager{
      * @brief _regs
      * 按顺序进行正则匹配
      */
-    QList<QPair<QRegExp, std::shared_ptr<TrainType>>> _regs;
+    QVector<QPair<QRegExp, std::shared_ptr<TrainType>>> _regs;
 
     /**
      * 默认的版本。注意这个不应该是static，因为系统Config和默认Config指定的默认颜色可能不同。
@@ -141,6 +142,15 @@ public:
     const QPen& getDefaultPen()const{return defaultPen;}
 
     auto getDefaultType()const{return defaultType;}
+
+    auto& regex()const { return _regs; }
+
+    auto& regexRef() { return _regs; }
+
+    /**
+     * 交换_types和_regs；都是浅拷贝。
+     */
+    void swapForRegex(TypeManager& other);
 
 private:
     /**

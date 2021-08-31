@@ -3,6 +3,10 @@
 #include "data/train/traintype.h"
 #include "model/delegate/qedelegate.h"
 
+#include <QWidget>
+#include <QMessageBox>
+#include <type_traits>
+
 TypeConfigModel::TypeConfigModel(TypeManager &manager_, QObject *parent):
     QEMoveableModel(parent),manager(manager_)
 {
@@ -102,3 +106,61 @@ void TypeConfigModel::setupNewRow(int row)
     setItem(row,ColLineStyle,it);
 }
 
+
+TypeRegexModel::TypeRegexModel(TypeManager &manager_, QWidget *parent):
+    QEMoveableModel(parent),manager(manager_)
+{
+    setColumnCount(ColMAX);
+    setHorizontalHeaderLabels({tr("正则"),tr("类型名称")});
+    setupModel();
+}
+
+void TypeRegexModel::refreshData()
+{
+    setupModel();
+}
+
+bool TypeRegexModel::appliedData(TypeManager& data)
+{
+    auto* par=qobject_cast<QWidget*>(parent());
+    data.typesRef() = manager.types();   // copy assign  浅拷贝
+    std::decay_t<decltype(manager.regex())> reges;
+    for(int i=0;i<rowCount();i++){
+        const QString& reg_s = item(i,ColRegex)->text();
+        QRegExp reg(reg_s);
+        if(!reg.isValid()){
+            QMessageBox::warning(par,tr("错误"),tr("第%1行的正则表达式[%2]非法，更改未提交。"
+            "\n有关正则表达式语法，可以参阅：https://doc.qt.io/qt-5/qregexp.html#details")
+                                 .arg(i+1).arg(reg_s));
+            return false;
+        }
+        const QString& type_s = item(i, ColType)->text();
+        if (type_s.isEmpty()) {
+            QMessageBox::warning(par, tr("错误"), tr("第%1行的类型名称为空，更改未提交。")
+                .arg(i + 1));
+            return false;
+        }
+        reges.push_back(qMakePair(reg, data.findOrCreate(type_s)));
+    }
+    data.regexRef() = std::move(reges);   // move assign
+    return true;
+}
+
+void TypeRegexModel::setupNewRow(int row)
+{
+    for (int c = 0; c < ColMAX; c++)
+        setItem(row, c, new QStandardItem);
+}
+
+
+void TypeRegexModel::setupModel()
+{
+    using SI=QStandardItem;
+    setRowCount(manager.regex().size());
+    int row=0;
+    foreach(const auto& p, manager.regex()){
+        setItem(row,ColRegex,new SI(p.first.pattern()));
+        setItem(row,ColType,new SI(p.second->name()));
+        row++;
+    }
+}

@@ -104,6 +104,12 @@ std::shared_ptr<TrainType> TypeManager::findOrCreate(const QString& name, bool p
 	}
 }
 
+void TypeManager::swapForRegex(TypeManager& other)
+{
+	std::swap(_types, other._types);
+	std::swap(_regs, other._regs);
+}
+
 bool TypeManager::fromJson(const QJsonObject& obj)
 {
 	if (obj.isEmpty())
@@ -212,12 +218,12 @@ void TypeManager::toJson(QJsonObject& obj) const
 	for (auto p = _types.begin(); p != _types.end(); ++p) {
 		if (p.value() == defaultType) {
 			objcolor.insert("default", p.value()->pen().color().name());
-			ls.insert("default", QJsonArray{ p.value()->pen().style(),p.value()->pen().widthF() });
+			ls.insert("default", QJsonArray{ (int) p.value()->pen().style(),p.value()->pen().widthF() });
 		}
 		else {
 			objcolor.insert(p.key(), p.value()->pen().color().name());
 			ls.insert(p.key(),
-				QJsonArray{ p.value()->pen().style(),p.value()->pen().widthF() });
+				QJsonArray{(int) p.value()->pen().style(),p.value()->pen().widthF() });
 		}
 	}
 	obj.insert("default_colors", objcolor);

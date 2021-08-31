@@ -1516,4 +1516,9 @@ void MainWindow::actSearchTrain()
     }
 }
 
+void MainWindow::saveDefaultConfig()
+{
+    _diagram.saveDefaultConfigs();
+}
+
 

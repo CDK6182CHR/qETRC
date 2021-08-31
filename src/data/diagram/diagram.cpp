@@ -848,6 +848,23 @@ int readruler::IntervalReport::stdInterval(TrainLine::IntervalAttachType type)co
 }
 
 
+bool Diagram::saveDefaultConfigs(const QString& filename) const
+{
+    QFile file(filename);
+    file.open(QFile::WriteOnly);
+    if (!file.isOpen()) {
+        qDebug() << "Diagram::saveDefaultConfigs: WARNING: open file " << filename 
+            << " failed" << Qt::endl;
+        return false;
+    }
+    auto data = _defaultConfig.toJson();
+    _defaultManager.toJson(data);
+    QJsonDocument doc(data);
+    file.write(doc.toJson());
+    file.close();
+    return true;
+}
+
 bool Diagram::readDefaultConfigs(const QString& filename)
 {
     QFile file(filename);

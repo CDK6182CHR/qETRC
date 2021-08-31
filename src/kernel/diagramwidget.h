@@ -214,10 +214,12 @@ private:
      * 两端对齐且符合指定宽度的字符串
      * 用于生成站名标签
      * @param use_stretch  如果false，则不使用分散对齐
+     * @param scale 2021.08.31新增  宽度中字体部分所占的比例
      */
     QGraphicsSimpleTextItem*
         alignedTextItem(const QString& text, const QFont& baseFont, double label_width,
-            double start_x, double center_y, bool use_stretch = true);
+            double start_x, double center_y, bool use_stretch = true,
+            double scale = 1.0);
 
     //def _addTimeAxisMark(self, value: int, gridColor: QtGui.QColor,
     //    font : QtGui.QFont, x : int)
