@@ -58,6 +58,7 @@ SOURCES += \
     src/editors/routing/routingwidget.cpp \
     src/editors/ruler/rulertabpy.cpp \
     src/editors/ruler/rulerwidget.cpp \
+    src/editors/systemjsondialog.cpp \
     src/editors/typeconfigdialog.cpp \
     src/editors/typeregexdialog.cpp \
     src/mainwindow/routingcontext.cpp \
@@ -172,6 +173,7 @@ HEADERS += \
     src/editors/routing/routingwidget.h \
     src/editors/ruler/rulertabpy.h \
     src/editors/ruler/rulerwidget.h \
+    src/editors/systemjsondialog.h \
     src/editors/typeconfigdialog.h \
     src/editors/typeregexdialog.h \
     src/mainwindow/routingcontext.h \

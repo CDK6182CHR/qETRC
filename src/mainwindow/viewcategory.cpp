@@ -5,6 +5,7 @@
 #include "editors/typeconfigdialog.h"
 #include "editors/typeregexdialog.h"
 #include "data/train/traintype.h"
+#include "editors/systemjsondialog.h"
 
 #include <SARibbonPannelItem.h>
 #include <SARibbonGallery.h>
@@ -116,16 +117,23 @@ void ViewCategory::initUI()
     panel = cat->addPannel(tr("设置"));
     act = new QAction(QIcon(":/icons/config.png"), tr("显示设置"), this);
     connect(act, SIGNAL(triggered()), this, SLOT(actShowConfig()));
+
+    auto* m = new SARibbonMenu(cat);
+    auto* ma = m->addAction(tr("全局配置选项"));
+    connect(ma, &QAction::triggered, this, &ViewCategory::actSystemJsonDialog);
+    act->setMenu(m);
+
     btn = panel->addLargeAction(act);
     btn->setMinimumWidth(80);
+    
 
     act = new QAction(QIcon(":/icons/settings.png"), tr("类型管理"), this);
     connect(act, &QAction::triggered, this, &ViewCategory::actTypeConfig);
     act->setToolTip(tr("类型管理\n管理[当前运行图文件]的列车类型，及各种类型的颜色、线形等。"));
     panel->addMediumAction(act);
 
-    auto* m = new SARibbonMenu(cat);
-    auto* ma = m->addAction(tr("默认类型管理"));
+    m = new SARibbonMenu(cat);
+    ma = m->addAction(tr("默认类型管理"));
     connect(ma, &QAction::triggered, this, &ViewCategory::actTypeConfigDefault);
     ma->setToolTip(tr("默认类型管理\n配置[系统默认设置]的类型管理部分，"
         "将用于缺省的新运行图。"));
@@ -334,6 +342,12 @@ void ViewCategory::actTypeRegexDefault()
     auto* dialog = new TypeRegexDialog(diagram.defaultTypeManager(), true, mw);
     connect(dialog, &TypeRegexDialog::typeRegexApplied,
         this, &ViewCategory::actDefaultTypeRegexChanged);
+    dialog->show();
+}
+
+void ViewCategory::actSystemJsonDialog()
+{
+    auto* dialog = new SystemJsonDialog(mw);
     dialog->show();
 }
 

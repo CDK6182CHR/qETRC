@@ -56,6 +56,7 @@ void SystemJson::fromJson(const QJsonObject& obj)
     show_train_tooltip = obj.value("show_train_tooltip").toBool(show_train_tooltip);
     ribbon_style = obj.value("ribbon_style").toInt(1);
     weaken_unselected = obj.value("weaken_unselected").toBool(true);
+    use_central_widget = obj.value("use_central_widget").toBool(true);
 
     const QJsonArray& arhis = obj.value("history").toArray();
     for (const auto& p : arhis) {
@@ -75,7 +76,8 @@ QJsonObject SystemJson::toJson() const
         {"history",ar},
         {"table_row_height",table_row_height},
         {"show_train_tooltip",show_train_tooltip},
-        {"weaken_unselected",weaken_unselected}
+        {"weaken_unselected",weaken_unselected},
+        {"use_central_widget",use_central_widget}
     };
 }
 

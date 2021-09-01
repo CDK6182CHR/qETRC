@@ -23,6 +23,8 @@ public:
 
     bool weaken_unselected = true;
 
+    bool use_central_widget = true;
+
     //todo: dock show..
 
     /**

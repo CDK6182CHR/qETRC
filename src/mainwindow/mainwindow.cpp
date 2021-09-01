@@ -316,10 +316,12 @@ void MainWindow::initDockWidgets()
     manager->setConfigFlag(ads::CDockManager::FocusHighlighting, true);
 
     // Central
-    dock = new ads::CDockWidget(tr("运行图窗口"));
-    dock->setFeature(ads::CDockWidget::NoTab, true);
-    auto* c = manager->setCentralWidget(dock);
-    centralArea = c;
+    if (SystemJson::instance.use_central_widget) {
+        dock = new ads::CDockWidget(tr("运行图窗口"));
+        dock->setFeature(ads::CDockWidget::NoTab, true);
+        auto* c = manager->setCentralWidget(dock);
+        centralArea = c;
+    }
 
     //总导航
     if constexpr (true) {
@@ -1423,8 +1425,14 @@ void MainWindow::insertPageWidget(std::shared_ptr<DiagramPage> page, int index)
     DiagramWidget* dw = new DiagramWidget(_diagram, page);
     auto* dock = new ads::CDockWidget(tr("运行图 - %1").arg(page->name()));
     dock->setWidget(dw);
-    //manager->addDockWidget(ads::RightDockWidgetArea, dock);
-    manager->addDockWidget(ads::CenterDockWidgetArea, dock, centralArea);
+    
+    if (SystemJson::instance.use_central_widget) {
+        manager->addDockWidget(ads::CenterDockWidgetArea, dock, centralArea);
+    }
+    else {
+        manager->addDockWidget(ads::RightDockWidgetArea, dock);
+    }
+    
     QAction* act = dock->toggleViewAction();
     pageMenu->addAction(act);
     diagramDocks.insert(index, dock);

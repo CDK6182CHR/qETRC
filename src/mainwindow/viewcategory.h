@@ -110,6 +110,8 @@ private slots:
     void actTypeRegex();
     void actTypeRegexDefault();
 
+    void actSystemJsonDialog();
+
 public slots:
     
     /**
