@@ -18,7 +18,7 @@ RoutingContext::RoutingContext(Diagram &diagram, SARibbonContextCategory *contex
 
 void RoutingContext::initUI()
 {
-    auto* page=cont->addCategoryPage(tr("交路编辑"));
+    auto* page=cont->addCategoryPage(tr("交路编辑(&0)"));
 
     auto* panel=page->addPannel(tr("基本信息"));
 

@@ -38,7 +38,7 @@ void PageContext::refreshAllData()
 
 void PageContext::initUI()
 {
-    auto* page = cont->addCategoryPage(tr("运行图"));
+    auto* page = cont->addCategoryPage(tr("运行图(&5)"));
     auto* panel = page->addPannel(tr(""));
 
     //基本信息部分

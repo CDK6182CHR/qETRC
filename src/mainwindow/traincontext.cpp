@@ -9,7 +9,7 @@
 #include "dialogs/exchangeintervaldialog.h"
 #include "dialogs/modifytimetabledialog.h"
 #include "viewers/diagnosisdialog.h"
-
+#include "viewers/timetablequickwidget.h"
 #include <QtWidgets>
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
@@ -30,7 +30,7 @@ void TrainContext::initUI()
 {
 	//审阅
 	if constexpr (true) {
-		auto* page = cont->addCategoryPage(tr("列车审阅"));
+		auto* page = cont->addCategoryPage(tr("列车审阅(&6)"));
 
 		auto* panel = page->addPannel(tr("基本信息"));
 
@@ -112,7 +112,7 @@ void TrainContext::initUI()
 
 	//编辑
 	if constexpr (true) {
-		auto* page = cont->addCategoryPage(tr("列车编辑"));
+		auto* page = cont->addCategoryPage(tr("列车编辑(&7)"));
 		auto* panel = page->addPannel(tr("基本信息"));
 
 		auto* w = new QWidget;
@@ -337,6 +337,9 @@ void TrainContext::commitTimetableChange(std::shared_ptr<Train> train, std::shar
 	diagram.updateTrain(train);
 	updateTrainWidget(train);
 	mw->updateTrainLines(train, std::move(adps));
+	if (mw->timetableQuickWidget->getTrain() == train) {
+		mw->timetableQuickWidget->refreshData();
+	}
 	emit timetableChanged(train);
 }
 

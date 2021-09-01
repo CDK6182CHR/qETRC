@@ -22,6 +22,7 @@
 #include "editors/routing/batchparseroutingdialog.h"
 #include "editors/routing/detectroutingdialog.h"
 #include "viewers/diagnosisdialog.h"
+#include "viewers/timetablequickwidget.h"
 
 #include "traincontext.h"
 #include "railcontext.h"
@@ -312,6 +313,14 @@ void MainWindow::initDockWidgets()
 {
     ads::CDockWidget* dock;
 
+    manager->setConfigFlag(ads::CDockManager::FocusHighlighting, true);
+
+    // Central
+    dock = new ads::CDockWidget(tr("运行图窗口"));
+    dock->setFeature(ads::CDockWidget::NoTab, true);
+    auto* c = manager->setCentralWidget(dock);
+    centralArea = c;
+
     //总导航
     if constexpr (true) {
         auto* tree = new NaviTree(naviModel, undoStack);
@@ -319,7 +328,6 @@ void MainWindow::initDockWidgets()
         dock = new ads::CDockWidget(QObject::tr("运行图资源管理器"));
         naviDock = dock;
         dock->setWidget(tree);
-        manager->addDockWidget(ads::LeftDockWidgetArea, dock);
 
         //context的显示条件：第一次触发时显示；后续一直在，该车次（线路，运行图）被删除则隐藏
         //各种focusout的slot保留，在需要隐藏的时候调用
@@ -361,6 +369,17 @@ void MainWindow::initDockWidgets()
         connect(naviView, &NaviTree::actBatchParseRouting,
             this, &MainWindow::actBatchParseRouting);
     }
+    auto* area = manager->addDockWidget(ads::LeftDockWidgetArea, dock);
+
+    // 历史记录
+    if constexpr (true) {
+        QUndoView* view = new QUndoView(undoStack);
+        undoView = view;
+        auto* dock = new ads::CDockWidget(tr("历史记录"));
+        dock->setWidget(view);
+        undoDock = dock;
+        manager->addDockWidget(ads::BottomDockWidgetArea, dock, area);
+    }
 
     //列车管理
     if constexpr (true) {
@@ -370,6 +389,7 @@ void MainWindow::initDockWidgets()
         trainListDock = dock;
         dock->setWidget(tw);
         manager->addDockWidget(ads::LeftDockWidgetArea, dock);
+        dock->closeDockWidget();
         connect(tw->getModel(), &TrainListModel::trainsRemovedUndone,
             this, &MainWindow::undoRemoveTrains);
         connect(tw->getModel(), &TrainListModel::trainsRemovedRedone,
@@ -414,6 +434,16 @@ void MainWindow::initDockWidgets()
         connect(naviView, &NaviTree::actAddRouting,
             rw, &RoutingWidget::actAdd);
     }
+
+    // 速览时刻
+    if constexpr (true) {
+        auto* w = new TimetableQuickWidget();
+        dock = new ads::CDockWidget(tr("速览时刻"));
+        dock->setWidget(w);
+        timetableQuickWidget = w;
+        timetableQuickDock = dock;
+        manager->addDockWidget(ads::RightDockWidgetArea, dock);
+    }
 }
 
 void MainWindow::initToolbar()
@@ -448,7 +478,7 @@ void MainWindow::initToolbar()
     QAction* actTrainList, * qactChangeStationName;
     //开始
     if constexpr (true) {
-        SARibbonCategory* cat = ribbon->addCategoryPage(QObject::tr("开始"));
+        SARibbonCategory* cat = ribbon->addCategoryPage(QObject::tr("开始(&1)"));
         SARibbonPannel* panel = cat->addPannel(QObject::tr("文件"));
 
         QAction* act = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileIcon),
@@ -511,12 +541,8 @@ void MainWindow::initToolbar()
         btn->setMinimumWidth(80);
 
         //undo  试一下把dock也放在这里初始化...
-        QUndoView* view = new QUndoView(undoStack);
-        auto* dock = new ads::CDockWidget(tr("历史记录"));
-        dock->setWidget(view);
-        manager->addDockWidgetTab(ads::CenterDockWidgetArea, dock);
 
-        act = dock->toggleViewAction();
+        act = undoDock->toggleViewAction();
         act->setText(tr("历史记录"));
         act->setIcon(QIcon(":/icons/clock.png"));
         act->setToolTip(tr("历史记录\n打开或关闭历史记录面板。\n" 
@@ -565,7 +591,7 @@ void MainWindow::initToolbar()
 
     //线路
     if constexpr (true) {
-        auto* cat = ribbon->addCategoryPage(tr("线路"));
+        auto* cat = ribbon->addCategoryPage(tr("线路(&2)"));
         auto* panel = cat->addPannel(tr("基础数据"));
 
         auto* act = new QAction(QIcon(":/icons/add.png"), tr("导入线路"), this);
@@ -622,7 +648,7 @@ void MainWindow::initToolbar()
 
     //列车
     if constexpr (true) {
-        auto* cat = ribbon->addCategoryPage(tr("列车"));
+        auto* cat = ribbon->addCategoryPage(tr("列车(&3)"));
         auto* panel = cat->addPannel(tr("车次管理"));
 
         auto* act = actTrainList;
@@ -664,6 +690,15 @@ void MainWindow::initToolbar()
         diaActions.addTrain = act;
         btn = panel->addMediumAction(act);
         connect(act, SIGNAL(triggered()), naviView, SLOT(actAddTrain()));
+
+        act = timetableQuickDock->toggleViewAction();
+        act->setIcon(QIcon(":/icons/clock.png"));
+        act->setShortcut(Qt::CTRL + Qt::Key_Y);
+        addAction(act);
+        act->setToolTip(tr("速览时刻 (Ctrl+Y)\n"
+            "显示或隐藏pyETRC风格的双行只读时刻表。"));
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(70);
 
         panel = cat->addPannel(tr("运行线控制"));
 
@@ -755,13 +790,13 @@ void MainWindow::initToolbar()
 
     //显示
     if constexpr (true) {
-        auto* cat = ribbon->addCategoryPage(tr("显示"));
+        auto* cat = ribbon->addCategoryPage(tr("显示(&4)"));
         catView = new ViewCategory(this, cat, this);
         connect(trainListWidget->getModel(), &TrainListModel::trainShowChanged,
             catView, &ViewCategory::actChangeSingleTrainShow);
     }
 
-    //context: page
+    //context: page 5
     if constexpr (true) {
         auto* cat = ribbon->addContextCategory(tr(""));
         contextPage = new PageContext(_diagram, cat, this);
@@ -771,7 +806,7 @@ void MainWindow::initToolbar()
             naviModel, &DiagramNaviModel::onPageNameChanged);
     }
 
-    //context: train
+    //context: train 6 7
     if constexpr (true) {
         auto* cat = ribbon->addContextCategory(tr(""));
         contextTrain = new TrainContext(_diagram, cat, this);
@@ -793,7 +828,7 @@ void MainWindow::initToolbar()
             this, &MainWindow::focusInRouting);
     }
 
-    //context: rail
+    //context: rail 8
     if constexpr (true) {
         auto* cat = ribbon->addContextCategory(tr(""));
         contextRail = new RailContext(_diagram, cat, this, this);
@@ -811,7 +846,7 @@ void MainWindow::initToolbar()
             contextRail, &RailContext::openForbidWidgetTab);
     }
 
-    //context: ruler
+    //context: ruler 9
     if constexpr (true) {
         auto* cat = ribbon->addContextCategory(tr(""));
         contextRuler = new RulerContext(_diagram, cat, this);
@@ -827,7 +862,7 @@ void MainWindow::initToolbar()
             contextRuler, &RulerContext::actRemoveRulerNavi);
     }
 
-    //context: routing
+    //context: routing 0
     if constexpr (true) {
         auto* cat = ribbon->addContextCategory(tr(""));
         contextRouting = new RoutingContext(_diagram, cat, this);
@@ -1379,7 +1414,6 @@ void MainWindow::openRecentFile()
 
 void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)
 {
-
     int idx = diagramDocks.size();
     insertPageWidget(page, idx);
 }
@@ -1389,7 +1423,8 @@ void MainWindow::insertPageWidget(std::shared_ptr<DiagramPage> page, int index)
     DiagramWidget* dw = new DiagramWidget(_diagram, page);
     auto* dock = new ads::CDockWidget(tr("运行图 - %1").arg(page->name()));
     dock->setWidget(dw);
-    manager->addDockWidget(ads::RightDockWidgetArea, dock);
+    //manager->addDockWidget(ads::RightDockWidgetArea, dock);
+    manager->addDockWidget(ads::CenterDockWidgetArea, dock, centralArea);
     QAction* act = dock->toggleViewAction();
     pageMenu->addAction(act);
     diagramDocks.insert(index, dock);
@@ -1451,6 +1486,9 @@ void MainWindow::focusInTrain(std::shared_ptr<Train> train)
 {
     ribbonBar()->showContextCategory(contextTrain->context());
     contextTrain->setTrain(train);
+    if (timetableQuickDock->isVisible()) {
+        timetableQuickWidget->setTrain(train);
+    }
 }
 
 void MainWindow::focusOutTrain()

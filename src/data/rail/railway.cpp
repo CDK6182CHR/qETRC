@@ -736,7 +736,6 @@ std::shared_ptr<Ruler> Railway::addRulerFrom(const Ruler& r)
 
 std::shared_ptr<Ruler> Railway::restoreRulerFrom(std::shared_ptr<Ruler> head, const Ruler& data)
 {
-	int idx = _rulers.count();
 	auto ruler = head;
 	_rulers.append(ruler);
 	auto p = firstDownInterval();

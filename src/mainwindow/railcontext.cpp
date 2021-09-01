@@ -63,7 +63,7 @@ void RailContext::updateForbidDiagrams(std::shared_ptr<Forbid> forbid, Direction
 
 void RailContext::initUI()
 {
-	auto* page = cont->addCategoryPage(tr("线路编辑"));
+	auto* page = cont->addCategoryPage(tr("线路编辑(&8)"));
 
 	auto* panel = page->addPannel(tr(""));
 

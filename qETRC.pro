@@ -65,6 +65,7 @@ SOURCES += \
     src/model/delegate/generalspindelegate.cpp \
     src/model/delegate/linestyledelegate.cpp \
     src/model/delegate/qetimedelegate.cpp \
+    src/model/train/timetablequickmodel.cpp \
     src/model/train/typemodel.cpp \
     src/model/rail/forbidmodel.cpp \
     src/model/rail/intervaldatamodel.cpp \
@@ -108,6 +109,7 @@ SOURCES += \
     src/util/qecontrolledtable.cpp \
     src/util/utilfunc.cpp \
     src/viewers/sectioncountdialog.cpp \
+    src/viewers/timetablequickwidget.cpp \
     src/viewers/traindiffdialog.cpp \
     src/viewers/traineventdialog.cpp \
     src/viewers/trainlinedialog.cpp \
@@ -177,6 +179,7 @@ HEADERS += \
     src/model/delegate/generalspindelegate.h \
     src/model/delegate/linestyledelegate.h \
     src/model/delegate/qetimedelegate.h \
+    src/model/train/timetablequickmodel.h \
     src/model/train/typemodel.h \
     src/model/rail/forbidmodel.h \
     src/model/rail/intervaldatamodel.h \
@@ -223,6 +226,7 @@ HEADERS += \
     src/util/qeexceptions.h \
     src/util/utilfunc.h \
     src/viewers/sectioncountdialog.h \
+    src/viewers/timetablequickwidget.h \
     src/viewers/traindiffdialog.h \
     src/viewers/traineventdialog.h \
     src/viewers/trainlinedialog.h \

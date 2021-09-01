@@ -144,7 +144,7 @@
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4577;4467;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4577;4467;4267;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ObjectFileName>debug\</ObjectFileName>
@@ -229,6 +229,7 @@
     <ClCompile Include="src\model\train\routingcollectionmodel.cpp" />
     <ClCompile Include="src\model\train\routingeditmodel.cpp" />
     <ClCompile Include="src\model\train\routinglistmodel.cpp" />
+    <ClCompile Include="src\model\train\timetablequickmodel.cpp" />
     <ClCompile Include="src\model\train\trainlistreadmodel.cpp" />
     <ClCompile Include="src\model\train\typemodel.cpp" />
     <ClCompile Include="src\util\railrulercombo.cpp" />
@@ -286,6 +287,7 @@
     <ClCompile Include="src\util\qecontrolledtable.cpp" />
     <ClCompile Include="src\util\utilfunc.cpp" />
     <ClCompile Include="src\viewers\sectioncountdialog.cpp" />
+    <ClCompile Include="src\viewers\timetablequickwidget.cpp" />
     <ClCompile Include="src\viewers\traindiffdialog.cpp" />
     <ClCompile Include="src\viewers\traineventdialog.cpp" />
     <ClCompile Include="src\viewers\trainlinedialog.cpp" />
@@ -322,6 +324,8 @@
     <QtMoc Include="src\model\train\typemodel.h" />
     <QtMoc Include="src\editors\typeregexdialog.h" />
     <ClInclude Include="src\model\delegate\linestyledelegate.h" />
+    <ClInclude Include="src\model\train\timetablequickmodel.h" />
+    <QtMoc Include="src\viewers\timetablequickwidget.h" />
     <ClInclude Include="src\viewers\traindiffdialog.h" />
     <QtMoc Include="src\wizards\readruler\readrulerpageinterval.h" />
     <QtMoc Include="src\wizards\readruler\readrulerwizard.h" />

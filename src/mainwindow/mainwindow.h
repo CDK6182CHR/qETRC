@@ -32,6 +32,9 @@ class ViewCategory;
 class RailContext;
 class TrainContext;
 class QSpinBox;
+class QUndoView;
+
+class TimetableQuickWidget;
 
 /**
  * @brief The MainWindow class
@@ -42,6 +45,7 @@ class MainWindow : public SARibbonMainWindow
     Diagram _diagram;
     ads::CDockManager* manager;
     QUndoStack* undoStack;
+    QUndoView* undoView;
 
     //窗口，Model的指针
     DiagramNaviModel* naviModel;
@@ -49,11 +53,14 @@ class MainWindow : public SARibbonMainWindow
     SARibbonMenu* pageMenu, * railMenu, * appMenu, * forbidMenu, * routingMenu;
     QList<ads::CDockWidget*> diagramDocks;
     QList<DiagramWidget*> diagramWidgets;
-    ads::CDockWidget* naviDock, * trainListDock, * routingDock;
+    ads::CDockWidget* naviDock, * trainListDock, * routingDock, * timetableQuickDock;
+    ads::CDockWidget* undoDock, * centralDock;
+    ads::CDockAreaWidget* centralArea;
     TrainListWidget* trainListWidget;
     QList<RailStationWidget*> railStationWidgets;
     QList<ads::CDockWidget*> railStationDocks;
     RoutingWidget* routingWidget;
+    TimetableQuickWidget* timetableQuickWidget;
 
     PageContext* contextPage;
     TrainContext* contextTrain;

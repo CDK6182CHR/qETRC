@@ -454,6 +454,8 @@ public:
      */
     void checkLinesShow();
 
+    int stationCount()const{return static_cast<int>(_timetable.size());}
+
 
     //static比较函数 用来排序
     static bool ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);

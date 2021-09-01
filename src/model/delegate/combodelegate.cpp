@@ -8,6 +8,7 @@ ComboDelegate::ComboDelegate(const QStringList& texts_, QObject* parent):
 
 QWidget* ComboDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
+	Q_UNUSED(option)
 	if (!index.isValid())
 		return nullptr;
 	auto* combo = new QComboBox(parent);

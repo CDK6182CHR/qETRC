@@ -152,7 +152,7 @@ protected:
 
     virtual void resizeEvent(QResizeEvent* e)override;
 
-    virtual void focusInEvent(QFocusEvent* e)override;
+    virtual bool event(QEvent* e)override;
 
     virtual void contextMenuEvent(QContextMenuEvent* e)override;
 

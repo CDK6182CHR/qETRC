@@ -442,10 +442,14 @@ void DiagramWidget::resizeEvent(QResizeEvent* e)
     }
 }
 
-void DiagramWidget::focusInEvent(QFocusEvent* e)
+bool DiagramWidget::event(QEvent* e)
 {
-    QGraphicsView::focusInEvent(e);
-    emit pageFocussedIn(_page);
+    bool flag = QGraphicsView::event(e);
+    if (e->type() == QEvent::WindowActivate) {
+        emit pageFocussedIn(_page);
+        return true;
+    }
+    return flag;
 }
 
 void DiagramWidget::contextMenuEvent(QContextMenuEvent* e)
@@ -937,7 +941,6 @@ QGraphicsSimpleTextItem* DiagramWidget::addLeftTableText(const QString& str,
     const QFont& textFont, double start_x, double start_y, double width, double height)
 {
     const QColor& textColor = config().text_color;
-    const auto& margins = config().margins;
 
     auto* text = scene()->addSimpleText(str);
     QFont font(textFont);   //copy
@@ -958,7 +961,6 @@ QGraphicsSimpleTextItem* DiagramWidget::addStationTableText(const QString& str,
     const QFont& textFont, double start_x, double center_y, double width)
 {
     const QColor& textColor = config().text_color;
-    const auto& margins = config().margins;
     //start_x += margins.left_white;
 
     auto* text = scene()->addSimpleText(str);

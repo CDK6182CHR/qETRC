@@ -92,7 +92,7 @@ bool TrainLine::endAtThis() const
 LineEventList TrainLine::listLineEvents(const TrainCollection& coll) const
 {
     LineEventList res;
-    res.reserve(_stations.size());
+    res.reserve(static_cast<int>(_stations.size()));
     for (int i = 0; i < _stations.size(); i++) {
         res.push_back(StationEventList());
     }

@@ -30,7 +30,7 @@ void GeneralSpinDelegate::setModelData(QWidget *editor, QAbstractItemModel *mode
 
 void GeneralSpinDelegate::setupSpin(QSpinBox *sp) const
 {
-
+    Q_UNUSED(sp);
 }
 
 SteppedSpinDelegate::SteppedSpinDelegate(int step, QObject *parent):
