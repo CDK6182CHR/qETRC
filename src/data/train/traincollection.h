@@ -199,6 +199,8 @@ public:
 
     void invalidateAllTempData();
 
+    int routingCount()const { return _routings.size(); }
+
 private:
     /**
      * @brief addMapInfo

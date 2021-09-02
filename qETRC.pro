@@ -46,6 +46,7 @@ SOURCES += \
     src/dialogs/printdiagramdialog.cpp \
     src/dialogs/rulerfromtraindialog.cpp \
     src/dialogs/selectrailstationdialog.cpp \
+    src/dialogs/trainfilter.cpp \
     src/editors/basictrainwidget.cpp \
     src/editors/configdialog.cpp \
     src/editors/forbidwidget.cpp \
@@ -161,6 +162,7 @@ HEADERS += \
     src/dialogs/printdiagramdialog.h \
     src/dialogs/rulerfromtraindialog.h \
     src/dialogs/selectrailstationdialog.h \
+    src/dialogs/trainfilter.h \
     src/editors/basictrainwidget.h \
     src/editors/configdialog.h \
     src/editors/forbidwidget.h \

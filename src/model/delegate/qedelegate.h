@@ -16,6 +16,7 @@ enum {
     TrainRole,
     BoolDataRole,
     TrainTypeRole,
+    RoutingRole,
 };
 }
 

@@ -14,6 +14,7 @@
 
 class MainWindow;
 class TypeManager;
+class TrainFilter;
 
 /**
  * @brief The ViewCategory class
@@ -33,6 +34,8 @@ class ViewCategory : public QObject
 
     SARibbonGalleryGroup* group;
     SARibbonGallery* gall;
+
+    TrainFilter* const filter;
     
 public:
     explicit ViewCategory(MainWindow* mw_,SARibbonCategory* cat_,
@@ -43,6 +46,11 @@ public:
      * 这是撤销或重做时执行的，真实有效的操作
      */
     void commitTrainsShow(const QList<std::shared_ptr<TrainLine>>& lines, bool show);
+
+    /**
+     * 更改列车显示状态；每个line设为相反的 
+     */
+    void commitTrainsShowByFilter(const QVector<std::shared_ptr<TrainLine>>& lines);
 
     /**
      * 执行单车次的显示状态变化
@@ -109,8 +117,13 @@ private slots:
 
     void actTypeRegex();
     void actTypeRegexDefault();
-
     void actSystemJsonDialog();
+
+    /**
+     * 采用高级筛选器修改列车显示。
+     * 和切换上下行是同一个cmd。操作压栈。
+     */
+    void trainFilterApplied();
 
 public slots:
     
@@ -173,6 +186,19 @@ namespace qecmd {
     public:
         ChangeTrainShow(const QList<std::shared_ptr<TrainLine>>& lines_, bool show_,
             ViewCategory* cat_, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    class ChangeTrainsShowByFilter :
+        public QUndoCommand {
+        QVector<std::shared_ptr<TrainLine>> lines;
+        ViewCategory* const cat;
+    public:
+        ChangeTrainsShowByFilter(QVector<std::shared_ptr<TrainLine>>&&lines_,
+            ViewCategory* cat_, QUndoCommand* parent = nullptr):
+            QUndoCommand(QObject::tr("筛选显示列车: 影响%1条运行线").arg(lines_.size()),parent),
+            lines(std::forward<QVector<std::shared_ptr<TrainLine>>>( lines_)),cat(cat_){}
         virtual void undo()override;
         virtual void redo()override;
     };

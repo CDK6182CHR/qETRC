@@ -6,6 +6,7 @@
 #include "editors/typeregexdialog.h"
 #include "data/train/traintype.h"
 #include "editors/systemjsondialog.h"
+#include "dialogs/trainfilter.h"
 
 #include <SARibbonPannelItem.h>
 #include <SARibbonGallery.h>
@@ -16,16 +17,28 @@
 
 ViewCategory::ViewCategory(MainWindow *mw_,
                            SARibbonCategory *cat_, QObject *parent):
-    QObject(parent),cat(cat_),diagram(mw_->_diagram),mw(mw_)
+    QObject(parent),cat(cat_),diagram(mw_->_diagram),mw(mw_),
+    filter(new TrainFilter(mw_->_diagram,mw))
 {
     initUI();
+    connect(filter, &TrainFilter::filterApplied,
+        this, &ViewCategory::trainFilterApplied);
 }
 
 void ViewCategory::commitTrainsShow(const QList<std::shared_ptr<TrainLine>>& lines, bool show)
 {
-    for (auto line : lines) {
+    foreach (auto line , lines) {
         line->setIsShow(show);
         setTrainShow(line, show);
+    }
+    onTrainShowChanged();
+}
+
+void ViewCategory::commitTrainsShowByFilter(const QVector<std::shared_ptr<TrainLine>>& lines)
+{
+    foreach(auto line, lines) {
+        line->setIsShow(!line->show());
+        setTrainShow(line, line->show());
     }
     onTrainShowChanged();
 }
@@ -113,6 +126,14 @@ void ViewCategory::initUI()
     group->setGridSize(QSize(group->gridSize().width(), SystemJson::instance.table_row_height));
     gall->currentViewGroup()->setGridSize(QSize(group->gridSize().width(),
         SystemJson::instance.table_row_height));
+
+    act = new QAction(QIcon(":/icons/filter.png"), tr("高级"), this);
+    act->setToolTip(tr("高级显示类型筛选 (Ctrl+Shift+L)\n"
+        "使用（与pyETRC一致的）车次筛选器来决定显示车次的集合。"));
+    act->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_L);
+    mw->addAction(act);
+    connect(act, &QAction::triggered, filter, &TrainFilter::show);
+    panel->addLargeAction(act);
 
     panel = cat->addPannel(tr("设置"));
     act = new QAction(QIcon(":/icons/config.png"), tr("显示设置"), this);
@@ -351,6 +372,24 @@ void ViewCategory::actSystemJsonDialog()
     dialog->show();
 }
 
+void ViewCategory::trainFilterApplied()
+{
+    QVector<std::shared_ptr<TrainLine>> lines;
+    foreach(auto train, diagram.trainCollection().trains()) {
+        bool show = filter->check(train);
+        //qDebug() << train->trainName().full() << ", " << show;
+        foreach(auto adp, train->adapters()) {
+            foreach(auto line, adp->lines()) {
+                if (line->show() != show) {
+                    lines.append(line);
+                }
+            }
+        }
+    }
+    if(!lines.empty())
+        mw->getUndoStack()->push(new qecmd::ChangeTrainsShowByFilter(std::move(lines), this));
+}
+
 void ViewCategory::commitConfigChange(Config& cfg, bool repaint)
 {
     Q_UNUSED(cfg);
@@ -549,4 +588,13 @@ void qecmd::ChangeTypeRegex::redo()
 {
     manager.swapForRegex(*data);
     if (forDefault) cat->saveDefaultConfigs();
+}
+
+void qecmd::ChangeTrainsShowByFilter::undo()
+{
+    cat->commitTrainsShowByFilter(lines);
+}
+void qecmd::ChangeTrainsShowByFilter::redo()
+{
+    cat->commitTrainsShowByFilter(lines);
 }

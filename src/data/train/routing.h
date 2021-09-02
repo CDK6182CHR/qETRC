@@ -294,3 +294,5 @@ public:
     int realCount()const;
 };
 
+Q_DECLARE_METATYPE(std::shared_ptr<Routing>);
+

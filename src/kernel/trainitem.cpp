@@ -744,13 +744,17 @@ void TrainItem::addLinkLine()
     if (!train()->hasRouting())
         return;
     std::shared_ptr<Routing> rout = train()->routing().lock();
-    auto* pre = rout->preLinked(*train());
+    auto* pre = rout->preLinked(*train());   // 这里已经保证first, last是同一个车站
     if (!pre)
         return;
     auto last = pre->train()->lastStation();
     auto first = train()->firstStation();
     if (train()->isNullStation(first) || pre->train()->isNullStation(last))
         return;
+    if (first != _line->firstTrainStation()) {
+        // 2021.09.02补正  必须是本线的才绘制
+        return;
+    }
     const QTime& last_tm = last->depart;
     const QTime& first_tm = first->arrive;
     auto rs = train()->boundStartingRail();

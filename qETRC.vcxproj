@@ -205,6 +205,7 @@
     <ClCompile Include="src\dialogs\printdiagramdialog.cpp" />
     <ClCompile Include="src\dialogs\rulerfromtraindialog.cpp" />
     <ClCompile Include="src\dialogs\selectrailstationdialog.cpp" />
+    <ClCompile Include="src\dialogs\trainfilter.cpp" />
     <ClCompile Include="src\editors\basictrainwidget.cpp" />
     <ClCompile Include="src\editors\configdialog.cpp" />
     <ClCompile Include="src\editors\forbidwidget.cpp" />
@@ -325,6 +326,7 @@
     <QtMoc Include="src\model\train\typemodel.h" />
     <QtMoc Include="src\editors\typeregexdialog.h" />
     <QtMoc Include="src\editors\systemjsondialog.h" />
+    <QtMoc Include="src\dialogs\trainfilter.h" />
     <ClInclude Include="src\model\delegate\linestyledelegate.h" />
     <ClInclude Include="src\model\train\timetablequickmodel.h" />
     <QtMoc Include="src\viewers\timetablequickwidget.h" />
