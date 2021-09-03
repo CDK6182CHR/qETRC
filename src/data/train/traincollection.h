@@ -142,6 +142,11 @@ public:
     void clearTrains();
 
     /**
+     * 清空列车和交路；除了typeManager外，和clear一样
+     */
+    void clearTrainsAndRoutings();
+
+    /**
      * 给TrainListWidget提供的删除API
      * 删除和返回指定列车的指针  注意更新映射表
      * 

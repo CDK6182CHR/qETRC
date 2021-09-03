@@ -104,6 +104,16 @@ std::shared_ptr<TrainType> TypeManager::findOrCreate(const QString& name, bool p
 	}
 }
 
+std::shared_ptr<TrainType> TypeManager::findOrCreate(std::shared_ptr<TrainType> tp)
+{
+	if (_types.contains(tp->name()))
+		return _types.value(tp->name());
+	else {
+		auto it = _types.insert(tp->name(), std::make_shared<TrainType>(*tp));
+		return it.value();
+	}
+}
+
 void TypeManager::swapForRegex(TypeManager& other)
 {
 	std::swap(_types, other._types);

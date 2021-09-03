@@ -5,15 +5,20 @@
 
 class TrainCollection;
 class QTableView;
+class TrainFilter;
+class Diagram;
 
 class ReadRulerPageTrain : public QWizardPage
 {
     Q_OBJECT;
+    Diagram& diagram;
     TrainCollection& coll;
     TrainListReadModel *mdUnsel, *mdSel;
     QTableView *tbUnsel,*tbSel;
+    TrainFilter* filter;
+
 public:
-    ReadRulerPageTrain(TrainCollection& coll_, QWidget* parent=nullptr);
+    ReadRulerPageTrain(Diagram& diagram_, QWidget* parent=nullptr);
     const auto& trains()const{return mdSel->trains();}
     virtual bool validatePage()override;
 private:
@@ -25,6 +30,7 @@ private:
     QVector<int> inversedSelectedRows(QTableView* table);
 private slots:
     void filtTrain();
+    void filtTrainApplied();
     void selectAll();
     void deselectAll();
     void select();

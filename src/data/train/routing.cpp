@@ -472,7 +472,7 @@ RoutingNode* Routing::preLinked(const Train& train)
     auto it = train.routingNode().value_or(_order.end());
     if (it == _order.begin()||it==_order.end())
         return nullptr;
-    auto pre = it; --pre;
+    auto pre = std::prev(it);
     if (pre->isVirtual())
         return nullptr;
     auto preend = pre->train()->boundTerminalRail();
@@ -490,8 +490,8 @@ RoutingNode* Routing::postLinked(const Train& train)
     auto it = train.routingNode().value_or(_order.end());
     if (it == _order.end())
         return nullptr;
-    auto post = it; ++post;
-    if (post == _order.end())
+    auto post = std::next(it);
+    if (post == _order.end() ||  post->isVirtual())
         return nullptr;
     auto curend = train.boundTerminalRail();
     auto poststart = post->train()->boundStartingRail();
@@ -499,6 +499,46 @@ RoutingNode* Routing::postLinked(const Train& train)
         return &(*post);
     }
     return nullptr;
+}
+
+QString Routing::preOrderString(const Train &train) 
+{
+    if (!train.hasRouting() || train.routing().lock().get() != this)
+        return {};
+    auto it = train.routingNode().value_or(_order.end());
+    if (it == _order.begin()||it==_order.end())
+        return {};
+    auto pre = std::prev(it);
+    if (pre->isVirtual())
+        return QObject::tr("%1 (否)").arg(pre->name());
+    auto preend = pre->train()->boundTerminalRail();
+    auto curstart = train.boundStartingRail();
+    if (preend == curstart && curstart) {
+        return QObject::tr("%1 (是)").arg(pre->name());
+    }
+    return QObject::tr("%1 (否)").arg(pre->name());
+}
+
+QString Routing::postOrderString(const Train &train) 
+{
+    if (!train.hasRouting() || train.routing().lock().get() != this)
+        return {};
+    auto it = train.routingNode().value_or(_order.end());
+    if (it == _order.end())
+        return {};
+    auto post = std::next(it);
+    if (post == _order.end())
+        return "-";
+    else if(post->isVirtual()){
+        return QObject::tr("%1 (否)").arg(post->name());
+    }
+    auto curend = train.boundTerminalRail();
+    auto poststart = post->train()->boundStartingRail();
+    if (curend && curend == poststart) {
+        // link
+        return QObject::tr("%1 (是)").arg(post->name());
+    }
+    return QObject::tr("%1 (否)").arg(post->name());
 }
 
 void Routing::print() const

@@ -146,6 +146,12 @@ public slots:
     void onRoutingInserted(const QModelIndex&, int first, int last);
 
     void onRoutingRemoved(const QModelIndex&, int first, int last);
+
+    /**
+     * 刷新交路部分。当列车导入时调用。
+     * Train那个分类由TrainListModel触发更新；交路这个需要单独。
+     */
+    void refreshRoutings();
 };
 
 

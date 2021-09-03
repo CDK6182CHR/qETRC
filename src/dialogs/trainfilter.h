@@ -120,6 +120,13 @@ class TrainFilter : public QDialog
 public:
     TrainFilter(Diagram& diagram_, QWidget* parent=nullptr);
     bool check(std::shared_ptr<Train> train)const;
+
+    /**
+     * 返回当前筛选器状态下，被选中的车次列表。
+     * 线性算法，暂时不引入缓存机制。
+     */
+    QList<std::shared_ptr<Train>> selectedTrains()const;
+
 private:
     void initUI();
     bool checkType(std::shared_ptr<Train> train)const;

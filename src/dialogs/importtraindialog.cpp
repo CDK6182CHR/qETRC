@@ -118,6 +118,7 @@ void ImportTrainDialog::actApply()
             //可以直接添加
             train->resetRouting();  // ?
             diagram.trainCollection().appendTrain(train);
+            train->setType(coll.typeManager().findOrCreate(train->type()));
             new_cnt++;
         }
         else if (cover) {

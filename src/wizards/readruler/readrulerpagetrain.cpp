@@ -1,13 +1,17 @@
 ﻿#include "readrulerpagetrain.h"
 #include "data/diagram/diagram.h"
 #include "util/buttongroup.hpp"
-
+#include "dialogs/trainfilter.h"
+#include "data/diagram/diagram.h"
 #include <QtWidgets>
 #include <algorithm>
 
-ReadRulerPageTrain::ReadRulerPageTrain(TrainCollection &coll_, QWidget *parent):
-    QWizardPage(parent), coll(coll_)
+ReadRulerPageTrain::ReadRulerPageTrain(Diagram& diagram_, QWidget *parent):
+    QWizardPage(parent),diagram(diagram_),  coll(diagram_.trainCollection())
 {
+    filter = new TrainFilter(diagram, this);
+    connect(filter, &TrainFilter::filterApplied,
+        this, &ReadRulerPageTrain::filtTrainApplied);
     initUI();
 }
 
@@ -83,13 +87,30 @@ QVector<int> ReadRulerPageTrain::inversedSelectedRows(QTableView *table)
 
 void ReadRulerPageTrain::filtTrain()
 {
-    QMessageBox::warning(this,tr("错误"),tr("“车次筛选器”尚未实现。"));
+    filter->show();
+}
+
+void ReadRulerPageTrain::filtTrainApplied()
+{
+    for (int i = 0; i < mdUnsel->rowCount({}); i++) {
+        auto train = mdUnsel->trains().at(i);
+        tbUnsel->setRowHidden(i, !filter->check(train));
+    }
 }
 
 void ReadRulerPageTrain::selectAll()
-{
-    mdSel->appendTrains(mdUnsel->trains());
-    mdUnsel->clearTrains();
+{  
+    // 2021.09.03 引入筛选器机制，原来的直接take不能用了
+    //mdSel->appendTrains(mdUnsel->trains());
+    //mdUnsel->clearTrains();
+    //tbSel->resizeColumnsToContents();
+    QList<std::shared_ptr<Train>> lst;
+    for (int i = mdUnsel->rowCount({}) - 1; i >= 0; i--) {
+        if (!tbUnsel->isRowHidden(i)) {
+            lst.prepend(mdUnsel->takeTrainAt(i));
+        }
+    }
+    mdSel->appendTrains(lst);
     tbSel->resizeColumnsToContents();
 }
 

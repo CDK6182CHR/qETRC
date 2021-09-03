@@ -35,6 +35,7 @@ class QSpinBox;
 class QUndoView;
 
 class TimetableQuickWidget;
+class TrainInfoWidget;
 
 /**
  * @brief The MainWindow class
@@ -54,6 +55,7 @@ class MainWindow : public SARibbonMainWindow
     QList<ads::CDockWidget*> diagramDocks;
     QList<DiagramWidget*> diagramWidgets;
     ads::CDockWidget* naviDock, * trainListDock, * routingDock, * timetableQuickDock;
+    ads::CDockWidget* trainInfoDock;
     ads::CDockWidget* undoDock, * centralDock;
     ads::CDockAreaWidget* centralArea = nullptr;
     TrainListWidget* trainListWidget;
@@ -61,6 +63,7 @@ class MainWindow : public SARibbonMainWindow
     QList<ads::CDockWidget*> railStationDocks;
     RoutingWidget* routingWidget;
     TimetableQuickWidget* timetableQuickWidget;
+    TrainInfoWidget* trainInfoWidget;
 
     PageContext* contextPage;
     TrainContext* contextTrain;
@@ -273,6 +276,8 @@ private slots:
      */
     void removeAllTrains();
 
+    void removeAllTrainsAndRoutings();
+
     /**
      * 删除新增的线路，只要关闭/删除相应的widget即可
      */
@@ -346,6 +351,8 @@ private slots:
     void actDiagnose();
 
     void actToggleWeakenUnselected(bool on);
+
+    void showQuickTimetable(std::shared_ptr<Train> train);
 
 public slots:
 

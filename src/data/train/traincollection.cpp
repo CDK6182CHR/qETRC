@@ -154,6 +154,14 @@ void TrainCollection::clearTrains()
 		removeTrainAt(0);
 }
 
+void TrainCollection::clearTrainsAndRoutings()
+{
+	_trains.clear();
+	_routings.clear();
+	fullNameMap.clear();
+	singleNameMap.clear();
+}
+
 std::shared_ptr<Train> TrainCollection::takeTrainAt(int i)
 {
 	auto t = _trains.takeAt(i);

@@ -72,6 +72,11 @@ namespace navi {
 		inline virtual int childCount()const override { return MaxDiagramRows; }
 		virtual QString data(int i)const override { return i == 0 ? QObject::tr("运行图") : ""; }
 		inline virtual int type()const override { return Type; }
+        /**
+         * @brief refreshRoutingList
+         * 重新加载Routing
+         */
+        void refreshRoutingList();
 	};
 
 	class RailwayItem;

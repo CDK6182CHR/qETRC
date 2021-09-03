@@ -114,6 +114,7 @@ SOURCES += \
     src/viewers/timetablequickwidget.cpp \
     src/viewers/traindiffdialog.cpp \
     src/viewers/traineventdialog.cpp \
+    src/viewers/traininfowidget.cpp \
     src/viewers/trainlinedialog.cpp \
     src/viewers/traintimetableplane.cpp \
     src/wizards/readruler/readrulerpageconfig.cpp \
@@ -233,6 +234,7 @@ HEADERS += \
     src/viewers/timetablequickwidget.h \
     src/viewers/traindiffdialog.h \
     src/viewers/traineventdialog.h \
+    src/viewers/traininfowidget.h \
     src/viewers/trainlinedialog.h \
     src/viewers/traintimetableplane.h \
     src/wizards/readruler/readrulerpageconfig.h \

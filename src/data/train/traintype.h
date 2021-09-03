@@ -132,6 +132,13 @@ public:
      * 如果有信息指明为客车，则优先用客车pen
      */
     std::shared_ptr<TrainType> findOrCreate(const QString& name, bool passenger);
+
+    /**
+     * 用于导入车次：根据名称查找类型；
+     * 如果类型不存在，加入入参的【拷贝】到类型表（深拷贝）
+     */
+    std::shared_ptr<TrainType> findOrCreate(std::shared_ptr<TrainType> tp);
+
     /**
      * 如果找不到，返回空
      */

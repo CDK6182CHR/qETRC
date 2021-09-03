@@ -1,0 +1,210 @@
+﻿#include "traininfowidget.h"
+
+#include <QFormLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QTextBrowser>
+#include <QVBoxLayout>
+
+#include "data/train/train.h"
+#include "data/train/routing.h"
+#include "data/train/traintype.h"
+#include "util/utilfunc.h"
+#include "util/dialogadapter.h"
+
+TrainInfoWidget::TrainInfoWidget(QWidget *parent) : QScrollArea(parent)
+{
+    setWindowTitle(tr("速览信息"));
+    setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    setWidgetResizable(true);
+    initUI();
+}
+
+void TrainInfoWidget::initUI()
+{
+    auto* w = new QWidget;
+    auto* vlay=new QVBoxLayout(w);
+    flay=new QFormLayout;
+
+    edName=makeLineEdit(tr("全车次"));
+    edNameDir=makeLineEdit(tr("分方向车次"));
+    edStartEnd=makeLineEdit(tr("始发终到"));
+    edType=makeLineEdit(tr("列车种类"));
+    edPassen=makeLineEdit(tr("旅客列车"));
+    edStations=makeLineEdit(tr("总/铺画站数"));
+    edLines=makeLineEdit(tr("运行线情况"));
+    edMile=makeLineEdit(tr("铺画里程"));
+    edTime=makeLineEdit(tr("铺画总时间"));
+    edTime->setToolTip(tr("本次列车在本运行图所有线路中的所有运行线的总时长"));
+    edRun=makeLineEdit(tr("铺画运行时间"));
+    edStay=makeLineEdit(tr("图定停站时间"));
+    edSpeed=makeLineEdit(tr("铺画旅行速度"));
+    edTechSpeed=makeLineEdit(tr("铺画技术速度"));
+    edRouting=makeLineEdit(tr("所属交路"));
+    edModel=makeLineEdit(tr("车底型号"));
+    edOwner=makeLineEdit(tr("担当交路"));
+    edPre=makeLineEdit(tr("前序 (连线)"));
+    edPost=makeLineEdit(tr("后序 (连线)"));
+
+    auto* btn=new QPushButton(tr("点击查看"));
+    flay->addRow(tr("查看时刻表"),btn);
+    btn->setMaximumWidth(150);
+    connect(btn,&QPushButton::clicked,this,&TrainInfoWidget::actShowTimetable);
+
+    btn=new QPushButton(tr("点击编辑"));
+    flay->addRow(tr("编辑时刻表"),btn);
+    btn->setMaximumWidth(150);
+    connect(btn,&QPushButton::clicked,this,&TrainInfoWidget::actEditTrain);
+
+    vlay->addLayout(flay);
+    vlay->addWidget(new QLabel(tr("交路序列")));
+    edOrder=new QTextBrowser;
+    vlay->addWidget(edOrder);
+
+    btn=new QPushButton(tr("导出为文本"));
+    connect(btn,&QPushButton::clicked,this,&TrainInfoWidget::toText);
+    vlay->addWidget(btn);
+    setWidget(w);
+}
+
+QLineEdit *TrainInfoWidget::makeLineEdit(const QString &title) const
+{
+    auto* ed=new QLineEdit;
+    ed->setFocusPolicy(Qt::NoFocus);
+    flay->addRow(title,ed);
+    return ed;
+}
+
+void TrainInfoWidget::setTrain(std::shared_ptr<Train> train)
+{
+    this->train=train;
+    refreshData();
+}
+
+void TrainInfoWidget::refreshData()
+{
+    if (!train)
+        return;
+    edName->setText(train->trainName().full());
+    edNameDir->setText(tr("%1 / %2").arg(train->trainName().down(),
+                                         train->trainName().up()));
+    edStartEnd->setText(tr("%1 -> %2").arg(train->starting().toSingleLiteral(),
+                                           train->terminal().toSingleLiteral()));
+    edType->setText(train->type()->name());
+
+    if(train->passenger() == TrainPassenger::Auto){
+        edPassen->setText(tr("自动 (%1)").arg(
+                            train->getIsPassenger()?tr("是"):tr("否")  ));
+    }else{
+        edPassen->setText(tr("指定 (%1)").arg(
+                            train->passenger() == TrainPassenger::True?tr("是"):tr("否")));
+    }
+    edStations->setText(tr("%1 / %2").arg(train->stationCount())
+                        .arg(train->adapterStationCount()));
+    edLines->setText(tr("%1线路 | %2运行线").arg(train->adapters().size())
+                     .arg(train->lineCount()));
+
+    double mile=train->localMile();
+    auto [run,stay]=train->localRunStaySecs();
+
+    edMile->setText(tr("%1 km").arg(QString::number(mile,'f',3)));
+    edTime->setText(qeutil::secsToStringHour(run+stay));
+    edRun->setText(qeutil::secsToStringHour(run));
+    edStay->setText(qeutil::secsToStringHour(stay));
+
+    double spd = mile / (run + stay) * 3600;
+    double techspd = mile / run * 3600;
+
+    edSpeed->setText(tr("%1 km/h").arg(QString::number(spd, 'f', 3)));
+    edTechSpeed->setText(tr("%1 km/h").arg(QString::number(techspd, 'f', 3)));
+
+    if (train->hasRouting()) {
+        auto rt = train->routing().lock();
+        edRouting->setText(rt->name());
+        edModel->setText(rt->model());
+        edOwner->setText(rt->owner());
+        // todo 前序后序
+        edPre->setText(rt->preOrderString(*train));
+        edPost->setText(rt->postOrderString(*train));
+        edOrder->setText(rt->orderString());
+    }
+    else {
+        edRouting->setText(tr("(无交路信息)"));
+        edModel->clear();
+        edOwner->clear();
+        edPre->clear();
+        edPost->clear();
+        edOrder->clear();
+    }
+}
+
+void TrainInfoWidget::toText()
+{
+    if(!train) return;
+    QString text;
+    text.append(tr("车次：%1\n").arg(train->trainName().full()));
+    text.append(tr("分方向车次：%1 / %2\n").arg(train->trainName().down(),train->trainName().up()));
+    text.append(tr("始发终到：%1 -> %2\n").arg(train->starting().toSingleLiteral(),
+                                        train->terminal().toSingleLiteral()));
+    text.append(tr("列车种类：%1\n").arg(train->type()->name()));
+    if(train->passenger() == TrainPassenger::Auto){
+        text.append(tr("客车类型：自动 (%1)\n").arg(
+                            train->getIsPassenger()?tr("是"):tr("否")  ));
+    }else{
+        text.append(tr("客车类型：指定 (%1)\n").arg(
+                            train->passenger() == TrainPassenger::True?tr("是"):tr("否")));
+    }
+
+    text.append(tr("总(铺画)站数：%1 / %2\n").arg(train->stationCount())
+                        .arg(train->adapterStationCount()));
+    text.append(tr("运行线信息：%1线路 | %2运行线\n").arg(train->adapters().size())
+                     .arg(train->lineCount()));
+
+    double mile=train->localMile();
+    auto [run,stay]=train->localRunStaySecs();
+
+    text.append(tr("铺画里程：%1 km\n").arg(QString::number(mile,'f',3)));
+    text.append(tr("铺画运行时间：") + qeutil::secsToStringHour(run+stay)+'\n');
+    text.append(tr("铺画纯运行时间：") + qeutil::secsToStringHour(run)+'\n');
+    text.append(tr("图定总停站时间：") + qeutil::secsToStringHour(stay)+'\n');
+
+    double spd = mile / (run + stay) * 3600;
+    double techspd = mile / run * 3600;
+
+    text.append(tr("铺画旅行速度：%1 km/h\n").arg(QString::number(spd, 'f', 3)));
+    text.append(tr("铺画技术速度：%1 km/h\n").arg(QString::number(techspd, 'f', 3)));
+
+    if (train->hasRouting()) {
+        auto rt = train->routing().lock();
+        text.append(tr("车底交路：") + rt->name()+'\n');
+        text.append(tr("车底类型：") + rt->model()+'\n');
+        text.append(tr("担当局段：") + rt->owner()+'\n');
+        // todo 前序后序
+        text.append(tr("前序（连线）：") + rt->preOrderString(*train)+'\n');
+        text.append(tr("后续（连线）：") + rt->postOrderString(*train)+'\n');
+        text.append(tr("交路序列：") + rt->orderString()+'\n');
+    }
+    else {
+        text.append(tr("本次列车无交路信息\n"));
+    }
+
+    auto* t=new QTextBrowser();
+    t->setWindowTitle(tr("列车信息导出"));
+    t->setText(text);
+    auto* dialog=new DialogAdapter(t);
+    dialog->resize(400,400);
+    dialog->show();
+}
+
+void TrainInfoWidget::actEditTrain()
+{
+    if(train)
+        emit editTrain(train);
+}
+
+void TrainInfoWidget::actShowTimetable()
+{
+    if(train)
+        emit showTimetable(train);
+}

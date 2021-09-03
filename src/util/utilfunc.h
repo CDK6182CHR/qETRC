@@ -33,6 +33,11 @@ QString secsToString(int secs);
 QString secsToString(const QTime& tm1, const QTime& tm2);
 
 /**
+ * 返回 hh:mm:ss格式的时间字符串表示
+ */
+QString secsToStringHour(int secs);
+
+/**
  * 用于天窗： hh:mm格式  传入分钟数！
  */
 QString minsToStringHM(int mins);

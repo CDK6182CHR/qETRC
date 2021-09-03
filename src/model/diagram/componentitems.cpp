@@ -17,7 +17,12 @@ navi::AbstractComponentItem* navi::DiagramItem::child(int i)
 	case RowTrains:return trainList.get();
     case RowRoutings:return routingList.get();
 	default:return nullptr;
-	}
+    }
+}
+
+void navi::DiagramItem::refreshRoutingList()
+{
+    routingList=std::make_unique<RoutingListItem>(_diagram.trainCollection(),this);
 }
 
 navi::RailwayListItem::RailwayListItem(Diagram& diagram, DiagramItem* parent):

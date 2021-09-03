@@ -22,6 +22,16 @@ TrainFilter::TrainFilter(Diagram &diagram_, QWidget *parent):
     initUI();
 }
 
+QList<std::shared_ptr<Train>> TrainFilter::selectedTrains() const
+{
+    QList<std::shared_ptr<Train>> res;
+    foreach(auto train, diagram.trainCollection().trains()) {
+        if (check(train))
+            res.push_back(train);
+    }
+    return res;
+}
+
 void TrainFilter::initUI()
 {
     auto* vlay=new QVBoxLayout(this);

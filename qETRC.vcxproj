@@ -292,6 +292,7 @@
     <ClCompile Include="src\viewers\timetablequickwidget.cpp" />
     <ClCompile Include="src\viewers\traindiffdialog.cpp" />
     <ClCompile Include="src\viewers\traineventdialog.cpp" />
+    <ClCompile Include="src\viewers\traininfowidget.cpp" />
     <ClCompile Include="src\viewers\trainlinedialog.cpp" />
     <ClCompile Include="src\viewers\traintimetableplane.cpp" />
     <ClCompile Include="src\wizards\readruler\readrulerpageconfig.cpp" />
@@ -306,6 +307,7 @@
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintwizard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="src\viewers\traininfowidget.h" />
     <QtMoc Include="src\wizards\readruler\readrulerpagepreview.h" />
     <QtMoc Include="src\wizards\readruler\readrulerpageconfig.h" />
     <QtMoc Include="src\wizards\readruler\readrulerpagetrain.h" />

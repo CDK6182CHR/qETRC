@@ -132,7 +132,16 @@ std::pair<const AdapterStation*, std::shared_ptr<TrainLine>>
 		if ((p = line->stationByTrainLinear(st)))
 			return std::make_pair(p, line);
 	}
-	return std::make_pair(nullptr, nullptr);
+    return std::make_pair(nullptr, nullptr);
+}
+
+int TrainAdapter::adapterStationCount() const
+{
+    int res=0;
+    foreach(auto line,_lines){
+        res+=line->stations().size();
+    }
+    return res;
 }
 
 void TrainAdapter::autoLines(const Config& config)

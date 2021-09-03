@@ -775,6 +775,24 @@ void Train::checkLinesShow()
     _show=anyLineShown();
 }
 
+int Train::adapterStationCount() const
+{
+    int  res=0;
+    foreach(auto adp,_adapters){
+        res+=adp->adapterStationCount();
+    }
+    return res;
+}
+
+int Train::lineCount() const
+{
+    int res=0;
+    foreach(auto adp,_adapters){
+        res+=adp->lines().size();
+    }
+    return res;
+}
+
 bool Train::anyLineShown() const
 {
     for (auto adp : _adapters) {

@@ -28,7 +28,7 @@ void ReadRulerWizard::initUI()
     initStartPage();   
     pgInterval = new ReadRulerPageInterval(diagram.railCategory());
     addPage(pgInterval); 
-    pgTrain = new ReadRulerPageTrain(diagram.trainCollection());
+    pgTrain = new ReadRulerPageTrain(diagram);
     addPage(pgTrain);
     pgConfig = new ReadRulerPageConfig();
     addPage(pgConfig);

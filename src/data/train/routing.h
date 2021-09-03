@@ -170,6 +170,10 @@ public:
 
     RoutingNode* postLinked(const Train& train);
 
+    QString preOrderString(const Train& train);
+
+    QString postOrderString(const Train& train);
+
     void print()const;
 
     /**

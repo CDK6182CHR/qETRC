@@ -23,6 +23,7 @@
 #include "editors/routing/detectroutingdialog.h"
 #include "viewers/diagnosisdialog.h"
 #include "viewers/timetablequickwidget.h"
+#include "viewers/traininfowidget.h"
 
 #include "traincontext.h"
 #include "railcontext.h"
@@ -150,6 +151,7 @@ void MainWindow::onTrainsImported()
     //informTrainListChanged();
     //手动更新TrainList
     trainListWidget->refreshData();   //这个自动调用naviTree的更新操作！
+    naviModel->refreshRoutings();
     undoStack->clear();  //不支持撤销
     markChanged();
 }
@@ -163,6 +165,20 @@ void MainWindow::removeAllTrains()
         return;
 
     _diagram.trainCollection().clearTrains();
+    onTrainsImported();   //后操作是一样的
+    contextTrain->resetTrain();
+    focusOutTrain();
+}
+
+void MainWindow::removeAllTrainsAndRoutings()
+{
+    auto flag = QMessageBox::question(this, tr("警告"),
+        tr("此操作删除所有车次和所有交路，且不可撤销，是否继续？\n"
+            "此操作通常用于导入新的车次之前。"));
+    if (flag != QMessageBox::Yes)
+        return;
+
+    _diagram.trainCollection().clearTrainsAndRoutings();
     onTrainsImported();   //后操作是一样的
     contextTrain->resetTrain();
     focusOutTrain();
@@ -437,6 +453,21 @@ void MainWindow::initDockWidgets()
             rw, &RoutingWidget::actAdd);
     }
 
+    
+    
+
+    // 速览信息
+    if constexpr (true) {
+        auto* w = new TrainInfoWidget();
+        dock = new ads::CDockWidget(tr("速览信息"));
+        dock->setWidget(w);
+        trainInfoWidget = w;
+        trainInfoDock = dock;
+        connect(w, &TrainInfoWidget::showTimetable,
+            this, &MainWindow::showQuickTimetable);
+    }
+    area = manager->addDockWidget(ads::RightDockWidgetArea, dock);
+
     // 速览时刻
     if constexpr (true) {
         auto* w = new TimetableQuickWidget();
@@ -444,7 +475,7 @@ void MainWindow::initDockWidgets()
         dock->setWidget(w);
         timetableQuickWidget = w;
         timetableQuickDock = dock;
-        manager->addDockWidget(ads::RightDockWidgetArea, dock);
+        manager->addDockWidgetTabToArea(dock, area);
     }
 }
 
@@ -660,6 +691,10 @@ void MainWindow::initToolbar()
         connect(actsub, SIGNAL(triggered()), this, SLOT(removeAllTrains()));
         menu->addAction(actsub);
 
+        actsub = new QAction(tr("删除所有车次和交路"), this);
+        connect(actsub, &QAction::triggered, this, &MainWindow::removeAllTrainsAndRoutings);
+        menu->addAction(actsub);
+
         actsub = new QAction(tr("自动始发终到站适配"), this);
         menu->addAction(actsub);
         connect(actsub, SIGNAL(triggered()), this, SLOT(actAutoStartingTerminal()));
@@ -693,12 +728,23 @@ void MainWindow::initToolbar()
         btn = panel->addMediumAction(act);
         connect(act, SIGNAL(triggered()), naviView, SLOT(actAddTrain()));
 
+        panel = cat->addPannel(tr("工具"));
+
         act = timetableQuickDock->toggleViewAction();
         act->setIcon(QIcon(":/icons/clock.png"));
-        act->setShortcut(Qt::CTRL + Qt::Key_Y);
+        act->setShortcut(Qt::CTRL + Qt::Key_I);
         addAction(act);
         act->setToolTip(tr("速览时刻 (Ctrl+Y)\n"
             "显示或隐藏pyETRC风格的双行只读时刻表。"));
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(70);
+
+        act = trainInfoDock->toggleViewAction();
+        act->setIcon(QIcon(":/icons/info.png"));
+        act->setShortcut(Qt::CTRL + Qt::Key_Q);
+        addAction(act);
+        act->setToolTip(tr("速览信息 (Ctrl+Q)\n"
+            "显示或隐藏pyETRC风格的列车信息栏。"));
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(70);
 
@@ -828,6 +874,8 @@ void MainWindow::initToolbar()
             this, &MainWindow::undoAddNewTrain);
         connect(contextTrain, &TrainContext::focusInRouting,
             this, &MainWindow::focusInRouting);
+        connect(trainInfoWidget, &TrainInfoWidget::editTrain,
+            contextTrain, &TrainContext::showBasicWidget);
     }
 
     //context: rail 8
@@ -1168,6 +1216,17 @@ void MainWindow::actToggleWeakenUnselected(bool on)
     SystemJson::instance.weaken_unselected = on;
 }
 
+void MainWindow::showQuickTimetable(std::shared_ptr<Train> train)
+{
+    if (timetableQuickDock->isClosed()) {
+        timetableQuickDock->toggleView(true);
+        timetableQuickWidget->setTrain(train);
+    }
+    else {
+        timetableQuickDock->setAsCurrentTab();
+    }
+}
+
 void MainWindow::updateWindowTitle()
 {
     QString filename = _diagram.filename();
@@ -1494,8 +1553,11 @@ void MainWindow::focusInTrain(std::shared_ptr<Train> train)
 {
     ribbonBar()->showContextCategory(contextTrain->context());
     contextTrain->setTrain(train);
-    if (timetableQuickDock->isVisible()) {
+    if (!timetableQuickDock->isClosed() ) {
         timetableQuickWidget->setTrain(train);
+    }
+    if (!trainInfoDock->isClosed()) {
+        trainInfoWidget->setTrain(train);
     }
 }
 

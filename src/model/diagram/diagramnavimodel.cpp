@@ -360,5 +360,13 @@ void DiagramNaviModel::onRoutingRemoved(const QModelIndex&, int first, int last)
     endRemoveRows();
 }
 
+void DiagramNaviModel::refreshRoutings()
+{
+    //auto&& par = index(navi::DiagramItem::RowRoutings, 0);
+    beginResetModel();
+    _root->refreshRoutingList();
+    endResetModel();
+}
+
 
 

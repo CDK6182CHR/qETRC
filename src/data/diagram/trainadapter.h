@@ -117,6 +117,8 @@ public:
     std::pair<const AdapterStation*,std::shared_ptr<TrainLine>>
         stationByTrainLinear(Train::ConstStationPtr st)const;
 
+    int adapterStationCount()const;
+
 private:
 
     /**
