@@ -106,11 +106,12 @@ private slots:
     void applyTypeShow();
 
     void actShowConfig();
+    void actShowDefaultConfig();
 
     /**
      * 点击确认修改配置。压栈操作
      */
-    void onActConfigApplied(Config& cfg, const Config& newcfg, bool repaint);
+    void onActConfigApplied(Config& cfg, const Config& newcfg, bool repaint, bool forDefault);
 
     void actTypeConfig();
     void actTypeConfigDefault();
@@ -118,6 +119,17 @@ private slots:
     void actTypeRegex();
     void actTypeRegexDefault();
     void actSystemJsonDialog();
+    
+    /**
+     * 应用默认设置为当前运行图设置；操作压栈
+     */
+    void actApplyDefaultConfig();
+
+    /**
+     * 将当前运行图设置保存为系统默认设置；操作压栈
+     */
+    void actSaveConfigAsDefault();
+    
 
     /**
      * 采用高级筛选器修改列车显示。

@@ -6,6 +6,7 @@
 #include "data/diagram/trainadapter.h"
 #include "data/train/traintype.h"
 #include "routing.h"
+#include "util/utilfunc.h"
 
 
 Train::Train(const TrainName &trainName,
@@ -544,7 +545,7 @@ bool Train::isTerminalStation(const AdapterStation* st)const
 {
     if (st->trainStation->name != _terminal)return false;
     for (auto adp : _adapters)
-        if (adp->isFirstStation(st))
+        if (adp->isLastStation(st))
             return true;
     return false;
 }
@@ -791,6 +792,63 @@ int Train::lineCount() const
         res+=adp->lines().size();
     }
     return res;
+}
+
+int Train::deltaDays(bool byTimetable) const
+{
+    if(empty()) return 0;
+    if(byTimetable){
+        auto pr=_timetable.begin(),p=_timetable.begin();
+        int day=0;
+        for(;p!=_timetable.end();pr=p,++p){
+            if(pr!=p){
+                // 比较上一区间
+                if (p->arrive < pr->depart)
+                    day++;
+            }
+            if (p->depart < p->arrive)
+                day++;
+        }
+        return day;
+    }else{
+        if (_timetable.back().arrive >= _timetable.front().depart)
+            return 0;
+        else return 1;
+    }
+}
+
+int Train::totalMinSecs() const
+{
+    if(empty()) return 0;
+    return qeutil::secsTo(_timetable.front().arrive,_timetable.back().depart);
+}
+
+void Train::refreshStationFlags()
+{
+    // 第一次遍历：设置停车Flag
+    for (auto& p: _timetable) {
+        if (p.isStopped())
+            p.flag = TrainStation::Stopped;
+        else
+            p.flag = TrainStation::NoFlag;
+    }
+    // 第二次遍历：增加绑定站信息 遍历所有Line
+    foreach(auto adp, _adapters) {
+        foreach(auto line, adp->lines()) {
+            for (auto& p : line->stations()) {
+                p.trainStation->flag |= TrainStation::Bound;
+            }
+        }
+    }
+    //最后：补充始发站和终到站
+    if (!_timetable.empty()) {
+        if (isStartingStation(_timetable.front().name)) {
+            _timetable.front().flag |= TrainStation::Starting;
+        }
+        if (isTerminalStation(_timetable.back().name)) {
+            _timetable.back().flag |= TrainStation::Terminal;
+        }
+    }
 }
 
 bool Train::anyLineShown() const

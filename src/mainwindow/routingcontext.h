@@ -10,6 +10,7 @@ class Routing;
 class MainWindow;
 class Diagram;
 class QLineEdit;
+class RoutingDiagramWidget;
 
 /**
  * @brief The RoutingContext class
@@ -22,7 +23,8 @@ class RoutingContext : public QObject
     SARibbonContextCategory* const cont;
     MainWindow* const mw;
     QList<RoutingEdit*> routingEdits;
-    QList<ads::CDockWidget*> routingDocks;
+    QList<RoutingDiagramWidget*> diagramWidgets;
+    QList<ads::CDockWidget*> routingDocks, diagramDocks;
     bool updating = false;
     SARibbonToolButton* btnHighlight;
 
@@ -55,6 +57,8 @@ private slots:
     void actDetectTrain();
 
     void actRemoveRouting();
+
+    void actRoutingDiagram();
 
 public slots:
     void refreshData();
@@ -98,6 +102,8 @@ public slots:
      */
     void commitBatchRoutingUpdate(const QVector<int>& indexes,
         const QVector<std::shared_ptr<Routing>>& data);
+
+    void openRoutingDiagramWidget(std::shared_ptr<Routing> routing);
 
 };
 

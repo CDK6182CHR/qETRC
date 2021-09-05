@@ -25,6 +25,7 @@ class ConfigDialog : public QDialog
      * 目前只有全局的，但以后可能会允许每个Page分别配置。
      */
     Config& _cfg;
+    const bool forDefault;
     bool repaint=false;
 
     QSpinBox* spStartHour, * spEndHour, * spVLines, * spMinMarkInter;
@@ -42,7 +43,7 @@ class ConfigDialog : public QDialog
     QColor gridColor, textColor;
 
 public:
-    ConfigDialog(Config& cfg,QWidget* parent=nullptr);
+    ConfigDialog(Config& cfg,bool forDefault_, QWidget* parent=nullptr);
     auto& config(){return _cfg;}
 
 signals:
@@ -53,7 +54,7 @@ signals:
      */
     void repaintDiagrams();
 
-    void onConfigApplied(Config& cfg,const Config& newcfg,bool repaint);
+    void onConfigApplied(Config& cfg, const Config& newcfg, bool repaint, bool forDefault);
 
 private:
     void initUI();
@@ -84,13 +85,12 @@ namespace qecmd {
         Config& cfg;
         Config newcfg;
         const bool repaint;
+        const bool forDefault;
         ViewCategory* const cat;
     public:
-        ChangeConfig(Config& cfg_, const Config& newcfg_, bool repaint_,ViewCategory* cat_,
-            QUndoCommand* parent=nullptr):
-        QUndoCommand(QObject::tr("更新显示设置"),parent),cfg(cfg_),newcfg(newcfg_),repaint(repaint_),
-            cat(cat_)
-        {}
+        ChangeConfig(Config& cfg_, const Config& newcfg_, bool repaint_, bool forDefault_,
+            ViewCategory* cat_,
+            QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
     };

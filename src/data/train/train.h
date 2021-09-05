@@ -460,6 +460,30 @@ public:
 
     int lineCount()const;
 
+    /**
+     * 设始发为第0日，返回终到是第几日。
+     * @param byTimetable 若启用，则扫描整个时刻表，每次发现时刻“倒退”就增加一日；
+     * 否则只比较首末站
+     */
+    int deltaDays(bool byTimetable)const;
+
+    /**
+     * @brief pyETRC.Train.totalMinTime
+     * 终到站时间减去始发站时间
+     */
+    int totalMinSecs()const;
+
+    /**
+     * 列车类型指针的引用，用于更改列车类型的undo/redo操作
+     * 注意是指针的引用；交换执行浅拷贝。
+     */
+    std::shared_ptr<TrainType>& typeRef() { return _type; }
+
+    /**
+     * 更新所有车站的Flag。
+     */
+    void refreshStationFlags();
+
 
     //static比较函数 用来排序
     static bool ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
@@ -497,5 +521,6 @@ uint qHash(const std::shared_ptr<_Ty>& key, uint seed)
     return qHash(key.get(), seed);
 }
 
-Q_DECLARE_METATYPE(std::shared_ptr<Train>);
+Q_DECLARE_METATYPE(std::shared_ptr<Train>)
+Q_DECLARE_METATYPE(std::list<TrainStation>::iterator)
 

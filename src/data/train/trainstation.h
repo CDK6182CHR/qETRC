@@ -9,6 +9,7 @@
 
 #include <QTime>
 #include <QDebug>
+#include <QFlags>
 
 #include "data/common/stationname.h"
 #include "data/rail/railstation.h"
@@ -20,11 +21,40 @@
 class TrainStation
 {
 public:
+
+    /**
+     * 车站特殊情况的标记。目前主要用于只读时刻表。
+     * 自LSB开始，各个bit表示：
+     * 是否停车；是否始发；是否终到；
+     * 是否营业；是否铺画（绑定到线路）
+     */
+    enum Flag {
+        NoFlag = 0b00000,
+        Stopped = 0b00001,
+        Starting = 0b00010,
+        Terminal = 0b00100,
+        Business = 0b01000,
+        Bound = 0b10000,
+        BoundStarting = Bound | Starting,
+        BoundTerminal = Bound | Terminal,
+        BoundStopped = Bound | Stopped,
+        BoundBusiness = Bound | Business,
+        NonPass = Stopped | Starting | Terminal,
+        BoundNonPass = Bound | NonPass,
+    };
+    Q_DECLARE_FLAGS(Flags, Flag);
+
     StationName name;
     QTime arrive,depart;
     bool business;    //是否办理业务
     QString track;
     QString note;
+
+    /**
+     * 注意此Flag暂时不保证准确。（2021.09.05）
+     * 要确保准确，必须先调用Train::updateStationFlags
+     */
+    Flags flag = NoFlag;
 
     static constexpr int msecsOfADay = 24 * 3600 * 1000;
     
@@ -69,7 +99,14 @@ public:
      * 时间标记。如果不停车，用...替代
      */
     QString timeStringCompressed()const;
+
+    /**
+     * 确保Flag的Stopped那一位准确
+     */
+    void updateStopFlag();
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(TrainStation::Flags);
 
 QDebug operator<<(QDebug debug, const TrainStation& ts);
 

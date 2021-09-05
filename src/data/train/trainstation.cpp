@@ -115,6 +115,16 @@ QString TrainStation::timeStringCompressed() const
     }
 }
 
+void TrainStation::updateStopFlag()
+{
+    if (isStopped()) {
+        flag |= Stopped;
+    }
+    else {
+        flag &= ~Stopped;
+    }
+}
+
 QDebug operator<<(QDebug debug, const TrainStation& ts)
 {
     debug << ts.name << " " <<

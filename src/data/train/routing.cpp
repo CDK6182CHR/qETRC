@@ -291,6 +291,39 @@ int Routing::realCount() const
     return cnt;
 }
 
+bool Routing::checkForDiagram(QString &report) const
+{
+    bool flag=true;
+    for(const auto& node:_order){
+        if (node.isVirtual()){
+            flag=false;
+            report.append(QObject::tr("交路节点[%1]为虚拟节点，无法获得时刻信息\n").arg(node.name()));
+        }else{
+            auto train=node.train();
+            if (train->empty()){
+                report.append(QObject::tr("交路车次[%1]时刻表为空，无法确定时刻信息\n")
+                              .arg(train->trainName().full()));
+                continue;
+            }
+            auto* s=train->boundStarting();
+            if (!s){
+                flag=false;
+                report.append(QObject::tr("交路车次[%1]缺失始发站[%2]的时刻信息\n")
+                              .arg(train->trainName().full(),
+                                   train->timetable().front().name.toSingleLiteral()));
+            }
+            auto* t=train->boundTerminal();
+            if(!t){
+                flag=false;
+                report.append(QObject::tr("交路车次[%1]缺失终到站[%2]的时刻信息\n")
+                              .arg(train->trainName().full(),
+                                   train->timetable().back().name.toSingleLiteral()));
+            }
+        }
+    }
+    return flag;
+}
+
 #undef ATTR_SWAP
 
 RoutingNode::RoutingNode(const QString &name, bool link):

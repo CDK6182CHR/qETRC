@@ -4,10 +4,12 @@
 #include "data/train/routing.h"
 #include "editors/routing/parseroutingdialog.h"
 #include "editors/routing/detectroutingdialog.h"
+#include "editors/routing/routingdiagramwidget.h"
 
 #include <QLabel>
 #include <QLineEdit>
 #include <QApplication>
+#include <QMessageBox>
 
 RoutingContext::RoutingContext(Diagram &diagram, SARibbonContextCategory *context,
                                MainWindow *mw_):
@@ -56,6 +58,12 @@ void RoutingContext::initUI()
     btn->setMinimumWidth(80);
 
     panel = page->addPannel(tr("工具"));
+    act = new QAction(QIcon(":/icons/routing-diagram.png"), tr("交路图"), this);
+    act->setToolTip(tr("交路图\n显示当前交路的（“中国动车组交路查询”风格的）示意图"));
+    connect(act, &QAction::triggered, this, &RoutingContext::actRoutingDiagram);
+    btn = panel->addLargeAction(act);
+    btn->setMinimumWidth(60);
+
     act = new QAction(QIcon(":/icons/text.png"), tr("文本解析"), this);
     act->setToolTip(tr("单交路文本解析\n"
         "输入车次套用的文本，从中解析交路序列，并直接应用于当前交路。"));
@@ -173,6 +181,30 @@ void RoutingContext::actRemoveRouting()
 {
     if (_routing)
         emit removeRouting(_routing);
+}
+
+
+void RoutingContext::actRoutingDiagram()
+{
+    if (!_routing)return;
+    openRoutingDiagramWidget(_routing);
+}
+
+void RoutingContext::openRoutingDiagramWidget(std::shared_ptr<Routing> routing)
+{
+    QString report;
+    if (!_routing->checkForDiagram(report)) {
+        QMessageBox::warning(mw, tr("错误"), tr("当前交路[%1]无法绘制交路图，原因如下：\n%2")
+            .arg(_routing->name(), report));
+        return;
+    }
+    auto* d = new RoutingDiagramWidget(_routing);
+    auto* dock = new ads::CDockWidget(d->windowTitle());
+    dock->setWidget(d);
+    diagramWidgets.push_back(d);
+    diagramDocks.push_back(dock);
+    dock->resize(1300, 870);
+    mw->getManager()->addDockWidgetFloating(dock);
 }
 
 void RoutingContext::refreshAllData()

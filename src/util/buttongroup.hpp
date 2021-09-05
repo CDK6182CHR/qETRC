@@ -26,6 +26,7 @@ public:
     _Button* get(int i)const{return buttons[i];}
     void setMinimumWidth(int w);
     void setFixedWidth(int w);
+    void setMaximumWidth(int w);
 
     /**
      * 将每个按钮的_signal分别绑定到target的_slots[i]
@@ -86,6 +87,13 @@ void ButtonGroup<_Num, _Layout, _Button>::setFixedWidth(int w)
 {
     for(int i=0;i<_Num;i++)
         buttons[i]->setFixedWidth(w);
+}
+
+template<size_t _Num, typename _Layout, typename _Button>
+void ButtonGroup<_Num, _Layout, _Button>::setMaximumWidth(int w)
+{
+    for(int i=0;i<_Num;i++)
+        buttons[i]->setMaximumWidth(w);
 }
 
 

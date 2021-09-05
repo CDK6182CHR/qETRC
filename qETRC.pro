@@ -55,6 +55,7 @@ SOURCES += \
     src/editors/routing/batchparseroutingdialog.cpp \
     src/editors/routing/detectroutingdialog.cpp \
     src/editors/routing/parseroutingdialog.cpp \
+    src/editors/routing/routingdiagramwidget.cpp \
     src/editors/routing/routingedit.cpp \
     src/editors/routing/routingwidget.cpp \
     src/editors/ruler/rulertabpy.cpp \
@@ -62,6 +63,7 @@ SOURCES += \
     src/editors/systemjsondialog.cpp \
     src/editors/typeconfigdialog.cpp \
     src/editors/typeregexdialog.cpp \
+    src/kernel/routingdiagram.cpp \
     src/mainwindow/routingcontext.cpp \
     src/model/delegate/generaldoublespindelegate.cpp \
     src/model/delegate/generalspindelegate.cpp \
@@ -172,6 +174,7 @@ HEADERS += \
     src/editors/routing/batchparseroutingdialog.h \
     src/editors/routing/detectroutingdialog.h \
     src/editors/routing/parseroutingdialog.h \
+    src/editors/routing/routingdiagramwidget.h \
     src/editors/routing/routingedit.h \
     src/editors/routing/routingwidget.h \
     src/editors/ruler/rulertabpy.h \
@@ -179,6 +182,7 @@ HEADERS += \
     src/editors/systemjsondialog.h \
     src/editors/typeconfigdialog.h \
     src/editors/typeregexdialog.h \
+    src/kernel/routingdiagram.h \
     src/mainwindow/routingcontext.h \
     src/model/delegate/generaldoublespindelegate.h \
     src/model/delegate/generalspindelegate.h \

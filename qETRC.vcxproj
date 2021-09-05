@@ -214,6 +214,7 @@
     <ClCompile Include="src\editors\routing\batchparseroutingdialog.cpp" />
     <ClCompile Include="src\editors\routing\detectroutingdialog.cpp" />
     <ClCompile Include="src\editors\routing\parseroutingdialog.cpp" />
+    <ClCompile Include="src\editors\routing\routingdiagramwidget.cpp" />
     <ClCompile Include="src\editors\routing\routingedit.cpp" />
     <ClCompile Include="src\editors\routing\routingwidget.cpp" />
     <ClCompile Include="src\editors\ruler\rulertabpy.cpp" />
@@ -221,6 +222,7 @@
     <ClCompile Include="src\editors\systemjsondialog.cpp" />
     <ClCompile Include="src\editors\typeconfigdialog.cpp" />
     <ClCompile Include="src\editors\typeregexdialog.cpp" />
+    <ClCompile Include="src\kernel\routingdiagram.cpp" />
     <ClCompile Include="src\mainwindow\routingcontext.cpp" />
     <ClCompile Include="src\model\delegate\generaldoublespindelegate.cpp" />
     <ClCompile Include="src\model\delegate\generalspindelegate.cpp" />
@@ -329,8 +331,10 @@
     <QtMoc Include="src\editors\typeregexdialog.h" />
     <QtMoc Include="src\editors\systemjsondialog.h" />
     <QtMoc Include="src\dialogs\trainfilter.h" />
+    <QtMoc Include="src\kernel\routingdiagram.h" />
+    <QtMoc Include="src\editors\routing\routingdiagramwidget.h" />
     <ClInclude Include="src\model\delegate\linestyledelegate.h" />
-    <ClInclude Include="src\model\train\timetablequickmodel.h" />
+    <QtMoc Include="src\model\train\timetablequickmodel.h" />
     <QtMoc Include="src\viewers\timetablequickwidget.h" />
     <ClInclude Include="src\viewers\traindiffdialog.h" />
     <QtMoc Include="src\wizards\readruler\readrulerpageinterval.h" />

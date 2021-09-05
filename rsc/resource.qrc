@@ -59,5 +59,6 @@
         <file>icons/trainline.png</file>
         <file>icons/line-manage.png</file>
         <file>icons/weaken.png</file>
+        <file>icons/routing-diagram.png</file>
     </qresource>
 </RCC>

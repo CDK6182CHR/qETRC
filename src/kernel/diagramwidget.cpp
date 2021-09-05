@@ -116,10 +116,11 @@ void DiagramWidget::paintGraph()
     connect(horizontalScrollBar(), SIGNAL(valueChanged(int)),
         this, SLOT(updateDistanceAxis()));
 
+    updating = false;
+
     updateTimeAxis();
     updateDistanceAxis();
     emit showNewStatus(QObject::tr("运行图铺画完毕"));
-    updating = false;
 }
 
 void DiagramWidget::clearGraph()

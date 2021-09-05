@@ -112,6 +112,10 @@ public slots:
     void updateAllMileSpeed();
 
     void updateAllTrainShow();
+
+    void updateAllTrainStartingTerminal();
+
+    void updateAllTrainTypes();
 };
 
 

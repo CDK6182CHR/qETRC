@@ -354,6 +354,8 @@ private slots:
 
     void showQuickTimetable(std::shared_ptr<Train> train);
 
+    void actAutoTrainType();
+
 public slots:
 
     /**

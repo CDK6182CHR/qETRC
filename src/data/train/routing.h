@@ -296,6 +296,13 @@ public:
 
     int virtualCount()const;
     int realCount()const;
+
+    /**
+     * 检查当前交路是否适合绘制交路图。返回结果。
+     * @param report 分析报告（错误原因）
+     * 一次性报告所有问题
+     */
+    bool checkForDiagram(QString& report)const;
 };
 
 Q_DECLARE_METATYPE(std::shared_ptr<Routing>);

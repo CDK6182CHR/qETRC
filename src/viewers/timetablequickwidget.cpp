@@ -10,8 +10,9 @@
 #include <data/common/qesystem.h>
 #include "data/train/train.h"
 
-TimetableQuickWidget::TimetableQuickWidget(QWidget *parent):
-    QWidget(parent), model(new TimetableQuickModel(this))
+TimetableQuickWidget::TimetableQuickWidget(QUndoStack* undo_, QWidget *parent):
+    QWidget(parent),
+    model(new TimetableQuickEditableModel(undo_,this))
 {
     initUI();
 }
@@ -26,21 +27,33 @@ void TimetableQuickWidget::initUI()
     auto* ck=new QCheckBox(tr("仅显示停车/营业站"));
     ckStopOnly=ck;
     connect(ck,&QCheckBox::toggled,this,&TimetableQuickWidget::onStopOnlyChanged);
-    vlay->addWidget(ck);
+    auto* hlay = new QHBoxLayout;
+    hlay->addWidget(ck);
+    ck = new QCheckBox(tr("编辑"));
+    ck->setToolTip(tr("启用编辑\n如果勾选，则允许直接修改车站时刻表，"
+        "修改的时刻立即生效。"));
+    hlay->addWidget(ck);
+    ckEdit = ck;
+    vlay->addLayout(hlay);
+    connect(ck, &QCheckBox::toggled, this, &TimetableQuickWidget::onEditCheckChanged);
 
     table=new QTableView;
-    table->setEditTriggers(QTableView::NoEditTriggers);
+    table->setEditTriggers(QTableView::NoEditTriggers);  
     table->setAlternatingRowColors(true);
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->verticalHeader()->hide();
     table->setModel(model);
+    table->setItemDelegateForColumn(TimetableQuickModel::ColTime,
+        new TimeQuickDelegate(this));
+
+
     vlay->addWidget(table);
 }
 
 void TimetableQuickWidget::onStopOnlyChanged(bool on)
 {
     for(int i=0;i<train->stationCount();i++){
-        bool hide=( on && model->item(2*i,0)->foreground().color() == Qt::black );
+        bool hide = (on && !model->isAlwaysShow(2 * i));
         table->setRowHidden(2*i,hide);
         table->setRowHidden(2*i+1,hide);
     }
@@ -50,6 +63,16 @@ void TimetableQuickWidget::setTrain(std::shared_ptr<Train> train)
 {
     this->train=train;
     refreshData();
+}
+
+void TimetableQuickWidget::onEditCheckChanged(bool on)
+{
+    if (on) {
+        table->setEditTriggers(QTableView::AllEditTriggers);
+    }
+    else {
+        table->setEditTriggers(QTableView::NoEditTriggers);
+    }
 }
 
 void TimetableQuickWidget::refreshData()

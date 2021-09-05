@@ -13,6 +13,7 @@
 #include <SARibbonGalleryGroup.h>
 #include <QApplication>
 #include <QStyle>
+#include <QMessageBox>
 
 
 ViewCategory::ViewCategory(MainWindow *mw_,
@@ -140,7 +141,17 @@ void ViewCategory::initUI()
     connect(act, SIGNAL(triggered()), this, SLOT(actShowConfig()));
 
     auto* m = new SARibbonMenu(cat);
-    auto* ma = m->addAction(tr("全局配置选项"));
+    auto* ma = m->addAction(tr("系统默认显示设置"));
+    connect(ma, &QAction::triggered, this, &ViewCategory::actShowDefaultConfig);
+
+    ma = m->addAction(tr("使用系统默认设置"));
+    connect(ma, &QAction::triggered, this, &ViewCategory::actApplyDefaultConfig);
+
+    ma = m->addAction(tr("保存当前运行图设置为默认"));
+    connect(ma, &QAction::triggered, this, &ViewCategory::actSaveConfigAsDefault);
+
+    m->addSeparator();
+    ma = m->addAction(tr("全局配置选项"));
     connect(ma, &QAction::triggered, this, &ViewCategory::actSystemJsonDialog);
     act->setMenu(m);
 
@@ -323,15 +334,24 @@ void ViewCategory::applyTypeShow()
 
 void ViewCategory::actShowConfig()
 {
-    auto* dialog = new ConfigDialog(diagram.config(), mw);
+    auto* dialog = new ConfigDialog(diagram.config(), false, mw);
     connect(dialog, &ConfigDialog::onConfigApplied, this,
         &ViewCategory::onActConfigApplied);
     dialog->open();
 }
 
-void ViewCategory::onActConfigApplied(Config& cfg, const Config& newcfg, bool repaint)
+void ViewCategory::actShowDefaultConfig()
 {
-    mw->getUndoStack()->push(new qecmd::ChangeConfig(cfg, newcfg, repaint, this));
+    auto* dialog = new ConfigDialog(diagram.defaultConfig(), true, mw);
+    connect(dialog, &ConfigDialog::onConfigApplied, this,
+        &ViewCategory::onActConfigApplied);
+    dialog->open();
+}
+
+void ViewCategory::onActConfigApplied(Config& cfg, const Config& newcfg, bool repaint,
+    bool forDefault)
+{
+    mw->getUndoStack()->push(new qecmd::ChangeConfig(cfg, newcfg, repaint, forDefault, this));
 }
 
 void ViewCategory::actTypeConfig()
@@ -370,6 +390,26 @@ void ViewCategory::actSystemJsonDialog()
 {
     auto* dialog = new SystemJsonDialog(mw);
     dialog->show();
+}
+
+void ViewCategory::actApplyDefaultConfig()
+{
+    auto flag = QMessageBox::question(mw, tr("提示"), tr("使用系统默认设置：将系统默认设置"
+        "应用到当前运行图设置。是否确认？"));
+    if (flag == QMessageBox::Yes) {
+        mw->getUndoStack()->push(new qecmd::ChangeConfig(diagram.config(),
+            diagram.defaultConfig(), true, false, this));
+    }
+}
+
+void ViewCategory::actSaveConfigAsDefault()
+{
+    auto flag = QMessageBox::question(mw, tr("提示"), tr("保存当前设置为默认：将当前运行图"
+        "的设置保存为系统默认设置。是否继续？"));
+    if (flag == QMessageBox::Yes) {
+        mw->getUndoStack()->push(new qecmd::ChangeConfig(diagram.defaultConfig(),
+            diagram.config(), false, true, this));
+    }
 }
 
 void ViewCategory::trainFilterApplied()

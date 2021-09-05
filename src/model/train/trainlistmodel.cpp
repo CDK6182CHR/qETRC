@@ -173,3 +173,15 @@ void TrainListModel::updateAllTrainShow()
 	emit dataChanged(index(0, ColShow), index(coll.trainCount() - 1, ColShow));
 }
 
+void TrainListModel::updateAllTrainStartingTerminal()
+{
+	emit dataChanged(index(0, ColStarting), index(coll.trainCount() - 1, ColTerminal),
+		{ Qt::DisplayRole });
+}
+
+void TrainListModel::updateAllTrainTypes()
+{
+	emit dataChanged(index(0, ColType), index(coll.trainCount() - 1, ColType), 
+		{ Qt::DisplayRole });
+}
+

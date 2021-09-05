@@ -30,3 +30,27 @@ private slots:
     void onTimeChanged();
 };
 
+
+/**
+ * 采用TimeDataRole来保存数据；DisplayRole来展示数据。
+ */
+class TimeQuickDelegate :public QStyledItemDelegate
+{
+    Q_OBJECT;
+    QString _format;
+public:
+    TimeQuickDelegate(QObject* parent = nullptr, const QString& format = "hh:mm:ss");
+    virtual QWidget* createEditor(QWidget* parent,
+        const QStyleOptionViewItem& option,
+        const QModelIndex& index) const override;
+    virtual void setEditorData(QWidget* editor, const QModelIndex& index) const override;
+    virtual void setModelData(QWidget* editor,
+        QAbstractItemModel* model, const QModelIndex& index) const override;
+
+protected:
+    virtual void setupEditor(QTimeEdit* ed)const;
+private slots:
+    void onTimeChanged();
+
+};
+

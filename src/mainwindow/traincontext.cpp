@@ -10,6 +10,7 @@
 #include "dialogs/modifytimetabledialog.h"
 #include "viewers/diagnosisdialog.h"
 #include "viewers/timetablequickwidget.h"
+#include "viewers/traininfowidget.h"
 #include <QtWidgets>
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
@@ -340,6 +341,17 @@ void TrainContext::commitTimetableChange(std::shared_ptr<Train> train, std::shar
 	if (mw->timetableQuickWidget->getTrain() == train) {
 		mw->timetableQuickWidget->refreshData();
 	}
+	if (mw->trainInfoWidget->getTrain() == train) {
+		mw->trainInfoWidget->refreshData();
+	}
+	emit timetableChanged(train);
+}
+
+void TrainContext::onTrainStationTimeChanged(std::shared_ptr<Train> train, bool repaint)
+{
+	updateTrainWidget(train);
+	if(repaint)
+		mw->repaintTrainLines(train);
 	emit timetableChanged(train);
 }
 
@@ -376,6 +388,31 @@ void TrainContext::commitExchangeTrainInterval(std::shared_ptr<Train> train1, st
 {
 	afterTimetableChanged(train1);
 	afterTimetableChanged(train2);
+}
+
+void TrainContext::commitAutoStartingTerminal(qecmd::StartingTerminalData& data)
+{
+	data.commit();
+	for (auto& p : data.startings) {
+		mw->repaintTrainLines(p.first);
+	}
+	for (auto& p : data.terminals) {
+		mw->repaintTrainLines(p.first);
+	}
+	mw->trainListWidget->getModel()->updateAllTrainStartingTerminal();
+	refreshCurrentTrainWidgets();
+}
+
+void TrainContext::commitAutoType(std::deque<std::pair<std::shared_ptr<Train>, std::shared_ptr<TrainType>>>& data)
+{
+	for (auto& p : data) {
+		std::swap(p.first->typeRef(), p.second);
+	}
+	for (const auto& p : data) {
+		mw->repaintTrainLines(p.first);
+	}
+	mw->trainListWidget->getModel()->updateAllTrainTypes();
+	refreshCurrentTrainWidgets();
 }
 
 void TrainContext::actShowTrainLine()
@@ -608,6 +645,13 @@ void TrainContext::actToRouting()
 	}
 }
 
+void TrainContext::refreshCurrentTrainWidgets()
+{
+	refreshAllData();
+	mw->trainInfoWidget->refreshData();
+	mw->timetableQuickWidget->refreshData();
+}
+
 void TrainContext::setTrain(std::shared_ptr<Train> train_)
 {
 	train = train_;
@@ -671,11 +715,19 @@ void qecmd::StartingTerminalData::commit()
 
 void qecmd::AutoStartingTerminal::commit()
 {
-	data.commit();
-	for (auto& p : data.startings) {
-		mw->repaintTrainLines(p.first);
-	}
-	for (auto& p : data.terminals) {
-		mw->repaintTrainLines(p.first);
-	}
+	cont->commitAutoStartingTerminal(data);
+}
+
+void qecmd::AutoTrainType::undo()
+{
+	commit();
+}
+void qecmd::AutoTrainType::redo()
+{
+	commit();
+}
+
+void qecmd::AutoTrainType::commit()
+{
+	cont->commitAutoType(data);
 }

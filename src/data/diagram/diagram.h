@@ -161,6 +161,7 @@ public:
     inline const QString& filename()const{return _filename;}
     inline void setFilename(const QString& n){_filename=n;}
     inline auto& config(){return _config;}
+    inline auto& defaultConfig() { return _defaultConfig; }
     inline const auto& config()const{return _config;}
     inline const QString& version()const { return _version; }
     inline void setVersion(const QString& v) { _version = v; }

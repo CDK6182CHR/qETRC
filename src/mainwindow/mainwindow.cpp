@@ -24,6 +24,7 @@
 #include "viewers/diagnosisdialog.h"
 #include "viewers/timetablequickwidget.h"
 #include "viewers/traininfowidget.h"
+#include "model/train/timetablequickmodel.h"
 
 #include "traincontext.h"
 #include "railcontext.h"
@@ -470,7 +471,7 @@ void MainWindow::initDockWidgets()
 
     // 速览时刻
     if constexpr (true) {
-        auto* w = new TimetableQuickWidget();
+        auto* w = new TimetableQuickWidget(undoStack);
         dock = new ads::CDockWidget(tr("速览时刻"));
         dock->setWidget(w);
         timetableQuickWidget = w;
@@ -695,9 +696,14 @@ void MainWindow::initToolbar()
         connect(actsub, &QAction::triggered, this, &MainWindow::removeAllTrainsAndRoutings);
         menu->addAction(actsub);
 
+        menu->addSeparator();
+
         actsub = new QAction(tr("自动始发终到站适配"), this);
         menu->addAction(actsub);
         connect(actsub, SIGNAL(triggered()), this, SLOT(actAutoStartingTerminal()));
+
+        actsub = menu->addAction(tr("自动推断所有列车类型"));
+        connect(actsub, &QAction::triggered, this, &MainWindow::actAutoTrainType);
 
         act->setMenu(menu);
         auto* btn = panel->addLargeAction(act);
@@ -876,6 +882,10 @@ void MainWindow::initToolbar()
             this, &MainWindow::focusInRouting);
         connect(trainInfoWidget, &TrainInfoWidget::editTrain,
             contextTrain, &TrainContext::showBasicWidget);
+
+        connect(timetableQuickWidget->getModel(),
+            &TimetableQuickEditableModel::trainStationTimeUpdated,
+            contextTrain, &TrainContext::onTrainStationTimeChanged);
     }
 
     //context: rail 8
@@ -1169,7 +1179,7 @@ void MainWindow::actAutoStartingTerminal()
     else {
         QMessageBox::information(this, tr("提示"), tr("设置成功。影响%1个车次的始发站和"
             "%2个车次的终到站。").arg(data.startings.size()).arg(data.terminals.size()));
-        undoStack->push(new qecmd::AutoStartingTerminal(std::move(data), this));
+        undoStack->push(new qecmd::AutoStartingTerminal(std::move(data), contextTrain));
     }
 }
 
@@ -1224,6 +1234,34 @@ void MainWindow::showQuickTimetable(std::shared_ptr<Train> train)
     }
     else {
         timetableQuickDock->setAsCurrentTab();
+    }
+}
+
+void MainWindow::actAutoTrainType()
+{
+    auto flag = QMessageBox::question(this, tr("提示"), tr("此操作根据当前的列车类型管理器，"
+        "对所有列车，根据其全车次，使用正则表达式匹配到列车类型。\n如果以前有手动设置的列车"
+        "类型，数据将被覆盖。\n是否确认？"));
+    if (flag != QMessageBox::Yes) return;
+
+    qecmd::AutoTrainType::data_t data;
+
+    auto& coll = _diagram.trainCollection();
+    foreach(auto train, coll.trains()) {
+        auto type = coll.typeManager().fromRegex(train->trainName());
+        if (type != train->type()) {
+            data.emplace_back(train, type);
+        }
+    }
+    if (data.empty()) {
+        QMessageBox::information(this, tr("提示"), tr("自动类型推断应用完成，"
+            "没有产生任何变化。"));
+    }
+    else {
+        int sz = data.size();
+        undoStack->push(new qecmd::AutoTrainType(std::move(data), contextTrain));
+        QMessageBox::information(this, tr("提示"), tr("自动类型推断应用完成，"
+            "%1个车次的类型发生变化。如有问题，可以撤销。").arg(sz));
     }
 }
 

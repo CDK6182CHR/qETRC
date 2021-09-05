@@ -6,12 +6,16 @@
 
 #include <QtWidgets>
 
-ConfigDialog::ConfigDialog(Config &cfg, QWidget *parent):
-    QDialog(parent),_cfg(cfg)
+ConfigDialog::ConfigDialog(Config &cfg,bool forDefault_, QWidget *parent):
+    QDialog(parent),_cfg(cfg),forDefault(forDefault_)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     resize(600, 600);
-    setWindowTitle(tr("运行图显示设置"));
+    if (forDefault) {
+        setWindowTitle(tr("系统默认显示设置"));
+    }
+    else
+        setWindowTitle(tr("运行图显示设置"));
     initUI();
     refreshData();
 }
@@ -417,7 +421,7 @@ void ConfigDialog::actApply()
     cnew.grid_color = gridColor;
     cnew.text_color = textColor;
 
-    emit onConfigApplied(_cfg, cnew, repaint);
+    emit onConfigApplied(_cfg, cnew, repaint && !forDefault, forDefault);
     done(QDialog::Accepted);
 }
 
@@ -455,16 +459,34 @@ void ConfigDialog::actTextColor()
     }
 }
 
+qecmd::ChangeConfig::ChangeConfig(Config& cfg_, const Config& newcfg_, 
+    bool repaint_, bool forDefault_, ViewCategory* cat_, QUndoCommand* parent):
+    QUndoCommand(parent), cfg(cfg_), newcfg(newcfg_),
+    repaint(repaint_), forDefault(forDefault_),
+    cat(cat_)
+{
+    if (forDefault) {
+        setText(QObject::tr("更改系统默认显示设置"));
+    }
+    else {
+        setText(QObject::tr("更改运行图显示设置"));
+    }
+}
+
 void qecmd::ChangeConfig::undo()
 {
     std::swap(cfg, newcfg);
     cat->commitConfigChange(cfg, repaint);
+    if (forDefault)
+        cat->saveDefaultConfigs();
 }
 
 void qecmd::ChangeConfig::redo()
 {
     std::swap(cfg, newcfg);
     cat->commitConfigChange(cfg, repaint);
+    if (forDefault)
+        cat->saveDefaultConfigs();
 }
 
 void qecmd::ChangePassedStation::undo()
