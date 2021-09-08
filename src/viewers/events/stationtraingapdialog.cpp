@@ -1,6 +1,7 @@
 ﻿#include "stationtraingapdialog.h"
 #include "data/diagram/traingap.h"
 #include "data/diagram/trainline.h"
+#include "data/diagram/diagram.h"
 
 #include <QHeaderView>
 #include <QLabel>
@@ -11,21 +12,27 @@
 #include "util/utilfunc.h"
 #include "model/delegate/timeintervaldelegate.h"
 
-StationTrainGapModel::StationTrainGapModel(std::shared_ptr<Railway> railway_,
-                                           std::shared_ptr<RailStation> station_,
-                                           std::vector<TrainGap> &&data_, QObject *parent):
-    QStandardItemModel(parent),railway(railway_),station(station_),
-    data(std::forward<std::vector<TrainGap>>(data_))
+
+StationTrainGapModel::StationTrainGapModel(Diagram& diagram, 
+    std::shared_ptr<Railway> railway_,
+    std::shared_ptr<RailStation> station_,
+    const RailStationEventList& events, 
+    const TrainFilterCore& filter, QObject* parent):
+    QStandardItemModel(parent),diagram(diagram), railway(railway_),
+    station(station_),events(events),
+    filter(filter)
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({
-        tr("间隔类型"),tr("间隔时长"),tr("方向"),tr("位置"),
+        tr("间隔类型"),tr("间隔时长"),tr("位置"),
         tr("前车次"),tr("前时刻"), tr("后车次"),tr("后时刻"),tr("数量")
         });
 }
 
 void StationTrainGapModel::refreshData()
 {
+    data = diagram.getTrainGaps(events, filter);
+    stat = diagram.countTrainGaps(data);
     setupModel();
 }
 
@@ -34,12 +41,11 @@ void StationTrainGapModel::setupModel()
     using SI = QStandardItem;
     setRowCount(data.size());
     for (int i = 0; i < data.size(); i++) {
-        const auto& ev = data.at(i);
+        const auto& ev = *(data.at(i));
         setItem(i, ColGapType, new SI(ev.typeString()));
         auto* it = new SI;
         it->setData(ev.secs(), Qt::EditRole);
         setItem(i, ColPeriod, it);
-        setItem(i, ColDir, new SI(DirFunc::dirToString(ev.leftDir())));
         setItem(i, ColPos, new SI(RailStationEvent::posToString(ev.position())));
         setItem(i, ColLeftTrain, new SI(ev.left->line->train()->trainName().full()));
         setItem(i, ColLeftTime, new SI(ev.left->time.toString("hh:mm:ss")));
@@ -48,21 +54,54 @@ void StationTrainGapModel::setupModel()
         it = new SI;
         it->setData(ev.num, Qt::EditRole);
         setItem(i, ColNumber, it);
+        QColor color(Qt::black);
+        if (isMinimumGap(ev)) {
+            color = Qt::red;
+        }
+        setRowColor(i, color);
+    }
+}
+
+bool StationTrainGapModel::isMinimumGap(const TrainGap& gap) const
+{
+    if (gap.position() == RailStationEvent::NoPos) {
+        // 既然有，那统计中的一定非空
+        return gap.secs() ==
+            (*stat.at(std::make_pair(gap.position(), gap.type)).begin())->secs();
+    }
+    // 不是NoPos的：按两个边界分别找
+    if (gap.position() & RailStationEvent::Pre && gap.secs() ==
+        (*stat.at(std::make_pair(RailStationEvent::Pre, gap.type)).begin())->secs()) {
+        return true;
+    }
+    if (gap.position() & RailStationEvent::Post && gap.secs() ==
+        (*stat.at(std::make_pair(RailStationEvent::Post, gap.type)).begin())->secs()) {
+        return true;
+    }
+    return false;
+}
+
+void StationTrainGapModel::setRowColor(int row, const QColor& color)
+{
+    for (int c = 0; c < ColMAX; c++) {
+        item(row, c)->setForeground(color);
     }
 }
 
 
 
-StationTrainGapDialog::StationTrainGapDialog(std::shared_ptr<Railway> railway_,
-                                             std::shared_ptr<RailStation> station_,
-                                             std::vector<TrainGap> &&data_, QWidget *parent):
-    QDialog(parent),railway(railway_),station(station_),
-    model(new StationTrainGapModel(railway_,station_,std::forward<std::vector<TrainGap>>(data_)))
+StationTrainGapDialog::StationTrainGapDialog(Diagram& diagram, 
+    std::shared_ptr<Railway> railway_, 
+    std::shared_ptr<RailStation> station_, 
+    const RailStationEventList& events, 
+    const TrainFilterCore& filter, QWidget* parent):
+    QDialog(parent), railway(railway_), station(station_),
+    model(new StationTrainGapModel(diagram,railway_,station_,events,filter,this))
 {
     setWindowTitle(tr("车站间隔分析 - %1 @ %2").arg(station->name.toSingleLiteral(),
         railway->name()));
     setAttribute(Qt::WA_DeleteOnClose);
-    resize(700,700);
+    resize(700, 700);
     initUI();
     refreshData();
 }

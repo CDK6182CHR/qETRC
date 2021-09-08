@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "trainevents.h"
 #include <QFlags>
+#include <set>
+#include <map>
 
 /**
  * @brief The TrainGap struct
@@ -15,14 +17,17 @@ struct TrainGap{
 
     /**
      * 从LSB开始：前事件是否附加，后事件是否附加，特殊 （暂定一个待避时长）
-     * 2021.09.08：
+     * 2021.09.08：添加方向Flag：按照左右车次是否为下行编码。
+     * GapTypes结合Positions，两个Flag构成完整的间隔描述，可以用来统计最小值。
      */
     enum GapType {
-        NoAppend=0b0,
-        LeftAppend=0b01,
-        RightAppend=0b10,
-        BothAppend=LeftAppend |RightAppend,
-        Avoid=0b100
+        LeftDown = 0b00100,
+        RightDown = 0b01000,
+        NoAppend = 0b00000,
+        LeftAppend = 0b00001,
+        RightAppend = 0b00010,
+        BothAppend = LeftAppend | RightAppend,
+        Avoid = 0b10000
     };
     Q_DECLARE_FLAGS(GapTypes, GapType)
 
@@ -38,10 +43,10 @@ struct TrainGap{
         std::shared_ptr<const RailStationEvent> right_);
 
     /**
-     * trivial的构造函数
+     * trivial的构造函数；直接指定完整的Type，主要用于待避类的构造
      */
     TrainGap(std::shared_ptr<const RailStationEvent> left_,
-        std::shared_ptr<const RailStationEvent> right_,GapType type_,
+        std::shared_ptr<const RailStationEvent> right_,GapTypes type_,
         int num_):
         left(left_),right(right_),type(type_),num(num_){}
 
@@ -61,6 +66,23 @@ struct TrainGap{
     bool isLeftFormer()const;
 
     bool isRightFormer()const;
+
+    bool operator<(const TrainGap& gap)const;
+
+    static bool ltSecs(const std::shared_ptr<TrainGap>& gap1,
+        const std::shared_ptr<TrainGap>& gap2);
 };
+
+struct TrainGapPtrComparator {
+    bool operator()(const std::shared_ptr<TrainGap>& gap1,
+        const std::shared_ptr<TrainGap>& gap2)const {
+        return TrainGap::ltSecs(gap1, gap2);
+    }
+};
+
+using TrainGapList = std::vector<std::shared_ptr<TrainGap>>;
+
+using TrainGapStatistics = std::map<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>,
+    std::set<std::shared_ptr<TrainGap>, TrainGapPtrComparator>>;
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(TrainGap::GapTypes)

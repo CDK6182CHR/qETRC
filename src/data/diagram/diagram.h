@@ -11,6 +11,7 @@
 #include "data/train/traintype.h"
 #include "data/diagram/trainline.h"
 #include "diagrampage.h"
+#include "traingap.h"
 
 #include "data/common/qesystem.h"
 
@@ -302,8 +303,16 @@ public:
      * 暂时只处理同向事件。
      * 保证所给输入都是同一个站的数据。
      */
-    std::vector<TrainGap> getTrainGaps(const RailStationEventList& events,
+    std::vector<std::shared_ptr<TrainGap>> getTrainGaps(const RailStationEventList& events,
         const TrainFilterCore& filter)const;
+
+    /**
+     * 2021.09.08
+     * 统计各种不同类型的列车间隔。
+     * Positions只取Pre, Post或者空白三种情况 （空白仅针对Avoid类型的）；
+     * 通通的，同时算入两边。set按照TrainGap的间隔自动排序。
+     */
+    TrainGapStatistics countTrainGaps(const TrainGapList& gaps)const;
 
     using SectionEventList = std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>>;
 

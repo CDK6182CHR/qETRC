@@ -86,6 +86,7 @@ class TrainLine;
 struct RailStationEvent {
 
     enum Position {
+        NoPos=0b00,   // 都不是：基本上用于处理Avoid类型的间隔
         Pre = 0b01,   // 小里程端
         Post = 0b10,  // 大里程端
         Both = Pre | Post

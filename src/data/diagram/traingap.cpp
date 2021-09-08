@@ -11,6 +11,10 @@ TrainGap::TrainGap(std::shared_ptr<const RailStationEvent> left_,
         type |= LeftAppend;
     if (right->hasAppend())
         type |= RightAppend;
+    if (left->line->dir() == Direction::Down)
+        type |= LeftDown;
+    if (right->line->dir() == Direction::Down)
+        type |= RightDown;
 }
 
 RailStationEvent::Positions TrainGap::position() const
@@ -39,12 +43,25 @@ QString TrainGap::typeString() const
     if (type == Avoid) {
         return QObject::tr("待避");
     }
-    else if (position() == RailStationEvent::Both) {
-        // 两事件都是站前站后贯通，只能是通通
-        return QObject::tr("通通");
+    QString text;
+    // 方向描述
+    if (bool(type & LeftDown) != bool(type & RightDown)) {
+        text = QObject::tr("对向");
+    }
+    else if (type & LeftDown) {
+        text = QObject::tr("下行");
+    }
+    else {
+        text = QObject::tr("上行");
     }
 
-    QString text;
+
+    if (position() == RailStationEvent::Both) {
+        // 两事件都是站前站后贯通，只能是通通
+        return text + QObject::tr("通通");
+    }
+
+    
     // 左车次描述
     if (type & LeftAppend) {
         if (isLeftFormer())
@@ -78,4 +95,15 @@ bool TrainGap::isRightFormer() const
 {
     return  (rightDir() == Direction::Down && (right->pos & RailStationEvent::Pre)) ||
         (rightDir() == Direction::Up && (right->pos & RailStationEvent::Post));
+}
+
+bool TrainGap::operator<(const TrainGap& gap) const
+{
+    return secs() < gap.secs();
+}
+
+bool TrainGap::ltSecs(const std::shared_ptr<TrainGap>& gap1, 
+    const std::shared_ptr<TrainGap>& gap2)
+{
+    return gap1->secs() < gap2->secs();
 }

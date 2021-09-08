@@ -295,10 +295,10 @@ std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>> Diagram::sectionEvents
     return res;
 }
 
-std::vector<TrainGap> Diagram::getTrainGaps(const RailStationEventList& events,
+TrainGapList Diagram::getTrainGaps(const RailStationEventList& events,
     const TrainFilterCore& filter)const
 {
-    std::vector<TrainGap> res;
+    TrainGapList res;
     std::shared_ptr<const RailStationEvent>
         downFormerLast = findLastEvent(events,filter, Direction::Down, RailStationEvent::Pre),
         downLatterLast = findLastEvent(events, filter, Direction::Down, RailStationEvent::Post),
@@ -354,14 +354,14 @@ std::vector<TrainGap> Diagram::getTrainGaps(const RailStationEventList& events,
             if (p->pos & RailStationEvent::Pre) {
                 // 与站前有交集
                 // 既然遇到了一个，那么last一定不是空
-                res.emplace_back(downFormerLast, p);
+                res.emplace_back(std::make_shared<TrainGap>(downFormerLast, p));
                 downFormerLast = p;
             }
             if (p->pos & RailStationEvent::Post) {
                 // 与站后有交集
                 if (!(p->pos & RailStationEvent::Pre)) {
                     // 这个条件是针对通通的情况，防止重复
-                    res.emplace_back(downLatterLast, p);
+                    res.emplace_back(std::make_shared<TrainGap>(downLatterLast, p));
                 }
                 downLatterLast = p;
             }
@@ -378,7 +378,8 @@ std::vector<TrainGap> Diagram::getTrainGaps(const RailStationEventList& events,
                         // 找到当前的进站记录
                         if (itr->second) {
                             // 存在被踩情况
-                            res.emplace_back(itr->first, p, TrainGap::Avoid, itr->second);
+                            res.emplace_back(std::make_shared<TrainGap>(
+                                itr->first, p, TrainGap::Avoid, itr->second));
                         }
                         down_in.erase(itr);
                         break;
@@ -400,13 +401,13 @@ std::vector<TrainGap> Diagram::getTrainGaps(const RailStationEventList& events,
         else {  // Up
             if (p->pos & RailStationEvent::Pre) {
                 // latter间隔
-                res.emplace_back(upLatterLast, p);
+                res.emplace_back(std::make_shared<TrainGap>(upLatterLast, p));
                 upLatterLast = p;
             }
             if(p->pos & RailStationEvent::Post) {
                 // former间隔
                 if (!(p->pos & RailStationEvent::Pre)) {
-                    res.emplace_back(upFormerLast, p);
+                    res.emplace_back(std::make_shared<TrainGap>(upFormerLast, p));
                 }
                 upFormerLast = p;
             }
@@ -418,7 +419,8 @@ std::vector<TrainGap> Diagram::getTrainGaps(const RailStationEventList& events,
                 for (auto itr = up_in.begin(); itr != up_in.end(); ++itr) {
                     if (itr->first->line == p->line) {
                         if (itr->second) {
-                            res.emplace_back(itr->first, p, TrainGap::Avoid, itr->second);
+                            res.emplace_back(std::make_shared<TrainGap>(
+                                itr->first, p, TrainGap::Avoid, itr->second));
                         }
                         up_in.erase(itr);
                         break;
@@ -433,6 +435,25 @@ std::vector<TrainGap> Diagram::getTrainGaps(const RailStationEventList& events,
                 for (auto& itr : up_in) {
                     itr.second++;
                 }
+            }
+        }
+    }
+    return res;
+}
+
+TrainGapStatistics Diagram::countTrainGaps(const TrainGapList &gaps) const
+{
+    TrainGapStatistics res;
+    for (const auto& p: gaps) {
+        if (p->position() == RailStationEvent::NoPos) {
+            res.operator[](std::make_pair(p->position(), p->type)).emplace(p);
+        }
+        else {
+            if (p->position() | RailStationEvent::Pre) {
+                res.operator[](std::make_pair(RailStationEvent::Pre, p->type)).emplace(p);
+            }
+            if (p->position() | RailStationEvent::Post) {
+                res.operator[](std::make_pair(RailStationEvent::Post, p->type)).emplace(p);
             }
         }
     }
