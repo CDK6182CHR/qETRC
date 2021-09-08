@@ -1,8 +1,15 @@
 ﻿#include "parseroutingdialog.h"
 
 #include "data/train/routing.h"
-#include <QtWidgets>
 #include "util/buttongroup.hpp"
+
+#include <QCheckBox>
+#include <QFormLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QTextBrowser>
+#include <QTextEdit>
 
 ParseRoutingDialog::ParseRoutingDialog(TrainCollection &coll_,
                                        bool fromContext_,  std::shared_ptr<Routing> original,

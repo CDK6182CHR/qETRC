@@ -1,9 +1,14 @@
 ﻿#include "detectroutingdialog.h"
 
-#include <QtWidgets>
 #include "util/buttongroup.hpp"
 #include "data/train/routing.h"
 #include "data/train/traincollection.h"
+
+#include <QCheckBox>
+#include <QFormLayout>
+#include <QLabel>
+#include <QTextBrowser>
+#include <QMessageBox>
 
 DetectRoutingDialog::DetectRoutingDialog(TrainCollection &coll_,
                                          std::shared_ptr<Routing> original,

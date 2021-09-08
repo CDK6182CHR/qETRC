@@ -1,21 +1,22 @@
 ﻿#pragma once
 
 #include <QWidget>
-#include <QTableView>
 #include <QString>
-#include <QLineEdit>
 #include <QUndoCommand>
-#include <QUndoStack>
 #include <QList>
-
-#include "data/train/traincollection.h"
-#include "model/train/trainlistmodel.h"
 
 
 
 /**
  * 和undo/redo有关的命令放在qecmd命名空间以回避冲突
  */
+
+class Train;
+class TrainCollection;
+class TrainListModel;
+class QTableView;
+class QLineEdit;
+
 namespace qecmd {
 
     /**

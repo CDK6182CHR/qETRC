@@ -7,6 +7,9 @@
 #include "data/train/traintype.h"
 #include "editors/systemjsondialog.h"
 #include "dialogs/trainfilter.h"
+#include "editors/trainlistwidget.h"
+#include "model/train/trainlistmodel.h"
+#include "data/diagram/config.h"
 
 #include <SARibbonPannelItem.h>
 #include <SARibbonGallery.h>
@@ -14,6 +17,8 @@
 #include <QApplication>
 #include <QStyle>
 #include <QMessageBox>
+#include <SARibbonMenu.h>
+#include <SARibbonCategory.h>
 
 
 ViewCategory::ViewCategory(MainWindow *mw_,
@@ -455,6 +460,7 @@ void ViewCategory::actChangeSingleTrainShow(std::shared_ptr<Train> train, bool s
 void ViewCategory::refreshTypeGroup()
 {
     auto& coll = diagram.trainCollection();
+    coll.refreshTypeCount();
     auto* model = group->groupModel();
     auto& cfg = diagram.config();
     model->clear();

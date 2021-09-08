@@ -22,6 +22,7 @@ SOURCES += \
     src/data/diagram/diagrampage.cpp \
     src/data/diagram/trainadapter.cpp \
     src/data/diagram/trainevents.cpp \
+    src/data/diagram/traingap.cpp \
     src/data/diagram/trainline.cpp \
     src/data/rail/forbid.cpp \
     src/data/rail/railcategory.cpp \
@@ -34,6 +35,7 @@ SOURCES += \
     src/data/train/routing.cpp \
     src/data/train/train.cpp \
     src/data/train/traincollection.cpp \
+    src/data/train/trainfiltercore.cpp \
     src/data/train/trainname.cpp \
     src/data/train/trainstation.cpp \
     src/data/train/traintype.cpp \
@@ -69,6 +71,7 @@ SOURCES += \
     src/model/delegate/generalspindelegate.cpp \
     src/model/delegate/linestyledelegate.cpp \
     src/model/delegate/qetimedelegate.cpp \
+    src/model/delegate/timeintervaldelegate.cpp \
     src/model/train/timetablequickmodel.cpp \
     src/model/train/typemodel.cpp \
     src/model/rail/forbidmodel.cpp \
@@ -81,11 +84,12 @@ SOURCES += \
     src/util/selectrailwaycombo.cpp \
     src/util/selecttraincombo.cpp \
     src/viewers/diagnosisdialog.cpp \
-    src/viewers/railsectionevents.cpp \
-    src/viewers/railsnapevents.cpp \
-    src/viewers/railstationeventlist.cpp \
+    src/viewers/events/railsectionevents.cpp \
+    src/viewers/events/railsnapevents.cpp \
+    src/viewers/events/railstationeventlist.cpp \
+    src/viewers/events/stationtraingapdialog.cpp \
     src/viewers/rulerrefdialog.cpp \
-    src/viewers/stationtimetablesettled.cpp \
+    src/viewers/events/stationtimetablesettled.cpp \
     src/editors/trainlistwidget.cpp \
     src/kernel/diagramwidget.cpp \
     src/kernel/trainitem.cpp \
@@ -115,7 +119,7 @@ SOURCES += \
     src/viewers/sectioncountdialog.cpp \
     src/viewers/timetablequickwidget.cpp \
     src/viewers/traindiffdialog.cpp \
-    src/viewers/traineventdialog.cpp \
+    src/viewers/events/traineventdialog.cpp \
     src/viewers/traininfowidget.cpp \
     src/viewers/trainlinedialog.cpp \
     src/viewers/traintimetableplane.cpp \
@@ -132,6 +136,7 @@ SOURCES += \
 
 HEADERS += \
     src/data/common/direction.h \
+    src/data/common/qeglobal.h \
     src/data/common/qesystem.h \
     src/data/common/stationname.h \
     src/data/diagram/config.h \
@@ -139,6 +144,7 @@ HEADERS += \
     src/data/diagram/diagrampage.h \
     src/data/diagram/trainadapter.h \
     src/data/diagram/trainevents.h \
+    src/data/diagram/traingap.h \
     src/data/diagram/trainline.h \
     src/data/rail/forbid.h \
     src/data/rail/rail.h \
@@ -153,6 +159,7 @@ HEADERS += \
     src/data/train/routing.h \
     src/data/train/train.h \
     src/data/train/traincollection.h \
+    src/data/train/trainfiltercore.h \
     src/data/train/trainname.h \
     src/data/train/trainstation.h \
     src/data/train/traintype.h \
@@ -188,6 +195,7 @@ HEADERS += \
     src/model/delegate/generalspindelegate.h \
     src/model/delegate/linestyledelegate.h \
     src/model/delegate/qetimedelegate.h \
+    src/model/delegate/timeintervaldelegate.h \
     src/model/train/timetablequickmodel.h \
     src/model/train/typemodel.h \
     src/model/rail/forbidmodel.h \
@@ -200,11 +208,12 @@ HEADERS += \
     src/util/selectrailwaycombo.h \
     src/util/selecttraincombo.h \
     src/viewers/diagnosisdialog.h \
-    src/viewers/railsectionevents.h \
-    src/viewers/railsnapevents.h \
-    src/viewers/railstationeventlist.h \
+    src/viewers/events/railsectionevents.h \
+    src/viewers/events/railsnapevents.h \
+    src/viewers/events/railstationeventlist.h \
+    src/viewers/events/stationtraingapdialog.h \
     src/viewers/rulerrefdialog.h \
-    src/viewers/stationtimetablesettled.h \
+    src/viewers/events/stationtimetablesettled.h \
     src/editors/trainlistwidget.h \
     src/kernel/diagramwidget.h \
     src/kernel/trainitem.h \
@@ -237,7 +246,7 @@ HEADERS += \
     src/viewers/sectioncountdialog.h \
     src/viewers/timetablequickwidget.h \
     src/viewers/traindiffdialog.h \
-    src/viewers/traineventdialog.h \
+    src/viewers/events/traineventdialog.h \
     src/viewers/traininfowidget.h \
     src/viewers/trainlinedialog.h \
     src/viewers/traintimetableplane.h \

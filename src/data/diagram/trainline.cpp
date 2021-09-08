@@ -1269,16 +1269,16 @@ const Railway& TrainLine::railway() const
     return _adapter.railway();
 }
 
-int TrainLine::passStationPos(ConstAdaPtr st) const
+RailStationEvent::Position TrainLine::passStationPos(ConstAdaPtr st) const
 {
     if (st == _stations.begin()) {
         //第一站
-        return dir() == Direction::Down ? 2 : 1;
+        return dir() == Direction::Down ? RailStationEvent::Post : RailStationEvent::Pre;
     }
     else if (st == std::prev(_stations.end())) {
-        return dir() == Direction::Down ? 1 : 2;
+        return dir() == Direction::Down ? RailStationEvent::Pre : RailStationEvent::Post;
     }
-    else return 3;
+    else return RailStationEvent::Both;
 }
 
 std::deque<AdapterStation>::const_iterator TrainLine::stationFromYValue(double y) const
@@ -1309,7 +1309,7 @@ const AdapterStation* TrainLine::stationByTrainLinear(Train::ConstStationPtr st)
     return nullptr;
 }
 
-QList<RailStationEvent> 
+RailStationEventList
     TrainLine::stationEventFromRail(std::shared_ptr<const RailStation> rail) const
 {
     auto p = stationFromYValue(rail->y_value.value());   //运行方向区间后站
@@ -1320,28 +1320,30 @@ QList<RailStationEvent>
             auto ts = p->trainStation;
             if (ts->isStopped()) {
                 //只要有停车，一律按到达出发处理
-                return { RailStationEvent(TrainEventType::Arrive,ts->arrive,
-                    p->railStation,std::cref(*train()),
-                    dir() == Direction::Down ? 1 : 2,ts->note),
-                    RailStationEvent(TrainEventType::Depart,ts->depart,
-                    p->railStation,std::cref(*train()),
-                    dir() == Direction::Down ? 2 : 1,ts->note) };
+                return { std::make_shared< RailStationEvent>(TrainEventType::Arrive,ts->arrive,
+                    p->railStation,shared_from_this(),
+                    dir() == Direction::Down ? RailStationEvent::Pre : RailStationEvent::Post,
+                    ts->note),
+                    std::make_shared<RailStationEvent>(TrainEventType::Depart,ts->depart,
+                    p->railStation,shared_from_this(),
+                    dir() == Direction::Down ? RailStationEvent::Post : RailStationEvent::Pre,
+                        ts->note) };
             }
             else if (isStartingStation(p)) {
                 //始发事件
-                return { RailStationEvent(TrainEventType::Origination,
-                    ts->depart,p->railStation,std::cref(*train()),
-                    dir() == Direction::Down ? 2 : 1,ts->note) };
+                return { std::make_shared<RailStationEvent>(TrainEventType::Origination,
+                    ts->depart,p->railStation,shared_from_this(),
+                    dir() == Direction::Down ? RailStationEvent::Post : RailStationEvent::Pre,ts->note) };
             }
             else if (isTerminalStation(p)) {
-                return { RailStationEvent(TrainEventType::Destination,
-                    ts->arrive,p->railStation,std::cref(*train()),
-                    dir() == Direction::Down ? 1 : 2,ts->note) };
+                return { std::make_shared<RailStationEvent>(TrainEventType::Destination,
+                    ts->arrive,p->railStation,shared_from_this(),
+                    dir() == Direction::Down ? RailStationEvent::Pre : RailStationEvent::Post,ts->note) };
             }
             else {
                 //通过
-                return { RailStationEvent(TrainEventType::SettledPass,
-                    ts->arrive,p->railStation,std::cref(*train()),
+                return { std::make_shared<RailStationEvent>(TrainEventType::SettledPass,
+                    ts->arrive,p->railStation,shared_from_this(),
                     passStationPos(p),ts->note) };
             }
         }
@@ -1357,9 +1359,9 @@ QList<RailStationEvent>
             p->trainStation->arrive)) * (yi - y0) / (yn - y0);
         if (!std::isnan(dsif) && !std::isinf(dsif)) {
             int dsi = int(std::round(dsif));
-            return { RailStationEvent(TrainEventType::CalculatedPass,
-                p0->trainStation->depart.addSecs(dsi), rail, std::cref(*train()),
-                3, QObject::tr("推算")) };
+            return { std::make_shared<RailStationEvent>(TrainEventType::CalculatedPass,
+                p0->trainStation->depart.addSecs(dsi), rail, shared_from_this(),
+                RailStationEvent::Both, QObject::tr("推算")) };
         }
     }
     return {};

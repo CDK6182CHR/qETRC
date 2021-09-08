@@ -1,10 +1,20 @@
 ﻿#include "railstationeventlist.h"
 
-#include <QtWidgets>
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"
 
 #include "data/diagram/diagram.h"
+#include "data/train/routing.h"
+#include "dialogs/trainfilter.h"
+#include "stationtraingapdialog.h"
+#include "model/delegate/qedelegate.h"
+#include "data/common/qeglobal.h"
+
+#include <QFormLayout>
+#include <QTableView>
+#include <QHeaderView>
+#include <QLabel>
+#include <QCheckBox>
 
 RailStationEventListModel::RailStationEventListModel(Diagram& diagram, const std::shared_ptr<Railway>& rail, const std::shared_ptr<RailStation>& station, QObject* parent) : QStandardItemModel(parent),
 diagram(diagram),
@@ -27,11 +37,15 @@ void RailStationEventListModel::setupModel()
 	setRowCount(lst.size());
 	using SI = QStandardItem;
 	for (int i = 0; i < lst.size(); i++) {
-		const auto& p = lst.at(i);
-		auto line = p.first;
+		const auto& p = *(lst.at(i));
+		auto line = p.line;
 		auto train = line->train();
-		const auto& ev = p.second;
-		setItem(i, ColTrainName, new SI(line->train()->trainName().full()));
+		const auto& ev = p;
+		auto* it = new SI(line->train()->trainName().full());
+		QVariant v;
+		v.setValue(train);
+		it->setData(v, qeutil::TrainRole);
+		setItem(i, ColTrainName, it);
 		setItem(i, ColTime, new SI(ev.time.toString("hh:mm:ss")));
 		setItem(i, ColEventType, new SI(qeutil::eventTypeString(ev.type)));
 		setItem(i, ColPos, new SI(ev.posString()));
@@ -52,11 +66,18 @@ void RailStationEventListModel::setupModel()
 	}
 }
 
+std::shared_ptr<const Train> RailStationEventListModel::trainForRow(int row) const
+{
+	return qvariant_cast<std::shared_ptr<const Train>>(
+		item(row, ColTrainName)->data(qeutil::TrainRole));
+}
+
 RailStationEventListDialog::RailStationEventListDialog(Diagram& diagram, const std::shared_ptr<Railway>& rail, const std::shared_ptr<RailStation>& station, QWidget* parent) : QDialog(parent),
 diagram(diagram),
 rail(rail),
 station(station),
-model(new RailStationEventListModel(diagram, rail, station))
+model(new RailStationEventListModel(diagram, rail, station)),
+filter(new TrainFilter(diagram,this))
 {
 	setWindowTitle(tr("车站事件表 - %1 @ %2").arg(station->name.toSingleLiteral())
 		.arg(rail->name()));
@@ -75,6 +96,11 @@ void RailStationEventListDialog::initUI()
 	ckPosPre = g->get(0); ckPosPost = g->get(1);
 	g->connectAllTo(SIGNAL(toggled(bool)), this,
 		SLOT(onPosShowChanged()));
+	auto* btn = new QPushButton(tr("车次筛选器"));
+	g->addWidget(btn);
+	connect(btn, &QPushButton::clicked, filter, &TrainFilter::show);
+	connect(filter, &TrainFilter::filterApplied,
+		this, &RailStationEventListDialog::onFilterChanged);
 	form->addRow(tr("筛选"), g);
 	vlay->addLayout(form);
 
@@ -99,9 +125,9 @@ void RailStationEventListDialog::initUI()
 		SLOT(sortByColumn(int, Qt::SortOrder)));
 	vlay->addWidget(table);
 
-	auto* h = new ButtonGroup<2>({ "导出CSV","关闭" });
+	auto* h = new ButtonGroup<3>({ "导出CSV","间隔分析" ,"关闭"});
 	h->connectAll(SIGNAL(clicked()), this, {
-		SLOT(toCsv()),SLOT(close())
+		SLOT(toCsv()),SLOT(gapAnalysis()), SLOT(close())
 		});
 	vlay->addLayout(h);
 	setLayout(vlay);
@@ -195,5 +221,21 @@ void RailStationEventListDialog::toCsv()
 {
 	QString s = QObject::tr("%1车站事件表.csv").arg(station->name.toSingleLiteral());
 	qeutil::exportTableToCsv(model, this, s);
+}
+
+
+
+void RailStationEventListDialog::gapAnalysis()
+{
+	auto* dialog = new StationTrainGapDialog(rail, station,
+		diagram.getTrainGaps(model->getData(), filter->getCore()), this);
+	dialog->show();
+}
+
+void RailStationEventListDialog::onFilterChanged()
+{
+	filtTableRows([this](int row)->bool {
+		return filter->check(model->trainForRow(row));
+		});
 }
 

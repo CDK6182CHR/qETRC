@@ -4,11 +4,12 @@
 #include <memory>
 
 #include "util/selecttraincombo.h"
+#include "data/common/qeglobal.h"
 
 class Ruler;
 class TrainCollection;
 class QSpinBox;
-class Railway;
+class Railway; 
 
 
 /**

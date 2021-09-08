@@ -3,10 +3,11 @@
 #include <QWidget>
 #include <QTabWidget>
 #include <memory>
+#include "data/common/direction.h"
 
-#include "model/rail/forbidmodel.h"
-#include "data/rail/forbid.h"
-
+class Railway;
+class ForbidModel;
+class Forbid;
 class QTableView;
 class QCheckBox;
 class QSpinBox;

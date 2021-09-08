@@ -1,9 +1,18 @@
 ﻿#include "forbidwidget.h"
 
-#include <QtWidgets>
+
 #include "model/delegate/qetimedelegate.h"
 #include "data/diagram/diagram.h"
 #include "util/buttongroup.hpp"
+#include "model/rail/forbidmodel.h"
+
+#include <QCheckBox>
+#include <QFormLayout>
+#include <QSpinBox>
+#include <QTableView>
+#include <QHeaderView>
+#include <QMenu>
+#include <QMessageBox>
 
 ForbidWidget::ForbidWidget(std::shared_ptr<Forbid> forbid_,bool commitInPlace, QWidget *parent):
     QWidget(parent),forbid(forbid_),model(new ForbidModel(forbid,this)),inplace(commitInPlace)

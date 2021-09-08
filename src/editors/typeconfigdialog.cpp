@@ -6,15 +6,18 @@
 #include "model/delegate/generaldoublespindelegate.h"
 #include "data/train/traintype.h"
 
-#include <QtWidgets>
-
 #include <model/delegate/linestyledelegate.h>
 
 #include <util/qecontrolledtable.h>
 
+#include <QLabel>
+#include <QHeaderView>
+#include <QMessageBox>
+#include <QColorDialog>
+
 TypeConfigDialog::TypeConfigDialog(TypeManager &manager_, bool forDefault_, QWidget *parent):
-    QDialog(parent), manager(manager_),forDefault(forDefault_),
-    model(new TypeConfigModel(manager_,this))
+    QDialog(parent), manager(manager_),
+    model(new TypeConfigModel(manager_,this)),forDefault(forDefault_)
 {
     resize(600,600);
     setAttribute(Qt::WA_DeleteOnClose);

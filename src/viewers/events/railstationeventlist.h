@@ -2,24 +2,27 @@
 
 #include <QDialog>
 #include <QStandardItemModel>
-#include <QTableView>
-#include <QCheckBox>
-#include <QLabel>
 #include <functional>
 #include <vector>
 #include <utility>
 
 #include "data/diagram/trainevents.h"
+
+class QCheckBox;
 class Diagram;
 class Railway;
 class RailStation;
+class TrainFilter;
+class QLabel;
+class QTableView;
+class TrainFilter;
 
 class RailStationEventListModel:public QStandardItemModel
 {
     Diagram& diagram;
     std::shared_ptr<Railway> rail;
     std::shared_ptr<RailStation> station;
-    std::vector<std::pair<std::shared_ptr<TrainLine>, RailStationEvent>> lst;
+    RailStationEventList lst;
 public:
     enum {
         ColTrainName = 0,
@@ -41,7 +44,8 @@ public:
                               QObject *parent = nullptr);
 
     void setupModel();
-
+    const auto& getData()const { return lst; }
+    std::shared_ptr<const Train> trainForRow(int row)const;
 };
 
 class RailStationEventListDialog : public QDialog
@@ -55,6 +59,7 @@ class RailStationEventListDialog : public QDialog
     QTableView* table;
     QCheckBox* ckPosPre, *ckPosPost;
     QLabel* lbCount;
+    TrainFilter*const filter;
 public:
     RailStationEventListDialog(Diagram &diagram,
                                const std::shared_ptr<Railway> &rail,
@@ -89,6 +94,10 @@ private slots:
     void onPosShowChanged();
 
     void toCsv();
+
+    void gapAnalysis();
+
+    void onFilterChanged();
 
 };
 

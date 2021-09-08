@@ -1,7 +1,14 @@
 ﻿#include "routingedit.h"
 
-#include <QtWidgets>
+#include <QFormLayout>
+#include <QLineEdit>
+#include <QTableView>
+#include <QHeaderView>
 #include <set>
+#include <QLabel>
+#include <QTextEdit>
+#include <QEvent>
+#include <QMessageBox>
 
 #include "data/train/routing.h"
 #include "util/buttongroup.hpp"

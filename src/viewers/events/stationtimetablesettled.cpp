@@ -1,9 +1,12 @@
 ﻿#include "stationtimetablesettled.h"
-#include <QtWidgets>
+
+#include <QLabel>
+#include <QTableView>
 
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"
 #include "data/diagram/diagram.h"
+#include "data/train/routing.h"
 
 StationTimetableSettledModel::StationTimetableSettledModel(
         Diagram& dia,

@@ -1,5 +1,6 @@
 ﻿#include "diagramwidget.h"
 #include "data/diagram/trainadapter.h"
+#include "data/train/routing.h"
 #include "trainitem.h"
 #include "util/utilfunc.h"
 #include <QPainter>
@@ -21,8 +22,7 @@
 #include "mainwindow/version.h"
 
 DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page, QWidget* parent):
-    _diagram(diagram),
-    QGraphicsView(parent),_page(page),startTime(diagram.config().start_hour,0,0)
+    QGraphicsView(parent), _page(page),_diagram(diagram),startTime(diagram.config().start_hour,0,0)
 {
     QScroller::grabGesture(this, QScroller::TouchGesture);
     setRenderHint(QPainter::Antialiasing, true);

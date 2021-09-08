@@ -7,6 +7,7 @@
 #include <vector>
 #include <QVector>
 #include <QString>
+#include <QFlags>
 #include <variant>
 #include <type_traits>
 
@@ -74,24 +75,51 @@ struct StationEvent {
     QString toString()const;
 };
 
+class TrainLine;
+
 /**
  * 用于处理车站事件。比车次的事件多一个站前还是站后的标志位。
  * another位置用来放相关车次，固定非null。
  * pos: 1-站前事件（小里程端事件）; 2-站后；3-both
+ * 2021.09.06：取消继承。修改API。
  */
-struct RailStationEvent :
-    public StationEvent {
-    int pos;
+struct RailStationEvent {
+
+    enum Position {
+        Pre = 0b01,   // 小里程端
+        Post = 0b10,  // 大里程端
+        Both = Pre | Post
+    };
+    Q_DECLARE_FLAGS(Positions, Position);
+
+    TrainEventType type;
+    QTime time;
+    std::weak_ptr<const RailStation> station;
+    std::shared_ptr<const TrainLine> line;
+    Positions pos;
+    QString note;
+    
     RailStationEvent(TrainEventType type_,
         const QTime& time_, std::weak_ptr<const RailStation> station_,
-        std::reference_wrapper<const Train> train,
-        int pos_, const QString& note_ = "") :
-        StationEvent(type_, time_, station_, train, note_), pos(pos_) {}
+        std::shared_ptr<const TrainLine> line_,
+        Positions pos_, const QString& note_ = "") :
+        type(type_),time(time_),station(station_),line(line_),pos(pos_),
+        note(note_){}
 
     QString posString()const;
-
     QString toString()const;
+
+    static QString posToString(const Positions& pos);
+
+    /**
+     * 当前事件是否对应于有标尺的附加时分参与
+     */
+    bool hasAppend()const;
 };
+
+using RailStationEventList = std::vector<std::shared_ptr<RailStationEvent>>;
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(RailStationEvent::Positions)
 
 
 struct AdapterStation;

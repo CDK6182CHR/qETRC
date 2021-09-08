@@ -211,7 +211,7 @@ public:
      * 基于事件的实现版本  二分查找
      * 包含推定。到达、出发要拆开，因此返回QList
      */
-    QList<RailStationEvent> 
+    RailStationEventList
            stationEventFromRail(std::shared_ptr<const RailStation> rail)const;
 
     /**
@@ -429,7 +429,7 @@ private:
      * 判断所给的图定通过事件是站前，站后还是both
      * 根据是否是首站、末站，以及行别
      */
-    int passStationPos(ConstAdaPtr st)const;
+    RailStationEvent::Position passStationPos(ConstAdaPtr st)const;
 
     /**
      * 单车次问题诊断，即自己时刻表直接能看出的问题

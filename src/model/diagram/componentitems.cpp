@@ -1,4 +1,7 @@
 ﻿#include "componentitems.h"
+#include "data/train/routing.h"
+#include "data/train/train.h"
+#include "data/rail/railway.h"
 
 navi::DiagramItem::DiagramItem(Diagram& diagram) :
 	AbstractComponentItem(0), _diagram(diagram),

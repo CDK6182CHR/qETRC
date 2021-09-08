@@ -4,14 +4,25 @@
 
 #include "viewers/sectioncountdialog.h"
 #include "dialogs/selectrailstationdialog.h"
-#include "viewers/stationtimetablesettled.h"
-#include "viewers/railstationeventlist.h"
-#include "viewers/railsectionevents.h"
-#include "viewers/railsnapevents.h"
+#include "viewers/events/stationtimetablesettled.h"
+#include "viewers/events/railstationeventlist.h"
+#include "viewers/events/railsectionevents.h"
+#include "viewers/events/railsnapevents.h"
 #include "editors/forbidwidget.h"
+#include "editors/railstationwidget.h"
 
-#include <QtWidgets>
 #include <QStyle>
+#include <QLabel>
+#include <QApplication>
+#include <DockManager.h>
+#include <QMessageBox>
+#include <QInputDialog>
+#include "model/diagram/diagramnavimodel.h"
+#include <SARibbonLineEdit.h>
+#include <SARibbonComboBox.h>
+#include <SARibbonMenu.h>
+#include "editors/ruler/rulerwidget.h"
+#include "model/rail/rulermodel.h"
 
 RailContext::RailContext(Diagram& diagram_, SARibbonContextCategory* context, 
 	MainWindow* mw_, QObject* parent):
@@ -697,6 +708,13 @@ void qecmd::UpdateRailStations::redo()
 	cont->commitUpdateTimetable(railold, equiv);
 }
 
+qecmd::ChangeOrdinate::ChangeOrdinate(RailContext *context_, std::shared_ptr<Railway> rail_,
+                                      int index_, QUndoCommand *parent):
+    QUndoCommand(QObject::tr("更改排图标尺: ")+rail_->name(),parent),
+    cont(context_),rail(rail_),index(index_)
+{}
+
+
 void qecmd::ChangeOrdinate::undo()
 {
 	int idx = rail->ordinateIndex();
@@ -736,6 +754,14 @@ void qecmd::AddNewRuler::redo()
 	}
 	cont->commitAddNewRuler(railway->rulers().last());
 }
+
+qecmd::UpdateForbidData::UpdateForbidData(std::shared_ptr<Forbid> forbid_,
+                                          std::shared_ptr<Railway> data_,
+                                          RailContext *context, QUndoCommand *parent):
+    QUndoCommand(QObject::tr("更新天窗: %1 - %2").arg(forbid_->name(),
+        forbid_->railway().name()),parent),
+    forbid(forbid_),data(data_),cont(context){}
+
 
 void qecmd::UpdateForbidData::undo()
 {

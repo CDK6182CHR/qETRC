@@ -1,8 +1,14 @@
 ﻿#include "addroutingnodedialog.h"
 
-#include <QtWidgets>
 #include "util/selecttraincombo.h"
 #include "util/buttongroup.hpp"
+#include "data/train/train.h"
+
+#include <QCheckBox>
+#include <QFormLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
 
 AddRoutingNodeDialog::AddRoutingNodeDialog(TrainCollection &coll_, QWidget *parent):
     QDialog(parent), coll(coll_)

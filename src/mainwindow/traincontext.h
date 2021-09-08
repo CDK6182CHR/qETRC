@@ -1,21 +1,31 @@
 ﻿#pragma once
 
-#include <SARibbonContextCategory.h>
+#include <QObject>
 #include <memory>
-#include <QLineEdit>
-#include <DockWidget.h>
-#include <SARibbonLineEdit.h>
-#include <SARibbonComboBox.h>
-#include <SARibbonCheckBox.h>
-#include <QDoubleSpinBox>
+#include <QColor>
+#include <deque>
+#include <QUndoCommand>
 
-#include "data/diagram/diagram.h"
-#include "editors/basictrainwidget.h"
-#include "util/linestylecombo.h"
+#include <data/train/train.h>
 
+class SARibbonContextCategory;
+class SARibbonLineEdit;
+class SARibbonComboBox;
+class SARibbonCheckBox;
+class SARibbonToolButton;
+class QDoubleSpinBox;
+class Diagram;
+class PenStyleCombo;
+class BasicTrainWidget;
+class Routing;
+class TrainType;
 namespace qecmd {
     struct StartingTerminalData;
 }
+namespace ads {
+class CDockWidget;
+}
+
 
 class MainWindow;
 /**
@@ -251,8 +261,8 @@ namespace qecmd {
             Train::StationPtr start2_, Train::StationPtr end2_,
             bool includeStart_, bool includeEnd_, TrainContext* context,
             QUndoCommand* parent=nullptr):
-            QUndoCommand(QObject::tr("区间换线: %1 & %2").arg(train1_->trainName().full())
-            .arg(train2_->trainName().full()),parent),
+            QUndoCommand(QObject::tr("区间换线: %1 & %2").arg(train1_->trainName().full(),
+            train2_->trainName().full()),parent),
             train1(train1_),train2(train2_),start1(start1_),end1(end1_),start2(start2_),
             end2(end2_),includeStart(includeStart_),includeEnd(includeEnd_),cont(context)
         {}

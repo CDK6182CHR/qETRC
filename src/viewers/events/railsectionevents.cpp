@@ -1,7 +1,14 @@
 ﻿#include "railsectionevents.h"
-#include <QtWidgets>
+
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"
+#include "data/train/routing.h"
+#include <QTableView>
+#include <QHeaderView>
+#include <QLabel>
+#include <QDoubleSpinBox>
+#include <QLineEdit>
+#include <QMessageBox>
 
 RailSectionEventsModel::RailSectionEventsModel(Diagram &diagram_,
                                                std::shared_ptr<Railway> rail,

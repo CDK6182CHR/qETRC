@@ -1,29 +1,11 @@
 ﻿#pragma once
 
-#include <QMainWindow>
-#include <QTreeView>
 #include <QList>
-#include <QUndoStack>
-#include <QStringLiteral>
-
-#include "data/rail/railway.h"
-#include "data/diagram/diagram.h"
 
 #include "kernel/diagramwidget.h"
-#include "model/diagram/diagramnavimodel.h"
-#include "editors/trainlistwidget.h"
-#include "editors/railstationwidget.h"
-#include "navi/navitree.h"
-#include "dialogs/changestationnamedialog.h"
-#include "editors/routing/routingwidget.h"
-
-//for SARibbon
 #include "SARibbonMainWindow.h"
-#include "SARibbonMenu.h"
-#include "SARibbonContextCategory.h"
 
-#include "DockManager.h"
-
+class SARibbonMenu;
 
 class RoutingContext;
 class RulerContext;
@@ -36,6 +18,21 @@ class QUndoView;
 
 class TimetableQuickWidget;
 class TrainInfoWidget;
+
+
+class QUndoStack;
+class DiagramNaviModel;
+class NaviTree;
+class DiagramWidget;
+class TrainListWidget;
+class RailStationWidget;
+class RoutingWidget;
+struct ChangeStationNameData;
+namespace ads{
+class CDockManager;
+class CDockAreaWidget;
+class CDockWidget;
+}
 
 /**
  * @brief The MainWindow class

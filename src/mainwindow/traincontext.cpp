@@ -1,9 +1,10 @@
 ﻿#include "traincontext.h"
 
-#include "viewers/traineventdialog.h"
+#include "viewers/events/traineventdialog.h"
 #include "mainwindow.h"
 #include "viewcategory.h"
 #include "data/train/train.h"
+#include "data/train/routing.h"
 #include "viewers/trainlinedialog.h"
 #include "viewers/rulerrefdialog.h"
 #include "dialogs/exchangeintervaldialog.h"
@@ -11,7 +12,22 @@
 #include "viewers/diagnosisdialog.h"
 #include "viewers/timetablequickwidget.h"
 #include "viewers/traininfowidget.h"
-#include <QtWidgets>
+#include "editors/trainlistwidget.h"
+#include "model/train/trainlistmodel.h"
+#include <DockManager.h>
+
+#include <QApplication>
+#include <QMessageBox>
+#include <QColorDialog>
+#include <SARibbonContextCategory.h>
+#include <SARibbonLineEdit.h>
+#include <QLabel>
+#include <SARibbonComboBox.h>
+#include <SARibbonCheckBox.h>
+#include <QDoubleSpinBox>
+#include <util/linestylecombo.h>
+
+#include "editors/basictrainwidget.h"
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
 	MainWindow* mw_) :
@@ -412,6 +428,7 @@ void TrainContext::commitAutoType(std::deque<std::pair<std::shared_ptr<Train>, s
 		mw->repaintTrainLines(p.first);
 	}
 	mw->trainListWidget->getModel()->updateAllTrainTypes();
+	diagram.trainCollection().refreshTypeCount();
 	refreshCurrentTrainWidgets();
 }
 

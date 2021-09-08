@@ -13,9 +13,11 @@
 #include "data/diagram/diagram.h"
 #include <util/qecontrolledtable.h>
 #include "model/general/qemoveablemodel.h"
+#include "data/train/routing.h"
+
 
 TrainFilter::TrainFilter(Diagram &diagram_, QWidget *parent):
-    QDialog(parent), diagram(diagram_)
+    QDialog(parent), diagram(diagram_), core(diagram_)
 {
     resize(400,500);
     setWindowTitle(tr("车次筛选器"));
@@ -71,76 +73,10 @@ void TrainFilter::initUI()
     g->connectAll(SIGNAL(clicked()),this,{SLOT(actApply()),SLOT(clearFilter()),SLOT(close())});
 }
 
-bool TrainFilter::checkType(std::shared_ptr<Train> train) const
+bool TrainFilter::check(std::shared_ptr<const Train> train) const
 {
-    if(!useType) return true;
-    return types.contains(train->type());
+    return core.check(train);
 }
-
-bool TrainFilter::checkInclude(std::shared_ptr<Train> train) const
-{
-    if (!useInclude) return false;   // 这个特殊
-    foreach (auto& p, includes){
-        const auto& n=train->trainName();
-        if (p.indexIn(n.full())==0 || p.indexIn(n.down())==0 || p.indexIn(n.up())==0){
-            return true;
-        }
-    }
-    return false;
-}
-
-bool TrainFilter::checkExclude(std::shared_ptr<Train> train) const
-{
-    if(!useExclude) return false;
-    foreach (auto& p, excludes){
-        const auto& n=train->trainName();
-        if (p.indexIn(n.full())==0 || p.indexIn(n.down())==0 || p.indexIn(n.up())==0){
-            return true;
-        }
-    }
-    return false;
-}
-
-bool TrainFilter::checkRouting(std::shared_ptr<Train> train) const
-{
-    if (!useRouting) return true;
-    if (train->hasRouting()){
-        return routings.contains(train->routing().lock());
-    }else{
-        return selNullRouting;
-    }
-}
-
-bool TrainFilter::checkPassenger(std::shared_ptr<Train> train) const
-{
-    switch (passengerType)
-    {
-    case TrainPassenger::False:return !train->getIsPassenger();
-        break;
-    case TrainPassenger::Auto: return true;
-        break;
-    case TrainPassenger::True:return train->getIsPassenger();
-        break;
-    default:return false;
-        break;
-    }
-}
-
-bool TrainFilter::checkShow(std::shared_ptr<Train> train) const
-{
-    if (!showOnly) return true;
-    else return train->isShow();
-}
-
-bool TrainFilter::check(std::shared_ptr<Train> train) const
-{
-    bool res = (checkType(train)
-        && checkRouting(train) && checkPassenger(train) && checkShow(train)
-        && !checkExclude(train)) || checkInclude(train);
-    if (useInverse)return !res;
-    return res;
-}
-
 
 void TrainFilter::selectType()
 {
@@ -178,32 +114,32 @@ void TrainFilter::selectRouting()
 
 void TrainFilter::actApply()
 {
-    useType = ckType->isChecked();
-    if(useType && dlgType){
-        types = dlgType->selected();   // copy assign
+    core.useType = ckType->isChecked();
+    if (core.useType && dlgType) {
+        core.types = dlgType->selected();   // copy assign
     }
-    useInclude = ckInclude->isChecked();
-    if(useInclude && dlgInclude){
-        includes=dlgInclude->names();
+    core.useInclude = ckInclude->isChecked();
+    if (core.useInclude && dlgInclude) {
+        core.includes = dlgInclude->names();
     }
-    useExclude=ckExclude->isChecked();
-    if(useExclude && dlgExclude){
-        excludes=dlgExclude->names();
+    core.useExclude = ckExclude->isChecked();
+    if (core.useExclude && dlgExclude) {
+        core.excludes = dlgExclude->names();
     }
-    useRouting=ckRouting->isChecked();
-    if(useRouting && ckRouting){
-        routings=dlgRouting->selected();
-        selNullRouting=dlgRouting->containsNull();
+    core.useRouting = ckRouting->isChecked();
+    if (core.useRouting && ckRouting) {
+        core.routings = dlgRouting->selected();
+        core.selNullRouting = dlgRouting->containsNull();
     }
-    showOnly=ckShowOnly->isChecked();
-    useInverse=ckInverse->isChecked();
+    core.showOnly = ckShowOnly->isChecked();
+    core.useInverse = ckInverse->isChecked();
 
     // 客车类型  Auto表示都行
-    passengerType=TrainPassenger::Auto;
-    if(gpPassen->get(0)->isChecked())
-        passengerType=TrainPassenger::True;
-    else if(gpPassen->get(1)->isChecked())
-        passengerType=TrainPassenger::False;
+    core.passengerType = TrainPassenger::Auto;
+    if (gpPassen->get(0)->isChecked())
+        core.passengerType = TrainPassenger::True;
+    else if (gpPassen->get(1)->isChecked())
+        core.passengerType = TrainPassenger::False;
 
     emit filterApplied(this);
     done(Accepted);

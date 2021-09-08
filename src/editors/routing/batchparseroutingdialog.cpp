@@ -1,12 +1,20 @@
 ﻿#include "batchparseroutingdialog.h"
 
 #include <model/train/routinglistmodel.h>
-#include <QtWidgets>
 #include "util/buttongroup.hpp"
 #include "data/common/qesystem.h"
 #include "data/train/routing.h"
 #include "data/train/traincollection.h"
 #include "util/dialogadapter.h"
+#include <QCheckBox>
+#include <QFormLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QTableView>
+#include <QTextEdit>
+#include <QHeaderView>
+#include <QMessageBox>
+#include <QTextBrowser>
 
 BatchParseRoutingDialog::BatchParseRoutingDialog(TrainCollection &coll_, QWidget *parent):
     QDialog(parent),coll(coll_),model(new RoutingListModel(this))

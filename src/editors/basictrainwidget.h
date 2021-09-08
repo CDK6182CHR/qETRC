@@ -1,20 +1,18 @@
 ﻿#pragma once
 
 #include <QWidget>
-#include <QTableView>
 #include <memory>
 
-#include "data/train/train.h"
-#include "data/train/traincollection.h"
-#include "model/train/timetablestdmodel.h"
-#include "util/qecontrolledtable.h"
+class QEControlledTable;
+class TimetableStdModel;
+class Train;
+class TrainCollection;
+class QTableView;
 
 /**
  * @brief The BasicTrainWidget class
  * pyETRC.CurrentWidget
  * 列车基本信息编辑面板，包含车次、时刻表等。
- * 
- * TODO：删除列车时，删除相应的Widget!!
  */
 class BasicTrainWidget : public QWidget
 {

@@ -1,5 +1,6 @@
 ﻿#include "traincollection.h"
 #include "routing.h"
+#include "train.h"
 
 #include <QJsonArray>
 
@@ -267,6 +268,14 @@ void TrainCollection::invalidateAllTempData()
 {
 	for (auto p : _trains)
 		p->invalidateTempData();
+}
+
+void TrainCollection::refreshTypeCount()
+{
+	_typeCount.clear();
+	foreach(auto train, _trains) {
+		++_typeCount[train->type()];
+	}
 }
 
 void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)

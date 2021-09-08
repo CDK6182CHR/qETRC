@@ -1,5 +1,6 @@
 ﻿#include "selecttraincombo.h"
-
+#include "data/train/train.h"
+#include "data/train/traincollection.h"
 #include <QtWidgets>
 
 SelectTrainCombo::SelectTrainCombo(TrainCollection &coll_, QWidget *parent):

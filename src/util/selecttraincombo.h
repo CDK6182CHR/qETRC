@@ -4,10 +4,10 @@
 #include <QHBoxLayout>
 #include <QList>
 
-#include "data/train/traincollection.h"
-
+class TrainCollection;
 class QComboBox;
 class QLineEdit;
+class Train;
 
 /**
  * @brief The SelectTrainCombo class

@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "data/common/common_header.h"
 
 #include <QColor>
 #include <QString>

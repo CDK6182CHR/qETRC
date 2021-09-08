@@ -1,6 +1,7 @@
 ﻿#include "routingcollectionmodel.h"
 
 #include "data/train/traincollection.h"
+#include "data/train/routing.h"
 
 RoutingCollectionModel::RoutingCollectionModel(TrainCollection &coll_, QObject *parent):
     QAbstractTableModel(parent),coll(coll_)

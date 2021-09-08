@@ -1,5 +1,6 @@
 ﻿#include "routing.h"
-#include "data/train/traincollection.h"
+#include "train.h"
+#include "traincollection.h"
 
 #include <algorithm>
 #include <QVector>

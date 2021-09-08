@@ -1,10 +1,13 @@
 ﻿#include "routingwidget.h"
 
-#include <QtWidgets>
+
 #include "data/train/traincollection.h"
 #include "data/common/qesystem.h"
 #include "util/buttongroup.hpp"
+#include "data/train/routing.h"
 
+#include <QTableView>
+#include <QHeaderView>
 
 RoutingWidget::RoutingWidget(TrainCollection &coll_,QUndoStack* undo, QWidget *parent):
     QWidget(parent),coll(coll_),_undo(undo), model(new RoutingCollectionModel(coll_,this))

@@ -27,6 +27,7 @@ class QLineEdit;
 class QSpinBox;
 class QTimeEdit;
 class Diagram;
+class Train;
 
 /**
  * @brief The BatchCopyTrainDialog class

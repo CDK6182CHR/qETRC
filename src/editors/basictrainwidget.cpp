@@ -1,9 +1,14 @@
 ﻿#include "basictrainwidget.h"
 
-#include <QtWidgets>
-#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
 #include "util/buttongroup.hpp"
 #include "model/delegate/qetimedelegate.h"
+
+#include "model/train/timetablestdmodel.h"
+#include "util/qecontrolledtable.h"
+
+#include <QTableView>
+#include <QHeaderView>
 
 
 BasicTrainWidget::BasicTrainWidget(TrainCollection &coll_, bool commitInPlace_,

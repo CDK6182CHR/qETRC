@@ -4,7 +4,13 @@
 #include "mainwindow/viewcategory.h"
 #include "mainwindow/mainwindow.h"
 
-#include <QtWidgets>
+#include <QCheckBox>
+#include <QColorDialog>
+#include <QComboBox>
+#include <QDoubleSpinBox>
+#include <QFormLayout>
+#include <QGroupBox>
+
 
 ConfigDialog::ConfigDialog(Config &cfg,bool forDefault_, QWidget *parent):
     QDialog(parent),_cfg(cfg),forDefault(forDefault_)

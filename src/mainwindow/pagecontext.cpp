@@ -3,11 +3,17 @@
 
 #include "dialogs/printdiagramdialog.h"
 
-#include <QtWidgets>
+#include <DockWidget.h>
+#include <QLabel>
+#include <QApplication>
+#include <QFormLayout>
+#include <QDialogButtonBox>
+#include <QMessageBox>
+
 
 PageContext::PageContext(Diagram &diagram_, SARibbonContextCategory *context,
                          MainWindow *mw_):
-    QObject(mw_),diagram(diagram_),cont(context),mw(mw_)
+    QObject(mw_),diagram(diagram_),mw(mw_),cont(context)
 {
     initUI();
 }

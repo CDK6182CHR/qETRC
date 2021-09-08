@@ -1,15 +1,11 @@
 ﻿#pragma once
 
 #include <QAbstractTableModel>
-#include <QObject>
-#include <QUndoStack>
 #include <QUndoCommand>
 #include <memory>
-#include <functional>
-#include <optional>
 
-#include "data/train/traincollection.h"
-#include "data/diagram/trainline.h"
+class Train;
+class TrainCollection;
 
 struct Config;
 

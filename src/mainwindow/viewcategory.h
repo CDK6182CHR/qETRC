@@ -1,16 +1,21 @@
 ﻿#pragma once
 
 #include <QObject>
-#include <QAction>
 #include <QUndoCommand>
 #include <QVector>
-#include "SARibbonCategory.h"
-#include <SARibbonGalleryGroup.h>
-
-#include "data/diagram/diagram.h"
+#include <QSet>
 
 #include "util/buttongroup.hpp"
+#include "data/common/direction.h"
 
+class TrainType;
+struct Config;
+class Train;
+class TrainLine;
+class SARibbonGallery;
+class SARibbonGalleryGroup;
+class Diagram;
+class SARibbonCategory;
 
 class MainWindow;
 class TypeManager;

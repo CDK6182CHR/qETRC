@@ -195,7 +195,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\data\common\qesystem.cpp" />
+    <ClCompile Include="src\data\diagram\traingap.cpp" />
     <ClCompile Include="src\data\rail\railcategory.cpp" />
+    <ClCompile Include="src\data\train\trainfiltercore.cpp" />
     <ClCompile Include="src\dialogs\batchcopytraindialog.cpp" />
     <ClCompile Include="src\dialogs\changestationnamedialog.cpp" />
     <ClCompile Include="src\dialogs\exchangeintervaldialog.cpp" />
@@ -228,6 +230,7 @@
     <ClCompile Include="src\model\delegate\generalspindelegate.cpp" />
     <ClCompile Include="src\model\delegate\linestyledelegate.cpp" />
     <ClCompile Include="src\model\delegate\qetimedelegate.cpp" />
+    <ClCompile Include="src\model\delegate\timeintervaldelegate.cpp" />
     <ClCompile Include="src\model\rail\forbidmodel.cpp" />
     <ClCompile Include="src\model\rail\intervaldatamodel.cpp" />
     <ClCompile Include="src\model\train\routingcollectionmodel.cpp" />
@@ -240,11 +243,12 @@
     <ClCompile Include="src\util\selectrailwaycombo.cpp" />
     <ClCompile Include="src\util\selecttraincombo.cpp" />
     <ClCompile Include="src\viewers\diagnosisdialog.cpp" />
-    <ClCompile Include="src\viewers\railsectionevents.cpp" />
-    <ClCompile Include="src\viewers\railsnapevents.cpp" />
-    <ClCompile Include="src\viewers\railstationeventlist.cpp" />
+    <ClCompile Include="src\viewers\events\railsectionevents.cpp" />
+    <ClCompile Include="src\viewers\events\railsnapevents.cpp" />
+    <ClCompile Include="src\viewers\events\railstationeventlist.cpp" />
+    <ClCompile Include="src\viewers\events\stationtraingapdialog.cpp" />
     <ClCompile Include="src\viewers\rulerrefdialog.cpp" />
-    <ClCompile Include="src\viewers\stationtimetablesettled.cpp" />
+    <ClCompile Include="src\viewers\events\stationtimetablesettled.cpp" />
     <ClCompile Include="src\mainwindow\mainwindow.cpp" />
     <ClCompile Include="src\mainwindow\pagecontext.cpp" />
     <ClCompile Include="src\mainwindow\railcontext.cpp" />
@@ -293,7 +297,7 @@
     <ClCompile Include="src\viewers\sectioncountdialog.cpp" />
     <ClCompile Include="src\viewers\timetablequickwidget.cpp" />
     <ClCompile Include="src\viewers\traindiffdialog.cpp" />
-    <ClCompile Include="src\viewers\traineventdialog.cpp" />
+    <ClCompile Include="src\viewers\events\traineventdialog.cpp" />
     <ClCompile Include="src\viewers\traininfowidget.cpp" />
     <ClCompile Include="src\viewers\trainlinedialog.cpp" />
     <ClCompile Include="src\viewers\traintimetableplane.cpp" />
@@ -315,6 +319,7 @@
     <QtMoc Include="src\wizards\readruler\readrulerpagetrain.h" />
     <QtMoc Include="src\model\train\trainlistreadmodel.h" />
     <QtMoc Include="src\model\train\routingcollectionmodel.h" />
+    <ClInclude Include="src\data\common\qeglobal.h" />
     <ClInclude Include="src\data\common\qesystem.h" />
     <QtMoc Include="src\editors\routing\routingwidget.h" />
     <QtMoc Include="src\editors\routing\routingedit.h" />
@@ -333,9 +338,13 @@
     <QtMoc Include="src\dialogs\trainfilter.h" />
     <QtMoc Include="src\kernel\routingdiagram.h" />
     <QtMoc Include="src\editors\routing\routingdiagramwidget.h" />
+    <ClInclude Include="src\data\diagram\traingap.h" />
+    <ClInclude Include="src\data\train\trainfiltercore.h" />
     <ClInclude Include="src\model\delegate\linestyledelegate.h" />
     <QtMoc Include="src\model\train\timetablequickmodel.h" />
     <QtMoc Include="src\viewers\timetablequickwidget.h" />
+    <QtMoc Include="src\viewers\events\stationtraingapdialog.h" />
+    <QtMoc Include="src\model\delegate\timeintervaldelegate.h" />
     <ClInclude Include="src\viewers\traindiffdialog.h" />
     <QtMoc Include="src\wizards\readruler\readrulerpageinterval.h" />
     <QtMoc Include="src\wizards\readruler\readrulerwizard.h" />
@@ -346,12 +355,12 @@
     <QtMoc Include="src\wizards\rulerpaint\rulerpaintwizard.h" />
     <QtMoc Include="src\wizards\rulerpaint\rulerpaintpagestart.h" />
     <QtMoc Include="src\viewers\trainlinedialog.h" />
-    <QtMoc Include="src\viewers\railsnapevents.h" />
-    <QtMoc Include="src\viewers\railsectionevents.h" />
+    <QtMoc Include="src\viewers\events\railsnapevents.h" />
+    <QtMoc Include="src\viewers\events\railsectionevents.h" />
     <QtMoc Include="src\viewers\rulerrefdialog.h" />
-    <QtMoc Include="src\viewers\railstationeventlist.h" />
+    <QtMoc Include="src\viewers\events\railstationeventlist.h" />
     <QtMoc Include="src\viewers\sectioncountdialog.h" />
-    <QtMoc Include="src\viewers\traineventdialog.h" />
+    <QtMoc Include="src\viewers\events\traineventdialog.h" />
     <QtMoc Include="src\mainwindow\mainwindow.h" />
     <QtMoc Include="src\mainwindow\traincontext.h" />
     <QtMoc Include="src\editors\railstationwidget.h" />
@@ -366,7 +375,7 @@
     <QtMoc Include="src\editors\ruler\rulertabpy.h" />
     <QtMoc Include="src\editors\ruler\rulerwidget.h" />
     <QtMoc Include="src\dialogs\selectrailstationdialog.h" />
-    <QtMoc Include="src\viewers\stationtimetablesettled.h" />
+    <QtMoc Include="src\viewers\events\stationtimetablesettled.h" />
     <QtMoc Include="src\dialogs\exchangeintervaldialog.h" />
     <QtMoc Include="src\dialogs\changestationnamedialog.h" />
     <QtMoc Include="src\dialogs\rulerfromtraindialog.h" />

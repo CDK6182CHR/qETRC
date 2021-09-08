@@ -3,12 +3,15 @@
 
 #include "mainwindow/mainwindow.h"
 
-#include <QtWidgets>
-#include <QString>
+#include <QLineEdit>
+#include <QTableView>
+#include <QHeaderView>
+
+#include <model/train/trainlistmodel.h>
 
 TrainListWidget::TrainListWidget(TrainCollection& coll_, QUndoStack* undo, QWidget* parent):
-	QWidget(parent), coll(coll_),_undo(undo), model(new TrainListModel(coll_,undo,this)),
-	table(new QTableView),editSearch(new QLineEdit)
+    QWidget(parent), coll(coll_),_undo(undo),
+    table(new QTableView),editSearch(new QLineEdit), model(new TrainListModel(coll_,undo,this))
 {
 	initUI();
 }

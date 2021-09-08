@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "data/common/common_header.h"
 #include <memory>
 #include <QList>
 #include <QJsonObject>
@@ -17,6 +16,8 @@
 
 class Train;
 class Railway;
+struct TrainGap;
+class TrainFilterCore;
 
 namespace readruler {
     /**
@@ -291,9 +292,18 @@ public:
     /**
      * 2021.08.01  基于事件的车站时刻表
      */
-    std::vector<std::pair<std::shared_ptr<TrainLine>, RailStationEvent>>
+    RailStationEventList
         stationEvents(std::shared_ptr<Railway> railway,
             std::shared_ptr<const RailStation> st)const;
+
+    /**
+     * 2021.09.06
+     * 基于车站事件表，转换成间隔表。
+     * 暂时只处理同向事件。
+     * 保证所给输入都是同一个站的数据。
+     */
+    std::vector<TrainGap> getTrainGaps(const RailStationEventList& events,
+        const TrainFilterCore& filter)const;
 
     using SectionEventList = std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>>;
 
@@ -364,6 +374,15 @@ private:
     std::tuple<int, int, int>
         __computeIntervalRuler(const std::map<TrainLine::IntervalAttachType,double>& values,
             int defaultStart, int defaultStop, int prec);
+
+    /**
+     * 倒着查，从车站事件表中查找最后一个符合指定方向、位置的事件。
+     * 如果找不到（极端情况），返回空。
+     */
+    std::shared_ptr<const RailStationEvent>
+        findLastEvent(const RailStationEventList& lst, const TrainFilterCore& filter,
+            const Direction& dir,
+            RailStationEvent::Positions pos)const;
 };
 
 

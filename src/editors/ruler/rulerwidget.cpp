@@ -3,7 +3,14 @@
 #include "model/delegate/postivespindelegate.h"
 #include "data/diagram/diagram.h"
 
-#include <QtWidgets>
+#include <QFormLayout>
+#include <QTableView>
+#include <QHeaderView>
+#include <QAction>
+#include <QMessageBox>
+#include <QLineEdit>
+
+#include "model/rail/rulermodel.h"
 
 RulerWidget::RulerWidget(std::shared_ptr<Ruler> ruler_,bool commitInPlace_, QWidget *parent) :
     QWidget(parent),ruler(ruler_),model(new RulerModel(ruler_,this)),commitInPlace(commitInPlace_)

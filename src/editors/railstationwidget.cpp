@@ -2,11 +2,19 @@
 #include "util/buttongroup.hpp"
 #include "model/delegate/combodelegate.h"
 #include "model/delegate/generaldoublespindelegate.h"
-#include <QtWidgets>
+
+#include "model/rail/railstationmodel.h"
+#include "util/qecontrolledtable.h"
+#include "data/common/qesystem.h"
+
+#include <QFormLayout>
+#include <QLineEdit>
+#include <QHeaderView>
+#include <QMessageBox>
 
 
 RailStationWidget::RailStationWidget(RailCategory& cat_, bool inplace, QWidget* parent) :
-	QWidget(parent), cat(cat_), commitInPlace(inplace), model(new RailStationModel(inplace, this))
+    QWidget(parent), model(new RailStationModel(inplace, this)), commitInPlace(inplace), cat(cat_)
 {
 	//暂定Model的Parent就是自己！
 	//setFocusPolicy(Qt::ClickFocus);
@@ -60,6 +68,8 @@ void RailStationWidget::initUI()
 	ctable->table()->setEditTriggers(QTableView::AllEditTriggers);
 	ctable->table()->setItemDelegateForColumn(RailStationModel::ColMile,
 		new GeneralDoubleSpinDelegate(this));
+    ctable->table()->verticalHeader()->setDefaultSectionSize(
+                SystemJson::instance.table_row_height);
 
 	vlay->addWidget(ctable);
 

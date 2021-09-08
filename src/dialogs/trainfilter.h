@@ -3,6 +3,7 @@
 #include <QDialog>
 #include "util/buttongroup.hpp"
 #include "data/train/train.h"
+#include "data/train/trainfiltercore.h"
 
 class Routing;
 class QEControlledTable;
@@ -22,7 +23,7 @@ class SelectTrainTypeDialog: public QDialog
     TrainCollection& coll;
     QStandardItemModel* model;
     QListView* view;
-    QSet<std::shared_ptr<TrainType>> _selected;
+    QSet<std::shared_ptr<const TrainType>> _selected;
 public:
     SelectTrainTypeDialog(TrainCollection& coll_, QWidget* parent=nullptr);
     const auto& selected()const {return _selected;}
@@ -72,7 +73,7 @@ class SelectRoutingDialog: public QDialog
     TrainCollection& coll;
     QStandardItemModel* model;
     QListView* view;
-    QSet<std::shared_ptr<Routing>> _selected;
+    QSet<std::shared_ptr<const Routing>> _selected;
     bool _containsNull=false;
 public:
     SelectRoutingDialog(TrainCollection& coll_, QWidget* parent=nullptr);
@@ -99,6 +100,7 @@ class TrainFilter : public QDialog
 {
     Q_OBJECT;
     Diagram& diagram;
+    TrainFilterCore core;
 
     QCheckBox* ckType,*ckInclude,*ckExclude,*ckRouting;
     QCheckBox* ckShowOnly,*ckInverse;
@@ -108,18 +110,10 @@ class TrainFilter : public QDialog
     TrainNameRegexDialog* dlgInclude=nullptr,*dlgExclude=nullptr;
     SelectRoutingDialog* dlgRouting=nullptr;
 
-    bool useType,useInclude,useExclude;
-    bool useRouting,showOnly,useInverse;
-    TrainPassenger passengerType;
-
-    QSet<std::shared_ptr<TrainType>> types;
-    QVector<QRegExp> includes,excludes;
-    QSet<std::shared_ptr<Routing>> routings;
-    bool selNullRouting;
-
 public:
     TrainFilter(Diagram& diagram_, QWidget* parent=nullptr);
-    bool check(std::shared_ptr<Train> train)const;
+    bool check(std::shared_ptr<const Train> train)const;
+    const auto& getCore()const { return core; }
 
     /**
      * 返回当前筛选器状态下，被选中的车次列表。
@@ -129,13 +123,6 @@ public:
 
 private:
     void initUI();
-    bool checkType(std::shared_ptr<Train> train)const;
-    bool checkInclude(std::shared_ptr<Train> train)const;
-    bool checkExclude(std::shared_ptr<Train> train)const;
-    bool checkRouting(std::shared_ptr<Train> train)const;
-    bool checkPassenger(std::shared_ptr<Train> train)const;
-    bool checkShow(std::shared_ptr<Train> train)const;
-    
 signals:
     void filterApplied(TrainFilter* s);
 private slots:

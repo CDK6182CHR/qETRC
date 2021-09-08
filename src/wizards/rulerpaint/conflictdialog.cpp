@@ -38,9 +38,9 @@ void ConflictModel::setupModel(std::shared_ptr<Railway> railway_,
     setRowCount(0);
     int row = 0;
     for (auto p = lst.begin(); p != lst.end(); ++p) {
-        auto line = p->first;
-        auto train = p->first->train();
-        const auto& ev = p->second;
+        auto line = (*p)->line;
+        auto train = line->train();
+        const auto& ev = **p;
         if (qeutil::timeInRange(showLeft, showRight, ev.time)) {
             insertRow(row);
 

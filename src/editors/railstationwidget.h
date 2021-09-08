@@ -1,13 +1,13 @@
 ﻿#pragma once
 
 #include <QWidget>
-#include <QUndoStack>
-#include <QLineEdit>
-#include <QUndoCommand>
 
-#include "util/qecontrolledtable.h"
-#include "model/rail/railstationmodel.h"
-#include "data/rail/rail.h"
+
+class RailCategory;
+class QLineEdit;
+class Railway;
+class RailStationModel;
+class QEControlledTable;
 
 /**
  * @brief The RailStationWidget class

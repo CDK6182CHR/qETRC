@@ -1,11 +1,14 @@
 ﻿#include "mainwindow.h"
 
+#include <QMessageBox>
+#include <QInputDialog>
 #include <QString>
+#include <QUndoView>
+#include <QApplication>
+#include <QFileDialog>
+#include <QSpinBox>
+#include <QLabel>
 
-
-#include <QTableView>
-#include <QDockWidget>
-#include <QtWidgets>
 #include "model/train/trainlistmodel.h"
 #include "editors/trainlistwidget.h"
 #include "model/diagram/diagramnavimodel.h"
@@ -43,17 +46,26 @@
 #include <SARibbonToolButton.h>
 
 #include "DockAreaWidget.h"
+#include <DockManager.h>
 
-//以下引入的是临时测试的
 #include "editors/railstationwidget.h"
+#include "editors/routing/routingwidget.h"
+
+#include <dialogs/changestationnamedialog.h>
+#include "data/train/routing.h"
+
+#include <model/rail/railstationmodel.h>
 
 
 MainWindow::MainWindow(QWidget* parent)
     : SARibbonMainWindow(parent),
-    manager(new ads::CDockManager(this)),
-    naviModel(new DiagramNaviModel(_diagram, this)),
-    undoStack(new QUndoStack(this))
+    undoStack(new QUndoStack(this)),
+    naviModel(new DiagramNaviModel(_diagram, this))
 {
+    ads::CDockManager::setConfigFlag(ads::CDockManager::OpaqueSplitterResize, true);
+    ads::CDockManager::setConfigFlag(ads::CDockManager::XmlCompressionEnabled, false);
+    ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
+    manager = new ads::CDockManager(this);
     _diagram.readDefaultConfigs();
     undoStack->setUndoLimit(100);
     connect(undoStack, SIGNAL(indexChanged(int)), this, SLOT(markChanged()));
@@ -330,10 +342,10 @@ void MainWindow::initDockWidgets()
 {
     ads::CDockWidget* dock;
 
-    manager->setConfigFlag(ads::CDockManager::FocusHighlighting, true);
+    //manager->setConfigFlag(ads::CDockManager::FocusHighlighting, true);
 
     // Central
-    if (SystemJson::instance.use_central_widget) {
+    if (SystemJson::instance.use_central_widget || true) {
         dock = new ads::CDockWidget(tr("运行图窗口"));
         dock->setFeature(ads::CDockWidget::NoTab, true);
         auto* c = manager->setCentralWidget(dock);
@@ -1304,31 +1316,11 @@ void MainWindow::closeEvent(QCloseEvent* e)
         e->accept();
 }
 
-//void MainWindow::informTrainListChanged()
-//{
-//    //注意：现在这个函数总是由TrainList那边变化发起的，所以TrainList不用更新
-//    naviModel->resetModel();
-//    //trainListWidget->refreshData();
-//    markChanged();   //既然通知变化了，就默认真的发生了变化！
-//}
-
 void MainWindow::informPageListChanged()
 {
     naviModel->resetModel();
     markChanged();
 }
-
-//void MainWindow::trainsReordered()
-//{
-//    //informTrainListChanged();
-//}
-//
-//void MainWindow::trainSorted(const QList<std::shared_ptr<Train>>& oldList, 
-//    TrainListModel* model)
-//{
-//    undoStack->push(new qecmd::SortTrains(oldList, model));
-//    trainsReordered();
-//}
 
 void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
 {

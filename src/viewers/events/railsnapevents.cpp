@@ -3,6 +3,7 @@
 #include <QtWidgets>
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"
+#include "data/train/routing.h"
 
 RailSnapEventsModel::RailSnapEventsModel(Diagram &diagram_,
                                          std::shared_ptr<Railway> railway_,

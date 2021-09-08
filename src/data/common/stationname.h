@@ -1,7 +1,6 @@
 ﻿
 #pragma once
 
-#include "common_header.h"
 
 #include <QString>
 #include <QHash>

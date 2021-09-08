@@ -10,6 +10,8 @@
 #include <QLineEdit>
 #include <QApplication>
 #include <QMessageBox>
+#include <SARibbonMenu.h>
+#include <DockManager.h>
 
 RoutingContext::RoutingContext(Diagram &diagram, SARibbonContextCategory *context,
                                MainWindow *mw_):

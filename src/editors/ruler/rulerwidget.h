@@ -1,14 +1,15 @@
 ﻿#pragma once
 
 #include <QWidget>
-#include <QLineEdit>
-#include <QCheckBox>
-#include <QTableView>
 
 #include <memory>
-#include "data/rail/rail.h"
-#include "model/rail/rulermodel.h"
 
+class Railway;
+class RulerModel;
+class Ruler;
+
+class QTableView;
+class QLineEdit;
 /**
  * @brief The RulerWidget class
  * 标尺编辑的面板。与pyETRC的实现比较类似，但不做那么多按钮。

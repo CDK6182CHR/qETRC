@@ -3,7 +3,9 @@
 #include <list>
 #include <QSet>
 #include <QJsonObject>
-#include "train.h"
+#include "data/common/qeglobal.h"
+
+class Train;
 
 /**
  * @brief The RoutingNode class 交路中的一个结点 pyETRC.data.CircuitNode
@@ -305,5 +307,5 @@ public:
     bool checkForDiagram(QString& report)const;
 };
 
-Q_DECLARE_METATYPE(std::shared_ptr<Routing>);
+
 

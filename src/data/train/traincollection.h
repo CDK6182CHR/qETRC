@@ -5,9 +5,13 @@
 #include <QJsonObject>
 #include <QHash>
 #include <QMap>
-#include "data/train/train.h"
+
 #include "data/train/traintype.h"
-#include "routing.h"
+
+class Railway;
+class Train;
+class Routing;
+class TrainType;
 
 /**
  * @brief The TrainCollection class
@@ -205,6 +209,11 @@ public:
     void invalidateAllTempData();
 
     int routingCount()const { return _routings.size(); }
+
+    /**
+     * 当发生大规模的类型变化时，直接刷新TypeCount
+     */
+    void refreshTypeCount();
 
 private:
     /**

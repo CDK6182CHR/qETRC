@@ -2,13 +2,15 @@
 
 #include <cstdint>
 #include <QVector>
-#include <QJsonObject>
 #include <QPen>
 #include <list>
 #include <optional>
 #include "trainname.h"
 #include "trainstation.h"
-#include "data/diagram/config.h"
+#include "data/common/qeglobal.h"
+
+class QJsonObject;
+struct Config;
 
 enum class TrainPassenger:
         std::int8_t{
@@ -521,6 +523,5 @@ uint qHash(const std::shared_ptr<_Ty>& key, uint seed)
     return qHash(key.get(), seed);
 }
 
-Q_DECLARE_METATYPE(std::shared_ptr<Train>)
 Q_DECLARE_METATYPE(std::list<TrainStation>::iterator)
 

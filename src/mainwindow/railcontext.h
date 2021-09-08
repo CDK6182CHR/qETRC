@@ -3,18 +3,26 @@
 #include <QObject>
 #include <QUndoCommand>
 #include <QList>
-#include <SARibbonLineEdit.h>
-#include <SARibbonComboBox.h>
-#include <SARibbonMenu.h>
-#include <DockWidget.h>
-#include "SARibbonContextCategory.h"
-#include "data/rail/rail.h"
-#include "data/diagram/diagram.h"
-#include "editors/ruler/rulerwidget.h"
 
+#include "data/common/direction.h"
+
+class RulerWidget;
+class SARibbonMenu;
+class SARibbonComboBox;
+class SARibbonLineEdit;
+class Railway;
+class SARibbonContextCategory;
+class Diagram;
+class Ruler;
+class Forbid;
+class RailStation;
 class ForbidTabWidget;
-
 class MainWindow;
+namespace ads {
+class CDockWidget;
+}
+
+
 /**
  * @brief The RailContext class
  * 代理线路的ContextCategory操作
@@ -268,10 +276,7 @@ namespace qecmd {
         RailContext* const cont;
     public:
         UpdateForbidData(std::shared_ptr<Forbid> forbid_, std::shared_ptr<Railway> data_,
-            RailContext* context, QUndoCommand* parent=nullptr):
-            QUndoCommand(QObject::tr("更新天窗: %1 - %2").arg(forbid_->name(), 
-                forbid_->railway().name()),parent),
-            forbid(forbid_),data(data_),cont(context){}
+            RailContext* context, QUndoCommand* parent=nullptr);
         virtual void undo()override;
         virtual void redo()override;
     };
@@ -295,10 +300,7 @@ namespace qecmd {
         bool first = true;
     public:
         ChangeOrdinate(RailContext* context_,std::shared_ptr<Railway> rail_,
-            int index_,QUndoCommand* parent=nullptr):
-            QUndoCommand(QObject::tr("更改排图标尺: ")+rail_->name(),parent),
-            cont(context_),rail(rail_),index(index_)
-        {}
+            int index_,QUndoCommand* parent=nullptr);
 
         virtual void undo()override;
         virtual void redo()override;
@@ -315,7 +317,7 @@ namespace qecmd {
         std::shared_ptr<Railway> theData{};   //这里保存标尺的数据
     public:
         AddNewRuler(const QString& name_, std::shared_ptr<Railway> railway_, RailContext* context, QUndoCommand* parent = nullptr):
-            QUndoCommand(parent),name(name_), cont(context), railway(railway_){}
+            QUndoCommand(parent),cont(context),name(name_),  railway(railway_){}
         virtual void undo()override;
         virtual void redo()override;
     };

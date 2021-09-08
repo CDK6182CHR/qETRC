@@ -1,9 +1,14 @@
 ﻿#include "rulerfromtraindialog.h"
 
-#include <QtWidgets>
 #include "data/rail/rail.h"
 #include "data/train/train.h"
 #include "data/diagram/trainadapter.h"
+
+#include <QDialogButtonBox>
+#include <QFormLayout>
+#include <QLabel>
+#include <QMessageBox>
+#include <QSpinBox>
 
 RulerFromTrainDialog::RulerFromTrainDialog(TrainCollection& coll_,
     std::shared_ptr<Ruler> ruler_, QWidget* parent) :
