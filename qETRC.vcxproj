@@ -247,6 +247,7 @@
     <ClCompile Include="src\viewers\events\railsnapevents.cpp" />
     <ClCompile Include="src\viewers\events\railstationeventlist.cpp" />
     <ClCompile Include="src\viewers\events\stationtraingapdialog.cpp" />
+    <ClCompile Include="src\viewers\events\traingapstatdialog.cpp" />
     <ClCompile Include="src\viewers\rulerrefdialog.cpp" />
     <ClCompile Include="src\viewers\events\stationtimetablesettled.cpp" />
     <ClCompile Include="src\mainwindow\mainwindow.cpp" />
@@ -345,6 +346,7 @@
     <QtMoc Include="src\viewers\timetablequickwidget.h" />
     <QtMoc Include="src\viewers\events\stationtraingapdialog.h" />
     <QtMoc Include="src\model\delegate\timeintervaldelegate.h" />
+    <QtMoc Include="src\viewers\events\traingapstatdialog.h" />
     <ClInclude Include="src\viewers\traindiffdialog.h" />
     <QtMoc Include="src\wizards\readruler\readrulerpageinterval.h" />
     <QtMoc Include="src\wizards\readruler\readrulerwizard.h" />

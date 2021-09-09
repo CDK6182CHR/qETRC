@@ -60,12 +60,25 @@ struct TrainGap{
      */
     QString typeString()const;
 
+    static QString typeToString(const GapTypes& type, const RailStationEvent::Positions& pos);
+
+    /**
+     * 给出pos-type的联合字符串表示形式；中间换行
+     */
+    static QString posTypeToString(const GapTypes& type, const RailStationEvent::Positions& pos);
+
     /**
      * 左车次这个事件是否为列车运行的站前事件。根据位置和行别判断。
      */
     bool isLeftFormer()const;
 
     bool isRightFormer()const;
+
+    /**
+     * 针对Type的判定：不依赖具体事件。
+     */
+    static bool isTypeLeftFormer(const GapTypes& type, const RailStationEvent::Positions& pos);
+    static bool isTypeRightFormer(const GapTypes& type, const RailStationEvent::Positions& pos);
 
     bool operator<(const TrainGap& gap)const;
 
@@ -81,6 +94,11 @@ struct TrainGapPtrComparator {
 };
 
 using TrainGapList = std::vector<std::shared_ptr<TrainGap>>;
+
+/**
+ * 对列车间隔的完整描述
+ */
+using TrainGapTypePair = std::pair<RailStationEvent::Positions, TrainGap::GapTypes>;
 
 using TrainGapStatistics = std::map<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>,
     std::set<std::shared_ptr<TrainGap>, TrainGapPtrComparator>>;

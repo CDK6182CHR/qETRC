@@ -298,12 +298,28 @@ public:
             std::shared_ptr<const RailStation> st)const;
 
     /**
+     * 一次性获取所给线路的所有站事件表。
+     * 初版暂时是暴力调用`stationEvents`，但很明显这个可以优化。
+     */
+    std::map<std::shared_ptr<RailStation>, RailStationEventList>
+        stationEventsForRail(std::shared_ptr<Railway> railway)const;
+
+    /**
      * 2021.09.06
      * 基于车站事件表，转换成间隔表。
      * 暂时只处理同向事件。
      * 保证所给输入都是同一个站的数据。
      */
-    std::vector<std::shared_ptr<TrainGap>> getTrainGaps(const RailStationEventList& events,
+    TrainGapList getTrainGaps(const RailStationEventList& events,
+        const TrainFilterCore& filter, bool useSingle)const;
+
+    /**
+     * 双线模式
+     */
+    TrainGapList getTrainGapsDouble(const RailStationEventList& events,
+        const TrainFilterCore& filter)const;
+
+    TrainGapList getTrainGapsSingle(const RailStationEventList& events,
         const TrainFilterCore& filter)const;
 
     /**

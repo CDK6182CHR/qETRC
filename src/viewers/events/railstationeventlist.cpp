@@ -228,7 +228,7 @@ void RailStationEventListDialog::toCsv()
 void RailStationEventListDialog::gapAnalysis()
 {
 	auto* dialog = new StationTrainGapDialog(diagram, rail, station, model->getData(),
-		filter->getCore(), this);
+		filter, this);
 	dialog->show();
 }
 

@@ -260,7 +260,7 @@ RailStationEventList
                 foreach (auto line , adp->lines()) {
                     const auto& lst = line->stationEventFromRail(st);
                     for (auto p = lst.begin(); p != lst.end(); ++p) {
-                        res.emplace_back(*p);
+                        res.push_back(*p);
                     }
                 }
             }
@@ -270,6 +270,16 @@ RailStationEventList
     std::sort(res.begin(), res.end(), [](const PR& p1, const PR& p2) {
         return p1->time < p2->time;
         });
+    return res;
+}
+
+std::map<std::shared_ptr<RailStation>, RailStationEventList>
+    Diagram::stationEventsForRail(std::shared_ptr<Railway> railway)const
+{
+    std::map<std::shared_ptr<RailStation>, RailStationEventList> res;
+    foreach(auto p, qAsConst(railway->stations())) {
+        res.emplace(p, stationEvents(railway, p));
+    }
     return res;
 }
 
@@ -296,6 +306,15 @@ std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>> Diagram::sectionEvents
 }
 
 TrainGapList Diagram::getTrainGaps(const RailStationEventList& events,
+    const TrainFilterCore& filter, bool useSingle)const
+{
+    return useSingle ?
+        getTrainGapsSingle(events, filter) :
+        getTrainGapsDouble(events, filter);
+}
+
+
+TrainGapList Diagram::getTrainGapsDouble(const RailStationEventList& events,
     const TrainFilterCore& filter)const
 {
     TrainGapList res;
@@ -441,6 +460,93 @@ TrainGapList Diagram::getTrainGaps(const RailStationEventList& events,
     return res;
 }
 
+TrainGapList Diagram::getTrainGapsSingle(const RailStationEventList& events,
+    const TrainFilterCore& filter)const
+{
+    // 单线版本：直接复制双线的代码，
+    // 原来down的保留直接作为单线的，up的删除
+    TrainGapList res;
+    std::shared_ptr<const RailStationEvent>
+        downFormerLast = findLastEvent(events, filter, Direction::Down, RailStationEvent::Pre),
+        downLatterLast = findLastEvent(events, filter, Direction::Down, RailStationEvent::Post);
+
+    // 当前站内车的情况。所有【到达】事件直接压进来。int位记录被踩了多少次。
+    // 类似队列的结构：从back插入，从front删除，但不绝对禁止中间删除。
+    std::deque<std::pair<std::shared_ptr<const RailStationEvent>, int>> down_in;
+
+    // 先预扫描一遍：把0点前进站没出站的存下来 （跨日停站的）
+    for (auto _p = events.cbegin(); _p != events.cend(); ++_p) {
+        const auto& p = *_p;
+        if (!filter.check(p->line->train()))continue;
+        if (p->type == TrainEventType::Arrive)
+            down_in.emplace_back(p, 0);
+        else if (p->type == TrainEventType::Depart) {
+            for (auto itr = down_in.begin(); itr != down_in.end(); ++itr) {
+                if (itr->first->line == p->line) {
+                    down_in.erase(itr);
+                    break;
+                }
+                else {
+                    itr->second++;
+                }
+            }
+        }
+
+    }
+
+    // 注意：pre/post是说绝对位置（里程小端和大端），former latter是说运行方向前后
+    for (auto _p = events.cbegin(); _p != events.cend(); ++_p) {
+        const auto& p = *_p;
+        if (!filter.check(p->line->train())) continue;
+        if (p->pos & RailStationEvent::Pre) {
+            // 与站前有交集
+            // 既然遇到了一个，那么last一定不是空
+            res.emplace_back(std::make_shared<TrainGap>(downFormerLast, p));
+            downFormerLast = p;
+        }
+        if (p->pos & RailStationEvent::Post) {
+            // 与站后有交集
+            if (!(p->pos & RailStationEvent::Pre)) {
+                // 这个条件是针对通通的情况，防止重复
+                res.emplace_back(std::make_shared<TrainGap>(downLatterLast, p));
+            }
+            downLatterLast = p;
+        }
+
+        // 现在：判断进出站情况。只考虑到达出发，以及通过的。
+        if (p->type == TrainEventType::Arrive) {
+            // 车次到达：进队列
+            down_in.emplace_back(std::make_pair(p, 0));
+        }
+        else if (p->type == TrainEventType::Depart) {
+            // 出发：先是所有比它到的早但还没跑掉的，都被踩一次
+            for (auto itr = down_in.begin(); itr != down_in.end(); ++itr) {
+                if (itr->first->line == p->line) {
+                    // 找到当前的进站记录
+                    if (itr->second) {
+                        // 存在被踩情况
+                        res.emplace_back(std::make_shared<TrainGap>(
+                            itr->first, p, TrainGap::Avoid, itr->second));
+                    }
+                    down_in.erase(itr);
+                    break;
+                }
+                else {
+                    itr->second += 1;
+                }
+            }
+        }
+        else if (p->type == TrainEventType::CalculatedPass ||
+            p->type == TrainEventType::SettledPass) {
+            // 站内所有车被踩一次
+            for (auto& q : down_in) {
+                q.second++;
+            }
+        }
+    }
+    return res;
+}
+
 TrainGapStatistics Diagram::countTrainGaps(const TrainGapList &gaps) const
 {
     TrainGapStatistics res;
@@ -449,10 +555,10 @@ TrainGapStatistics Diagram::countTrainGaps(const TrainGapList &gaps) const
             res.operator[](std::make_pair(p->position(), p->type)).emplace(p);
         }
         else {
-            if (p->position() | RailStationEvent::Pre) {
+            if (p->position() & RailStationEvent::Pre) {
                 res.operator[](std::make_pair(RailStationEvent::Pre, p->type)).emplace(p);
             }
-            if (p->position() | RailStationEvent::Post) {
+            if (p->position() & RailStationEvent::Post) {
                 res.operator[](std::make_pair(RailStationEvent::Post, p->type)).emplace(p);
             }
         }

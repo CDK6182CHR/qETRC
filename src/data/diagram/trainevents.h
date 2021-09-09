@@ -118,7 +118,7 @@ struct RailStationEvent {
     bool hasAppend()const;
 };
 
-using RailStationEventList = std::vector<std::shared_ptr<RailStationEvent>>;
+using RailStationEventList = QVector<std::shared_ptr<RailStationEvent>>;
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(RailStationEvent::Positions)
 

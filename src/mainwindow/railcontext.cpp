@@ -23,6 +23,8 @@
 #include <SARibbonMenu.h>
 #include "editors/ruler/rulerwidget.h"
 #include "model/rail/rulermodel.h"
+#include "viewers/events/stationtraingapdialog.h"
+#include "viewers/events/traingapstatdialog.h"
 
 RailContext::RailContext(Diagram& diagram_, SARibbonContextCategory* context, 
 	MainWindow* mw_, QObject* parent):
@@ -88,7 +90,7 @@ void RailContext::initUI()
 		auto* lab = new QLabel(tr("当前线路"));
 		lab->setAlignment(Qt::AlignCenter);
 		vlay->addWidget(lab);
-		
+
 		ed->setFocusPolicy(Qt::NoFocus);
 		ed->setAlignment(Qt::AlignCenter);
 		ed->setFixedWidth(120);
@@ -124,7 +126,7 @@ void RailContext::initUI()
 	}
 
 	panel = page->addPannel(tr("编辑"));
-	
+
 	QAction* act;
 	act = new QAction(QIcon(":/icons/rail.png"), tr("基线编辑"), this);
 	auto* btn = panel->addLargeAction(act);
@@ -165,33 +167,42 @@ void RailContext::initUI()
 	connect(act, SIGNAL(triggered()), this, SLOT(showSectionCount()));
 	btn = panel->addLargeAction(act);
 	btn->setMinimumWidth(70);
+	panel->addSeparator();
 
-	act = new QAction(QIcon(":/icons/timetable.png"), tr("车站车次表"), this);
+	act = new QAction(QIcon(":/icons/timetable.png"), tr("车站车次"), this);
 	connect(act, SIGNAL(triggered()), this, SLOT(actStationTrains()));
-	act->setToolTip(tr("车站车次表\n显示指定车站的（pyETRC风格的）时刻表。"
+	act->setToolTip(tr("车站车次\n显示指定车站的（pyETRC风格的）时刻表。"
 		"时刻表以车次为单位，只考虑图定时刻。"));
-	btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(80);
+	panel->addMediumAction(act);
 
-	act = new QAction(QIcon(":/icons/electronic-clock.png"), tr("车站事件表"), this);
+	act = new QAction(QIcon(":/icons/electronic-clock.png"), tr("车站事件"), this);
 	connect(act, SIGNAL(triggered()), this, SLOT(actStationEvents()));
-	act->setToolTip(tr("车站事件表\n显示指定车站的（基于事件的）时刻表。"
+	act->setToolTip(tr("车站事件\n显示指定车站的（基于事件的）时刻表。"
 		"时刻表以事件为单位，并考虑推定；如果存在停车，则到、开视为不同的事件。"));
-	btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(80);
+	btn = panel->addMediumAction(act);
 
-	act = new QAction(QIcon(":/icons/diagram.png"), tr("断面事件表"), this);
+	act = new QAction(QIcon(":/icons/diagram.png"), tr("断面事件"), this);
 	connect(act, SIGNAL(triggered()), this, SLOT(actSectionEvents()));
-	act->setToolTip(tr("断面事件表\n显示本线（站间区间）给定里程标位置的列车（通过）时刻表。"));
-	btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(80);
+	act->setToolTip(tr("断面事件\n显示本线（站间区间）给定里程标位置的列车（通过）时刻表。"));
+	panel->addMediumAction(act);
 
 	act = new QAction(QIcon(":/icons/clock.png"), tr("运行快照"), this);
 	connect(act, SIGNAL(triggered()), this, SLOT(actSnapEvents()));
 	act->setToolTip(tr("运行快照\n显示本线指定时刻所有列车的运行状态"
 		"（如果运行线与指定时刻存在交点）。"));
-	btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(80);
+	panel->addMediumAction(act);
+
+	panel->addSeparator();
+	act = new QAction(QIcon(":/icons/h_expand.png"), tr("间隔分析"), this);
+	connect(act, &QAction::triggered, this, &RailContext::actShowTrainGap);
+	act->setToolTip(tr("列车间隔分析\n根据车站的列车事件表，分析相邻车次之间的间隔情况。"));
+	panel->addMediumAction(act);
+
+	act = new QAction(QIcon(":/icons/adjust-2.png"), tr("间隔汇总"), this);
+	connect(act, &QAction::triggered, this, &RailContext::actTrainGapSummary);
+	act->setToolTip(tr("列车间隔汇总\n一次性列出所有车站（分别的）以及全局的各类最小间隔。"
+		"可能有较大的计算代价。"));
+	panel->addMediumAction(act);
 
 	panel = page->addPannel("");
 	act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
@@ -442,6 +453,22 @@ void RailContext::actInverseRail()
 	rail->mergeIntervalData(*railway);
 	rail->reverse();
 	mw->getUndoStack()->push(new qecmd::UpdateRailStations(this, railway, rail, false));
+}
+
+void RailContext::actShowTrainGap()
+{
+	if (!railway)return;
+	auto st = SelectRailStationDialog::getStation(railway, mw);
+	if (!st)return;
+	auto* dlg = new StationTrainGapDialog(diagram, railway, st, mw);
+	dlg->show();
+}
+
+void RailContext::actTrainGapSummary()
+{
+	if (!railway)return;
+	auto* dlg = new TrainGapSummaryDialog(diagram, railway, mw);
+	dlg->show();
 }
 
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)

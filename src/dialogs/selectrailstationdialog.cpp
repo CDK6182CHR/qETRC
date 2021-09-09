@@ -14,6 +14,21 @@ SelectRailStationDialog::SelectRailStationDialog(std::shared_ptr<Railway> rail,
     initUI();
 }
 
+std::shared_ptr<RailStation> SelectRailStationDialog::getStation(
+    std::shared_ptr<Railway> rail, QWidget* parent)
+{
+    auto* dlg = new SelectRailStationDialog(rail, parent);
+    dlg->setAttribute(Qt::WA_DeleteOnClose, false);
+    int flag = dlg->exec();
+    std::shared_ptr<RailStation> res{};
+    if (flag) {
+        res = dlg->station();
+    }
+    dlg->setParent(nullptr);
+    delete dlg;
+    return res;
+}
+
 void SelectRailStationDialog::initUI()
 {
     setWindowTitle(tr("选择车站"));
@@ -49,14 +64,16 @@ void SelectRailStationDialog::actApply()
         QMessageBox::warning(this,tr("错误"),tr("请先选择一个车站！"));
         return;
     }
-    emit stationSelected(railway->stations().at(idx.row()));
+    _station = railway->stations().at(idx.row());
+    emit stationSelected(_station);
     done(QDialog::Accepted);
 }
 
 void SelectRailStationDialog::onItemDoubleClicked(const QModelIndex &index)
 {
     if(index.isValid()){
-        emit stationSelected(railway->stations().at(index.row()));
+        _station = railway->stations().at(index.row());
+        emit stationSelected(_station);
         done(QDialog::Accepted);
     }
 }

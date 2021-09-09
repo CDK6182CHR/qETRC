@@ -17,8 +17,12 @@ class SelectRailStationDialog : public QDialog
 
     RailStationModel* const model;
     QTableView* table;
+    std::shared_ptr<RailStation> _station;
 public:
     SelectRailStationDialog(std::shared_ptr<Railway> rail,QWidget* parent=nullptr);
+    static std::shared_ptr<RailStation> getStation(std::shared_ptr<Railway> rail,
+        QWidget* parent);
+    auto station() { return _station; }
 private:
     void initUI();
 signals:

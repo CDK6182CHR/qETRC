@@ -139,6 +139,10 @@ private slots:
      */
     void actInverseRail();
 
+    void actShowTrainGap();
+
+    void actTrainGapSummary();
+
 
 public slots:
 

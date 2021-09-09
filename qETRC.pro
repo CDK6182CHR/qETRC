@@ -88,6 +88,7 @@ SOURCES += \
     src/viewers/events/railsnapevents.cpp \
     src/viewers/events/railstationeventlist.cpp \
     src/viewers/events/stationtraingapdialog.cpp \
+    src/viewers/events/traingapstatdialog.cpp \
     src/viewers/rulerrefdialog.cpp \
     src/viewers/events/stationtimetablesettled.cpp \
     src/editors/trainlistwidget.cpp \
@@ -212,6 +213,7 @@ HEADERS += \
     src/viewers/events/railsnapevents.h \
     src/viewers/events/railstationeventlist.h \
     src/viewers/events/stationtraingapdialog.h \
+    src/viewers/events/traingapstatdialog.h \
     src/viewers/rulerrefdialog.h \
     src/viewers/events/stationtimetablesettled.h \
     src/editors/trainlistwidget.h \
