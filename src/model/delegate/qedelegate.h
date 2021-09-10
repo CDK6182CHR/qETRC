@@ -19,10 +19,9 @@ enum {
     RoutingRole,
     TrainStationRole,
     TimeDataRole,
+    TrainGapRole,
 };
 }
 
 //Q_DECLARE_METATYPE(std::optional<double>);
 Q_DECLARE_METATYPE(std::shared_ptr<TrainLine>);
-Q_DECLARE_METATYPE(std::shared_ptr<const RailStation>);
-Q_DECLARE_METATYPE(std::shared_ptr<RailStation>);

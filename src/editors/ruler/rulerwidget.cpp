@@ -9,6 +9,7 @@
 #include <QAction>
 #include <QMessageBox>
 #include <QLineEdit>
+#include <QEvent>
 
 #include "model/rail/rulermodel.h"
 

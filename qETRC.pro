@@ -43,6 +43,7 @@ SOURCES += \
     src/dialogs/changestationnamedialog.cpp \
     src/dialogs/exchangeintervaldialog.cpp \
     src/dialogs/importtraindialog.cpp \
+    src/dialogs/locatedialog.cpp \
     src/dialogs/modifytimetabledialog.cpp \
     src/dialogs/outputsubdiagramdialog.cpp \
     src/dialogs/printdiagramdialog.cpp \
@@ -80,6 +81,8 @@ SOURCES += \
     src/model/train/routingeditmodel.cpp \
     src/model/train/routinglistmodel.cpp \
     src/model/train/trainlistreadmodel.cpp \
+    src/util/pagecomboforrail.cpp \
+    src/util/qeballoomtip.cpp \
     src/util/railrulercombo.cpp \
     src/util/selectrailwaycombo.cpp \
     src/util/selecttraincombo.cpp \
@@ -168,6 +171,7 @@ HEADERS += \
     src/dialogs/changestationnamedialog.h \
     src/dialogs/exchangeintervaldialog.h \
     src/dialogs/importtraindialog.h \
+    src/dialogs/locatedialog.h \
     src/dialogs/modifytimetabledialog.h \
     src/dialogs/outputsubdiagramdialog.h \
     src/dialogs/printdiagramdialog.h \
@@ -205,6 +209,8 @@ HEADERS += \
     src/model/train/routingeditmodel.h \
     src/model/train/routinglistmodel.h \
     src/model/train/trainlistreadmodel.h \
+    src/util/pagecomboforrail.h \
+    src/util/qeballoomtip.h \
     src/util/railrulercombo.h \
     src/util/selectrailwaycombo.h \
     src/util/selecttraincombo.h \

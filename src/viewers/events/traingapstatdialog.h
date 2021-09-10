@@ -65,6 +65,7 @@ class TrainGapSummaryModel :
     int nextCol;
 
     bool useSingle = false;
+    int  cutSecs = 0;
 public:
     enum {
         ColStation=0,
@@ -80,6 +81,7 @@ public:
     std::shared_ptr<RailStation> stationForRow(int row);
     const auto& getEvents()const { return events; }
     auto& getDiagram() { return diagram; }
+    void setCutSecs(int s) { cutSecs = s; }
 private:
     // 只做常规的设置数据的事情
     void setupModel();
@@ -92,6 +94,7 @@ private:
 };
 
 class TimeIntervalDelegate;
+class QSpinBox;
 
 class TrainGapSummaryDialog : public QDialog
 {
@@ -103,6 +106,7 @@ class TrainGapSummaryDialog : public QDialog
     QCheckBox* ckSingle;
     QTableView* table;
     TimeIntervalDelegate* dele;
+    QSpinBox* spCut;
 public:
     TrainGapSummaryDialog(Diagram& diagram, std::shared_ptr<Railway> railway,
                           QWidget* parent=nullptr);

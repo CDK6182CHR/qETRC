@@ -461,6 +461,8 @@ void RailContext::actShowTrainGap()
 	auto st = SelectRailStationDialog::getStation(railway, mw);
 	if (!st)return;
 	auto* dlg = new StationTrainGapDialog(diagram, railway, st, mw);
+	connect(dlg, &StationTrainGapDialog::locateToEvent,
+		mw, &MainWindow::locateDiagramOnStation);
 	dlg->show();
 }
 

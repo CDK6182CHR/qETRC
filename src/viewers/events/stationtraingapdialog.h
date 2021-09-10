@@ -24,6 +24,7 @@ class StationTrainGapModel: public QStandardItemModel
     const std::shared_ptr<Railway> railway;
     const std::shared_ptr<RailStation> station;
     bool singleLine=false;
+    int _cutSecs = 0;
 
     /**
      * 2021.09.09 取消引用，改为值类型：为了保证从工具栏直接调起的操作是安全的
@@ -50,11 +51,16 @@ public:
         const RailStationEventList& events,
         const TrainFilterCore& filter,
         QObject* parent = nullptr,
-        bool useSingleLine = false);
+        bool useSingleLine = false,
+        int cutSecs_ = 0);
     void refreshData();
     const auto& getStat()const { return stat; }
     void setSingleLine(bool on){singleLine=on;}
     bool isSingleLine()const { return singleLine; }
+    void setCutSecs(int v) { _cutSecs = v; }
+    int cutSecs()const { return _cutSecs; }
+    std::shared_ptr<TrainGap> gapForRow(int row);
+    auto& getDiagram() { return diagram; }
 private:
     void setupModel();
     
@@ -67,6 +73,7 @@ private:
     void setRowColor(int row, const QColor& color);
 };
 
+class QSpinBox;
 
 /**
  * @brief The StationTrainGapDialog class
@@ -84,6 +91,7 @@ class StationTrainGapDialog : public QDialog
 
     QTableView * table;
     QCheckBox* ckSingle;
+    QSpinBox* spCut;
 public:
 
     /**
@@ -95,7 +103,8 @@ public:
         const RailStationEventList& events,
         TrainFilter* filter,
         QWidget* parent = nullptr,
-        bool useSingleLine = false);
+        bool useSingleLine = false,
+        int cutSecs=0);
 
     /**
      * 此版本用于从工具栏直接调起，现场创建自己的filter对象
@@ -106,9 +115,15 @@ public:
         QWidget* parent = nullptr);
 private:
     void initUI();
+    void locateToTime(const QTime& tm);
+signals:
+    void locateToEvent(int pageIndex, std::shared_ptr<const Railway>, std::shared_ptr<const RailStation>,
+        const QTime& time);
 private slots:
     void actToCsv();
     void actStatistics();
+    void locateLeft();
+    void locateRight();
 public slots:
     void refreshData();
 };

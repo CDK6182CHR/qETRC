@@ -3,6 +3,9 @@
 #include "train.h"
 
 #include <QJsonArray>
+#include <QFile>
+#include <QJsonObject>
+#include <QJsonDocument>
 
 TrainCollection::TrainCollection(const QJsonObject& obj, const TypeManager& defaultManager)
 {

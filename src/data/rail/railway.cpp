@@ -5,6 +5,7 @@
 #include <QPair>
 #include <memory>
 #include <QDebug>
+#include <QJsonArray>
 
 #include "railinterval.h"
 #include "ruler.h"
@@ -1038,7 +1039,7 @@ std::shared_ptr<Railway> Railway::cloneBase() const
 	return res;
 }
 
-Railway::SectionInfo Railway::getSectionInfo(double mile)
+Railway::SectionInfo Railway::getSectionInfo(double mile)const
 {
 	//按照里程进行二分搜索
 	auto p = std::lower_bound(_stations.begin(), _stations.end(), mile, RailStationMileLess());

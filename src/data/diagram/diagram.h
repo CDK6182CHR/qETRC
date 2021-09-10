@@ -328,7 +328,7 @@ public:
      * Positions只取Pre, Post或者空白三种情况 （空白仅针对Avoid类型的）；
      * 通通的，同时算入两边。set按照TrainGap的间隔自动排序。
      */
-    TrainGapStatistics countTrainGaps(const TrainGapList& gaps)const;
+    TrainGapStatistics countTrainGaps(const TrainGapList& gaps, int curSecs)const;
 
     using SectionEventList = std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>>;
 

@@ -24,7 +24,7 @@ void TimetableQuickWidget::initUI()
     ed->setFocusPolicy(Qt::NoFocus);
     vlay->addWidget(ed);
     edName = ed;
-    auto* ck=new QCheckBox(tr("仅显示停车/营业站"));
+    auto* ck=new QCheckBox(tr("仅停车/营业站"));
     ckStopOnly=ck;
     connect(ck,&QCheckBox::toggled,this,&TimetableQuickWidget::onStopOnlyChanged);
     auto* hlay = new QHBoxLayout;

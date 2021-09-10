@@ -1,6 +1,8 @@
 ﻿#include "trainstation.h"
 #include "util/utilfunc.h"
 
+#include <QJsonObject>
+
 
 TrainStation::TrainStation(const StationName& name_, 
     const QTime& arrive_, const QTime& depart_, bool business_,
@@ -44,8 +46,9 @@ QJsonObject TrainStation::toJson() const
 int TrainStation::stopSec() const
 {
 	int s = arrive.secsTo(depart);
-    if (s < 0)
+    if (s < 0){
         s += 24 * 3600;
+    }
 	return s;
 }
 

@@ -2,9 +2,7 @@
 
 #include <optional>
 #include <map>
-#include <QtCore>
 #include <QString>
-#include <Qt>
 
 #include "data/common/stationname.h"
 #include "railinterval.h"
@@ -47,7 +45,7 @@ namespace qeutil {
 }
 
 
-
+class QJsonObject;
 
 /**
  * 原pyETRC项目的LineStation类
@@ -212,3 +210,5 @@ public:
     }
 };
 
+Q_DECLARE_METATYPE(std::shared_ptr<RailStation>)
+Q_DECLARE_METATYPE(std::shared_ptr<const RailStation>)

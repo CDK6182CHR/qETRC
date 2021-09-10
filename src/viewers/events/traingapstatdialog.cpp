@@ -6,6 +6,7 @@
 #include <utility>
 #include <QFormLayout>
 #include <QCheckBox>
+#include <QSpinBox>
 #include <data/common/qesystem.h>
 #include "model/delegate/timeintervaldelegate.h"
 #include "data/diagram/diagram.h"
@@ -113,7 +114,7 @@ void TrainGapSummaryModel::setupModel()
 {
     setRowCount(localMin.size() + 1);
     int row = 0;
-    setupRow(row++, tr("全局最小"), globalMin);
+    setupRow(row++, tr("全线最小"), globalMin);
     foreach(const auto& st, railway->stations()) {
         if (auto itr = localMin.find(st); itr != localMin.end()) {
             setupRow(row, st->name.toSingleLiteral(), itr->second);
@@ -123,9 +124,10 @@ void TrainGapSummaryModel::setupModel()
             row++;
         }
     }
+    for (int c = 0; c < columnCount(); c++) {
+        item(0, c)->setBackground(QColor(0, 0, 255, 64));
+    }
 }
-
-#include <QMap>
 
 void TrainGapSummaryModel::setupHeader()
 {
@@ -136,7 +138,7 @@ void TrainGapSummaryModel::setupHeader()
     for (auto _p = events.begin(); _p != events.end(); ++_p) {
         const RailStationEventList& lst = _p->second;
         auto gaps = diagram.getTrainGaps(lst, filter, useSingle);
-        TrainGapStatistics stat = diagram.countTrainGaps(gaps);
+        TrainGapStatistics stat = diagram.countTrainGaps(gaps, cutSecs);
         for (auto q = stat.begin(); q != stat.end(); ++q) {
             const TrainGapTypePair& tp = q->first;
             std::shared_ptr<TrainGap> gap = q->second.begin().operator*();
@@ -218,6 +220,15 @@ void TrainGapSummaryDialog::initUI()
     flay->addRow(tr("选项"),hlay);
     vlay->addLayout(flay);
 
+    spCut = new QSpinBox;
+    spCut->setMaximumWidth(200);
+    spCut->setSuffix(tr(" 秒 (s)"));
+    spCut->setRange(0, 100000);
+    spCut->setSingleStep(10);
+    spCut->setToolTip(tr("截断秒数\n小于所给秒数的间隔不参与最小值统计。"
+        "注意它们还是会出现在间隔表中，只是计算最小值时不予考虑。"));
+    flay->addRow(tr("最小间隔"), spCut);
+
     auto* lab=new QLabel(tr("此功能一次性统计所有车站的所有列车间隔情况。" 
         "下表列出的数值是符合条件的最小间隔时长。第一行为所有车站的最小值汇总。\n" 
         "可以在上方更改配置、筛选参与计算的车次，修改后请点击[刷新]来显示最新结果。" 
@@ -247,7 +258,7 @@ void TrainGapSummaryDialog::onDoubleClicked(const QModelIndex& idx)
     auto st = model->stationForRow(idx.row());
     decltype(auto) events = model->getEvents();
     auto* dlg = new StationTrainGapDialog(model->getDiagram(), model->getRailway(),
-        st, events.at(st), filter, this, ckSingle->isChecked());
+        st, events.at(st), filter, this, ckSingle->isChecked(), spCut->value());
     dlg->show();
 }
 
@@ -260,6 +271,7 @@ void TrainGapSummaryDialog::toCsv()
 void TrainGapSummaryDialog::refreshData()
 {
     model->setUseSingle(ckSingle->isChecked());
+    model->setCutSecs(spCut->value());
     model->refreshData();
     
     for (int i = TrainGapSummaryModel::ColOTHERS; i < model->columnCount(); i++) {

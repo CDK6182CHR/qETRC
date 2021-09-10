@@ -1,6 +1,7 @@
 ﻿
 #include "forbid.h"
 #include <QDebug>
+#include <QJsonArray>
 
 Forbid::Forbid(Railway& railway, bool different, int index) :
     RailIntervalData<ForbidNode, Forbid>(railway, different, index),

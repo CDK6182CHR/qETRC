@@ -4,6 +4,7 @@
 
 #include "kernel/diagramwidget.h"
 #include "SARibbonMainWindow.h"
+#include "data/diagram/diagram.h"
 
 class SARibbonMenu;
 
@@ -28,6 +29,7 @@ class TrainListWidget;
 class RailStationWidget;
 class RoutingWidget;
 struct ChangeStationNameData;
+class LocateDialog;
 namespace ads{
 class CDockManager;
 class CDockAreaWidget;
@@ -70,6 +72,7 @@ class MainWindow : public SARibbonMainWindow
     ViewCategory* catView;
 
     QSpinBox* spPassedStations;
+    LocateDialog* locateDialog = nullptr;
 
     /**
      * 可能在多个地方使用到的action，包装一下
@@ -109,6 +112,11 @@ public:
      * 注意dock与diagram的顺序应当完全一致！！
      */
     void insertPageWidget(std::shared_ptr<DiagramPage> page, int index);
+
+    /**
+     * 由下标，设置指定index的运行图为当前。保证index有效。
+     */
+    void activatePageWidget(int index);
 
     auto* getManager() { return manager; }
 
@@ -353,6 +361,8 @@ private slots:
 
     void actAutoTrainType();
 
+    void actLocateDiagram();
+
 public slots:
 
     /**
@@ -416,6 +426,11 @@ public slots:
      * 系统默认配置改变后立即保存
      */
     void saveDefaultConfig();
+
+    void locateDiagramOnMile(int pageIndex, 
+        std::shared_ptr<Railway>, double mile, const QTime& time);
+    void locateDiagramOnStation(int pageIndex, std::shared_ptr<const Railway> railway,
+        std::shared_ptr<const RailStation>, const QTime& time);
 
 };
 

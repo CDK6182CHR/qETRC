@@ -1,6 +1,9 @@
 ﻿#include "railstation.h"
 #include "data/common/stationname.h"
 #include <QDebug>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonValue>
 
 RailStation::RailStation(const StationName& name_,
     double mile_,

@@ -2,11 +2,30 @@
 
 #include <memory>
 #include <QGraphicsView>
-#include <QWidget>
 #include <QString>
-#include <QGraphicsItemGroup>
+#include <QTime>
+#include <deque>
+#include "data/common/direction.h"
+#include "data/diagram/trainline.h"
 
-#include "data/diagram/diagram.h"
+
+class Diagram;
+class QGraphicsItemGroup;
+class TrainItem;
+class DiagramPage;
+class Train;
+class QMenu;
+class TrainLine;
+class TrainAdapter;
+class Railway;
+struct MarginConfig;
+struct Config;
+class Forbid;
+class ForbidNode;
+class Routing;
+namespace qeutil {
+    class QEBalloonTip;
+}
 
 /**
  * @brief The DiagramWidget class  运行图绘图窗口
@@ -46,6 +65,7 @@ class DiagramWidget : public QGraphicsView
     //显示当前车次的Item
     QGraphicsSimpleTextItem* nowItem;
     QGraphicsRectItem* weakItem = nullptr;
+    qeutil::QEBalloonTip* posTip = nullptr;
 
     bool updating = false;
 
@@ -207,8 +227,8 @@ private:
         double width, QList<QGraphicsItem*>& leftItems,
         QList<QGraphicsItem*>& rightItems, double label_start_x);
 
-    const auto& margins()const { return _diagram.config().margins; }
-    const auto& config()const { return _diagram.config(); }
+    const MarginConfig& margins()const;
+    const Config& config()const;
 
     /**
      * 两端对齐且符合指定宽度的字符串
@@ -278,6 +298,9 @@ private:
 
     void hideWeakenItem();
 
+    void showPosTip(const QPoint& pos, const QString& msg, 
+        const QString& title = tr("运行图定位"));
+
 signals:
     void showNewStatus(QString);
     void trainSelected(std::shared_ptr<Train> train);
@@ -315,6 +338,14 @@ public slots:
     void zoomIn();
 
     void zoomOut();
+
+    /**
+     * 定位到指定线路的指定车站
+     */
+    void locateToStation(std::shared_ptr<const Railway> railway,
+        std::shared_ptr<const RailStation> station, const QTime& tm);
+
+    void locateToMile(std::shared_ptr<const Railway> railway, double mile, const QTime& tm);
 
 };
 

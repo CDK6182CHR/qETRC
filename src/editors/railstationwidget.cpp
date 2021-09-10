@@ -11,6 +11,7 @@
 #include <QLineEdit>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QEvent>
 
 
 RailStationWidget::RailStationWidget(RailCategory& cat_, bool inplace, QWidget* parent) :

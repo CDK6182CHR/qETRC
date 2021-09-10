@@ -1312,22 +1312,33 @@ const AdapterStation* TrainLine::stationByTrainLinear(Train::ConstStationPtr st)
 RailStationEventList
     TrainLine::stationEventFromRail(std::shared_ptr<const RailStation> rail) const
 {
+    if (isNull())return {};
+    auto last = std::prev(_stations.end());
     auto p = stationFromYValue(rail->y_value.value());   //运行方向区间后站
     if (p == _stations.end())
         return {};
     else if (p->railStation.lock() == rail) {
-        if (startLabel() || p != _stations.begin()) {
+        // 2021.09.09新增规则：运行线首站到达、末站出发不算进来
+        bool localFirst = (p == _stations.begin());
+        bool localLast = (p == last);
+        if (startLabel() || !localFirst) {
             auto ts = p->trainStation;
             if (ts->isStopped()) {
                 //只要有停车，一律按到达出发处理
-                return { std::make_shared< RailStationEvent>(TrainEventType::Arrive,ts->arrive,
-                    p->railStation,shared_from_this(),
-                    dir() == Direction::Down ? RailStationEvent::Pre : RailStationEvent::Post,
-                    ts->note),
-                    std::make_shared<RailStationEvent>(TrainEventType::Depart,ts->depart,
-                    p->railStation,shared_from_this(),
-                    dir() == Direction::Down ? RailStationEvent::Post : RailStationEvent::Pre,
-                        ts->note) };
+                RailStationEventList res;
+                if (!localFirst) {
+                    res.push_back(std::make_shared< RailStationEvent>(TrainEventType::Arrive, ts->arrive,
+                        p->railStation, shared_from_this(),
+                        dir() == Direction::Down ? RailStationEvent::Pre : RailStationEvent::Post,
+                        ts->note));
+                }
+                if (!localLast) {
+                    res.push_back(std::make_shared<RailStationEvent>(TrainEventType::Depart, ts->depart,
+                        p->railStation, shared_from_this(),
+                        dir() == Direction::Down ? RailStationEvent::Post : RailStationEvent::Pre,
+                        ts->note));
+                }
+                return res;
             }
             else if (isStartingStation(p)) {
                 //始发事件

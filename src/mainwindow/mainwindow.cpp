@@ -55,6 +55,7 @@
 #include "data/train/routing.h"
 
 #include <model/rail/railstationmodel.h>
+#include "dialogs/locatedialog.h"
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -690,6 +691,17 @@ void MainWindow::initToolbar()
         connect(act, SIGNAL(triggered()), this, SLOT(actReadRulerWizard()));
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
+
+        panel->addSeparator();
+        act = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileDialogContentsView),
+            tr("定位"), this);
+        act->setToolTip(tr("运行图定位 (Ctrl+G)\n输入时刻，线路及其里程，"
+            "快速定位到运行图面板上。"));
+        act->setShortcut(Qt::CTRL + Qt::Key_G);
+        connect(act, &QAction::triggered, this, &MainWindow::actLocateDiagram);
+        addAction(act);
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
     }
 
     //列车
@@ -1277,6 +1289,18 @@ void MainWindow::actAutoTrainType()
     }
 }
 
+void MainWindow::actLocateDiagram()
+{
+    if (!locateDialog) {
+        locateDialog = new LocateDialog(_diagram, this);
+        connect(locateDialog, &LocateDialog::locateOnMile,
+            this, &MainWindow::locateDiagramOnMile);
+        connect(locateDialog, &LocateDialog::locateOnStation,
+            this, &MainWindow::locateDiagramOnStation);
+    }
+    locateDialog->showDialog();
+}
+
 void MainWindow::updateWindowTitle()
 {
     QString filename = _diagram.filename();
@@ -1533,6 +1557,17 @@ void MainWindow::insertPageWidget(std::shared_ptr<DiagramPage> page, int index)
     connect(dw, &DiagramWidget::pageFocussedIn, this, &MainWindow::focusInPage);
 }
 
+void MainWindow::activatePageWidget(int index)
+{
+    auto* d = diagramDocks.at(index);
+    if (d->isClosed()) {
+        d->toggleView(true);
+    }
+    else {
+        d->setAsCurrentTab();
+    }
+}
+
 //void MainWindow::actAddPage(std::shared_ptr<DiagramPage> page)
 //{
 //    undoStack->push(new qecmd::AddPage(_diagram, page, this));
@@ -1657,6 +1692,23 @@ void MainWindow::actSearchTrain()
 void MainWindow::saveDefaultConfig()
 {
     _diagram.saveDefaultConfigs();
+}
+
+void MainWindow::locateDiagramOnMile(int pageIndex, std::shared_ptr<Railway> railway, double mile, const QTime& time)
+{
+    if (pageIndex < 0)return;
+    activatePageWidget(pageIndex);
+    auto* w = diagramWidgets.at(pageIndex);
+    w->locateToMile(railway, mile, time);
+}
+
+void MainWindow::locateDiagramOnStation(int pageIndex, std::shared_ptr<const Railway> railway, 
+    std::shared_ptr<const RailStation> station, const QTime& time)
+{
+    if (pageIndex < 0)return;
+    activatePageWidget(pageIndex);
+    auto* w = diagramWidgets.at(pageIndex);
+    w->locateToStation(railway, station, time);
 }
 
 

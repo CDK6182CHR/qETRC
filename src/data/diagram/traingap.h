@@ -86,6 +86,8 @@ struct TrainGap{
         const std::shared_ptr<TrainGap>& gap2);
 };
 
+Q_DECLARE_METATYPE(std::shared_ptr<TrainGap>);
+
 struct TrainGapPtrComparator {
     bool operator()(const std::shared_ptr<TrainGap>& gap1,
         const std::shared_ptr<TrainGap>& gap2)const {

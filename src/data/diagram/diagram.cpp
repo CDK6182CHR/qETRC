@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QJsonObject>
 #include <numeric>
+#include <QJsonDocument>
 
 
 void Diagram::addRailway(std::shared_ptr<Railway> rail)
@@ -547,10 +548,12 @@ TrainGapList Diagram::getTrainGapsSingle(const RailStationEventList& events,
     return res;
 }
 
-TrainGapStatistics Diagram::countTrainGaps(const TrainGapList &gaps) const
+TrainGapStatistics Diagram::countTrainGaps(const TrainGapList &gaps, int cutSecs) const
 {
     TrainGapStatistics res;
     for (const auto& p: gaps) {
+        if (p->secs() < cutSecs)
+            continue;
         if (p->position() == RailStationEvent::NoPos) {
             res.operator[](std::make_pair(p->position(), p->type)).emplace(p);
         }

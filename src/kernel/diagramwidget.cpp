@@ -20,6 +20,7 @@
 #include <QMenu>
 
 #include "mainwindow/version.h"
+#include "util/qeballoomtip.h"
 
 DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page, QWidget* parent):
     QGraphicsView(parent), _page(page),_diagram(diagram),startTime(diagram.config().start_hour,0,0)
@@ -226,6 +227,15 @@ void DiagramWidget::hideWeakenItem()
         weakItem->setVisible(false);
 }
 
+void DiagramWidget::showPosTip(const QPoint& pos, const QString& msg, const QString& title)
+{
+    if (!posTip) {
+        posTip = new qeutil::QEBalloonTip({}, title, msg,this);
+        //scene()->addWidget(posTip);
+    }
+    posTip->balloon(pos, 10000, true);
+}
+
 bool DiagramWidget::toPng(const QString& filename, const QString& title, const QString& note)
 {
     constexpr int note_apdx = 80;
@@ -429,9 +439,12 @@ void DiagramWidget::mouseMoveEvent(QMouseEvent* e)
     intervalToolTip(prev, itr, *line);
 }
 
+
 void DiagramWidget::mouseDoubleClickEvent(QMouseEvent* e)
 {
     QGraphicsView::mouseDoubleClickEvent(e);
+    
+    showPosTip(e->globalPos(), tr("。。。。。。"));
 }
 
 void DiagramWidget::resizeEvent(QResizeEvent* e)
@@ -990,7 +1003,17 @@ void DiagramWidget::drawSingleHLine(const QFont& textFont, double y,
         label_start_x + 5, y));
     
     rightItems.append(alignedTextItem(name, textFont, margins().label_width,
-        scene()->width() - config().rightRectWidth()-5 - margins().right_white , y));
+                                      scene()->width() - config().rightRectWidth()-5 - margins().right_white , y));
+}
+
+const MarginConfig& DiagramWidget::margins() const
+{
+    return _diagram.config().margins;
+}
+
+const Config &DiagramWidget::config() const
+{
+    return _diagram.config();
 }
 
 QGraphicsSimpleTextItem* DiagramWidget::alignedTextItem(const QString& text, 
@@ -1086,6 +1109,45 @@ void DiagramWidget::zoomIn()
 void DiagramWidget::zoomOut()
 {
     scale(0.80, 0.80);
+}
+
+void DiagramWidget::locateToStation(std::shared_ptr<const Railway> railway, 
+    std::shared_ptr<const RailStation> station, const QTime& tm)
+{
+    double x = calXFromStart(tm) ;
+    if (x > config().diagramWidth()) {
+        QMessageBox::warning(this, tr("错误"), tr("无法定位到所给时刻，"
+            "可能因为所给时刻不在铺画范围内。"));
+        return;
+    }
+    x += config().totalLeftMargin();
+    double y = _page->railwayStartY(*railway) + station->y_value.value();
+    QString text = tr("线路：%1\n车站：%2\n时刻：%3")
+        .arg(railway->name(), station->name.toSingleLiteral(), tm.toString("hh:mm:ss"));
+    ensureVisible(x, y, 100, 100);
+    showPosTip(mapToGlobal(mapFromScene(x, y)), text);
+}
+
+void DiagramWidget::locateToMile(std::shared_ptr<const Railway> railway, double mile, const QTime& tm)
+{
+    Railway::SectionInfo info = railway->getSectionInfo(mile);
+    if (!info.has_value()) {
+        QMessageBox::warning(this, tr("错误"), tr("所给里程标无法定位到运行图上，" 
+            "可能是因为所给里程标不在有效范围内。"));
+        return;
+    }
+    double y = std::get<0>(info.value()) + _page->railwayStartY(*railway);
+    double x = calXFromStart(tm);
+    if (x > config().diagramWidth()) {
+        QMessageBox::warning(this, tr("错误"), tr("无法定位到所给时刻，"
+            "可能因为所给时刻不在铺画范围内。"));
+        return;
+    }
+    x += config().totalLeftMargin();
+    QString text = tr("线路：%1\n里程标：%2 km\n时刻：%3")
+        .arg(railway->name(), QString::number(mile, 'f', 3), tm.toString("hh:mm:ss"));
+    ensureVisible(x, y, 100, 100);
+    showPosTip(mapToGlobal(mapFromScene(x, y)), text);
 }
 
 void DiagramWidget::showForbid(std::shared_ptr<Forbid> forbid, Direction dir)

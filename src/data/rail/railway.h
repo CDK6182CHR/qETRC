@@ -552,7 +552,7 @@ public:
      * y坐标值一定有效，根据下行区间进行插值。如果下行区间找不到，直接返回空
      * （特例是给首站的情况，直接返回首站的y坐标）
      */
-    SectionInfo getSectionInfo(double mile);
+    SectionInfo getSectionInfo(double mile)const;
 
     /**
      * 从已有的Forbid中复制数据。
@@ -568,7 +568,6 @@ public:
      * 线性算法。
      */
     std::shared_ptr<RailInterval> intervalCircByIndex(int i);
-
 
 private:
     /**

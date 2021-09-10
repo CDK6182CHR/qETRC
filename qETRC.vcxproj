@@ -202,6 +202,7 @@
     <ClCompile Include="src\dialogs\changestationnamedialog.cpp" />
     <ClCompile Include="src\dialogs\exchangeintervaldialog.cpp" />
     <ClCompile Include="src\dialogs\importtraindialog.cpp" />
+    <ClCompile Include="src\dialogs\locatedialog.cpp" />
     <ClCompile Include="src\dialogs\modifytimetabledialog.cpp" />
     <ClCompile Include="src\dialogs\outputsubdiagramdialog.cpp" />
     <ClCompile Include="src\dialogs\printdiagramdialog.cpp" />
@@ -239,6 +240,8 @@
     <ClCompile Include="src\model\train\timetablequickmodel.cpp" />
     <ClCompile Include="src\model\train\trainlistreadmodel.cpp" />
     <ClCompile Include="src\model\train\typemodel.cpp" />
+    <ClCompile Include="src\util\pagecomboforrail.cpp" />
+    <ClCompile Include="src\util\qeballoomtip.cpp" />
     <ClCompile Include="src\util\railrulercombo.cpp" />
     <ClCompile Include="src\util\selectrailwaycombo.cpp" />
     <ClCompile Include="src\util\selecttraincombo.cpp" />
@@ -341,12 +344,15 @@
     <QtMoc Include="src\editors\routing\routingdiagramwidget.h" />
     <ClInclude Include="src\data\diagram\traingap.h" />
     <ClInclude Include="src\data\train\trainfiltercore.h" />
+    <QtMoc Include="src\dialogs\locatedialog.h" />
     <ClInclude Include="src\model\delegate\linestyledelegate.h" />
     <QtMoc Include="src\model\train\timetablequickmodel.h" />
     <QtMoc Include="src\viewers\timetablequickwidget.h" />
     <QtMoc Include="src\viewers\events\stationtraingapdialog.h" />
     <QtMoc Include="src\model\delegate\timeintervaldelegate.h" />
     <QtMoc Include="src\viewers\events\traingapstatdialog.h" />
+    <QtMoc Include="src\util\qeballoomtip.h" />
+    <QtMoc Include="src\util\pagecomboforrail.h" />
     <ClInclude Include="src\viewers\traindiffdialog.h" />
     <QtMoc Include="src\wizards\readruler\readrulerpageinterval.h" />
     <QtMoc Include="src\wizards\readruler\readrulerwizard.h" />
