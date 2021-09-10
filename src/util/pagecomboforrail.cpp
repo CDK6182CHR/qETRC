@@ -33,6 +33,9 @@ void PageComboForRail::refreshData()
 int PageComboForRail::dlgGetPageIndex(Diagram &diagram, std::shared_ptr<Railway> rail,
             QWidget *parent, const QString &title, const QString &prompt)
 {
+    auto t = diagram.pageIndexWithRail(rail);
+    if (t.empty())return -1;
+    else if (t.size() == 1)return t.front();
     auto* dlg=new QDialog(parent);
     auto* vlay=new QVBoxLayout(dlg);
     dlg->setWindowTitle(title);

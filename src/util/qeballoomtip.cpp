@@ -133,7 +133,7 @@ QEBalloonTip::QEBalloonTip(const QIcon& icon, const QString& title,
     setPalette(pal);
 }
 
-void QEBalloonTip::paintEvent(QPaintEvent *)
+void QEBalloonTip::paintEvent(QPaintEvent * e)
 {
     QPainter painter(this);
     painter.drawPixmap(rect(), pixmap);

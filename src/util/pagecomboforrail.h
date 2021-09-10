@@ -24,6 +24,11 @@ public:
     int pageIndex()const;
     void refreshData();
 
+    /**
+     * 打开对话框，询问选择的运行图。
+     * 特殊情况：如果没有符合条件的，直接返回-1；
+     * 如果恰有一个符合条件，直接返回其下标。
+     */
     static int dlgGetPageIndex(Diagram& diagram, std::shared_ptr<Railway> rail,
                         QWidget* parent, const QString& title, const QString& prompt);
 

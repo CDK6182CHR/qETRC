@@ -408,6 +408,8 @@ void RailContext::actStationEvents()
 void RailContext::stationEvents(std::shared_ptr<RailStation> station)
 {
 	auto* dialog = new RailStationEventListDialog(diagram, railway, station, mw);
+	connect(dialog, &RailStationEventListDialog::locateOnEvent,
+		mw, &MainWindow::locateDiagramOnStation);
 	dialog->show();
 }
 
@@ -470,6 +472,8 @@ void RailContext::actTrainGapSummary()
 {
 	if (!railway)return;
 	auto* dlg = new TrainGapSummaryDialog(diagram, railway, mw);
+	connect(dlg, &TrainGapSummaryDialog::locateOnEvent,
+		mw, &MainWindow::locateDiagramOnStation);
 	dlg->show();
 }
 

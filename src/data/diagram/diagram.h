@@ -365,6 +365,11 @@ public:
             int cutCount=1
             );
 
+    /**
+     * 返回包含所给线路的Page的下标集合。
+     */
+    QVector<int> pageIndexWithRail(std::shared_ptr<const Railway> railway)const;
+
 private:
     void bindAllTrains();
     QString validPageName(const QString& prefix)const;

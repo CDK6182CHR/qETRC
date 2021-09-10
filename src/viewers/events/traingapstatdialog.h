@@ -112,6 +112,9 @@ public:
                           QWidget* parent=nullptr);
 private:
     void initUI();
+signals:
+    void locateOnEvent(int pageIndex, std::shared_ptr<const Railway>,
+        std::shared_ptr<const RailStation>, const QTime&);  // 只用来转发
 private slots:
     void toCsv();
     void onDoubleClicked(const QModelIndex& idx);

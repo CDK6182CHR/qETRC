@@ -96,13 +96,14 @@ void LocateDialog::onApplied()
     auto railway=cbRailway->railway();
     if(!railway)return;
     if (rdStation->isChecked()){
-        // 首先保证车站非空
-        if(cbStation->currentIndex()==-1) return;
+        //if(cbStation->currentIndex()==-1) return;
+        //如果是-1，交给mainwindow报错
         auto st=qvariant_cast<std::shared_ptr<RailStation>>(cbStation->currentData());
         emit locateOnStation(cbPage->pageIndex(),railway,st,edTime->time());
     }else{
         emit locateOnMile(cbPage->pageIndex(),railway,spMile->value(),edTime->time());
     }
+    done(Accepted);
 }
 
 void LocateDialog::showDialog()

@@ -636,6 +636,17 @@ ReadRulerReport Diagram::rulerFromMultiTrains(std::shared_ptr<Railway> railway,
     return res;
 }
 
+QVector<int> Diagram::pageIndexWithRail(std::shared_ptr<const Railway> railway)const
+{
+    QVector<int> res;
+    for (int i = 0; i < _pages.size(); i++) {
+        if (_pages.at(i)->containsRailway(*railway)) {
+            res.push_back(i);
+        }
+    }
+    return res;
+}
+
 void Diagram::bindAllTrains()
 {
     foreach (auto p , railways()) {

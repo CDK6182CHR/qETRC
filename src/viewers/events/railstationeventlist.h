@@ -46,6 +46,7 @@ public:
     void setupModel();
     const auto& getData()const { return lst; }
     std::shared_ptr<const Train> trainForRow(int row)const;
+    QTime timeForRow(int row)const;
 };
 
 class RailStationEventListDialog : public QDialog
@@ -83,8 +84,11 @@ private:
      * 根据pred，返回true的显示，否则隐藏
      */
     void filtTableRows(std::function<bool(int)> pred);
-
     void updateShownRows(int cnt);
+
+signals:
+    void locateOnEvent(int pageIndex, std::shared_ptr<const Railway>,
+        std::shared_ptr<const RailStation>, const QTime&);
 
 private slots:
 
@@ -98,6 +102,8 @@ private slots:
     void gapAnalysis();
 
     void onFilterChanged();
+
+    void actLocate();
 
 };
 

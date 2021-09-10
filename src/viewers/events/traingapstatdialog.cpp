@@ -259,6 +259,8 @@ void TrainGapSummaryDialog::onDoubleClicked(const QModelIndex& idx)
     decltype(auto) events = model->getEvents();
     auto* dlg = new StationTrainGapDialog(model->getDiagram(), model->getRailway(),
         st, events.at(st), filter, this, ckSingle->isChecked(), spCut->value());
+    connect(dlg, &StationTrainGapDialog::locateToEvent,
+        this, &TrainGapSummaryDialog::locateOnEvent);
     dlg->show();
 }
 

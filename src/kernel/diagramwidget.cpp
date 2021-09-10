@@ -227,11 +227,16 @@ void DiagramWidget::hideWeakenItem()
         weakItem->setVisible(false);
 }
 
+#include <QGraphicsProxyWidget>
+
 void DiagramWidget::showPosTip(const QPoint& pos, const QString& msg, const QString& title)
 {
     if (!posTip) {
-        posTip = new qeutil::QEBalloonTip({}, title, msg,this);
-        //scene()->addWidget(posTip);
+        posTip = new qeutil::QEBalloonTip({}, title, msg, this);
+        //pw = scene()->addWidget(posTip, Qt::ToolTip);
+    }
+    else {
+        posTip->setContents(title, msg);
     }
     posTip->balloon(pos, 10000, true);
 }
@@ -1124,7 +1129,7 @@ void DiagramWidget::locateToStation(std::shared_ptr<const Railway> railway,
     double y = _page->railwayStartY(*railway) + station->y_value.value();
     QString text = tr("线路：%1\n车站：%2\n时刻：%3")
         .arg(railway->name(), station->name.toSingleLiteral(), tm.toString("hh:mm:ss"));
-    ensureVisible(x, y, 100, 100);
+    centerOn(x, y);
     showPosTip(mapToGlobal(mapFromScene(x, y)), text);
 }
 
@@ -1146,7 +1151,7 @@ void DiagramWidget::locateToMile(std::shared_ptr<const Railway> railway, double 
     x += config().totalLeftMargin();
     QString text = tr("线路：%1\n里程标：%2 km\n时刻：%3")
         .arg(railway->name(), QString::number(mile, 'f', 3), tm.toString("hh:mm:ss"));
-    ensureVisible(x, y, 100, 100);
+    centerOn(x, y);
     showPosTip(mapToGlobal(mapFromScene(x, y)), text);
 }
 

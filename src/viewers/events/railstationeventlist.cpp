@@ -9,12 +9,14 @@
 #include "stationtraingapdialog.h"
 #include "model/delegate/qedelegate.h"
 #include "data/common/qeglobal.h"
+#include "util/pagecomboforrail.h"
 
 #include <QFormLayout>
 #include <QTableView>
 #include <QHeaderView>
 #include <QLabel>
 #include <QCheckBox>
+#include <QAction>
 
 RailStationEventListModel::RailStationEventListModel(Diagram& diagram, const std::shared_ptr<Railway>& rail, const std::shared_ptr<RailStation>& station, QObject* parent) : QStandardItemModel(parent),
 diagram(diagram),
@@ -46,7 +48,9 @@ void RailStationEventListModel::setupModel()
 		v.setValue(train);
 		it->setData(v, qeutil::TrainRole);
 		setItem(i, ColTrainName, it);
-		setItem(i, ColTime, new SI(ev.time.toString("hh:mm:ss")));
+		it = new SI(ev.time.toString("hh:mm:ss"));
+		it->setData(ev.time, qeutil::TimeDataRole);
+		setItem(i, ColTime, it);
 		setItem(i, ColEventType, new SI(qeutil::eventTypeString(ev.type)));
 		setItem(i, ColPos, new SI(ev.posString()));
 		setItem(i, ColTrainType, new SI(line->train()->type()->name()));
@@ -70,6 +74,11 @@ std::shared_ptr<const Train> RailStationEventListModel::trainForRow(int row) con
 {
 	return qvariant_cast<std::shared_ptr<const Train>>(
 		item(row, ColTrainName)->data(qeutil::TrainRole));
+}
+
+QTime RailStationEventListModel::timeForRow(int row) const
+{
+	return item(row, ColTime)->data(qeutil::TimeDataRole).toTime();
 }
 
 RailStationEventListDialog::RailStationEventListDialog(Diagram& diagram, const std::shared_ptr<Railway>& rail, const std::shared_ptr<RailStation>& station, QWidget* parent) : QDialog(parent),
@@ -124,6 +133,11 @@ void RailStationEventListDialog::initUI()
 		SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), table,
 		SLOT(sortByColumn(int, Qt::SortOrder)));
 	vlay->addWidget(table);
+
+	auto* act = new QAction(tr("定位到运行图"), table);
+	table->addAction(act);
+	table->setContextMenuPolicy(Qt::ActionsContextMenu);
+	connect(act, &QAction::triggered, this, &RailStationEventListDialog::actLocate);
 
 	auto* h = new ButtonGroup<3>({ "导出CSV","间隔分析" ,"关闭"});
 	h->connectAll(SIGNAL(clicked()), this, {
@@ -229,6 +243,8 @@ void RailStationEventListDialog::gapAnalysis()
 {
 	auto* dialog = new StationTrainGapDialog(diagram, rail, station, model->getData(),
 		filter, this);
+	connect(dialog, &StationTrainGapDialog::locateToEvent,
+		this, &RailStationEventListDialog::locateOnEvent);
 	dialog->show();
 }
 
@@ -237,5 +253,16 @@ void RailStationEventListDialog::onFilterChanged()
 	filtTableRows([this](int row)->bool {
 		return filter->check(model->trainForRow(row));
 		});
+}
+
+void RailStationEventListDialog::actLocate()
+{
+	auto&& idx = table->currentIndex();
+	if (!idx.isValid())return;
+	auto time = model->timeForRow(idx.row());
+	int i = PageComboForRail::dlgGetPageIndex(diagram, rail, this, tr("选择运行图"),
+		tr("请选择要定位到的运行图窗口名："));
+	if (i == -1)return;
+	emit locateOnEvent(i, rail, station, time);
 }
 

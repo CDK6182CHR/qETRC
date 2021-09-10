@@ -1696,7 +1696,11 @@ void MainWindow::saveDefaultConfig()
 
 void MainWindow::locateDiagramOnMile(int pageIndex, std::shared_ptr<Railway> railway, double mile, const QTime& time)
 {
-    if (pageIndex < 0)return;
+    if (pageIndex < 0) {
+        QMessageBox::warning(this, tr("错误"), tr("线路[%1]没有包含在任何运行图中，"
+            "无法进行定位。").arg(railway->name()));
+        return;
+    }
     activatePageWidget(pageIndex);
     auto* w = diagramWidgets.at(pageIndex);
     w->locateToMile(railway, mile, time);
@@ -1705,7 +1709,11 @@ void MainWindow::locateDiagramOnMile(int pageIndex, std::shared_ptr<Railway> rai
 void MainWindow::locateDiagramOnStation(int pageIndex, std::shared_ptr<const Railway> railway, 
     std::shared_ptr<const RailStation> station, const QTime& time)
 {
-    if (pageIndex < 0)return;
+    if (pageIndex < 0) {
+        QMessageBox::warning(this, tr("错误"), tr("线路[%1]没有包含在任何运行图中，"
+            "无法进行定位。").arg(railway->name()));
+        return;
+    }
     activatePageWidget(pageIndex);
     auto* w = diagramWidgets.at(pageIndex);
     w->locateToStation(railway, station, time);
