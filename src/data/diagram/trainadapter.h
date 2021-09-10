@@ -18,7 +18,7 @@ class TrainCollection;
  */
 class TrainAdapter
 {
-    Railway& _railway;
+    std::weak_ptr<Railway> _railway;
     std::weak_ptr<Train> _train;
 
     /**
@@ -34,7 +34,7 @@ public:
      * @brief 将线路与列车绑定，生成相关信息
      * @param config  暂时不保存，只用来生成信息
      */
-    TrainAdapter(std::weak_ptr<Train> train, Railway& railway,
+    TrainAdapter(std::weak_ptr<Train> train, std::weak_ptr<Railway> railway,
                  const Config& config);
     TrainAdapter(const TrainAdapter&) = delete;
     TrainAdapter(TrainAdapter&&) = default;
@@ -52,19 +52,18 @@ public:
 
     inline bool isNull()const { return _lines.empty(); }
 
-    inline auto& railway() { return _railway; }
-    inline const auto& railway()const { return _railway; }
+    inline auto railway()const { return _railway.lock(); }
     std::shared_ptr<Train> train() { return _train.lock(); }
     std::shared_ptr<const Train> train()const { return _train.lock(); }
     inline auto& lines() { return _lines; }
     inline const auto& lines()const { return _lines; }
 
     inline bool isInSameRailway(const TrainAdapter& another)const {
-        return &_railway == &(another._railway);
+        return _railway.lock() == another._railway.lock();
     }
 
     inline bool isInSameRailway(std::shared_ptr<const Railway> rail)const {
-        return &_railway == rail.get();
+        return _railway.lock() == rail;
     }
 
     /**

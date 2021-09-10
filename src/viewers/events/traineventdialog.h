@@ -23,6 +23,7 @@ class TrainEventModel:public QStandardItemModel
      * ETRC风格的报告，计算后立即生成好
      */
     QString etrcReport;
+public:
 
     enum Columns {
         ColRail=0,
@@ -35,7 +36,6 @@ class TrainEventModel:public QStandardItemModel
         ColMAX
     };
 
-public:
     TrainEventModel(std::shared_ptr<Train> train_,
                     Diagram& diagram_,
                     QObject* parent=nullptr);
@@ -44,12 +44,17 @@ public:
 
     bool exportToCsv(const QString& filename);
 
+    QTime timeForRow(int row)const;
+    std::shared_ptr<Railway> railForRow(int row)const;
+    double mileForRow(int row)const;
+
 private:
     void setupModel();
     void setStationRow(int row, std::shared_ptr<TrainAdapter> adp, const StationEvent& e);
     void setIntervalRow(int row, std::shared_ptr<TrainAdapter> adp, const IntervalEvent& e);
 };
 
+class QTableView;
 
 /**
  * @brief The TrainEventDialog class
@@ -61,15 +66,22 @@ class TrainEventDialog : public QDialog
     Diagram& diagram;
     std::shared_ptr<Train> train;
     TrainEventModel* model;
+    QTableView* table;
 public:
     TrainEventDialog(Diagram& diagram_, std::shared_ptr<Train> train, QWidget* parent = nullptr);
 
     void initUI();
+
+signals:
+    void locateToEvent(int pageIndex, std::shared_ptr<const Railway> railway,
+        double mile, const QTime&);
 
 private slots:
     void exportETRC();
     void exportText();
     void exportExcel();
     void exportCsv();
+    void actLocate();
+
 };
 

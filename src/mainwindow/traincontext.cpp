@@ -682,6 +682,8 @@ void TrainContext::showTrainEvents()
 		return;
 	}
 	auto* dialog = new TrainEventDialog(diagram, train, mw);
+	connect(dialog, &TrainEventDialog::locateToEvent,
+		mw, &MainWindow::locateDiagramOnMile);
 	dialog->show();
 }
 

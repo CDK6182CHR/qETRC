@@ -1694,7 +1694,7 @@ void MainWindow::saveDefaultConfig()
     _diagram.saveDefaultConfigs();
 }
 
-void MainWindow::locateDiagramOnMile(int pageIndex, std::shared_ptr<Railway> railway, double mile, const QTime& time)
+void MainWindow::locateDiagramOnMile(int pageIndex, std::shared_ptr<const Railway> railway, double mile, const QTime& time)
 {
     if (pageIndex < 0) {
         QMessageBox::warning(this, tr("错误"), tr("线路[%1]没有包含在任何运行图中，"

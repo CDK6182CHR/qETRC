@@ -57,7 +57,7 @@ TrainLine::TrainLine(TrainAdapter& adapter) :
 void TrainLine::print() const
 {
     qDebug() << "TrainLine  labels (" << _startLabel << ", " << _endLabel << "): ";
-    qDebug() << train()->trainName().full() << " @ " << _adapter.railway().name() << Qt::endl;
+    qDebug() << train()->trainName().full() << " @ " << _adapter.railway()->name() << Qt::endl;
     for (const auto& p : _stations) {
         qDebug() << *p.trainStation << " -> " << p.railStation.lock()->name << Qt::endl;
     }
@@ -370,11 +370,11 @@ void TrainLine::diagnoForbid(DiagnosisList& res, std::shared_ptr<const RailInter
     const QTime& in, const QTime& out) const
 {
     const auto& rail = _adapter.railway();
-    if (rail.forbids().size() != Forbid::FORBID_COUNT) {
+    if (rail->forbids().size() != Forbid::FORBID_COUNT) {
         qDebug() << "TrainLine::diagnoForbid: WARNING: unexpeted forbid count: " <<
-            rail.forbids().size() << ", expected " << Forbid::FORBID_COUNT << Qt::endl;
+            rail->forbids().size() << ", expected " << Forbid::FORBID_COUNT << Qt::endl;
     }
-    foreach(auto f, rail.forbids()) {
+    foreach(auto f, rail->forbids()) {
         auto n = railint->getForbidNode(f);
         if (!n->isNull()) {
             if (qeutil::timeRangeIntersected(n->beginTime, n->endTime,
@@ -1193,7 +1193,7 @@ bool TrainLine::mileAfterEq(std::shared_ptr<const RailStation> st, double mile) 
 QString TrainLine::stationString(const AdapterStation& st) const
 {
     return st.trainStation->name.toSingleLiteral() + " [" +
-        train()->trainName().full() + " @ " + _adapter.railway().name() + "]";
+        train()->trainName().full() + " @ " + _adapter.railway()->name() + "]";
 }
 
 bool TrainLine::notStartOrEnd(const TrainLine& another, ConstAdaPtr pme, ConstAdaPtr phe)const
@@ -1264,7 +1264,7 @@ QString TrainLine::attachTypeStringFull(IntervalAttachType type)
     return res;
 }
 
-const Railway& TrainLine::railway() const
+std::shared_ptr<const Railway> TrainLine::railway() const
 {
     return _adapter.railway();
 }

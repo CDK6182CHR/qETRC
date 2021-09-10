@@ -4,7 +4,7 @@
 #include "kernel/trainitem.h"
 
 TrainAdapter::TrainAdapter(std::weak_ptr<Train> train,
-    Railway& railway, const Config& config):
+    std::weak_ptr<Railway> railway, const Config& config):
     _railway(railway),_train(train)
 {
 	autoLines(config);
@@ -22,7 +22,7 @@ TrainAdapter& TrainAdapter::operator=(TrainAdapter&& another)noexcept
 void TrainAdapter::print() const
 {
     qDebug() << "TrainAdapter: " << train()->trainName().full() << " @ " <<
-        _railway.name() << ", lines: " << _lines.size() << Qt::endl;
+        _railway.lock()->name() << ", lines: " << _lines.size() << Qt::endl;
 	for (const auto& p : _lines) {
 		p->print();
 	}
@@ -148,7 +148,7 @@ void TrainAdapter::autoLines(const Config& config)
 {
 	//命名规则：前缀r表示rail，t表示train
     auto& table = train()->timetable();
-    auto& rail = _railway;    //alias
+    auto rail = _railway.lock();    //alias
 	//上一个绑定到的车站
     auto tlast = train()->nullStation();
 	std::shared_ptr<RailStation> rlast{};
@@ -163,7 +163,7 @@ void TrainAdapter::autoLines(const Config& config)
 
 
 	for (auto tcur = table.begin(); tcur != table.end(); ++tcur) {
-        std::shared_ptr rcur = rail.stationByGeneralName(tcur->name);
+        std::shared_ptr rcur = rail->stationByGeneralName(tcur->name);
 		bool bound = false;   //本站是否成功绑定
 		if (rcur) {
 			if (!loccnt) {
@@ -171,7 +171,7 @@ void TrainAdapter::autoLines(const Config& config)
 				line->addStation(tcur, rcur);
 				bound = true;
 			}
-			else if (loccnt == 1 && !rlast->isDirectionVia(rail.gapDirection(rlast, rcur))) {
+			else if (loccnt == 1 && !rlast->isDirectionVia(rail->gapDirection(rlast, rcur))) {
 				//首先判断是否要撤销第一站的绑定 （应当很少见的特殊情况）
 				//第一个站是非法绑定，即它的行别不匹配 （例如上行经过下行单向站）
 				//此时应当撤销上一站的绑定，当前站的绑定按照第一站的规则进行；但行别已经确定
@@ -181,7 +181,7 @@ void TrainAdapter::autoLines(const Config& config)
 				line->_stations.pop_back();
 				loccnt--;
 			}
-			else if (rcur->isDirectionVia(locdir = rail.gapDirection(rlast, rcur))) {  
+			else if (rcur->isDirectionVia(locdir = rail->gapDirection(rlast, rcur))) {  
 				if (rcur == rlast) {
 					//如果本站和上一站是同一站...直接绑定
 					//此时不对方向有任何判断
@@ -189,7 +189,7 @@ void TrainAdapter::autoLines(const Config& config)
 					bound = true;
 				}
 				// !rlast  此前已经有过绑定
-                else if (rail.stationsBetween(rlast, rcur) + tpass >
+                else if (rail->stationsBetween(rlast, rcur) + tpass >
 					config.max_passed_stations) {
 					//跨越区间数量超限，截断运行线
 					if (loccnt >= 2) {  

@@ -127,9 +127,9 @@ void RulerRefModel::setRulerIndex(int i)
 {
     ruler.reset();
     if (adp) {
-        auto& rail = adp->railway();
-        if (i > 0 && i <= rail.rulers().size()) {
-            ruler = rail.getRuler(i - 1);
+        auto rail = adp->railway();
+        if (i > 0 && i <= rail->rulers().size()) {
+            ruler = rail->getRuler(i - 1);
         }
     }
     setupModel();
@@ -158,7 +158,7 @@ void RulerRefDialog::initUI()
         SLOT(setRulerIndex(int)));
 
     for (auto t : train->adapters()) {
-        cbRail->addItem(t->railway().name());
+        cbRail->addItem(t->railway()->name());
     }
     
     hlay->addWidget(cbRail);
@@ -186,7 +186,7 @@ void RulerRefDialog::onRailIndexChanged(int i)
 
     cbRuler->clear();
     cbRuler->addItem(tr("(空)"));
-    for (auto t : adp->railway().rulers()) {
+    for (auto t : adp->railway()->rulers()) {
         cbRuler->addItem(t->name());
     }
 

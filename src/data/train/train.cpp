@@ -243,11 +243,11 @@ QList<Train::StationPtr> Train::findAllGeneralStations(const StationName &name)
     return res;
 }
 
-std::shared_ptr<TrainAdapter> Train::bindToRailway(Railway& railway, const Config& config)
+std::shared_ptr<TrainAdapter> Train::bindToRailway(std::shared_ptr<Railway> railway, const Config& config)
 {
     //2021.06.24 新的实现 基于Adapter
     for (auto p = _adapters.begin(); p != _adapters.end(); ++p) {
-        if (&((*p)->railway()) == &railway) {
+        if (((*p)->railway()) == railway) {
             invalidateTempData();
             return *p;
         }
@@ -262,7 +262,7 @@ std::shared_ptr<TrainAdapter> Train::bindToRailway(Railway& railway, const Confi
 }
 
 
-std::shared_ptr<TrainAdapter> Train::updateBoundRailway(Railway& railway, const Config& config)
+std::shared_ptr<TrainAdapter> Train::updateBoundRailway(std::shared_ptr<Railway> railway, const Config& config)
 {
     //2021.06.24  基于Adapter新的实现
     //2021.07.04  TrainLine里面有Adapter的引用。不要move assign，直接删了重来好了
@@ -271,10 +271,10 @@ std::shared_ptr<TrainAdapter> Train::updateBoundRailway(Railway& railway, const 
     return nullptr;
 }
 
-void Train::unbindToRailway(const Railway& railway)
+void Train::unbindToRailway(std::shared_ptr<const Railway> railway)
 {
     for (auto p = _adapters.begin(); p != _adapters.end(); ++p) {
-        if (&((*p)->railway()) == &railway) {
+        if (((*p)->railway()) == railway) {
             _adapters.erase(p);
             invalidateTempData();
             return;
@@ -764,7 +764,7 @@ void Train::swapBaseInfo(Train& other)
 std::shared_ptr<const TrainAdapter> Train::adapterFor(const Railway& railway)const
 {
     for(auto adp:_adapters){
-        if(&(adp->railway())==&railway){
+        if((adp->railway().get())==&railway){
             return adp;
         }
     }

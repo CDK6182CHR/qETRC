@@ -9,6 +9,9 @@
 #include <QDoubleSpinBox>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QAction>
+#include "model/delegate/qetimedelegate.h"
+#include "util/pagecomboforrail.h"
 
 RailSectionEventsModel::RailSectionEventsModel(Diagram &diagram_,
                                                std::shared_ptr<Railway> rail,
@@ -29,6 +32,11 @@ void RailSectionEventsModel::setY(double y)
     setupModel();
 }
 
+QTime RailSectionEventsModel::timeForRow(int row) const
+{
+    return item(row, ColTime)->data(Qt::EditRole).toTime();
+}
+
 void RailSectionEventsModel::setupModel()
 {
     using SI = QStandardItem;
@@ -41,7 +49,9 @@ void RailSectionEventsModel::setupModel()
         auto line = p.first;
         auto train = line->train();
         setItem(i, ColTrainName, new SI(train->trainName().full()));
-        setItem(i, ColTime, new SI(p.second.toString("hh:mm:ss")));
+        auto* it = new SI;
+        it->setData(p.second, Qt::EditRole);
+        setItem(i, ColTime, it);
         setItem(i, ColType, new SI(train->type()->name()));
         setItem(i, ColDir, new SI(DirFunc::dirToString(line->dir())));
         setItem(i, ColStarting, new SI(train->starting().toSingleLiteral()));
@@ -114,11 +124,18 @@ void RailSectionEventsDialog::initUI()
     table->setModel(model);
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->setEditTriggers(QTableView::NoEditTriggers);
+    table->setItemDelegateForColumn(RailSectionEventsModel::ColTime,
+        new QETimeDelegate(this));
 
     connect(table->horizontalHeader(),SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
             table,SLOT(sortByColumn(int,Qt::SortOrder)));
     table->horizontalHeader()->setSortIndicatorShown(true);
     vlay->addWidget(table);
+
+    auto* act = new QAction(tr("定位到运行图"), this);
+    connect(act, &QAction::triggered, this, &RailSectionEventsDialog::actLocate);
+    table->addAction(act);
+    table->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     auto* g=new ButtonGroup<2>({"导出CSV","关闭"});
     g->connectAll(SIGNAL(clicked()),this,{
@@ -166,4 +183,14 @@ void RailSectionEventsDialog::toCsv()
 {
     QString r=tr("%1断面事件表").arg(railway->name());
     qeutil::exportTableToCsv(model,this,r);
+}
+
+void RailSectionEventsDialog::actLocate()
+{
+    auto&& idx = table->currentIndex();
+    if (!idx.isValid())return;
+    int pageIndex = PageComboForRail::dlgGetPageIndex(diagram, railway, this,
+        tr("选择运行图"), tr("请选择要定位到的运行图页面"));
+    if (pageIndex < 0)return;
+    emit locateToEvent(pageIndex, railway, spMile->value(), model->timeForRow(idx.row()));
 }

@@ -76,7 +76,7 @@ void RailContext::updateForbidDiagrams(std::shared_ptr<Forbid> forbid, Direction
 
 void RailContext::initUI()
 {
-	auto* page = cont->addCategoryPage(tr("线路编辑(&8)"));
+	auto* page = cont->addCategoryPage(tr("线路工具(&8)"));
 
 	auto* panel = page->addPannel(tr(""));
 
@@ -416,12 +416,16 @@ void RailContext::stationEvents(std::shared_ptr<RailStation> station)
 void RailContext::actSectionEvents()
 {
 	auto* dialog = new RailSectionEventsDialog(diagram, railway, mw);
+	connect(dialog, &RailSectionEventsDialog::locateToEvent,
+		mw, &MainWindow::locateDiagramOnMile);
 	dialog->show();
 }
 
 void RailContext::actSnapEvents()
 {
 	auto* dialog = new RailSnapEventsDialog(diagram, railway, mw);
+	connect(dialog, &RailSnapEventsDialog::locateToEvent,
+		mw, &MainWindow::locateDiagramOnMile);
 	dialog->show();
 }
 

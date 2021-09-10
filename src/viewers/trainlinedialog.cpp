@@ -31,7 +31,7 @@ void TrainLineListModel::setupModel()
     for(auto adp:train->adapters()){
         for(auto line: adp->lines()){
             insertRow(row);
-            auto* it=new SI(adp->railway().name());
+            auto* it=new SI(adp->railway()->name());
             QVariant v;
             v.setValue(line);
             it->setData(v,qeutil::TrainLineRole);

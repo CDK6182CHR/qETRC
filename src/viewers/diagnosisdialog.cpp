@@ -21,7 +21,7 @@ void DiagnosisModel::setupModel()
         const auto& iss = lst.at(i);
         auto train = iss.line->train();
         setItem(i, ColTrainName, new SI(train->trainName().full()));
-        setItem(i, ColRailway, new SI(iss.line->railway().name()));
+        setItem(i, ColRailway, new SI(iss.line->railway()->name()));
         setItem(i, ColPos, new SI(iss.posString()));
         setItem(i, ColLevel, new SI(qeutil::diagnoLevelString(iss.level)));
         setItem(i, ColType, new SI(qeutil::diagnoTypeString(iss.type)));

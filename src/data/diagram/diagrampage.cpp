@@ -185,7 +185,7 @@ bool DiagramPage::hasTrain(const Train& train) const
 {
     for (auto r : _railways) {
         for (auto a : train.adapters()) {
-            if (r.get() == &(a->railway()))
+            if (r == (a->railway()))
                 return true;
         }
     }

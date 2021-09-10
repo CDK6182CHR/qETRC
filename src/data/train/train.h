@@ -214,7 +214,7 @@ public:
      * 注意：如果已经绑定到同一条线路，不做任何事
      * （在这里调用TrainAdapter构造函数）
      */
-    std::shared_ptr<TrainAdapter> bindToRailway(Railway& railway, const Config& config);
+    std::shared_ptr<TrainAdapter> bindToRailway(std::shared_ptr<Railway> railway, const Config& config);
 
     /**
      * 一次性清除所有绑定数据
@@ -225,13 +225,13 @@ public:
      * 适用于线路可能发生变化时，
      * 即使已经绑定到同一条线路，也会撤销再重来 （转移构造）
      */
-    std::shared_ptr<TrainAdapter> updateBoundRailway(Railway& railway, const Config& config);
+    std::shared_ptr<TrainAdapter> updateBoundRailway(std::shared_ptr<Railway> railway, const Config& config);
 
     /**
      * @brief unbindToRailway
      * 撤销与所选线路的绑定，删除绑定对象。基于地址判定。
      */
-    void unbindToRailway(const Railway& railway);
+    void unbindToRailway(std::shared_ptr<const Railway> railway);
 
     //inline bool isBoundToRailway()const { return !_boundRail.expired(); }
 

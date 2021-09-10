@@ -428,7 +428,7 @@ public slots:
     void saveDefaultConfig();
 
     void locateDiagramOnMile(int pageIndex, 
-        std::shared_ptr<Railway>, double mile, const QTime& time);
+        std::shared_ptr<const Railway>, double mile, const QTime& time);
     void locateDiagramOnStation(int pageIndex, std::shared_ptr<const Railway> railway,
         std::shared_ptr<const RailStation>, const QTime& time);
 

@@ -4,6 +4,8 @@
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"
 #include "data/train/routing.h"
+#include "model/delegate/generaldoublespindelegate.h"
+#include "util/pagecomboforrail.h"
 
 RailSnapEventsModel::RailSnapEventsModel(Diagram &diagram_,
                                          std::shared_ptr<Railway> railway_,
@@ -24,6 +26,11 @@ void RailSnapEventsModel::setTime(const QTime &time)
     setupModel();
 }
 
+double RailSnapEventsModel::mileForRow(int row) const
+{
+    return item(row, ColMile)->data(Qt::EditRole).toDouble();
+}
+
 void RailSnapEventsModel::setupModel()
 {
     beginResetModel();
@@ -34,7 +41,9 @@ void RailSnapEventsModel::setupModel()
         const auto& e=lst.at(i);
         auto train=e.line->train();
         setItem(i,ColTrainName,new SI(train->trainName().full()));
-        setItem(i,ColMile,new SI(QString::number(e.mile,'f',3)));
+        auto* it = new SI;
+        it->setData(e.mile, Qt::EditRole);
+        setItem(i, ColMile, it);
         if(e.isStationEvent()){
             auto st=std::get<std::shared_ptr<const RailStation>>(e.pos);
             setItem(i,ColPos,new SI(st->name.toSingleLiteral()));
@@ -93,8 +102,15 @@ void RailSnapEventsDialog::initUI()
     table->setModel(model);
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->horizontalHeader()->setSortIndicatorShown(true);
+    table->setEditTriggers(QTableView::NoEditTriggers);
+    table->setItemDelegateForColumn(RailSnapEventsModel::ColMile,
+        new GeneralDoubleSpinDelegate(this));
+    auto* act = new QAction(tr("定位到运行图"), this);
+    table->addAction(act);
+    connect(act, &QAction::triggered, this, &RailSnapEventsDialog::actLocate);
     connect(table->horizontalHeader(),SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
             table,SLOT(sortByColumn(int,Qt::SortOrder)));
+    table->setContextMenuPolicy(Qt::ActionsContextMenu);
     vlay->addWidget(table);
     auto* g=new ButtonGroup<2>({"导出CSV","关闭"});
     g->connectAll(SIGNAL(clicked()),this,{SLOT(toCsv()),SLOT(close())});
@@ -113,4 +129,14 @@ void RailSnapEventsDialog::toCsv()
 {
     QString s=tr("%1运行快照").arg(railway->name());
     qeutil::exportTableToCsv(model,this,s);
+}
+
+void RailSnapEventsDialog::actLocate()
+{
+    auto&& idx = table->currentIndex();
+    if (!idx.isValid())return;
+    int pageIndex = PageComboForRail::dlgGetPageIndex(diagram, railway, this,
+        tr("选择运行图"), tr("请选择要定位到的运行图页面："));
+    if (pageIndex < 0)return;
+    emit locateToEvent(pageIndex, railway, model->mileForRow(idx.row()), timeEdit->time());
 }

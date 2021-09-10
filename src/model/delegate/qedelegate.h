@@ -20,6 +20,7 @@ enum {
     TrainStationRole,
     TimeDataRole,
     TrainGapRole,
+    RailwayRole,
 };
 }
 

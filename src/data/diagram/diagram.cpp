@@ -16,7 +16,7 @@ void Diagram::addRailway(std::shared_ptr<Railway> rail)
 {
     railways().append(rail);
     foreach (auto p , trains()) {
-        p->bindToRailway(*rail, _config);
+        p->bindToRailway(rail, _config);
     }
 }
 
@@ -44,14 +44,14 @@ std::shared_ptr<Railway> Diagram::railwayByName(const QString &name)
 void Diagram::updateRailway(std::shared_ptr<Railway> r)
 {
     foreach (const auto& p, _trainCollection.trains()){
-        p->updateBoundRailway(*r, _config);
+        p->updateBoundRailway(r, _config);
     }
 }
 
 void Diagram::updateTrain(std::shared_ptr<Train> t)
 {
     foreach(const auto& r, railways()){
-        t->updateBoundRailway(*r, _config);
+        t->updateBoundRailway(r, _config);
     }
 }
 
@@ -134,7 +134,7 @@ void Diagram::applyBindOn(TrainCollection& coll)
 {
     foreach (auto p , railways()) {
         for (auto t : coll.trains()) {
-            t->bindToRailway(*p, _config);
+            t->bindToRailway(p, _config);
         }
     }
 }
@@ -172,7 +172,7 @@ void Diagram::removeRailwayAt(int i)
     }
     //与列车解除绑定
     foreach (auto p , _trainCollection.trains()) {
-        p->unbindToRailway(*rail);
+        p->unbindToRailway(rail);
     }
 }
 
@@ -181,7 +181,7 @@ void Diagram::rebindAllTrains()
     foreach (auto t , _trainCollection.trains()) {
         t->clearBoundRailways();
         foreach (auto p , railways()) {
-            t->bindToRailway(*p, _config);
+            t->bindToRailway(p, _config);
         }
     }
 }
@@ -191,7 +191,7 @@ std::map<std::shared_ptr<RailInterval>, int> Diagram::sectionTrainCount(std::sha
     std::map<std::shared_ptr<RailInterval>, int> res;
     for (auto train : _trainCollection.trains()) {
         foreach (auto adp , train->adapters()) {
-            if(&(adp->railway())==railway.get()){
+            if((adp->railway())==railway){
                 foreach(auto line,adp->lines()){
                     sectionTrainCount(res, line);
                 }
@@ -208,7 +208,7 @@ std::pair<Diagram::sec_cnt_t, Diagram::sec_cnt_t>
     foreach (auto train , _trainCollection.trains()) {
         bool ispas = train->getIsPassenger();
         foreach(auto adp, train->adapters()) {
-            if (&(adp->railway()) == railway.get()) {
+            if ((adp->railway()) == railway) {
                 foreach(auto line, adp->lines()) {
                     if (ispas) {
                         sectionTrainCount(passen, line);
@@ -651,7 +651,7 @@ void Diagram::bindAllTrains()
 {
     foreach (auto p , railways()) {
         foreach (auto t , _trainCollection.trains()) {
-            t->bindToRailway(*p, _config);
+            t->bindToRailway(p, _config);
         }
     }
 }

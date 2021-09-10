@@ -914,7 +914,7 @@ void DiagramWidget::paintTrain(Train& train)
         //暂时按照暴力平方遍历的方法去找符合条件的Railway
         for (int i = 0; i < _page->railwayCount(); i++) {
             auto r = _page->railways().at(i);
-            if (&(adp->railway()) == r.get()) {
+            if ((adp->railway()) == r) {
                 for (auto line : adp->lines()) {
                     if (line->isNull()) {
                         //这个是不应该的
@@ -922,7 +922,7 @@ void DiagramWidget::paintTrain(Train& train)
                             "Unexpected null TrainLine! " << train.trainName().full() << Qt::endl;
                     }
                     else if(line->show()) {
-                        auto* item = new TrainItem(_diagram, line, adp->railway(), *_page,
+                        auto* item = new TrainItem(_diagram, line, *adp->railway(), *_page,
                             _page->startYs().at(i));
                         _page->addItemMap(line.get(), item);
                         item->setZValue(5);
@@ -942,8 +942,8 @@ void DiagramWidget::paintTrainLine(std::shared_ptr<TrainLine> line)
             "Unexpected null TrainLine! " << line->adapter().train()->trainName().full() << Qt::endl;
     }
     else {
-        auto* item = new TrainItem(_diagram, line, line->adapter().railway(), *_page,
-            _page->railwayStartY(line->adapter().railway()));
+        auto* item = new TrainItem(_diagram, line, *line->adapter().railway(), *_page,
+            _page->railwayStartY(*line->adapter().railway()));
         _page->addItemMap(line.get(), item);
         item->setZValue(5);
         scene()->addItem(item);
@@ -1385,7 +1385,7 @@ void DiagramWidget::showTrainEventText()
     QString res;
     for (const auto& p : lst) {
         res += _selectedTrain->trainName().full() + " 在 " +
-            p.first->railway().name() + " 上的事件时刻表: \n";
+            p.first->railway()->name() + " 上的事件时刻表: \n";
         for (const auto& q : p.second) {
             //站内事件表
             for (const auto& r : q.stEvents) {

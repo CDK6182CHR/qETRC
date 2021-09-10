@@ -19,6 +19,7 @@ class RailSectionEventsModel: public QStandardItemModel
     std::shared_ptr<Railway> railway;
     double y=0;
     Diagram::SectionEventList lst;
+public:
     enum{
         ColTrainName=0,
         ColTime,
@@ -30,10 +31,10 @@ class RailSectionEventsModel: public QStandardItemModel
         ColOwner,
         ColMAX
     };
-public:
     RailSectionEventsModel(Diagram& diagram_, std::shared_ptr<Railway> rail,
                            QObject* parent=nullptr);
     void setY(double y);
+    QTime timeForRow(int row)const;
 
 private:
     void setupModel();
@@ -60,6 +61,9 @@ public:
 
 private:
     void initUI();
+signals:
+    void locateToEvent(int pageIndex, std::shared_ptr<const Railway>, double mile,
+        const QTime&);
 private slots:
 
     /**
@@ -69,5 +73,7 @@ private slots:
     void updateData();
 
     void toCsv();
+
+    void actLocate();
 };
 

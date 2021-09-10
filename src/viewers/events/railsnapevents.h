@@ -29,6 +29,7 @@ public:
     RailSnapEventsModel(Diagram& diagram_, std::shared_ptr<Railway> railway_,
                         QObject* parent=nullptr);
     void setTime(const QTime& time);
+    double mileForRow(int row)const;
 private:
     void setupModel();
 };
@@ -51,8 +52,12 @@ public:
                          QWidget* parent=nullptr);
 private:
     void initUI();
+signals:
+    void locateToEvent(int pageIndex, std::shared_ptr<const Railway>, double mile,
+        const QTime&);
 private slots:
     void updateData();
     void toCsv();
+    void actLocate();
 };
 

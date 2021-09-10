@@ -250,7 +250,7 @@ public:
      */
     static QString attachTypeStringFull(IntervalAttachType type);
 
-    const Railway& railway()const;
+    std::shared_ptr<const Railway> railway()const;
 
 private:
 
