@@ -56,6 +56,7 @@
 
 #include <model/rail/railstationmodel.h>
 #include "dialogs/locatedialog.h"
+#include "wizards/timeinterp/timeinterpwizard.h"
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -864,6 +865,12 @@ void MainWindow::initToolbar()
         connect(act, SIGNAL(triggered()), this, SLOT(actBatchCopyTrain()));
         diaActions.batchCopy = act;
         panel->addMediumAction(act);
+
+        act = new QAction(QIcon(":/icons/add.png"), tr("时刻插值"), this);
+        act->setToolTip(tr("时刻插值（推定通过站时刻）\n"
+            "通过标尺数据，推定列车时刻表中未给出的通过站的时刻。"));
+        connect(act, &QAction::triggered, this, &MainWindow::actInterpolation);
+        panel->addMediumAction(act);
     }
 
     //显示
@@ -1299,6 +1306,15 @@ void MainWindow::actLocateDiagram()
             this, &MainWindow::locateDiagramOnStation);
     }
     locateDialog->showDialog();
+}
+
+
+void MainWindow::actInterpolation()
+{
+    auto* dlg = new TimeInterpWizard(_diagram, this);
+    connect(dlg, &TimeInterpWizard::interpolationApplied,
+        contextTrain, &TrainContext::actInterpolation);
+    dlg->show();
 }
 
 void MainWindow::updateWindowTitle()

@@ -168,6 +168,12 @@ public slots:
     void commitAutoType(std::deque<std::pair<std::shared_ptr<Train>, 
         std::shared_ptr<TrainType>>>& data);
 
+    void actInterpolation(const QVector<std::shared_ptr<Train>>& trains,
+        const QVector<std::shared_ptr<Train>>& data);
+
+    void commitInterpolation(const QVector<std::shared_ptr<Train>>& trains,
+        const QVector<std::shared_ptr<Train>>& data);
+
 private slots:
     void showTrainEvents();
     void actShowTrainLine();
@@ -306,6 +312,19 @@ namespace qecmd {
         data_t data;
         TrainContext* const cont; 
         void commit();
+    };
+
+    class TimetableInterpolation :public QUndoCommand {
+        QVector<std::shared_ptr<Train>> trains, data;
+        TrainContext* const cont;
+    public:
+        TimetableInterpolation(const QVector<std::shared_ptr<Train>>& trains,
+            const QVector<std::shared_ptr<Train>>& data,
+            TrainContext* context, QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("列车时刻插值"),parent),
+            trains(trains),data(data),cont(context){}
+        virtual void undo()override;
+        virtual void redo()override;
     };
 }
 

@@ -305,10 +305,10 @@ public:
     void show()const;
 
     inline bool isStartingStation(const StationName& s)const {
-        return starting().equalOrBelongsTo(s);
+        return starting().generalEqual(s);
     }
     inline bool isTerminalStation(const StationName& s)const {
-        return terminal().equalOrBelongsTo(s);
+        return terminal().generalEqual(s);
     }
 
     /**
@@ -447,6 +447,7 @@ public:
      * 线性遍历
      */
     std::shared_ptr<const TrainAdapter> adapterFor(const Railway& railway)const;
+    std::shared_ptr<TrainAdapter> adapterFor(const Railway& railway);
 
     /**
      * 注意只由TrainLine调用

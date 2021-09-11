@@ -448,8 +448,6 @@ void DiagramWidget::mouseMoveEvent(QMouseEvent* e)
 void DiagramWidget::mouseDoubleClickEvent(QMouseEvent* e)
 {
     QGraphicsView::mouseDoubleClickEvent(e);
-    
-    showPosTip(e->globalPos(), tr("。。。。。。"));
 }
 
 void DiagramWidget::resizeEvent(QResizeEvent* e)

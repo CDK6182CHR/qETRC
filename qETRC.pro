@@ -136,7 +136,10 @@ SOURCES += \
     src/wizards/rulerpaint/rulerpaintpagestart.cpp \
     src/wizards/rulerpaint/rulerpaintpagestation.cpp \
     src/wizards/rulerpaint/rulerpaintpagetable.cpp \
-    src/wizards/rulerpaint/rulerpaintwizard.cpp
+    src/wizards/rulerpaint/rulerpaintwizard.cpp \
+    src/wizards/timeinterp/timeinterppagepreview.cpp \
+    src/wizards/timeinterp/timeinterppagetrain.cpp \
+    src/wizards/timeinterp/timeinterpwizard.cpp
 
 HEADERS += \
     src/data/common/direction.h \
@@ -267,7 +270,10 @@ HEADERS += \
     src/wizards/rulerpaint/rulerpaintpagestart.h \
     src/wizards/rulerpaint/rulerpaintpagestation.h \
     src/wizards/rulerpaint/rulerpaintpagetable.h \
-    src/wizards/rulerpaint/rulerpaintwizard.h
+    src/wizards/rulerpaint/rulerpaintwizard.h \
+    src/wizards/timeinterp/timeinterppagepreview.h \
+    src/wizards/timeinterp/timeinterppagetrain.h \
+    src/wizards/timeinterp/timeinterpwizard.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

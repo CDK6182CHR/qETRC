@@ -123,10 +123,24 @@ public:
     std::shared_ptr<RailStation> downAdjacent();
     std::shared_ptr<RailStation> upAdjacent();
 
+    /**
+     * 指定方向的反向近邻
+     */
+    std::shared_ptr<RailStation> downPrevAdjacent();
+    std::shared_ptr<RailStation> upPrevAdjacent();
+
     std::shared_ptr<RailStation> dirAdjacent(Direction _dir) {
         switch (_dir) {
         case Direction::Down: return downAdjacent();
         case Direction::Up: return upAdjacent();
+        default:return nullptr;
+        }
+    }
+
+    std::shared_ptr<RailStation> dirPrevAdjacent(Direction _dir) {
+        switch (_dir) {
+        case Direction::Down: return downPrevAdjacent();
+        case Direction::Up: return upPrevAdjacent();
         default:return nullptr;
         }
     }

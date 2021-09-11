@@ -100,6 +100,20 @@ std::shared_ptr<RailStation> RailStation::upAdjacent()
     return upNext->toStation();
 }
 
+std::shared_ptr<RailStation> RailStation::downPrevAdjacent()
+{
+    if (downPrev)
+        return downPrev->fromStation();
+    else return {};
+}
+
+std::shared_ptr<RailStation> RailStation::upPrevAdjacent()
+{
+    if (upPrev)
+        return upPrev->fromStation();
+    else return {};
+}
+
 std::shared_ptr<RailInterval> RailStation::adjacentIntervalTo(std::shared_ptr<const RailStation> another)
 {
     if (downAdjacent() == another)

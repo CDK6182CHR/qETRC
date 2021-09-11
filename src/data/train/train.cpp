@@ -771,6 +771,16 @@ std::shared_ptr<const TrainAdapter> Train::adapterFor(const Railway& railway)con
     return {};
 }
 
+std::shared_ptr<TrainAdapter> Train::adapterFor(const Railway& railway)
+{
+    for (auto adp : _adapters) {
+        if ((adp->railway().get()) == &railway) {
+            return adp;
+        }
+    }
+    return {};
+}
+
 void Train::checkLinesShow()
 {
     _show=anyLineShown();

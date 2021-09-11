@@ -118,6 +118,22 @@ public:
 
     int adapterStationCount()const;
 
+    /**
+     * 推定通过站时刻  pyETRC.data.Train.detectPassStation
+     * precondition: 本次列车已经绑定到线路。
+     * 不要求删除非铺画站点，但杂项可能导致插入的站点位置不对。
+     * 直接修改this对象（以及相应的train对象）。
+     * 主要的逻辑还是分发给TrainLine去搞
+     * toStart, toEnd是指线路的首站末站。
+     */
+    void timetableInterpolation(std::shared_ptr<const Ruler> ruler, 
+        bool toRailStart, bool toRailEnd, int prec);
+
+    /**
+     * 用于时刻插值的相对误差计算。
+     */
+    double relativeError(std::shared_ptr<const Ruler> ruler)const;
+
 private:
 
     /**

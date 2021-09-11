@@ -2,6 +2,8 @@
 #include <cassert>
 
 #include "kernel/trainitem.h"
+#include "util/utilfunc.h"
+
 
 TrainAdapter::TrainAdapter(std::weak_ptr<Train> train,
     std::weak_ptr<Railway> railway, const Config& config):
@@ -142,6 +144,52 @@ int TrainAdapter::adapterStationCount() const
         res+=line->stations().size();
     }
     return res;
+}
+
+void TrainAdapter::timetableInterpolation(std::shared_ptr<const Ruler> ruler, 
+	bool toRailStart, bool toRailEnd, int prec)
+{
+	for (int i = 0; i < _lines.size(); i++) {
+		auto line = _lines.at(i);
+		bool toBegin = false, toEnd = false;
+		if (i == 0) {
+			toBegin = (line->dir() == Direction::Down && toRailStart ||
+				line->dir() == Direction::Up && toRailEnd);
+		}
+		if (i == _lines.size() - 1) {
+			toEnd = (line->dir() == Direction::Down && toRailEnd ||
+				line->dir() == Direction::Up && toRailStart);
+		}
+		line->timetaleInterpolation(ruler, toBegin, toEnd, prec);
+	}
+}
+
+double TrainAdapter::relativeError(std::shared_ptr<const Ruler> ruler) const
+{
+	int this_time = 0, error_time = 0;
+	foreach(auto line, _lines) {
+		if (line->isNull())continue;
+		auto pr = line->stations().begin();
+		auto p = std::next(pr);
+		for (; p != line->stations().end(); pr = p, ++p) {
+			int secs_real = qeutil::secsTo(pr->trainStation->depart, 
+				p->trainStation->arrive);
+			int secs_std = ruler->totalInterval(pr->railStation.lock(), p->railStation.lock(),
+				line->dir());
+			if (secs_std == -1)continue;
+			if (line->hasStartAppend(pr)) {
+				secs_std -= pr->railStation.lock()->dirNextInterval(line->dir())
+					->getRulerNode(*ruler)->start;
+			}
+			if (line->hasStopAppend(p)) {
+				secs_std -= p->railStation.lock()->dirPrevInterval(line->dir())
+					->getRulerNode(*ruler)->stop;
+			}
+			this_time += secs_real;
+			error_time += std::abs(secs_real - secs_std);
+		}
+	}
+	return static_cast<double>(error_time) / this_time;
 }
 
 void TrainAdapter::autoLines(const Config& config)

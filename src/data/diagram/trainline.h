@@ -226,9 +226,22 @@ public:
      */
     SnapEventList getSnapEvents(const QTime& time)const;
 
+    /**
+     * 所给站是否是始发站。seealso `hasStartAppend`
+     */
     bool isStartingStation(ConstAdaPtr st)const;
 
     bool isTerminalStation(ConstAdaPtr st)const;
+
+    /**
+     * 所给站站后区间是否包含起步附加，即所给站为始发站，或停车
+     */
+    bool hasStartAppend(ConstAdaPtr st)const;
+
+    /**
+     * 所给站站前区间是否包含停车附加，即所给站为终到站，或停车
+     */
+    bool hasStopAppend(ConstAdaPtr st)const;
 
     /**
      * 所给区间的附加情况，例如起，始停之类的；不包含“通”。
@@ -444,6 +457,16 @@ private:
 
     void diagnoForbid(DiagnosisList& res, std::shared_ptr<const RailInterval> railint,
         const QTime& in, const QTime& out)const;
+
+    /**
+     * 时刻插值的具体实现，由Adapter转发过来。
+     * toBegin, toEnd转换为关于本次列车（本运行线）的数据。由Adapter负责保证本运行线
+     * 是第一或最后运行线；但如果当前时刻的首站、末站为始发终到站，则不进行外插，
+     * 由本函数进行这个判断。
+     * 暂定新推定的时刻直接进行绑定。
+     */
+    void timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool toBegin,
+        bool toEnd, int precision);
 
 };
 

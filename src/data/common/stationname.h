@@ -90,6 +90,14 @@ public:
 
     inline bool isSingleName()const { return _field.isEmpty(); }
 
+    /**
+     * 相等，或者其中有一个有场名，另一个没有
+     */
+    inline bool generalEqual(const StationName& another)const {
+        return (station() == another.station()) &&
+            (field() == another.field() || another.isBare() || isBare());
+    }
+
 };
 
 inline uint qHash(const StationName& sn, uint seed)

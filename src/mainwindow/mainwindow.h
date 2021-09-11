@@ -363,6 +363,8 @@ private slots:
 
     void actLocateDiagram();
 
+    void actInterpolation();
+
 public slots:
 
     /**

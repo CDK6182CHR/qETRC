@@ -1213,6 +1213,16 @@ bool TrainLine::isTerminalStation(ConstAdaPtr st) const
     return endAtThis() && st == last;
 }
 
+bool TrainLine::hasStartAppend(ConstAdaPtr st) const
+{
+    return isStartingStation(st) || st->trainStation->isStopped();
+}
+
+bool TrainLine::hasStopAppend(ConstAdaPtr st) const
+{
+    return isTerminalStation(st) || st->trainStation->isStopped();
+}
+
 QString TrainLine::appStringShort(ConstAdaPtr prev, ConstAdaPtr cur) const
 {
     QString res;
@@ -1428,6 +1438,121 @@ SnapEventList TrainLine::getSnapEvents(const QTime& time) const
         pr = p;
     }
     return res;
+}
+
+static int round_secs(int secs, int prec)
+{
+    int rem = secs % prec;
+    if (rem >= prec / 2)
+        return secs - rem + prec;
+    else return secs - rem;
+}
+
+void TrainLine::timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool toBegin,
+    bool toEnd, int precision)
+{
+    if (isNull())return;
+
+    // todo 时刻修约还没写
+
+    // 先进行内插操作
+    // 先写一个直接实现的版本，不考虑抽象
+    auto pr = _stations.begin(), p = std::next(_stations.begin());
+    for (; p != _stations.end(); pr = p, ++p) {
+        auto rpr = pr->railStation.lock(), rp = p->railStation.lock();
+        if (rpr->dirAdjacent(dir()) != rp) {
+            // 现在需要进行插值操作
+            int secs = qeutil::secsTo(pr->trainStation->depart, p->trainStation->arrive);
+            int std_pass = ruler->totalInterval(rpr, rp, dir());
+            if (std_pass <= 0) {
+                // 标尺缺数据，此区间不推定
+                continue;
+            }
+            // 现在区间标尺一定有效
+            QTime startTime = pr->trainStation->depart;
+            int std_start = rpr->dirNextInterval(dir())->getRulerNode(*ruler)->start;
+            int std_stop = rp->dirPrevInterval(dir())->getRulerNode(*ruler)->stop;
+            int real_pass = secs;
+            if (isStartingStation(pr) || pr->trainStation->isStopped()) {
+                real_pass -= std_start;
+                startTime = startTime.addSecs(std_start);
+            }
+            if (isTerminalStation(p) || p->trainStation->isStopped())
+                real_pass -= std_stop;
+            if (real_pass <= 0) {
+                // 数据异常，此区间不推定
+                continue;
+            }
+            double rate = double(real_pass) / std_pass;
+            int accum_std_secs = 0;    // 当前站距离推定起始站的累加标尺通通时分
+
+            // 下面可以安全地进行划分了
+            // 现在的一切操作，必须注意迭代器p的有效性！！
+            auto itr = pr;   // 此迭代器永远有效，并且总是在它之后插入
+            decltype (rpr) to_deter;   // 下一个要计算的站
+            while ((to_deter = itr->railStation.lock()->dirAdjacent(dir())) != rp) {
+                accum_std_secs += to_deter->dirPrevInterval(dir())
+                    ->getRulerNode(*ruler)->interval;
+                QTime tm = startTime.addSecs(int(round_secs(accum_std_secs * rate,precision)));
+                // 插入时刻表车站
+                auto train_itr = train()->timetable().emplace(std::next(itr->trainStation),
+                    to_deter->name, tm, tm, false, "", QObject::tr("推定"));
+                auto line_itr = _stations.emplace(std::next(itr), train_itr, to_deter);
+                itr = line_itr;
+            }
+            p = std::next(itr);
+        }
+    }
+    if (toBegin && !isStartingStation(_stations.begin())) {
+        // 向前做外插操作，注意需要截止于（可能出现的）始发站
+        auto to_deter=_stations.begin()
+            ->railStation.lock()->dirPrevAdjacent(dir());
+        QTime refTime = _stations.begin()->trainStation->arrive;
+        int acc_std_secs = 0;   // 保存正数，方便修约
+        while (to_deter) {
+            auto node = to_deter->dirNextInterval(dir())->getRulerNode(*ruler);
+            if (node->isNull())
+                break;
+            acc_std_secs += node->interval;
+            if (hasStopAppend(_stations.begin()))
+                acc_std_secs += node->stop;
+            bool is_starting = train()->isStartingStation(to_deter->name);
+            if (is_starting)
+                acc_std_secs += node->start;
+            QTime tm = refTime.addSecs(-round_secs(acc_std_secs, precision));
+            auto train_itr=train()->timetable().emplace(_stations.begin()->trainStation,
+                to_deter->name, tm, tm, is_starting, "", QObject::tr("推定"));
+            _stations.emplace_front(train_itr, to_deter);
+            if (is_starting)break;
+            else to_deter = to_deter->dirPrevAdjacent(dir());
+        }
+    }
+    if (auto last = std::prev(_stations.end());toEnd && !isTerminalStation(last)) {
+        // 向后做外插
+        // last迭代器要始终保持有效
+        auto to_deter = last->railStation.lock()->dirAdjacent(dir());
+        QTime refTime = last->trainStation->depart;
+        int acc_std_secs = 0;
+        while (to_deter) {
+            auto node = to_deter->dirPrevInterval(dir())->getRulerNode(*ruler);
+            if (node->isNull())break;
+            acc_std_secs += node->interval;
+            if (hasStartAppend(last))
+                acc_std_secs += node->start;
+            bool is_terminal = train()->isTerminalStation(to_deter->name);
+            if (is_terminal) {
+                acc_std_secs += node->stop;
+            }
+            QTime tm = refTime.addSecs(round_secs(acc_std_secs, precision));
+            auto train_itr = train()->timetable().emplace(
+                std::next(last->trainStation), to_deter->name,
+                tm, tm, is_terminal, "", QObject::tr("推定"));
+            _stations.emplace_back(train_itr, to_deter);
+            last = std::prev(_stations.end());
+            if (is_terminal)break;
+            else to_deter = to_deter->dirAdjacent(dir());
+        }
+    }
 }
 
 

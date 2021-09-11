@@ -28,6 +28,7 @@
 #include <util/linestylecombo.h>
 
 #include "editors/basictrainwidget.h"
+#include "wizards/timeinterp/timeinterpwizard.h"
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
 	MainWindow* mw_) :
@@ -432,6 +433,25 @@ void TrainContext::commitAutoType(std::deque<std::pair<std::shared_ptr<Train>, s
 	refreshCurrentTrainWidgets();
 }
 
+void TrainContext::actInterpolation(const QVector<std::shared_ptr<Train>>& trains, const QVector<std::shared_ptr<Train>>& data)
+{
+	mw->getUndoStack()->push(new qecmd::TimetableInterpolation(trains, data, this));
+}
+
+void TrainContext::commitInterpolation(const QVector<std::shared_ptr<Train>>& trains, 
+	const QVector<std::shared_ptr<Train>>& data)
+{
+	for (int i = 0; i < trains.size(); i++) {
+		auto train = trains.at(i);
+		train->swapTimetable(*data.at(i));
+		QVector<std::shared_ptr<TrainAdapter>> adps = std::move(train->adapters());
+		diagram.updateTrain(train);
+		mw->updateTrainLines(train, std::move(adps));
+	}
+	mw->trainListWidget->getModel()->updateAllMileSpeed();
+	refreshCurrentTrainWidgets();
+}
+
 void TrainContext::actShowTrainLine()
 {
 	//强制显示列车运行线。如果已经全部显示了也没关系，没有任何效果
@@ -749,4 +769,14 @@ void qecmd::AutoTrainType::redo()
 void qecmd::AutoTrainType::commit()
 {
 	cont->commitAutoType(data);
+}
+
+void qecmd::TimetableInterpolation::undo()
+{
+	cont->commitInterpolation(trains, data);
+}
+
+void qecmd::TimetableInterpolation::redo()
+{
+	cont->commitInterpolation(trains, data);
 }
