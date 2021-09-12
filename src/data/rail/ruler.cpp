@@ -5,7 +5,9 @@
 #include "railintervaldata.hpp"
 #include "data/diagram/trainadapter.h"
 #include "util/utilfunc.h"
+#include "data/train/trainstation.h"
 #include <QDebug>
+#include <QJsonArray>
 
 Ruler::Ruler(Railway &railway, const QString &name, bool different, int index):
     RailIntervalData<RulerNode,Ruler>(railway,different,index),

@@ -4,7 +4,7 @@
 #include <QList>
 #include <QHash>
 
-#include "config.h"
+
 #include "data/train/train.h"
 
 class Railway;

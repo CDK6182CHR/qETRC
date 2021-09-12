@@ -1,9 +1,18 @@
 ﻿#include "rulerpaintpagetable.h"
 #include "rulerpaintpagestation.h"
-#include <QtWidgets>
+
+
+#include <QComboBox>
+#include <QFormLayout>
 #include <QTime>
+#include <QCheckBox>
+#include <QTimeEdit>
+#include <QLabel>
+#include <QLineEdit>
+#include <QAction>
+#include <QHeaderView>
 #include "data/rail/rail.h"
-#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
 #include "rulerpaintwizard.h"
 #include "model/delegate/qedelegate.h"
 #include "model/delegate/generalspindelegate.h"
@@ -36,7 +45,6 @@ void RulerPaintModel::setupModel(std::shared_ptr<Railway> railway_,
                                  Direction dir_,
                                  std::shared_ptr<const RailStation> anchorStation_)
 {
-    using SI=QStandardItem;
     railway=railway_;
     ruler=ruler_;
     dir=dir_;

@@ -1,5 +1,6 @@
 ﻿#include "diagramnavimodel.h"
 
+#include "data/diagram/diagram.h"
 
 DiagramNaviModel::DiagramNaviModel(Diagram& diagram, QObject* parent):
     QAbstractItemModel(parent),_diagram(diagram),

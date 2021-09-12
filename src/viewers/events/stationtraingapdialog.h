@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "data/diagram/traingap.h"
+#include "data/common/qeglobal.h"
 
 class QCheckBox;
 class QTableView;

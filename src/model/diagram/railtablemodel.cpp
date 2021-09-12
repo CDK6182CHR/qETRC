@@ -1,8 +1,14 @@
 ﻿#include "railtablemodel.h"
+#include "data/diagram/diagram.h"
 
 RailTableModel::RailTableModel(Diagram& diagram_, QObject* parent):
 	QAbstractTableModel(parent),diagram(diagram_)
 {
+}
+
+int RailTableModel::rowCount(const QModelIndex &) const
+{
+    return diagram.railwayCount();
 }
 
 QVariant RailTableModel::data(const QModelIndex& index, int role) const

@@ -3,6 +3,8 @@
 
 #include "kernel/trainitem.h"
 #include "util/utilfunc.h"
+#include "config.h"
+#include "data/rail/rulernode.h"
 
 
 TrainAdapter::TrainAdapter(std::weak_ptr<Train> train,

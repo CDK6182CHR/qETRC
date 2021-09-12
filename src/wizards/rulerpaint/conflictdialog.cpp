@@ -1,8 +1,16 @@
 ﻿#include "conflictdialog.h"
 #include "util/utilfunc.h"
-
-#include <QtWidgets>
+#include "data/common/qesystem.h"
 #include "data/diagram/diagram.h"
+#include "data/train/train.h"
+#include "data/train/traintype.h"
+
+#include <QTableView>
+#include <QHeaderView>
+#include <QVBoxLayout>
+#include <QFormLayout>
+#include <QLabel>
+#include <QLineEdit>
 
 
 ConflictModel::ConflictModel(Diagram &diagram_, QObject *parent):

@@ -4,7 +4,8 @@
 #include <QStandardItemModel>
 #include <vector>
 #include <utility>
-#include "data/diagram/diagram.h"
+
+#include "data/diagram/diagram.h"   // 使用了定义的Alias
 
 
 

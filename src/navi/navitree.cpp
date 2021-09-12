@@ -437,3 +437,49 @@ void qecmd::AddRailway::redo()
 {
     navi->commitAddRailway(rail);
 }
+
+qecmd::AddNewTrain::AddNewTrain(DiagramNaviModel *navi_,
+       std::shared_ptr<Train> train_, QUndoCommand *parent):
+    QUndoCommand(QObject::tr("新建车次: ")+train_->trainName().full(),parent),
+    navi(navi_),train(train_)
+{
+
+}
+
+void qecmd::AddNewTrain::undo()
+{
+    navi->undoAddTrain();
+}
+
+void qecmd::AddNewTrain::redo()
+{
+
+               navi->commitAddTrain(train);
+}
+
+void qecmd::BatchAddTrain::undo()
+{
+    navi->undoBatchAddTrains(trains.size());
+}
+
+void qecmd::BatchAddTrain::redo()
+
+    {
+               navi->commitBatchAddTrains(trains);
+           }
+
+
+qecmd::RemoveSingleTrain::RemoveSingleTrain(DiagramNaviModel *navi_,
+     std::shared_ptr<Train> train_, int index_, QUndoCommand *parent):
+    QUndoCommand(QObject::tr("删除列车: ")+train_->trainName().full(),parent),
+    navi(navi_),train(train_),index(index_){}
+
+void qecmd::RemoveSingleTrain::undo()
+{
+    navi->undoRemoveSingleTrain(index, train);
+}
+
+void qecmd::RemoveSingleTrain::redo()
+{
+           navi->commitRemoveSingleTrain(index);
+       }

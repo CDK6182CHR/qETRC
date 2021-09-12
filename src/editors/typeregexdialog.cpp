@@ -1,15 +1,18 @@
 ﻿#include "typeregexdialog.h"
 #include "model/train/typemodel.h"
 #include "data/train/traintype.h"
+#include "data/train/typemanager.h"
 #include "util/qecontrolledtable.h"
 #include "data/common/qesystem.h"
 #include "util/buttongroup.hpp"
-#include <QtWidgets>
+
+#include <QLabel>
+#include <QHeaderView>
 
 
 TypeRegexDialog::TypeRegexDialog(TypeManager &manager_,bool forDefault_, QWidget *parent):
-    QDialog(parent),manager(manager_),forDefault(forDefault_),
-    model(new TypeRegexModel(manager_,this))
+    QDialog(parent),manager(manager_),
+    model(new TypeRegexModel(manager_,this)),forDefault(forDefault_)
 {
     setWindowTitle(tr("类型规则"));
     resize(600,600);

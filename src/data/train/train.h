@@ -9,6 +9,8 @@
 #include "trainstation.h"
 #include "data/common/qeglobal.h"
 
+class RailStation;
+class Railway;
 class QJsonObject;
 struct Config;
 
@@ -518,11 +520,7 @@ private:
 
 };
 
-template <typename _Ty>
-uint qHash(const std::shared_ptr<_Ty>& key, uint seed)
-{
-    return qHash(key.get(), seed);
-}
+
 
 Q_DECLARE_METATYPE(std::list<TrainStation>::iterator)
 

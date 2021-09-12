@@ -2,6 +2,8 @@
 #include <algorithm>
 #include "trainadapter.h"
 #include "trainline.h"
+#include "data/rail/railstation.h"
+#include "data/train/train.h"
 
 bool qeutil::timeCompare(const QTime& tm1, const QTime& tm2)
 {

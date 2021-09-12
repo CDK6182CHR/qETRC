@@ -2,9 +2,16 @@
 #include "data/diagram/diagram.h"
 #include "data/common/qesystem.h"
 
-#include <QtWidgets>
 #include "util/buttongroup.hpp"
 #include "util/selecttraincombo.h"
+#include "data/train/train.h"
+
+#include <QCheckBox>
+#include <QFormLayout>
+#include <QGroupBox>
+#include <QHeaderView>
+#include <QMessageBox>
+#include <QTableView>
 
 DiagnosisModel::DiagnosisModel(Diagram &diagram_, QObject *parent):
     QStandardItemModel(parent), diagram(diagram_)

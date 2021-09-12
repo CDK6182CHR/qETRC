@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "intervaldatamodel.h"
 
-#include "data/rail/forbid.h"
 
 class ForbidModel : public IntervalDataModel
 {

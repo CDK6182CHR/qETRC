@@ -1,13 +1,12 @@
 ﻿#pragma once
 
 #include <QGraphicsItem>
-#include <QWidget>
-#include <QPen>
+#include <QTime>
 
-#include "data/diagram/diagram.h"
 #include "data/diagram/diagrampage.h"
-#include "data/rail/railstation.h"
 
+class DiagramPage;
+class Diagram;
 class TrainAdapter;
 class TrainLine;
 class Railway;
@@ -120,12 +119,12 @@ public:
      */
     void clearLabelInfo();
 
-    auto dir()const { return _line->dir(); }
+    Direction dir()const;
 
 private:
     
-    const Config& config()const { return _diagram.config(); }
-    const auto& margins()const { return _diagram.config().margins; }
+    const Config& config()const;
+    const MarginConfig& margins()const;
 
     void setLine();
 

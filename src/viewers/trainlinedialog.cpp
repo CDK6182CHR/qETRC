@@ -1,11 +1,17 @@
 ﻿#include "trainlinedialog.h"
 
-#include <QtWidgets>
-
 #include "model/delegate/qedelegate.h"
 #include "data/diagram/trainadapter.h"
-#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
+#include "data/train/train.h"
+#include "data/rail/railway.h"
+#include "util/utilfunc.h"
 
+#include <QLabel>
+#include <QSplitter>
+#include <QTableView>
+#include <QVBoxLayout>
+#include <QHeaderView>
 
 TrainLineListModel::TrainLineListModel(std::shared_ptr<Train> train_, QObject *parent):
     QStandardItemModel(parent), train(train_)

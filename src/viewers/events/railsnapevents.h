@@ -1,8 +1,10 @@
 ﻿#pragma once
 #include <QDialog>
 #include <QStandardItemModel>
-#include "data/diagram/diagram.h"
+#include "data/diagram/trainevents.h"
 
+class Railway;
+class Diagram;
 
 class RailSnapEventsModel:
     public QStandardItemModel

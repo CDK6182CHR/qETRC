@@ -12,6 +12,9 @@
 #include <QAction>
 #include "model/delegate/qetimedelegate.h"
 #include "util/pagecomboforrail.h"
+#include "data/common/qesystem.h"
+#include "data/train/train.h"
+#include "data/train/traintype.h"
 
 RailSectionEventsModel::RailSectionEventsModel(Diagram &diagram_,
                                                std::shared_ptr<Railway> rail,

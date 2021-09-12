@@ -7,7 +7,7 @@
 #include "data/train/traintype.h"
 #include "routing.h"
 #include "util/utilfunc.h"
-
+#include "typemanager.h"
 
 Train::Train(const TrainName &trainName,
              const StationName &starting,

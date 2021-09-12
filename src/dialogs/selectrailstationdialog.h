@@ -1,10 +1,13 @@
 ﻿#pragma once
 
 #include <QDialog>
-#include "data/rail/railway.h"
 #include <memory>
-#include <QTableView>
-#include "model/rail/railstationmodel.h"
+
+class RailStation;
+class RailStationModel;
+class Railway;
+
+class QTableView;
 
 /**
  * @brief The SelectRailStationDialog class

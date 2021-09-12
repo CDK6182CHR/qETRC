@@ -3,12 +3,10 @@
 #include <memory>
 #include <QVector>
 
-#include "data/train/train.h"
-#include "data/rail/railway.h"
-#include "data/diagram/config.h"
 #include "trainline.h"
 
 class TrainCollection;
+struct Config;
 
 /**
  * @brief 与线路数据相结合的列车信息
@@ -114,7 +112,7 @@ public:
      * 线性查找
      */
     std::pair<const AdapterStation*,std::shared_ptr<TrainLine>>
-        stationByTrainLinear(Train::ConstStationPtr st)const;
+        stationByTrainLinear(std::list<TrainStation>::const_iterator st)const;
 
     int adapterStationCount()const;
 

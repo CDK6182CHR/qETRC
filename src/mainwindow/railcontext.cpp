@@ -10,6 +10,7 @@
 #include "viewers/events/railsnapevents.h"
 #include "editors/forbidwidget.h"
 #include "editors/railstationwidget.h"
+#include "data/diagram/diagrampage.h"
 
 #include <QStyle>
 #include <QLabel>

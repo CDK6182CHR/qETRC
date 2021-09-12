@@ -7,7 +7,6 @@
 #include "data/diagram/diagram.h"
 
 class SARibbonMenu;
-
 class RoutingContext;
 class RulerContext;
 class PageContext;
@@ -16,11 +15,8 @@ class RailContext;
 class TrainContext;
 class QSpinBox;
 class QUndoView;
-
 class TimetableQuickWidget;
 class TrainInfoWidget;
-
-
 class QUndoStack;
 class DiagramNaviModel;
 class NaviTree;

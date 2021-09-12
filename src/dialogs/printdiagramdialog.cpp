@@ -1,7 +1,15 @@
 ﻿#include "printdiagramdialog.h"
 #include "util/buttongroup.hpp"
 
-#include <QtWidgets>
+#include "kernel/diagramwidget.h"
+#include "data/diagram/diagrampage.h"
+
+#include <QFileDialog>
+#include <QFormLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QTextEdit>
 
 PrintDiagramDialog::PrintDiagramDialog(DiagramWidget *dw_, QWidget *parent):
     QDialog(parent),dw(dw_),page(dw_->page())

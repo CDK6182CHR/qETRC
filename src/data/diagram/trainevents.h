@@ -10,9 +10,10 @@
 #include <QFlags>
 #include <variant>
 #include <type_traits>
+#include <QTime>
+#include <optional>
 
-#include "data/rail/railway.h"
-#include "data/train/train.h"
+
 
 /**
  * @brief The TrainEventType pyETRC.GraphicsWidget.TrainEventType
@@ -32,6 +33,12 @@ enum class TrainEventType:int8_t {
     Undefined
 };
 
+
+class Train;
+
+class RailStation;
+
+class RailInterval;
 namespace qeutil {
     QString eventTypeString(TrainEventType t);
 

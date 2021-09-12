@@ -2,24 +2,21 @@
 
 #include <memory>
 #include <QList>
-#include <QJsonObject>
 #include <QString>
-#include <QStringView>
-#include <map>
 #include "config.h"
 #include "data/train/traincollection.h"
-#include "data/train/traintype.h"
-#include "data/diagram/trainline.h"
-#include "diagrampage.h"
 #include "traingap.h"
+#include "data/diagram/trainline.h"    // for: alias
+#include "data/rail/railcategory.h"
 
-#include "data/common/qesystem.h"
 
 class Train;
 class Railway;
 struct TrainGap;
 class TrainFilterCore;
 
+
+class DiagramPage;
 namespace readruler {
     /**
      * 每个区间的每一种（四种附加情况）数据的描述：

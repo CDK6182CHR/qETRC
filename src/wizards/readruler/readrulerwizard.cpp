@@ -1,7 +1,14 @@
 ﻿#include "readrulerwizard.h"
 
-#include <QtWidgets>
+
 #include "data/diagram/diagram.h"
+#include "data/rail/rulernode.h"
+
+#include <QInputDialog>
+#include <QLabel>
+#include <QMessageBox>
+#include <QSpinBox>
+#include <QComboBox>
 
 ReadRulerWizard::ReadRulerWizard(Diagram& diagram_, QWidget* parent) :
     QWizard(parent), diagram(diagram_)

@@ -1,4 +1,5 @@
-#include "railcategory.h"
+﻿#include "railcategory.h"
+#include "railway.h"
 
 bool RailCategory::railNameIsValid(const QString& name, std::shared_ptr<Railway> rail) const
 {

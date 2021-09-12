@@ -5,6 +5,7 @@
 
 #include "model/train/timetablestdmodel.h"
 #include "util/buttongroup.hpp"
+#include "data/common/qeglobal.h"
 
 class SelectTrainCombo;
 class QTableView;

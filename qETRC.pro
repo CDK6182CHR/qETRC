@@ -39,6 +39,7 @@ SOURCES += \
     src/data/train/trainname.cpp \
     src/data/train/trainstation.cpp \
     src/data/train/traintype.cpp \
+    src/data/train/typemanager.cpp \
     src/dialogs/batchcopytraindialog.cpp \
     src/dialogs/changestationnamedialog.cpp \
     src/dialogs/exchangeintervaldialog.cpp \
@@ -170,6 +171,7 @@ HEADERS += \
     src/data/train/trainname.h \
     src/data/train/trainstation.h \
     src/data/train/traintype.h \
+    src/data/train/typemanager.h \
     src/dialogs/batchcopytraindialog.h \
     src/dialogs/changestationnamedialog.h \
     src/dialogs/exchangeintervaldialog.h \

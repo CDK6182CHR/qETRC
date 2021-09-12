@@ -2,6 +2,7 @@
 #include "data/diagram/trainadapter.h"
 #include "data/diagram/trainline.h"
 #include "data/train/routing.h"
+#include "data/diagram/diagram.h"
 
 #include <QPainterPath>
 #include <QPointF>
@@ -10,8 +11,8 @@
 
 TrainItem::TrainItem(Diagram& diagram, std::shared_ptr<TrainLine> line,
     Railway& railway, DiagramPage& page, double startY, QGraphicsItem* parent):
-    QGraphicsItem(parent),_diagram(diagram),
-    _line(line),_railway(railway),_page(page),
+    QGraphicsItem(parent),
+    _line(line),_diagram(diagram),_page(page),_railway(railway),
     startTime(diagram.config().start_hour,0,0),
     start_x(diagram.config().totalLeftMargin()),start_y(startY)
 {
@@ -242,6 +243,21 @@ void TrainItem::clearLabelInfo()
         se.erase(endLabelInfo);
         endLabelInfo = se.end();
     }
+}
+
+Direction TrainItem::dir() const
+{
+    return _line->dir();
+}
+
+const Config &TrainItem::config() const
+{
+    return _diagram.config();
+}
+
+const MarginConfig &TrainItem::margins() const
+{
+    return _diagram.config().margins;
 }
 
 void TrainItem::setLine()

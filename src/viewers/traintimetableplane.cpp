@@ -1,9 +1,10 @@
 ﻿#include "traintimetableplane.h"
 
-#include <QtWidgets>
+#include <QHeaderView>
 
-#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
 #include "model/delegate/qetimedelegate.h"
+#include "data/train/train.h"
 
 TrainTimetablePlane::TrainTimetablePlane(QWidget *parent) :
     QTableView(parent), model(new TimetableStdModel(false,this))

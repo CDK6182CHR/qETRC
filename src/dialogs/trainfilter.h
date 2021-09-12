@@ -2,7 +2,6 @@
 
 #include <QDialog>
 #include "util/buttongroup.hpp"
-#include "data/train/train.h"
 #include "data/train/trainfiltercore.h"
 
 class Routing;

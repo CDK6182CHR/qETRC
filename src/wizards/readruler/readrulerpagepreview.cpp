@@ -1,8 +1,13 @@
 ﻿#include "readrulerpagepreview.h"
 
-#include <QtWidgets>
-#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
 #include "util/utilfunc.h"
+#include "util/dialogadapter.h"
+#include "data/train/train.h"
+#include <QTableView>
+#include <QHeaderView>
+#include <QVBoxLayout>
+#include <QAction>
 
 ReadRulerPreviewModel::ReadRulerPreviewModel(const ReadRulerReport& data_,
     const QVector<std::shared_ptr<RailInterval>>& intervals_, QObject* parent):

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "data/diagram/diagram.h"
 #include "util/utilfunc.h"
+#include "data/train/train.h"
 
 ModifyTimetableDialog::ModifyTimetableDialog(std::shared_ptr<Train> train_, QWidget* parent) :
 	QDialog(parent), train(train_), table(new TrainTimetablePlane)

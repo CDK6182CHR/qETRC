@@ -3,13 +3,24 @@
 
 #include <memory>
 #include <deque>
-#include "data/diagram/diagram.h"
-#include "data/train/traincollection.h"
+#include <QString>
+#include <QObject>
+
+class Diagram;
+class TrainCollection;
 
 /**
  * 用于做导航窗口的ModelItem类
  * 由于名字太容易冲突，用namespace 封装一下
  */
+
+class Railway;
+class DiagramPage;
+class Ruler;
+class Forbid;
+class Train;
+class Routing;
+
 namespace navi {
 
 	/**

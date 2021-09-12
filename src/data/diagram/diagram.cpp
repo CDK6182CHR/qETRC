@@ -5,6 +5,8 @@
 #include "data/train/routing.h"
 #include "data/diagram/traingap.h"
 #include "data/train/trainfiltercore.h"
+#include "data/diagram/diagrampage.h"
+#include "data/rail/forbid.h"
 
 #include <QFile>
 #include <QJsonObject>
@@ -334,31 +336,59 @@ TrainGapList Diagram::getTrainGapsDouble(const RailStationEventList& events,
         const auto& p = *_p;
         if (!filter.check(p->line->train()))continue;
         if (p->line->dir() == Direction::Down) {
-            if (p->type == TrainEventType::Arrive)
-                down_in.emplace_back(p, 0);
+            if (p->type == TrainEventType::Arrive) {
+                down_in.emplace_back(std::make_pair(p, 0));
+            }
             else if (p->type == TrainEventType::Depart) {
+                std::optional<decltype(down_in)::iterator> pitr{};   //被删除的那个的迭代器 
                 for (auto itr = down_in.begin(); itr != down_in.end(); ++itr) {
                     if (itr->first->line == p->line) {
-                        down_in.erase(itr);
+                        // 找到当前的进站记录
+                        pitr = down_in.erase(itr);
                         break;
                     }
-                    else {
+                }
+                if (pitr.has_value()) {
+                    for (auto itr = down_in.begin(); itr != pitr; ++itr) {
                         itr->second++;
+                    }
+                }
+            }
+            else if (p->type == TrainEventType::CalculatedPass ||
+                p->type == TrainEventType::SettledPass) {
+                if (p->pos == RailStationEvent::Both) {
+                    // 站内所有车被踩一次
+                    for (auto& q : down_in) {
+                        q.second++;
                     }
                 }
             }
         }
         else {  // Up
-            if (p->type == TrainEventType::Arrive)
-                up_in.emplace_back(p, 0);
+            if (p->type == TrainEventType::Arrive) {
+                up_in.emplace_back(std::make_pair(p, 0));
+            }
             else if (p->type == TrainEventType::Depart) {
+                std::optional<decltype(up_in)::iterator> pitr{};   //被删除的那个的迭代器 
                 for (auto itr = up_in.begin(); itr != up_in.end(); ++itr) {
                     if (itr->first->line == p->line) {
-                        up_in.erase(itr);
+                        // 找到当前的进站记录
+                        pitr = up_in.erase(itr);
                         break;
                     }
-                    else {
+                }
+                if (pitr.has_value()) {
+                    for (auto itr = up_in.begin(); itr != pitr; ++itr) {
                         itr->second++;
+                    }
+                }
+            }
+            else if (p->type == TrainEventType::CalculatedPass ||
+                p->type == TrainEventType::SettledPass) {
+                if (p->pos == RailStationEvent::Both) {
+                    // 站内所有车被踩一次
+                    for (auto& q : up_in) {
+                        q.second++;
                     }
                 }
             }
@@ -393,6 +423,7 @@ TrainGapList Diagram::getTrainGapsDouble(const RailStationEventList& events,
             }
             else if (p->type == TrainEventType::Depart) {
                 // 出发：先是所有比它到的早但还没跑掉的，都被踩一次
+                std::optional<decltype(down_in)::iterator> pitr{};   //被删除的那个的迭代器 
                 for (auto itr = down_in.begin(); itr != down_in.end(); ++itr) {
                     if (itr->first->line == p->line) {
                         // 找到当前的进站记录
@@ -401,19 +432,25 @@ TrainGapList Diagram::getTrainGapsDouble(const RailStationEventList& events,
                             res.emplace_back(std::make_shared<TrainGap>(
                                 itr->first, p, TrainGap::Avoid, itr->second));
                         }
-                        down_in.erase(itr);
+                        pitr = down_in.erase(itr);
                         break;
                     }
-                    else {
-                        itr->second += 1;
+                }
+                if (pitr.has_value()) {
+                    // 删除实际发生了，所有此前列车都被踩一次
+                    // 这个条件是为了防止运行线端点没有到达事件只有出发事件的情况
+                    for (auto itr = down_in.begin(); itr != pitr; ++itr) {
+                        itr->second++;
                     }
                 }
             }
             else if (p->type == TrainEventType::CalculatedPass ||
                 p->type == TrainEventType::SettledPass) {
-                // 站内所有车被踩一次
-                for (auto& q : down_in) {
-                    q.second++;
+                if (p->pos == RailStationEvent::Both) {
+                    // 站内所有车被踩一次
+                    for (auto& q : down_in) {
+                        q.second++;
+                    }
                 }
             }
 
@@ -436,24 +473,33 @@ TrainGapList Diagram::getTrainGapsDouble(const RailStationEventList& events,
                 up_in.emplace_back(p, 0);
             }
             else if (p->type == TrainEventType::Depart) {
+                std::optional<decltype(up_in)::iterator> pitr{};   //被删除的那个的迭代器 
                 for (auto itr = up_in.begin(); itr != up_in.end(); ++itr) {
                     if (itr->first->line == p->line) {
+                        // 找到当前的进站记录
                         if (itr->second) {
+                            // 存在被踩情况
                             res.emplace_back(std::make_shared<TrainGap>(
                                 itr->first, p, TrainGap::Avoid, itr->second));
                         }
-                        up_in.erase(itr);
+                        pitr = up_in.erase(itr);
                         break;
                     }
-                    else {
+                }
+                if (pitr.has_value()) {
+                    // 删除实际发生了，所有此前列车都被踩一次
+                    // 这个条件是为了防止运行线端点没有到达事件只有出发事件的情况
+                    for (auto itr = up_in.begin(); itr != pitr; ++itr) {
                         itr->second++;
                     }
                 }
             }
             else if (p->type == TrainEventType::CalculatedPass ||
                 p->type == TrainEventType::SettledPass) {
-                for (auto& itr : up_in) {
-                    itr.second++;
+                if (p->pos == RailStationEvent::Both) {
+                    for (auto& itr : up_in) {
+                        itr.second++;
+                    }
                 }
             }
         }
@@ -479,16 +525,30 @@ TrainGapList Diagram::getTrainGapsSingle(const RailStationEventList& events,
     for (auto _p = events.cbegin(); _p != events.cend(); ++_p) {
         const auto& p = *_p;
         if (!filter.check(p->line->train()))continue;
-        if (p->type == TrainEventType::Arrive)
-            down_in.emplace_back(p, 0);
+        if (p->type == TrainEventType::Arrive) {
+            down_in.emplace_back(std::make_pair(p, 0));
+        }
         else if (p->type == TrainEventType::Depart) {
+            std::optional<decltype(down_in)::iterator> pitr{};   //被删除的那个的迭代器 
             for (auto itr = down_in.begin(); itr != down_in.end(); ++itr) {
                 if (itr->first->line == p->line) {
-                    down_in.erase(itr);
+                    // 找到当前的进站记录
+                    pitr = down_in.erase(itr);
                     break;
                 }
-                else {
+            }
+            if (pitr.has_value()) {
+                for (auto itr = down_in.begin(); itr != pitr; ++itr) {
                     itr->second++;
+                }
+            }
+        }
+        else if (p->type == TrainEventType::CalculatedPass ||
+            p->type == TrainEventType::SettledPass) {
+            if (p->pos == RailStationEvent::Both) {
+                // 站内所有车被踩一次
+                for (auto& q : down_in) {
+                    q.second++;
                 }
             }
         }
@@ -521,6 +581,7 @@ TrainGapList Diagram::getTrainGapsSingle(const RailStationEventList& events,
         }
         else if (p->type == TrainEventType::Depart) {
             // 出发：先是所有比它到的早但还没跑掉的，都被踩一次
+            std::optional<decltype(down_in)::iterator> pitr{};   //被删除的那个的迭代器 
             for (auto itr = down_in.begin(); itr != down_in.end(); ++itr) {
                 if (itr->first->line == p->line) {
                     // 找到当前的进站记录
@@ -529,19 +590,25 @@ TrainGapList Diagram::getTrainGapsSingle(const RailStationEventList& events,
                         res.emplace_back(std::make_shared<TrainGap>(
                             itr->first, p, TrainGap::Avoid, itr->second));
                     }
-                    down_in.erase(itr);
+                    pitr = down_in.erase(itr);
                     break;
                 }
-                else {
-                    itr->second += 1;
+            }
+            if (pitr.has_value()) {
+                // 删除实际发生了，所有此前列车都被踩一次
+                // 这个条件是为了防止运行线端点没有到达事件只有出发事件的情况
+                for (auto itr = down_in.begin(); itr != pitr; ++itr) {
+                    itr->second++;
                 }
             }
         }
         else if (p->type == TrainEventType::CalculatedPass ||
             p->type == TrainEventType::SettledPass) {
-            // 站内所有车被踩一次
-            for (auto& q : down_in) {
-                q.second++;
+            if (p->pos == RailStationEvent::Both) {
+                // 站内所有车被踩一次
+                for (auto& q : down_in) {
+                    q.second++;
+                }
             }
         }
     }
@@ -930,7 +997,6 @@ void Diagram::__intervalRulerMode(readruler::IntervalReport& itrep,
     std::map<TrainLine::IntervalAttachType, double> modes;
     for (auto tp = itrep.types.begin(); tp != itrep.types.end(); ++tp) {
         auto& tpcnt = tp->second.count;
-        using _ty = std::map<int, int>::value_type;
         // 所选的数据迭代器  一定存在
         auto sel = std::max_element(tpcnt.begin(), tpcnt.end(), readruler::valueCountComp);
         tp->second.value = sel->first;

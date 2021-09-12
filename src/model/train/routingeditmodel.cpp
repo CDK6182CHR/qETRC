@@ -1,6 +1,7 @@
 ﻿#include "routingeditmodel.h"
 #include "data/train/routing.h"
 #include "model/delegate/qedelegate.h"
+#include "data/train/train.h"
 #include <QWidget>
 #include <QMessageBox>
 

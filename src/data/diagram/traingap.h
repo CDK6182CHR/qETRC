@@ -4,6 +4,8 @@
 #include <set>
 #include <map>
 
+#include "data/common/direction.h"
+
 /**
  * @brief The TrainGap struct
  * 两列车事件之间的间隔（追踪间隔）。暂时只考虑同向。

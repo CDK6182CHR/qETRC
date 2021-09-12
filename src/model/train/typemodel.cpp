@@ -2,6 +2,7 @@
 
 #include "data/train/traintype.h"
 #include "model/delegate/qedelegate.h"
+#include "data/train/typemanager.h"
 
 #include <QWidget>
 #include <QMessageBox>

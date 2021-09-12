@@ -1,5 +1,4 @@
 ﻿#include "traineventdialog.h"
-#include <QtWidgets>
 
 #include "data/diagram/trainadapter.h"
 #include "data/rail/rail.h"
@@ -10,6 +9,17 @@
 #include "model/delegate/generaldoublespindelegate.h"
 #include "model/delegate/qetimedelegate.h"
 #include "util/pagecomboforrail.h"
+#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
+#include "data/train/train.h"
+
+#include <QFile>
+#include <QTableView>
+#include <QHeaderView>
+#include <QAction>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QTextBrowser>
 
 TrainEventModel::TrainEventModel(std::shared_ptr<Train> train_, Diagram& diagram_, QObject* parent):
 	QStandardItemModel(parent),train(train_),diagram(diagram_)
@@ -59,7 +69,6 @@ double TrainEventModel::mileForRow(int row) const
 
 void TrainEventModel::setupModel()
 {
-	using SI = QStandardItem;
 	TrainEventList res = diagram.listTrainEvents(*train);
 	beginResetModel();
 	setColumnCount(ColMAX);
@@ -134,8 +143,7 @@ void TrainEventModel::setIntervalRow(int row, std::shared_ptr<TrainAdapter> adp,
 	it->setData(t.time, Qt::EditRole);
 	setItem(row, ColTime, it);
 	setItem(row, ColPlace, new SI(tr("%1-%2")
-		.arg(t.former->name.toSingleLiteral())
-		.arg(t.latter->name.toSingleLiteral())));
+        .arg(t.former->name.toSingleLiteral(),t.latter->name.toSingleLiteral())));
 	it = new SI;
 	it->setData(t.mile, Qt::EditRole);
 	setItem(row, ColMile, it);

@@ -2,9 +2,10 @@
 
 
 #include "model/delegate/qetimedelegate.h"
-#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
 #include "util/buttongroup.hpp"
 #include "model/rail/forbidmodel.h"
+#include "data/rail/forbid.h"
 
 #include <QCheckBox>
 #include <QFormLayout>

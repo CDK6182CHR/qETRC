@@ -2,7 +2,8 @@
 #include "data/diagram/diagram.h"
 #include "util/buttongroup.hpp"
 #include "dialogs/trainfilter.h"
-#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
+#include "model/train/trainlistreadmodel.h"
 #include <QtWidgets>
 #include <algorithm>
 
@@ -13,6 +14,11 @@ ReadRulerPageTrain::ReadRulerPageTrain(Diagram& diagram_, QWidget *parent):
     connect(filter, &TrainFilter::filterApplied,
         this, &ReadRulerPageTrain::filtTrainApplied);
     initUI();
+}
+
+const QList<std::shared_ptr<Train> > &ReadRulerPageTrain::trains()const
+{
+    return mdSel->trains();
 }
 
 bool ReadRulerPageTrain::validatePage()

@@ -1,8 +1,17 @@
 ﻿#include "traindiffdialog.h"
 #include "data/diagram/trainadapter.h"
 #include "util/utilfunc.h"
+#include "data/common/qesystem.h"
 #include "data/diagram/diagram.h"
-#include <QtWidgets>
+#include "data/train/train.h"
+
+#include <QFormLayout>
+#include <QTableView>
+#include <QHeaderView>
+
+#include <util/selectrailwaycombo.h>
+#include <util/selecttraincombo.h>
+
 
 TrainDiffModel::TrainDiffModel(Diagram &diagram_, QObject *parent):
     QStandardItemModel(parent), diagram(diagram_)
@@ -112,7 +121,7 @@ void TrainDiffModel::setTrainMap(std::shared_ptr<Train> train, intermap_t& imap)
 
 void TrainDiffModel::setTrain1(std::shared_ptr<Train> train)
 {
-    train1 = train1;
+    train1 = train;
     setTrainMap(train, map1);
     setupModel();
 }

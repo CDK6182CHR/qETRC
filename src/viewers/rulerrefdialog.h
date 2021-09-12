@@ -2,7 +2,10 @@
 
 #include <QDialog>
 #include <QStandardItemModel>
-#include "data/diagram/diagram.h"
+
+class Ruler;
+class TrainAdapter;
+class Train;
 
 /**
  * @brief The RulerRefModel class

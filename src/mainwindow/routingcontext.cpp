@@ -5,6 +5,7 @@
 #include "editors/routing/parseroutingdialog.h"
 #include "editors/routing/detectroutingdialog.h"
 #include "editors/routing/routingdiagramwidget.h"
+#include "data/train/train.h"
 
 #include <QLabel>
 #include <QLineEdit>

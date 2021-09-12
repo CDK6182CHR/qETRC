@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <memory>
-#include "data/rail/ruler.h"
 #include "intervaldatamodel.h"
 
 /**

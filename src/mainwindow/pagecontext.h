@@ -2,15 +2,14 @@
 
 #include <QObject>
 #include <QDialog>
-#include <QTextEdit>
 #include <memory>
-#include <SARibbonContextCategory.h>
-#include <QLineEdit>
 #include <QUndoCommand>
 
-#include "data/diagram/diagram.h"
-#include "data/diagram/diagrampage.h"
-
+class QTextEdit;
+class QLineEdit;
+class SARibbonContextCategory;
+class DiagramPage;
+class Diagram;
 class MainWindow;
 
 /**

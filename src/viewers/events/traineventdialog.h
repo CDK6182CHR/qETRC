@@ -4,8 +4,12 @@
 #include <QDialog>
 #include <QStandardItemModel>
 
-#include "data/train/train.h"
-#include "data/diagram/diagram.h"
+struct IntervalEvent;
+struct StationEvent;
+class TrainAdapter;
+class Railway;
+class Diagram;
+class Train;
 
 /**
  * @brief The TrainEventModel class

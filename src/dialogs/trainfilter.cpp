@@ -11,9 +11,11 @@
 #include "data/train/traincollection.h"
 #include "model/delegate/qedelegate.h"
 #include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
 #include <util/qecontrolledtable.h>
 #include "model/general/qemoveablemodel.h"
 #include "data/train/routing.h"
+#include "data/train/traintype.h"
 
 
 TrainFilter::TrainFilter(Diagram &diagram_, QWidget *parent):

@@ -2,7 +2,8 @@
 
 #include <QList>
 #include <memory>
-#include "railway.h"
+
+class Railway;
 
 /**
  * @brief The RailCategory class

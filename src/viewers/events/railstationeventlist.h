@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "data/diagram/trainevents.h"
+#include "data/common/qeglobal.h"
 
 class QCheckBox;
 class Diagram;

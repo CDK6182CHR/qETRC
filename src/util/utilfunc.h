@@ -75,4 +75,8 @@ bool timeInRange(const QTime& left, const QTime& right, const QTime& t);
 bool timeRangeIntersected(const QTime& start1, const QTime& end1, const QTime& start2,
 	const QTime& end2);
 
+inline Qt::CheckState boolToCheckState(bool d) {
+    return d ? Qt::Checked : Qt::Unchecked;
+}
+
 }

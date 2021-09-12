@@ -4,6 +4,7 @@
 #include "util/buttongroup.hpp"
 #include "model/train/timetablestdmodel.h"
 #include "viewers/traintimetableplane.h"
+#include "data/common/qeglobal.h"
 
 class Train;
 class QSpinBox;

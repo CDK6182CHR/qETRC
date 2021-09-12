@@ -4,9 +4,11 @@
 #include <QWizardPage>
 #include <QList>
 
+// 一大堆Alias，方便起见，直接include
 #include "data/diagram/diagram.h"
-#include "util/dialogadapter.h"
 
+class RailInterval;
+class DialogAdapter;
 class QTableView;
 
 class ReadRulerPreviewModel: public QStandardItemModel
@@ -29,6 +31,7 @@ public:
 		QObject* parent=nullptr);
 	void refreshData();
 };
+
 
 /**
  * 计算细节表格

@@ -10,6 +10,8 @@ class TimetableQuickModel;
 class TimetableQuickEditableModel;
 class Train;
 class QUndoStack;
+class Railway;
+class RailStation;
 
 /**
  * @brief The TimetableQuickWidget class
@@ -31,9 +33,13 @@ public:
 private:
     void initUI();
 signals:
+    void locateToEvent(int pageIndex, std::shared_ptr<const Railway>,
+        std::shared_ptr<const RailStation>, const QTime&);
 private slots:
     void onStopOnlyChanged(bool on);
     void onEditCheckChanged(bool on);
+    void locateArrive();
+    void locateDepart();
 public slots:
     void setTrain(std::shared_ptr<Train> train);
     void refreshData();

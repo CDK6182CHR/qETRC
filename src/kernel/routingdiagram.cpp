@@ -7,6 +7,7 @@
 #include "util/utilfunc.h"
 #include <optional>
 #include <QPrinter>
+#include "data/train/train.h"
 
 #include "mainwindow/version.h"
 

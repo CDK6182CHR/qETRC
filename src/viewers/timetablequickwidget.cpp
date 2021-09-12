@@ -75,6 +75,18 @@ void TimetableQuickWidget::onEditCheckChanged(bool on)
     }
 }
 
+void TimetableQuickWidget::locateArrive()
+{
+    auto&& idx = table->currentIndex();
+    if (!idx.isValid())return;
+
+    // todo: 现在没有关联车站信息，不方便做定位
+}
+
+void TimetableQuickWidget::locateDepart()
+{
+}
+
 void TimetableQuickWidget::refreshData()
 {
     if(!train)return;

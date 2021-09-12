@@ -1,15 +1,12 @@
 ﻿#pragma once
 
-#include <QStandardItemModel>
-#include <QStyledItemDelegate>
-#include <QUndoStack>
-#include <QUndoCommand>
 #include <memory>
 
-#include "data/rail/rail.h"
-#include "model/delegate/qedelegate.h"
+#include "data/common/direction.h"
 #include "model/general/qemoveablemodel.h"
 
+class RailStation;
+class Railway;
 /**
  * @brief The RailStationModel class
  * 线路的站表（里程表）的数据模型，用于编辑里程的表格。

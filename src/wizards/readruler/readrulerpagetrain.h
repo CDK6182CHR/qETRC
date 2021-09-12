@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include <QWizardPage>
 
-#include "model/train/trainlistreadmodel.h"
+class Train;
+class TrainListReadModel;
 
 class TrainCollection;
 class QTableView;
@@ -19,7 +20,7 @@ class ReadRulerPageTrain : public QWizardPage
 
 public:
     ReadRulerPageTrain(Diagram& diagram_, QWidget* parent=nullptr);
-    const auto& trains()const{return mdSel->trains();}
+    const QList<std::shared_ptr<Train>>& trains()const;
     virtual bool validatePage()override;
 private:
     void initUI();

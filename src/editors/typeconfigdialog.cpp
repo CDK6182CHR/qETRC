@@ -5,7 +5,7 @@
 #include "util/buttongroup.hpp"
 #include "model/delegate/generaldoublespindelegate.h"
 #include "data/train/traintype.h"
-
+#include "data/train/typemanager.h"
 #include <model/delegate/linestyledelegate.h>
 
 #include <util/qecontrolledtable.h>

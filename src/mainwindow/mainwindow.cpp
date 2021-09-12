@@ -12,7 +12,7 @@
 #include "model/train/trainlistmodel.h"
 #include "editors/trainlistwidget.h"
 #include "model/diagram/diagramnavimodel.h"
-#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
 #include "navi/navitree.h"
 #include "navi/addpagedialog.h"
 #include "editors/configdialog.h"

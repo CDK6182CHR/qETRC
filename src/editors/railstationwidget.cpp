@@ -6,6 +6,8 @@
 #include "model/rail/railstationmodel.h"
 #include "util/qecontrolledtable.h"
 #include "data/common/qesystem.h"
+#include "data/rail/railway.h"
+#include "data/rail/railcategory.h"
 
 #include <QFormLayout>
 #include <QLineEdit>

@@ -5,11 +5,10 @@
 #include <memory>
 #include <map>
 
-#include "data/train/train.h"
-#include "model/rail/intervaldatamodel.h"
-#include "util/selectrailwaycombo.h"
-#include "util/selecttraincombo.h"
-
+class SelectTrainCombo;
+class SelectRailwayCombo;
+class RailInterval;
+class Train;
 class Railway;
 class Diagram;
 

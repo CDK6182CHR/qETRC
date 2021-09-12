@@ -1,16 +1,31 @@
 ﻿#pragma once
 
-#include <QWidget>
-#include <QMenu>
-#include <QPoint>
-#include <QUndoStack>
 #include <QUndoCommand>
-#include <QVector>
+#include <QWidget>
 
-#include "data/diagram/diagrampage.h"
-#include "model/diagram/diagramnavimodel.h"
+class Forbid;
+class Routing;
+class Ruler;
+class Railway;
+class Train;
+class DiagramPage;
+class QUndoStack;
+class DiagramNaviModel;
+class QMenu;
+//#include <QMenu>
+//#include <QPoint>
+//#include <QUndoStack>
+//#include <QUndoCommand>
+//#include <QVector>
+
+//#include "data/diagram/diagrampage.h"
+//#include "model/diagram/diagramnavimodel.h"
 
 class QTreeView;
+namespace navi {
+    class AbstractComponentItem;
+    class DiagramItem;
+}
 
 /**
  * @brief The NaviTree class  系统导航那个TreeView
@@ -175,15 +190,9 @@ namespace qecmd {
         std::shared_ptr<Train> train;
     public:
         AddNewTrain(DiagramNaviModel* navi_,std::shared_ptr<Train> train_,
-            QUndoCommand* parent=nullptr):
-            QUndoCommand(QObject::tr("新建车次: ")+train_->trainName().full(),parent),
-            navi(navi_),train(train_){}
-        virtual void undo()override {
-            navi->undoAddTrain();
-        }
-        virtual void redo()override {
-            navi->commitAddTrain(train);
-        }
+            QUndoCommand* parent=nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
     };
 
     class BatchAddTrain : public QUndoCommand {
@@ -195,12 +204,8 @@ namespace qecmd {
             QUndoCommand(QObject::tr("批量添加%1个车次").arg(trains_.size()),parent),
             navi(navi_),trains(trains_){}
 
-        virtual void undo()override {
-            navi->undoBatchAddTrains(trains.size());
-        }
-        virtual void redo()override {
-            navi->commitBatchAddTrains(trains);
-        }
+        virtual void undo()override;
+        virtual void redo()override;
     };
 
     class RemoveSingleTrain :public QUndoCommand {
@@ -209,15 +214,9 @@ namespace qecmd {
         int index;
     public:
         RemoveSingleTrain(DiagramNaviModel* navi_,std::shared_ptr<Train> train_, int index_,
-            QUndoCommand* parent=nullptr):
-            QUndoCommand(QObject::tr("删除列车: ")+train_->trainName().full(),parent),
-            navi(navi_),train(train_),index(index_){}
-        virtual void undo()override {
-            navi->undoRemoveSingleTrain(index, train);
-        }
-        virtual void redo()override {
-            navi->commitRemoveSingleTrain(index);
-        }
+            QUndoCommand* parent=nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
     };
 
     

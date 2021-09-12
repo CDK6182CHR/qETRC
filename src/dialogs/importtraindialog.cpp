@@ -1,9 +1,20 @@
 ﻿#include "importtraindialog.h"
 #include "util/utilfunc.h"
 #include "data/train/routing.h"
+#include "data/diagram/diagram.h"
+#include "data/train/train.h"
 
-#include<QtWidgets>
+#include <QCheckBox>
+#include <QDialogButtonBox>
+#include <QFileDialog>
+#include <QFormLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QSplitter>
 #include <QString>
+
+#include <editors/trainlistwidget.h>
 
 ImportTrainDialog::ImportTrainDialog(Diagram& diagram_, QWidget* parent):
 	QDialog(parent),diagram(diagram_)

@@ -3,7 +3,8 @@
 #include <QMessageBox>
 
 #include "util/utilfunc.h"
-
+#include "data/train/train.h"
+#include "util/utilfunc.h"
 
 TimetableStdModel::TimetableStdModel(bool inplace, QWidget *parent):
     QEMoveableModel(parent), commitInPlace(inplace)

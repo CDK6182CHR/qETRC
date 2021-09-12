@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 
 #include "dialogs/printdiagramdialog.h"
+#include "data/diagram/diagrampage.h"
 
 #include <DockWidget.h>
 #include <QLabel>
@@ -9,6 +10,9 @@
 #include <QFormLayout>
 #include <QDialogButtonBox>
 #include <QMessageBox>
+#include <QLineEdit>
+#include <SARibbonContextCategory.h>
+#include <QTextEdit>
 
 
 PageContext::PageContext(Diagram &diagram_, SARibbonContextCategory *context,

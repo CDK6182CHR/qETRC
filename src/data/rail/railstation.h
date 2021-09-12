@@ -38,10 +38,6 @@ namespace qeutil {
     inline QString passDirStr(int dir) {
         return passDirStr(static_cast<PassedDirection>(dir));
     }
-
-    inline Qt::CheckState boolToCheckState(bool d) {
-        return d ? Qt::Checked : Qt::Unchecked;
-    }
 }
 
 

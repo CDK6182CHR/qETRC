@@ -1,9 +1,19 @@
 ﻿#include "exchangeintervaldialog.h"
-#include <QtWidgets>
+#include <QCheckBox>
+#include <QFormLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QSplitter>
+#include <QTableView>
+#include <QHeaderView>
 #include <algorithm>
+#include <QMessageBox>
 
-#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
 #include "util/buttongroup.hpp"
+#include <model/train/timetablestdmodel.h>
+#include "data/train/train.h"
+#include <util/selecttraincombo.h>
 
 ExchangeIntervalDialog::ExchangeIntervalDialog(TrainCollection &coll_,
                        std::shared_ptr<Train> train1_, QWidget *parent):

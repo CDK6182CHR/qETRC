@@ -7,6 +7,8 @@
 #include "util/utilfunc.h"
 #include "data/diagram/diagram.h"
 #include "data/train/routing.h"
+#include "data/train/train.h"
+#include "data/train/traintype.h"
 
 StationTimetableSettledModel::StationTimetableSettledModel(
         Diagram& dia,

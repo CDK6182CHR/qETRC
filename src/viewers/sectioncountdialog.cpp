@@ -1,6 +1,12 @@
 ﻿#include "sectioncountdialog.h"
 
-#include <QtWidgets>
+#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
+
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QHeaderView>
 
 SectionCountModel::SectionCountModel(Diagram& diagram_,
 	std::shared_ptr<Railway> railway_,

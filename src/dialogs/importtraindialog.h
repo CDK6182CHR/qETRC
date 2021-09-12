@@ -1,14 +1,15 @@
 ﻿#pragma once
 
 #include <QDialog>
-#include <QTableView>
-#include <QLineEdit>
-#include <QCheckBox>
-#include "data/diagram/diagram.h"
-#include "data/train/traincollection.h"
-#include "model/train/trainlistmodel.h"
-#include "editors/trainlistwidget.h"
+
 #include "util/buttongroup.hpp"
+#include "data/train/traincollection.h"
+
+class QLineEdit;
+class QCheckBox;
+class TrainListModel;
+class TrainListWidget;
+class Diagram;
 
 /**
  * @brief The ImportTrainDialog class  导入车次对话框

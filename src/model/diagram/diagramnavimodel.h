@@ -1,12 +1,7 @@
 ﻿#pragma once
 
 #include <QAbstractItemModel>
-#include <QObject>
-#include <QWidget>
-#include <QVector>
-#include <QModelIndex>
 
-#include "data/diagram/diagram.h"
 #include "componentitems.h"
 
 /**

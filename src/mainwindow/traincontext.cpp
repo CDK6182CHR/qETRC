@@ -29,6 +29,7 @@
 
 #include "editors/basictrainwidget.h"
 #include "wizards/timeinterp/timeinterpwizard.h"
+#include "data/train/traintype.h"
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
 	MainWindow* mw_) :

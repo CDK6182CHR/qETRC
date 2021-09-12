@@ -4,19 +4,18 @@
 #include <deque>
 #include <optional>
 #include <tuple>
-#include <QJsonObject>
 #include <cstdint>
 #include <QPair>
 #include <QList>
-#include "data/rail/rail.h"
-#include "data/train/trainstation.h"
-#include "data/common/direction.h"
+
 #include "trainevents.h"
+#include "data/common/direction.h"
 
-
+class Ruler;
+class Railway;
+class StationName;
+class TrainStation;
 class Train;
-
-
 
 
 /**
@@ -30,7 +29,7 @@ struct AdapterStation{
         std::weak_ptr<RailStation> railStation_):
         trainStation(trainStation_),railStation(railStation_){}
     bool operator<(double y)const;
-    inline double yValue()const { return railStation.lock()->y_value.value(); }
+    double yValue()const;
 };
 
 bool operator<(double y, const AdapterStation& adp);
@@ -113,8 +112,10 @@ public:
     std::shared_ptr<Train> train();
     std::shared_ptr<const Train> train()const;
 
-    inline const StationName& firstStationName()const { return _stations.front().trainStation->name; }
-    inline const StationName& lastStationName()const { return _stations.back().trainStation->name; }
+    const StationName& firstStationName()const;
+
+    const StationName& lastStationName()const;
+
 
     inline std::shared_ptr<RailStation>
         firstRailStation(){
@@ -205,7 +206,7 @@ public:
      * 标尺排图中，初始化选择起始站使用。
      * 线性查找。
      */
-    const AdapterStation* stationByTrainLinear(Train::ConstStationPtr st)const;
+    const AdapterStation* stationByTrainLinear(std::list<TrainStation>::const_iterator st)const;
 
     /**
      * 基于事件的实现版本  二分查找

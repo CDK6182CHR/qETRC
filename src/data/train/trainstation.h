@@ -12,7 +12,6 @@
 #include <QFlags>
 
 #include "data/common/stationname.h"
-#include "data/rail/railstation.h"
 
 /**
  * 注：目前支持在（绑定到相同线路的）不同车次间移动时不出问题。

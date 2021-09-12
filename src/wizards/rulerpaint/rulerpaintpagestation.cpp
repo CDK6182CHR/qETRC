@@ -2,12 +2,18 @@
 
 #include "model/rail/railstationmodel.h"
 #include "model/delegate/generaldoublespindelegate.h"
-#include <QtWidgets>
+
+#include <QFormLayout>
+#include <QLabel>
+#include <QMessageBox>
 #include <QVariant>
+#include <QHeaderView>
 #include "util/railrulercombo.h"
-#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
 
 #include "rulerpaintwizard.h"
+#include "data/rail/railcategory.h"
+#include "model/delegate/qedelegate.h"
 
 
 RulerPaintPageStation::RulerPaintPageStation(RailCategory &cat_, QWidget *parent):

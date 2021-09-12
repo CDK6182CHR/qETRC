@@ -19,8 +19,12 @@
 #include <QPrinter>
 #include <QMenu>
 
+#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
 #include "mainwindow/version.h"
 #include "util/qeballoomtip.h"
+#include "data/rail/rulernode.h"
+#include "data/rail/forbid.h"
 
 DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page, QWidget* parent):
     QGraphicsView(parent), _page(page),_diagram(diagram),startTime(diagram.config().start_hour,0,0)

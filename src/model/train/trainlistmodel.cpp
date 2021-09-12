@@ -2,6 +2,7 @@
 #include "editors/trainlistwidget.h"
 #include "data/train/traincollection.h"
 #include "data/train/train.h"
+#include "data/train/traintype.h"
 
 TrainListModel::TrainListModel(TrainCollection& collection, QUndoStack* undo, QObject* parent):
 	QAbstractTableModel(parent), coll(collection), _undo(undo)

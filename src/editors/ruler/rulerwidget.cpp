@@ -1,7 +1,9 @@
 ﻿#include "rulerwidget.h"
 #include "util/buttongroup.hpp"
 #include "model/delegate/postivespindelegate.h"
-#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
+#include "data/rail/rulernode.h"
+#include "data/rail/ruler.h"
 
 #include <QFormLayout>
 #include <QTableView>

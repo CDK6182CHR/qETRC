@@ -4,9 +4,10 @@
 #include <QTableView>
 #include <QStandardItemModel>
 #include <map>
-#include "data/diagram/diagram.h"
-#include "data/rail/railway.h"
 
+class RailInterval;
+class Railway;
+class Diagram;
 
 /**
  * @brief The SectionCountModel class

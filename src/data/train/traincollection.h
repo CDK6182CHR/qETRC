@@ -6,7 +6,7 @@
 #include <QHash>
 #include <QMap>
 
-#include "data/train/traintype.h"
+#include "data/train/typemanager.h"
 
 class Railway;
 class Train;

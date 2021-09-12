@@ -10,8 +10,10 @@
 #include "util/dialogadapter.h"
 #include "viewers/traintimetableplane.h"
 
+class RulerNode;
 class RulerPaintPageTable;
 class QComboBox;
+class Ruler;
 
 /**
  * @brief The RulerPaintModel class

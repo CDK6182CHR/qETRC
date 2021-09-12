@@ -3,8 +3,10 @@
 #include <QDialog>
 #include <QStandardItemModel>
 
-#include "data/train/train.h"
-#include "data/diagram/trainline.h"
+class RailStation;
+class TrainStation;
+class TrainLine;
+class Train;
 
 /**
  * @brief The TrainLineListModel class
@@ -61,7 +63,7 @@ public slots:
 private:
     void setupModel();
 
-    void setTrainRow(int row, Train::ConstStationPtr st, bool bound);
+    void setTrainRow(int row, std::list<TrainStation>::const_iterator st, bool bound);
 
     void setRailwayRow(int row, std::shared_ptr<const RailStation> st,bool bound);
 };

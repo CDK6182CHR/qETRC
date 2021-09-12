@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include <QDialog>
-#include "data/train/train.h"
-#include "data/train/traincollection.h"
-#include "model/train/timetablestdmodel.h"
-#include "util/selecttraincombo.h"
 
+class TrainStation;
+class SelectTrainCombo;
+class TimetableStdModel;
+class Train;
+class TrainCollection;
 class QTableView;
 class QCheckBox;
 
@@ -29,8 +30,8 @@ private:
     void initUI();
 signals:
     void exchangeApplied(std::shared_ptr<Train> train1, std::shared_ptr<Train>train2,
-            Train::StationPtr start1, Train::StationPtr end1,
-            Train::StationPtr start2, Train::StationPtr end2,
+            std::list<TrainStation>::iterator start1, std::list<TrainStation>::iterator end1,
+            std::list<TrainStation>::iterator start2, std::list<TrainStation>::iterator end2,
             bool includeStart, bool includeEnd);
 private slots:
     void onTrain2Changed(std::shared_ptr<Train> t2);

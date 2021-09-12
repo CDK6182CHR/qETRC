@@ -3,6 +3,7 @@
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"
 
+#include "data/common/qesystem.h"
 #include "data/diagram/diagram.h"
 #include "data/train/routing.h"
 #include "dialogs/trainfilter.h"
@@ -10,6 +11,7 @@
 #include "model/delegate/qedelegate.h"
 #include "data/common/qeglobal.h"
 #include "util/pagecomboforrail.h"
+#include "data/train/traintype.h"
 
 #include <QFormLayout>
 #include <QTableView>

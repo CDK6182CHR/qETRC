@@ -1,7 +1,9 @@
 ﻿#include "railstationmodel.h"
 #include "model/delegate/qedelegate.h"
-
-#include <QtWidgets>
+#include "data/rail/railway.h"
+#include "util/utilfunc.h"
+#include <QMessageBox>
+#include <QWidget>
 
 
 RailStationModel::RailStationModel(bool inplace, QWidget *parent):

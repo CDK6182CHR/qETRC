@@ -10,6 +10,7 @@
 #include "editors/trainlistwidget.h"
 #include "model/train/trainlistmodel.h"
 #include "data/diagram/config.h"
+#include "data/common/qesystem.h"
 
 #include <SARibbonPannelItem.h>
 #include <SARibbonGallery.h>

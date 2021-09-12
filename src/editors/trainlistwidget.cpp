@@ -2,6 +2,7 @@
 #include "util/buttongroup.hpp"
 
 #include "mainwindow/mainwindow.h"
+#include "data/train/train.h"
 
 #include <QLineEdit>
 #include <QTableView>

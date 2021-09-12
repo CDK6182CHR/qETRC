@@ -1,5 +1,11 @@
 ﻿#include "selectrailwaycombo.h"
-#include <QtWidgets>
+
+#include "data/rail/railway.h"
+
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QLabel>
+#include <QVBoxLayout>
 
 SelectRailwayCombo::SelectRailwayCombo(RailCategory &cat_, QWidget *parent):
     QComboBox(parent),cat(cat_)

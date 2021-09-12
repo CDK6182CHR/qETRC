@@ -2,6 +2,10 @@
 #include "data/train/routing.h"
 #include "data/train/train.h"
 #include "data/rail/railway.h"
+#include "data/diagram/diagram.h"
+#include "data/diagram/diagrampage.h"
+#include "data/rail/forbid.h"
+#include "data/rail/ruler.h"
 
 navi::DiagramItem::DiagramItem(Diagram& diagram) :
 	AbstractComponentItem(0), _diagram(diagram),

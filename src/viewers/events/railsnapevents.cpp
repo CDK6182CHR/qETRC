@@ -6,6 +6,10 @@
 #include "data/train/routing.h"
 #include "model/delegate/generaldoublespindelegate.h"
 #include "util/pagecomboforrail.h"
+#include "data/common/qesystem.h"
+#include "data/train/train.h"
+#include "data/train/traintype.h"
+#include "data/diagram/diagram.h"
 
 RailSnapEventsModel::RailSnapEventsModel(Diagram &diagram_,
                                          std::shared_ptr<Railway> railway_,

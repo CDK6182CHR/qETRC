@@ -1,9 +1,16 @@
 ﻿#include "rulerrefdialog.h"
 
+#include <QComboBox>
+#include <QTableView>
+#include <QHeaderView>
+#include <QVBoxLayout>
 #include <initializer_list>
-#include <QtWidgets>
 #include "data/diagram/trainadapter.h"
 #include "util/utilfunc.h"
+#include "data/common/qesystem.h"
+#include "data/train/train.h"
+#include "data/rail/ruler.h"
+#include "data/rail/rulernode.h"
 
 RulerRefModel::RulerRefModel(std::shared_ptr<Train> train_, QObject *parent):
     QStandardItemModel(parent),train(train_)

@@ -1,10 +1,20 @@
 ﻿#include "batchcopytraindialog.h"
 #include "util/buttongroup.hpp"
-#include <QtWidgets>
+
+#include <QFormLayout>
+#include <QGroupBox>
+#include <QLineEdit>
 #include <QSet>
+#include <QSpinBox>
+#include <QTimeEdit>
+#include <QTableView>
+#include <QHeaderView>
+#include <QMessageBox>
+#include "data/common/qesystem.h"
 #include "data/diagram/diagram.h"
 #include "model/delegate/qetimedelegate.h"
 #include "util/utilfunc.h"
+#include "data/train/train.h"
 
 BatchCopyTrainModel::BatchCopyTrainModel(QObject* parent) :
     QEMoveableModel(parent)

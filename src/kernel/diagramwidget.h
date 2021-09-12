@@ -7,7 +7,7 @@
 #include <deque>
 #include "data/common/direction.h"
 #include "data/diagram/trainline.h"
-
+#include "data/common/qeglobal.h"
 
 class Diagram;
 class QGraphicsItemGroup;

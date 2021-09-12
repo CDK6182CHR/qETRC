@@ -1,12 +1,9 @@
 ﻿#pragma once
 
-#include <QStandardItemModel>
-#include <QUndoStack>
 #include <memory>
-
-#include "data/train/train.h"
 #include "model/general/qemoveablemodel.h"
 
+class Train;
 /**
  * @brief The TimetableStdModel class
  * 列车时刻表的模型；用于原来的当前列车编辑页面。

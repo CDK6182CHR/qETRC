@@ -1,11 +1,10 @@
 ﻿#pragma once
 #include <QDialog>
-#include <QLineEdit>
-#include <QTextEdit>
 
-#include "data/diagram/diagram.h"
-#include "data/diagram/diagrampage.h"
-#include "kernel/diagramwidget.h"
+class QTextEdit;
+class QLineEdit;
+class DiagramPage;
+class DiagramWidget;
 
 
 /**

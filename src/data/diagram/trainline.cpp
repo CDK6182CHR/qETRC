@@ -79,6 +79,16 @@ std::shared_ptr<const Train> TrainLine::train() const
     return _adapter.train();
 }
 
+const StationName &TrainLine::firstStationName() const
+{
+    return _stations.front().trainStation->name;
+}
+
+const StationName &TrainLine::lastStationName() const
+{
+    return _stations.back().trainStation->name;
+}
+
 bool TrainLine::startAtThis() const
 {
     return !isNull() && train()->isStartingStation(_stations.front().trainStation->name);
@@ -1559,6 +1569,11 @@ void TrainLine::timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool t
 bool AdapterStation::operator<(double y) const
 {
     return railStation.lock()->y_value.value() < y;
+}
+
+double AdapterStation::yValue() const
+{
+    return railStation.lock()->y_value.value();
 }
 
 bool operator<(double y, const AdapterStation& adp)

@@ -1,5 +1,6 @@
 ﻿#include "forbidmodel.h"
 #include "util/utilfunc.h"
+#include "data/rail/forbid.h"
 
 ForbidModel::ForbidModel(std::shared_ptr<Forbid> forbid_, QObject *parent):
     IntervalDataModel(forbid_->railway(),parent),forbid(forbid_)

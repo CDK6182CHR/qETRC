@@ -1,9 +1,16 @@
 ﻿#include "selectrailstationdialog.h"
-#include <QtWidgets>
 
 #include "util/buttongroup.hpp"
-#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
 #include "model/delegate/generaldoublespindelegate.h"
+#include "data/rail/railway.h"
+
+#include <QLabel>
+#include <QTableView>
+#include <QHeaderView>
+#include <QMessageBox>
+
+#include <model/rail/railstationmodel.h>
 
 SelectRailStationDialog::SelectRailStationDialog(std::shared_ptr<Railway> rail,
                                                  QWidget *parent):

@@ -4,6 +4,7 @@
 #include <QStandardItemModel>
 #include "data/diagram/traingap.h"
 
+class Railway;
 class QCheckBox;
 class TrainFilterCore;
 class QTableView;

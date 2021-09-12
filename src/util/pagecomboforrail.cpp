@@ -1,5 +1,6 @@
 ﻿#include "pagecomboforrail.h"
 #include "data/diagram/diagram.h"
+#include "data/diagram/diagrampage.h"
 
 #include <QDialog>
 #include <QDialogButtonBox>

@@ -1,10 +1,17 @@
 ﻿#include "rulerpaintpagestart.h"
 #include "util/selecttraincombo.h"
-#include <QtWidgets>
 
+#include <QFormLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QStackedWidget>
+#include <QTableView>
+#include <QHeaderView>
 #include <algorithm>
-#include "data/diagram/diagram.h"
+#include "data/common/qesystem.h"
 #include "util/utilfunc.h"
+#include "data/train/train.h"
 
 RulerPaintPageStart::RulerPaintPageStart(TrainCollection &coll_, QWidget *parent):
     QWizardPage(parent),coll(coll_),model(new TimetableStdModel(false,this))
