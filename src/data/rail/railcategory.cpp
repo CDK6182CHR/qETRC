@@ -1,16 +1,64 @@
 ﻿#include "railcategory.h"
 #include "railway.h"
 
-RailCategory::RailCategory(std::weak_ptr<RailCategory> parent):
-	_parent(parent)
+RailCategory::RailCategory(const QString& name):
+	 _name(name)
 {
 }
 
-bool RailCategory::railNameIsValid(const QString& name, std::shared_ptr<Railway> rail) const
+bool RailCategory::railNameIsValid(const QString& name, std::shared_ptr<const Railway> rail) const
 {
 	if (name.isEmpty())return false;
 	for (auto p : _railways) {
 		if (p->name() == name && p != rail)
+			return false;
+	}
+	foreach(auto p, _subcats) {
+		if (p->name() == name)
+			return false;
+	}
+	return true;
+}
+
+bool RailCategory::categoryNameIsValid(const QString& name, 
+	std::shared_ptr<const RailCategory> cat) const
+{
+	if (name.isEmpty())return false;
+	for (auto p : _railways) {
+		if (p->name() == name)
+			return false;
+	}
+	foreach(auto p, _subcats) {
+		if (p->name() == name && p!=cat)
+			return false;
+	}
+	return true;
+}
+
+bool RailCategory::railNameIsValidRec(const QString& name, std::shared_ptr<const Railway> rail) const
+{
+	if (name.isEmpty())return false;
+	for (auto p : _railways) {
+		if (p->name() == name && p != rail)
+			return false;
+	}
+	foreach(auto p, _subcats) {
+		if (p->name() == name || !p->railNameIsValidRec(name,rail))
+			return false;
+	}
+	return true;
+}
+
+bool RailCategory::categoryNameIsValidRec(const QString& name,
+	std::shared_ptr<const RailCategory> cat) const
+{
+	if (name.isEmpty())return false;
+	for (auto p : _railways) {
+		if (p->name() == name)
+			return false;
+	}
+	foreach(auto p, _subcats) {
+		if ((p->name() == name && p != cat) || !p->categoryNameIsValidRec(name,cat))
 			return false;
 	}
 	return true;
@@ -34,4 +82,49 @@ int RailCategory::getRailwayIndex(const Railway& rail) const
 			return i;
 	}
 	return -1;
+}
+
+void RailCategory::fromJson(const QJsonObject& obj)
+{
+	clear();
+	for (auto p = obj.constBegin(); p != obj.constEnd(); ++p) {
+		const auto& subobj = p.value().toObject();
+		if (isRailway(subobj)) {
+			_railways.push_back(std::make_shared<Railway>(subobj));
+		}
+		else {
+			auto subcat = std::make_shared<RailCategory>(p.key());
+			subcat->fromJson(subobj);
+			_subcats.push_back(subcat);
+		}
+	}
+}
+
+QJsonObject RailCategory::toJson() const
+{
+	QJsonObject obj;
+	foreach(auto p, _subcats) {
+		obj.insert(p->name(), p->toJson());
+	}
+	foreach(auto p, _railways) {
+		obj.insert(p->name(), p->toJson());
+	}
+	return obj;
+}
+
+void RailCategory::clear()
+{
+	_subcats.clear();
+	_railways.clear();
+}
+
+bool RailCategory::isNull() const
+{
+	return _subcats.empty() && _railways.empty();
+}
+
+bool RailCategory::isRailway(const QJsonObject& obj)
+{
+	return obj.contains("name") && obj.value("name").isString() &&
+		obj.contains("stations") && obj.value("stations").isArray();
 }

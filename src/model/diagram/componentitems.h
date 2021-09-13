@@ -39,6 +39,21 @@ namespace navi {
 			ColDescription,
 			ColMaxNumber
 		};
+
+        /**
+         * @brief The DBColumns enum
+         * 用于线路数据库的列数描述，前缀DB以防止冲突
+         */
+        enum DBColumns {
+            DBColName=0,
+            DBColMile,
+            DBColStart,
+            DBColEnd,
+            DBColAuthor,
+            DBColVersion,
+            DBColMAX
+        }; 
+
 		inline AbstractComponentItem(int row,
 			AbstractComponentItem* parent = nullptr) :
 			_row(row), _parent(parent) {}

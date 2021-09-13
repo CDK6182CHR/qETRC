@@ -201,14 +201,21 @@ void RailStationModel::actCancel()
     setupModel();
 }
 
+bool RailStationModel::submit()
+{
+    emit dataSubmitted();
+    return QEMoveableModel::submit();
+}
+
 void RailStationModel::setupModel()
 {
-    beginResetModel();
-
     if (!railway) {
         setRowCount(0);
         return;
     }
+
+    beginResetModel();
+
 
     setRowCount(railway->stationCount());
 

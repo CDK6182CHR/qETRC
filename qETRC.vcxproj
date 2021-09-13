@@ -241,6 +241,12 @@
     <ClCompile Include="src\model\train\timetablequickmodel.cpp" />
     <ClCompile Include="src\model\train\trainlistreadmodel.cpp" />
     <ClCompile Include="src\model\train\typemodel.cpp" />
+    <ClCompile Include="src\railnet\raildb\raildb.cpp" />
+    <ClCompile Include="src\railnet\raildb\raildbcontext.cpp" />
+    <ClCompile Include="src\railnet\raildb\raildbitems.cpp" />
+    <ClCompile Include="src\railnet\raildb\raildbmodel.cpp" />
+    <ClCompile Include="src\railnet\raildb\raildbnavi.cpp" />
+    <ClCompile Include="src\railnet\raildb\raildbwindow.cpp" />
     <ClCompile Include="src\util\pagecomboforrail.cpp" />
     <ClCompile Include="src\util\qeballoomtip.cpp" />
     <ClCompile Include="src\util\railrulercombo.cpp" />
@@ -322,6 +328,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\data\train\typemanager.h" />
+    <ClInclude Include="src\railnet\raildb\raildb.h" />
+    <QtMoc Include="src\railnet\raildb\raildbcontext.h" />
+    <ClInclude Include="src\railnet\raildb\raildbitems.h" />
+    <QtMoc Include="src\railnet\raildb\raildbmodel.h" />
+    <QtMoc Include="src\railnet\raildb\raildbnavi.h" />
+    <QtMoc Include="src\railnet\raildb\raildbwindow.h" />
     <ClInclude Include="src\wizards\timeinterp\timeinterppagepreview.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterpwizard.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterppagetrain.h" />

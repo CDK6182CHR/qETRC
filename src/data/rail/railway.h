@@ -74,9 +74,11 @@ public:
     Railway(const QString& name="");
     Railway(const QJsonObject& obj);
 
-    //copy ctor & copy = 需要时再写
-    //注意可能需要深拷贝
-    Railway(const Railway& rail) = delete;
+    /**
+     * 2021.09.13实现 拷贝构造
+     * 用于从RailDB导入线路的操作  手写深拷贝
+     */
+    Railway(const Railway& other);
 
     /**
      * 2021.07.04  警告！！ IntervalData持有Railway的反向引用
@@ -373,6 +375,9 @@ public:
     }
     inline QString& nameRef() { return _name; }  //用来搞交换
     inline void setName(const QString& n) { _name = n; }
+
+    auto& notes() { return _notes; }
+    const auto& notes()const { return _notes; }
 
     void showStations()const;
 

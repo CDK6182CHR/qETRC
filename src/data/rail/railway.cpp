@@ -41,6 +41,23 @@ Railway::Railway(const QJsonObject& obj) :
 	fromJson(obj);
 }
 
+Railway::Railway(const Railway& other):
+	_name(other._name),_notes(other._notes),_diagramHeight(other._diagramHeight),
+	numberMapEnabled(false)
+{
+	// 通过逐个添加车站的方式，构建空区间
+	foreach(auto p, other._stations) {
+		appendStation(*p);
+	}
+	// 标尺 天窗，采用addFrom的方式
+	foreach(auto ruler, other._rulers) {
+		addRulerFrom(ruler);
+	}
+	foreach(auto forbid, other._forbids) {
+		addForbidFrom(forbid);
+	}
+}
+
 void Railway::moveStationInfo(Railway&& another)
 {
 	_name = std::move(another._name);
@@ -767,7 +784,7 @@ std::shared_ptr<Ruler> Railway::addRuler(const QJsonObject& obj)
 		StationName
 			from = StationName::fromSingleLiteral(node.value("fazhan").toString()),
 			to = StationName::fromSingleLiteral(node.value("daozhan").toString());
-		auto it = findInterval(from, to);
+		auto it = findGeneralInterval(from, to);
 		if (!it) {
 			qDebug() << "Railway::addRuler: WARNING: invalid interval " << from << "->" << to <<
 				", to be ignored. " << Qt::endl;

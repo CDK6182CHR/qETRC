@@ -82,6 +82,8 @@ signals:
     void actStationTableChanged(std::shared_ptr<Railway> railway,std::shared_ptr<Railway> newtable,
         bool equiv);
 
+    void dataSubmitted();
+
 public slots:
 
     /**
@@ -96,6 +98,8 @@ public slots:
     void actCancel();
 
     inline void refreshData() { setupModel(); }
+
+    virtual bool submit()override;
 
 private:
     void setupModel();

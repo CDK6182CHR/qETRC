@@ -321,6 +321,13 @@ void NaviTree::importRailways()
     _undo->push(new qecmd::ImportRailways(_model, rails));
 }
 
+void NaviTree::importRailwayFromDB(std::shared_ptr<Railway> railway)
+{
+    auto r = std::make_shared<Railway>(*railway);   // copy construct!
+    r->setName(_model->diagram().validRailwayName(railway->name()));
+    _undo->push(new qecmd::ImportRailways(_model, { r }));
+}
+
 void NaviTree::onDoubleClicked(const QModelIndex& index)
 {
     ACI* item = getItem(index);

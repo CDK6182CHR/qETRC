@@ -82,6 +82,12 @@ SOURCES += \
     src/model/train/routingeditmodel.cpp \
     src/model/train/routinglistmodel.cpp \
     src/model/train/trainlistreadmodel.cpp \
+    src/railnet/raildb/raildb.cpp \
+    src/railnet/raildb/raildbcontext.cpp \
+    src/railnet/raildb/raildbitems.cpp \
+    src/railnet/raildb/raildbmodel.cpp \
+    src/railnet/raildb/raildbnavi.cpp \
+    src/railnet/raildb/raildbwindow.cpp \
     src/util/pagecomboforrail.cpp \
     src/util/qeballoomtip.cpp \
     src/util/railrulercombo.cpp \
@@ -214,6 +220,12 @@ HEADERS += \
     src/model/train/routingeditmodel.h \
     src/model/train/routinglistmodel.h \
     src/model/train/trainlistreadmodel.h \
+    src/railnet/raildb/raildb.h \
+    src/railnet/raildb/raildbcontext.h \
+    src/railnet/raildb/raildbitems.h \
+    src/railnet/raildb/raildbmodel.h \
+    src/railnet/raildb/raildbnavi.h \
+    src/railnet/raildb/raildbwindow.h \
     src/util/pagecomboforrail.h \
     src/util/qeballoomtip.h \
     src/util/railrulercombo.h \

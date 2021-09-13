@@ -26,6 +26,7 @@ class RailStationWidget;
 class RoutingWidget;
 struct ChangeStationNameData;
 class LocateDialog;
+class RailDBContext;
 namespace ads{
 class CDockManager;
 class CDockAreaWidget;
@@ -65,6 +66,7 @@ class MainWindow : public SARibbonMainWindow
     RailContext* contextRail;
     RulerContext* contextRuler;
     RoutingContext* contextRouting;
+    RailDBContext* contextDB;
     ViewCategory* catView;
 
     QSpinBox* spPassedStations;
@@ -360,6 +362,10 @@ private slots:
     void actLocateDiagram();
 
     void actInterpolation();
+
+    void actRailDB();
+
+    void actRailDBDock();
 
 public slots:
 

@@ -57,6 +57,9 @@
 #include <model/rail/railstationmodel.h>
 #include "dialogs/locatedialog.h"
 #include "wizards/timeinterp/timeinterpwizard.h"
+#include "railnet/raildb/raildbnavi.h"
+#include "railnet/raildb/raildbwindow.h"
+#include "railnet/raildb/raildbcontext.h"
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -658,6 +661,22 @@ void MainWindow::initToolbar()
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
+        act = new QAction(QIcon(":/icons/database.png"), tr("数据库"), this);
+        act->setToolTip(tr("线路数据库 (Ctrl+H)\n"
+            "查看、编辑或者导入线路数据库中的基线数据。"));
+        connect(act, &QAction::triggered, this, &MainWindow::actRailDBDock);
+        act->setShortcut(Qt::CTRL + Qt::Key_H);
+        addAction(act);
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
+
+        menu = new SARibbonMenu(this);
+        auto actsub = menu->addAction(tr("线路数据库 (pyETRC风格)"));
+        addAction(actsub);
+        actsub->setShortcut(Qt::CTRL + Qt::ALT + Qt::Key_H);
+        connect(actsub, &QAction::triggered, this, &MainWindow::actRailDB);
+        act->setMenu(menu);
+
         act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺编辑"), this);
         act->setToolTip(tr("标尺编辑 (Ctrl+B)\n"
             "打开全局任意线路中的任意一个标尺的编辑面板。"));
@@ -974,6 +993,14 @@ void MainWindow::initToolbar()
             contextRouting, &RoutingContext::onRoutingRemoved);
         connect(contextRouting, &RoutingContext::removeRouting,
             routingWidget, &RoutingWidget::onRemoveRoutingFromContext);
+    }
+
+    // context: DB
+    if constexpr (true) {
+        auto* cat = ribbon->addContextCategory(tr(""));
+        contextDB = new RailDBContext(cat, this);
+        connect(contextDB->getNavi(), &RailDBNavi::exportRailwayToDiagram,
+            naviView, &NaviTree::importRailwayFromDB);
     }
 
     //ApplicationMenu的初始化放在最后，因为可能用到前面的..
@@ -1317,6 +1344,25 @@ void MainWindow::actInterpolation()
     dlg->show();
 }
 
+void MainWindow::actRailDB()
+{
+    QMessageBox::information(this, tr("注意"), tr("线路数据库功能尚未完成，现在只提供"
+        "基线数据浏览和导入线路到当前运行图。对数据库所做的更改可能无法正确保存。\n"
+        "提供了入口并且没有显式未实现提示的功能是已经实现了的。\n"
+        "导入线路到运行图操作，请在右键菜单中完成。"
+    ));
+    auto* window = new RailDBWindow(this);
+    window->getNavi()->openDB(SystemJson::instance.default_raildb_file);
+    connect(window, &RailDBWindow::exportRailwayToDiagram,
+        naviView, &NaviTree::importRailwayFromDB);
+    window->show();
+}
+
+void MainWindow::actRailDBDock()
+{
+    contextDB->activateDB();
+}
+
 void MainWindow::updateWindowTitle()
 {
     QString filename = _diagram.filename();
@@ -1476,9 +1522,11 @@ void MainWindow::actSaveGraph()
 {
     if (_diagram.filename().isEmpty())
         actSaveGraphAs();
-    _diagram.save();
-    markUnchanged();
-    undoStack->setClean();
+    else {
+        _diagram.save();
+        markUnchanged();
+        undoStack->setClean();
+    }
 }
 
 void MainWindow::actSaveGraphAs()

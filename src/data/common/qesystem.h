@@ -15,6 +15,7 @@ public:
 
     QString last_file;
     QString default_file = "sample.pyetgr";
+    QString default_raildb_file = "linesNew.pyetlib";
     int table_row_height = 25;
 
     bool show_train_tooltip = true;

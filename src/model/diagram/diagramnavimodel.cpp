@@ -64,7 +64,6 @@ QVariant DiagramNaviModel::data(const QModelIndex& index, int role) const
 
     const ACI* item = static_cast<ACI*>(index.internalPointer());
 
-    //临时实现..
     if(item)
         return item->data(index.column());
     return {};

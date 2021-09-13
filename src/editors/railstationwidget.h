@@ -24,6 +24,7 @@ class RailStationWidget : public QWidget
     std::shared_ptr<Railway> railway;
     QLineEdit* edName;
     RailCategory& cat;
+    bool _changed = false;
 public:
     explicit RailStationWidget(RailCategory& cat_, bool inplace, QWidget *parent = nullptr);
 
@@ -39,6 +40,14 @@ public:
     auto getRailway() { return railway; }
 
     auto* getModel() { return model; }
+
+    bool isChanged()const { return _changed; }
+
+    /**
+     * 应用更改，返回更新是否成功。
+     * 是否成功通过changed标签判定。
+     */
+    bool applyChange();
 
 protected:
     bool event(QEvent* e)override;
@@ -58,9 +67,8 @@ signals:
 private slots:
     void actApply();
     void actCancel();
-
-public slots:
-
+    void markChanged();
+    
 };
 
 

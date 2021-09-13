@@ -135,6 +135,7 @@ public slots:
     void actBatchAddTrains(const QVector<std::shared_ptr<Train>>& trains);
 
     void importRailways();
+    void importRailwayFromDB(std::shared_ptr<Railway> railway);
     void addNewPage();
     
     void importTrains();

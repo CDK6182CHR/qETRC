@@ -22,14 +22,18 @@ RailStationWidget::RailStationWidget(RailCategory& cat_, bool inplace, QWidget* 
 	//暂定Model的Parent就是自己！
 	//setFocusPolicy(Qt::ClickFocus);
 	initUI();
+	connect(edName, &QLineEdit::textChanged, this, &RailStationWidget::markChanged);
+	connect(model, &RailStationModel::dataSubmitted, this, &RailStationWidget::markChanged);
 }
 
 void RailStationWidget::setRailway(std::shared_ptr<Railway> rail)
 {
 	railway = rail;
 	model->setRailway(rail);
+	if (!railway)return;
 	ctable->table()->resizeColumnsToContents();
 	edName->setText(railway->name());
+	_changed = false;
 }
 
 void RailStationWidget::refreshBasicData()
@@ -39,9 +43,17 @@ void RailStationWidget::refreshBasicData()
 
 void RailStationWidget::refreshData()
 {
+	if (!railway)return;
 	model->refreshData();
 	ctable->table()->resizeColumnsToContents();
 	edName->setText(railway->name());
+	_changed = false;
+}
+
+bool RailStationWidget::applyChange()
+{
+	actApply();
+	return !_changed;
 }
 
 bool RailStationWidget::event(QEvent* e)
@@ -86,7 +98,12 @@ void RailStationWidget::initUI()
 
 void RailStationWidget::actCancel()
 {
-    model->actCancel();
+	refreshData();
+}
+
+void RailStationWidget::markChanged()
+{
+	_changed = true;
 }
 
 void RailStationWidget::actApply()
@@ -94,7 +111,7 @@ void RailStationWidget::actApply()
 	//先讨论线名的修改
 	const QString& name = edName->text();
 	if (name != railway->name()) {
-		if (!cat.railNameIsValid(name, railway)) {
+		if (!cat.railNameIsValidRec(name, railway)) {
 			QMessageBox::warning(this, tr("错误"), tr("线路名称不能为空或与其他线名冲突，请重新设置。"));
 			return;
 		}
@@ -106,4 +123,5 @@ void RailStationWidget::actApply()
 		}
 	}
 	model->actApply();
+	_changed = false;
 }
