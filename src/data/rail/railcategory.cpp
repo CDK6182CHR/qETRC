@@ -1,6 +1,11 @@
 ﻿#include "railcategory.h"
 #include "railway.h"
 
+RailCategory::RailCategory(std::weak_ptr<RailCategory> parent):
+	_parent(parent)
+{
+}
+
 bool RailCategory::railNameIsValid(const QString& name, std::shared_ptr<Railway> rail) const
 {
 	if (name.isEmpty())return false;

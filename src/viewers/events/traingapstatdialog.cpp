@@ -195,6 +195,7 @@ TrainGapSummaryDialog::TrainGapSummaryDialog(Diagram &diagram,
 {
     setWindowTitle(tr("列车间隔汇总 - %1").arg(railway->name()));
     setAttribute(Qt::WA_DeleteOnClose);
+    setWindowFlags(Qt::Window);
     resize(800,800);
     initUI();
 
