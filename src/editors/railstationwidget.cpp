@@ -30,15 +30,21 @@ void RailStationWidget::setRailway(std::shared_ptr<Railway> rail)
 {
 	railway = rail;
 	model->setRailway(rail);
-	if (!railway)return;
-	ctable->table()->resizeColumnsToContents();
-	edName->setText(railway->name());
+	if (railway) {
+		ctable->table()->resizeColumnsToContents();
+		edName->setText(railway->name());
+	}
+	else {
+		edName->clear();
+	}
 	_changed = false;
 }
 
 void RailStationWidget::refreshBasicData()
 {
-	edName->setText(railway->name());
+	if (railway)
+		edName->setText(railway->name());
+	else edName->clear();
 }
 
 void RailStationWidget::refreshData()
@@ -108,6 +114,12 @@ void RailStationWidget::markChanged()
 
 void RailStationWidget::actApply()
 {
+	if (!railway) {
+		// 这种情况只可能在线路数据库中发生。
+		// 如果出现，什么都不做，RailDBWindow会判定Index的有效性
+		emit invalidApplyRequest();
+		return;
+	}
 	//先讨论线名的修改
 	const QString& name = edName->text();
 	if (name != railway->name()) {

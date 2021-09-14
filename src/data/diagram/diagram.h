@@ -235,6 +235,8 @@ public:
 
     QString validRailwayName(const QString& prefix)const;
 
+    QString validPageName(const QString& prefix)const;
+
     /**
      * 如果读取失败，则运行图是个Null。
      * 没有任何线路的运行图是Null。
@@ -369,7 +371,6 @@ public:
 
 private:
     void bindAllTrains();
-    QString validPageName(const QString& prefix)const;
 
     void sectionTrainCount(std::map<std::shared_ptr<RailInterval>, int>& res,
         std::shared_ptr<TrainLine> line)const;

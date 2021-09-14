@@ -2,6 +2,7 @@
 #include "raildbmodel.h"
 #include "data/common/qesystem.h"
 #include "raildb.h"
+#include "data/rail/railway.h"
 
 #include <QTreeView>
 #include <QVBoxLayout>
@@ -38,12 +39,20 @@ void RailDBNavi::initUI()
     connect(tree, &QTreeView::customContextMenuRequested,
         this, &RailDBNavi::showContextMenu);
 
+    int c = 0;
+    for (int w : {200, 80, 120, 120, 120, 120}) {
+        tree->setColumnWidth(c++, w);
+    }
 }
 
 void RailDBNavi::initContext()
 {
     QAction* act;
     meCat=new QMenu;
+    meCat->addAction(tr("展开"), this, &RailDBNavi::actExpand);
+    meCat->addAction(tr("折叠"), this, &RailDBNavi::actCollapse);
+    meCat->addSeparator();
+
     act=meCat->addAction(tr("新建线路"));
     connect(act,&QAction::triggered,this,&RailDBNavi::actNewRail);
     act=meCat->addAction(tr("新建子分类"));
@@ -68,6 +77,7 @@ void RailDBNavi::initContext()
 std::shared_ptr<Railway> RailDBNavi::currentRailway()
 {
     auto&& idx=tree->currentIndex();
+    if (!idx.isValid())return nullptr;
     auto* it=model->getItem(idx);
     if(it->type()==navi::RailwayItemDB::Type){
         return static_cast<navi::RailwayItemDB*>(it)->railway();
@@ -83,6 +93,11 @@ std::shared_ptr<RailCategory> RailDBNavi::currentCategory()
         return static_cast<navi::RailCategoryItem*>(it)->category();
     }
     return nullptr;
+}
+
+RailDBNavi::ACI *RailDBNavi::currentItem()
+{
+    return model->getItem(tree->currentIndex());
 }
 
 void RailDBNavi::showContextMenu(const QPoint &pos)
@@ -113,8 +128,9 @@ void RailDBNavi::actNewParallelCat()
 
 void RailDBNavi::actEditRail()
 {
-    if (auto p=currentRailway()){
-        emit focusInRailway(p);
+    if(auto* it=currentItem();it->type()==navi::RailwayItemDB::Type){
+        emit focusInRailway(static_cast<navi::RailwayItemDB*>(it)->railway(),
+                            it->path());
     }
 }
 
@@ -137,7 +153,30 @@ void RailDBNavi::actExportToDiagram()
 {
     auto rail=currentRailway();
     if(rail){
+        //auto flag = QMessageBox::question(this, tr("线路数据库"),
+        //    tr("是否确认将当前选中的线路[%1]完整添加到当前运行图文件？\n"
+        //        "如果需要，添加后请手动新建或运行图视窗，以显示运行图。")
+        //.arg(rail->name()));
+        //if (flag == QMessageBox::Yes) {
+        //    emit exportRailwayToDiagram(rail);
+        //}
         emit exportRailwayToDiagram(rail);
+        
+    }
+}
+
+void RailDBNavi::actSetAsDefaultFile()
+{
+    if (_raildb->filename().isEmpty()) {
+        QMessageBox::warning(this, tr("错误"), tr("当前数据库文件名为空（可能是新建的数据库），"
+            "不可设置为默认文件名。"));
+    }
+    else {
+        SystemJson::instance.default_raildb_file = _raildb->filename();
+        QMessageBox::information(this, tr("提示"), tr("已将当前文件名[%1]设置为默认的"
+            "线路数据库文件名。\n"
+            "此信息保存在system.json配置文件中。本次关闭主程序后，下次在主程序中使用"
+            "线路数据库功能时，将默认打开本文件。").arg(_raildb->filename()));
     }
 }
 
@@ -152,7 +191,8 @@ void RailDBNavi::onCurrentChanged(const QModelIndex &cur, const QModelIndex &pre
     auto* it=model->getItem(cur);
     switch (it->type()){
     case navi::RailwayItemDB::Type:
-        emit focusInRailway(static_cast<navi::RailwayItemDB*>(it)->railway());break;
+        emit focusInRailway(static_cast<navi::RailwayItemDB*>(it)->railway(),
+                            it->path());break;
     }
 }
 
@@ -217,6 +257,16 @@ void RailDBNavi::markUnchanged()
         _changed=false;
         emit changedFlagChanged(_changed);
     }
+}
+
+void RailDBNavi::actExpand()
+{
+    tree->expand(tree->currentIndex());
+}
+
+void RailDBNavi::actCollapse()
+{
+    tree->collapse(tree->currentIndex());
 }
 
 

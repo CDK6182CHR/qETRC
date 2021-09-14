@@ -1,6 +1,6 @@
 ﻿#include "raildbmodel.h"
 #include "raildb.h"
-
+#include "data/rail/railway.h"
 
 RailDBModel::RailDBModel(std::shared_ptr<RailDB> raildb, QObject *parent) :
     QAbstractItemModel(parent), _raildb(raildb),
@@ -88,6 +88,20 @@ RailDBModel::pACI RailDBModel::getItem(const QModelIndex &idx) const
     else return nullptr;
 }
 
+QModelIndex RailDBModel::indexByPath(const std::deque<int> &path)
+{
+    QModelIndex idx{};
+    for(int i:path){
+        idx=index(i,0,idx);
+    }
+    return idx;
+}
+
+QModelIndex RailDBModel::railIndexBrute(std::shared_ptr<Railway> railway)
+{
+    return railIndexBruteFrom(railway,{});
+}
+
 RailDBModel::pACI RailDBModel::getParentItem(const QModelIndex &parent)const
 {
     if(parent.isValid()){
@@ -95,6 +109,50 @@ RailDBModel::pACI RailDBModel::getParentItem(const QModelIndex &parent)const
     }else{
         return _root.get();
     }
+}
+
+QModelIndex RailDBModel::railIndexBruteFrom(std::shared_ptr<Railway> railway,
+                                            const QModelIndex &idx)
+{
+    auto* it=getParentItem(idx);
+    for(int i=0;i<it->childCount();i++){
+        auto* sub=it->child(i);
+        if(!sub) continue;
+        if(sub->type()==navi::RailCategoryItem::Type){
+            // 递归
+            auto subres=railIndexBruteFrom(railway,index(i,0,idx));
+            if(subres.isValid()){
+                return subres;
+            }
+        }else if(sub->type()==navi::RailwayItemDB::Type){
+            if (static_cast<navi::RailwayItemDB*>(sub)->railway()==railway){
+                return index(sub->row(),0,idx);
+            }
+        }
+    }
+    return {};
+}
+
+std::shared_ptr<Railway> RailDBModel::railwayByIndex(const QModelIndex& idx)
+{
+    if (!idx.isValid())return nullptr;
+    if (auto* it = static_cast<pACI>(idx.internalPointer());
+        it->type() == navi::RailwayItemDB::Type) {
+        return static_cast<navi::RailwayItemDB*>(it)->railway();
+    }
+    return nullptr;
+}
+
+void RailDBModel::onRailInfoChanged(std::shared_ptr<Railway> railway, const std::deque<int>& path)
+{
+    auto idx = indexByPath(path);
+    if (!idx.isValid() || railwayByIndex(idx)!=railway) {
+        qDebug() << "RailDBModel::onRailInfoChanged: WARNING: invalid path to railway: " <<
+            railway->name() << ", will use brute-force alg. " << Qt::endl;
+        idx = railIndexBrute(railway);
+    }
+    emit dataChanged(idx, index(idx.row(), ACI::DBColMAX - 1, idx.parent()), 
+        { Qt::EditRole });
 }
 
 void RailDBModel::resetModel()

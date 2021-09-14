@@ -23,6 +23,11 @@ class Routing;
 
 namespace navi {
 
+    /**
+     * 定位到一个Item的路径。从front()至back()，是从顶层至底层的行号。
+     */
+    using path_t=std::deque<int>;
+
 	/**
 	 * Diagram中资源的封装类 （基类）
 	 * 注意数据发生变化时，需要通知相关对象更新状态
@@ -65,6 +70,17 @@ namespace navi {
         inline int row()const { return _row; }
         inline void setRow(int r){_row=r;}
         inline int& rowRef(){return _row;}
+
+        /**
+         * @brief path
+         * @return 当前Item从根节点开始的每一层行号。
+         */
+        path_t path()const;
+
+        /**
+         * 根据path，从当前结点开始查找，返回对应结点
+         */
+        AbstractComponentItem* itemByPath(const path_t& path);
 	};
 
 	class RailwayListItem;

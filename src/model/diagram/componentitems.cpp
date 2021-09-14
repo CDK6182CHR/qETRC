@@ -409,3 +409,31 @@ QString navi::RoutingItem::data(int i) const
     default:return {};
     }
 }
+
+navi::path_t navi::AbstractComponentItem::path() const
+{
+    path_t res;
+    const auto* p=this;
+    while (p->_parent){
+        res.push_front(p->row());
+        p=p->_parent;
+    }
+    return res;
+}
+
+typename navi::AbstractComponentItem*
+    navi::AbstractComponentItem::itemByPath(const path_t &path)
+{
+    // 待定的特殊处理：禁止空白
+    if(path.empty()) return nullptr;
+    auto* p=this;
+    for(auto itr=path.begin();itr!=path.end();++itr){
+        p=p->child(*itr);
+        if(!p){
+            qDebug()<<"navi::AbstractComponentItem::itemByPath: WARNING "<<
+                    "invalid path, early terminate. "<<Qt::endl;
+            break;
+        }
+    }
+    return p;
+}

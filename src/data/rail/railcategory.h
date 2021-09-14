@@ -28,6 +28,7 @@ public:
     RailCategory(const QString& name);
     RailCategory(RailCategory&&)=default;
     RailCategory(const RailCategory&)=delete;
+    RailCategory& operator=(const RailCategory&) = delete;
     RailCategory& operator=(RailCategory&&)=default;
 
     //auto parent() { return _parent; }

@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <QWidget>
 #include <memory>
+#include <deque>
+
 
 class QUndoStack;
 class RailCategory;
@@ -9,6 +11,10 @@ class Railway;
 class QTreeView;
 class RailDBModel;
 class RailDB;
+namespace navi {
+class AbstractComponentItem;
+}
+
 
 /**
  * @brief The RailDBNavi class
@@ -17,6 +23,8 @@ class RailDB;
 class RailDBNavi : public QWidget
 {
     Q_OBJECT
+    using ACI=navi::AbstractComponentItem;
+
     std::shared_ptr<RailDB> _raildb;
     RailDBModel* const model;
 
@@ -27,6 +35,9 @@ class RailDBNavi : public QWidget
     bool _changed=false;
 public:
     explicit RailDBNavi(std::shared_ptr<RailDB> raildb, QWidget *parent = nullptr);
+    auto* getTree() { return tree; }
+    auto* getModel() { return model;}
+    auto* undoStack() { return _undo; }
 private:
     void initUI();
     void initContext();
@@ -36,13 +47,14 @@ private:
      */
     std::shared_ptr<Railway> currentRailway();
     std::shared_ptr<RailCategory> currentCategory();
+    ACI* currentItem();
     
     void clearDBUnchecked();
     void afterResetDB();
     bool saveQuestion();
 
 signals:
-    void focusInRailway(std::shared_ptr<Railway>);
+    void focusInRailway(std::shared_ptr<Railway>, const std::deque<int>& idx);
     void exportRailwayToDiagram(std::shared_ptr<Railway>);
 
     /**
@@ -61,10 +73,14 @@ private slots:
     void actRuler();
     void actForbid();
     void actExportToDiagram();
-
+    
     void onCurrentChanged(const QModelIndex& cur, const QModelIndex& prev);
     void markChanged();
     void markUnchanged();
+
+    void actExpand();
+    void actCollapse();
+
 
 public slots:
     void refreshData();
@@ -73,6 +89,7 @@ public slots:
     void actSave();
     void actSaveAs();
     bool openDB(const QString& filename);
+    void actSetAsDefaultFile();
 
 };
 

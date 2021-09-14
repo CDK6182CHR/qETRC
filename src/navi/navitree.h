@@ -89,7 +89,7 @@ private slots:
     void onDoubleClicked(const QModelIndex& index);
 
     /**
-     * AddPageDialog返回后进入
+     * AddPageDialog返回后进入 操作压栈
      */
     void addNewPageApply(std::shared_ptr<DiagramPage> page);
 

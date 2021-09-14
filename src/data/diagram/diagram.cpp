@@ -726,7 +726,8 @@ void Diagram::bindAllTrains()
 QString Diagram::validPageName(const QString& prefix) const
 {
     for (int i = 0;; i++) {
-        QString name = prefix + QString::number(i);
+        QString name = prefix;
+        if (i) name.append(QString::number(i));
         if (!pageNameExisted(name))
             return name;
     }

@@ -57,12 +57,18 @@ private:
    
 
 signals:
-    /*
+
+    /**
      * 此信号发送给railcontext来执行压栈
      */
     void railNameChanged(std::shared_ptr<Railway> railway, const QString& name);
 
     void focusInRailway(std::shared_ptr<Railway> rail);
+
+    /**
+     * 线路数据库中可能出现的，railway为空时要求提交
+     */
+    void invalidApplyRequest();
 
 private slots:
     void actApply();

@@ -29,8 +29,8 @@ void RailDBContext::initUI()
 void RailDBContext::activateDB()
 {
     if (dock == nullptr) {
-        dock = new ads::CDockWidget(tr("数据库导航"));
-        mw->getManager()->addDockWidgetFloating(dock);
+        dock = new ads::CDockWidget(tr("线路数据库"));
+        mw->getManager()->addDockWidgetTab(ads::CenterDockWidgetArea, dock);
         dock->setWidget(window);
     }
     if (dock->isClosed()) {
