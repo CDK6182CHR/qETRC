@@ -61,7 +61,28 @@ bool RailCategory::categoryNameIsValidRec(const QString& name,
 		if ((p->name() == name && p != cat) || !p->categoryNameIsValidRec(name,cat))
 			return false;
 	}
+
 	return true;
+}
+
+QString RailCategory::validRailwayName(const QString& prefix)const
+{
+	for (int i = 0;; i++) {
+		QString res = prefix;
+		if (i)res += QString::number(i);
+		if (railNameIsValid(res, nullptr))
+			return res;
+	}
+}
+
+QString RailCategory::validRailwayNameRec(const QString& prefix)const
+{
+	for (int i = 0;; i++) {
+		QString res = prefix;
+		if (i)res += QString::number(i);
+		if (railNameIsValidRec(res, nullptr))
+			return res;
+	}
 }
 
 int RailCategory::getRailwayIndex(std::shared_ptr<const Railway> rail) const

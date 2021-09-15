@@ -3,6 +3,8 @@
 #include "data/common/qesystem.h"
 #include "raildb.h"
 #include "data/rail/railway.h"
+#include "data/rail/forbid.h"
+#include "editors/forbidwidget.h"
 
 #include <QTreeView>
 #include <QVBoxLayout>
@@ -61,7 +63,7 @@ void RailDBNavi::initContext()
     connect(act,&QAction::triggered,this,&RailDBNavi::actNewParallelCat);
 
     meRail=new QMenu;
-    act=meRail->addAction(tr("打开基线"));
+    act=meRail->addAction(tr("编辑"));
     connect(act,&QAction::triggered,this,&RailDBNavi::actEditRail);
     act=meRail->addAction(tr("删除"));
     connect(act,&QAction::triggered,this,&RailDBNavi::actRemoveRail);
@@ -72,6 +74,9 @@ void RailDBNavi::initContext()
     meRail->addSeparator();
     act=meRail->addAction(tr("导出到运行图"));
     connect(act,&QAction::triggered,this,&RailDBNavi::actExportToDiagram);
+    
+    meRail->addSeparator();
+    meRail->addAction(tr("新建线路"), this, &RailDBNavi::actNewRail);
 }
 
 std::shared_ptr<Railway> RailDBNavi::currentRailway()
@@ -113,7 +118,17 @@ void RailDBNavi::showContextMenu(const QPoint &pos)
 
 void RailDBNavi::actNewRail()
 {
-    _RAILDB_NOT_IMPLEMENTED;
+    auto* it = currentItem();
+    auto idx = tree->currentIndex();
+    if (it->type() == navi::RailwayItemDB::Type) {
+        it = it->parent();
+        idx = idx.parent();
+    }
+    auto path = it->path();
+    path.emplace_back(it->childCount());
+    auto railway = std::make_shared<Railway>(_raildb->validRailwayNameRec(tr("新线路")));
+    _undo->push(new qecmd::InsertRailDB(railway, path, model));
+    tree->setCurrentIndex(model->index(it->childCount() - 1, 0, idx));
 }
 
 void RailDBNavi::actNewSubcat()
@@ -136,7 +151,11 @@ void RailDBNavi::actEditRail()
 
 void RailDBNavi::actRemoveRail()
 {
-    _RAILDB_NOT_IMPLEMENTED;
+    auto idx = tree->currentIndex();
+    auto rail = currentRailway();
+    if (!rail)return;
+    auto* it = static_cast<ACI*>(idx.internalPointer());
+    _undo->push(new qecmd::RemoveRailDB(rail, it->path(), model));
 }
 
 void RailDBNavi::actRuler()
@@ -146,7 +165,16 @@ void RailDBNavi::actRuler()
 
 void RailDBNavi::actForbid()
 {
-    _RAILDB_NOT_IMPLEMENTED;
+    auto rail = currentRailway();
+    if (!rail)return;
+    auto* w = new ForbidTabWidget(rail, false, this);
+    w->resize(600, 600);
+    w->setWindowTitle(tr("天窗编辑 - %1").arg(rail->name()));
+    w->setAttribute(Qt::WA_DeleteOnClose);
+    w->setWindowFlags(Qt::Dialog);
+    connect(w, &ForbidTabWidget::forbidChanged,
+        this, &RailDBNavi::actChangeForbid);
+    w->show();
 }
 
 void RailDBNavi::actExportToDiagram()
@@ -269,6 +297,11 @@ void RailDBNavi::actCollapse()
     tree->collapse(tree->currentIndex());
 }
 
+void RailDBNavi::actChangeForbid(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> data)
+{
+    _undo->push(new qecmd::UpdateForbidDB(forbid, data));
+}
+
 
 void RailDBNavi::actOpen()
 {
@@ -321,3 +354,52 @@ void RailDBNavi::actSaveAs()
     }
 }
 
+qecmd::RemoveRailDB::RemoveRailDB(std::shared_ptr<Railway> railway_, 
+    const std::deque<int>& path_, RailDBModel* model_, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("删除线路: %1").arg(railway_->name()), parent),
+    railway(railway_),path(path_),model(model_)
+{
+}
+
+void qecmd::RemoveRailDB::undo()
+{
+    model->commitInsertRailwayAt(railway, path);
+}
+
+void qecmd::RemoveRailDB::redo()
+{
+    model->commitRemoveRailwayAt(railway, path);
+}
+
+qecmd::InsertRailDB::InsertRailDB(std::shared_ptr<Railway> railway_, 
+    const std::deque<int>& path_, RailDBModel* model_, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("新建线路: %1").arg(railway_->name()),parent),
+    railway(railway_),path(path_),model(model_)
+{
+}
+
+void qecmd::InsertRailDB::undo()
+{
+    model->commitRemoveRailwayAt(railway, path);
+}
+
+void qecmd::InsertRailDB::redo()
+{
+    model->commitInsertRailwayAt(railway, path);
+}
+
+qecmd::UpdateForbidDB::UpdateForbidDB(std::shared_ptr<Forbid> forbid, 
+    std::shared_ptr<Railway> data, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("更新天窗: %1 @%2").arg(forbid->name(),forbid->railway().name()),
+        parent),forbid(forbid),data(data)
+{
+}
+
+void qecmd::UpdateForbidDB::undo()
+{
+    forbid->swap(*data->getForbid(0));
+}
+void qecmd::UpdateForbidDB::redo()
+{
+    forbid->swap(*data->getForbid(0));
+}

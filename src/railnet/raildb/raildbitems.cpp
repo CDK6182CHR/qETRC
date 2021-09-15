@@ -42,6 +42,28 @@ QString navi::RailCategoryItem::data(int i) const
     }
 }
 
+void navi::RailCategoryItem::removeRailwayAt(int i)
+{
+    int ri=i-_subcats.size();
+    _category->railways().removeAt(ri);
+    auto p=_railways.begin();std::advance(p,ri);
+    p=_railways.erase(p);
+    for(;p!=_railways.end();++p){
+        (*p)->setRow((*p)->row()-1);
+    }
+}
+
+void navi::RailCategoryItem::insertRailwayAt(std::shared_ptr<Railway> rail, int i)
+{
+    int ri=i-_subcats.size();
+    _category->railways().insert(ri,rail);
+    auto p=_railways.begin();std::advance(p,ri);
+    p=_railways.insert(p,std::make_unique<RailwayItemDB>(rail,i,this));
+    for(++p;p!=_railways.end();++p){
+        (*p)->setRow((*p)->row()+1);
+    }
+}
+
 
 navi::RailwayItemDB::RailwayItemDB(std::shared_ptr<Railway> rail,
                                    int row, RailCategoryItem *parent):

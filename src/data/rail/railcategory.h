@@ -50,6 +50,9 @@ public:
     bool railNameIsValidRec(const QString& name, std::shared_ptr<const Railway> rail)const;
     bool categoryNameIsValidRec(const QString& name, std::shared_ptr<const RailCategory> cat)const;
 
+    QString validRailwayName(const QString& prefix)const;
+    QString validRailwayNameRec(const QString& prefix)const;
+
     int getRailwayIndex(std::shared_ptr<const Railway> rail)const;
 
     int getRailwayIndex(const Railway& rail)const;

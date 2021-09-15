@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <QWidget>
+#include <QUndoCommand>
 #include <memory>
 #include <deque>
 
@@ -8,6 +9,7 @@ class QUndoStack;
 class RailCategory;
 class QMenu;
 class Railway;
+class Forbid;
 class QTreeView;
 class RailDBModel;
 class RailDB;
@@ -68,7 +70,7 @@ private slots:
     void actNewRail();
     void actNewSubcat();
     void actNewParallelCat();
-    void actEditRail();
+    
     void actRemoveRail();
     void actRuler();
     void actForbid();
@@ -81,8 +83,14 @@ private slots:
     void actExpand();
     void actCollapse();
 
+    /**
+     * 天窗编辑。直接更新，无需后续操作。操作压栈
+     */
+    void actChangeForbid(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> data);
+
 
 public slots:
+    void actEditRail();
     void refreshData();
     void actOpen();
     void actNewDB();
@@ -93,3 +101,39 @@ public slots:
 
 };
 
+
+namespace qecmd {
+    class RemoveRailDB :public QUndoCommand 
+    {
+        std::shared_ptr<Railway> railway;
+        std::deque<int> path;
+        RailDBModel* const model;
+    public:
+        RemoveRailDB(std::shared_ptr<Railway> railway_, const std::deque<int>& path_,
+            RailDBModel* model_, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    class InsertRailDB :public QUndoCommand
+    {
+        std::shared_ptr<Railway> railway;
+        std::deque<int> path;
+        RailDBModel* const model;
+    public :
+        InsertRailDB(std::shared_ptr<Railway> railway_, const std::deque<int>& path_,
+            RailDBModel* model_, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
+    class UpdateForbidDB :public QUndoCommand {
+        std::shared_ptr<Forbid> forbid;
+        std::shared_ptr<Railway> data;
+    public:
+        UpdateForbidDB(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> data,
+            QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+}

@@ -97,6 +97,16 @@ QModelIndex RailDBModel::indexByPath(const std::deque<int> &path)
     return idx;
 }
 
+QModelIndex RailDBModel::parentIndexByPath(const std::deque<int>& path)
+{
+    if (path.empty())return {};
+    QModelIndex idx{};
+    for (auto p = path.begin(); p != std::prev(path.end()); ++p) {
+        idx = index(*p, 0, idx);
+    }
+    return idx;
+}
+
 QModelIndex RailDBModel::railIndexBrute(std::shared_ptr<Railway> railway)
 {
     return railIndexBruteFrom(railway,{});
@@ -153,6 +163,34 @@ void RailDBModel::onRailInfoChanged(std::shared_ptr<Railway> railway, const std:
     }
     emit dataChanged(idx, index(idx.row(), ACI::DBColMAX - 1, idx.parent()), 
         { Qt::EditRole });
+}
+
+void RailDBModel::commitRemoveRailwayAt(std::shared_ptr<Railway> railway, 
+    const std::deque<int>& path)
+{
+    auto idx = indexByPath(path);
+    if (!idx.isValid() || railwayByIndex(idx) != railway) {
+        qDebug() << "RailDBModel::commitRemoveRailwayAt: WARNING: " <<
+            "Invalid path, use brute-force" << Qt::endl;
+        idx = railIndexBrute(railway);
+    }
+    // 现在：idx指向要被删除的东西。
+    const auto& par = idx.parent();
+    beginRemoveRows(par, idx.row(), idx.row());
+    auto* par_it = static_cast<navi::RailCategoryItem*>(par.internalPointer());
+    par_it->removeRailwayAt(path.back());
+    endRemoveRows();
+}
+
+void RailDBModel::commitInsertRailwayAt(std::shared_ptr<Railway> railway, const std::deque<int>& path)
+{
+    // 不用检查 （没办法检查），直接按照path插入。
+    // 如果path出现越界啥的，直接让抛异常好了
+    auto par = parentIndexByPath(path);
+    beginInsertRows(par, path.back(), path.back());
+    auto* par_it = static_cast<navi::RailCategoryItem*>(par.internalPointer());
+    par_it->insertRailwayAt(railway, path.back());
+    endInsertRows();
 }
 
 void RailDBModel::resetModel()

@@ -12,6 +12,7 @@
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QTreeView>
+#include <QUndoView>
 
 #include <editors/railstationwidget.h>
 #include "data/common/qesystem.h"
@@ -42,6 +43,10 @@ void RailDBWindow::initUI()
     connect(navi,&RailDBNavi::exportRailwayToDiagram,
             this,&RailDBWindow::exportRailwayToDiagram);
 
+    undoView = new QUndoView(navi->undoStack(), this);
+    undoView->setWindowFlags(Qt::Dialog);
+    undoView->setWindowTitle(tr("线路数据库 - 历史记录"));
+
     editor=new RailStationWidget(*_raildb,false);
     sp->addWidget(editor);
     setCentralWidget(sp);
@@ -62,6 +67,7 @@ void RailDBWindow::initMenuBar()
 {
     auto* menubar = new QMenuBar(this);
     setMenuBar(menubar);
+    QAction* act;
 
     auto* menu = menubar->addMenu(tr("文件"));
     menu->addAction(tr("新建"), navi, &RailDBNavi::actNewDB);
@@ -71,6 +77,13 @@ void RailDBWindow::initMenuBar()
     menu->addSeparator();
     menu->addAction(tr("将当前数据库文件设为默认文件"), navi, &RailDBNavi::actSetAsDefaultFile);
     menu->addSeparator();
+
+    menu = menubar->addMenu(tr("编辑"));
+    menu->addAction(navi->undoStack()->createUndoAction(menu, tr("撤销")));
+    menu->addAction(navi->undoStack()->createRedoAction(menu, tr("重做")));
+    menu->addAction(tr("历史记录"), undoView, &QUndoView::show);
+    menu->addSeparator();
+    menu->addAction(tr("编辑当前线路"), navi, &RailDBNavi::actEditRail);
     
     menu = menubar->addMenu(tr("查看"));
     menu->addAction(tr("刷新线路表"), navi, &RailDBNavi::refreshData);
@@ -117,7 +130,7 @@ QMessageBox::information(this,tr("线路数据库"), tr("此功能尚未实现�
 
 void RailDBWindow::onEditorRailNameChanged(std::shared_ptr<Railway> railway, const QString& name)
 {
-    _RAILDB_NOT_IMPLEMENTED;
+    navi->undoStack()->push(new qecmd::UpdateRailNameDB(railway, name, editorPath, this));
 }
 
 void RailDBWindow::onEditorStationChanged(std::shared_ptr<Railway> railway,
@@ -132,6 +145,14 @@ void RailDBWindow::onEditorInvalidApplied()
 {
     QMessageBox::warning(this, tr("错误"), tr("当前没有在编辑的线路。请先选择要编辑的线路，"
         "或新建线路，再提交。"));
+}
+
+void RailDBWindow::commitUpdateRailName(std::shared_ptr<Railway> railway, const std::deque<int>& path)
+{
+    if (editor->getRailway() == railway) {
+        editor->refreshBasicData();
+    }
+    navi->getModel()->onRailInfoChanged(railway, path);
 }
 
 void RailDBWindow::commitUpdateStations(std::shared_ptr<Railway> railway, const std::deque<int> &path)
@@ -168,4 +189,23 @@ void qecmd::UpdateRailStationsDB::redo()
 {
     railway->swapBaseWith(*table);
     wnd->commitUpdateStations(railway, path);
+}
+
+qecmd::UpdateRailNameDB::UpdateRailNameDB(std::shared_ptr<Railway> railway_, 
+    const QString& name_, const std::deque<int>& path_, RailDBWindow* wnd_, 
+    QUndoCommand* parent):
+    QUndoCommand(QObject::tr("更改线名: %1").arg(name_),parent),
+    railway(railway_),name(name_),path(path_),wnd(wnd_)
+{
+}
+
+void qecmd::UpdateRailNameDB::undo()
+{
+    std::swap(railway->nameRef(), name);
+    wnd->commitUpdateRailName(railway, path);
+}
+void qecmd::UpdateRailNameDB::redo()
+{
+    std::swap(railway->nameRef(), name);
+    wnd->commitUpdateRailName(railway, path);
 }

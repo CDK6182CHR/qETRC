@@ -30,6 +30,12 @@ public:
     QModelIndex indexByPath(const std::deque<int>& path);
 
     /**
+     * 返回path所示的父节点。如果为空，直接返回空。
+     * 用在插入时，插入的index可能是个无效的。
+     */
+    QModelIndex parentIndexByPath(const std::deque<int>& path);
+
+    /**
      * @brief railIndexBrute
      * 暴力查找 （DFS）指定线路。一般用不到；只在Path失效的情况紧急替代。
      */
@@ -51,5 +57,18 @@ public slots:
      * 指定线路变更后，更新数据。
      */
     void onRailInfoChanged(std::shared_ptr<Railway> railway, const std::deque<int>& path);
+
+    /**
+     * 执行删除：railway参数用来检查PATH对应的路径是否合理。
+     * 调用相关Item完成确实的操作。
+     */
+    void commitRemoveRailwayAt(std::shared_ptr<Railway> railway,
+        const std::deque<int>& path);
+
+    /**
+     * 执行添加，或撤销删除。path给出的是插入后的位置
+     */
+    void commitInsertRailwayAt(std::shared_ptr<Railway> railway,
+        const std::deque<int>& path);
 };
 

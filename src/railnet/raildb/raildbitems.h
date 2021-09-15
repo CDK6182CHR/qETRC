@@ -30,6 +30,18 @@ namespace navi {
         virtual int childCount() const override;
         virtual QString data(int i) const override;
         virtual int type() const override {return Type;}
+
+        /**
+         * 删除指定位置的railway。执行实际的删除操作。
+         * 注意入参i是行数，要减去前面subcat的行
+         */
+        void removeRailwayAt(int i);
+
+        /**
+         * 在位置i处插入railway，执行实际的插入操作。
+         * 注意入参i是行数。
+         */
+        void insertRailwayAt(std::shared_ptr<Railway> rail, int i);
     };
 
 
