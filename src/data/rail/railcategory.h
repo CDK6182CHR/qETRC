@@ -23,11 +23,16 @@ class RailCategory: public std::enable_shared_from_this<RailCategory>
     //std::weak_ptr<RailCategory> _parent;
     QList<std::shared_ptr<RailCategory>> _subcats;
     QList<std::shared_ptr<Railway>> _railways;
+
+    /**
+     * 浅拷贝的构造函数，作为private访问。
+     * 目前仅允许用于导出子数据库操作。
+     */
+    explicit RailCategory(const RailCategory& other) = default;
 public:
     RailCategory()=default;
     RailCategory(const QString& name);
     RailCategory(RailCategory&&)=default;
-    RailCategory(const RailCategory&)=delete;
     RailCategory& operator=(const RailCategory&) = delete;
     RailCategory& operator=(RailCategory&&)=default;
 
@@ -64,6 +69,12 @@ public:
     void clear();
 
     bool isNull()const;
+
+    /**
+     * 浅拷贝操作  仅复制了指针
+     * 慎用！
+     */
+    RailCategory shallowCopy()const;
 
 private:
     /**

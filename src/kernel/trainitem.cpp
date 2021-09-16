@@ -350,6 +350,8 @@ void TrainItem::setPathItem(const QString& trainName)
             //存在停点，到点和开点不同
             if (xdep <= width) {
                 //界内
+                if (!started)  // 此条件：解决界外到达、界内出发的首站没有设置started的问题
+                    started = true;
                 QPointF pdep(start_x + xdep, start_y + ycur);
                 if (xdep < xarr) {
                     //站内越界

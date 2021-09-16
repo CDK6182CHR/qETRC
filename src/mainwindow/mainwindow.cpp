@@ -1396,6 +1396,11 @@ bool MainWindow::saveQuestion()
 
 void MainWindow::closeEvent(QCloseEvent* e)
 {
+    if (!contextDB->deactiveOnClose()) {
+        e->ignore();
+        return;
+    }
+        
     if (changed && !saveQuestion())
         e->ignore();
     else
@@ -1434,6 +1439,8 @@ void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
         contextRail, &RailContext::actUpdateTimetable);
     connect(w, &RailStationWidget::focusInRailway,
         this, &MainWindow::focusInRailway);
+    connect(w, &RailStationWidget::railNoteChanged,
+        contextRail, &RailContext::actUpdateRailNotes);
     railStationWidgets.append(w);
     railStationDocks.append(dock);
 

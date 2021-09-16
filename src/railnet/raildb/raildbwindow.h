@@ -5,12 +5,15 @@
 #include <QPersistentModelIndex>
 #include <deque>
 
+#include "data/rail/railinfonote.h"
+
 class RailStationWidget;
 class RailDBNavi;
 class QUndoStack;
 class RailDB;
 class Railway;
 class QUndoView;
+class RailDBModel;
 
 class RailDBWindow : public QMainWindow
 {
@@ -33,6 +36,12 @@ public:
     auto* getNavi(){return navi;}
     auto railDB() { return _raildb; }
     const auto& getEditingPath() { return editorPath; }
+    
+    /**
+     * 直接转发给navi->deactive 
+     */
+    bool deactive();
+
 private:
     void initUI();
     void initMenuBar();
@@ -48,6 +57,7 @@ private slots:
     void onEditorStationChanged(std::shared_ptr<Railway> railway, std::shared_ptr<Railway> newtable,
         bool equiv);
     void onEditorInvalidApplied();
+    void onEditorRailNoteChanged(std::shared_ptr<Railway> railway, const RailInfoNote& note);
 
 public slots:
 
@@ -83,6 +93,19 @@ namespace qecmd {
             const std::deque<int>& path_, RailDBWindow* wnd_, QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+
+    class UpdateRailNoteDB :public QUndoCommand {
+        std::shared_ptr<Railway> railway;
+        RailInfoNote data;
+        std::deque<int> path;
+        RailDBModel* const model;
+    public:
+        UpdateRailNoteDB(std::shared_ptr<Railway> railway, const RailInfoNote& data,
+            const std::deque<int>& path, RailDBModel* model, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
     };
 }
 

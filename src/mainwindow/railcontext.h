@@ -5,6 +5,7 @@
 #include <QList>
 
 #include "data/common/direction.h"
+#include "data/rail/railinfonote.h"
 
 class RulerWidget;
 class SARibbonMenu;
@@ -238,6 +239,9 @@ public slots:
      * 由标尺综合调用：添加空白的命名标尺
      */
     void actAddNamedNewRuler(std::shared_ptr<Railway> railway, const QString& name);
+
+    // 操作压栈。后续操作无需回调
+    void actUpdateRailNotes(std::shared_ptr<Railway> railway, const RailInfoNote& note);
 };
 
 
@@ -324,6 +328,16 @@ namespace qecmd {
             QUndoCommand(parent),cont(context),name(name_),  railway(railway_){}
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    class UpdateRailNote : public QUndoCommand {
+        std::shared_ptr<Railway> railway;
+        RailInfoNote data;
+    public :
+        UpdateRailNote(std::shared_ptr<Railway> railway, const RailInfoNote& data,
+            QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
     };
 
 

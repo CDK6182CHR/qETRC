@@ -270,6 +270,12 @@ public:
      */
     void rebindAllTrains();
 
+    /**
+     * 2021.09.16  删除末尾的最后一条线路。保证没有关联的page之类的，
+     * 但需要清除列车的绑定情况。
+     */
+    void undoImportRailway();
+
     using sec_cnt_t = std::map<std::shared_ptr<RailInterval>, int>;
     
     std::map<std::shared_ptr<RailInterval>, int>

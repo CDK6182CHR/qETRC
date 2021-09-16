@@ -16,14 +16,9 @@
 
 #include "railstation.h"
 #include "railinterval.h"
+#include "railinfonote.h"
 
 
-struct RailInfoNote{
-    QString author,version,note;
-    RailInfoNote()=default;
-    void fromJson(const QJsonObject& obj);
-    QJsonObject toJson()const;
-};
 
 class Ruler;
 class Forbid;

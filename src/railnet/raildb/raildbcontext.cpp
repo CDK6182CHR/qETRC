@@ -13,6 +13,8 @@ RailDBContext::RailDBContext(SARibbonContextCategory *cont, MainWindow *mw_):
     QObject(mw_), cont(cont),mw(mw_),
     window(new RailDBWindow()),_raildb(window->railDB())
 {
+    connect(window->getNavi(), &RailDBNavi::deactivated,
+        this, &RailDBContext::onWindowDeactivated);
     initUI();
 }
 
@@ -24,6 +26,18 @@ RailDBNavi* RailDBContext::getNavi()
 void RailDBContext::initUI()
 {
     auto* page=cont->addCategoryPage(tr("线路数据库"));
+}
+
+bool RailDBContext::deactiveOnClose()
+{
+    return window->getNavi()->deactiveOnClose();
+}
+
+void RailDBContext::onWindowDeactivated()
+{
+    mw->ribbonBar()->hideContextCategory(cont);
+    if(dock)
+        dock->closeDockWidget();
 }
 
 void RailDBContext::activateDB()
@@ -48,5 +62,5 @@ void RailDBContext::activateDB()
 
 void RailDBContext::deactivateDB()
 {
- // todo
+    window->deactive();
 }

@@ -33,6 +33,11 @@ RailDBWindow::RailDBWindow(QWidget *parent) : QMainWindow(parent),
     updateWindowTitle(false);
 }
 
+bool RailDBWindow::deactive()
+{
+    return navi->deactivate();
+}
+
 void RailDBWindow::initUI()
 {
     resize(1200,800);
@@ -59,6 +64,8 @@ void RailDBWindow::initUI()
         this, &RailDBWindow::onEditorStationChanged);
     connect(editor, &RailStationWidget::invalidApplyRequest,
         this, &RailDBWindow::onEditorInvalidApplied);
+    connect(editor, &RailStationWidget::railNoteChanged,
+        this, &RailDBWindow::onEditorRailNoteChanged);
 
     initMenuBar();
 }
@@ -77,18 +84,29 @@ void RailDBWindow::initMenuBar()
     menu->addSeparator();
     menu->addAction(tr("将当前数据库文件设为默认文件"), navi, &RailDBNavi::actSetAsDefaultFile);
     menu->addSeparator();
+    menu->addAction(tr("退出线路数据库"), navi, &RailDBNavi::deactivate);
 
     menu = menubar->addMenu(tr("编辑"));
     menu->addAction(navi->undoStack()->createUndoAction(menu, tr("撤销")));
     menu->addAction(navi->undoStack()->createRedoAction(menu, tr("重做")));
     menu->addAction(tr("历史记录"), undoView, &QUndoView::show);
     menu->addSeparator();
-    menu->addAction(tr("编辑当前线路"), navi, &RailDBNavi::actEditRail);
+    menu->addAction(tr("编辑列表所选线路"), navi, &RailDBNavi::actEditRail);
+    menu->addAction(tr("在列表所选类新建线路"), navi, &RailDBNavi::actNewRail);
+    menu->addAction(tr("删除列表所选线路"), navi, &RailDBNavi::actRemoveRail);
+    menu->addSeparator();
+    menu->addAction(tr("编辑列表所选线路的标尺"), navi, &RailDBNavi::actRuler);
+    menu->addAction(tr("编辑列表所选线路的天窗"), navi, &RailDBNavi::actForbid);
     
     menu = menubar->addMenu(tr("查看"));
     menu->addAction(tr("刷新线路表"), navi, &RailDBNavi::refreshData);
     menu->addAction(tr("全部展开"), navi->getTree(), &QTreeView::expandAll);
     menu->addAction(tr("全部折叠"), navi->getTree(), &QTreeView::collapseAll);
+
+    menu = menubar->addMenu(tr("导入"));
+
+    menu = menubar->addMenu(tr("导出"));
+    menu->addAction(tr("导出列表所选线路至运行图"), navi, &RailDBNavi::actExportToDiagram);
 
 }
 
@@ -145,6 +163,13 @@ void RailDBWindow::onEditorInvalidApplied()
 {
     QMessageBox::warning(this, tr("错误"), tr("当前没有在编辑的线路。请先选择要编辑的线路，"
         "或新建线路，再提交。"));
+}
+
+void RailDBWindow::onEditorRailNoteChanged(std::shared_ptr<Railway> railway, 
+    const RailInfoNote& note)
+{
+    navi->undoStack()->push(new qecmd::UpdateRailNoteDB(railway, note, editorPath,
+        navi->getModel()));
 }
 
 void RailDBWindow::commitUpdateRailName(std::shared_ptr<Railway> railway, const std::deque<int>& path)
@@ -208,4 +233,23 @@ void qecmd::UpdateRailNameDB::redo()
 {
     std::swap(railway->nameRef(), name);
     wnd->commitUpdateRailName(railway, path);
+}
+
+qecmd::UpdateRailNoteDB::UpdateRailNoteDB(std::shared_ptr<Railway> railway,
+    const RailInfoNote& data, const std::deque<int>& path, RailDBModel* model,
+    QUndoCommand* parent):
+    QUndoCommand(QObject::tr("更新线路备注: %1").arg(railway->name()),parent),
+    railway(railway),data(data),path(path),model(model)
+{
+}
+
+void qecmd::UpdateRailNoteDB::undo()
+{
+    std::swap(railway->notes(), data);
+    model->onRailInfoChanged(railway, path);
+}
+void qecmd::UpdateRailNoteDB::redo()
+{
+    std::swap(railway->notes(), data);
+    model->onRailInfoChanged(railway, path);
 }

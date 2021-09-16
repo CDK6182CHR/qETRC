@@ -327,12 +327,12 @@ void NaviTree::importRailwayFromDB(std::shared_ptr<Railway> railway)
     r->setName(_model->diagram().validRailwayName(railway->name()));
     _undo->push(new qecmd::ImportRailways(_model, { r }));
     auto flag = QMessageBox::question(this, tr("qETRC主程序"),
-        tr("基线[%1]添加成功。是否立即创建该线路的运行图窗口？").arg(railway->name()));
+        tr("基线[%1]添加成功。是否立即创建该线路的运行图窗口？").arg(r->name()));
     if (flag == QMessageBox::Yes) {
         auto&& dia = _model->diagram();
-        QString name = dia.validPageName(railway->name());
+        QString name = dia.validPageName(r->name());
         auto pg = std::make_shared<DiagramPage>(
-            QList<std::shared_ptr<Railway>>{ railway }, name);
+            QList<std::shared_ptr<Railway>>{ r }, name);
         addNewPageApply(pg);
     }
 }

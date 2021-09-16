@@ -31,10 +31,15 @@ public:
                            MainWindow* mw_);
     auto* getWindow() { return window; }
     RailDBNavi* getNavi();
+
+    bool deactiveOnClose();
 private:
     void initUI();
 
 signals:
+
+private slots:
+    void onWindowDeactivated();
 
 public slots:
     /**

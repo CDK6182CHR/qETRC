@@ -3,6 +3,7 @@
 #include <QUndoCommand>
 #include <memory>
 #include <deque>
+#include <QPointer>
 
 
 class QUndoStack;
@@ -13,10 +14,12 @@ class Forbid;
 class QTreeView;
 class RailDBModel;
 class RailDB;
+class Ruler;
 namespace navi {
 class AbstractComponentItem;
 }
 
+class RulerWidget;
 
 /**
  * @brief The RailDBNavi class
@@ -35,11 +38,25 @@ class RailDBNavi : public QWidget
 
     QUndoStack* _undo;
     bool _changed=false;
+
+    QList<QPointer<RulerWidget>> rulerWidgets;
 public:
     explicit RailDBNavi(std::shared_ptr<RailDB> raildb, QWidget *parent = nullptr);
     auto* getTree() { return tree; }
     auto* getModel() { return model;}
     auto* undoStack() { return _undo; }
+
+    /**
+     * 退出线路数据库模式的操作。如果改变，询问是否保存；然后清空数据。
+     * 返回：是否继续操作 （返回false表示用户点了取消，中断操作）
+     */
+    bool deactivate();
+
+    /**
+     * 关闭程序时的提示：少一个问题。
+     */
+    bool deactiveOnClose();
+
 private:
     void initUI();
     void initContext();
@@ -65,16 +82,13 @@ signals:
      */
     void changedFlagChanged(bool);
     void dbReset();
+
+    /**
+     * 退出DB模式；提示Main关闭相关页面
+     */
+    void deactivated();
 private slots:
     void showContextMenu(const QPoint& pos);
-    void actNewRail();
-    void actNewSubcat();
-    void actNewParallelCat();
-    
-    void actRemoveRail();
-    void actRuler();
-    void actForbid();
-    void actExportToDiagram();
     
     void onCurrentChanged(const QModelIndex& cur, const QModelIndex& prev);
     void markChanged();
@@ -88,6 +102,9 @@ private slots:
      */
     void actChangeForbid(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> data);
 
+    void actChangeRulerName(std::shared_ptr<Ruler> ruler, const QString& name);
+    void actUpdateRulerData(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> data);
+    void actRemoveRuler(std::shared_ptr<Ruler> ruler);
 
 public slots:
     void actEditRail();
@@ -99,6 +116,20 @@ public slots:
     bool openDB(const QString& filename);
     void actSetAsDefaultFile();
 
+    void actNewRail();
+    void actNewSubcat();
+    void actNewParallelCat();
+
+    void actRemoveRail();
+    void actRuler();
+    void actForbid();
+    void actExportToDiagram();
+    void actExportRailToFile();
+    void actExportCategoryToDiagramFile();
+    void actExportCategoryToLib();
+
+    void openRulerWidget(std::shared_ptr<Ruler> ruler);
+    void closeRulerWidget(std::shared_ptr<Ruler> ruler);
 };
 
 
@@ -133,6 +164,58 @@ namespace qecmd {
     public:
         UpdateForbidDB(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> data,
             QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
+    /**
+     * 添加新的标尺 （直接添加在末尾），然后打开编辑窗口。
+     */
+    class AddNewRulerDB : public QUndoCommand {
+        std::shared_ptr<Railway> railway;
+        QString name;
+        std::shared_ptr<Ruler> theRuler{};
+        std::shared_ptr<Railway> theData{};
+        RailDBNavi* const navi;   // 反向引用用于撤销时关闭页面
+    public:
+        AddNewRulerDB(std::shared_ptr<Railway> railway, const QString& name,
+            RailDBNavi* navi, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
+    class ChangeRulerNameDB :public QUndoCommand {
+        std::shared_ptr<Ruler> ruler;
+        QString name;
+    public:
+        ChangeRulerNameDB(std::shared_ptr<Ruler> ruler, const QString& name,
+            QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
+    class UpdateRulerDataDB :public QUndoCommand {
+        std::shared_ptr<Ruler> ruler;
+        std::shared_ptr<Railway> data;
+    public:
+        UpdateRulerDataDB(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> data,
+            QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
+    /**
+     * 删除标尺：处理数据变更，然后要求关闭窗口。
+     * ordinate 形式上设置数据。但其实没多大用（db里面的ordinate基本没用）
+     */
+    class RemoveRulerDB :public QUndoCommand {
+        std::shared_ptr<Ruler> ruler;
+        std::shared_ptr<Railway> data;
+        bool isOrdinate;
+        RailDBNavi* navi;
+    public:
+        RemoveRulerDB(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> data,
+            bool isOrd, RailDBNavi* navi, QUndoCommand* parent = nullptr);
         void undo()override;
         void redo()override;
     };

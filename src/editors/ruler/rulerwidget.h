@@ -45,11 +45,13 @@ private slots:
 
     void copyFromDownToUp();   //主要是询问一下  操作在model里面
     void copyFromUpToDown();
+    void actRemove();
 
 signals:
     void actChangeRulerData(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> nr);
     void actChangeRulerName(std::shared_ptr<Ruler> ruler, const QString& name);
     void focusInRuler(std::shared_ptr<Ruler>ruler);
+    void actRemoveRuler(std::shared_ptr<Ruler>);
 
 };
 

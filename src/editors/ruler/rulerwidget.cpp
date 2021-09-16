@@ -93,9 +93,10 @@ void RulerWidget::initUI()
 
     vlay->addWidget(table);
 
-    auto* g=new ButtonGroup<2>({"确定","还原"});
+    auto* g=new ButtonGroup<3>({"确定","还原","删除"});
     vlay->addLayout(g);
-    g->connectAll(SIGNAL(clicked()),this,{SLOT(actApply()),SLOT(actCancel())});
+    g->connectAll(SIGNAL(clicked()), this, { SLOT(actApply()),SLOT(actCancel()),
+        SLOT(actRemove()) });
 
     setLayout(vlay);
 }
@@ -155,6 +156,13 @@ void RulerWidget::copyFromUpToDown()
             "如果存在上下行分设站，则有关的区间数据不变。是否确认？"));
     if (t == QMessageBox::Yes)
         model->copyFromUpToDown();
+}
+
+void RulerWidget::actRemove()
+{
+    if (ruler) {
+        emit actRemoveRuler(ruler);
+    }
 }
 
 void RulerWidget::actApply()

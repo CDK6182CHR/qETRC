@@ -5,6 +5,9 @@
 #include "data/rail/railway.h"
 #include "data/rail/forbid.h"
 #include "editors/forbidwidget.h"
+#include "editors/ruler/rulerwidget.h"
+#include "data/rail/ruler.h"
+#include "data/diagram/diagram.h"
 
 #include <QTreeView>
 #include <QVBoxLayout>
@@ -12,6 +15,7 @@
 #include <QMessageBox>
 #include <QUndoStack>
 #include <QFileDialog>
+#include <QInputDialog>
 
 #define _RAILDB_NOT_IMPLEMENTED do{  \
 QMessageBox::information(this,tr("线路数据库"), tr("此功能尚未实现！"));\
@@ -26,6 +30,26 @@ RailDBNavi::RailDBNavi(std::shared_ptr<RailDB> raildb, QWidget *parent):
     connect(_undo,&QUndoStack::indexChanged,this,
             &RailDBNavi::markChanged);
     //openDB(SystemJson::instance.default_raildb_file);
+}
+
+bool RailDBNavi::deactivate()
+{
+    auto flag = QMessageBox::question(this, tr("线路数据库"), tr("此操作退出线路数据库，"
+        "关闭已打开的数据库文件并释放内存。如果下次再启动线路数据库，将重新读取。"
+        "是否继续？"));
+    if (flag != QMessageBox::Yes)
+        return false;
+    else return deactiveOnClose();
+}
+
+bool RailDBNavi::deactiveOnClose()
+{
+    if (_changed && !saveQuestion())
+        return false;
+    clearDBUnchecked();
+    emit dbReset();
+    emit deactivated();
+    return true;
 }
 
 void RailDBNavi::initUI()
@@ -61,6 +85,11 @@ void RailDBNavi::initContext()
     connect(act,&QAction::triggered,this,&RailDBNavi::actNewSubcat);
     act=meCat->addAction(tr("新建平级分类"));
     connect(act,&QAction::triggered,this,&RailDBNavi::actNewParallelCat);
+    meCat->addSeparator();
+    meCat->addAction(tr("导出为qETRC多线路运行图文件"), this,
+        &RailDBNavi::actExportCategoryToDiagramFile);
+    meCat->addAction(tr("导出为子数据库文件"), this,
+        &RailDBNavi::actExportCategoryToLib);
 
     meRail=new QMenu;
     act=meRail->addAction(tr("编辑"));
@@ -74,6 +103,7 @@ void RailDBNavi::initContext()
     meRail->addSeparator();
     act=meRail->addAction(tr("导出到运行图"));
     connect(act,&QAction::triggered,this,&RailDBNavi::actExportToDiagram);
+    meRail->addAction(tr("导出为独立运行图文件"), this, &RailDBNavi::actExportRailToFile);
     
     meRail->addSeparator();
     meRail->addAction(tr("新建线路"), this, &RailDBNavi::actNewRail);
@@ -160,7 +190,26 @@ void RailDBNavi::actRemoveRail()
 
 void RailDBNavi::actRuler()
 {
-    _RAILDB_NOT_IMPLEMENTED;
+    QStringList items;
+    auto railway = currentRailway();
+    if (!railway)
+        return;
+    foreach(auto ruler, railway->rulers()) {
+        items.push_back(ruler->name());
+    }
+    items.push_back(tr("(新建标尺)"));
+    bool ok;
+    QString res = QInputDialog::getItem(this, tr("编辑标尺"), tr("当前编辑数据库中线路[%1]的标尺。"
+        "请选择一个既有标尺，或新建标尺。").arg(railway->name()), items, 0, false, &ok);
+    if (!ok)return;
+    if (res == tr("(新建标尺)")) {
+        // 新建操作
+        _undo->push(new qecmd::AddNewRulerDB(railway, 
+            railway->validRulerName(tr("新标尺")), this));
+    }
+    else {
+        openRulerWidget(railway->rulerByName(res));
+    }
 }
 
 void RailDBNavi::actForbid()
@@ -193,6 +242,61 @@ void RailDBNavi::actExportToDiagram()
     }
 }
 
+void RailDBNavi::actExportRailToFile()
+{
+    auto rail = currentRailway();
+    if (!rail)return;
+    QString res = QFileDialog::getSaveFileName(this, tr("导出单线路到运行图"),
+        rail->name(), tr("qETRC/pyETRC运行图文件 (*.pyetgr)\nJSON文件 (*.json)\n所有文件 (*)"));
+    if (res.isEmpty())return;
+    
+    Diagram dia;
+    dia.addRailway(rail);
+    bool flag = dia.saveAs(res);
+    if (flag) {
+        QMessageBox::information(this, tr("提示"), tr("导出成功"));
+    }
+    else {
+        QMessageBox::warning(this, tr("错误"), tr("导出失败"));
+    }
+}
+
+void RailDBNavi::actExportCategoryToDiagramFile()
+{
+    auto cat = currentCategory();
+    if (!cat)return;
+    auto res = QFileDialog::getSaveFileName(this, tr("导出分类到运行图文件"),
+        cat->name(), tr("qETRC/pyETRC运行图文件 (*.pyetgr)\nJSON文件 (*.json)\n所有文件 (*)"));
+    if (res.isEmpty())return;
+    Diagram dia;
+    dia.railways().append(cat->railways());
+    bool flag = dia.saveAs(res);
+    if (flag) {
+        QMessageBox::information(this, tr("提示"), tr("导出成功"));
+    }
+    else {
+        QMessageBox::warning(this, tr("错误"), tr("导出失败"));
+    }
+}
+
+void RailDBNavi::actExportCategoryToLib()
+{
+    auto cat = currentCategory();
+    if (!cat)return;
+    auto res = QFileDialog::getSaveFileName(this, tr("导出分类为子数据库文件"),
+        cat->name(), tr("pyETRC/qETRC线路数据库文件 (*.pyetlib)\nJSON文件 (*.json)\n"
+            "所有文件 (*)"));
+    if (res.isEmpty())return;
+    RailDB subdb = cat->shallowCopy();    // move construct
+    bool flag = subdb.saveAs(res);
+    if (flag) {
+        QMessageBox::information(this, tr("提示"), tr("导出成功"));
+    }
+    else {
+        QMessageBox::warning(this, tr("错误"), tr("导出失败"));
+    }
+}
+
 void RailDBNavi::actSetAsDefaultFile()
 {
     if (_raildb->filename().isEmpty()) {
@@ -205,6 +309,39 @@ void RailDBNavi::actSetAsDefaultFile()
             "线路数据库文件名。\n"
             "此信息保存在system.json配置文件中。本次关闭主程序后，下次在主程序中使用"
             "线路数据库功能时，将默认打开本文件。").arg(_raildb->filename()));
+    }
+}
+
+void RailDBNavi::openRulerWidget(std::shared_ptr<Ruler> ruler)
+{
+    auto* w = new RulerWidget(ruler, false, this);
+    w->setAttribute(Qt::WA_DeleteOnClose);
+    w->setWindowFlags(Qt::Dialog);
+    w->resize(500, 600);
+    w->setWindowTitle(tr("标尺编辑 @ %1").arg(ruler->railway().name()));
+    connect(w, &RulerWidget::actChangeRulerName,
+        this, &RailDBNavi::actChangeRulerName);
+    connect(w, &RulerWidget::actChangeRulerData,
+        this, &RailDBNavi::actUpdateRulerData);
+    connect(w, &RulerWidget::actRemoveRuler,
+        this, &RailDBNavi::actRemoveRuler);
+    rulerWidgets.push_back(w);
+
+    w->show();
+}
+
+void RailDBNavi::closeRulerWidget(std::shared_ptr<Ruler> ruler)
+{
+    for (int i = 0; i < rulerWidgets.size();) {
+        auto w = rulerWidgets.at(i);
+        if (!w || w->getRuler() == ruler) {
+            // 同时清除掉已经无效的指针
+            rulerWidgets.removeAt(i);
+            if (w) {
+                w->close();
+            }
+        }
+        else i++;
     }
 }
 
@@ -244,6 +381,7 @@ void RailDBNavi::clearDBUnchecked()
 {
     _undo->clear();
     _raildb->clear();
+    _changed = false;
 }
 
 void RailDBNavi::afterResetDB()
@@ -300,6 +438,22 @@ void RailDBNavi::actCollapse()
 void RailDBNavi::actChangeForbid(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> data)
 {
     _undo->push(new qecmd::UpdateForbidDB(forbid, data));
+}
+
+void RailDBNavi::actChangeRulerName(std::shared_ptr<Ruler> ruler, const QString& name)
+{
+    _undo->push(new qecmd::ChangeRulerNameDB(ruler, name));
+}
+
+void RailDBNavi::actUpdateRulerData(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> data)
+{
+    _undo->push(new qecmd::UpdateRulerDataDB(ruler, data));
+}
+
+void RailDBNavi::actRemoveRuler(std::shared_ptr<Ruler> ruler)
+{
+    auto data = ruler->clone();
+    _undo->push(new qecmd::RemoveRulerDB(ruler, data, ruler->isOrdinateRuler(), this));
 }
 
 
@@ -402,4 +556,82 @@ void qecmd::UpdateForbidDB::undo()
 void qecmd::UpdateForbidDB::redo()
 {
     forbid->swap(*data->getForbid(0));
+}
+
+qecmd::AddNewRulerDB::AddNewRulerDB(std::shared_ptr<Railway> railway,
+    const QString& name, RailDBNavi* navi, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("新建标尺: %1 @ %2").arg(name,railway->name()),parent),
+    railway(railway),name(name),navi(navi)
+{
+}
+
+void qecmd::AddNewRulerDB::undo()
+{
+    auto r = railway->takeLastRuler();
+    navi->closeRulerWidget(r);
+}
+
+void qecmd::AddNewRulerDB::redo()
+{
+    if (!theRuler) {
+        theRuler = railway->addEmptyRuler(name, true);
+        theData = theRuler->clone();
+    }
+    else {
+        railway->restoreRulerFrom(theRuler, theData->getRuler(0));
+    }
+    navi->openRulerWidget(theRuler);
+}
+
+qecmd::ChangeRulerNameDB::ChangeRulerNameDB(std::shared_ptr<Ruler> ruler, 
+    const QString& name, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("更改标尺名称: %1 @ %2").arg(name,ruler->railway().name()),parent),
+    ruler(ruler),name(name)
+{
+}
+
+void qecmd::ChangeRulerNameDB::undo()
+{
+    std::swap(ruler->nameRef(), name);
+}
+void qecmd::ChangeRulerNameDB::redo()
+{
+    std::swap(ruler->nameRef(), name);
+}
+
+qecmd::UpdateRulerDataDB::UpdateRulerDataDB(std::shared_ptr<Ruler> ruler, 
+    std::shared_ptr<Railway> data, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("更新标尺: %1 @ %2").arg(ruler->name(),ruler->railway().name()),
+        parent),ruler(ruler),data(data)
+{
+}
+
+void qecmd::UpdateRulerDataDB::undo()
+{
+    ruler->swap(*data->getRuler(0));
+}
+void qecmd::UpdateRulerDataDB::redo()
+{
+    ruler->swap(*data->getRuler(0));
+}
+
+qecmd::RemoveRulerDB::RemoveRulerDB(std::shared_ptr<Ruler> ruler,
+    std::shared_ptr<Railway> data, bool isOrd, RailDBNavi* navi, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("删除标尺: %1 @ %2").arg(ruler->name(),ruler->railway().name()),
+        parent),ruler(ruler),data(data),isOrdinate(isOrd),navi(navi)
+{
+}
+
+void qecmd::RemoveRulerDB::undo()
+{
+    ruler->railway().undoRemoveRuler(ruler, data);
+    if (isOrdinate) {
+        ruler->railway().setOrdinate(ruler);
+    }
+}
+
+void qecmd::RemoveRulerDB::redo()
+{
+    ruler->railway().removeRuler(ruler);
+    navi->closeRulerWidget(ruler);
 }

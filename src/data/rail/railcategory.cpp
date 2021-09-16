@@ -144,6 +144,12 @@ bool RailCategory::isNull() const
 	return _subcats.empty() && _railways.empty();
 }
 
+RailCategory RailCategory::shallowCopy() const
+{
+	RailCategory other(*this);   // copy construct!
+	return other;
+}
+
 bool RailCategory::isRailway(const QJsonObject& obj)
 {
 	return obj.contains("name") && obj.value("name").isString() &&

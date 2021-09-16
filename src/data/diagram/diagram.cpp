@@ -188,6 +188,14 @@ void Diagram::rebindAllTrains()
     }
 }
 
+void Diagram::undoImportRailway()
+{
+    auto t = railways().takeLast();
+    foreach(auto p, _trainCollection.trains()) {
+        p->unbindToRailway(t);
+    }
+}
+
 std::map<std::shared_ptr<RailInterval>, int> Diagram::sectionTrainCount(std::shared_ptr<Railway> railway) const
 {
     std::map<std::shared_ptr<RailInterval>, int> res;

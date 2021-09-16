@@ -11,6 +11,7 @@ class RailDB : public RailCategory
     QString _filename;
 public:
     using RailCategory::RailCategory;
+    RailDB(RailCategory&& other);   // move construct
 
     /**
      * @brief parseJson
@@ -29,5 +30,7 @@ public:
     bool saveAs(const QString& filename);
 
     const  auto& filename()const{return _filename;}
+
+    void clear();
 };
 

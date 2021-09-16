@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <QWidget>
+#include <QDialog>
 
 
 class RailCategory;
@@ -8,6 +8,28 @@ class QLineEdit;
 class Railway;
 class RailStationModel;
 class QEControlledTable;
+struct RailInfoNote;
+class QPlainTextEdit;
+
+class RailNoteDialog :
+    public QDialog
+{
+    Q_OBJECT
+    std::shared_ptr<Railway> railway;
+    const bool commitInPlace;
+    QLineEdit* edAuthor, * edVersion;
+    QPlainTextEdit* edNote;
+public:
+    explicit RailNoteDialog(std::shared_ptr<Railway> railway_,
+        bool inplace, QWidget* parent = nullptr);
+    void refreshData();
+private:
+    void initUI();
+signals:
+    void railNoteChanged(std::shared_ptr<Railway> railway, const RailInfoNote& data);
+private slots:
+    void actApply();
+};
 
 /**
  * @brief The RailStationWidget class
@@ -70,10 +92,13 @@ signals:
      */
     void invalidApplyRequest();
 
+    void railNoteChanged(std::shared_ptr<Railway> railway, const RailInfoNote& data);
+
 private slots:
     void actApply();
     void actCancel();
     void markChanged();
+    void actNote();
     
 };
 

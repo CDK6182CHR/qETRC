@@ -14,6 +14,8 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QEvent>
+#include <QPlainTextEdit>
+#include <QLabel>
 
 
 RailStationWidget::RailStationWidget(RailCategory& cat_, bool inplace, QWidget* parent) :
@@ -94,9 +96,10 @@ void RailStationWidget::initUI()
 
 	vlay->addWidget(ctable);
 
-	auto* g = new ButtonGroup<2>({ "确定","还原" });
+	auto* g = new ButtonGroup<3>({ "确定","还原","备注" });
 	g->setMinimumWidth(50);
-	g->connectAll(SIGNAL(clicked()), this, { SLOT(actApply()),SLOT(actCancel()) });
+	g->connectAll(SIGNAL(clicked()), this, { SLOT(actApply()),SLOT(actCancel()),
+		SLOT(actNote()) });
 	vlay->addLayout(g);
 	
 	setLayout(vlay);
@@ -109,7 +112,15 @@ void RailStationWidget::actCancel()
 
 void RailStationWidget::markChanged()
 {
-	_changed = true;
+    _changed = true;
+}
+
+void RailStationWidget::actNote()
+{
+    auto* dia=new RailNoteDialog(railway,commitInPlace,this);
+    connect(dia,&RailNoteDialog::railNoteChanged,
+            this,&RailStationWidget::railNoteChanged);
+    dia->open();
 }
 
 void RailStationWidget::actApply()
@@ -136,4 +147,51 @@ void RailStationWidget::actApply()
 	}
 	model->actApply();
 	_changed = false;
+}
+
+RailNoteDialog::RailNoteDialog(std::shared_ptr<Railway> railway_, bool inplace, QWidget* parent):
+	QDialog(parent),railway(railway_),commitInPlace(inplace)
+{
+	resize(400, 400);
+	setWindowTitle(tr("备注 - %1").arg(railway->name()));
+	setAttribute(Qt::WA_DeleteOnClose);
+    initUI();
+    refreshData();
+}
+
+void RailNoteDialog::refreshData()
+{
+    edAuthor->setText(railway->notes().author);
+    edVersion->setText(railway->notes().version);
+    edNote->setPlainText(railway->notes().note);
+}
+
+void RailNoteDialog::initUI()
+{
+    auto* vlay=new QVBoxLayout(this);
+    auto* flay=new QFormLayout;
+    edAuthor=new QLineEdit;
+    flay->addRow(tr("作者"),edAuthor);
+    edVersion=new QLineEdit;
+    flay->addRow(tr("版本"),edVersion);
+    edNote=new QPlainTextEdit;
+    vlay->addLayout(flay);
+    vlay->addWidget(new QLabel(tr("其他说明：")));
+    vlay->addWidget(edNote);
+
+    auto* g=new ButtonGroup<2>({"确定","取消"});
+    g->connectAll(SIGNAL(clicked()),this,{SLOT(actApply()),SLOT(close())});
+    vlay->addLayout(g);
+}
+
+void RailNoteDialog::actApply()
+{
+    RailInfoNote data;
+    data.author=edAuthor->text();
+    data.version=edVersion->text();
+    data.note=edNote->toPlainText();
+    if (data != railway->notes()){
+        emit railNoteChanged(railway,data);
+    }
+	done(QDialog::Accepted);
 }

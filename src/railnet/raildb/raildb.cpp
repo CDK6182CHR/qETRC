@@ -4,6 +4,11 @@
 #include <QJsonDocument>
 
 
+RailDB::RailDB(RailCategory&& other):
+    RailCategory(std::forward<RailCategory>(other))
+{
+}
+
 bool RailDB::parseJson(const QString &filename)
 {
     QFile file(filename);
@@ -40,4 +45,10 @@ bool RailDB::saveAs(const QString &filename)
 {
     _filename=filename;
     return save();
+}
+
+void RailDB::clear()
+{
+    RailCategory::clear();
+    _filename.clear();
 }

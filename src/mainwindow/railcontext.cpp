@@ -324,6 +324,8 @@ void RailContext::openRulerWidget(std::shared_ptr<Ruler> ruler)
 		connect(rw, &RulerWidget::focusInRuler, mw, &MainWindow::focusInRuler);
 		connect(rw, &RulerWidget::actChangeRulerName, mw->getRulerContext(),
 			&RulerContext::actChangeRulerName);
+		connect(rw, &RulerWidget::actRemoveRuler, mw->getRulerContext(),
+			&RulerContext::actRemoveRulerNavi);
 		meRulerWidgets->addAction(dock->toggleViewAction());
 		mw->getManager()->addDockWidgetFloating(dock);
 	}
@@ -703,6 +705,11 @@ void RailContext::actAddNamedNewRuler(std::shared_ptr<Railway> railway, const QS
 	mw->getUndoStack()->push(new qecmd::AddNewRuler(name, railway, this));
 }
 
+void RailContext::actUpdateRailNotes(std::shared_ptr<Railway> railway, const RailInfoNote& note)
+{
+	mw->getUndoStack()->push(new qecmd::UpdateRailNote(railway, note));
+}
+
 
 qecmd::ChangeRailName::ChangeRailName(std::shared_ptr<Railway> rail_,
 	const QString& name, RailContext* context, QUndoCommand* parent) :
@@ -833,3 +840,19 @@ void qecmd::ToggleForbidShow::redo()
 	cont->commitToggleForbidShow(forbid, dir);
 }
 
+qecmd::UpdateRailNote::UpdateRailNote(std::shared_ptr<Railway> railway, 
+	const RailInfoNote& data, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("更新线路备注: %1").arg(railway->name()),parent),
+	railway(railway),data(data)
+{
+}
+
+void qecmd::UpdateRailNote::undo()
+{
+	std::swap(railway->notes(), data);
+}
+
+void qecmd::UpdateRailNote::redo()
+{
+	std::swap(railway->notes(), data);
+}
