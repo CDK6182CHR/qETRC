@@ -861,6 +861,21 @@ void Train::refreshStationFlags()
     }
 }
 
+bool Train::removeDetected()
+{
+    bool flag = false;
+    for (auto p = _timetable.begin(); p != _timetable.end(); ) {
+        if (p->note == QObject::tr("推定")) {
+            flag = true;
+            p = _timetable.erase(p);
+        }
+        else {
+            ++p;
+        }
+    }
+    return flag;
+}
+
 bool Train::anyLineShown() const
 {
     for (auto adp : _adapters) {

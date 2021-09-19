@@ -31,17 +31,31 @@ namespace navi {
         virtual QString data(int i) const override;
         virtual int type() const override {return Type;}
 
+        int subCategoriesCount()const;
+
         /**
          * 删除指定位置的railway。执行实际的删除操作。
          * 注意入参i是行数，要减去前面subcat的行
          */
         void removeRailwayAt(int i);
 
+        void removeRailwaysAt(int i, int count);
+
         /**
          * 在位置i处插入railway，执行实际的插入操作。
          * 注意入参i是行数。
          */
         void insertRailwayAt(std::shared_ptr<Railway> rail, int i);
+
+        void insertRailwaysAt(const QList<std::shared_ptr<Railway>>& rails, int i);
+
+        /**
+         * 插入Category。执行实际的数据更改操作。
+         * 注意所有railway的行数也应该修改
+         */
+        void insertCategoryAt(std::shared_ptr<RailCategory> cat, int i);
+
+        void removeCategoryAt(int i);
     };
 
 

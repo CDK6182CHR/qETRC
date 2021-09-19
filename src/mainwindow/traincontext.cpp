@@ -453,6 +453,33 @@ void TrainContext::commitInterpolation(const QVector<std::shared_ptr<Train>>& tr
 	refreshCurrentTrainWidgets();
 }
 
+void TrainContext::actRemoveInterpolation()
+{
+	auto flag = QMessageBox::question(mw, tr("提示"), tr("撤销所有推定结果：此功能删除"
+		"所有列车时刻表中备注为“推定”的项目，无论是否为时刻插值功能标记的。\n"
+		"此操作可撤销。是否继续？"));
+	if (flag != QMessageBox::Yes)
+		return;
+	QVector<std::shared_ptr<Train>> modified, data;
+	foreach(auto train, diagram.trains()) {
+		auto t = std::make_shared<Train>(*train);
+		bool flag = t->removeDetected();
+		if (flag) {
+			modified.push_back(train);
+			data.push_back(t);
+		}
+	}
+	if (modified.isEmpty()) {
+		QMessageBox::information(mw, tr("提示"), tr("操作完成，没有列车受到影响。"));
+	}
+	else {
+		QMessageBox::information(mw, tr("提示"), tr("操作完成，共%1个车次受到影响。")
+			.arg(modified.size()));
+		mw->getUndoStack()->push(new qecmd::RemoveInterpolation(modified, data, this));
+	}
+	
+}
+
 void TrainContext::actShowTrainLine()
 {
 	//强制显示列车运行线。如果已经全部显示了也没关系，没有任何效果
@@ -778,6 +805,15 @@ void qecmd::TimetableInterpolation::undo()
 }
 
 void qecmd::TimetableInterpolation::redo()
+{
+	cont->commitInterpolation(trains, data);
+}
+
+void qecmd::RemoveInterpolation::undo()
+{
+	cont->commitInterpolation(trains, data);
+}
+void qecmd::RemoveInterpolation::redo()
 {
 	cont->commitInterpolation(trains, data);
 }

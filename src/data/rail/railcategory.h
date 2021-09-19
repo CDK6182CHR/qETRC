@@ -44,6 +44,7 @@ public:
     const auto& subCategories()const { return _subcats; }
     const auto& name()const { return _name; }
     void setName(const QString& name) { _name = name; }
+    auto& nameRef() { return _name; }
 
     bool railNameIsValid(const QString& name, std::shared_ptr<const Railway> rail)const;
     bool categoryNameIsValid(const QString& name, std::shared_ptr<const RailCategory> cat)const;
@@ -57,6 +58,8 @@ public:
 
     QString validRailwayName(const QString& prefix)const;
     QString validRailwayNameRec(const QString& prefix)const;
+
+    QString validCategoryNameRec(const QString& prefix)const;
 
     int getRailwayIndex(std::shared_ptr<const Railway> rail)const;
 

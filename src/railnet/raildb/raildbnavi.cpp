@@ -58,6 +58,7 @@ void RailDBNavi::initUI()
 
     tree=new QTreeView;
     tree->setModel(model);
+    //tree->setSelectionMode(QTreeView::ContiguousSelection);
     connect(tree->selectionModel(),&QItemSelectionModel::currentChanged,
             this,&RailDBNavi::onCurrentChanged);
     vlay->addWidget(tree);
@@ -77,6 +78,7 @@ void RailDBNavi::initContext()
     meCat=new QMenu;
     meCat->addAction(tr("展开"), this, &RailDBNavi::actExpand);
     meCat->addAction(tr("折叠"), this, &RailDBNavi::actCollapse);
+    meCat->addAction(tr("重命名"), this, &RailDBNavi::actRenameCategory);
     meCat->addSeparator();
 
     act=meCat->addAction(tr("新建线路"));
@@ -85,11 +87,15 @@ void RailDBNavi::initContext()
     connect(act,&QAction::triggered,this,&RailDBNavi::actNewSubcat);
     act=meCat->addAction(tr("新建平级分类"));
     connect(act,&QAction::triggered,this,&RailDBNavi::actNewParallelCat);
+    meCat->addAction(tr("删除分类"), this, &RailDBNavi::actRemoveCategory);
     meCat->addSeparator();
     meCat->addAction(tr("导出为qETRC多线路运行图文件"), this,
         &RailDBNavi::actExportCategoryToDiagramFile);
     meCat->addAction(tr("导出为子数据库文件"), this,
         &RailDBNavi::actExportCategoryToLib);
+    meCat->addSeparator();
+    meCat->addAction(tr("从运行图文件导入线路"), this, &RailDBNavi::actImportFromDiagram);
+    meCat->addAction(tr("导入子数据库文件"), this, &RailDBNavi::actImportFromLib);
 
     meRail=new QMenu;
     act=meRail->addAction(tr("编辑"));
@@ -163,12 +169,41 @@ void RailDBNavi::actNewRail()
 
 void RailDBNavi::actNewSubcat()
 {
-    _RAILDB_NOT_IMPLEMENTED;
+    auto* it = currentItem();
+    if (!it)return;
+    if (it->type() == navi::RailwayItemDB::Type) it = it->parent();
+    insertSubcatOf(it);
+}
+
+
+void RailDBNavi::insertSubcatOf(ACI* it)
+{
+    if (!it)return;
+    auto* cit = static_cast<navi::RailCategoryItem*>(it);
+    auto cat = cit->category();
+    auto path = cit->path();
+    path.emplace_back(cit->subCategoriesCount());
+
+    auto subcat = std::make_shared<RailCategory>(_raildb->validCategoryNameRec(tr("新分类")));
+    _undo->push(new qecmd::InsertCategory(subcat, path, model));
 }
 
 void RailDBNavi::actNewParallelCat()
 {
-    _RAILDB_NOT_IMPLEMENTED;
+    auto* it = currentItem();
+    if (!it)return;
+    insertSubcatOf(it->parent());
+}
+
+void RailDBNavi::actRemoveCategory()
+{
+    auto it = currentItem();
+    if (!it) return;
+    if (it->type() == navi::RailwayItemDB::Type) it = it->parent();
+    const auto& path = it->path();
+    auto cat = static_cast<navi::RailCategoryItem*>(it)->category();
+
+    _undo->push(new qecmd::RemoveCategory(cat, path, model));
 }
 
 void RailDBNavi::actEditRail()
@@ -178,6 +213,7 @@ void RailDBNavi::actEditRail()
                             it->path());
     }
 }
+
 
 void RailDBNavi::actRemoveRail()
 {
@@ -309,6 +345,87 @@ void RailDBNavi::actSetAsDefaultFile()
             "线路数据库文件名。\n"
             "此信息保存在system.json配置文件中。本次关闭主程序后，下次在主程序中使用"
             "线路数据库功能时，将默认打开本文件。").arg(_raildb->filename()));
+    }
+}
+
+void RailDBNavi::actImportFromDiagram()
+{
+    auto* it = currentItem();
+    if (!it)return;
+    if (it->type() == navi::RailwayItemDB::Type)it = it->parent();
+    auto cat = static_cast<navi::RailCategoryItem*>(it)->category();
+
+    auto res = QFileDialog::getOpenFileName(this, tr("从运行图文件导入线路"), {},
+        tr("qETRC/pyETRC列车运行图文件 (*.pyetgr)\nJSON文件 (*.json)\n所有文件 (*)"));
+    if (res.isEmpty())return;
+
+    Diagram dia;
+    bool flag = dia.fromJson(res);
+    if (flag && ! dia.railways().isEmpty()) {
+        QList<std::shared_ptr<Railway>> lst = std::move(dia.railways());
+        foreach(auto p, lst) {
+            p->setName(_raildb->validRailwayNameRec(p->name()));
+        }
+        navi::path_t path = it->path();
+        path.emplace_back(it->childCount());
+        _undo->push(new qecmd::ImportRailsDB(lst, path, model));
+    }
+
+    else {
+        QMessageBox::warning(this, tr("错误"), tr("文件格式错误或为空，无法读取线路数据。"));
+    }
+}
+
+void RailDBNavi::actImportFromLib()
+{
+    auto it = currentItem();
+    if (!it)return;
+    if (it->type() == navi::RailwayItemDB::Type) it = it->parent();
+    auto* cit = static_cast<navi::RailCategoryItem*>(it);
+    auto path = cit->path();
+    path.push_back(cit->subCategoriesCount());
+
+    auto filename = QFileDialog::getOpenFileName(this, tr("从线路数据库导入"), {},
+        tr("qETRC/pyETRC线路数据库文件 (*.pyetlib)\nJSON文件 (*.json)\n所有文件 (*)"));
+    if (filename.isEmpty())return;
+
+    RailDB subdb;
+    bool flag = subdb.parseJson(filename);
+    if (flag && ! subdb.isNull()) {
+        // 直接移动给新的对象了
+        auto cat = std::make_shared<RailCategory>(std::move(subdb));
+        cat->setName(_raildb->validCategoryNameRec(filename.split('.').front()));
+        foreach(auto p, cat->railways()) {
+            p->setName(_raildb->validRailwayNameRec(p->name()));
+        }
+        _undo->push(new qecmd::InsertCategory(cat, path, model));
+    }
+    else {
+        QMessageBox::warning(this, tr("错误"), tr("文件错误或为空，无法导入"));
+    }
+}
+
+void RailDBNavi::actRenameCategory()
+{
+    auto* it = currentItem();
+    if (!it || it->type() != navi::RailCategoryItem::Type)
+        return;
+    auto* cit = static_cast<navi::RailCategoryItem*>(it);
+    auto cat = cit->category();
+
+    bool ok;
+    auto name = QInputDialog::getText(this, tr("重命名分类"), tr("将分类[%1]重命名为：")
+        .arg(cat->name()), QLineEdit::Normal, cat->name(), &ok);
+    if (!ok)return;
+    if (name == cat->name()) {
+        QMessageBox::information(this, tr("提示"), tr("分类重命名：未做更改。"));
+    }
+    else if (!_raildb->categoryNameIsValidRec(name, cat)) {
+        QMessageBox::warning(this, tr("错误"), tr("名称无效：名称不能为空，且不能与"
+            "既有线路、分类名称重复。"));
+    }
+    else {
+        _undo->push(new qecmd::UpdateCategoryNameDB(cat, name, it->path(), model));
     }
 }
 
@@ -634,4 +751,74 @@ void qecmd::RemoveRulerDB::redo()
 {
     ruler->railway().removeRuler(ruler);
     navi->closeRulerWidget(ruler);
+}
+
+qecmd::ImportRailsDB::ImportRailsDB(const QList<std::shared_ptr<Railway>>& rails, 
+    const std::deque<int>& path, RailDBModel* model, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("导入%1条线路").arg(rails.size()),parent),
+    rails(rails),path(path),model(model)
+{
+}
+
+void qecmd::ImportRailsDB::undo()
+{
+    model->commitRemoveRailwaysAt(rails, path);
+}
+
+void qecmd::ImportRailsDB::redo()
+{
+    model->commitInsertRailwaysAt(rails, path);
+}
+
+qecmd::InsertCategory::InsertCategory(std::shared_ptr<RailCategory> cat, 
+    const std::deque<int>& path, RailDBModel* model, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("插入分类: %1").arg(cat->name()),parent),
+    cat(cat),path(path),model(model)
+{
+}
+
+void qecmd::InsertCategory::undo()
+{
+    model->commitRemoveCategoryAt(cat, path);
+}
+
+void qecmd::InsertCategory::redo()
+{
+    model->commitInsertCategoryAt(cat, path);
+}
+
+qecmd::RemoveCategory::RemoveCategory(std::shared_ptr<RailCategory> cat, 
+    const std::deque<int>& path, RailDBModel* model, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("删除分类: %1").arg(cat->name()),parent),
+    cat(cat),path(path),model(model)
+{
+}
+
+void qecmd::RemoveCategory::undo()
+{
+    model->commitInsertCategoryAt(cat, path);
+}
+
+void qecmd::RemoveCategory::redo()
+{
+    model->commitRemoveCategoryAt(cat, path);
+}
+
+qecmd::UpdateCategoryNameDB::UpdateCategoryNameDB(std::shared_ptr<RailCategory> cat, 
+    const QString& name, const std::deque<int>& path, RailDBModel* model, 
+    QUndoCommand* parent):
+    QUndoCommand(QObject::tr("更新分类名: %1").arg(cat->name()),parent),
+    cat(cat),name(name),path(path),model(model)
+{
+}
+
+void qecmd::UpdateCategoryNameDB::undo()
+{
+    std::swap(cat->nameRef(), name);
+    model->onCategoryInfoChanged(cat, path);
+}
+void qecmd::UpdateCategoryNameDB::redo()
+{
+    std::swap(cat->nameRef(), name);
+    model->onCategoryInfoChanged(cat, path);
 }

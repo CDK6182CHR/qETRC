@@ -8,6 +8,8 @@
 #include <DockManager.h>
 #include <SARibbonContextCategory.h>
 #include <SARibbonBar.h>
+#include <QApplication>
+#include <QStyle>
 
 RailDBContext::RailDBContext(SARibbonContextCategory *cont, MainWindow *mw_):
     QObject(mw_), cont(cont),mw(mw_),
@@ -26,6 +28,17 @@ RailDBNavi* RailDBContext::getNavi()
 void RailDBContext::initUI()
 {
     auto* page=cont->addCategoryPage(tr("线路数据库"));
+    QAction* act;
+    SARibbonToolButton* btn;
+
+    auto* panel = page->addPannel(tr(""));
+    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
+        tr("关闭"), this);
+    act->setToolTip(tr("关闭线路数据库\n关闭线路数据库面板，关闭打开的文件，清空数据。\n"
+        "下次打开时，需要重新读取文件。"));
+    connect(act, &QAction::triggered, this, &RailDBContext::deactivateDB);
+    btn=panel->addLargeAction(act);
+    btn->setMinimumWidth(70);
 }
 
 bool RailDBContext::deactiveOnClose()

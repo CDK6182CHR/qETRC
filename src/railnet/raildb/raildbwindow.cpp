@@ -97,6 +97,10 @@ void RailDBWindow::initMenuBar()
     menu->addSeparator();
     menu->addAction(tr("编辑列表所选线路的标尺"), navi, &RailDBNavi::actRuler);
     menu->addAction(tr("编辑列表所选线路的天窗"), navi, &RailDBNavi::actForbid);
+    menu->addSeparator();
+    menu->addAction(tr("新建子分类"), navi, &RailDBNavi::actNewSubcat);
+    menu->addAction(tr("新建平行分类"), navi, &RailDBNavi::actNewParallelCat);
+    menu->addAction(tr("删除列表所选分类"), navi, &RailDBNavi::actRemoveCategory);
     
     menu = menubar->addMenu(tr("查看"));
     menu->addAction(tr("刷新线路表"), navi, &RailDBNavi::refreshData);
@@ -104,9 +108,13 @@ void RailDBWindow::initMenuBar()
     menu->addAction(tr("全部折叠"), navi->getTree(), &QTreeView::collapseAll);
 
     menu = menubar->addMenu(tr("导入"));
+    menu->addAction(tr("从运行图文件导入"), navi, &RailDBNavi::actImportFromDiagram);
+    menu->addAction(tr("从子数据库文件导入"), navi, &RailDBNavi::actImportFromLib);
 
     menu = menubar->addMenu(tr("导出"));
     menu->addAction(tr("导出列表所选线路至运行图"), navi, &RailDBNavi::actExportToDiagram);
+    menu->addAction(tr("导出列表所选分类为独立数据库"), navi,
+        &RailDBNavi::actExportCategoryToLib);
 
 }
 

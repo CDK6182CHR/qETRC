@@ -85,6 +85,16 @@ QString RailCategory::validRailwayNameRec(const QString& prefix)const
 	}
 }
 
+QString RailCategory::validCategoryNameRec(const QString& prefix) const
+{
+	for (int i = 0;; i++) {
+		QString res = prefix;
+		if (i)res += QString::number(i);
+		if (categoryNameIsValidRec(res, nullptr))
+			return res;
+	}
+}
+
 int RailCategory::getRailwayIndex(std::shared_ptr<const Railway> rail) const
 {
 	for (int i = 0; i < _railways.size(); i++) {

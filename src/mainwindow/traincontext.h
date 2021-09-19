@@ -174,6 +174,12 @@ public slots:
     void commitInterpolation(const QVector<std::shared_ptr<Train>>& trains,
         const QVector<std::shared_ptr<Train>>& data);
 
+    /**
+     * 撤销所有推定结果，直接从Toolbar调用。
+     * 推定和撤销推定的commit操作实际上是完全一样的
+     */
+    void actRemoveInterpolation();
+
 private slots:
     void showTrainEvents();
     void actShowTrainLine();
@@ -325,6 +331,22 @@ namespace qecmd {
             trains(trains),data(data),cont(context){}
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    /**
+     * 撤销所有推定结果：所有备注为“推定”的站直接删除
+     */
+    class RemoveInterpolation :public QUndoCommand {
+        QVector<std::shared_ptr<Train>> trains, data;
+        TrainContext* const cont;
+    public:
+        RemoveInterpolation(const QVector<std::shared_ptr<Train>>& trains,
+            const QVector<std::shared_ptr<Train>>& data, TrainContext* cont,
+            QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("撤销所有推定"),parent),trains(trains),data(data),
+            cont(cont){}
+        void undo()override;
+        void redo()override;
     };
 }
 

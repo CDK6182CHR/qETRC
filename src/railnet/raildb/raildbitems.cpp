@@ -42,6 +42,11 @@ QString navi::RailCategoryItem::data(int i) const
     }
 }
 
+int navi::RailCategoryItem::subCategoriesCount() const
+{
+    return _subcats.size();
+}
+
 void navi::RailCategoryItem::removeRailwayAt(int i)
 {
     int ri=i-_subcats.size();
@@ -53,14 +58,69 @@ void navi::RailCategoryItem::removeRailwayAt(int i)
     }
 }
 
+void navi::RailCategoryItem::removeRailwaysAt(int i, int count)
+{
+    int ri = i - _subcats.size();
+    auto p = _railways.begin(); std::advance(p, ri);
+    for (int t = 0; t < count; t++) {
+        p = _railways.erase(p);
+        _category->railways().removeAt(ri);
+    }
+    for (; p != _railways.end(); ++p) {
+        (*p)->setRow((*p)->row() - count);
+    }
+}
+
 void navi::RailCategoryItem::insertRailwayAt(std::shared_ptr<Railway> rail, int i)
 {
-    int ri=i-_subcats.size();
+    int ri = i - _subcats.size();
     _category->railways().insert(ri,rail);
     auto p=_railways.begin();std::advance(p,ri);
     p=_railways.insert(p,std::make_unique<RailwayItemDB>(rail,i,this));
     for(++p;p!=_railways.end();++p){
         (*p)->setRow((*p)->row()+1);
+    }
+}
+
+void navi::RailCategoryItem::insertRailwaysAt(const QList<std::shared_ptr<Railway>>& rails, int i)
+{
+    int ri = i - _subcats.size();
+    auto p = _railways.begin();
+    std::advance(p, ri);
+    foreach(auto rail, rails) {
+        _category->railways().insert(ri, rail);
+        p = _railways.insert(p, std::make_unique<RailwayItemDB>(rail, i, this));
+        ++p; ++i; ++ri;
+    }
+
+    for (; p != _railways.end(); ++p) {
+        (*p)->setRow((*p)->row() + rails.size());
+    }
+}
+
+void navi::RailCategoryItem::insertCategoryAt(std::shared_ptr<RailCategory> cat, int i)
+{
+    _category->subCategories().insert(i, cat);
+    auto p = _subcats.begin(); std::advance(p, i);
+    p = _subcats.insert(p, std::make_unique<RailCategoryItem>(cat, i, this));
+    for (++p; p != _subcats.end(); ++p) {
+        (*p)->setRow((*p)->row() + 1);
+    }
+    for (auto& p : _railways) {
+        p->setRow(p->row() + 1);
+    }
+}
+
+void navi::RailCategoryItem::removeCategoryAt(int i)
+{
+    _category->subCategories().removeAt(i);
+    auto p = _subcats.begin(); std::advance(p, i);
+    p = _subcats.erase(p);
+    for (; p != _subcats.end(); ++p) {
+        (*p)->setRow((*p)->row() - 1);
+    }
+    for (auto& p : _railways) {
+        p->setRow(p->row() - 1);
     }
 }
 

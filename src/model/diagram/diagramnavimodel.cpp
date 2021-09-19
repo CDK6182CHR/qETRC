@@ -184,7 +184,7 @@ void DiagramNaviModel::removePageAt(int idx)
     auto* item = static_cast<navi::PageListItem*>(getItem(idx0));
     beginRemoveRows(idx0, idx, idx);
     item->removePageAt(idx);
-    endRemoveColumns();
+    endRemoveRows();
 }
 
 void DiagramNaviModel::onPageNameChanged(int i)

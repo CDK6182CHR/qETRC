@@ -670,12 +670,12 @@ void MainWindow::initToolbar()
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
 
-        menu = new SARibbonMenu(this);
-        auto actsub = menu->addAction(tr("线路数据库 (pyETRC风格)"));
-        addAction(actsub);
-        actsub->setShortcut(Qt::CTRL + Qt::ALT + Qt::Key_H);
-        connect(actsub, &QAction::triggered, this, &MainWindow::actRailDB);
-        act->setMenu(menu);
+        //menu = new SARibbonMenu(this);
+        //auto actsub = menu->addAction(tr("线路数据库 (pyETRC风格)"));
+        //addAction(actsub);
+        ////actsub->setShortcut(Qt::CTRL + Qt::ALT + Qt::Key_H);
+        //connect(actsub, &QAction::triggered, this, &MainWindow::actRailDB);
+        //act->setMenu(menu);
 
         act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺编辑"), this);
         act->setToolTip(tr("标尺编辑 (Ctrl+B)\n"
@@ -724,6 +724,7 @@ void MainWindow::initToolbar()
         btn->setMinimumWidth(80);
     }
 
+    QAction* actRemoveInterp;
     //列车
     if constexpr (true) {
         auto* cat = ribbon->addCategoryPage(tr("列车(&3)"));
@@ -889,7 +890,13 @@ void MainWindow::initToolbar()
         act->setToolTip(tr("时刻插值（推定通过站时刻）\n"
             "通过标尺数据，推定列车时刻表中未给出的通过站的时刻。"));
         connect(act, &QAction::triggered, this, &MainWindow::actInterpolation);
-        panel->addMediumAction(act);
+
+        menu = new SARibbonMenu(this);
+        actRemoveInterp = menu->addAction(tr("删除所有推定结果"));
+        act->setMenu(menu);
+        btn = panel->addMediumAction(act);
+        btn->setPopupMode(QToolButton::DelayedPopup);
+        
     }
 
     //显示
@@ -936,6 +943,9 @@ void MainWindow::initToolbar()
         connect(timetableQuickWidget->getModel(),
             &TimetableQuickEditableModel::trainStationTimeUpdated,
             contextTrain, &TrainContext::onTrainStationTimeChanged);
+
+        connect(actRemoveInterp, &QAction::triggered,
+            contextTrain, &TrainContext::actRemoveInterpolation);
     }
 
     //context: rail 8

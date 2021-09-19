@@ -119,6 +119,13 @@ public slots:
     void actNewRail();
     void actNewSubcat();
     void actNewParallelCat();
+    void actRemoveCategory();
+
+    /**
+     * 在item所示的分类下新增分类。
+     * 保证入参有效且为分类类型。操作压栈
+     */
+    void insertSubcatOf(ACI* it);
 
     void actRemoveRail();
     void actRuler();
@@ -127,6 +134,24 @@ public slots:
     void actExportRailToFile();
     void actExportCategoryToDiagramFile();
     void actExportCategoryToLib();
+
+    /**
+     * 从运行图文件导入线路：将运行图文件中读取到的所有线路，加入到当前分类下。
+     * 如果名称冲突，自动重命名
+     */
+    void actImportFromDiagram();
+
+    /**
+     * 指定pyetlib文档，导入为新的分类
+     */
+    void actImportFromLib();
+
+    void actRenameCategory();
+
+    /**
+     * 从当前运行图导入线路
+     */
+    //void actImportFromCurrent();
 
     void openRulerWidget(std::shared_ptr<Ruler> ruler);
     void closeRulerWidget(std::shared_ptr<Ruler> ruler);
@@ -154,6 +179,41 @@ namespace qecmd {
     public :
         InsertRailDB(std::shared_ptr<Railway> railway_, const std::deque<int>& path_,
             RailDBModel* model_, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
+    class InsertCategory :public QUndoCommand
+    {
+        std::shared_ptr<RailCategory> cat;
+        std::deque<int> path;    // 新增cat的path
+        RailDBModel* const model;
+    public:
+        InsertCategory(std::shared_ptr<RailCategory> cat, const std::deque<int>& path,
+            RailDBModel* model, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
+    class RemoveCategory :public QUndoCommand {
+        std::shared_ptr<RailCategory> cat;
+        std::deque<int> path;
+        RailDBModel* const model;
+    public:
+        RemoveCategory(std::shared_ptr<RailCategory> cat, const std::deque<int>& path,
+            RailDBModel* model, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
+    class ImportRailsDB : public QUndoCommand
+    {
+        QList<std::shared_ptr<Railway>> rails;
+        std::deque<int> path;   // 第一位的path
+        RailDBModel* const model;
+    public:
+        ImportRailsDB(const QList<std::shared_ptr<Railway>>& rails,
+            const std::deque<int>& path, RailDBModel* model, QUndoCommand* parent = nullptr);
         void undo()override;
         void redo()override;
     };
@@ -216,6 +276,19 @@ namespace qecmd {
     public:
         RemoveRulerDB(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> data,
             bool isOrd, RailDBNavi* navi, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
+    class UpdateCategoryNameDB : public QUndoCommand{
+        std::shared_ptr<RailCategory> cat;
+        QString name;
+        std::deque<int> path;
+        RailDBModel* const model;
+    public:
+        UpdateCategoryNameDB(std::shared_ptr<RailCategory> cat,
+            const QString& name, const std::deque<int>& path, RailDBModel* model,
+            QUndoCommand* parent = nullptr);
         void undo()override;
         void redo()override;
     };

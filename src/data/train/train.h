@@ -489,6 +489,12 @@ public:
      */
     void refreshStationFlags();
 
+    /**
+     * 清除所有标记为 “推定”的站  
+     * 返回是否有实际变更
+     */
+    bool removeDetected();
+
 
     //static比较函数 用来排序
     static bool ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
