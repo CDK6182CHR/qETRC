@@ -1289,6 +1289,28 @@ std::shared_ptr<const Railway> TrainLine::railway() const
     return _adapter.railway();
 }
 
+std::shared_ptr<Railway> TrainLine::railway()
+{
+    return _adapter.railway();
+}
+
+bool TrainLine::autoBusiness()
+{
+    bool flag = false;
+    auto t = train();
+    bool passen = t->getIsPassenger();
+    for (auto p = _stations.begin(); p != _stations.end(); ++p) {
+        bool should_busi = (isStartingOrTerminal(p) || p->trainStation->isStopped())
+            && ((passen && p->railStation.lock()->passenger) ||
+                (!passen && p->railStation.lock()->freight));
+        if (should_busi != p->trainStation->business) {
+            p->trainStation->business = should_busi;
+            flag = true;
+        }
+    }
+    return flag;
+}
+
 RailStationEvent::Position TrainLine::passStationPos(ConstAdaPtr st) const
 {
     if (st == _stations.begin()) {

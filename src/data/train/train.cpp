@@ -761,6 +761,19 @@ void Train::swapBaseInfo(Train& other)
     SWAP(_pen);
 }
 
+void Train::swapTimetableWithAdapters(Train& other)
+{
+    swapTimetable(other);
+    std::swap(_adapters, other._adapters);
+}
+
+void Train::swap(Train &other)
+{
+    swapTimetable(other);
+    swapBaseInfo(other);
+    std::swap(_adapters,other._adapters);
+}
+
 std::shared_ptr<const TrainAdapter> Train::adapterFor(const Railway& railway)const
 {
     for(auto adp:_adapters){
@@ -841,6 +854,8 @@ void Train::refreshStationFlags()
             p.flag = TrainStation::Stopped;
         else
             p.flag = TrainStation::NoFlag;
+        if (p.business)
+            p.flag |= TrainStation::Business;
     }
     // 第二次遍历：增加绑定站信息 遍历所有Line
     foreach(auto adp, _adapters) {
@@ -871,6 +886,18 @@ bool Train::removeDetected()
         }
         else {
             ++p;
+        }
+    }
+    return flag;
+}
+
+bool Train::autoBusiness()
+{
+    bool flag=false;
+    foreach(auto adp,_adapters){
+        foreach(auto line,adp->lines()){
+            bool a=line->autoBusiness();
+            flag=(flag||a);
         }
     }
     return flag;

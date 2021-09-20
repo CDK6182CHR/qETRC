@@ -158,8 +158,7 @@ public:
      */
     inline bool hasLabelInfo()const { return !_belowLabels.isEmpty() || !_overLabels.isEmpty(); }
 
-    bool containsRailway(std::shared_ptr<Railway> rail)const { return _railways.contains(rail); }
-
+    bool containsRailway(std::shared_ptr<const Railway> rail)const;
     bool containsRailway(const Railway& railway)const;
 
     /**

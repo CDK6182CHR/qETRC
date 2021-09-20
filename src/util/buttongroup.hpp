@@ -44,6 +44,19 @@ public:
         }
     }
 
+    template <typename _TySignal,typename _TySlot>
+    void connectFront(_TySignal _signal, QObject* _target,
+        std::initializer_list<_TySlot> _slots)
+    {
+        assert(_slots.size() <= _Num);
+        //static_assert(_slots.size() == _Num, "connectAll: Invalid size of slots");
+        auto sl = _slots.begin();
+        auto bt = buttons.begin();
+        for (; bt != buttons.end()&&sl!=_slots.end(); ++bt,++sl) {
+            QObject::connect(*bt, _signal, _target, *sl);
+        }
+    }
+
     /**
      * 将每个按钮的_signal都绑定到同一个_slot
      */

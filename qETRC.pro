@@ -20,6 +20,7 @@ SOURCES += \
     src/data/diagram/config.cpp \
     src/data/diagram/diagram.cpp \
     src/data/diagram/diagrampage.cpp \
+    src/data/diagram/stationbinding.cpp \
     src/data/diagram/trainadapter.cpp \
     src/data/diagram/trainevents.cpp \
     src/data/diagram/traingap.cpp \
@@ -43,6 +44,7 @@ SOURCES += \
     src/data/train/typemanager.cpp \
     src/dialogs/batchcopytraindialog.cpp \
     src/dialogs/changestationnamedialog.cpp \
+    src/dialogs/correcttimetabledialog.cpp \
     src/dialogs/exchangeintervaldialog.cpp \
     src/dialogs/importtraindialog.cpp \
     src/dialogs/locatedialog.cpp \
@@ -157,6 +159,7 @@ HEADERS += \
     src/data/diagram/config.h \
     src/data/diagram/diagram.h \
     src/data/diagram/diagrampage.h \
+    src/data/diagram/stationbinding.h \
     src/data/diagram/trainadapter.h \
     src/data/diagram/trainevents.h \
     src/data/diagram/traingap.h \
@@ -182,6 +185,7 @@ HEADERS += \
     src/data/train/typemanager.h \
     src/dialogs/batchcopytraindialog.h \
     src/dialogs/changestationnamedialog.h \
+    src/dialogs/correcttimetabledialog.h \
     src/dialogs/exchangeintervaldialog.h \
     src/dialogs/importtraindialog.h \
     src/dialogs/locatedialog.h \

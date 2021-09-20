@@ -166,6 +166,15 @@ void DiagramPage::clearGraphics()
     _overLabels.clear();
 }
 
+bool DiagramPage::containsRailway(std::shared_ptr<const Railway> rail) const
+{
+    for (auto r : _railways) {
+        if (rail == r)
+            return true;
+    }
+    return false;
+}
+
 bool DiagramPage::containsRailway(const Railway& railway) const
 {
     for (auto r : _railways) {

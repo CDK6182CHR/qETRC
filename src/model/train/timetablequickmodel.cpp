@@ -2,6 +2,7 @@
 #include "data/train/train.h"
 #include "util/utilfunc.h"
 #include "model/delegate/qedelegate.h"
+#include "data/diagram/trainadapter.h"
 
 TimetableQuickModel::TimetableQuickModel(QObject *parent) : QStandardItemModel(parent)
 {
@@ -45,6 +46,7 @@ void TimetableQuickModel::setupModel()
 
         row += 2;
     }
+    setupBoudingMap();
     updating = false;
 }
 
@@ -53,6 +55,37 @@ bool TimetableQuickModel::isAlwaysShow(int row) const
     auto p = qvariant_cast<Train::StationPtr>(
         item(row, ColName)->data(qeutil::TrainStationRole));
     return p->flag & TrainStation::NonPass;
+}
+
+TrainStationBoundingList TimetableQuickModel::getBoundingList(int row) const
+{
+    if (row % 2 != 0)
+        --row;
+    auto st = trainStationForRow(row);
+    if (auto itr = boundingMap.find(&*st); itr != boundingMap.end()) {
+        return itr->second;
+    }
+    else {
+        return {};
+    }
+}
+
+std::list<TrainStation>::iterator TimetableQuickModel::trainStationForRow(int row)const
+{
+    return qvariant_cast<Train::StationPtr>(
+        item(row, ColName)->data(qeutil::TrainStationRole));
+}
+
+QTime TimetableQuickModel::arriveTimeForRow(int row) const
+{
+    if (row % 2 != 0)row--;
+    return item(row, ColTime)->data(qeutil::TimeDataRole).toTime();
+}
+
+QTime TimetableQuickModel::departTimeForRow(int row) const
+{
+    if (row % 2 != 0)row++;
+    return item(row, ColTime)->data(qeutil::TimeDataRole).toTime();
 }
 
 void TimetableQuickModel::setTimeItem(int row, const QTime &tm)
@@ -96,6 +129,19 @@ void TimetableQuickModel::refreshData()
     setupModel();
 }
 
+void TimetableQuickModel::setupBoudingMap()
+{
+    boundingMap.clear();
+    foreach(auto adp, train->adapters()) {
+        foreach(auto line, adp->lines()) {
+            for (const auto& p : line->stations()) {
+                boundingMap[&*p.trainStation].push_back(
+                    TrainStationBounding(line, p.railStation));
+            }
+        }
+    }
+}
+
 QStandardItem* TimetableQuickModel::NESI(const QString& text)
 {
     auto* it = new QStandardItem(text);
@@ -131,8 +177,10 @@ void TimetableQuickModel::setStationStopCol(const TrainStation& station, int row
         takeItem(row, ColNote);
     }
     if (station.flag & TrainStation::Bound) {
-        if (station.flag & TrainStation::Business)
+        if (station.flag & TrainStation::Business &&
+            station.flag & TrainStation::NonPass) {
             color = Qt::red;
+        }
     }
     else {
         color = Qt::darkGray;

@@ -569,8 +569,10 @@ void MainWindow::initToolbar()
 
         panel = cat->addPannel(tr("窗口"));
         act = naviDock->toggleViewAction();
+        act->setShortcut(Qt::Key_F3);
+        addAction(act);
         act->setText(QObject::tr("导航"));
-        act->setToolTip(tr("导航面板\n打开或关闭运行图总导航面板。"));
+        act->setToolTip(tr("导航面板 (F3)\n打开或关闭运行图总导航面板。"));
         act->setIcon(QIcon(":/icons/Graph-add.png"));
         auto* btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
@@ -632,6 +634,10 @@ void MainWindow::initToolbar()
             tr("关于"), this);
         connect(act, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
         panel->addLargeAction(act);
+        menu = new SARibbonMenu(this);
+        menu->addAction(QApplication::style()->standardIcon(QStyle::SP_TitleBarMenuButton),
+            tr("关于Qt"), QApplication::aboutQt);
+        act->setMenu(menu);
 
         act = new QAction(QApplication::style()->standardIcon(QStyle::SP_BrowserStop),
             tr("退出"), this);
@@ -724,7 +730,7 @@ void MainWindow::initToolbar()
         btn->setMinimumWidth(80);
     }
 
-    QAction* actRemoveInterp;
+    QAction* actRemoveInterp, * actAutoBusiness;
     //列车
     if constexpr (true) {
         auto* cat = ribbon->addCategoryPage(tr("列车(&3)"));
@@ -749,6 +755,8 @@ void MainWindow::initToolbar()
 
         actsub = menu->addAction(tr("自动推断所有列车类型"));
         connect(actsub, &QAction::triggered, this, &MainWindow::actAutoTrainType);
+
+        actAutoBusiness = menu->addAction(tr("自动设置所有营业站"));
 
         act->setMenu(menu);
         auto* btn = panel->addLargeAction(act);
@@ -946,6 +954,10 @@ void MainWindow::initToolbar()
 
         connect(actRemoveInterp, &QAction::triggered,
             contextTrain, &TrainContext::actRemoveInterpolation);
+        connect(timetableQuickWidget, &TimetableQuickWidget::locateToBoundStation,
+            contextTrain, &TrainContext::locateToBoundStation);
+        connect(actAutoBusiness, &QAction::triggered,
+            contextTrain, &TrainContext::actAutoBusiness);
     }
 
     //context: rail 8
@@ -1634,6 +1646,7 @@ void MainWindow::insertPageWidget(std::shared_ptr<DiagramPage> page, int index)
     dw->setupMenu(diaActions);
     //informPageListChanged();
     connect(dw, &DiagramWidget::trainSelected, this, &MainWindow::focusInTrain);
+    connect(dw, &DiagramWidget::railFocussedIn, this, &MainWindow::focusInRailway);
     connect(contextTrain, &TrainContext::highlightTrainLine, dw, &DiagramWidget::highlightTrain);
     connect(dw, &DiagramWidget::pageFocussedIn, this, &MainWindow::focusInPage);
 }

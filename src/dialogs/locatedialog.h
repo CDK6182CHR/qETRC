@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <QDialog>
 
+struct TrainStationBounding;
 class QDoubleSpinBox;
 class RailStation;
 class QTimeEdit;
@@ -45,5 +46,39 @@ public slots:
      * @brief showDialog  刷新数据后显示
      */
     void showDialog();
+};
+
+
+/**
+ * @brief The LocateBindingDialog class
+ * 从TimetableQuickWidget调起的定位对话框。
+ * 近似全局单例的作法；构造时，不给出数据。
+ */
+class LocateBoundingDialog:
+       public QDialog
+{
+    Q_OBJECT
+    Diagram& diagram;
+    QVector<struct TrainStationBounding> boudingList{};
+    QComboBox* cbBound;
+    PageComboForRail* cbPage;
+    QTimeEdit* edTime;
+public:
+    LocateBoundingDialog(Diagram& diagram, QWidget* parent=nullptr);
+
+    /**
+     * 设置好数据，然后显示对话框。
+     */
+    void showForStation(const QVector<TrainStationBounding>& boudingList,
+                        const QTime& tm);
+private:
+    void initUI();
+    using QDialog::show;
+signals:
+    void locateOnStation(int pageIndex, std::shared_ptr<const Railway>,
+                         std::shared_ptr<const RailStation>, const QTime& time);
+private slots:
+    void onApply();
+    void onBoundComboChanged(int i);
 };
 

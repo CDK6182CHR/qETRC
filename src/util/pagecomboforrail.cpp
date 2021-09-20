@@ -23,7 +23,10 @@ PageComboForRail::PageComboForRail(Diagram &diagram_, std::shared_ptr<Railway> r
 
 int PageComboForRail::pageIndex() const
 {
-    return currentData(Qt::UserRole).toInt();
+    bool ok;
+    int i=currentData(Qt::UserRole).toInt(&ok);
+    if (ok) return i;
+    else return -1;
 }
 
 void PageComboForRail::refreshData()
@@ -73,7 +76,7 @@ void PageComboForRail::setupItems()
     }
 }
 
-void PageComboForRail::setRailway(const std::shared_ptr<Railway> &railway)
+void PageComboForRail::setRailway(const std::shared_ptr<const Railway> &railway)
 {
     _railway=railway;
     setupItems();

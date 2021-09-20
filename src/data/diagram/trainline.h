@@ -265,6 +265,14 @@ public:
     static QString attachTypeStringFull(IntervalAttachType type);
 
     std::shared_ptr<const Railway> railway()const;
+    std::shared_ptr<Railway> railway();
+
+    /**
+     * 自动设置营业站信息
+     * 客运列车在办客站停车/始发/终到视为营业  其他情况类推
+     * 当前这个对象应该是复制的Train对象下面的，并且已经特别绑定到线路
+     */
+    bool autoBusiness();
 
 private:
 

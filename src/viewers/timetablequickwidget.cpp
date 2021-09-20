@@ -6,9 +6,12 @@
 #include <QTableView>
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QMessageBox>
+#include <QMenu>
 
 #include <data/common/qesystem.h>
 #include "data/train/train.h"
+#include "dialogs/locatedialog.h"
 
 TimetableQuickWidget::TimetableQuickWidget(QUndoStack* undo_, QWidget *parent):
     QWidget(parent),
@@ -45,7 +48,17 @@ void TimetableQuickWidget::initUI()
     table->setModel(model);
     table->setItemDelegateForColumn(TimetableQuickModel::ColTime,
         new TimeQuickDelegate(this));
+    table->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(table, &QTableView::customContextMenuRequested,
+        this, &TimetableQuickWidget::onTableContext);
 
+    meContext = new QMenu(this);
+    auto* act = meContext->addAction(tr("定位到到达点"), this,
+        &TimetableQuickWidget::locateArrive, Qt::ALT + Qt::Key_G);
+    table->addAction(act);
+    act = meContext->addAction(tr("定位到出发点"), this,
+        &TimetableQuickWidget::locateDepart, Qt::ALT + Qt::SHIFT + Qt::Key_G);
+    table->addAction(act);
 
     vlay->addWidget(table);
 }
@@ -80,11 +93,34 @@ void TimetableQuickWidget::locateArrive()
     auto&& idx = table->currentIndex();
     if (!idx.isValid())return;
 
-    // todo: 现在没有关联车站信息，不方便做定位
+    auto lst = model->getBoundingList(idx.row());
+    if (lst.empty()) {
+        QMessageBox::warning(this, tr("错误"),
+            tr("指定车站没有铺画点，无法定位到运行图"));
+    }
+    else {
+        emit locateToBoundStation(lst, model->arriveTimeForRow(idx.row()));
+    }
 }
 
 void TimetableQuickWidget::locateDepart()
 {
+    auto&& idx = table->currentIndex();
+    if (!idx.isValid())return;
+
+    auto lst = model->getBoundingList(idx.row());
+    if (lst.empty()) {
+        QMessageBox::warning(this, tr("错误"),
+            tr("指定车站没有铺画点，无法定位到运行图"));
+    }
+    else {
+        emit locateToBoundStation(lst, model->departTimeForRow(idx.row()));
+    }
+}
+
+void TimetableQuickWidget::onTableContext(const QPoint& pos)
+{
+    meContext->popup(table->mapToGlobal(pos));
 }
 
 void TimetableQuickWidget::refreshData()
@@ -103,3 +139,4 @@ void TimetableQuickWidget::refreshData()
 
     onStopOnlyChanged(ckStopOnly->isChecked());
 }
+

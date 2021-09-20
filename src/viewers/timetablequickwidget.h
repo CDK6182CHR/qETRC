@@ -2,7 +2,9 @@
 
 #include <QWidget>
 #include <memory>
+#include "data/diagram/stationbinding.h"
 
+class LocateBoundingDialog;
 class QTableView;
 class QCheckBox;
 class QLineEdit;
@@ -12,6 +14,7 @@ class Train;
 class QUndoStack;
 class Railway;
 class RailStation;
+class QMenu;
 
 /**
  * @brief The TimetableQuickWidget class
@@ -26,6 +29,8 @@ class TimetableQuickWidget : public QWidget
     QLineEdit* edName;
     QCheckBox* ckStopOnly, * ckEdit;
     QTableView* table;
+    LocateBoundingDialog* dlgLocate=nullptr;
+    QMenu* meContext;
 public:
     explicit TimetableQuickWidget(QUndoStack* undo_, QWidget *parent = nullptr);
     auto getTrain(){return train;}
@@ -33,16 +38,23 @@ public:
 private:
     void initUI();
 signals:
-    void locateToEvent(int pageIndex, std::shared_ptr<const Railway>,
-        std::shared_ptr<const RailStation>, const QTime&);
+
+    /**
+     * 因为本类没有Diagram引用，无法处理定位问题。
+     * 只能发送信号出去，暂定给TrainContext处理
+     */
+    void locateToBoundStation(const TrainStationBoundingList& bound,
+        const QTime& time);
+
 private slots:
     void onStopOnlyChanged(bool on);
     void onEditCheckChanged(bool on);
     void locateArrive();
     void locateDepart();
+    void onTableContext(const QPoint& pos);
 public slots:
     void setTrain(std::shared_ptr<Train> train);
     void refreshData();
-
+    
 };
 

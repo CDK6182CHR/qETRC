@@ -19,6 +19,8 @@ class PenStyleCombo;
 class BasicTrainWidget;
 class Routing;
 class TrainType;
+
+struct TrainStationBounding;
 namespace qecmd {
     struct StartingTerminalData;
 }
@@ -28,6 +30,7 @@ class CDockWidget;
 
 
 class MainWindow;
+class LocateBoundingDialog;
 /**
  * @brief The TrainContext class
  * 列车的ContextMenu。尝试从MainWindow分出来，是为了减少MainWindow代码量。
@@ -56,6 +59,8 @@ class TrainContext : public QObject
 
     QList<BasicTrainWidget*> basicWidgets;
     QList<ads::CDockWidget*> basicDocks;
+
+    LocateBoundingDialog* dlgLocate = nullptr;
 public:
     TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_, MainWindow* mw);
     auto* context() { return cont; }
@@ -180,6 +185,23 @@ public slots:
      */
     void actRemoveInterpolation();
 
+    /**
+     * 代替quickWidget处理定位问题：显示对话框
+     */
+    void locateToBoundStation(const QVector<TrainStationBounding>& boudings,
+        const QTime& time);
+
+    /**
+     * 自动营业站  代理MainWindow的东西
+     * 操作压栈
+     */
+    void actAutoBusiness();
+
+    /**
+     * 自动营业站 执行 似乎不需要重新铺画，只需要刷新数据。
+     */
+    void commitAutoBusiness();
+
 private slots:
     void showTrainEvents();
     void actShowTrainLine();
@@ -227,6 +249,8 @@ private slots:
      * 注意不要重复执行这个操作。
      */
     void refreshCurrentTrainWidgets();
+
+    void actCorrection();
 };
 
 
@@ -347,6 +371,23 @@ namespace qecmd {
             cont(cont){}
         void undo()override;
         void redo()override;
+    };
+
+    class AutoBusiness :public QUndoCommand {
+        QVector<std::shared_ptr<Train>> trains, data;
+        TrainContext* const cont;
+    public:
+        AutoBusiness(QVector<std::shared_ptr<Train>>&& trains,
+            QVector<std::shared_ptr<Train>>&& data, TrainContext* cont,
+            QUndoCommand* parent = nullptr):
+            QUndoCommand(QObject::tr("自动营业站"),parent),
+            trains(std::forward<QVector<std::shared_ptr<Train>>>(trains)),
+            data(std::forward<QVector<std::shared_ptr<Train>>>(data)),cont(cont){}
+
+        void undo()override;
+        void redo()override;
+    private:
+        void commit();
     };
 }
 

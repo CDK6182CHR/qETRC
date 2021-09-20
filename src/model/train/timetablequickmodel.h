@@ -5,7 +5,9 @@
 #include <list>
 #include "model/delegate/qetimedelegate.h"
 #include <QUndoCommand>
+#include <map>
 #include "data/train/trainstation.h"
+#include "data/diagram/stationbinding.h"
 
 class Train;
 
@@ -19,6 +21,7 @@ class TimetableQuickModel : public QStandardItemModel
 protected:
     std::shared_ptr<Train> train;
     bool updating = false;
+    std::map<const TrainStation*, TrainStationBoundingList> boundingMap;
 public:
     enum {
         ColName,
@@ -35,12 +38,32 @@ public:
      * 保证所给row是偶数。
      */
     bool isAlwaysShow(int row)const;
+
+    /**
+     * 返回指定行的列车绑定情况
+     */
+    TrainStationBoundingList getBoundingList(int row)const;
+
+    /**
+     * 获取指定行所示的车站迭代器。保证入参row为偶数。
+     */
+    std::list<TrainStation>::iterator trainStationForRow(int row)const;
+
+    QTime arriveTimeForRow(int row)const;
+    QTime departTimeForRow(int row)const;
+
 protected:
     void setTimeItem(int row,const QTime& tm);
     void setTimeItem(int row,const QTime& tm,const QString& text);
 
-    virtual void setupModel();
+    void setupModel();
     void setStationColor(int row, const QColor& color);
+
+    /**
+     * 通过遍历所有的TrainLine，搞一个TrainStation -> BoudingList的映射表
+     * 每次设定新的列车时使用
+     */
+    void setupBoudingMap();
 
     /**
      * 创建不可编辑的Item

@@ -438,10 +438,17 @@ public:
      */
     void swapTimetable(Train& other);
 
+    void swapTimetableWithAdapters(Train& other);
+
     /**
      * 交换车次、始发终到等信息，但不交换时刻表
      */
     void swapBaseInfo(Train& other);
+
+    /**
+     * 交换所有信息，包括Adapter
+     */
+    void swap(Train& other);
 
     inline bool empty()const { return _timetable.empty(); }
 
@@ -494,6 +501,12 @@ public:
      * 返回是否有实际变更
      */
     bool removeDetected();
+
+    /**
+     * 转发给所有的TrainLine。
+     * 返回是否变更。
+     */
+    bool autoBusiness();
 
 
     //static比较函数 用来排序

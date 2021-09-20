@@ -305,6 +305,7 @@ signals:
     void showNewStatus(QString);
     void trainSelected(std::shared_ptr<Train> train);
     void pageFocussedIn(std::shared_ptr<DiagramPage> page);
+    void railFocussedIn(std::shared_ptr<Railway> railway);
 
 private slots:
     void updateTimeAxis();

@@ -30,6 +30,8 @@
 #include "editors/basictrainwidget.h"
 #include "wizards/timeinterp/timeinterpwizard.h"
 #include "data/train/traintype.h"
+#include "dialogs/locatedialog.h"
+#include "dialogs/correcttimetabledialog.h"
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
 	MainWindow* mw_) :
@@ -244,6 +246,13 @@ void TrainContext::initUI()
 		connect(act, SIGNAL(triggered()), this, SLOT(actAdjustTimetable()));
 		panel->addMediumAction(act);
 		mw->diaActions.timeAdjust = act;
+
+		act = new QAction(QIcon(":/icons/settings.png"), tr("时刻修正"), this);
+		act->setToolTip(tr("时刻修正\n修正本次列车时刻表中的一些常见类型错误，"
+			"例如到发时刻排反、顺序错排等。"));
+		connect(act, &QAction::triggered, this, &TrainContext::actCorrection);
+		btn = panel->addLargeAction(act);
+		btn->setMinimumWidth(70);
 
 		panel = page->addPannel(tr(""));
 
@@ -478,6 +487,45 @@ void TrainContext::actRemoveInterpolation()
 		mw->getUndoStack()->push(new qecmd::RemoveInterpolation(modified, data, this));
 	}
 	
+}
+
+void TrainContext::locateToBoundStation(const QVector<TrainStationBounding>& boudings, 
+	const QTime& time)
+{
+	if (!dlgLocate) {
+		dlgLocate = new LocateBoundingDialog(diagram, mw);
+		connect(dlgLocate, &LocateBoundingDialog::locateOnStation,
+			mw, &MainWindow::locateDiagramOnStation);
+	}
+	dlgLocate->showForStation(boudings, time);
+}
+
+void TrainContext::actAutoBusiness()
+{
+	QVector<std::shared_ptr<Train>> modified, data;
+	foreach(auto train, diagram.trains()) {
+		auto t = std::make_shared<Train>(*train);
+		diagram.updateTrain(t);
+		bool flag = t->autoBusiness();
+		if (flag) {
+			modified.push_back(train);
+			data.push_back(t);
+		}
+	}
+	if (modified.empty()) {
+		QMessageBox::information(mw, tr("提示"), tr("应用完成，没有更改被执行"));
+	}
+	else {
+		int sz = modified.size();
+		mw->getUndoStack()->push(new qecmd::AutoBusiness(std::move(modified), std::move(data),
+			this));
+		QMessageBox::information(mw, tr("提示"), tr("应用完成，共%1个车次受到影响。").arg(sz));
+	}
+}
+
+void TrainContext::commitAutoBusiness()
+{
+	refreshCurrentTrainWidgets();
 }
 
 void TrainContext::actShowTrainLine()
@@ -717,6 +765,14 @@ void TrainContext::refreshCurrentTrainWidgets()
 	mw->timetableQuickWidget->refreshData();
 }
 
+void TrainContext::actCorrection()
+{
+	if (!train)return;
+	auto* dlg = new CorrectTimetableDialog(train, mw);
+	// todo: connect
+	dlg->show();
+}
+
 void TrainContext::setTrain(std::shared_ptr<Train> train_)
 {
 	train = train_;
@@ -816,4 +872,25 @@ void qecmd::RemoveInterpolation::undo()
 void qecmd::RemoveInterpolation::redo()
 {
 	cont->commitInterpolation(trains, data);
+}
+
+void qecmd::AutoBusiness::undo()
+{
+	commit();
+	cont->commitAutoBusiness();
+}
+
+void qecmd::AutoBusiness::redo()
+{
+	commit();
+	cont->commitAutoBusiness();
+}
+
+void qecmd::AutoBusiness::commit()
+{
+	for (int i = 0; i < trains.size(); i++) {
+		auto train = trains.at(i);
+		auto d = data.at(i);
+		train->swapTimetableWithAdapters(*d);
+	}
 }

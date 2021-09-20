@@ -9,7 +9,7 @@ class PageComboForRail : public QComboBox
 {
     Q_OBJECT
     Diagram& diagram;
-    std::shared_ptr<Railway> _railway{};
+    std::shared_ptr<const Railway> _railway{};
     std::shared_ptr<DiagramPage> _page{};
 public:
     PageComboForRail(Diagram& diagram_, QWidget* parent=nullptr);
@@ -37,7 +37,7 @@ private:
 signals:
     void pageIndexChanged(int i);
 public slots:
-    void setRailway(const std::shared_ptr<Railway>& railway);
+    void setRailway(const std::shared_ptr<const Railway>& railway);
 private slots:
     void onIndexChanged(int i);
 };

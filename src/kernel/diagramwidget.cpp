@@ -403,10 +403,6 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
             selectTrain(item);
         }
     }
-    else if (e->button() == Qt::RightButton) {
-        //todo: context menu
-    }
-    
 }
 
 void DiagramWidget::mouseMoveEvent(QMouseEvent* e)
@@ -1070,6 +1066,7 @@ void DiagramWidget::selectTrain(TrainItem* item)
     if (!item)
         return;
 
+    emit railFocussedIn(item->trainLine()->railway());
     _selectedTrain = item->train();
     _page->highlightTrainItems(*_selectedTrain);
 
