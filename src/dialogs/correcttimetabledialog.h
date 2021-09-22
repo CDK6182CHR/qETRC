@@ -6,6 +6,7 @@
 class TrainCollection;
 class QTableView;
 class Train;
+class QBitArray;
 class CorrectTimetableModel: public QEMoveableModel
 {
     Q_OBJECT
@@ -17,12 +18,21 @@ public:
         ColDepart,
         ColStopDuration,
         ColIntervalDuration,
+        ColBusiness,
+        ColTrack,
         ColNote,
         ColMAX
     };
     CorrectTimetableModel(std::shared_ptr<Train> train, QObject* parent=nullptr);
     void refreshData();
     //void setTrain(std::shared_ptr<Train> train);
+
+    /**
+     * @brief appliedTrain
+     * 将当前表格数据整理成Train对象返回
+     */
+    std::shared_ptr<Train> appliedTrain();
+
 public slots:
 
     /**
@@ -56,9 +66,21 @@ private:
 
     QTime rowArrive(int row)const;
     QTime rowDepart(int row)const;
+
+    void calculateSelectedRows(const QBitArray& rows);
+    void calculateAllRows();
+
+    int firstSelectedRow();
+    int lastSelectedRow();
+
+private slots:
+    void onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight,
+        const QVector<int>& roles);
+
 };
 
 class SelectTrainCombo;
+class QCheckBox;
 
 /**
  * @brief The CorrectTimetableDialog class
@@ -72,14 +94,19 @@ class CorrectTimetableDialog : public QDialog
     SelectTrainCombo* cbTrain;
     CorrectTimetableModel* const model;
     QTableView* table;
+    QCheckBox* ckEdit;
+    bool informEdit = true;
 public:
     CorrectTimetableDialog(
          std::shared_ptr<Train> train, QWidget* parent=nullptr);
 private:
     void initUI();
+signals:
+    void correctionApplied(std::shared_ptr<Train> train, std::shared_ptr<Train> table);
 private slots:
     //void setTrain(std::shared_ptr<Train> train);
     void refreshData();
     void batchSelect();
     void actApply();
+    void onEditToggled(bool on);
 };

@@ -2,6 +2,7 @@
 
 #include <QLabel>
 #include <QTableView>
+#include <QHeaderView>
 
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"
@@ -9,6 +10,7 @@
 #include "data/train/routing.h"
 #include "data/train/train.h"
 #include "data/train/traintype.h"
+#include "data/common/qesystem.h"
 
 StationTimetableSettledModel::StationTimetableSettledModel(
         Diagram& dia,
@@ -95,6 +97,7 @@ void StationTimetableSettledDialog::initUI()
         &StationTimetableSettledDialog::onHidePassChanged);
     vlay->addWidget(ckHidePass);
     table=new QTableView;
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->setModel(model);
     table->resizeColumnsToContents();
     vlay->addWidget(table);

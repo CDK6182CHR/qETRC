@@ -4,11 +4,15 @@
 #include "util/utilfunc.h"
 #include "util/buttongroup.hpp"
 #include "data/common/qesystem.h"
+#include "model/delegate/qetimedelegate.h"
 
 #include <QLabel>
 #include <QTableView>
 #include <QHeaderView>
 #include <QFormLayout>
+#include <QBitArray>
+#include <QCheckBox>
+#include <QMessageBox>
 
 #include <util/selecttraincombo.h>
 
@@ -17,14 +21,30 @@ CorrectTimetableModel::CorrectTimetableModel(std::shared_ptr<Train> train, QObje
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({
-        tr("站名"),tr("到点"),tr("开点"),tr("停时"),tr("区间"),tr("备注")
+        tr("站名"),tr("到点"),tr("开点"),tr("停时"),tr("区间"),tr("营业"),tr("股道"),
+                                  tr("备注")
         });
     setupModel();
+    connect(this, &QEMoveableModel::dataChanged,
+        this, &CorrectTimetableModel::onDataChanged);
 }
 
 void CorrectTimetableModel::refreshData()
 {
     setupModel();
+}
+
+std::shared_ptr<Train> CorrectTimetableModel::appliedTrain()
+{
+    auto res=std::make_shared<Train>(train->trainName());
+    for(int i=0;i<rowCount();i++){
+        res->appendStation(item(i,ColName)->text(),
+                           rowArrive(i),rowDepart(i),
+                           item(i,ColBusiness)->checkState()==Qt::Checked,
+                           item(i,ColTrack)->text(),
+                           item(i,ColNote)->text());
+    }
+    return res;
 }
 
 void CorrectTimetableModel::doExchange()
@@ -50,42 +70,90 @@ void CorrectTimetableModel::doExchange()
 
 void CorrectTimetableModel::doReverse()
 {
-    // todo ..
+    int first = firstSelectedRow(), last = lastSelectedRow();
+    if (first == -1)return;
+    int front = first, back = last;
+    while (front < back) {
+        exchangeRow(front++, back--);
+    }
+    for (int row = first; row <= last + 1 && row < rowCount(); row++) {
+        calculateDurations(row);
+    }
 }
 
 void CorrectTimetableModel::doMoveUp()
 {
-    // todo ..
+    QBitArray ar = QBitArray(rowCount());
+    for (int i = 1; i < rowCount(); i++) {
+        // 第一行不用管..
+        if (item(i, ColName)->checkState() == Qt::Checked) {
+            moveUp(i);
+            ar.setBit(i); ar.setBit(i - 1); ar.setBit(i + 1);
+        }
+    }
+    calculateSelectedRows(ar);
 }
 
 void CorrectTimetableModel::doMoveDown()
 {
-    // todo ..
+    QBitArray ar(rowCount() + 1);
+    for (int i = rowCount() - 2; i >= 0; --i) {
+        if (item(i, ColName)->checkState() == Qt::Checked) {
+            moveDown(i);
+            ar.setBit(i); ar.setBit(i + 1); ar.setBit(i + 2);
+        }
+    }
+    calculateSelectedRows(ar);
 }
 
 void CorrectTimetableModel::doToTop()
 {
-    // todo ..
+    int r = 0;
+    for (int i = 0; i < rowCount(); i++) {
+        if (item(i, ColName)->checkState() == Qt::Checked) {
+            moveRow({}, i, {}, r++);
+        }
+    }
+    calculateAllRows();
 }
 
 void CorrectTimetableModel::doToBottom()
 {
-    // todo ..
+    int r = rowCount();
+    // 倒着遍历
+    for (int i = rowCount() - 1; i >= 0; i--) {
+        if (item(i, ColName)->checkState() == Qt::Checked) {
+            moveRow({}, i, {}, r--);
+        }
+    }
+    calculateAllRows();
 }
 
 void CorrectTimetableModel::selectAll()
 {
-    // todo ..
+    for (int i = 0; i < rowCount(); i++) {
+        item(i, ColName)->setCheckState(Qt::Checked);
+    }
 }
 
 void CorrectTimetableModel::deselectAll()
 {
-    // todo ..
+    for (int i = 0; i < rowCount(); i++) {
+        item(i, ColName)->setCheckState(Qt::Unchecked);
+    }
 }
 
 void CorrectTimetableModel::selectInverse()
 {
-    // todo ..
+    for (int i = 0; i < rowCount(); i++) {
+        auto* it = item(i, ColName);
+        if (it->checkState() == Qt::Checked) {
+            it->setCheckState(Qt::Unchecked);
+        }
+        else {
+            it->setCheckState(Qt::Checked);
+        }
+    }
 }
 
 //void CorrectTimetableModel::setTrain(std::shared_ptr<Train> train)
@@ -118,6 +186,10 @@ void CorrectTimetableModel::setupModel()
         it->setData(p->depart, Qt::EditRole);
         setItem(row, ColDepart, it);
 
+        it=makeCheckItem();
+        it->setCheckState(qeutil::boolToCheckState(p->business));
+        setItem(row,ColBusiness,it);
+        setItem(row,ColTrack,new SI(p->track));
         setItem(row, ColNote, new SI(p->note));
 
         calculateDurations(row);
@@ -132,7 +204,7 @@ void CorrectTimetableModel::calculateDurations(int row)
 
     // 停时
     int secs = qeutil::secsTo(arr, dep);
-    auto* it = new SI(qeutil::secsToString(secs));
+    auto* it = new SI(qeutil::secsToStringWithEmpty(secs));
     if (secs > 12 * 3600) {
         it->setBackground(QColor(255, 0, 0, 150));
     }
@@ -147,6 +219,9 @@ void CorrectTimetableModel::calculateDurations(int row)
         }
         setItem(row, ColIntervalDuration, it);
     }
+    else {
+        setItem(row, ColIntervalDuration, new SI);
+    }
 }
 
 QTime CorrectTimetableModel::rowArrive(int row) const
@@ -157,6 +232,56 @@ QTime CorrectTimetableModel::rowArrive(int row) const
 QTime CorrectTimetableModel::rowDepart(int row) const
 {
     return item(row, ColDepart)->data(Qt::EditRole).toTime();
+}
+
+void CorrectTimetableModel::calculateSelectedRows(const QBitArray &rows)
+{
+    for (int i = 0; i < rowCount(); i++) {
+        if (rows.testBit(i)) {
+            calculateDurations(i);
+        }
+    }
+}
+
+void CorrectTimetableModel::calculateAllRows()
+{
+    for (int i = 0; i < rowCount(); i++) {
+        calculateDurations(i);
+    }
+}
+
+int CorrectTimetableModel::firstSelectedRow()
+{
+    for (int i = 0; i < rowCount(); i++) {
+        if (item(i, ColName)->checkState() == Qt::Checked) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int CorrectTimetableModel::lastSelectedRow()
+{
+    for (int i = rowCount() - 1; i >= 0; i--) {
+        if (item(i, ColName)->checkState() == Qt::Checked) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void CorrectTimetableModel::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
+{
+    if (!roles.contains(Qt::EditRole))
+        return;
+    if (updating)
+        return;
+    if (std::max(topLeft.column(), (int)ColArrive) <=
+        std::min(bottomRight.column(), (int)ColDepart)) {
+        for (int r = topLeft.row(); r <= bottomRight.row(); r++) {
+            calculateDurations(r);
+        }
+    }
 }
 
 CorrectTimetableDialog::CorrectTimetableDialog(
@@ -172,10 +297,20 @@ CorrectTimetableDialog::CorrectTimetableDialog(
 void CorrectTimetableDialog::initUI()
 {
     auto* vlay=new QVBoxLayout(this);
-    auto* lab=new QLabel(tr(""));
+    auto* lab=new QLabel(tr("本功能提供时刻表排序中常见问题的手动更正功能。"
+        "请先选择要操作的行，然后选择相应的操作。\n"
+        "说明：上移（下移）功能将所有选中的行从当前位置向上（向下）移动一行；"
+        "置顶、置底功能保持当前选中的行的顺序不变，而将它们移动到时刻表最前或者最后；"
+        "反排功能将当前选中的第一行和最后一行之间的所有行顺序反排。"));
 
     lab->setWordWrap(true);
     vlay->addWidget(lab);
+
+    auto* flay=new QFormLayout;
+    ckEdit=new QCheckBox(tr("启用全部编辑"));
+    connect(ckEdit,&QCheckBox::toggled,this,&CorrectTimetableDialog::onEditToggled);
+    flay->addRow(tr("选项"),ckEdit);
+    vlay->addLayout(flay);
 
     auto* g4=new ButtonGroup<4>({"上移","下移","置顶","置底"});
     vlay->addLayout(g4);
@@ -195,10 +330,14 @@ void CorrectTimetableDialog::initUI()
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->setModel(model);
     table->setEditTriggers(QTableView::NoEditTriggers);
+    table->setSelectionMode(QTableView::ContiguousSelection);
     vlay->addWidget(table);
+    auto* dele = new QETimeDelegate(this);
+    table->setItemDelegateForColumn(CorrectTimetableModel::ColArrive, dele);
+    table->setItemDelegateForColumn(CorrectTimetableModel::ColDepart, dele);
 
     int c = 0;
-    for (int i : {100, 100, 100, 80, 80, 80}) {
+    for (int i : {120, 80, 80, 80, 80, 30, 80, 80}) {
         table->setColumnWidth(c++, i);
     }
 
@@ -210,7 +349,24 @@ void CorrectTimetableDialog::initUI()
 
 void CorrectTimetableDialog::actApply()
 {
-    //todo
+    auto res = model->appliedTrain();
+    emit correctionApplied(train, res);
+}
+
+void CorrectTimetableDialog::onEditToggled(bool on)
+{
+    if (on){
+        if(informEdit){
+            QMessageBox::information(this,tr("提示"),tr("本功能主要设计为"
+            "通过下面的按钮对时刻表进行重排，以修复时刻表中常见的错误类型。"
+            "但方便起见，仍然提供对时刻表既有车站全部元素进行编辑的功能。"
+            "请注意防止误触。\n此消息在本功能每次运行期间，提示一次。"));
+            informEdit=false;
+        }
+        table->setEditTriggers(QTableView::AllEditTriggers);
+    }else{
+        table->setEditTriggers(QTableView::NoEditTriggers);
+    }
 }
 
 void CorrectTimetableDialog::refreshData()
@@ -220,9 +376,14 @@ void CorrectTimetableDialog::refreshData()
 
 void CorrectTimetableDialog::batchSelect()
 {
-    const auto& sel=table->selectionModel()->selectedRows();
-    foreach(const auto& idx, sel){
-        auto* it=model->item(idx.row(),CorrectTimetableModel::ColName);
+    const auto& sel = table->selectionModel()->selectedIndexes();
+    // 转换成行的信息
+    QSet<int> rows;
+    foreach(const auto & idx, sel) {
+        rows.insert(idx.row());
+    }
+    foreach(int row,rows){
+        auto* it=model->item(row,CorrectTimetableModel::ColName);
         if (it->checkState() == Qt::Checked){
             it->setCheckState(Qt::Unchecked);
         }else{

@@ -633,11 +633,12 @@ void MainWindow::initToolbar()
         act = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation),
             tr("关于"), this);
         connect(act, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
-        panel->addLargeAction(act);
+        btn->setPopupMode(QToolButton::InstantPopup);
         menu = new SARibbonMenu(this);
         menu->addAction(QApplication::style()->standardIcon(QStyle::SP_TitleBarMenuButton),
             tr("关于Qt"), QApplication::aboutQt);
         act->setMenu(menu);
+        btn = panel->addLargeAction(act);
 
         act = new QAction(QApplication::style()->standardIcon(QStyle::SP_BrowserStop),
             tr("退出"), this);

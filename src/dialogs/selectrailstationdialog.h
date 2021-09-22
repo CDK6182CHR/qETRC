@@ -21,8 +21,10 @@ class SelectRailStationDialog : public QDialog
     RailStationModel* const model;
     QTableView* table;
     std::shared_ptr<RailStation> _station;
+    bool _allowNonPaint;
 public:
-    SelectRailStationDialog(std::shared_ptr<Railway> rail,QWidget* parent=nullptr);
+    SelectRailStationDialog(std::shared_ptr<Railway> rail, QWidget* parent = nullptr,
+        bool allowNonPaint = false);
     static std::shared_ptr<RailStation> getStation(std::shared_ptr<Railway> rail,
         QWidget* parent);
     auto station() { return _station; }

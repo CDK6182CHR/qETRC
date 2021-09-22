@@ -40,7 +40,14 @@ bool QEMoveableModel::insertRows(int row, int count, const QModelIndex& parent)
 void QEMoveableModel::moveUp(int row)
 {
 	if (row > 0 && row < rowCount()) {
-		moveRow(QModelIndex(), row, QModelIndex(), row - 1);
+        updating=true;
+		for (int c = 0; c < columnCount(); c++) {
+			auto* it1 = takeItem(row - 1, c);
+			auto* it2 = takeItem(row, c);
+			setItem(row - 1, c, it2);
+			setItem(row, c, it1);
+		}
+        updating=false;
 	}
 }
 
@@ -48,6 +55,18 @@ void QEMoveableModel::moveDown(int row)
 {
 	if (row >= 0 && row < rowCount()-1) {
 		moveUp(row + 1);
+	}
+}
+
+void QEMoveableModel::exchangeRow(int row1, int row2)
+{
+	if (row1 != row2) {
+		for (int c = 0; c < columnCount(); c++) {
+			auto* it1 = takeItem(row1, c);
+			auto* it2 = takeItem(row2, c);
+			setItem(row1, c, it2);
+			setItem(row2, c, it1);
+		}
 	}
 }
 

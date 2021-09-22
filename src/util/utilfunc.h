@@ -30,6 +30,12 @@ inline int secsTo(const QTime& tm1, const QTime& tm2) {
  */
 QString secsToString(int secs);
 
+/**
+ * 返回时间间隔的中文表示 xx分 或者 xx分xx秒
+ * 但数据为0时返回空
+ */
+QString secsToStringWithEmpty(int secs);
+
 QString secsToString(const QTime& tm1, const QTime& tm2);
 
 /**
@@ -73,6 +79,24 @@ bool timeInRange(const QTime& left, const QTime& right, const QTime& t);
  * seealso: TrainStation::stopRangeIntersected
  */
 bool timeRangeIntersected(const QTime& start1, const QTime& end1, const QTime& start2,
+	const QTime& end2);
+
+/**
+ * 两个时间范围是否存在交叉。Excl后缀表示不含边界
+ * seealso: TrainStation::stopRangeIntersected
+ */
+bool timeRangeIntersectedExcl(const QTime& start1, const QTime& end1, const QTime& start2,
+	const QTime& end2);
+
+/**
+ * 两个时间范围是否存在交叉。包含边界。不考虑周期边界条件：
+ * 即是保证start<=end。直接做简单的范围判断。
+ * seealso: TrainStation::stopRangeIntersected
+ */
+bool timeRangeIntersectedNoPBC(const QTime& start1, const QTime& end1, const QTime& start2,
+	const QTime& end2);
+
+bool timeRangeIntersectedNoPBCExcl(const QTime& start1, const QTime& end1, const QTime& start2,
 	const QTime& end2);
 
 inline Qt::CheckState boolToCheckState(bool d) {

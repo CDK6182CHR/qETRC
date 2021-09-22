@@ -13,8 +13,9 @@
 #include <model/rail/railstationmodel.h>
 
 SelectRailStationDialog::SelectRailStationDialog(std::shared_ptr<Railway> rail,
-                                                 QWidget *parent):
-    QDialog(parent), railway(rail), model(new RailStationModel(rail,true,this))
+                                                 QWidget *parent, bool allowNonPaint):
+    QDialog(parent), railway(rail), model(new RailStationModel(rail,true,this)),
+    _allowNonPaint(allowNonPaint)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     resize(500,600);
@@ -72,6 +73,11 @@ void SelectRailStationDialog::actApply()
         return;
     }
     _station = railway->stations().at(idx.row());
+    if (!_allowNonPaint && _station->direction == PassedDirection::NoVia) {
+        QMessageBox::warning(this, tr("错误"), tr("此处不允许选择单向站类型为[不通过]的站。"
+            "请重新选择。"));
+        return;
+    }
     emit stationSelected(_station);
     done(QDialog::Accepted);
 }

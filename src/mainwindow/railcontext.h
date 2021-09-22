@@ -144,6 +144,11 @@ private slots:
 
     void actTrainGapSummary();
 
+    void actShowTrack();
+
+    void actSaveTrackOrder(std::shared_ptr<Railway> railway, std::shared_ptr<RailStation> station,
+        const QList<QString>& order);
+
 
 public slots:
 
@@ -336,6 +341,18 @@ namespace qecmd {
     public :
         UpdateRailNote(std::shared_ptr<Railway> railway, const RailInfoNote& data,
             QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
+    class SaveTrackOrder : public QUndoCommand
+    {
+        std::shared_ptr<Railway> railway;
+        std::shared_ptr<RailStation> station;
+        QList<QString> order;
+    public:
+        SaveTrackOrder(std::shared_ptr<Railway> railway, std::shared_ptr<RailStation> station,
+            const QList<QString>& order, QUndoCommand* parent = nullptr);
         void undo()override;
         void redo()override;
     };

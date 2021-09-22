@@ -231,8 +231,10 @@ public:
      * 所给站是否是始发站。seealso `hasStartAppend`
      */
     bool isStartingStation(ConstAdaPtr st)const;
+    bool isStartingStation(const AdapterStation* st)const;
 
     bool isTerminalStation(ConstAdaPtr st)const;
+    bool isTerminalStation(const AdapterStation* st)const;
 
     /**
      * 所给站站后区间是否包含起步附加，即所给站为始发站，或停车

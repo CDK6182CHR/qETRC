@@ -26,6 +26,7 @@
 #include "model/rail/rulermodel.h"
 #include "viewers/events/stationtraingapdialog.h"
 #include "viewers/events/traingapstatdialog.h"
+#include "viewers/events/railtrackwidget.h"
 
 RailContext::RailContext(Diagram& diagram_, SARibbonContextCategory* context, 
 	MainWindow* mw_, QObject* parent):
@@ -192,6 +193,13 @@ void RailContext::initUI()
 	act->setToolTip(tr("运行快照\n显示本线指定时刻所有列车的运行状态"
 		"（如果运行线与指定时刻存在交点）。"));
 	panel->addMediumAction(act);
+
+	act = new QAction(QIcon(":/icons/rail.png"), tr("股道分析"), this);
+	connect(act, &QAction::triggered, this, &RailContext::actShowTrack);
+	act->setToolTip(tr("股道分析\n根据手动给出的股道表，或本系统的内置算法，"
+		"绘出可能的股道分布情况。"));
+	btn=panel->addLargeAction(act);
+	btn->setMinimumWidth(70);
 
 	panel->addSeparator();
 	act = new QAction(QIcon(":/icons/h_expand.png"), tr("间隔分析"), this);
@@ -482,6 +490,23 @@ void RailContext::actTrainGapSummary()
 	connect(dlg, &TrainGapSummaryDialog::locateOnEvent,
 		mw, &MainWindow::locateDiagramOnStation);
 	dlg->show();
+}
+
+void RailContext::actShowTrack()
+{
+	if (!railway)return;
+	auto st = SelectRailStationDialog::getStation(railway, mw);
+	if (!st)return;
+
+	auto* dlg = new RailTrackWidget(diagram, railway, st, mw);
+	connect(dlg, &RailTrackWidget::actSaveTrackOrder,
+		this, &RailContext::actSaveTrackOrder);
+	dlg->show();
+}
+
+void RailContext::actSaveTrackOrder(std::shared_ptr<Railway> railway, std::shared_ptr<RailStation> station, const QList<QString>& order)
+{
+	mw->getUndoStack()->push(new qecmd::SaveTrackOrder(railway, station, order));
 }
 
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
@@ -855,4 +880,21 @@ void qecmd::UpdateRailNote::undo()
 void qecmd::UpdateRailNote::redo()
 {
 	std::swap(railway->notes(), data);
+}
+
+qecmd::SaveTrackOrder::SaveTrackOrder(std::shared_ptr<Railway> railway, 
+	std::shared_ptr<RailStation> station, const QList<QString>& order, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("保存股道表: %1 @ %2").arg(railway->name(),
+		station->name.toSingleLiteral()),parent),
+	railway(railway),station(station),order(order)
+{
+}
+
+void qecmd::SaveTrackOrder::undo()
+{
+	std::swap(station->tracks, order);
+}
+void qecmd::SaveTrackOrder::redo()
+{
+	std::swap(station->tracks, order);
 }

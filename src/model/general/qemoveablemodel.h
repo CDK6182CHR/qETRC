@@ -27,8 +27,14 @@ public:
 	virtual bool insertRows(int row, int count,
 		const QModelIndex& parent = QModelIndex()) override;
 
+	/**
+	 * 2021.09.21重写：不再调用moveRows；
+	 * 直接写和上一行交换item。
+	 */
 	void moveUp(int row);
 	void moveDown(int row);
+
+	void exchangeRow(int row1, int row2);
 
 protected:
 	/**

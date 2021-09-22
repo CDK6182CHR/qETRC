@@ -769,7 +769,8 @@ void TrainContext::actCorrection()
 {
 	if (!train)return;
 	auto* dlg = new CorrectTimetableDialog(train, mw);
-	// todo: connect
+	connect(dlg, &CorrectTimetableDialog::correctionApplied,
+		this, &TrainContext::onTrainTimetableChanged);
 	dlg->show();
 }
 

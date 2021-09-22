@@ -1217,10 +1217,20 @@ bool TrainLine::isStartingStation(ConstAdaPtr st) const
     return startAtThis() && st == _stations.begin();
 }
 
+bool TrainLine::isStartingStation(const AdapterStation* st) const
+{
+    return startAtThis() && st == &*_stations.begin();
+}
+
 bool TrainLine::isTerminalStation(ConstAdaPtr st) const
 {
     ConstAdaPtr last = _stations.end(); --last;
     return endAtThis() && st == last;
+}
+
+bool TrainLine::isTerminalStation(const AdapterStation* st) const
+{
+    return endAtThis() && st == &(_stations.back());
 }
 
 bool TrainLine::hasStartAppend(ConstAdaPtr st) const
@@ -1334,7 +1344,8 @@ std::deque<AdapterStation>::const_iterator TrainLine::stationFromYValue(double y
 
 const AdapterStation* TrainLine::stationFromRail(std::shared_ptr<RailStation> rail) const
 {
-    auto p = std::lower_bound(_stations.begin(), _stations.end(), rail->y_value.value());
+    // 2021.09.22：不能直接lower_bound，要考虑上下行
+    auto p = stationFromYValue(rail->y_value.value());
     if (p!=_stations.end()&& p->railStation.lock() == rail) {
         return &(*p);
     }

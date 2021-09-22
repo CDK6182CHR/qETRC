@@ -30,10 +30,12 @@ SOURCES += \
     src/data/rail/railinfonote.cpp \
     src/data/rail/railinterval.cpp \
     src/data/rail/railstation.cpp \
+    src/data/rail/railtrack.cpp \
     src/data/rail/railway.cpp \
     src/data/rail/ruler.cpp \
     src/data/rail/rulernode.cpp \
     src/data/common/stationname.cpp \
+    src/data/rail/trackdiagramdata.cpp \
     src/data/train/routing.cpp \
     src/data/train/train.cpp \
     src/data/train/traincollection.cpp \
@@ -71,6 +73,7 @@ SOURCES += \
     src/editors/typeconfigdialog.cpp \
     src/editors/typeregexdialog.cpp \
     src/kernel/routingdiagram.cpp \
+    src/kernel/trackdiagram.cpp \
     src/mainwindow/routingcontext.cpp \
     src/model/delegate/generaldoublespindelegate.cpp \
     src/model/delegate/generalspindelegate.cpp \
@@ -100,6 +103,7 @@ SOURCES += \
     src/viewers/events/railsectionevents.cpp \
     src/viewers/events/railsnapevents.cpp \
     src/viewers/events/railstationeventlist.cpp \
+    src/viewers/events/railtrackwidget.cpp \
     src/viewers/events/stationtraingapdialog.cpp \
     src/viewers/events/traingapstatdialog.cpp \
     src/viewers/rulerrefdialog.cpp \
@@ -172,9 +176,11 @@ HEADERS += \
     src/data/rail/railintervaldata.hpp \
     src/data/rail/railintervalnode.hpp \
     src/data/rail/railstation.h \
+    src/data/rail/railtrack.h \
     src/data/rail/railway.h \
     src/data/rail/ruler.h \
     src/data/rail/rulernode.h \
+    src/data/rail/trackdiagramdata.h \
     src/data/train/routing.h \
     src/data/train/train.h \
     src/data/train/traincollection.h \
@@ -212,6 +218,7 @@ HEADERS += \
     src/editors/typeconfigdialog.h \
     src/editors/typeregexdialog.h \
     src/kernel/routingdiagram.h \
+    src/kernel/trackdiagram.h \
     src/mainwindow/routingcontext.h \
     src/model/delegate/generaldoublespindelegate.h \
     src/model/delegate/generalspindelegate.h \
@@ -241,6 +248,7 @@ HEADERS += \
     src/viewers/events/railsectionevents.h \
     src/viewers/events/railsnapevents.h \
     src/viewers/events/railstationeventlist.h \
+    src/viewers/events/railtrackwidget.h \
     src/viewers/events/stationtraingapdialog.h \
     src/viewers/events/traingapstatdialog.h \
     src/viewers/rulerrefdialog.h \

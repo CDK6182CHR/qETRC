@@ -199,6 +199,8 @@
     <ClCompile Include="src\data\diagram\traingap.cpp" />
     <ClCompile Include="src\data\rail\railcategory.cpp" />
     <ClCompile Include="src\data\rail\railinfonote.cpp" />
+    <ClCompile Include="src\data\rail\railtrack.cpp" />
+    <ClCompile Include="src\data\rail\trackdiagramdata.cpp" />
     <ClCompile Include="src\data\train\trainfiltercore.cpp" />
     <ClCompile Include="src\data\train\typemanager.cpp" />
     <ClCompile Include="src\dialogs\batchcopytraindialog.cpp" />
@@ -230,6 +232,7 @@
     <ClCompile Include="src\editors\typeconfigdialog.cpp" />
     <ClCompile Include="src\editors\typeregexdialog.cpp" />
     <ClCompile Include="src\kernel\routingdiagram.cpp" />
+    <ClCompile Include="src\kernel\trackdiagram.cpp" />
     <ClCompile Include="src\mainwindow\routingcontext.cpp" />
     <ClCompile Include="src\model\delegate\generaldoublespindelegate.cpp" />
     <ClCompile Include="src\model\delegate\generalspindelegate.cpp" />
@@ -259,6 +262,7 @@
     <ClCompile Include="src\viewers\events\railsectionevents.cpp" />
     <ClCompile Include="src\viewers\events\railsnapevents.cpp" />
     <ClCompile Include="src\viewers\events\railstationeventlist.cpp" />
+    <ClCompile Include="src\viewers\events\railtrackwidget.cpp" />
     <ClCompile Include="src\viewers\events\stationtraingapdialog.cpp" />
     <ClCompile Include="src\viewers\events\traingapstatdialog.cpp" />
     <ClCompile Include="src\viewers\rulerrefdialog.cpp" />
@@ -332,14 +336,18 @@
   <ItemGroup>
     <ClInclude Include="src\data\diagram\stationbinding.h" />
     <ClInclude Include="src\data\rail\railinfonote.h" />
+    <ClInclude Include="src\data\rail\railtrack.h" />
+    <ClInclude Include="src\data\rail\trackdiagramdata.h" />
     <ClInclude Include="src\data\train\typemanager.h" />
     <QtMoc Include="src\dialogs\correcttimetabledialog.h" />
+    <QtMoc Include="src\kernel\trackdiagram.h" />
     <ClInclude Include="src\railnet\raildb\raildb.h" />
     <QtMoc Include="src\railnet\raildb\raildbcontext.h" />
     <ClInclude Include="src\railnet\raildb\raildbitems.h" />
     <QtMoc Include="src\railnet\raildb\raildbmodel.h" />
     <QtMoc Include="src\railnet\raildb\raildbnavi.h" />
     <QtMoc Include="src\railnet\raildb\raildbwindow.h" />
+    <QtMoc Include="src\viewers\events\railtrackwidget.h" />
     <ClInclude Include="src\wizards\timeinterp\timeinterppagepreview.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterpwizard.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterppagetrain.h" />
