@@ -241,6 +241,7 @@
     <ClCompile Include="src\model\delegate\timeintervaldelegate.cpp" />
     <ClCompile Include="src\model\rail\forbidmodel.cpp" />
     <ClCompile Include="src\model\rail\intervaldatamodel.cpp" />
+    <ClCompile Include="src\model\rail\railtrackadjustmodel.cpp" />
     <ClCompile Include="src\model\train\routingcollectionmodel.cpp" />
     <ClCompile Include="src\model\train\routingeditmodel.cpp" />
     <ClCompile Include="src\model\train\routinglistmodel.cpp" />
@@ -341,6 +342,7 @@
     <ClInclude Include="src\data\train\typemanager.h" />
     <QtMoc Include="src\dialogs\correcttimetabledialog.h" />
     <QtMoc Include="src\kernel\trackdiagram.h" />
+    <QtMoc Include="src\model\rail\railtrackadjustmodel.h" />
     <ClInclude Include="src\railnet\raildb\raildb.h" />
     <QtMoc Include="src\railnet\raildb\raildbcontext.h" />
     <ClInclude Include="src\railnet\raildb\raildbitems.h" />

@@ -6,14 +6,17 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QMessageBox>
 #include <kernel/trackdiagram.h>
 #include "data/rail/railstation.h"
 #include "data/diagram/diagram.h"
-
+#include "data/train/trainstation.h"
 #include <util/qecontrolledtable.h>
 
 #include <model/general/qemoveablemodel.h>
 #include "data/common/qesystem.h"
+
+#include <model/rail/railtrackadjustmodel.h>
 
 RailTrackSetupWidget::RailTrackSetupWidget(TrackDiagramData &data, QWidget *parent):
     QWidget(parent), _data(data)
@@ -47,8 +50,10 @@ void RailTrackSetupWidget::initUI()
     spOpps->setSuffix(tr(" 秒 (s)"));
     spOpps->setMaximumWidth(200);
     flay->addRow(tr("对向接车间隔"),spOpps);
+    auto* btn=new QPushButton(tr("调整"));
+    connect(btn,&QPushButton::clicked,this,&RailTrackSetupWidget::actAdjust);
+    flay->addRow(tr("股道次序表"),btn);
     vlay->addLayout(flay);
-    vlay->addWidget(new QLabel(tr("股道次序表")));
     ctable=new QEControlledTable();
     table=ctable->table();
     model=new QEMoveableModel(this);
@@ -88,7 +93,7 @@ void RailTrackSetupWidget::refreshData()
 
     int row=0;
     foreach(const auto& p, _data.getTrackOrder()){
-        model->setItem(row++,0,new QStandardItem(p));
+        model->setItem(row++,0,new QStandardItem(p->name()));
     }
 }
 
@@ -109,11 +114,11 @@ void RailTrackSetupWidget::actApply()
     _data.setSameSplitSecs(spSame->value());
     _data.setOppositeSplitSecs(spOpps->value());
 
-    auto& order=_data.getTrackOrderRef();
-    order.clear();
+    QStringList order;
     for(int i=0;i<model->rowCount();i++){
         order.push_back(model->item(i)->text());
     }
+    _data.setInitOrder(order);
     emit applied();
 }
 
@@ -139,6 +144,21 @@ void RailTrackSetupWidget::onModeChanged()
     }
 }
 
+void RailTrackSetupWidget::actAdjust()
+{
+    if(informOnAdjust){
+        QMessageBox::information(this,tr("提示"),tr("此功能提供股道名称和次序的调整，"
+        "调整过程中股道中的车次序列保持不变。自动、手动铺画模式下，皆可使用。\n"
+        "请注意所有调整立即生效且不能撤销，无论是否重新进行铺画。"
+        "请注意数据有效性。设置空白或冲突的股道名称可能导致未定义行为。"));
+        informOnAdjust=false;
+    }
+    auto* dlg=new TrackAdjustDialog(_data.getTrackOrderRef(),this);
+    connect(dlg,&TrackAdjustDialog::repaintDiagram,
+            this,&RailTrackSetupWidget::repaintDiagram);
+    dlg->open();   // modal ..
+}
+
 
 RailTrackWidget::RailTrackWidget(Diagram &diagram, std::shared_ptr<Railway> railway,
                  std::shared_ptr<RailStation> station, QWidget *parent):
@@ -148,7 +168,7 @@ RailTrackWidget::RailTrackWidget(Diagram &diagram, std::shared_ptr<Railway> rail
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(Qt::Dialog);
-    setWindowTitle(tr("车站股道分析 - %1 @ %2").arg(railway->name(),
+    setWindowTitle(tr("车站股道分析 - %2 @ %1").arg(railway->name(),
                                               station->name.toSingleLiteral()));
     resize(1200,600);
     initUI();
@@ -187,6 +207,14 @@ void RailTrackWidget::initUI()
     hlay->addStretch(20);
     vlay->addLayout(hlay);
 
+    hlay=new QHBoxLayout;
+    auto* btn=new QPushButton(tr("保存股道分析结果至时刻表"));
+    btn->setMaximumWidth(200);
+    connect(btn,&QPushButton::clicked,this,
+            &RailTrackWidget::actSaveTracks);
+    hlay->addWidget(btn);
+    vlay->addLayout(hlay);
+
     trackDiagram=new TrackDiagram(data);
     vlay->addWidget(trackDiagram);
     addWidget(w);
@@ -194,11 +222,15 @@ void RailTrackWidget::initUI()
     connect(slider,&QSlider::valueChanged, trackDiagram,
             &TrackDiagram::setXScale);
 
+    connect(setupWidget,&RailTrackSetupWidget::repaintDiagram,
+            trackDiagram,&TrackDiagram::repaintDiagram);
+
 }
 
 void RailTrackWidget::refreshData()
 {
     trackDiagram->refreshData();
+    setupWidget->refreshData();
 }
 
 void RailTrackWidget::onSaveOrder(const QList<QString> &order)
@@ -206,4 +238,90 @@ void RailTrackWidget::onSaveOrder(const QList<QString> &order)
     emit actSaveTrackOrder(railway,station,order);
 }
 
+void RailTrackWidget::actSaveTracks()
+{
+    auto flag=QMessageBox::question(this,tr("提醒"),tr("此操作将把当前车站的"
+    "股道分析结果保存到列车时刻表，并覆盖时刻表中原有股道信息。\n"
+    "重要：请保证从进行本次股道分析起至现在，没有进行过影响本站车次时刻表的操作（例如，"
+    "修改通过本站列车的时刻表；删除通过本站的列车等），否则可能导致非预期的结果，"
+    "甚至程序崩溃！！\n"
+    "是否确认？"));
+    if(flag!=QMessageBox::Yes)
+        return;
+    QVector<TrainStation*> stations;
+    QVector<QString> trackNames;
+    foreach(const auto& track, data.getTrackOrder()){
+        for(auto p=track->begin();p!=track->end();++p){
+            if (! p->fromLeft){  // 此条件用来保证不重复
+                // 第一个应该总是有值
+                if (p->item->trainStation1.value()->track != track->name()){
+                    stations.push_back(p->item->trainStation1.value());
+                    trackNames.push_back(track->name());
+                }
+                if(p->item->trainStation2.has_value() &&
+                        p->item->trainStation2.value()->track != track->name()){
+                    stations.push_back(p->item->trainStation2.value());
+                    trackNames.push_back(track->name());
+                }
+            }
+        }
+    }
+    if(!stations.empty()){
+        emit saveTrackToTimetable(stations, trackNames);
+        QMessageBox::information(this,tr("提示"),tr("成功保存%1条数据至列车时刻表。"
+            "如有问题，此操作可以撤销。").arg(stations.size()));
+    }else{
+        QMessageBox::information(this,tr("提示"),tr("未做任何更改。"));
+    }
+}
 
+
+
+TrackAdjustDialog::TrackAdjustDialog(QVector<std::shared_ptr<Track> > &order,
+                                     QWidget *parent):
+    QDialog(parent), order(order), model(new RailTrackAdjustModel(order,this))
+{
+    setWindowTitle(tr("股道名称调整"));
+    resize(400,500);
+    setAttribute(Qt::WA_DeleteOnClose);
+    initUI();
+}
+
+void TrackAdjustDialog::initUI()
+{
+    auto* vlay=new QVBoxLayout(this);
+    auto* lab=new QLabel(tr("本功能支持调整股道名称和次序；股道内的车次铺排不变。"
+        "请在下表中进行上移、下移或重命名（双击）操作。\n"
+        "请注意操作立即生效且不可撤销（即使没有重新铺画）；请勿将股道重命名为空白或冲突名称，"
+        "否则将引发未定义行为。"));
+    lab->setWordWrap(true);
+    vlay->addWidget(lab);
+
+    table=new QTableView;
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->setModel(model);
+    table->setEditTriggers(QTableView::DoubleClicked);
+    vlay->addWidget(table);
+
+    auto* g=new ButtonGroup<2>({"上移","下移"});
+    vlay->addLayout(g);
+    g->connectAll(SIGNAL(clicked()),this,{SLOT(moveUp()),SLOT(moveDown())});
+
+    g=new ButtonGroup<2>({"铺画","关闭"});
+    vlay->addLayout(g);
+    g->connectAll(SIGNAL(clicked()),this,{SIGNAL(repaintDiagram()),SLOT(close())});
+}
+
+void TrackAdjustDialog::moveUp()
+{
+    const auto& idx=table->currentIndex();
+    if(idx.isValid())
+        model->moveUp(idx.row());
+}
+
+void TrackAdjustDialog::moveDown()
+{
+    const auto& idx=table->currentIndex();
+    if(idx.isValid())
+        model->moveDown(idx.row());
+}

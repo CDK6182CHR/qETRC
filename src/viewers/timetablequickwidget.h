@@ -54,6 +54,7 @@ private slots:
     void onTableContext(const QPoint& pos);
 public slots:
     void setTrain(std::shared_ptr<Train> train);
+    void resetTrain();
     void refreshData();
     
 };

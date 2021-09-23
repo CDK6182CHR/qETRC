@@ -25,6 +25,7 @@ public:
     TrackDiagram(TrackDiagramData& data, QWidget* parent=nullptr);
     void refreshData();
     int xScale()const{return seconds_per_pix;}
+
 private:
     void paintDiagram();
     void _initXAxis(double width,double height,const QColor& gridColor);
@@ -34,6 +35,7 @@ private:
     double _calXValue(const QTime& tm)const;
 public slots:
     void setXScale(int value);
+    void repaintDiagram();
 };
 
 

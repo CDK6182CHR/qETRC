@@ -123,14 +123,19 @@ void TimetableQuickWidget::onTableContext(const QPoint& pos)
     meContext->popup(table->mapToGlobal(pos));
 }
 
+void TimetableQuickWidget::resetTrain()
+{
+    setTrain(nullptr);
+}
+
 void TimetableQuickWidget::refreshData()
 {
+    model->setTrain(train);
     if(!train)return;
     edName->setText(tr("%1 (%2->%3)").arg(train->trainName().full(),
                                           train->starting().toSingleLiteral(),
                                           train->terminal().toSingleLiteral()));
     edName->setCursorPosition(0);
-    model->setTrain(train);
     // 合并单元格
     for(int i=0;i<train->stationCount();i++){
         table->setSpan(2*i,0,2,1);

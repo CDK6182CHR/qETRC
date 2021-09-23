@@ -4,9 +4,11 @@
 
 TrackItem::TrackItem(const QString &title, const StationName &stationName,
           const QTime &beginTime, const QTime &endTime,
-          StayType type, std::shared_ptr<TrainLine> line, QString specTrack):
+          StayType type, std::shared_ptr<TrainLine> line, QString specTrack,
+                     const train_st_t& st1, const train_st_t& st2):
     title(title),stationName(stationName),beginTime(beginTime),endTime(endTime),
-    type(type),line(line),dir(line->dir()),specTrack(specTrack)
+    type(type),line(line),dir(line->dir()),specTrack(specTrack),
+    trainStation1(st1),trainStation2(st2)
 {
 
 }

@@ -80,6 +80,7 @@ SOURCES += \
     src/model/delegate/linestyledelegate.cpp \
     src/model/delegate/qetimedelegate.cpp \
     src/model/delegate/timeintervaldelegate.cpp \
+    src/model/rail/railtrackadjustmodel.cpp \
     src/model/train/timetablequickmodel.cpp \
     src/model/train/typemodel.cpp \
     src/model/rail/forbidmodel.cpp \
@@ -225,6 +226,7 @@ HEADERS += \
     src/model/delegate/linestyledelegate.h \
     src/model/delegate/qetimedelegate.h \
     src/model/delegate/timeintervaldelegate.h \
+    src/model/rail/railtrackadjustmodel.h \
     src/model/train/timetablequickmodel.h \
     src/model/train/typemodel.h \
     src/model/rail/forbidmodel.h \

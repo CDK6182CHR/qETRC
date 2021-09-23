@@ -19,6 +19,7 @@ class Forbid;
 class RailStation;
 class ForbidTabWidget;
 class MainWindow;
+class TrainStation;
 namespace ads {
 class CDockWidget;
 }
@@ -149,6 +150,12 @@ private slots:
     void actSaveTrackOrder(std::shared_ptr<Railway> railway, std::shared_ptr<RailStation> station,
         const QList<QString>& order);
 
+    /**
+     * 保存股道信息到时刻表；操作压栈
+     */
+    void actSaveTrackToTimetable(const QVector<TrainStation*>& stations,
+        const QVector<QString>& trackNames);
+
 
 public slots:
 
@@ -247,6 +254,11 @@ public slots:
 
     // 操作压栈。后续操作无需回调
     void actUpdateRailNotes(std::shared_ptr<Railway> railway, const RailInfoNote& note);
+
+    /**
+     * 保存股道表的后续：实际上只需要更新一下窗口。
+     */
+    void commitSaveTrackToTimetable();
 };
 
 
@@ -357,5 +369,18 @@ namespace qecmd {
         void redo()override;
     };
 
-
+    class SaveTrackToTimetable :public QUndoCommand {
+        QVector<TrainStation*> stations;
+        QVector<QString> trackNames;
+        RailContext* const cont;
+    public:
+        SaveTrackToTimetable(const QVector<TrainStation*>& stations,
+            const QVector<QString>& trackNames, RailContext* cont,
+            QUndoCommand* parent = nullptr):
+            QUndoCommand(QObject::tr("保存股道信息至时刻表"),parent),
+            stations(stations),trackNames(trackNames),cont(cont){}
+        void undo()override;
+        void redo()override;
+        void commit();
+    };
 }

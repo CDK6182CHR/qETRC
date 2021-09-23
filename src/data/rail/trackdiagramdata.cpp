@@ -6,7 +6,7 @@
 
 TrackDiagramData::TrackDiagramData(const events_t& data,
     const QList<QString>& initTrackOrder) :
-    data(data), trackOrder(initTrackOrder)
+    data(data), initTrackOrder(initTrackOrder)
 {
     //self._parseInitTrackOrder(init_tracks)
     _makeList();
@@ -36,15 +36,37 @@ void TrackDiagramData::_makeList()
         _allowMainStay = true;
         _doubleLine = false;
     }
+    else {
+        trackOrder.clear();
+    }
     msg.clear();
     items.clear();
     singleTracks.clear();
     downTracks.clear();
     upTracks.clear();
 
+    // 交路的后续列车：列车->LinkItem的映射
+    std::map<const Train*, TrackItem*> postTrainMap;
+
+    // 交路前序列车：对象->对应后续列车
+    std::map<events_t::value_type, const Train*> preTrainMap;
+
     // 第一轮处理：数据格式转换
     for (const auto& pa : data) {
-        convertItem(pa);
+        convertItem(pa, postTrainMap, preTrainMap);
+    }
+
+    // 补充处理：LinkItem之间：把TrainStationPtr加到后续Item中
+    for (auto& p : preTrainMap) {
+        if (auto itr = postTrainMap.find(p.second); itr != postTrainMap.end()) {
+            // 找到
+            itr->second->trainStation2 = &*(p.first.second->trainStation);
+        }
+        else {
+            qDebug() << "TrackDiagramData::_makeList: WARNING: " <<
+                "Unexpected null data while looking for post-order-item: pre order is "
+                << p.first.first->train()->trainName().full() << Qt::endl;
+        }
     }
 
     // 第二轮处理：铺画  跨日的处理暂时不要表达在数据上
@@ -60,11 +82,14 @@ void TrackDiagramData::_makeList()
     _autoTrackOrder();
 }
 
-void TrackDiagramData::convertItem(events_t::const_reference pa)
+void TrackDiagramData::convertItem(events_t::const_reference pa, 
+    std::map<const Train*, TrackItem*>& postTrainMap,
+    std::map<events_t::value_type, const Train*>& preTrainMap)
 {
     auto line = pa.first;
     auto train = line->train();
     const auto& ts = pa.second->trainStation;
+    auto* pts=&*ts;
     //始发
     if (line->isStartingStation(pa.second)) {
         bool linkFlag = false;
@@ -77,8 +102,9 @@ void TrackDiagramData::convertItem(events_t::const_reference pa)
                     pa.second->trainStation->name,
                     pre->train()->lastStation()->arrive,
                     train->firstStation()->depart, TrackItem::Link,
-                    line, pa.second->trainStation->track);
+                    line, pa.second->trainStation->track, pts);
                 items.push_back(it);
+                postTrainMap.emplace(train.get(), it.get());
                 linkFlag = true;
             }
         }
@@ -87,7 +113,7 @@ void TrackDiagramData::convertItem(events_t::const_reference pa)
             auto it = std::make_shared<TrackItem>(train->trainName().full(),
                 pa.second->trainStation->name, pa.second->trainStation->arrive,
                 pa.second->trainStation->depart, TrackItem::Departure, line,
-                pa.second->trainStation->track);
+                pa.second->trainStation->track, pts);
             items.push_back(it);
         }
     }
@@ -96,20 +122,21 @@ void TrackDiagramData::convertItem(events_t::const_reference pa)
         bool linkFlag = false;
         if (auto rt = train->routing().lock()) {
             if (auto post = rt->postLinked(*train)) {
+                preTrainMap.emplace(pa, post->train().get());
                 linkFlag = true;
             }
         }
         if (!linkFlag) {
             auto it = std::make_shared<TrackItem>(train->trainName().full(),
                 pa.second->trainStation->name, ts->arrive, ts->depart,
-                TrackItem::Destination, line, ts->track);
+                TrackItem::Destination, line, ts->track, pts);
             items.push_back(std::move(it));
         }
     }
     else {
         auto tp = (ts->isStopped() ? TrackItem::Stop : TrackItem::Pass);
         items.push_back(std::make_shared<TrackItem>(train->trainName().full(),
-            ts->name, ts->arrive, ts->depart, tp, line, ts->track));
+            ts->name, ts->arrive, ts->depart, tp, line, ts->track, pts));
     }
 }
 
@@ -188,11 +215,32 @@ void TrackDiagramData::_autoTrackNames()
 void TrackDiagramData::_autoTrackOrder()
 {
     if (_manual) {
-        foreach(auto p, singleTracks.tracks()) {
-            if (!trackOrder.contains(p->name())) {
-                trackOrder.push_back(p->name());
-            }
+        // 只有手动模式下才解析原有的Order
+        foreach(const auto& name, initTrackOrder){
+            trackOrder.push_back(singleTracks.trackByName(name));
         }
+//        if(_doubleLine){
+//            // 这是原来不存在的分支  双线+手动铺画尝试
+//            for (auto p = downTracks.tracks().crbegin();
+//                p != downTracks.tracks().crend(); ++p) {
+//                if(!trackOrder.contains((*p))){
+//                     trackOrder.push_back((*p));
+//                }
+//            }
+//            foreach(const auto & p, upTracks.tracks()) {
+//                if(!trackOrder.contains(p->name())){
+//                    trackOrder.push_back(p->name());
+//                }
+//            }
+//        }
+
+            foreach(auto p, singleTracks.tracks()) {
+                if (!trackOrder.contains(p)) {
+                    trackOrder.push_back(p);
+                }
+            }
+
+
     }
     else {
         // 单双线自动排序 ..
@@ -200,15 +248,15 @@ void TrackDiagramData::_autoTrackOrder()
         if (_doubleLine) {
             for (auto p = downTracks.tracks().crbegin();
                 p != downTracks.tracks().crend(); ++p) {
-                trackOrder.push_back((*p)->name());
+                trackOrder.push_back(*p);
             }
             foreach(const auto & p, upTracks.tracks()) {
-                trackOrder.push_back(p->name());
+                trackOrder.push_back(p);
             }
         }
         else {
             foreach(const auto & p, singleTracks.tracks()) {
-                trackOrder.push_back(p->name());
+                trackOrder.push_back(p);
             }
         }
     }
@@ -230,7 +278,7 @@ void TrackGroup::autoAddDouble(std::shared_ptr<TrackItem> item, bool ignoreMainT
     auto p = _tracks.begin();
     if (ignoreMainTrack) {
         ensureOneTrack();
-        ++p;
+        p = std::next(_tracks.begin());
     }
     for (; p != _tracks.end(); ++p) {
         if ((*p)->isIdleForDouble(item, sameSplitSecs)) {
@@ -252,7 +300,7 @@ void TrackGroup::autoAddSingle(std::shared_ptr<TrackItem> item, bool ignoreMainT
     auto p = _tracks.begin();
     if (ignoreMainTrack) {
         ensureOneTrack();
-        ++p;
+        p = std::next(_tracks.begin());
     }
     for (; p != _tracks.end(); ++p) {
         if ((*p)->isIdleFor(item, sameSplitSecs, oppsiteSplitSecs)) {

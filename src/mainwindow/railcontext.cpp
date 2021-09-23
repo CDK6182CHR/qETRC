@@ -1,6 +1,7 @@
 ﻿#include "railcontext.h"
 #include "mainwindow.h"
 #include "rulercontext.h"
+#include "traincontext.h"
 
 #include "viewers/sectioncountdialog.h"
 #include "dialogs/selectrailstationdialog.h"
@@ -501,12 +502,19 @@ void RailContext::actShowTrack()
 	auto* dlg = new RailTrackWidget(diagram, railway, st, mw);
 	connect(dlg, &RailTrackWidget::actSaveTrackOrder,
 		this, &RailContext::actSaveTrackOrder);
+	connect(dlg, &RailTrackWidget::saveTrackToTimetable,
+		this, &RailContext::actSaveTrackToTimetable);
 	dlg->show();
 }
 
 void RailContext::actSaveTrackOrder(std::shared_ptr<Railway> railway, std::shared_ptr<RailStation> station, const QList<QString>& order)
 {
 	mw->getUndoStack()->push(new qecmd::SaveTrackOrder(railway, station, order));
+}
+
+void RailContext::actSaveTrackToTimetable(const QVector<TrainStation*>& stations, const QVector<QString>& trackNames)
+{
+	mw->getUndoStack()->push(new qecmd::SaveTrackToTimetable(stations, trackNames, this));
 }
 
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
@@ -735,6 +743,13 @@ void RailContext::actUpdateRailNotes(std::shared_ptr<Railway> railway, const Rai
 	mw->getUndoStack()->push(new qecmd::UpdateRailNote(railway, note));
 }
 
+void RailContext::commitSaveTrackToTimetable()
+{
+	mw->contextTrain->refreshCurrentTrainWidgets();
+}
+
+
+
 
 qecmd::ChangeRailName::ChangeRailName(std::shared_ptr<Railway> rail_,
 	const QString& name, RailContext* context, QUndoCommand* parent) :
@@ -897,4 +912,24 @@ void qecmd::SaveTrackOrder::undo()
 void qecmd::SaveTrackOrder::redo()
 {
 	std::swap(station->tracks, order);
+}
+
+void qecmd::SaveTrackToTimetable::undo()
+{
+	commit();
+}
+void qecmd::SaveTrackToTimetable::redo()
+{
+	commit();
+}
+
+void qecmd::SaveTrackToTimetable::commit()
+{
+	assert(stations.size() == trackNames.size());
+	auto it1 = stations.begin();
+	auto it2 = trackNames.begin();
+	while (it1 != stations.end()) {
+		std::swap((*it1++)->track, (*it2++));
+	}
+	cont->commitSaveTrackToTimetable();
 }

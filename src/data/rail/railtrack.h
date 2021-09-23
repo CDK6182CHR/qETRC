@@ -5,10 +5,13 @@
 #include <memory>
 #include <QTime>
 #include <set>
+#include <list>
+#include <optional>
 #include <QColor>
 #include "data/common/direction.h"
 #include "data/common/stationname.h"
 
+class TrainStation;
 class TrainLine;
 /**
  * @brief 占用股道的元素，包括停车、通过等。
@@ -33,10 +36,17 @@ struct TrackItem{
     Direction dir;
     QString specTrack;    // 指定股道（图定股道） 不包含推定的
 
+    using train_st_t=std::optional<TrainStation*>;
+    /**
+     * 记录时刻表中的车站。2仅在LinkItem中启用。
+     * 由于有效性可能出现问题，所以尽量不要调用；目前仅在保存股道信息时使用。
+     */
+    train_st_t trainStation1,trainStation2;
 
     TrackItem(const QString& title, const StationName& stationName, const QTime& beginTime,
               const QTime& endTime, StayType type, std::shared_ptr<TrainLine> line,
-              QString specTrack="");
+              QString specTrack,const train_st_t& st1,
+              const train_st_t& st2=std::nullopt);
 
     QString typeString()const;
     QString toString()const;

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "railtrack.h"
+#include <map>
 
 /**
  * @brief The TrackGroup class
@@ -70,7 +71,8 @@ class TrackDiagramData
         const AdapterStation*>>;
     const events_t& data;
     QVector<std::shared_ptr<TrackItem>> items;
-    QList<QString> trackOrder;
+    QList<QString> initTrackOrder;
+    QVector<std::shared_ptr<Track>> trackOrder;
 
 
     bool _doubleLine=false;   // 按双线铺画
@@ -108,6 +110,8 @@ public:
     int oppositeSplitSecs()const{return _oppositeSiteSplitSecs;}
     void setOppositeSplitSecs(int i){_oppositeSiteSplitSecs=i;}
 
+    void setInitOrder(const QList<QString>& order){initTrackOrder=order;}
+
 private:
     void _makeList();
 
@@ -115,7 +119,10 @@ private:
      * 和pyETRC的_judgeType比较类似；判定类型，然后添加到列表。
      * 注意：所有的Link统一在后续的时候做！！
      */
-    void convertItem(events_t::const_reference pa);
+    void convertItem(events_t::const_reference pa,
+        std::map<const Train*, TrackItem*>& postTrainMap,
+        std::map<events_t::value_type, const Train*>& preTrainMap
+        );
 
     void _addPassTrain(std::shared_ptr<TrackItem> item);
     void _addStopTrain(std::shared_ptr<TrackItem> item);

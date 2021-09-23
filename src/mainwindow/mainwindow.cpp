@@ -185,6 +185,7 @@ void MainWindow::removeAllTrains()
     _diagram.trainCollection().clearTrains();
     onTrainsImported();   //后操作是一样的
     contextTrain->resetTrain();
+    timetableQuickWidget->resetTrain();
     focusOutTrain();
 }
 
@@ -199,6 +200,7 @@ void MainWindow::removeAllTrainsAndRoutings()
     _diagram.trainCollection().clearTrainsAndRoutings();
     onTrainsImported();   //后操作是一样的
     contextTrain->resetTrain();
+    timetableQuickWidget->resetTrain();
     focusOutTrain();
 }
 

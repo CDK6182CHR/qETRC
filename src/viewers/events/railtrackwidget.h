@@ -1,9 +1,11 @@
 ﻿#pragma once
+#include <QDialog>
 #include <QSplitter>
 #include <vector>
 #include "data/rail/trackdiagramdata.h"
 #include "util/buttongroup.hpp"
 
+class RailTrackAdjustModel;
 class QEMoveableModel;
 class QTableView;
 class QEControlledTable;
@@ -31,6 +33,8 @@ class RailTrackSetupWidget: public QWidget
     QEControlledTable* ctable;
     QTableView* table;
     QEMoveableModel* model;
+
+    bool informOnAdjust=true;
 public:
     RailTrackSetupWidget(TrackDiagramData& data, QWidget* parent=nullptr);
 
@@ -39,13 +43,36 @@ private:
 signals:
     void applied();
     void actSaveOrder(const QList<QString>& order);
+    void repaintDiagram();  // 转发信号 ..
 public slots:
     void refreshData();
 private slots:
     void actApply();
     void actSave();
     void onModeChanged();
+    void actAdjust();
+};
 
+/**
+ * @brief The TrackAdjustDialog class
+ * 调整股道次序和名称的对话框
+ */
+class TrackAdjustDialog: public QDialog
+{
+    Q_OBJECT
+    QVector<std::shared_ptr<Track>>& order;
+    RailTrackAdjustModel* model;
+    QTableView* table;
+public:
+    TrackAdjustDialog(QVector<std::shared_ptr<Track>>& order,
+                      QWidget* parent=nullptr);
+private:
+    void initUI();
+signals:
+    void repaintDiagram();
+private slots:
+    void moveUp();
+    void moveDown();
 };
 
 
@@ -67,17 +94,21 @@ class RailTrackWidget : public QSplitter
     TrackDiagram* trackDiagram;
     RailTrackSetupWidget* setupWidget;
     QSlider* slider;
+
 public:
     RailTrackWidget(Diagram& diagram, std::shared_ptr<Railway> railway,
                     std::shared_ptr<RailStation> station, QWidget* parent=nullptr);
 signals:
     void actSaveTrackOrder(std::shared_ptr<Railway> rail, std::shared_ptr<RailStation> station,
                       const QList<QString>& order);
+    void saveTrackToTimetable(const QVector<TrainStation*>&,
+                              const QVector<QString>&);
 private:
     void initUI();
 public slots:
     void refreshData();
 private slots:
     void onSaveOrder(const QList<QString>& order);
+    void actSaveTracks();
 };
 

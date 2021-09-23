@@ -17,7 +17,12 @@ TrackDiagram::TrackDiagram(TrackDiagramData &data, QWidget* parent):
 void TrackDiagram::refreshData()
 {
 	_data.refreshData();
-	paintDiagram();
+    paintDiagram();
+}
+
+void TrackDiagram::repaintDiagram()
+{
+    paintDiagram();
 }
 
 void TrackDiagram::paintDiagram()
@@ -78,10 +83,10 @@ void TrackDiagram::_initXAxis(double width, double height, const QColor& gridCol
 void TrackDiagram::_initYAxis(double width, const QPen& defaultPen, const QPen& boldPen)
 {
 	int i = 0;
-	foreach(const auto & name, _data.getTrackOrder()) {
+    foreach(const auto & track, _data.getTrackOrder()) {
 		double y = margins.top + (i + 1) * row_height;
 		scene()->addLine(margins.left, y, margins.left + width, y, defaultPen);
-		auto* textItem = scene()->addSimpleText(name);
+        auto* textItem = scene()->addSimpleText(track->name());
 		textItem->setY(y - row_height / 2 - textItem->boundingRect().height() / 2);
 		i++;
 	}
@@ -90,10 +95,11 @@ void TrackDiagram::_initYAxis(double width, const QPen& defaultPen, const QPen& 
 void TrackDiagram::_addTrains()
 {
 	double start_y = margins.top;
-	foreach(const auto & name, _data.getTrackOrder()) {
-		auto track = _data.trackByName(name);
-		for (const auto& to : *track) {
-			_addTrainRect(to, start_y);
+    foreach(const auto & track, _data.getTrackOrder()) {
+		if (track) {
+			for (const auto& to : *track) {
+				_addTrainRect(to, start_y);
+			}
 		}
 		start_y += row_height;
 	}

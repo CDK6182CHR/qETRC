@@ -202,6 +202,14 @@ public slots:
      */
     void commitAutoBusiness();
 
+    /**
+     * 当列车发生大范围变化时，更新当前context, 以及速览时刻、速览信息等窗口，
+     * 以及所有的BasicWidget
+     * 不管当前列车有没有改动。
+     * 注意不要重复执行这个操作。
+     */
+    void refreshCurrentTrainWidgets();
+
 private slots:
     void showTrainEvents();
     void actShowTrainLine();
@@ -241,14 +249,6 @@ private slots:
     void actDiagnose();
 
     void actToRouting();
-
-    /**
-     * 当列车发生大范围变化时，更新当前context, 以及速览时刻、速览信息等窗口，
-     * 以及所有的BasicWidget
-     * 不管当前列车有没有改动。
-     * 注意不要重复执行这个操作。
-     */
-    void refreshCurrentTrainWidgets();
 
     void actCorrection();
 };
