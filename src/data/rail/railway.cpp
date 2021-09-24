@@ -526,6 +526,7 @@ QList<QPair<StationName, StationName>> Railway::adjIntervals(bool down) const
 void Railway::mergeCounter(const Railway& another)
 {
 	//注意插入会导致迭代器失效，因此不可用迭代器
+	//2021.09.24 提醒修改区间情况！
 	int i = 0;
 	int j = another.stationCount() - 1;
 	while (true) {
@@ -567,6 +568,46 @@ void Railway::mergeCounter(const Railway& another)
 			}
 		}
 	}
+	initUpIntervals();
+
+    QMap<QString,int> rulerMap;
+    // 初始化 自己的标尺下标
+    foreach(const auto& r,_rulers){
+        rulerMap.insert(r->name(),r->index());
+    }
+
+    // 2021.09.24 新增 标尺天窗的合并
+    // 以上算法保证现在this的上行径路和another的下行径路（区间）完全一致
+    std::shared_ptr<RailInterval> p1;
+    std::shared_ptr<const RailInterval> p2;
+    for(p1=firstUpInterval(), p2=another.firstDownInterval();
+        p1 && p2; p1=p1->nextInterval(),p2=p2->nextInterval()){
+        // 天窗 按下标
+		//qDebug() << "merge intervals: " << *p1 << ", " << *p2;
+        for(int i=0;i<std::min(forbids().size(),another.forbids().size());i++){
+            p1->_forbidNodes.at(i)->operator=(*(p2->_forbidNodes.at(i)));
+        }
+
+        // 标尺 按名称
+        for(int i=0;i<another._rulers.size();i++){
+            auto ruler=another._rulers.at(i);
+            int idx;
+            if (auto itr=rulerMap.find(ruler->name());itr!=rulerMap.end()){
+                idx=itr.value();
+            }else{
+                idx=rulerMap.size();
+                addEmptyRuler(ruler->name(), true);
+                rulerMap.insert(ruler->name(),idx);
+            }
+            p1->_rulerNodes.at(idx)->operator=(
+                        *(p2->_rulerNodes.at(ruler->index())));
+        }
+    }
+    if ((!p1) != (!p2)){
+        qDebug()<<"Railway::mergeCounter: WARNING: "<<
+                  "interval not terminated simutaneously!"<<Qt::endl;
+		//qDebug() << *p2 << Qt::endl;
+    }
 }
 
 #if 0
@@ -656,6 +697,15 @@ std::shared_ptr<RailInterval> Railway::firstUpInterval()
         }
     }
     return std::shared_ptr<RailInterval>();
+}
+
+std::shared_ptr<RailInterval> Railway::lastDownInterval()
+{
+    for(auto p=_stations.rbegin();p!=_stations.rend();++p){
+        if((*p)->isDownVia())
+            return (*p)->downPrev;
+    }
+    return nullptr;
 }
 
 std::shared_ptr<const RailStation> Railway::firstDownStation() const
@@ -1337,6 +1387,23 @@ std::shared_ptr<RailInterval> Railway::addInterval(Direction _dir, std::shared_p
         t->_forbidNodes.append(std::make_shared<ForbidNode>(*_forbids[i],*t));
     }
     return t;
+}
+
+void Railway::initUpIntervals()
+{
+	if (empty())return;
+	auto p = _stations.rbegin();
+	for (; p != _stations.rend(); ++p) {
+		if ((*p)->isUpVia())break;
+	}
+	auto pr = p;   // pr: 上一个上行通过的站
+	for (++p; p != _stations.rend(); ++p) {
+		if ((*p)->isUpVia()) {
+			addInterval(Direction::Up, *pr, *p);
+			pr = p;
+		}
+	}
+
 }
 
 std::shared_ptr<Forbid> Railway::addEmptyForbid(bool different)

@@ -1,10 +1,12 @@
 ﻿#pragma once
 
 #include <map>
+#include <unordered_map>
 #include <set>
+#include <unordered_set>
+#include <deque>
 #include <memory>
 #include <type_traits>
-#include <functional>
 
 namespace xtl
 {
@@ -129,8 +131,8 @@ namespace xtl
 
         template <typename _Val>
         struct sssp_ret_t {
-            std::map<std::shared_ptr<vertex>, _Val> distance;
-            std::map<std::shared_ptr<vertex>, std::shared_ptr<edge>> path;
+            std::unordered_map<std::shared_ptr<vertex>, _Val> distance;
+            std::unordered_map<std::shared_ptr<vertex>, std::shared_ptr<edge>> path;
         };
 
 
@@ -147,7 +149,7 @@ namespace xtl
             constexpr _Val MAX = std::numeric_limits<_Val>::max() - 1;
             sssp_ret_t<_Val> ret{};
 
-            std::set<std::shared_ptr<vertex>> si;
+            std::unordered_set<std::shared_ptr<vertex>> si;
             ret.distance.emplace(source, (_Val)0);
 
             // 注：数值为空表示不可达/无穷大
@@ -184,7 +186,7 @@ namespace xtl
             constexpr _Val MAX = std::numeric_limits<_Val>::max() - 1;
             sssp_ret_t<_Val> ret{};
 
-            std::set<std::shared_ptr<vertex>> si;
+            std::unordered_set<std::shared_ptr<vertex>> si;
             ret.distance.emplace(source, (_Val)0);
 
             // 注：数值为空表示不可达/无穷大
@@ -212,12 +214,45 @@ namespace xtl
             return ret;
         }
 
+
+        /**
+         * 由sssp计算结果给出路径，以边的序列表示。
+         * 如果不可达或者source, target一样，返回空
+         */
+        template <typename _Val>
+        std::deque<std::shared_ptr<edge>>
+                dump_path(const std::shared_ptr<vertex>& source,
+                          const std::shared_ptr<vertex>& target,
+                          const sssp_ret_t<_Val>& res)
+        {
+            if (auto itr=res.distance.find(target);itr==res.distance.end()){
+                return {};
+            }
+            std::deque<std::shared_ptr<edge>> path;
+            std::shared_ptr<vertex> cur=target;
+            while(cur!=source){
+                if (auto itr=res.path.find(cur);itr!=res.path.end()){
+                    // 找到上一步的路径
+                    path.emplace_front(itr->second);
+                    cur=itr->second->from.lock();
+                }else{
+                    break;
+                }
+            }
+            if(cur==source){
+                // 成功找到路径
+                return path;
+            }else{
+                return {};
+            }
+        }
+
     private:
 
         template <typename _Val>
         std::shared_ptr<vertex> get_min_dist(
             const sssp_ret_t<_Val>& ret,
-            const std::set<std::shared_ptr<vertex>>& si,
+            const std::unordered_set<std::shared_ptr<vertex>>& si,
             _Val MAX)
         {
             _Val curmin = MAX;

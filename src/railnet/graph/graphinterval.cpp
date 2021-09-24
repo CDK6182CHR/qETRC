@@ -10,6 +10,12 @@ GraphForbidNode::GraphForbidNode(const ForbidNode &node):
 
 }
 
+void GraphForbidNode::exportToNode(ForbidNode &node) const
+{
+    node.beginTime=beginTime;
+    node.endTime=endTime;
+}
+
 GraphRulerNode::GraphRulerNode(const RulerNode &node):
     name(node.dataHead().name()),
     interval(node.interval),start(node.start),stop(node.stop)
@@ -17,13 +23,26 @@ GraphRulerNode::GraphRulerNode(const RulerNode &node):
 
 }
 
+void GraphRulerNode::exportToNode(RulerNode &node) const
+{
+    node.interval=interval;
+    node.start=start;
+    node.stop=stop;
+}
+
 GraphInterval::GraphInterval(const QString &name, const RailInterval &interval):
-    railName(name),dir(interval.direction())
+    railName(name),dir(interval.direction()),mile(interval.mile())
 {
     foreach(const auto& fn, interval._forbidNodes){
         forbidNodes.push_back(*fn);
     }
     foreach(const auto& rn, interval._rulerNodes){
-        rulerNodes.push_back(*rn);
+        if (!rn->isNull())
+            rulerNodes.push_back(*rn);
     }
+}
+
+double GraphInterval::getMile(const GraphInterval &inter)
+{
+    return inter.mile;
 }

@@ -85,6 +85,7 @@ class MainWindow : public SARibbonMainWindow
     friend class RailContext;
     friend class RoutingContext;
     friend class TrainContext;
+    friend class RailDBContext;
 
     bool changed = false;
 

@@ -17,12 +17,14 @@ class ForbidNode;
 struct GraphForbidNode{
     QTime beginTime,endTime;
     GraphForbidNode(const ForbidNode& node);
+    void exportToNode(ForbidNode& node)const;
 };
 
 struct GraphRulerNode{
     QString name;
     int interval,start,stop;
     GraphRulerNode(const RulerNode& node);
+    void exportToNode(RulerNode& node)const;
 };
 
 /**
@@ -37,8 +39,11 @@ public:
     Direction dir;
     QVector<GraphForbidNode> forbidNodes;
     QVector<GraphRulerNode> rulerNodes;
+    double mile;
 public:
     GraphInterval()=default;
     GraphInterval(const QString& name, const RailInterval& interval);
+
+    static double getMile(const GraphInterval& inter);
 };
 

@@ -53,6 +53,8 @@ void RailDBContext::onWindowDeactivated()
         dock->closeDockWidget();
 }
 
+#include "editors/railstationwidget.h"
+
 void RailDBContext::activateDB()
 {
     if (dock == nullptr) {
@@ -74,6 +76,14 @@ void RailDBContext::activateDB()
 
     // test
     loadNet();
+    QString rep;
+    auto rail = net.sliceByPath({ "成都","南充","万源","安康"}, &rep);
+    qDebug() << rep << Qt::endl;
+    
+    auto* w = new RailStationWidget(mw->_diagram.railCategory(), true, mw);
+    w->setRailway(rail);
+    w->setWindowFlags(Qt::Dialog);
+    w->show();
 }
 
 void RailDBContext::deactivateDB()

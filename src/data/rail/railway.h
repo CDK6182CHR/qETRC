@@ -361,6 +361,11 @@ public:
     std::shared_ptr<const RailInterval> firstUpInterval()const;
     std::shared_ptr<RailInterval> firstUpInterval();
 
+    /**
+     * 2021.09.24  最后一个下行区间；从最后一个站倒回去找。
+     */
+    std::shared_ptr<RailInterval> lastDownInterval();
+
     std::shared_ptr<const RailStation> firstDownStation()const;
 
     std::shared_ptr<const RailStation> firstUpStation()const;
@@ -666,6 +671,12 @@ private:
     std::shared_ptr<RailInterval> addInterval(Direction _dir,
             std::shared_ptr<RailStation> from,
             std::shared_ptr<RailStation> to);
+
+    /**
+     * 通过一次遍历，补充所有上行区间对象。
+     * 用于mergeCounter之后。
+     */
+    void initUpIntervals();
 
     std::shared_ptr<Forbid> addEmptyForbid(bool different=true);
 
