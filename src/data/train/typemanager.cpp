@@ -120,6 +120,12 @@ void TypeManager::swapForRegex(TypeManager& other)
     std::swap(_regs, other._regs);
 }
 
+//TypeManager::~TypeManager() noexcept
+//{
+//    _types.clear();
+//    qDebug()<<"typeManager delete"<<Qt::endl;
+//}
+
 bool TypeManager::fromJson(const QJsonObject& obj)
 {
     if (obj.isEmpty())

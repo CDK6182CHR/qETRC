@@ -20,6 +20,7 @@ class RailInterval:
 	public std::enable_shared_from_this<RailInterval>
 {
 	friend class Railway;
+    friend class GraphInterval;
 	//注意一律按照有向边约定
 	std::weak_ptr<RailStation> from, to;
     Direction _dir;

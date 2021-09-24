@@ -122,6 +122,8 @@ public:
      */
     void swapForRegex(TypeManager& other);
 
+    // ~TypeManager()noexcept;
+
 private:
     /**
      * 输入格式是pyETRC的config.json或者graph中config对象

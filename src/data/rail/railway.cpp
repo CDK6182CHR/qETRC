@@ -616,17 +616,27 @@ void Railway::jointWith(const Railway& another, bool former, bool reverse)
 	//todo: 标尺天窗...
 }
 
-std::shared_ptr<RailInterval> Railway::firstDownInterval() const
+std::shared_ptr<const RailInterval> Railway::firstDownInterval() const
 {
 	for (int i = 0; i < stationCount(); i++) {
 		const auto& t = _stations.at(i);
 		if (t->isDownVia())
 			return t->downNext;
 	}
-	return std::shared_ptr<RailInterval>();
+    return std::shared_ptr<RailInterval>();
 }
 
-std::shared_ptr<RailInterval> Railway::firstUpInterval() const
+std::shared_ptr<RailInterval> Railway::firstDownInterval()
+{
+    for (int i = 0; i < stationCount(); i++) {
+        const auto& t = _stations.at(i);
+        if (t->isDownVia())
+            return t->downNext;
+    }
+    return std::shared_ptr<RailInterval>();
+}
+
+std::shared_ptr<const RailInterval> Railway::firstUpInterval() const
 {
 	for (int i = stationCount() - 1; i >= 0; i--) {
 		const auto& t = _stations.at(i);
@@ -634,7 +644,18 @@ std::shared_ptr<RailInterval> Railway::firstUpInterval() const
 			return t->upNext;
 		}
 	}
-	return std::shared_ptr<RailInterval>();
+    return std::shared_ptr<RailInterval>();
+}
+
+std::shared_ptr<RailInterval> Railway::firstUpInterval()
+{
+    for (int i = stationCount() - 1; i >= 0; i--) {
+        const auto& t = _stations.at(i);
+        if (t->isUpVia()) {
+            return t->upNext;
+        }
+    }
+    return std::shared_ptr<RailInterval>();
 }
 
 std::shared_ptr<const RailStation> Railway::firstDownStation() const
@@ -1363,6 +1384,16 @@ std::shared_ptr<RailInterval> Railway::nextIntervalCirc(std::shared_ptr<RailInte
 	if (!t && railint->isDown()) {
 		return firstUpInterval();
 	}
+    return t;
+}
+
+std::shared_ptr<const RailInterval> Railway::nextIntervalCirc(
+        std::shared_ptr<const RailInterval> railint) const
+{
+    auto t = railint->nextInterval();
+    if (!t && railint->isDown()) {
+        return firstUpInterval();
+    }
     return t;
 }
 

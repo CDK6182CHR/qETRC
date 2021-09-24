@@ -89,6 +89,9 @@ SOURCES += \
     src/model/train/routingeditmodel.cpp \
     src/model/train/routinglistmodel.cpp \
     src/model/train/trainlistreadmodel.cpp \
+    src/railnet/graph/graphinterval.cpp \
+    src/railnet/graph/graphstation.cpp \
+    src/railnet/graph/railnet.cpp \
     src/railnet/raildb/raildb.cpp \
     src/railnet/raildb/raildbcontext.cpp \
     src/railnet/raildb/raildbitems.cpp \
@@ -235,6 +238,10 @@ HEADERS += \
     src/model/train/routingeditmodel.h \
     src/model/train/routinglistmodel.h \
     src/model/train/trainlistreadmodel.h \
+    src/railnet/graph/graphinterval.h \
+    src/railnet/graph/graphstation.h \
+    src/railnet/graph/railnet.h \
+    src/railnet/graph/xtl_graph.hpp \
     src/railnet/raildb/raildb.h \
     src/railnet/raildb/raildbcontext.h \
     src/railnet/raildb/raildbitems.h \

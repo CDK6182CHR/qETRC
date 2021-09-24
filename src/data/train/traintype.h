@@ -18,8 +18,10 @@ class TrainType
     QPen _pen;
     bool _passenger;
 public:
-    TrainType(const QString& name, const QPen& pen, bool passenger=false) :
-        _name(name), _pen(pen),_passenger(passenger){}
+    TrainType(const QString& name, const QPen& pen, bool passenger=false);
+
+    // for test...
+    // TrainType(const TrainType& other);
 
     const QPen& pen()const{return _pen;}
     QPen& pen() { return _pen; }
@@ -33,6 +35,8 @@ public:
     bool operator!=(const TrainType& other)const;
 
     void swap(TrainType& other);
+
+    ~TrainType()noexcept=default;
 };
 
 

@@ -436,5 +436,7 @@ public slots:
     void locateDiagramOnStation(int pageIndex, std::shared_ptr<const Railway> railway,
         std::shared_ptr<const RailStation>, const QTime& time);
 
+    void showStatus(const QString& msg);
+
 };
 

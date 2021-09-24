@@ -355,9 +355,11 @@ public:
     /// first, last皆按运行方向
     /// </summary>
     /// <returns></returns>
-    std::shared_ptr<RailInterval> firstDownInterval()const;
+    std::shared_ptr<const RailInterval> firstDownInterval()const;
+    std::shared_ptr<RailInterval> firstDownInterval();
 
-    std::shared_ptr<RailInterval> firstUpInterval()const;
+    std::shared_ptr<const RailInterval> firstUpInterval()const;
+    std::shared_ptr<RailInterval> firstUpInterval();
 
     std::shared_ptr<const RailStation> firstDownStation()const;
 
@@ -498,6 +500,10 @@ public:
      * 但额外支持一次性解决上行的
      */
     std::shared_ptr<RailInterval> nextIntervalCirc(std::shared_ptr<RailInterval> railint);
+
+    std::shared_ptr<const RailInterval>
+        nextIntervalCirc(std::shared_ptr<const RailInterval> railint)const;
+
 
     inline double totalMile()const { return empty() ? 0.0 : _stations.last()->mile; }
 

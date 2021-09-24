@@ -248,6 +248,9 @@
     <ClCompile Include="src\model\train\timetablequickmodel.cpp" />
     <ClCompile Include="src\model\train\trainlistreadmodel.cpp" />
     <ClCompile Include="src\model\train\typemodel.cpp" />
+    <ClCompile Include="src\railnet\graph\graphinterval.cpp" />
+    <ClCompile Include="src\railnet\graph\graphstation.cpp" />
+    <ClCompile Include="src\railnet\graph\railnet.cpp" />
     <ClCompile Include="src\railnet\raildb\raildb.cpp" />
     <ClCompile Include="src\railnet\raildb\raildbcontext.cpp" />
     <ClCompile Include="src\railnet\raildb\raildbitems.cpp" />
@@ -343,6 +346,10 @@
     <QtMoc Include="src\dialogs\correcttimetabledialog.h" />
     <QtMoc Include="src\kernel\trackdiagram.h" />
     <QtMoc Include="src\model\rail\railtrackadjustmodel.h" />
+    <ClInclude Include="src\railnet\graph\graphinterval.h" />
+    <ClInclude Include="src\railnet\graph\graphstation.h" />
+    <ClInclude Include="src\railnet\graph\railnet.h" />
+    <ClInclude Include="src\railnet\graph\xtl_graph.hpp" />
     <ClInclude Include="src\railnet\raildb\raildb.h" />
     <QtMoc Include="src\railnet\raildb\raildbcontext.h" />
     <ClInclude Include="src\railnet\raildb\raildbitems.h" />

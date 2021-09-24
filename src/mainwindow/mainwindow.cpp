@@ -7,7 +7,9 @@
 #include <QApplication>
 #include <QFileDialog>
 #include <QSpinBox>
+#include <QStatusBar>
 #include <QLabel>
+#include <chrono>
 
 #include "model/train/trainlistmodel.h"
 #include "editors/trainlistwidget.h"
@@ -67,6 +69,7 @@ MainWindow::MainWindow(QWidget* parent)
     undoStack(new QUndoStack(this)),
     naviModel(new DiagramNaviModel(_diagram, this))
 {
+    auto start = std::chrono::system_clock::now();
     ads::CDockManager::setConfigFlag(ads::CDockManager::OpaqueSplitterResize, true);
     ads::CDockManager::setConfigFlag(ads::CDockManager::XmlCompressionEnabled, false);
     ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
@@ -84,6 +87,13 @@ MainWindow::MainWindow(QWidget* parent)
 
     loadInitDiagram(cmdFile);
     updateWindowTitle();
+
+    auto end = std::chrono::system_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    auto secs = static_cast<double>(duration.count()) * std::chrono::microseconds::period::num /
+        std::chrono::microseconds::period::den;
+    qDebug() << "MainWindow init consumes: " << secs << Qt::endl;
+    showStatus(tr("主窗口初始化用时: %1 秒").arg(secs));
 }
 
 MainWindow::~MainWindow()
@@ -1558,6 +1568,7 @@ void MainWindow::actSaveGraph()
         _diagram.save();
         markUnchanged();
         undoStack->setClean();
+        showStatus(tr("保存成功"));
     }
 }
 
@@ -1573,6 +1584,7 @@ void MainWindow::actSaveGraphAs()
         undoStack->setClean();
         addRecentFile(res);
         updateWindowTitle();
+        showStatus(tr("保存成功"));
     }
 }
 
@@ -1814,6 +1826,11 @@ void MainWindow::locateDiagramOnStation(int pageIndex, std::shared_ptr<const Rai
     activatePageWidget(pageIndex);
     auto* w = diagramWidgets.at(pageIndex);
     w->locateToStation(railway, station, time);
+}
+
+void MainWindow::showStatus(const QString& msg)
+{
+    statusBar()->showMessage(tr("%1 | %2").arg(QTime::currentTime().toString("hh:mm:ss"), msg));
 }
 
 

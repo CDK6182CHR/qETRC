@@ -2,6 +2,8 @@
 
 #include <QObject>
 
+#include "railnet/graph/railnet.h"
+
 class RailDB;
 class SARibbonContextCategory;
 class MainWindow;
@@ -25,6 +27,7 @@ class RailDBContext : public QObject
     ads::CDockWidget* dock=nullptr;
     RailDBWindow* const window;   // 必须在raildb之前初始化！ 
     const std::shared_ptr<RailDB> _raildb;
+    RailNet net;
     bool _active = false;
 public:
     explicit RailDBContext(SARibbonContextCategory* cont,
@@ -54,6 +57,11 @@ public slots:
      * 退出db模式：隐藏context；删除widget（但dock可以不删除）。
      */
     void deactivateDB();
+
+    /**
+     * 刷新net；从当前的RailDB提取数据
+     */
+    void loadNet();
 
 };
 

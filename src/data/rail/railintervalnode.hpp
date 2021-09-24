@@ -18,6 +18,7 @@ class RailIntervalNode{
 //    static_assert (std::is_base_of_v<RailIntervalData<_Node,_Data>,_Data >,
 //    "Invalid Data type");
 
+protected:
     using NodeType=_Node;
     using DataType=_Data;
 
@@ -101,6 +102,9 @@ public:
     inline const StationName& toStationName()const{
         return _railint.toStation()->name;
     }
+
+    auto& dataHead(){return _data;}
+    const auto& dataHead()const{return _data;}
 
 };
 

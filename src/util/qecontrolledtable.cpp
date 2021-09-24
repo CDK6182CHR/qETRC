@@ -10,9 +10,10 @@ QEControlledTable::QEControlledTable(QWidget *parent) : QWidget(parent)
 
 void QEControlledTable::initUI()
 {
-	auto* vlay = new QVBoxLayout;
-	_table = new QTableView;
+    auto* vlay = new QVBoxLayout(this);
+    _table = new QTableView();
 	vlay->addWidget(_table);
+    //qDebug()<<"QEControlledTable: parent" <<_table->parent()<<Qt::endl;
 
 	auto* g = new ButtonGroup<5>({
 		"前插","后插","删除","上移","下移"
@@ -24,7 +25,8 @@ void QEControlledTable::initUI()
 		});
 
 	vlay->addLayout(g);
-	setLayout(vlay);
+    //qDebug()<<"Layout parent: "<<g->parent()<<Qt::endl;
+    //qDebug()<<"QEControlledTable: parent" <<_table->parent()<<Qt::endl;
 }
 
 

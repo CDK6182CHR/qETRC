@@ -13,7 +13,7 @@
 
 RailDBContext::RailDBContext(SARibbonContextCategory *cont, MainWindow *mw_):
     QObject(mw_), cont(cont),mw(mw_),
-    window(new RailDBWindow()),_raildb(window->railDB())
+    window(new RailDBWindow(mw_)),_raildb(window->railDB())
 {
     connect(window->getNavi(), &RailDBNavi::deactivated,
         this, &RailDBContext::onWindowDeactivated);
@@ -71,9 +71,19 @@ void RailDBContext::activateDB()
         _active = true;
     }
     mw->ribbonBar()->showContextCategory(cont);
+
+    // test
+    loadNet();
 }
 
 void RailDBContext::deactivateDB()
 {
     window->deactive();
+}
+
+void RailDBContext::loadNet()
+{
+    net.clear();
+    net.fromRailCategory(_raildb.get());
+    qDebug() << "RailNet size "<< net.size() << Qt::endl;
 }
