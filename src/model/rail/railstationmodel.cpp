@@ -174,7 +174,7 @@ std::shared_ptr<const RailStation> RailStationModel::getRowStation(int row)
     return qvariant_cast<std::shared_ptr<const RailStation>>(v);
 }
 
-bool RailStationModel::actApply()
+bool RailStationModel::applyChange()
 {
     auto rail = generateRailway();
     if (!rail)
@@ -193,7 +193,12 @@ bool RailStationModel::actApply()
         //支持撤销，则交给Context处理
         emit actStationTableChanged(railway, rail, equiv);
     }
-    return false;
+    return true;
+}
+
+void RailStationModel::actApply()
+{
+    applyChange();
 }
 
 void RailStationModel::actCancel()

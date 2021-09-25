@@ -15,6 +15,8 @@ class QTreeView;
 class RailDBModel;
 class RailDB;
 class Ruler;
+
+class QLineEdit;
 namespace navi {
 class AbstractComponentItem;
 }
@@ -35,6 +37,7 @@ class RailDBNavi : public QWidget
 
     QTreeView* tree;
     QMenu* meRail,*meCat;
+    QLineEdit* edSearch;
 
     QUndoStack* _undo;
     bool _changed=false;
@@ -106,6 +109,11 @@ private slots:
     void actUpdateRulerData(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> data);
     void actRemoveRuler(std::shared_ptr<Ruler> ruler);
 
+    void searchFullName();
+    void searchPartName();
+    void searchRailName();
+    void searchResult(const std::deque<std::deque<int>>& paths);
+
 public slots:
     void actEditRail();
     void refreshData();
@@ -125,7 +133,7 @@ public slots:
      * 在item所示的分类下新增分类。
      * 保证入参有效且为分类类型。操作压栈
      */
-    void insertSubcatOf(ACI* it);
+    void insertSubcatOf(RailDBNavi::ACI* it);
 
     void actRemoveRail();
     void actRuler();

@@ -12,6 +12,7 @@
 #include <QJsonObject>
 #include <numeric>
 #include <QJsonDocument>
+#include <cmath>
 
 
 void Diagram::addRailway(std::shared_ptr<Railway> rail)

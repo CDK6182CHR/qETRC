@@ -5,6 +5,7 @@
 #include "data/diagram/diagram.h"
 #include "data/train/train.h"
 
+#include <cmath>
 #include <QFormLayout>
 #include <QTableView>
 #include <QHeaderView>

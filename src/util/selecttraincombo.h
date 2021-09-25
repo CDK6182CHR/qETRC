@@ -3,6 +3,7 @@
 
 #include <QHBoxLayout>
 #include <QList>
+#include <memory>
 
 class TrainCollection;
 class QComboBox;

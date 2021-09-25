@@ -2,6 +2,7 @@
 
 #include <QAbstractTableModel>
 #include <QList>
+#include <memory>
 
 class Routing;
 /**

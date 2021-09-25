@@ -660,6 +660,7 @@ void MainWindow::initToolbar()
     }
 
     //线路
+    QAction* actQuickPath;
     if constexpr (true) {
         auto* cat = ribbon->addCategoryPage(tr("线路(&2)"));
         auto* panel = cat->addPannel(tr("基础数据"));
@@ -679,22 +680,6 @@ void MainWindow::initToolbar()
         menu->setTitle(tr("线路编辑"));
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
-
-        act = new QAction(QIcon(":/icons/database.png"), tr("数据库"), this);
-        act->setToolTip(tr("线路数据库 (Ctrl+H)\n"
-            "查看、编辑或者导入线路数据库中的基线数据。"));
-        connect(act, &QAction::triggered, this, &MainWindow::actRailDBDock);
-        act->setShortcut(Qt::CTRL + Qt::Key_H);
-        addAction(act);
-        btn = panel->addLargeAction(act);
-        btn->setMinimumWidth(80);
-
-        //menu = new SARibbonMenu(this);
-        //auto actsub = menu->addAction(tr("线路数据库 (pyETRC风格)"));
-        //addAction(actsub);
-        ////actsub->setShortcut(Qt::CTRL + Qt::ALT + Qt::Key_H);
-        //connect(actsub, &QAction::triggered, this, &MainWindow::actRailDB);
-        //act->setMenu(menu);
 
         act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺编辑"), this);
         act->setToolTip(tr("标尺编辑 (Ctrl+B)\n"
@@ -741,6 +726,32 @@ void MainWindow::initToolbar()
         addAction(act);
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(80);
+
+        panel = cat->addPannel(tr("路网管理"));
+
+        act = new QAction(QIcon(":/icons/database.png"), tr("数据库"), this);
+        act->setToolTip(tr("线路数据库 (Ctrl+H)\n"
+            "查看、编辑或者导入线路数据库中的基线数据。"));
+        connect(act, &QAction::triggered, this, &MainWindow::actRailDBDock);
+        act->setShortcut(Qt::CTRL + Qt::Key_H);
+        addAction(act);
+        btn = panel->addLargeAction(act);
+        btn->setMinimumWidth(80);
+
+        //menu = new SARibbonMenu(this);
+        //auto actsub = menu->addAction(tr("线路数据库 (pyETRC风格)"));
+        //addAction(actsub);
+        ////actsub->setShortcut(Qt::CTRL + Qt::ALT + Qt::Key_H);
+        //connect(actsub, &QAction::triggered, this, &MainWindow::actRailDB);
+        //act->setMenu(menu);
+
+        act = new QAction(QIcon(":/icons/diagram.png"), tr("快速生成"), this);
+        act->setToolTip(tr("快速径路生成 (Ctrl+J)\n"
+            "通过线路数据库中的数据，给出经由的关键点表，利用最短路算法生成新线路数据。"));
+        act->setShortcut(Qt::CTRL + Qt::Key_J);
+        addAction(act);
+        panel->addMediumAction(act);
+        actQuickPath = act;
     }
 
     QAction* actRemoveInterp, * actAutoBusiness;
@@ -1035,6 +1046,10 @@ void MainWindow::initToolbar()
         auto* cat = ribbon->addContextCategory(tr(""));
         contextDB = new RailDBContext(cat, this);
         connect(contextDB->getNavi(), &RailDBNavi::exportRailwayToDiagram,
+            naviView, &NaviTree::importRailwayFromDB);
+        connect(actQuickPath, &QAction::triggered,
+            contextDB, &RailDBContext::activateQuickSelector);
+        connect(contextDB, &RailDBContext::exportRailToDiagram,
             naviView, &NaviTree::importRailwayFromDB);
     }
 

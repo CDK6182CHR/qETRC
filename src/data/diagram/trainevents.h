@@ -156,6 +156,8 @@ struct IntervalEvent{
 
     IntervalEvent(IntervalEvent&&)noexcept = default;
     IntervalEvent(const IntervalEvent&) = default;
+    IntervalEvent& operator=(const IntervalEvent&)=default;
+    IntervalEvent& operator=(IntervalEvent&&)=default;
 
     bool operator<(const IntervalEvent& another)const;
 

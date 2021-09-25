@@ -56,6 +56,13 @@ namespace navi {
         void insertCategoryAt(std::shared_ptr<RailCategory> cat, int i);
 
         void removeCategoryAt(int i);
+
+        /**
+         * 搜索符合pred所给条件的线路，返回符合条件的路径表。
+         * 注意只搜索Railway，不搜索Category。
+         * 从当前对象开始搜索。
+         */
+        std::deque<navi::path_t> searchBy(std::function<bool(const Railway& )> pred);
     };
 
 

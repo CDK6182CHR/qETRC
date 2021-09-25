@@ -72,6 +72,11 @@ public:
     int fromSingleTrain(std::shared_ptr<const TrainAdapter> adp,
         int start, int stop);
 
+    /**
+     * 2021.09.25  非空节点数
+     */
+    int validNodeCount()const;
+
 
 };
 

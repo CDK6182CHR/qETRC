@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <QDialog>
+#include "data/diagram/stationbinding.h"
 
 struct TrainStationBounding;
 class QDoubleSpinBox;
@@ -59,7 +60,7 @@ class LocateBoundingDialog:
 {
     Q_OBJECT
     Diagram& diagram;
-    QVector<struct TrainStationBounding> boudingList{};
+    QVector<TrainStationBounding> boudingList{};
     QComboBox* cbBound;
     PageComboForRail* cbPage;
     QTimeEdit* edTime;

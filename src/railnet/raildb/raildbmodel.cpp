@@ -117,6 +117,38 @@ QModelIndex RailDBModel::categoryIndexBrute(std::shared_ptr<RailCategory> catego
     return categoryIndexBruteFrom(category, {});
 }
 
+std::deque<navi::path_t> RailDBModel::searchFullName(const QString &name)
+{
+    auto func=[&name](const Railway& rail)->bool{
+        return bool(rail.stationByName(name));
+    };
+    return _root->searchBy(func);
+}
+
+std::deque<navi::path_t> RailDBModel::searchPartName(const QString &name)
+{
+    auto func=[&name](const Railway& rail)->bool{
+        return bool(rail.stationByGeneralName(name));
+    };
+    return _root->searchBy(func);
+}
+
+std::deque<navi::path_t> RailDBModel::searchRailName(const QString &name)
+{
+    auto func=[&name](const Railway& rail)->bool{
+        return rail.name().contains(name);
+    };
+    return _root->searchBy(func);
+}
+
+std::shared_ptr<Railway> RailDBModel::railwayByPath(const navi::path_t &path)
+{
+    auto it=_root->itemByPath(path);
+    if(it&&it->type()==navi::RailwayItemDB::Type){
+        return static_cast<navi::RailwayItemDB*>(it)->railway();
+    }else return {};
+}
+
 RailDBModel::pACI RailDBModel::getParentItem(const QModelIndex &parent)const
 {
     if(parent.isValid()){

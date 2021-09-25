@@ -3,7 +3,8 @@
 
 #include <QtWidgets>
 
-QEControlledTable::QEControlledTable(QWidget *parent) : QWidget(parent)
+QEControlledTable::QEControlledTable(QWidget *parent, bool doubleLine) :
+    QWidget(parent), doubleLine(doubleLine)
 {
 	initUI();
 }
@@ -13,18 +14,32 @@ void QEControlledTable::initUI()
     auto* vlay = new QVBoxLayout(this);
     _table = new QTableView();
 	vlay->addWidget(_table);
+    vlay->setContentsMargins(0,0,0,0);
     //qDebug()<<"QEControlledTable: parent" <<_table->parent()<<Qt::endl;
 
-	auto* g = new ButtonGroup<5>({
-		"前插","后插","删除","上移","下移"
-		});
-	g->setMinimumWidth(50);
-	g->connectAll(SIGNAL(clicked()), this, {
-		SLOT(insertBefore()),SLOT(insertAfter()),SLOT(removeRow()),
-		SLOT(moveUp()),SLOT(moveDown())
-		});
+    if(doubleLine){
+        auto* g=new ButtonGroup<3>({"前插","后插","删除"});
+        g->setMinimumWidth(50);
+        g->connectAll(SIGNAL(clicked()),this,{SLOT(insertBefore()),
+                      SLOT(insertAfter()),SLOT(removeRow())});
+        vlay->addLayout(g);
+        auto* h=new ButtonGroup<2>({"上移","下移"});
+        h->setMinimumWidth(50);
+        vlay->addLayout(h);
+        h->connectAll(SIGNAL(clicked()),this,{SLOT(moveUp()),SLOT(moveDown())});
+    }else{
+        auto* g = new ButtonGroup<5>({
+            "前插","后插","删除","上移","下移"
+            });
+        g->setMinimumWidth(50);
+        g->connectAll(SIGNAL(clicked()), this, {
+            SLOT(insertBefore()),SLOT(insertAfter()),SLOT(removeRow()),
+            SLOT(moveUp()),SLOT(moveDown())
+            });
 
-	vlay->addLayout(g);
+        vlay->addLayout(g);
+    }
+
     //qDebug()<<"Layout parent: "<<g->parent()<<Qt::endl;
     //qDebug()<<"QEControlledTable: parent" <<_table->parent()<<Qt::endl;
 }

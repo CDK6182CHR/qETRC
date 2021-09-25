@@ -21,6 +21,8 @@ enum {
     TimeDataRole,
     TrainGapRole,
     RailwayRole,
+    GraphVertexRole,
+    GraphEdgeRole,
 };
 }
 

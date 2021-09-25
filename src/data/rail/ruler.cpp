@@ -112,3 +112,12 @@ int Ruler::fromSingleTrain(std::shared_ptr<const TrainAdapter> adp, int start, i
     }
     return cnt;
 }
+
+int Ruler::validNodeCount() const
+{
+    int cnt = 0;
+    for (auto n = firstDownNode(); n; n = n->nextNodeCirc()) {
+        if (!n->isNull())cnt++;
+    }
+    return cnt;
+}

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <QAbstractTableModel>
+#include <memory>
 
 class Track;
 

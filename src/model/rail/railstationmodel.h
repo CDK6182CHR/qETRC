@@ -74,6 +74,12 @@ public:
      */
     std::shared_ptr<const RailStation> getRowStation(int row);
 
+    /**
+     * 修改并报告结果（是否成功）。
+     * 不是slot。seealso `actApply`
+     */
+    bool applyChange();
+
 signals:
 
     /**
@@ -89,8 +95,9 @@ public slots:
     /**
      * 提交数据，即点击了确定
      * 注意不能用submit...这个会被自动Call
+     * seealso `applyChange()`
      */
-    bool actApply();
+    void actApply();
 
     /**
      * 撤销数据更改，即点击还原

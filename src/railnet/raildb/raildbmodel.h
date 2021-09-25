@@ -41,6 +41,13 @@ public:
      */
     QModelIndex railIndexBrute(std::shared_ptr<Railway> railway);
     QModelIndex categoryIndexBrute(std::shared_ptr<RailCategory> category);
+
+    std::deque<navi::path_t> searchFullName(const QString& name);
+    std::deque<navi::path_t> searchPartName(const QString& name);
+    std::deque<navi::path_t> searchRailName(const QString& name);
+
+    std::shared_ptr<Railway> railwayByPath(const navi::path_t& path);
+
 private:
     /**
      * @brief getParentItem
@@ -54,6 +61,9 @@ private:
         const QModelIndex& idx);
     std::shared_ptr<Railway> railwayByIndex(const QModelIndex& idx);
     std::shared_ptr<RailCategory> categoryByIndex(const QModelIndex& idx);
+
+
+
 public slots:
     void resetModel();
 

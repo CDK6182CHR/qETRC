@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <QAbstractTableModel>
+#include <memory>
 
 class TrainCollection;
 class Routing;

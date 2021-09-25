@@ -8,6 +8,7 @@
 #include "editors/ruler/rulerwidget.h"
 #include "data/rail/ruler.h"
 #include "data/diagram/diagram.h"
+#include "util/buttongroup.hpp"
 
 #include <QTreeView>
 #include <QVBoxLayout>
@@ -55,6 +56,15 @@ bool RailDBNavi::deactiveOnClose()
 void RailDBNavi::initUI()
 {
     auto* vlay=new QVBoxLayout(this);
+    auto* hlay=new QHBoxLayout;
+    edSearch=new QLineEdit;
+    hlay->addWidget(edSearch);
+    auto* g=new ButtonGroup<3>({"搜索全站名","搜索部分站名","搜索线名"});
+    hlay->addLayout(g);
+    vlay->addLayout(hlay);
+    g->connectAll(SIGNAL(clicked()),this,
+                  {SLOT(searchFullName()),SLOT(searchPartName()),
+                  SLOT(searchRailName())});
 
     tree=new QTreeView;
     tree->setModel(model);
@@ -571,6 +581,49 @@ void RailDBNavi::actRemoveRuler(std::shared_ptr<Ruler> ruler)
 {
     auto data = ruler->clone();
     _undo->push(new qecmd::RemoveRulerDB(ruler, data, ruler->isOrdinateRuler(), this));
+}
+
+void RailDBNavi::searchFullName()
+{
+    searchResult(model->searchFullName(edSearch->text()));
+}
+
+void RailDBNavi::searchPartName()
+{
+    searchResult(model->searchPartName(edSearch->text()));
+}
+
+void RailDBNavi::searchRailName()
+{
+    searchResult(model->searchRailName(edSearch->text()));
+}
+
+void RailDBNavi::searchResult(const std::deque<std::deque<int> > &paths)
+{
+    if(paths.empty()){
+        QMessageBox::warning(this,tr("错误"),tr("无符合条件线路"));
+    }else if(paths.size()==1){
+        tree->setCurrentIndex(model->indexByPath(paths.front()));
+    }else{
+        QMap<QString, navi::path_t> nameMap;
+        QStringList lst;
+        for(const auto& p:paths){
+            auto rail=model->railwayByPath(p);
+            if(!rail){
+                qDebug()<<"RailDBNavi::searchResults: WARNING: invalid path"<<
+                          Qt::endl;
+            }else{
+                lst.push_back(rail->name());
+                nameMap.insert(rail->name(), p);
+            }
+        }
+        bool ok;
+        QString res=QInputDialog::getItem(this,tr("搜索结果"),tr("有多个选项符合条件，请选择："),
+                              lst,0,false,&ok);
+        if(!ok) return;
+        auto path=nameMap.value(res);
+        tree->setCurrentIndex(model->indexByPath(path));
+    }
 }
 
 

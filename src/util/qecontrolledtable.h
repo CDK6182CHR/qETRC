@@ -11,8 +11,9 @@ class QEControlledTable : public QWidget
 {
     Q_OBJECT
     QTableView* _table;
+    bool doubleLine;
 public:
-    explicit QEControlledTable(QWidget *parent = nullptr);
+    explicit QEControlledTable(QWidget *parent = nullptr, bool doubleLine=false);
     auto* table(){return _table;}
 
 private:

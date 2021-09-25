@@ -1,5 +1,6 @@
 ﻿#include "rulerrefdialog.h"
 
+#include <cmath>
 #include <QComboBox>
 #include <QTableView>
 #include <QHeaderView>

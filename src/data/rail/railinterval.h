@@ -121,26 +121,27 @@ public:
     template <typename Node>
     inline std::shared_ptr<Node> getDataAt(int i);
 
-    template <>
-    inline std::shared_ptr<const RulerNode> getDataAt(int i)const{
-        return _rulerNodes.at(i);
-    }
-
-    template <>
-    inline std::shared_ptr<RulerNode> getDataAt(int i){
-        return _rulerNodes[i];
-    }
-
-    template <>
-    inline std::shared_ptr<const ForbidNode> getDataAt(int i)const{
-        return _forbidNodes.at(i);
-    }
-
-    template <>
-    inline std::shared_ptr<ForbidNode> getDataAt(int i){
-        return _forbidNodes[i];
-    }
-
 };
+
+template <>
+inline std::shared_ptr<const RulerNode> RailInterval::getDataAt(int i)const{
+    return _rulerNodes.at(i);
+}
+
+template <>
+inline std::shared_ptr<RulerNode> RailInterval::getDataAt(int i){
+    return _rulerNodes[i];
+}
+
+template <>
+inline std::shared_ptr<const ForbidNode> RailInterval::getDataAt(int i)const{
+    return _forbidNodes.at(i);
+}
+
+template <>
+inline std::shared_ptr<ForbidNode> RailInterval::getDataAt(int i){
+    return _forbidNodes[i];
+}
+
 
 QDebug operator<<(QDebug debug, const RailInterval& s);

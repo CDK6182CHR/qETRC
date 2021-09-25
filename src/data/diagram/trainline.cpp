@@ -8,6 +8,7 @@
 #include "util/utilfunc.h"
 
 #include <QDebug>
+#include <cmath>
 
 //I/O部分暂不实现
 #if 0

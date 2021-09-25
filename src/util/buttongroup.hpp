@@ -20,8 +20,12 @@ class ButtonGroup:
 protected:
     std::array<_Button*,_Num> buttons;
 public:
-    //ButtonGroup(const std::array<QString,_Num>& labels);
-    ButtonGroup(const std::array<const char*,_Num>& labels);
+    ButtonGroup(const std::array<const char*,_Num>& labels){
+        for(int i=0;i<_Num;i++){
+            this->buttons[i]=new _Button(QObject::tr(labels[i]));
+            this->addWidget(buttons[i]);
+        }
+    }
 
     _Button* get(int i)const{return buttons[i];}
     void setMinimumWidth(int w);
@@ -70,23 +74,6 @@ public:
     }
 };
 
-//template<size_t _Num, typename _Layout, typename _Button>
-//ButtonGroup<_Num, _Layout, _Button>::ButtonGroup(const std::array<QString, _Num> &labels)
-//{
-//    for(int i=0;i<_Num;i++){
-//        buttons[i]=new _Button(labels[i]);
-//        addWidget(buttons[i]);
-//    }
-//}
-
-template<size_t _Num, typename _Layout, typename _Button>
-ButtonGroup<_Num, _Layout, _Button>::ButtonGroup(const std::array<const char *, _Num> &labels)
-{
-    for(int i=0;i<_Num;i++){
-        buttons[i]=new _Button(QObject::tr(labels[i]));
-        addWidget(buttons[i]);
-    }
-}
 
 template<size_t _Num, typename _Layout, typename _Button>
 void ButtonGroup<_Num, _Layout, _Button>::setMinimumWidth(int w)
@@ -120,10 +107,10 @@ class RadioButtonGroup :
     QButtonGroup* group;
 public:
     RadioButtonGroup(const std::array<const char*, _Num>& labels, QWidget* parent) :
-        ButtonGroup(labels), group(new QButtonGroup(parent)) 
+        ButtonGroup<_Num,_Layout,_Button>(labels), group(new QButtonGroup(parent))
     {
         for (int i = 0; i < _Num; i++) {
-            group->addButton(buttons[i]);
+            group->addButton(this->buttons[i]);
         }
     }
 };

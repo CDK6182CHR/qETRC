@@ -580,6 +580,17 @@ public:
      */
     std::shared_ptr<RailInterval> intervalCircByIndex(int i);
 
+    /**
+     * 删除小于指定节点数的标尺。不考虑撤销。
+     */
+    void filtRulerByCount(int minCount);
+
+    /**
+     * 使对称：将所有站简单地改成上下行通过，然后生成上行区间。
+     * 用于生成对称的切片。
+     */
+    void symmetrize();
+
 private:
     /**
      * 维护nameMap和fieldMap

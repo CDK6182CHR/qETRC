@@ -124,6 +124,22 @@ void navi::RailCategoryItem::removeCategoryAt(int i)
     }
 }
 
+std::deque<navi::path_t> navi::RailCategoryItem::searchBy(
+        std::function<bool (const Railway &)> pred)
+{
+    std::deque<path_t> res;
+    for(const auto& subcat:_subcats){
+        auto subres=subcat->searchBy(pred);
+        res.insert(res.end(),subres.begin(),subres.end());
+    }
+    for(const auto& rail:_railways){
+        if (pred(*(rail->railway()))){
+            res.emplace_back(rail->path());
+        }
+    }
+    return res;
+}
+
 
 navi::RailwayItemDB::RailwayItemDB(std::shared_ptr<Railway> rail,
                                    int row, RailCategoryItem *parent):

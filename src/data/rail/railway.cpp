@@ -1498,6 +1498,34 @@ std::shared_ptr<RailInterval> Railway::intervalCircByIndex(int index)
 	return p;
 }
 
+void Railway::filtRulerByCount(int minCount)
+{
+	int i = 0;
+	while (i < _rulers.size()) {
+		auto r = _rulers.at(i);
+		if (r->validNodeCount() < minCount) {
+			removeRuler(r);
+		}
+		else {
+			i++;
+		}
+	}
+}
+
+void Railway::symmetrize()
+{
+	foreach(const auto & p, _stations) {
+		p->direction = PassedDirection::BothVia;
+	}
+	initUpIntervals();
+	foreach(const auto& ruler, _rulers) {
+		ruler->copyDownToUp();
+	}
+	foreach(const auto& forbid, _forbids) {
+		forbid->copyDownToUp();
+	}
+}
+
 double Railway::calStationYValueByMile(const Config& config)
 {
 	for (auto& p : _stations) {
