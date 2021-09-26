@@ -99,5 +99,7 @@ private slots:
     void actShowAdj();
 
     void actRefreshNet();
+
+    void actPathSelector();
 };
 

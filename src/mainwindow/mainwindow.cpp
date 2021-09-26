@@ -817,7 +817,7 @@ void MainWindow::initToolbar()
         act->setIcon(QIcon(":/icons/clock.png"));
         act->setShortcut(Qt::CTRL + Qt::Key_I);
         addAction(act);
-        act->setToolTip(tr("速览时刻 (Ctrl+Y)\n"
+        act->setToolTip(tr("速览时刻 (Ctrl+I)\n"
             "显示或隐藏pyETRC风格的双行只读时刻表。"));
         btn = panel->addLargeAction(act);
         btn->setMinimumWidth(70);
@@ -1507,6 +1507,7 @@ void MainWindow::commitPassedStationChange(int n)
 
 void MainWindow::refreshAll()
 {
+    auto start = std::chrono::system_clock::now();
     _diagram.rebindAllTrains();
     updateAllDiagrams();
     //直接由Main管理的子页面
@@ -1522,6 +1523,8 @@ void MainWindow::refreshAll()
     contextRuler->refreshAllData();
     contextPage->refreshAllData();
     updateWindowTitle();
+    auto end = std::chrono::system_clock::now();
+    showStatus(tr("全部刷新完毕  用时 %1 毫秒").arg((end - start) / std::chrono::milliseconds(1)));
 }
 
 void MainWindow::applyChangeStationName(const ChangeStationNameData& data)
@@ -1562,17 +1565,24 @@ void MainWindow::repaintTrainLines(std::shared_ptr<Train> train)
 
 void MainWindow::actOpenGraph()
 {
+    using namespace std::chrono_literals;
     if (changed && !saveQuestion())
         return;
     QString res = QFileDialog::getOpenFileName(this, QObject::tr("打开"), QString(),
         QObject::tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)"));
     if (res.isNull())
         return;
+    auto start = std::chrono::system_clock::now();
     bool flag = openGraph(res);
     if (!flag)
         QMessageBox::warning(this, QObject::tr("错误"), QObject::tr("文件错误，请检查!"));
-    else
+    else {
         markUnchanged();
+        auto end = std::chrono::system_clock::now();
+        showStatus(tr("打开运行图文件%1成功  用时%2毫秒").arg(res)
+            .arg((end - start) / 1ms));
+    }
+        
 }
 
 void MainWindow::actSaveGraph()
@@ -1634,6 +1644,8 @@ void MainWindow::resetRecentActions()
 
 void MainWindow::openRecentFile()
 {
+    using namespace std::chrono_literals;
+    auto start = std::chrono::system_clock::now();
     QAction* act = qobject_cast<QAction*>(sender());
     if (act) {
         const QString& filename = act->data().toString();
@@ -1645,6 +1657,9 @@ void MainWindow::openRecentFile()
                 markUnchanged();
                 resetRecentActions();
                 updateWindowTitle();
+                auto end = std::chrono::system_clock::now();
+                showStatus(tr("打开运行图文件%1成功  用时%2毫秒").arg(filename)
+                    .arg((end - start) / 1ms));
             }
         }
     }

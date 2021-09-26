@@ -14,6 +14,7 @@
 #include "railnet/path/quickpathselector.h"
 #include "railnet/path/railpreviewdialog.h"
 #include "railnet/graph/viewadjacentwidget.h"
+#include "wizards/selectpath/selectpathwizard.h"
 
 RailDBContext::RailDBContext(SARibbonContextCategory *cont, MainWindow *mw_):
     QObject(mw_), cont(cont),mw(mw_),
@@ -61,6 +62,13 @@ void RailDBContext::initUI()
     act->setIcon(QIcon(":/icons/diagram.png"));
     act->setToolTip(tr("快速径路选择 (Ctrl+J)\n"
         "给出关键点，用最短路算法计算径路，生成切片。"));
+    btn = panel->addLargeAction(act);
+    btn->setMinimumWidth(80);
+
+    act = new QAction(QIcon(":/icons/polyline.png"), tr("经由选择"), this);
+    connect(act, &QAction::triggered, this, &RailDBContext::actPathSelector);
+    act->setToolTip(tr("经由选择器 (Ctrl+K)\n"
+        "弹出向导，从线网中手动选择径路，生成线路及其运行图。"));
     btn = panel->addLargeAction(act);
     btn->setMinimumWidth(80);
 
@@ -166,11 +174,18 @@ void RailDBContext::activateQuickSelector()
     }
 }
 
+#include <chrono>
+
 void RailDBContext::loadDB()
 {
     if (!_active) {
+        using namespace std::chrono_literals;
+        auto start = std::chrono::system_clock::now();
         window->getNavi()->openDB(SystemJson::instance.default_raildb_file);
         _active = true;
+        auto end = std::chrono::system_clock::now();
+        int ms = (end - start) / 1ms;
+        mw->showStatus(tr("线路数据库初始化完成 用时%1 ms").arg(ms));
     }
 }
 
@@ -197,11 +212,22 @@ void RailDBContext::actRefreshNet()
     // 这里放后续的刷新工作
 }
 
+void RailDBContext::actPathSelector()
+{
+    auto* wzd = new SelectPathWizard(net, mw);
+    // todo: connect
+    wzd->show();
+}
+
 void RailDBContext::loadNet()
 {
+    using namespace std::chrono_literals;
+    auto start = std::chrono::system_clock::now();
     net.clear();
     net.fromRailCategory(_raildb.get());
-    qDebug() << "RailNet size "<< net.size() << Qt::endl;
+    auto end = std::chrono::system_clock::now();
+    mw->showStatus(tr("线网有向图加载完毕  共%1站 用时%2毫秒").arg(net.size())
+        .arg((end - start) / 1ms));
 }
 
 void RailDBContext::previewRail(std::shared_ptr<Railway> railway, const QString& pathString)

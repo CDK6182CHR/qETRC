@@ -7,6 +7,7 @@
 #include "graphstation.h"
 #include "graphinterval.h"
 
+class PathOperationSeq;
 
 class Railway;
 class RailCategory;
@@ -16,6 +17,8 @@ class RailNet: public xtl::di_graph<StationName, GraphStation, GraphInterval>
     using di_graph::dump_path;
 public:
     RailNet()=default;
+
+    using path_t=path_t;
 
     struct rail_ret_t{
         std::shared_ptr<Railway> railway;
@@ -57,6 +60,37 @@ public:
      */
     QString pathToString(const path_t& path)const;
 
+    /**
+     * 径路转换为单行的字符串。
+     */
+    QString pathToStringSimple(const path_t& path)const;
+
+    /**
+     * 按最短路算法生成部分路径。此混搭签名是为了用于经由选择器。
+     */
+    path_t shortestPath(const std::shared_ptr<const vertex>& from,
+                        const std::shared_ptr<const vertex> & to,
+                        QString* report) const;
+
+    /**
+     * 计算径路的总长度，简单累加每段的里程。
+     */
+    static double pathMile(const path_t& path);
+
+    /**
+     * 由所给边，按照当前线名向前追踪至线路终点，返回整个径路，包含起始。
+     */
+    path_t railPathFrom(const std::shared_ptr<const edge>& start)const;
+
+    /**
+     * 根据指定线名、方向，查找始点至末点的路径。
+     * 如果找不到目标点，返回空。
+     * 用于添加反向路径。
+     */
+    path_t railPathTo(const std::shared_ptr<const vertex>& start,
+                      const std::shared_ptr<const vertex>& target,
+                      const QString& railName, Direction dir)const;
+
 
 private:
     void addRailway(const Railway* railway);
@@ -69,6 +103,23 @@ private:
     std::pair<std::shared_ptr<Railway>,path_t>
         singleRailFromPath(const QVector<QString>& points, bool withRuler,
                            QString* report)const;
+
+    std::shared_ptr<Railway> singleRailFromPath(const path_t& path, bool withRuler)const;
+
+    /**
+     * 将子路径所示的内容添加到rail所指向的线路中。
+     * 可用于从PathOperationSeq中生成线路。
+     */
+    void appendSubPathToRail(const std::shared_ptr<Railway>& rail,
+                             const path_t& subpath,
+                             bool withRuler,
+                             QMap<QString,int>& rulerMap)const;
+
+    /**
+     * 由经由选择操作生成线路。
+     */
+    std::shared_ptr<Railway> singleRailFromPathOperations(
+            const PathOperationSeq& seq, bool withRuler)const;
 
     QString intervalPathToString(std::shared_ptr<const vertex> pre,
         const std::shared_ptr<const vertex> post, const QString& railName,

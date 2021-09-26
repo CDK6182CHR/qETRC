@@ -89,6 +89,7 @@ SOURCES += \
     src/model/train/routingeditmodel.cpp \
     src/model/train/routinglistmodel.cpp \
     src/model/train/trainlistreadmodel.cpp \
+    src/railnet/graph/adjacentlistmodel.cpp \
     src/railnet/graph/adjacentlistwidget.cpp \
     src/railnet/graph/edgedatamodels.cpp \
     src/railnet/graph/graphinterval.cpp \
@@ -96,6 +97,10 @@ SOURCES += \
     src/railnet/graph/railnet.cpp \
     src/railnet/graph/vertexlistwidget.cpp \
     src/railnet/graph/viewadjacentwidget.cpp \
+    src/railnet/path/graphpathmodel.cpp \
+    src/railnet/path/pathoperation.cpp \
+    src/railnet/path/pathoperationmodel.cpp \
+    src/railnet/path/pathselectwidget.cpp \
     src/railnet/path/quickpathselector.cpp \
     src/railnet/path/railpreviewdialog.cpp \
     src/railnet/raildb/raildb.cpp \
@@ -161,6 +166,8 @@ SOURCES += \
     src/wizards/rulerpaint/rulerpaintpagestation.cpp \
     src/wizards/rulerpaint/rulerpaintpagetable.cpp \
     src/wizards/rulerpaint/rulerpaintwizard.cpp \
+    src/wizards/selectpath/selectpathpagestart.cpp \
+    src/wizards/selectpath/selectpathwizard.cpp \
     src/wizards/timeinterp/timeinterppagepreview.cpp \
     src/wizards/timeinterp/timeinterppagetrain.cpp \
     src/wizards/timeinterp/timeinterpwizard.cpp
@@ -244,6 +251,7 @@ HEADERS += \
     src/model/train/routingeditmodel.h \
     src/model/train/routinglistmodel.h \
     src/model/train/trainlistreadmodel.h \
+    src/railnet/graph/adjacentlistmodel.h \
     src/railnet/graph/adjacentlistwidget.h \
     src/railnet/graph/edgedatamodels.h \
     src/railnet/graph/graphinterval.h \
@@ -252,6 +260,10 @@ HEADERS += \
     src/railnet/graph/vertexlistwidget.h \
     src/railnet/graph/viewadjacentwidget.h \
     src/railnet/graph/xtl_graph.hpp \
+    src/railnet/path/graphpathmodel.h \
+    src/railnet/path/pathoperation.h \
+    src/railnet/path/pathoperationmodel.h \
+    src/railnet/path/pathselectwidget.h \
     src/railnet/path/quickpathselector.h \
     src/railnet/path/railpreviewdialog.h \
     src/railnet/raildb/raildb.h \
@@ -320,6 +332,8 @@ HEADERS += \
     src/wizards/rulerpaint/rulerpaintpagestation.h \
     src/wizards/rulerpaint/rulerpaintpagetable.h \
     src/wizards/rulerpaint/rulerpaintwizard.h \
+    src/wizards/selectpath/selectpathpagestart.h \
+    src/wizards/selectpath/selectpathwizard.h \
     src/wizards/timeinterp/timeinterppagepreview.h \
     src/wizards/timeinterp/timeinterppagetrain.h \
     src/wizards/timeinterp/timeinterpwizard.h

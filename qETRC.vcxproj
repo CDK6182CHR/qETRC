@@ -248,6 +248,7 @@
     <ClCompile Include="src\model\train\timetablequickmodel.cpp" />
     <ClCompile Include="src\model\train\trainlistreadmodel.cpp" />
     <ClCompile Include="src\model\train\typemodel.cpp" />
+    <ClCompile Include="src\railnet\graph\adjacentlistmodel.cpp" />
     <ClCompile Include="src\railnet\graph\adjacentlistwidget.cpp" />
     <ClCompile Include="src\railnet\graph\edgedatamodels.cpp" />
     <ClCompile Include="src\railnet\graph\graphinterval.cpp" />
@@ -255,6 +256,10 @@
     <ClCompile Include="src\railnet\graph\railnet.cpp" />
     <ClCompile Include="src\railnet\graph\vertexlistwidget.cpp" />
     <ClCompile Include="src\railnet\graph\viewadjacentwidget.cpp" />
+    <ClCompile Include="src\railnet\path\graphpathmodel.cpp" />
+    <ClCompile Include="src\railnet\path\pathoperation.cpp" />
+    <ClCompile Include="src\railnet\path\pathoperationmodel.cpp" />
+    <ClCompile Include="src\railnet\path\pathselectwidget.cpp" />
     <ClCompile Include="src\railnet\path\quickpathselector.cpp" />
     <ClCompile Include="src\railnet\path\railpreviewdialog.cpp" />
     <ClCompile Include="src\railnet\raildb\raildb.cpp" />
@@ -339,6 +344,8 @@
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagestation.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagetable.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintwizard.cpp" />
+    <ClCompile Include="src\wizards\selectpath\selectpathpagestart.cpp" />
+    <ClCompile Include="src\wizards\selectpath\selectpathwizard.cpp" />
     <ClCompile Include="src\wizards\timeinterp\timeinterppagepreview.cpp" />
     <ClCompile Include="src\wizards\timeinterp\timeinterppagetrain.cpp" />
     <ClCompile Include="src\wizards\timeinterp\timeinterpwizard.cpp" />
@@ -353,6 +360,7 @@
     <QtMoc Include="src\kernel\trackdiagram.h" />
     <QtMoc Include="src\model\rail\railtrackadjustmodel.h" />
     <QtMoc Include="src\railnet\graph\adjacentlistwidget.h" />
+    <QtMoc Include="src\railnet\graph\adjacentlistmodel.h" />
     <ClInclude Include="src\railnet\graph\edgedatamodels.h" />
     <ClInclude Include="src\railnet\graph\graphinterval.h" />
     <ClInclude Include="src\railnet\graph\graphstation.h" />
@@ -362,6 +370,10 @@
     <ClInclude Include="src\railnet\graph\xtl_graph.hpp" />
     <QtMoc Include="src\railnet\path\quickpathselector.h" />
     <QtMoc Include="src\railnet\path\railpreviewdialog.h" />
+    <QtMoc Include="src\railnet\path\graphpathmodel.h" />
+    <ClInclude Include="src\railnet\path\pathoperation.h" />
+    <QtMoc Include="src\railnet\path\pathoperationmodel.h" />
+    <QtMoc Include="src\railnet\path\pathselectwidget.h" />
     <ClInclude Include="src\railnet\raildb\raildb.h" />
     <QtMoc Include="src\railnet\raildb\raildbcontext.h" />
     <ClInclude Include="src\railnet\raildb\raildbitems.h" />
@@ -369,6 +381,8 @@
     <QtMoc Include="src\railnet\raildb\raildbnavi.h" />
     <QtMoc Include="src\railnet\raildb\raildbwindow.h" />
     <QtMoc Include="src\viewers\events\railtrackwidget.h" />
+    <QtMoc Include="src\wizards\selectpath\selectpathpagestart.h" />
+    <QtMoc Include="src\wizards\selectpath\selectpathwizard.h" />
     <ClInclude Include="src\wizards\timeinterp\timeinterppagepreview.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterpwizard.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterppagetrain.h" />
