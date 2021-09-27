@@ -91,6 +91,12 @@ public:
                       const std::shared_ptr<const vertex>& target,
                       const QString& railName, Direction dir)const;
 
+    /**
+     * 由经由选择操作生成线路。
+     */
+    std::shared_ptr<Railway> singleRailFromPathOperations(
+            const PathOperationSeq& seq, bool withRuler)const;
+
 
 private:
     void addRailway(const Railway* railway);
@@ -115,11 +121,7 @@ private:
                              bool withRuler,
                              QMap<QString,int>& rulerMap)const;
 
-    /**
-     * 由经由选择操作生成线路。
-     */
-    std::shared_ptr<Railway> singleRailFromPathOperations(
-            const PathOperationSeq& seq, bool withRuler)const;
+
 
     QString intervalPathToString(std::shared_ptr<const vertex> pre,
         const std::shared_ptr<const vertex> post, const QString& railName,

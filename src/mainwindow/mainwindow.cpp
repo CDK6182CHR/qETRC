@@ -182,6 +182,7 @@ void MainWindow::onTrainsImported()
     naviModel->refreshRoutings();
     undoStack->clear();  //不支持撤销
     markChanged();
+    showStatus(tr("导入列车完成"));
 }
 
 void MainWindow::removeAllTrains()
@@ -571,6 +572,13 @@ void MainWindow::initToolbar()
         connect(act, SIGNAL(triggered()), this, SLOT(actSaveGraph()));
         sharedActions.save = act;
 
+        act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogSaveAllButton),
+            tr("另存为.."), this);
+        act->setToolTip(tr("另存为\n将当前运行图另存为新建文件。"));
+        panel->addMediumAction(act);
+        connect(act, &QAction::triggered, this, &MainWindow::actSaveGraphAs);
+        sharedActions.saveas = act;
+
         act = new QAction(QIcon(":/icons/ETRC-dynamic.png"), tr("导出为.."), this);
         act->setToolTip(tr("导出为单线路运行图 (Ctrl+M)\n"
             "导出为单一线路的pyETRC或ETRC运行图文件格式。"));
@@ -660,7 +668,7 @@ void MainWindow::initToolbar()
     }
 
     //线路
-    QAction* actQuickPath;
+    QAction* actQuickPath, * actSelector;
     if constexpr (true) {
         auto* cat = ribbon->addCategoryPage(tr("线路(&2)"));
         auto* panel = cat->addPannel(tr("基础数据"));
@@ -745,13 +753,22 @@ void MainWindow::initToolbar()
         //connect(actsub, &QAction::triggered, this, &MainWindow::actRailDB);
         //act->setMenu(menu);
 
-        act = new QAction(QIcon(":/icons/diagram.png"), tr("快速生成"), this);
+        act = new QAction(QIcon(":/icons/diagram.png"), tr("快速径路"), this);
         act->setToolTip(tr("快速径路生成 (Ctrl+J)\n"
             "通过线路数据库中的数据，给出经由的关键点表，利用最短路算法生成新线路数据。"));
         act->setShortcut(Qt::CTRL + Qt::Key_J);
         addAction(act);
         panel->addMediumAction(act);
         actQuickPath = act;
+
+        act = new QAction(QIcon(":/icons/polyline.png"), tr("经由选择"), this);
+        act->setToolTip(tr("交互式经由选择 (Ctrl+K)\n"
+            "通过数据库中的数据，手动指定通过邻站、邻线或者区间最短路方式，"
+            "生成径路可精确控制的新线路数据。"));
+        act->setShortcut(Qt::CTRL + Qt::Key_K);
+        addAction(act);
+        panel->addMediumAction(act);
+        actSelector = act;
     }
 
     QAction* actRemoveInterp, * actAutoBusiness;
@@ -1051,6 +1068,8 @@ void MainWindow::initToolbar()
             contextDB, &RailDBContext::activateQuickSelector);
         connect(contextDB, &RailDBContext::exportRailToDiagram,
             naviView, &NaviTree::importRailwayFromDB);
+        connect(actSelector, &QAction::triggered, contextDB,
+            &RailDBContext::actPathSelector);
     }
 
     //ApplicationMenu的初始化放在最后，因为可能用到前面的..
@@ -1069,11 +1088,7 @@ void MainWindow::initAppMenu()
     menu->addAction(sharedActions.newfile);
     menu->addAction(sharedActions.open);
     menu->addAction(sharedActions.save);
-
-    auto* act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogSaveAllButton),
-        tr("另存为"), this);
-    connect(act, SIGNAL(triggered()), this, SLOT(actSaveGraphAs()));
-    menu->addAction(act);
+    menu->addAction(sharedActions.saveas);
 
     menu->addSeparator();
 
@@ -1144,6 +1159,7 @@ void MainWindow::actNewGraph()
     clearDiagram();
     _diagram.setFilename("");
     endResetGraph();
+    showStatus(tr("新建空白运行图"));
 }
 
 void MainWindow::endResetGraph()
@@ -1326,6 +1342,7 @@ void MainWindow::actBatchDetectRouting()
 void MainWindow::actDiagnose()
 {
     auto* d = new DiagnosisDialog(_diagram, this);
+    connect(d, &DiagnosisDialog::showStatus, this, &MainWindow::showStatus);
     d->show();
 }
 
@@ -1590,10 +1607,13 @@ void MainWindow::actSaveGraph()
     if (_diagram.filename().isEmpty())
         actSaveGraphAs();
     else {
+        using namespace std::chrono_literals;
+        auto start = std::chrono::system_clock::now();
         _diagram.save();
         markUnchanged();
         undoStack->setClean();
-        showStatus(tr("保存成功"));
+        auto end = std::chrono::system_clock::now();
+        showStatus(tr("保存成功  用时%1毫秒").arg((end-start)/1ms));
     }
 }
 
@@ -1605,11 +1625,14 @@ void MainWindow::actSaveGraphAs()
         return;
     bool flag = _diagram.saveAs(res);
     if (flag) {
+        using namespace std::chrono_literals;
+        auto start = std::chrono::system_clock::now();
         markUnchanged();
         undoStack->setClean();
         addRecentFile(res);
         updateWindowTitle();
-        showStatus(tr("保存成功"));
+        auto end = std::chrono::system_clock::now();
+        showStatus(tr("保存成功  用时%1毫秒").arg((end-start)/1ms));
     }
 }
 
@@ -1673,6 +1696,8 @@ void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)
 
 void MainWindow::insertPageWidget(std::shared_ptr<DiagramPage> page, int index)
 {
+    using namespace std::chrono_literals;
+    auto start = std::chrono::system_clock::now();
     DiagramWidget* dw = new DiagramWidget(_diagram, page);
     auto* dock = new ads::CDockWidget(tr("运行图 - %1").arg(page->name()));
     dock->setWidget(dw);
@@ -1694,6 +1719,9 @@ void MainWindow::insertPageWidget(std::shared_ptr<DiagramPage> page, int index)
     connect(dw, &DiagramWidget::railFocussedIn, this, &MainWindow::focusInRailway);
     connect(contextTrain, &TrainContext::highlightTrainLine, dw, &DiagramWidget::highlightTrain);
     connect(dw, &DiagramWidget::pageFocussedIn, this, &MainWindow::focusInPage);
+    connect(dw, &DiagramWidget::showNewStatus, this, &MainWindow::showStatus);
+    auto end = std::chrono::system_clock::now();
+    showStatus(tr("添加运行图 [%1] 用时%2毫秒").arg(page->name()).arg((end - start) / 1ms));
 }
 
 void MainWindow::activatePageWidget(int index)

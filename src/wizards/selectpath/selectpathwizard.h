@@ -2,9 +2,12 @@
 
 #include <QWizard>
 
+class Railway;
+class SelectPathPagePreview;
 class PathSelectWidget;
 class RailNet;
 class SelectPathPageStart;
+
 class SelectPathWizard : public QWizard
 {
     Q_OBJECT
@@ -12,6 +15,7 @@ class SelectPathWizard : public QWizard
     SelectPathPageStart* pgStart;
     PathSelectWidget* selDown,*selUp;
     QWizardPage* pgDown,*pgUp;
+    SelectPathPagePreview* pgPreview;
 public:
     SelectPathWizard(const RailNet& net, QWidget* parent=nullptr);
 
@@ -19,6 +23,8 @@ protected:
     virtual void initializePage(int id) override;
 private:
     void initUI();
+signals:
+    void railwayConfirmed(std::shared_ptr<Railway>);
 private slots:
     /**
      * @brief regenerateInversePath
@@ -31,4 +37,7 @@ private slots:
      */
     void generateInversePath();
 
+public slots:
+    virtual void accept() override;
+    virtual void reject() override;
 };

@@ -486,10 +486,14 @@ void RailContext::actShowTrainGap()
 
 void RailContext::actTrainGapSummary()
 {
+	using namespace std::chrono_literals;
 	if (!railway)return;
+	auto start = std::chrono::system_clock::now();
 	auto* dlg = new TrainGapSummaryDialog(diagram, railway, mw);
 	connect(dlg, &TrainGapSummaryDialog::locateOnEvent,
 		mw, &MainWindow::locateDiagramOnStation);
+	auto end = std::chrono::system_clock::now();
+	mw->showStatus(tr("列车间隔分析  用时%1毫秒").arg((end - start) / 1ms));
 	dlg->show();
 }
 

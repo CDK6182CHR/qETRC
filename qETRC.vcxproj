@@ -344,6 +344,7 @@
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagestation.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagetable.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintwizard.cpp" />
+    <ClCompile Include="src\wizards\selectpath\selectpathpagepreview.cpp" />
     <ClCompile Include="src\wizards\selectpath\selectpathpagestart.cpp" />
     <ClCompile Include="src\wizards\selectpath\selectpathwizard.cpp" />
     <ClCompile Include="src\wizards\timeinterp\timeinterppagepreview.cpp" />
@@ -383,6 +384,7 @@
     <QtMoc Include="src\viewers\events\railtrackwidget.h" />
     <QtMoc Include="src\wizards\selectpath\selectpathpagestart.h" />
     <QtMoc Include="src\wizards\selectpath\selectpathwizard.h" />
+    <QtMoc Include="src\wizards\selectpath\selectpathpagepreview.h" />
     <ClInclude Include="src\wizards\timeinterp\timeinterppagepreview.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterpwizard.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterppagetrain.h" />

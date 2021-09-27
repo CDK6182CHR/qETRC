@@ -47,4 +47,7 @@ void SelectPathPageStart::initUI()
     spRulerCount->setMaximumWidth(200);
     flay->addRow(tr("最小标尺区间数"),spRulerCount);
     vlay->addLayout(flay);
+
+    spRulerCount->setEnabled(false);
+    connect(ckRuler,&QCheckBox::toggled,spRulerCount,&QSpinBox::setEnabled);
 }

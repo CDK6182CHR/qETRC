@@ -324,6 +324,9 @@ std::shared_ptr<Railway> RailNet::singleRailFromPathOperations(
     auto res=std::make_shared<Railway>(QString("%1-%2").arg(seq.start()->data.name.toSingleLiteral(),
                      seq.lastVertex()->data.name.toSingleLiteral()));
     res->ensureForbids(Forbid::FORBID_COUNT);
+    res->appendStation(seq.start()->data.name, 0, seq.start()->data.level,
+        std::nullopt, PassedDirection::DownVia, true, seq.start()->data.passenger,
+        seq.start()->data.freight);
     QMap<QString, int> rulerMap;
     foreach(const auto& op, seq.operations()){
         appendSubPathToRail(res,op.path,withRuler,rulerMap);

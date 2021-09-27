@@ -722,7 +722,7 @@ void TrainLine::diagnoWithSameDir(DiagnosisList& res, const TrainLine& another, 
         if (pme != mylast && phe != hislast) {
             auto pint = findIntervalIntersectionSameDir(mylast, pme, hislast, phe);
             if (pint.has_value()) {
-                //区间越行  todo
+                //区间越行  
                 auto pos = compressSnapInterval(mylast, pme, std::get<0>(*pint));
                 res.push_back(DiagnosisIssue(DiagnosisType::IntervalOverTaking,
                     qeutil::Error, pos, shared_from_this(), QObject::tr("在里程[%1]，时刻"
@@ -958,9 +958,10 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
     double ymmin = ym1, ymmax = ym2;
     if (ymmin > ymmax)std::swap(ymmin, ymmax);
 
-    //判定交点是否在合理范围内
-    if (ymmin <= yinter && yinter <= ymmax &&
-        yhmin <= yinter && yinter <= yhmax) {
+    // 判定交点是否在合理范围内
+    // 2021.09.27 删除等号——正好相等的情况应处理为站内事件。
+    if (ymmin < yinter && yinter < ymmax &&
+        yhmin < yinter && yinter < yhmax) {
         //合法交点  在本次列车的运行线上算出里程
         double mile;
         if (b1 == 0)mile = rm1->mile;   //斜率无穷大，没得算
@@ -1090,9 +1091,10 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
     double ymmin = ym1, ymmax = ym2;
     if (ymmin > ymmax)std::swap(ymmin, ymmax);
 
-    //判定交点是否在合理范围内。用x判定，因为x的大小关系是明确的
-    if (yhmin <= yinter && yinter <= yhmax &&
-        ymmin <= yinter && yinter <= ymmax) {
+    // 判定交点是否在合理范围内。用x判定，因为x的大小关系是明确的
+    // 2021.09.27删除等号；正好相等的情况应在站内处理。
+    if (yhmin < yinter && yinter < yhmax &&
+        ymmin < yinter && yinter < ymmax) {
         //合法交点  在本次列车的运行线上算出里程
         double mile;
         if (b1 == 0)mile = rm1->mile;   //斜率无穷大，没得算

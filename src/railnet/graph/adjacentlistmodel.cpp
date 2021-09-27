@@ -12,8 +12,10 @@ AdjacentListModel::AdjacentListModel(const RailNet &net, QObject *parent):
 
 std::shared_ptr<RailNet::edge> AdjacentListModel::edgeFromRow(int row)
 {
-    return qvariant_cast<std::shared_ptr<RailNet::edge>>(
-                             item(row,ColRailName)->data(qeutil::GraphEdgeRole));
+    if (row >= 0)
+        return qvariant_cast<std::shared_ptr<RailNet::edge>>(
+            item(row, ColRailName)->data(qeutil::GraphEdgeRole));
+    else return nullptr;
 }
 
 void AdjacentListModel::setupForInAdj(std::shared_ptr<const RailNet::vertex> v)

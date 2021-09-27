@@ -72,6 +72,8 @@ public slots:
      */
     void activateQuickSelector();
 
+    void actPathSelector();
+
 private:
 
     /**
@@ -100,6 +102,6 @@ private slots:
 
     void actRefreshNet();
 
-    void actPathSelector();
+    
 };
 

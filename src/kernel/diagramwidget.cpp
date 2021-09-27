@@ -56,6 +56,7 @@ void DiagramWidget::autoPaintGraph()
 
 void DiagramWidget::paintGraph()
 {
+    auto clock_start = std::chrono::system_clock::now();
     updating = true;
     clearGraph();
     _selectedTrain = nullptr;
@@ -125,7 +126,9 @@ void DiagramWidget::paintGraph()
 
     updateTimeAxis();
     updateDistanceAxis();
-    emit showNewStatus(QObject::tr("运行图铺画完毕"));
+    auto clock_end = std::chrono::system_clock::now();
+    emit showNewStatus(QObject::tr("运行图 [%1] 铺画完毕  用时%2毫秒").arg(_page->name())
+        .arg((clock_end - clock_start) / std::chrono::milliseconds(1)));
 }
 
 void DiagramWidget::clearGraph()
@@ -1074,6 +1077,8 @@ void DiagramWidget::selectTrain(TrainItem* item)
 
     showWeakenItem();
     emit trainSelected(_selectedTrain);
+    emit showNewStatus(tr("运行图 [%1] 选中车次运行线 [%2]").arg(_page->name(),
+        _selectedTrain->trainName().full()));
 }
 
 void DiagramWidget::unselectTrain()

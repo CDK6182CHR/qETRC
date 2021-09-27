@@ -181,12 +181,15 @@ bool PathOperationModel::fromInverseSeq(const PathOperationSeq &other,
                 return false;
             }
         }else{
+            std::shared_ptr<const RailNet::vertex> stepStart = seq.lastVertex(), stepEnd = vet;
             auto path=net.railPathTo(seq.lastVertex(),vet,
                                      p->railName(),DirFunc::reverse(p->dir()));
             if(path.empty()){
                 report->append(tr("按邻线算法查找%1-%2的反向径路失败。\n"
-                "Hint: 出现这种问题，最有可能是选择的路径关键点中存在单向站。"
-                "如无必要，请不要选择单向站作为关键点；或手动给出反向路径。"));
+                    "Hint: 出现这种问题，最有可能是选择的路径关键点中存在单向站。"
+                    "如无必要，请不要选择单向站作为关键点；或手动给出反向路径。").arg(
+                        stepStart->data.name.toSingleLiteral(),
+                        stepEnd->data.name.toSingleLiteral()));
                 return false;
             }
             bool flag=addByAdjPath(std::move(path),report);

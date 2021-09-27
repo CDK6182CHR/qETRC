@@ -11,6 +11,7 @@
 #include <QApplication>
 #include <QStyle>
 #include <QMessageBox>
+#include <chrono>
 #include "railnet/path/quickpathselector.h"
 #include "railnet/path/railpreviewdialog.h"
 #include "railnet/graph/viewadjacentwidget.h"
@@ -174,7 +175,7 @@ void RailDBContext::activateQuickSelector()
     }
 }
 
-#include <chrono>
+
 
 void RailDBContext::loadDB()
 {
@@ -214,8 +215,21 @@ void RailDBContext::actRefreshNet()
 
 void RailDBContext::actPathSelector()
 {
+    activateBase();
+    if (net.empty()) {
+        loadNet();
+        if (net.empty()) {
+            QMessageBox::warning(mw, tr("警告"), tr("当前有向图模型为空，无法进行经由选择。"
+                "只能使用快速径路生成 (Ctrl+J) 中的强制径路生成功能。\n"
+                "出现此问题，可能是因为当前打开的线路数据库（或默认线路数据库）为空。"
+                "可先打开线路数据库管理器 (Ctrl+H)，正确加载后，在执行本功能。"));
+            return;
+        }
+    }
+
     auto* wzd = new SelectPathWizard(net, mw);
-    // todo: connect
+    connect(wzd, &SelectPathWizard::railwayConfirmed,
+        this, &RailDBContext::exportRailToDiagram);
     wzd->show();
 }
 

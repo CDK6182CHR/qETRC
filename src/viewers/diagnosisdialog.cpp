@@ -12,6 +12,7 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QTableView>
+#include <chrono>
 
 DiagnosisModel::DiagnosisModel(Diagram &diagram_, QObject *parent):
     QStandardItemModel(parent), diagram(diagram_)
@@ -135,6 +136,8 @@ void DiagnosisDialog::initUI()
 
 void DiagnosisDialog::actApply()
 {
+    using namespace std::chrono_literals;
+    auto start = std::chrono::system_clock::now();
     if (rdSingle->isChecked()) {
         auto train = cbTrain->train();
         if (!train) {
@@ -146,6 +149,9 @@ void DiagnosisDialog::actApply()
     else {
         model->setupForAll(ckIntMeet->isChecked());
     }
+    auto end = std::chrono::system_clock::now();
+    emit showStatus(tr("时刻诊断  用时%1毫秒").arg((end - start) / 1ms));
+
     if (model->rowCount() == 0)
         QMessageBox::information(this, tr("提示"), tr("当前所选范围内未发现问题。"));
     else

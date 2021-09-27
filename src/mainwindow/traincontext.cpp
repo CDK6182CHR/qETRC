@@ -26,6 +26,7 @@
 #include <SARibbonCheckBox.h>
 #include <QDoubleSpinBox>
 #include <util/linestylecombo.h>
+#include <chrono>
 
 #include "editors/basictrainwidget.h"
 #include "wizards/timeinterp/timeinterpwizard.h"
@@ -748,6 +749,8 @@ void TrainContext::actAdjustTimetable()
 void TrainContext::actDiagnose()
 {
 	auto* d = new DiagnosisDialog(diagram, train, mw);
+	connect(d, &DiagnosisDialog::showStatus,
+		mw, &MainWindow::showStatus);
 	d->show();
 }
 

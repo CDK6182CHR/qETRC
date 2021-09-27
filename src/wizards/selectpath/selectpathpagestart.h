@@ -17,7 +17,10 @@ public:
 
     bool exportRuler()const;
     int minRulerCount()const;
+
 private:
     void initUI();
+
+
 };
 

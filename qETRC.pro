@@ -166,6 +166,7 @@ SOURCES += \
     src/wizards/rulerpaint/rulerpaintpagestation.cpp \
     src/wizards/rulerpaint/rulerpaintpagetable.cpp \
     src/wizards/rulerpaint/rulerpaintwizard.cpp \
+    src/wizards/selectpath/selectpathpagepreview.cpp \
     src/wizards/selectpath/selectpathpagestart.cpp \
     src/wizards/selectpath/selectpathwizard.cpp \
     src/wizards/timeinterp/timeinterppagepreview.cpp \
@@ -332,6 +333,7 @@ HEADERS += \
     src/wizards/rulerpaint/rulerpaintpagestation.h \
     src/wizards/rulerpaint/rulerpaintpagetable.h \
     src/wizards/rulerpaint/rulerpaintwizard.h \
+    src/wizards/selectpath/selectpathpagepreview.h \
     src/wizards/selectpath/selectpathpagestart.h \
     src/wizards/selectpath/selectpathwizard.h \
     src/wizards/timeinterp/timeinterppagepreview.h \

@@ -60,6 +60,8 @@ public:
         QWidget* parent = nullptr);
 private:
     void initUI();
+signals:
+    void showStatus(const QString&);
 private slots:
     void actApply();
     void onSingleToggled(bool on);
