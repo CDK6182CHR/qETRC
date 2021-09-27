@@ -149,7 +149,8 @@ void RulerContext::actRemoveRulerNavi(std::shared_ptr<Ruler> ruler)
 
 void RulerContext::actSetAsOrdinate()
 {
-    mw->getRailContext()->actChangeOrdinate(ruler->index() + 1);
+    if (mw->getRailContext()->getRailway().get()==&(ruler->railway()))
+        mw->getRailContext()->actChangeOrdinate(ruler->index() + 1);
 }
 
 void RulerContext::actRemoveRuler()

@@ -290,7 +290,9 @@ std::map<std::shared_ptr<RailStation>, RailStationEventList>
 {
     std::map<std::shared_ptr<RailStation>, RailStationEventList> res;
     foreach(auto p, qAsConst(railway->stations())) {
-        res.emplace(p, stationEvents(railway, p));
+        if (p->direction != PassedDirection::NoVia) {
+            res.emplace(p, stationEvents(railway, p));
+        }
     }
     return res;
 }

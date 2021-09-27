@@ -84,6 +84,7 @@ public slots:
      */
     void actRemoveRulerNavi(std::shared_ptr<Ruler> ruler);
 
+
 private slots:
 
     void actShowEditWidget();

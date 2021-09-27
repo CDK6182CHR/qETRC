@@ -148,6 +148,8 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
         "无法使用导出PDF功能"));
     return false;
 #else
+    using namespace std::chrono_literals;
+    auto start = std::chrono::system_clock::now();
     QPrinter printer(QPrinter::HighResolution);
     printer.setOutputFormat(QPrinter::PdfFormat);
     printer.setOutputFileName(filename);
@@ -167,7 +169,8 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
     painter.scale(printer.width() / scene()->width(), printer.width() / scene()->width());
 
     paintToFile(painter, title, note);
-
+    auto end = std::chrono::system_clock::now();
+    emit showNewStatus(tr("导出PDF  用时%1毫秒").arg((end - start) / 1ms));
     return true;
 #endif
 }
@@ -250,6 +253,8 @@ void DiagramWidget::showPosTip(const QPoint& pos, const QString& msg, const QStr
 
 bool DiagramWidget::toPng(const QString& filename, const QString& title, const QString& note)
 {
+    using namespace std::chrono_literals;
+    auto start = std::chrono::system_clock::now();
     constexpr int note_apdx = 80;
     QImage image(scene()->width(), scene()->height() + 100 + note_apdx,
         QImage::Format_ARGB32);
@@ -257,7 +262,12 @@ bool DiagramWidget::toPng(const QString& filename, const QString& title, const Q
     QPainter painter;
     painter.begin(&image);
     paintToFile(painter, title, note);
-    return image.save(filename);
+    bool flag= image.save(filename);
+    if (flag) {
+        auto end = std::chrono::system_clock::now();
+        showNewStatus(tr("导出PNG  用时%1毫秒").arg((end - start) / 1ms));
+    }
+    return flag;
 }
 
 void DiagramWidget::removeTrain(const Train& train)

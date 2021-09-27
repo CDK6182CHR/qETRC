@@ -771,7 +771,7 @@ void MainWindow::initToolbar()
         actSelector = act;
     }
 
-    QAction* actRemoveInterp, * actAutoBusiness;
+    QAction* actRemoveInterp, * actAutoBusiness, * actImportTimetableCsv;
     //列车
     if constexpr (true) {
         auto* cat = ribbon->addCategoryPage(tr("列车(&3)"));
@@ -808,8 +808,12 @@ void MainWindow::initToolbar()
         act->setShortcut(Qt::CTRL + Qt::Key_D);
         addAction(act);
         connect(act, SIGNAL(triggered()), naviView, SLOT(importTrains()));
+        
+        menu = new SARibbonMenu(this);
+        actImportTimetableCsv = menu->addAction(tr("导入时刻表 (CSV)"));
+        act->setMenu(menu);
         btn = panel->addLargeAction(act);
-        btn->setMinimumWidth(70);
+        btn->setMinimumWidth(80);
 
         act = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileDialogContentsView),
             tr("搜索车次"), this);
@@ -999,6 +1003,9 @@ void MainWindow::initToolbar()
             contextTrain, &TrainContext::locateToBoundStation);
         connect(actAutoBusiness, &QAction::triggered,
             contextTrain, &TrainContext::actAutoBusiness);
+
+        connect(actImportTimetableCsv, &QAction::triggered,
+            contextTrain, &TrainContext::actImportTrainFromCsv);
     }
 
     //context: rail 8
@@ -1668,11 +1675,11 @@ void MainWindow::resetRecentActions()
 void MainWindow::openRecentFile()
 {
     using namespace std::chrono_literals;
-    auto start = std::chrono::system_clock::now();
     QAction* act = qobject_cast<QAction*>(sender());
     if (act) {
         const QString& filename = act->data().toString();
         if (!changed || saveQuestion()) {
+            auto start = std::chrono::system_clock::now();
             bool flag = openGraph(filename);
             if (!flag)
                 QMessageBox::warning(this, QObject::tr("错误"), QObject::tr("文件错误，请检查!"));

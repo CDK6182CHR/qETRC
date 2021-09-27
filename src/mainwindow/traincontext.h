@@ -210,6 +210,12 @@ public slots:
      */
     void refreshCurrentTrainWidgets();
 
+
+    /**
+     * 导入列车时刻表，代理MainWindow处理。
+     */
+    void actImportTrainFromCsv();
+
 private slots:
     void showTrainEvents();
     void actShowTrainLine();

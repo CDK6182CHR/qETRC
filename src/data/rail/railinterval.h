@@ -1,7 +1,7 @@
 ﻿
 #pragma once
 #include <memory>
-#include <QList>
+#include <QVector>
 #include <QDebug>
 
 #include "data/common/direction.h"
@@ -15,6 +15,7 @@ class Forbid;
 
 /**
  * 新增针对线路区间的抽象
+ * 2021.09.27  nodes改用QVector装
  */
 class RailInterval:
 	public std::enable_shared_from_this<RailInterval>
@@ -25,8 +26,8 @@ class RailInterval:
 	std::weak_ptr<RailStation> from, to;
     Direction _dir;
 
-    QList<std::shared_ptr<RulerNode>> _rulerNodes;
-    QList<std::shared_ptr<ForbidNode>> _forbidNodes;
+    QVector<std::shared_ptr<RulerNode>> _rulerNodes;
+    QVector<std::shared_ptr<ForbidNode>> _forbidNodes;
 
     explicit RailInterval(Direction dir_);
 

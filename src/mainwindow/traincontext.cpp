@@ -25,7 +25,9 @@
 #include <SARibbonComboBox.h>
 #include <SARibbonCheckBox.h>
 #include <QDoubleSpinBox>
+#include <QFileDialog>
 #include <util/linestylecombo.h>
+#include <util/utilfunc.h>
 #include <chrono>
 
 #include "editors/basictrainwidget.h"
@@ -529,6 +531,100 @@ void TrainContext::commitAutoBusiness()
 	refreshCurrentTrainWidgets();
 }
 
+#include "navi/navitree.h"
+
+void TrainContext::actImportTrainFromCsv()
+{
+	QString filename = QFileDialog::getOpenFileName(mw, tr("从CSV导入时刻表"), {},
+		tr("逗号分隔值 (*.csv)\n所有文件 (*)"));
+	if (filename.isEmpty()) return;
+
+	QFile file(filename);
+	file.open(QFile::ReadOnly);
+	if (!file.isOpen()) {
+		QMessageBox::warning(mw, tr("错误"), tr("打开文件失败"));
+		return;
+	}
+	QTextStream ts(&file);
+	ts.setCodec("utf-8");
+
+	QVector<std::shared_ptr<Train>> newTrains, modifiedTrains, modifiedData;
+	QMap<QString, std::shared_ptr<Train>> trainMap;   // 这里存的是要更新的对象，副本或新增的
+
+	auto& coll = diagram.trainCollection();
+	
+	int valid = 0;
+	while (!ts.atEnd()) {
+		QString line = ts.readLine();
+		if (line.isEmpty()) continue;
+		auto splitted = line.split(',');
+		if (splitted.size() < 4)
+			continue;
+		QString trainName = splitted.at(0);
+		std::shared_ptr<Train> toAddTrain{};
+
+		if (auto itr = trainMap.find(trainName); itr != trainMap.end()) {
+			toAddTrain = itr.value();
+		}
+		else {
+			// 第一次读到这个车次；分为新建和修改两种情况。
+			if (auto train = coll.findFullName(trainName)) {
+				// 修改既有车次  添加
+				toAddTrain = std::make_shared<Train>(*train);   // deep copy construct
+
+				modifiedTrains.push_back(train);
+				modifiedData.push_back(toAddTrain);
+			}
+			else {
+				// 新增的车次
+				toAddTrain = std::make_shared<Train>(trainName);
+				newTrains.push_back(toAddTrain);
+			}
+			trainMap.insert(trainName, toAddTrain);
+		}
+
+		// 现在：新读取的时刻添加到toAddTrain所示对象中
+		QString stationName = splitted.at(1);
+		QTime arrive = qeutil::parseTime(splitted.at(2));
+		QTime depart = qeutil::parseTime(splitted.at(3));
+		if (!arrive.isValid() || !depart.isValid())
+			continue;
+		QString track, note;
+		if (splitted.size() >= 5)
+			track = splitted.at(4);
+		if (splitted.size() >= 6)
+			note = splitted.at(5);
+		toAddTrain->appendStation(stationName, arrive, depart, true, track, note);
+		valid++;
+	}
+
+	for (auto p = newTrains.begin(); p != newTrains.end();) {
+		if ((*p)->empty()) {
+			p = newTrains.erase(p);
+		}
+		else {
+			diagram.updateTrain(*p);
+			++p;
+		}
+	}
+
+	if (valid) {
+		// 新增的
+		if(!newTrains.empty())
+			mw->naviView->actBatchAddTrains(newTrains);
+		// 修订的
+		if (!modifiedTrains.empty()) {
+			auto* cmd = new qecmd::TimetableInterpolation(modifiedTrains, modifiedData, this);
+			cmd->setText(tr("批量修改列车时刻表"));
+			mw->getUndoStack()->push(cmd);
+		}
+
+	}
+	else {
+		QMessageBox::information(mw, tr("导入CSV时刻表"), tr("无有效数据导入。"));
+	}
+}
+
 void TrainContext::actShowTrainLine()
 {
 	//强制显示列车运行线。如果已经全部显示了也没关系，没有任何效果
@@ -785,13 +881,18 @@ void TrainContext::setTrain(std::shared_ptr<Train> train_)
 
 void TrainContext::showTrainEvents()
 {
+	using namespace std::chrono_literals;
 	if (!train) {
 		QMessageBox::warning(mw, tr("错误"), tr("列车事件表：没有选中车次！"));
 		return;
 	}
+	auto start = std::chrono::system_clock::now();
 	auto* dialog = new TrainEventDialog(diagram, train, mw);
 	connect(dialog, &TrainEventDialog::locateToEvent,
 		mw, &MainWindow::locateDiagramOnMile);
+	auto end = std::chrono::system_clock::now();
+	mw->showStatus(tr("%1 列车事件表  用时%2毫秒").arg(train->trainName().full())
+		.arg((end - start) / 1ms));
 	dialog->show();
 }
 
