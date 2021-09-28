@@ -24,7 +24,8 @@ class Ruler;
 class Forbid;
 struct Config;
 
-class Railway
+class Railway:
+    public std::enable_shared_from_this<Railway>
 {
     QString _name;
 
@@ -61,13 +62,15 @@ class Railway
     QHash<StationName, std::shared_ptr<RailStation>> nameMap;
     QHash<QString, QList<StationName>> fieldMap;
     QHash<StationName, int> numberMap;
-    bool numberMapEnabled;
+    bool numberMapEnabled = false;
 
     double _diagramHeight = -1;
 
 public:
     Railway(const QString& name="");
-    Railway(const QJsonObject& obj);
+    // 2021.09.28  删除这个构造函数；因为shared_from_this，
+    // 只能先默认构造，再读Json。
+    //Railway(const QJsonObject& obj);
 
     /**
      * 2021.09.13实现 拷贝构造

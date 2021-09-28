@@ -1302,13 +1302,16 @@ bool Diagram::fromJson(const QJsonObject& obj)
     _version = obj.value("version").toString();
 
     //线路  line作为第一个，lines作为其他，不存在就是空
-    auto rail0 = std::make_shared<Railway>(obj.value("line").toObject());
+    auto rail0 = std::make_shared<Railway>();
+    rail0->fromJson(obj.value("line").toObject());
     railways().append(rail0);
 
     //其他线路
     const QJsonArray& arrail = obj.value("lines").toArray();
     for (const auto& r : arrail) {
-        railways().append(std::make_shared<Railway>(r.toObject()));
+        auto tt = std::make_shared<Railway>();
+        tt->fromJson(r.toObject());
+        railways().append(tt);
     }
 
     //特殊：旧版排图标尺 （优先级低于rail中的）

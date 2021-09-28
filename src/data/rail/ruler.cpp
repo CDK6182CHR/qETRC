@@ -9,7 +9,7 @@
 #include <QDebug>
 #include <QJsonArray>
 
-Ruler::Ruler(Railway &railway, const QString &name, bool different, int index):
+Ruler::Ruler(std::weak_ptr<Railway> railway, const QString &name, bool different, int index):
     RailIntervalData<RulerNode,Ruler>(railway,different,index),
     _name(name)
 {
@@ -64,12 +64,12 @@ int Ruler::totalInterval(std::shared_ptr<RailStation> from,
 
 bool Ruler::isOrdinateRuler() const
 {
-    return _railway.get().ordinate().get() == this;
+    return railway()-> ordinate().get() == this;
 }
 
 std::shared_ptr<Railway> Ruler::clone() const
 {
-    auto p = _railway.get().cloneBase();
+    auto p = railway()->cloneBase();
     p->addRulerFrom(*this);
     return p;
 }

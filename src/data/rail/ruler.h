@@ -27,7 +27,7 @@ class Ruler:
     /**
      * 构造函数原则上仅允许Railway::addEmptyRuler调用
      */
-    Ruler(Railway& railway, const QString& name, bool different, int index);
+    Ruler(std::weak_ptr<Railway> railway, const QString& name, bool different, int index);
 public:
 
     inline const QString& name()const { return _name; }

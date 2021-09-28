@@ -22,7 +22,7 @@ void RulerContext::refreshData()
 {
     if (!ruler)return;
     edRulerName->setText(ruler->name());
-    edRailName->setText(ruler->railway().name());
+    edRailName->setText(ruler->railway()->name());
 }
 
 void RulerContext::refreshAllData()
@@ -118,9 +118,9 @@ void RulerContext::commitChangeRulerName(std::shared_ptr<Ruler> ruler)
 void RulerContext::commitRemoveRuler(std::shared_ptr<Ruler> ruler, bool isord)
 {
     // 实施删除标尺：从线路中移除数据；退出当前面板；如果是ord则撤销ord
-    auto& rail = ruler->railway();
+    auto rail = ruler->railway();
 
-    mw->getRailContext()->removeRulerAt(ruler->railway(), ruler->index(), isord);
+    mw->getRailContext()->removeRulerAt(*(ruler->railway()), ruler->index(), isord);
     mw->getRailContext()->removeRulerWidget(ruler);
 
     if (isord) {
@@ -137,7 +137,7 @@ void RulerContext::undoRemoveRuler(std::shared_ptr<Ruler> ruler, bool isord)
     if (isord) {
         mw->updateRailwayDiagrams(ruler->railway());
     }
-    mw->getRailContext()->insertRulerAt(ruler->railway(), ruler, isord);
+    mw->getRailContext()->insertRulerAt(*(ruler->railway()), ruler, isord);
 }
 
 void RulerContext::actRemoveRulerNavi(std::shared_ptr<Ruler> ruler)
@@ -149,8 +149,12 @@ void RulerContext::actRemoveRulerNavi(std::shared_ptr<Ruler> ruler)
 
 void RulerContext::actSetAsOrdinate()
 {
-    if (mw->getRailContext()->getRailway().get()==&(ruler->railway()))
+    if (mw->getRailContext()->getRailway()==(ruler->railway()))
         mw->getRailContext()->actChangeOrdinate(ruler->index() + 1);
+    else {
+        // 需要这里来设置Ordinate -- 操作压栈
+        mw->getRailContext()->changeRailOrdinate(ruler->railway(), ruler->index());
+    }
 }
 
 void RulerContext::actRemoveRuler()
@@ -201,15 +205,15 @@ void qecmd::ChangeRulerName::redo()
 
 void qecmd::RemoveRuler::undo()
 {
-    ruler->railway().undoRemoveRuler(ruler, data);
+    ruler->railway()->undoRemoveRuler(ruler, data);
     if (isOrd) {
-        ruler->railway().setOrdinate(ruler);
+        ruler->railway()->setOrdinate(ruler);
     }
     cont->undoRemoveRuler(ruler, isOrd);
 }
 
 void qecmd::RemoveRuler::redo()
 {
-    ruler->railway().removeRuler(ruler);
+    ruler->railway()->removeRuler(ruler);
     cont->commitRemoveRuler(ruler, isOrd);
 }

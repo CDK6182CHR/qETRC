@@ -114,7 +114,7 @@ void RulerWidget::onDiffChanged(bool on)
         return;
     //立即生效  提交给rulerContext执行
     updating = true;
-    if (!on && ruler->railway().isSplitted()) {
+    if (!on && ruler->railway()->isSplitted()) {
         QMessageBox::warning(this, tr("错误"),
             tr("本线路存在上下行分设车站，标尺必须设置为上下行分设。"));
         updating = false;

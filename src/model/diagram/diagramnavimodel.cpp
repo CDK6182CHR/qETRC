@@ -325,7 +325,7 @@ void DiagramNaviModel::removeRulerAt(const Railway& rail, int i)
 
 void DiagramNaviModel::onRulerNameChanged(std::shared_ptr<const Ruler> ruler)
 {
-    auto&& idx = getRailIndex(ruler->railway());
+    auto&& idx = getRailIndex(*(ruler->railway()));
     auto* item = static_cast<navi::RailwayItem*>(idx.internalPointer());
     int i = item->getRulerRow(ruler);
     auto&& idxruler = index(i, 0, idx);

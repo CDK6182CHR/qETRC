@@ -48,7 +48,7 @@ class Forbid:
     friend class Railway;
     bool downShow,upShow;
 
-    Forbid(Railway& railway,bool different,int index);
+    Forbid(std::weak_ptr<Railway> railway,bool different,int index);
     Forbid(const Forbid&) = delete;
     Forbid(Forbid&&) = delete;
 

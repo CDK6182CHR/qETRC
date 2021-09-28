@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QJsonArray>
 
-Forbid::Forbid(Railway& railway, bool different, int index) :
+Forbid::Forbid(std::weak_ptr<Railway> railway, bool different, int index) :
     RailIntervalData<ForbidNode, Forbid>(railway, different, index),
     downShow(false),upShow(false)
 {
@@ -54,7 +54,7 @@ void Forbid::_show() const
 
 std::shared_ptr<Railway> Forbid::clone() const
 {
-    auto r = railway().cloneBase();
+    auto r = railway()->cloneBase();
     r->addForbidFrom(*this);
     return r;
 }

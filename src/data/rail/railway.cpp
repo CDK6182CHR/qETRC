@@ -19,11 +19,11 @@ Railway::Railway(const QString& name) :
 {
 }
 
-Railway::Railway(const QJsonObject& obj) :
-	numberMapEnabled(false)
-{
-	fromJson(obj);
-}
+//Railway::Railway(const QJsonObject& obj) :
+//	numberMapEnabled(false)
+//{
+//	fromJson(obj);
+//}
 
 Railway::Railway(const Railway& other):
 	_name(other._name),_notes(other._notes),_diagramHeight(other._diagramHeight),
@@ -771,7 +771,7 @@ void Railway::showIntervals() const
 std::shared_ptr<Ruler> Railway::addEmptyRuler(const QString& name, bool different)
 {
 	int idx = _rulers.count();
-    auto r=std::shared_ptr<Ruler>(new Ruler(*this,name,different,idx));
+    auto r=std::shared_ptr<Ruler>(new Ruler(weak_from_this(),name,different,idx));
     _rulers.append(r);
 	//下行区间
 	auto p = firstDownInterval();
@@ -793,7 +793,7 @@ std::shared_ptr<Ruler> Railway::addRulerFrom(std::shared_ptr<Ruler> r)
 std::shared_ptr<Ruler> Railway::addRulerFrom(const Ruler& r)
 {
 	int idx = _rulers.count();
-	auto ruler = std::shared_ptr<Ruler>(new Ruler(*this, r.name(), r.different(), idx));
+	auto ruler = std::shared_ptr<Ruler>(new Ruler(weak_from_this(), r.name(), r.different(), idx));
 	_rulers.append(ruler);
 	auto p = firstDownInterval();
 	auto n = r.firstDownNode();
@@ -1093,11 +1093,11 @@ void Railway::swapBaseWith(Railway& other)
 	//ordinate
 	if (_ordinate) {
 		_ordinate = _rulers.at(_ordinate->index());
-		assert(&(_ordinate->_railway.get()) == this);
+		assert((_ordinate->_railway.lock().get()) == this);
 	}
 		
 	if (!_rulers.empty()) {
-		assert(&(_rulers.first()->_railway.get()) == this);
+		assert((_rulers.first()->_railway.lock().get()) == this);
 		qDebug() << "Assertion of ruler railway passed.";
 	}
 }
@@ -1409,7 +1409,7 @@ void Railway::initUpIntervals()
 std::shared_ptr<Forbid> Railway::addEmptyForbid(bool different)
 {
     int n=_forbids.count();
-	auto forbid = std::shared_ptr<Forbid>(new Forbid(*this, different, n));
+	auto forbid = std::shared_ptr<Forbid>(new Forbid(weak_from_this(), different, n));
     _forbids.append(forbid);
     auto p=firstDownInterval();
     for(;p;p=p->nextInterval()){
@@ -1472,7 +1472,7 @@ std::shared_ptr<Forbid> Railway::addForbidFrom(std::shared_ptr<Forbid> other)
 std::shared_ptr<Forbid> Railway::addForbidFrom(const Forbid& other)
 {
 	int idx = _forbids.count();
-	auto forbid = std::shared_ptr<Forbid>(new Forbid(*this, other.different(), idx));
+	auto forbid = std::shared_ptr<Forbid>(new Forbid(weak_from_this(), other.different(), idx));
 	forbid->downShow = other.downShow;
 	forbid->upShow = other.upShow;
 	_forbids.append(forbid);

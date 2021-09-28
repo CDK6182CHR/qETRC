@@ -1,6 +1,6 @@
 ﻿#include "intervaldatamodel.h"
 
-IntervalDataModel::IntervalDataModel(Railway& railway, QObject *parent) :
+IntervalDataModel::IntervalDataModel(std::shared_ptr<Railway> railway, QObject *parent) :
     QStandardItemModel(parent),_railway(std::ref(railway))
 {
 
@@ -10,10 +10,10 @@ void IntervalDataModel::setupModel()
 {
     beginResetModel();
     updating=true;
-    auto& rail=railway();
-    setRowCount(rail.stationCount()*2);
+    auto rail=railway();
+    setRowCount(rail->stationCount()*2);
     int row=0;
-    for(auto p=rail.firstDownInterval();p;p=rail.nextIntervalCirc(p)){
+    for(auto p=rail->firstDownInterval();p;p=rail->nextIntervalCirc(p)){
         setupRow(row++,p);
     }
     setRowCount(row);
@@ -63,7 +63,7 @@ void IntervalDataModel::copyFromDownToUp()
     QMap<QPair<std::shared_ptr<RailStation>,std::shared_ptr<RailStation>>,int> itrows;
 
     int row=0;
-    for(auto p=railway().firstDownInterval();p;
+    for(auto p=railway()->firstDownInterval();p;
         p=p->nextInterval()){
         if (checkRowInterval(p,row)){
             itrows.insert(qMakePair(p->fromStation(),p->toStation()),row);
@@ -72,7 +72,7 @@ void IntervalDataModel::copyFromDownToUp()
     }
 
     //上行：接着读
-    for(auto p=railway().firstUpInterval();p;p=p->nextInterval()){
+    for(auto p=railway()->firstUpInterval();p;p=p->nextInterval()){
         if (checkRowInterval(p,row)){
             auto&& key=qMakePair(p->toStation(),p->fromStation());
             if(itrows.contains(key)){
@@ -88,7 +88,7 @@ void IntervalDataModel::copyFromUpToDown()
     //这里仍然记得是下行数据
     QMap<QPair<std::shared_ptr<RailStation>,std::shared_ptr<RailStation>>,int> itrows;
     int row=0;
-    for(auto p=railway().firstDownInterval();p;p=p->nextInterval()){
+    for(auto p=railway()->firstDownInterval();p;p=p->nextInterval()){
         if(checkRowInterval(p,row)){
             itrows.insert(qMakePair(p->fromStation(),p->toStation()),row);
         }
@@ -96,7 +96,7 @@ void IntervalDataModel::copyFromUpToDown()
     }
 
     //上行
-    for(auto p=railway().firstUpInterval();p;p=p->nextInterval()){
+    for(auto p=railway()->firstUpInterval();p;p=p->nextInterval()){
         if(checkRowInterval(p,row)){
             auto&& key=qMakePair(p->toStation(),p->fromStation());
             if(itrows.contains(key)){
@@ -108,7 +108,7 @@ void IntervalDataModel::copyFromUpToDown()
 
 void IntervalDataModel::updateRailIntervals(std::shared_ptr<Railway> railway, bool equiv)
 {
-    if (railway.get() != &(_railway.get()))
+    if (railway==_railway)
         return;
     if (equiv) {
         int row = 0;

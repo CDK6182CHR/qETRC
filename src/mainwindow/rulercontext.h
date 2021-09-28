@@ -42,7 +42,7 @@ signals:
     /**
      * 仅在排图标尺被更新时，通知重新铺画运行图
      */
-    void ordinateRulerModified(Railway& rail);
+    void ordinateRulerModified(std::shared_ptr<Railway> rail);
 
     /**
      * 标尺被删除，关闭面板

@@ -62,12 +62,12 @@ void RulerFromTrainDialog::onApply()
             tr("请先选择一个车次！"));
         return;
     }
-    auto adp = train->adapterFor(ruler->railway());
+    auto adp = train->adapterFor(*(ruler->railway()));
     if (!adp) {
         QMessageBox::warning(this, tr("错误"),
             tr("所选择的车次[%1]在当前标尺窗线路[%2]上无运行线，无法读取，"
                 "请重新选择车次！").arg(train->trainName().full())
-            .arg(ruler->railway().name()));
+            .arg(ruler->railway()->name()));
         return;
     }
     auto r = ruler->clone();

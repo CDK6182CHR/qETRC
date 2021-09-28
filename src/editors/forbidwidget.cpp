@@ -162,7 +162,7 @@ void ForbidWidget::copyToNextRow()
 void ForbidWidget::copyToAllRows()
 {
     int r = currentRow();
-    auto p = forbid->railway().intervalCircByIndex(r);
+    auto p = forbid->railway()->intervalCircByIndex(r);
     if (p) {
         for (p = p->nextInterval(); p; p = p->nextInterval()) {
             copyToNextRow();

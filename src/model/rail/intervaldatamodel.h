@@ -2,7 +2,6 @@
 
 #include <QStandardItemModel>
 #include <memory>
-#include <functional>
 
 #include "data/rail/railintervaldata.hpp"
 
@@ -16,14 +15,14 @@
 class IntervalDataModel : public QStandardItemModel
 {
     Q_OBJECT;
-    std::reference_wrapper<Railway> _railway;
+    std::shared_ptr<Railway> _railway;
 protected:
     bool updating=false;
 public:
-    explicit IntervalDataModel(Railway& railway, QObject *parent = nullptr);
+    explicit IntervalDataModel(std::shared_ptr<Railway> railway, QObject *parent = nullptr);
 protected:
-    Railway& railway(){return _railway.get();}
-    void setRailway(Railway& r){_railway=std::ref(r);}
+    auto railway(){return _railway;}
+    void setRailway(std::shared_ptr<Railway> r){_railway=r;}
 
     /**
      * @brief setupModel

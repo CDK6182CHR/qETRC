@@ -121,7 +121,9 @@ void RailCategory::fromJson(const QJsonObject& obj)
 	for (auto p = obj.constBegin(); p != obj.constEnd(); ++p) {
 		const auto& subobj = p.value().toObject();
 		if (isRailway(subobj)) {
-			_railways.push_back(std::make_shared<Railway>(subobj));
+			auto t = std::make_shared<Railway>();
+			t->fromJson(subobj);
+			_railways.push_back(t);
 		}
 		else {
 			auto subcat = std::make_shared<RailCategory>(p.key());

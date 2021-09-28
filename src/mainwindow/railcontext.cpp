@@ -278,7 +278,16 @@ void RailContext::actChangeOrdinate(int i)
 	if (idx == oldindex)
 		return;
 	updating = true;
+	changeRailOrdinate(railway, idx);
+	
+	updating = false;
+}
 
+
+void RailContext::changeRailOrdinate(std::shared_ptr<Railway> railway, int idx)
+{
+	int oldindex = railway->ordinateIndex();
+	if (oldindex == idx) return;
 	//第一次操作要现场执行，试一下能不能行
 	railway->setOrdinateIndex(idx);
 	bool flag = railway->calStationYValue(diagram.config());
@@ -295,7 +304,6 @@ void RailContext::actChangeOrdinate(int i)
 			.arg(railway->getRuler(idx)->name()));
 		cbRulers->setCurrentIndex(oldindex + 1);
 	}
-	updating = false;
 }
 
 void RailContext::actSelectRuler()
@@ -317,6 +325,7 @@ void RailContext::actSelectRuler()
 	openRulerWidget(ruler);
 }
 
+
 void RailContext::openRulerWidget(std::shared_ptr<Ruler> ruler)
 {
 	int i = rulerWidgetIndex(ruler);
@@ -324,7 +333,7 @@ void RailContext::openRulerWidget(std::shared_ptr<Ruler> ruler)
 		//创建
 		auto* rw = new RulerWidget(ruler, false);
 		auto* dock = new ads::CDockWidget(tr("标尺编辑 - %1 - %2").arg(ruler->name())
-			.arg(ruler->railway().name()));
+			.arg(ruler->railway()->name()));
 		dock->setWidget(rw);
 		rulerWidgets.append(rw);
 		rulerDocks.append(dock);
@@ -619,10 +628,10 @@ void RailContext::onRulerNameChanged(std::shared_ptr<Ruler> ruler)
 			//2021.08.15  这里不能更新全局，否则数据更新就没了
 			w->refreshBasicData();
 			rulerDocks.at(i)->setWindowTitle(tr("标尺编辑 - %1 - %2").arg(ruler->name())
-				.arg(ruler->railway().name()));
+				.arg(ruler->railway()->name()));
 		}
 	}
-	if (&(ruler->railway()) == railway.get()) {
+	if ((ruler->railway()) == railway) {
 		cbRulers->setItemText(ruler->index()+1, ruler->name());
 	}
 }
@@ -655,7 +664,7 @@ void RailContext::insertRulerAt(const Railway& rail, std::shared_ptr<Ruler> rule
 
 void RailContext::commitAddNewRuler(std::shared_ptr<Ruler> ruler)
 {
-	insertRulerAt(ruler->railway(), ruler, false);
+	insertRulerAt(*(ruler->railway()), ruler, false);
 	openRulerWidget(ruler);
 }
 
@@ -848,7 +857,7 @@ qecmd::UpdateForbidData::UpdateForbidData(std::shared_ptr<Forbid> forbid_,
                                           std::shared_ptr<Railway> data_,
                                           RailContext *context, QUndoCommand *parent):
     QUndoCommand(QObject::tr("更新天窗: %1 - %2").arg(forbid_->name(),
-        forbid_->railway().name()),parent),
+        forbid_->railway()->name()),parent),
     forbid(forbid_),data(data_),cont(context){}
 
 

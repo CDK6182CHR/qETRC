@@ -64,7 +64,6 @@
     <TargetName>qETRC</TargetName>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>D:\QTProject\site-packages\SARibbon\bin_qt5.15.2_debug_64;D:\QTProject\site-packages\Qt-Advanced-Docking-System\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <QtInstall>Qt5.15.2 MSVC2019</QtInstall>
@@ -84,7 +83,7 @@
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <DisableSpecificWarnings>4577;4467;26812;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ObjectFileName>release\</ObjectFileName>
@@ -100,8 +99,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SARibbonBar.lib;qtadvanceddocking.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\QTProject\qETRC\qETRC\lib\SARibbon\Qt5.15.2-win32-msvc;D:\QTProject\qETRC\qETRC\lib\ads\Qt5.15.2-win32-msvc;C:\openssl\lib;C:\Utils\my_sql\mysql-5.7.25-winx64\lib;C:\Utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>.\lib\SARibbon\Qt5.15.2-win32-msvc\SARibbonBar.lib;.\lib\ads\Qt5.15.2-win32-msvc\qtadvanceddocking.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\lib\SARibbon\Qt5.15.2-win32-msvc;.\lib\ads\Qt5.15.2-win32-msvc;C:\openssl\lib;C:\Utils\my_sql\mysql-5.7.25-winx64\lib;C:\Utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -131,8 +130,8 @@
     </QtMoc>
     <QtRcc>
       <Compression>default</Compression>
-      <InitFuncName>resource</InitFuncName>
       <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
+      <InitFuncName>resource</InitFuncName>
       <QtRccDir>$(Configuration)</QtRccDir>
       <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
     </QtRcc>
@@ -144,7 +143,7 @@
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4577;4467;4267;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ObjectFileName>debug\</ObjectFileName>
@@ -158,8 +157,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SARibbonBard.lib;qtadvanceddockingd.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\QTProject\qETRC\qETRC\lib\SARibbon\Qt5.15.2-win32-msvc;D:\QTProject\qETRC\qETRC\lib\ads\Qt5.15.2-win32-msvc;C:\openssl\lib;C:\Utils\my_sql\mysql-5.7.25-winx64\lib;C:\Utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>.\lib\SARibbon\Qt5.15.2-win32-msvc\SARibbonBard.lib;.\lib\ads\Qt5.15.2-win32-msvc\qtadvanceddockingd.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\lib\SARibbon\Qt5.15.2-win32-msvc;.\lib\ads\Qt5.15.2-win32-msvc;C:\openssl\lib;C:\Utils\my_sql\mysql-5.7.25-winx64\lib;C:\Utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -186,341 +185,449 @@
       <QtMocFileName>moc_%(Filename).cpp</QtMocFileName>
     </QtMoc>
     <QtRcc>
+      <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
       <Compression>default</Compression>
       <InitFuncName>resource</InitFuncName>
-      <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
       <QtRccDir>$(Configuration)</QtRccDir>
       <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
     </QtRcc>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\data\common\qesystem.cpp" />
-    <ClCompile Include="src\data\diagram\stationbinding.cpp" />
-    <ClCompile Include="src\data\diagram\traingap.cpp" />
-    <ClCompile Include="src\data\rail\railcategory.cpp" />
-    <ClCompile Include="src\data\rail\railinfonote.cpp" />
-    <ClCompile Include="src\data\rail\railtrack.cpp" />
-    <ClCompile Include="src\data\rail\trackdiagramdata.cpp" />
-    <ClCompile Include="src\data\train\trainfiltercore.cpp" />
-    <ClCompile Include="src\data\train\typemanager.cpp" />
-    <ClCompile Include="src\dialogs\batchcopytraindialog.cpp" />
-    <ClCompile Include="src\dialogs\changestationnamedialog.cpp" />
-    <ClCompile Include="src\dialogs\correcttimetabledialog.cpp" />
-    <ClCompile Include="src\dialogs\exchangeintervaldialog.cpp" />
-    <ClCompile Include="src\dialogs\importtraindialog.cpp" />
-    <ClCompile Include="src\dialogs\locatedialog.cpp" />
-    <ClCompile Include="src\dialogs\modifytimetabledialog.cpp" />
-    <ClCompile Include="src\dialogs\outputsubdiagramdialog.cpp" />
-    <ClCompile Include="src\dialogs\printdiagramdialog.cpp" />
-    <ClCompile Include="src\dialogs\rulerfromtraindialog.cpp" />
-    <ClCompile Include="src\dialogs\selectrailstationdialog.cpp" />
-    <ClCompile Include="src\dialogs\trainfilter.cpp" />
-    <ClCompile Include="src\editors\basictrainwidget.cpp" />
-    <ClCompile Include="src\editors\configdialog.cpp" />
-    <ClCompile Include="src\editors\forbidwidget.cpp" />
-    <ClCompile Include="src\editors\railstationwidget.cpp" />
+    <ClCompile Include="src\navi\addpagedialog.cpp" />
     <ClCompile Include="src\editors\routing\addroutingnodedialog.cpp" />
-    <ClCompile Include="src\editors\routing\batchparseroutingdialog.cpp" />
-    <ClCompile Include="src\editors\routing\detectroutingdialog.cpp" />
-    <ClCompile Include="src\editors\routing\parseroutingdialog.cpp" />
-    <ClCompile Include="src\editors\routing\routingdiagramwidget.cpp" />
-    <ClCompile Include="src\editors\routing\routingedit.cpp" />
-    <ClCompile Include="src\editors\routing\routingwidget.cpp" />
-    <ClCompile Include="src\editors\ruler\rulertabpy.cpp" />
-    <ClCompile Include="src\editors\ruler\rulerwidget.cpp" />
-    <ClCompile Include="src\editors\systemjsondialog.cpp" />
-    <ClCompile Include="src\editors\typeconfigdialog.cpp" />
-    <ClCompile Include="src\editors\typeregexdialog.cpp" />
-    <ClCompile Include="src\kernel\routingdiagram.cpp" />
-    <ClCompile Include="src\kernel\trackdiagram.cpp" />
-    <ClCompile Include="src\mainwindow\routingcontext.cpp" />
-    <ClCompile Include="src\model\delegate\generaldoublespindelegate.cpp" />
-    <ClCompile Include="src\model\delegate\generalspindelegate.cpp" />
-    <ClCompile Include="src\model\delegate\linestyledelegate.cpp" />
-    <ClCompile Include="src\model\delegate\qetimedelegate.cpp" />
-    <ClCompile Include="src\model\delegate\timeintervaldelegate.cpp" />
-    <ClCompile Include="src\model\rail\forbidmodel.cpp" />
-    <ClCompile Include="src\model\rail\intervaldatamodel.cpp" />
-    <ClCompile Include="src\model\rail\railtrackadjustmodel.cpp" />
-    <ClCompile Include="src\model\train\routingcollectionmodel.cpp" />
-    <ClCompile Include="src\model\train\routingeditmodel.cpp" />
-    <ClCompile Include="src\model\train\routinglistmodel.cpp" />
-    <ClCompile Include="src\model\train\timetablequickmodel.cpp" />
-    <ClCompile Include="src\model\train\trainlistreadmodel.cpp" />
-    <ClCompile Include="src\model\train\typemodel.cpp" />
     <ClCompile Include="src\railnet\graph\adjacentlistmodel.cpp" />
     <ClCompile Include="src\railnet\graph\adjacentlistwidget.cpp" />
+    <ClCompile Include="src\editors\basictrainwidget.cpp" />
+    <ClCompile Include="src\dialogs\batchcopytraindialog.cpp" />
+    <ClCompile Include="src\editors\routing\batchparseroutingdialog.cpp" />
+    <ClCompile Include="src\dialogs\changestationnamedialog.cpp" />
+    <ClCompile Include="src\model\delegate\combodelegate.cpp" />
+    <ClCompile Include="src\model\diagram\componentitems.cpp" />
+    <ClCompile Include="src\data\diagram\config.cpp" />
+    <ClCompile Include="src\editors\configdialog.cpp" />
+    <ClCompile Include="src\wizards\rulerpaint\conflictdialog.cpp" />
+    <ClCompile Include="src\dialogs\correcttimetabledialog.cpp" />
+    <ClCompile Include="src\editors\routing\detectroutingdialog.cpp" />
+    <ClCompile Include="src\viewers\diagnosisdialog.cpp" />
+    <ClCompile Include="src\data\diagram\diagram.cpp" />
+    <ClCompile Include="src\model\diagram\diagramnavimodel.cpp" />
+    <ClCompile Include="src\data\diagram\diagrampage.cpp" />
+    <ClCompile Include="src\kernel\diagramwidget.cpp" />
+    <ClCompile Include="src\util\dialogadapter.cpp" />
     <ClCompile Include="src\railnet\graph\edgedatamodels.cpp" />
+    <ClCompile Include="src\dialogs\exchangeintervaldialog.cpp" />
+    <ClCompile Include="src\data\rail\forbid.cpp" />
+    <ClCompile Include="src\model\rail\forbidmodel.cpp" />
+    <ClCompile Include="src\editors\forbidwidget.cpp" />
+    <ClCompile Include="src\model\delegate\generaldoublespindelegate.cpp" />
+    <ClCompile Include="src\model\delegate\generalspindelegate.cpp" />
     <ClCompile Include="src\railnet\graph\graphinterval.cpp" />
-    <ClCompile Include="src\railnet\graph\graphstation.cpp" />
-    <ClCompile Include="src\railnet\graph\railnet.cpp" />
-    <ClCompile Include="src\railnet\graph\vertexlistwidget.cpp" />
-    <ClCompile Include="src\railnet\graph\viewadjacentwidget.cpp" />
     <ClCompile Include="src\railnet\path\graphpathmodel.cpp" />
+    <ClCompile Include="src\railnet\graph\graphstation.cpp" />
+    <ClCompile Include="src\dialogs\importtraindialog.cpp" />
+    <ClCompile Include="src\model\rail\intervaldatamodel.cpp" />
+    <ClCompile Include="src\util\linestylecombo.cpp" />
+    <ClCompile Include="src\model\delegate\linestyledelegate.cpp" />
+    <ClCompile Include="src\dialogs\locatedialog.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\mainwindow\mainwindow.cpp" />
+    <ClCompile Include="src\dialogs\modifytimetabledialog.cpp" />
+    <ClCompile Include="src\navi\navitree.cpp" />
+    <ClCompile Include="src\dialogs\outputsubdiagramdialog.cpp" />
+    <ClCompile Include="src\util\pagecomboforrail.cpp" />
+    <ClCompile Include="src\mainwindow\pagecontext.cpp" />
+    <ClCompile Include="src\editors\routing\parseroutingdialog.cpp" />
     <ClCompile Include="src\railnet\path\pathoperation.cpp" />
     <ClCompile Include="src\railnet\path\pathoperationmodel.cpp" />
     <ClCompile Include="src\railnet\path\pathselectwidget.cpp" />
+    <ClCompile Include="src\model\delegate\postivespindelegate.cpp" />
+    <ClCompile Include="src\dialogs\printdiagramdialog.cpp" />
+    <ClCompile Include="src\util\qeballoomtip.cpp" />
+    <ClCompile Include="src\util\qecontrolledtable.cpp" />
+    <ClCompile Include="src\model\general\qemoveablemodel.cpp" />
+    <ClCompile Include="src\data\common\qesystem.cpp" />
+    <ClCompile Include="src\model\delegate\qetimedelegate.cpp" />
     <ClCompile Include="src\railnet\path\quickpathselector.cpp" />
-    <ClCompile Include="src\railnet\path\railpreviewdialog.cpp" />
+    <ClCompile Include="src\data\rail\railcategory.cpp" />
+    <ClCompile Include="src\mainwindow\railcontext.cpp" />
     <ClCompile Include="src\railnet\raildb\raildb.cpp" />
     <ClCompile Include="src\railnet\raildb\raildbcontext.cpp" />
     <ClCompile Include="src\railnet\raildb\raildbitems.cpp" />
     <ClCompile Include="src\railnet\raildb\raildbmodel.cpp" />
     <ClCompile Include="src\railnet\raildb\raildbnavi.cpp" />
     <ClCompile Include="src\railnet\raildb\raildbwindow.cpp" />
-    <ClCompile Include="src\util\pagecomboforrail.cpp" />
-    <ClCompile Include="src\util\qeballoomtip.cpp" />
+    <ClCompile Include="src\data\rail\railinfonote.cpp" />
+    <ClCompile Include="src\data\rail\railinterval.cpp" />
+    <ClCompile Include="src\railnet\graph\railnet.cpp" />
+    <ClCompile Include="src\railnet\path\railpreviewdialog.cpp" />
     <ClCompile Include="src\util\railrulercombo.cpp" />
-    <ClCompile Include="src\util\selectrailwaycombo.cpp" />
-    <ClCompile Include="src\util\selecttraincombo.cpp" />
-    <ClCompile Include="src\viewers\diagnosisdialog.cpp" />
     <ClCompile Include="src\viewers\events\railsectionevents.cpp" />
     <ClCompile Include="src\viewers\events\railsnapevents.cpp" />
-    <ClCompile Include="src\viewers\events\railstationeventlist.cpp" />
-    <ClCompile Include="src\viewers\events\railtrackwidget.cpp" />
-    <ClCompile Include="src\viewers\events\stationtraingapdialog.cpp" />
-    <ClCompile Include="src\viewers\events\traingapstatdialog.cpp" />
-    <ClCompile Include="src\viewers\rulerrefdialog.cpp" />
-    <ClCompile Include="src\viewers\events\stationtimetablesettled.cpp" />
-    <ClCompile Include="src\mainwindow\mainwindow.cpp" />
-    <ClCompile Include="src\mainwindow\pagecontext.cpp" />
-    <ClCompile Include="src\mainwindow\railcontext.cpp" />
-    <ClCompile Include="src\mainwindow\rulercontext.cpp" />
-    <ClCompile Include="src\mainwindow\traincontext.cpp" />
-    <ClCompile Include="src\mainwindow\viewcategory.cpp" />
-    <ClCompile Include="src\model\delegate\combodelegate.cpp" />
-    <ClCompile Include="src\model\delegate\postivespindelegate.cpp" />
-    <ClCompile Include="src\model\diagram\componentitems.cpp" />
-    <ClCompile Include="src\data\diagram\config.cpp" />
-    <ClCompile Include="src\data\diagram\diagram.cpp" />
-    <ClCompile Include="src\model\diagram\diagramnavimodel.cpp" />
-    <ClCompile Include="src\data\diagram\diagrampage.cpp" />
-    <ClCompile Include="src\kernel\diagramwidget.cpp" />
-    <ClCompile Include="src\data\rail\forbid.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\data\rail\railinterval.cpp" />
     <ClCompile Include="src\data\rail\railstation.cpp" />
-    <ClCompile Include="src\data\rail\railway.cpp" />
-    <ClCompile Include="src\data\train\routing.cpp" />
-    <ClCompile Include="src\data\rail\ruler.cpp" />
-    <ClCompile Include="src\data\rail\rulernode.cpp" />
-    <ClCompile Include="src\data\common\stationname.cpp" />
-    <ClCompile Include="src\data\train\train.cpp" />
-    <ClCompile Include="src\data\diagram\trainadapter.cpp" />
-    <ClCompile Include="src\data\train\traincollection.cpp" />
-    <ClCompile Include="src\data\diagram\trainevents.cpp" />
-    <ClCompile Include="src\kernel\trainitem.cpp" />
-    <ClCompile Include="src\data\diagram\trainline.cpp" />
-    <ClCompile Include="src\model\diagram\railtablemodel.cpp" />
-    <ClCompile Include="src\model\general\qemoveablemodel.cpp" />
+    <ClCompile Include="src\viewers\events\railstationeventlist.cpp" />
     <ClCompile Include="src\model\rail\railstationmodel.cpp" />
-    <ClCompile Include="src\model\rail\rulermodel.cpp" />
-    <ClCompile Include="src\model\train\timetablestdmodel.cpp" />
-    <ClCompile Include="src\model\train\trainlistmodel.cpp" />
-    <ClCompile Include="src\editors\trainlistwidget.cpp" />
-    <ClCompile Include="src\data\train\trainname.cpp" />
-    <ClCompile Include="src\data\train\trainstation.cpp" />
-    <ClCompile Include="src\data\train\traintype.cpp" />
-    <ClCompile Include="src\navi\addpagedialog.cpp" />
-    <ClCompile Include="src\navi\navitree.cpp" />
-    <ClCompile Include="src\util\dialogadapter.cpp" />
-    <ClCompile Include="src\util\linestylecombo.cpp" />
-    <ClCompile Include="src\util\qecontrolledtable.cpp" />
-    <ClCompile Include="src\util\utilfunc.cpp" />
-    <ClCompile Include="src\viewers\sectioncountdialog.cpp" />
-    <ClCompile Include="src\viewers\timetablequickwidget.cpp" />
-    <ClCompile Include="src\viewers\traindiffdialog.cpp" />
-    <ClCompile Include="src\viewers\events\traineventdialog.cpp" />
-    <ClCompile Include="src\viewers\traininfowidget.cpp" />
-    <ClCompile Include="src\viewers\trainlinedialog.cpp" />
-    <ClCompile Include="src\viewers\traintimetableplane.cpp" />
+    <ClCompile Include="src\editors\railstationwidget.cpp" />
+    <ClCompile Include="src\model\diagram\railtablemodel.cpp" />
+    <ClCompile Include="src\data\rail\railtrack.cpp" />
+    <ClCompile Include="src\model\rail\railtrackadjustmodel.cpp" />
+    <ClCompile Include="src\viewers\events\railtrackwidget.cpp" />
+    <ClCompile Include="src\data\rail\railway.cpp" />
     <ClCompile Include="src\wizards\readruler\readrulerpageconfig.cpp" />
     <ClCompile Include="src\wizards\readruler\readrulerpageinterval.cpp" />
     <ClCompile Include="src\wizards\readruler\readrulerpagepreview.cpp" />
     <ClCompile Include="src\wizards\readruler\readrulerpagetrain.cpp" />
     <ClCompile Include="src\wizards\readruler\readrulerwizard.cpp" />
-    <ClCompile Include="src\wizards\rulerpaint\conflictdialog.cpp" />
+    <ClCompile Include="src\data\train\routing.cpp" />
+    <ClCompile Include="src\model\train\routingcollectionmodel.cpp" />
+    <ClCompile Include="src\mainwindow\routingcontext.cpp" />
+    <ClCompile Include="src\kernel\routingdiagram.cpp" />
+    <ClCompile Include="src\editors\routing\routingdiagramwidget.cpp" />
+    <ClCompile Include="src\editors\routing\routingedit.cpp" />
+    <ClCompile Include="src\model\train\routingeditmodel.cpp" />
+    <ClCompile Include="src\model\train\routinglistmodel.cpp" />
+    <ClCompile Include="src\editors\routing\routingwidget.cpp" />
+    <ClCompile Include="src\data\rail\ruler.cpp" />
+    <ClCompile Include="src\mainwindow\rulercontext.cpp" />
+    <ClCompile Include="src\dialogs\rulerfromtraindialog.cpp" />
+    <ClCompile Include="src\model\rail\rulermodel.cpp" />
+    <ClCompile Include="src\data\rail\rulernode.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagestart.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagestation.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintpagetable.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\rulerpaintwizard.cpp" />
+    <ClCompile Include="src\viewers\rulerrefdialog.cpp" />
+    <ClCompile Include="src\editors\ruler\rulertabpy.cpp" />
+    <ClCompile Include="src\editors\ruler\rulerwidget.cpp" />
+    <ClCompile Include="src\viewers\sectioncountdialog.cpp" />
     <ClCompile Include="src\wizards\selectpath\selectpathpagepreview.cpp" />
     <ClCompile Include="src\wizards\selectpath\selectpathpagestart.cpp" />
     <ClCompile Include="src\wizards\selectpath\selectpathwizard.cpp" />
+    <ClCompile Include="src\dialogs\selectrailstationdialog.cpp" />
+    <ClCompile Include="src\util\selectrailwaycombo.cpp" />
+    <ClCompile Include="src\util\selecttraincombo.cpp" />
+    <ClCompile Include="src\data\diagram\stationbinding.cpp" />
+    <ClCompile Include="src\data\common\stationname.cpp" />
+    <ClCompile Include="src\viewers\events\stationtimetablesettled.cpp" />
+    <ClCompile Include="src\viewers\events\stationtraingapdialog.cpp" />
+    <ClCompile Include="src\editors\systemjsondialog.cpp" />
     <ClCompile Include="src\wizards\timeinterp\timeinterppagepreview.cpp" />
     <ClCompile Include="src\wizards\timeinterp\timeinterppagetrain.cpp" />
     <ClCompile Include="src\wizards\timeinterp\timeinterpwizard.cpp" />
+    <ClCompile Include="src\model\delegate\timeintervaldelegate.cpp" />
+    <ClCompile Include="src\model\train\timetablequickmodel.cpp" />
+    <ClCompile Include="src\viewers\timetablequickwidget.cpp" />
+    <ClCompile Include="src\model\train\timetablestdmodel.cpp" />
+    <ClCompile Include="src\kernel\trackdiagram.cpp" />
+    <ClCompile Include="src\data\rail\trackdiagramdata.cpp" />
+    <ClCompile Include="src\data\train\train.cpp" />
+    <ClCompile Include="src\data\diagram\trainadapter.cpp" />
+    <ClCompile Include="src\data\train\traincollection.cpp" />
+    <ClCompile Include="src\mainwindow\traincontext.cpp" />
+    <ClCompile Include="src\viewers\traindiffdialog.cpp" />
+    <ClCompile Include="src\viewers\events\traineventdialog.cpp" />
+    <ClCompile Include="src\data\diagram\trainevents.cpp" />
+    <ClCompile Include="src\dialogs\trainfilter.cpp" />
+    <ClCompile Include="src\data\train\trainfiltercore.cpp" />
+    <ClCompile Include="src\data\diagram\traingap.cpp" />
+    <ClCompile Include="src\viewers\events\traingapstatdialog.cpp" />
+    <ClCompile Include="src\viewers\traininfowidget.cpp" />
+    <ClCompile Include="src\kernel\trainitem.cpp" />
+    <ClCompile Include="src\data\diagram\trainline.cpp" />
+    <ClCompile Include="src\viewers\trainlinedialog.cpp" />
+    <ClCompile Include="src\model\train\trainlistmodel.cpp" />
+    <ClCompile Include="src\model\train\trainlistreadmodel.cpp" />
+    <ClCompile Include="src\editors\trainlistwidget.cpp" />
+    <ClCompile Include="src\data\train\trainname.cpp" />
+    <ClCompile Include="src\data\train\trainstation.cpp" />
+    <ClCompile Include="src\viewers\traintimetableplane.cpp" />
+    <ClCompile Include="src\data\train\traintype.cpp" />
+    <ClCompile Include="src\editors\typeconfigdialog.cpp" />
+    <ClCompile Include="src\data\train\typemanager.cpp" />
+    <ClCompile Include="src\model\train\typemodel.cpp" />
+    <ClCompile Include="src\editors\typeregexdialog.cpp" />
+    <ClCompile Include="src\util\utilfunc.cpp" />
+    <ClCompile Include="src\railnet\graph\vertexlistwidget.cpp" />
+    <ClCompile Include="src\railnet\graph\viewadjacentwidget.cpp" />
+    <ClCompile Include="src\mainwindow\viewcategory.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\data\diagram\stationbinding.h" />
-    <ClInclude Include="src\data\rail\railinfonote.h" />
-    <ClInclude Include="src\data\rail\railtrack.h" />
-    <ClInclude Include="src\data\rail\trackdiagramdata.h" />
-    <ClInclude Include="src\data\train\typemanager.h" />
-    <QtMoc Include="src\dialogs\correcttimetabledialog.h" />
-    <QtMoc Include="src\kernel\trackdiagram.h" />
-    <QtMoc Include="src\model\rail\railtrackadjustmodel.h" />
-    <QtMoc Include="src\railnet\graph\adjacentlistwidget.h" />
-    <QtMoc Include="src\railnet\graph\adjacentlistmodel.h" />
-    <ClInclude Include="src\railnet\graph\edgedatamodels.h" />
-    <ClInclude Include="src\railnet\graph\graphinterval.h" />
-    <ClInclude Include="src\railnet\graph\graphstation.h" />
-    <ClInclude Include="src\railnet\graph\railnet.h" />
-    <QtMoc Include="src\railnet\graph\vertexlistwidget.h" />
-    <QtMoc Include="src\railnet\graph\viewadjacentwidget.h" />
-    <ClInclude Include="src\railnet\graph\xtl_graph.hpp" />
-    <QtMoc Include="src\railnet\path\quickpathselector.h" />
-    <QtMoc Include="src\railnet\path\railpreviewdialog.h" />
-    <QtMoc Include="src\railnet\path\graphpathmodel.h" />
-    <ClInclude Include="src\railnet\path\pathoperation.h" />
-    <QtMoc Include="src\railnet\path\pathoperationmodel.h" />
-    <QtMoc Include="src\railnet\path\pathselectwidget.h" />
-    <ClInclude Include="src\railnet\raildb\raildb.h" />
-    <QtMoc Include="src\railnet\raildb\raildbcontext.h" />
-    <ClInclude Include="src\railnet\raildb\raildbitems.h" />
-    <QtMoc Include="src\railnet\raildb\raildbmodel.h" />
-    <QtMoc Include="src\railnet\raildb\raildbnavi.h" />
-    <QtMoc Include="src\railnet\raildb\raildbwindow.h" />
-    <QtMoc Include="src\viewers\events\railtrackwidget.h" />
-    <QtMoc Include="src\wizards\selectpath\selectpathpagestart.h" />
-    <QtMoc Include="src\wizards\selectpath\selectpathwizard.h" />
-    <QtMoc Include="src\wizards\selectpath\selectpathpagepreview.h" />
-    <ClInclude Include="src\wizards\timeinterp\timeinterppagepreview.h" />
-    <QtMoc Include="src\wizards\timeinterp\timeinterpwizard.h" />
-    <QtMoc Include="src\wizards\timeinterp\timeinterppagetrain.h" />
-    <QtMoc Include="src\viewers\traininfowidget.h" />
-    <QtMoc Include="src\wizards\readruler\readrulerpagepreview.h" />
-    <QtMoc Include="src\wizards\readruler\readrulerpageconfig.h" />
-    <QtMoc Include="src\wizards\readruler\readrulerpagetrain.h" />
-    <QtMoc Include="src\model\train\trainlistreadmodel.h" />
-    <QtMoc Include="src\model\train\routingcollectionmodel.h" />
-    <ClInclude Include="src\data\common\qeglobal.h" />
-    <ClInclude Include="src\data\common\qesystem.h" />
-    <QtMoc Include="src\editors\routing\routingwidget.h" />
-    <QtMoc Include="src\editors\routing\routingedit.h" />
-    <QtMoc Include="src\model\train\routingeditmodel.h" />
-    <QtMoc Include="src\mainwindow\routingcontext.h" />
-    <QtMoc Include="src\editors\routing\addroutingnodedialog.h" />
-    <QtMoc Include="src\editors\routing\parseroutingdialog.h" />
-    <QtMoc Include="src\editors\routing\detectroutingdialog.h" />
-    <QtMoc Include="src\model\train\routinglistmodel.h" />
-    <QtMoc Include="src\editors\routing\batchparseroutingdialog.h" />
-    <QtMoc Include="src\viewers\diagnosisdialog.h" />
-    <QtMoc Include="src\editors\typeconfigdialog.h" />
-    <QtMoc Include="src\model\train\typemodel.h" />
-    <QtMoc Include="src\editors\typeregexdialog.h" />
-    <QtMoc Include="src\editors\systemjsondialog.h" />
-    <QtMoc Include="src\dialogs\trainfilter.h" />
-    <QtMoc Include="src\kernel\routingdiagram.h" />
-    <QtMoc Include="src\editors\routing\routingdiagramwidget.h" />
-    <ClInclude Include="src\data\diagram\traingap.h" />
-    <ClInclude Include="src\data\train\trainfiltercore.h" />
-    <QtMoc Include="src\dialogs\locatedialog.h" />
-    <ClInclude Include="src\model\delegate\linestyledelegate.h" />
-    <QtMoc Include="src\model\train\timetablequickmodel.h" />
-    <QtMoc Include="src\viewers\timetablequickwidget.h" />
-    <QtMoc Include="src\viewers\events\stationtraingapdialog.h" />
-    <QtMoc Include="src\model\delegate\timeintervaldelegate.h" />
-    <QtMoc Include="src\viewers\events\traingapstatdialog.h" />
-    <QtMoc Include="src\util\qeballoomtip.h" />
-    <QtMoc Include="src\util\pagecomboforrail.h" />
-    <ClInclude Include="src\viewers\traindiffdialog.h" />
-    <QtMoc Include="src\wizards\readruler\readrulerpageinterval.h" />
-    <QtMoc Include="src\wizards\readruler\readrulerwizard.h" />
-    <QtMoc Include="src\viewers\traintimetableplane.h" />
-    <QtMoc Include="src\wizards\rulerpaint\conflictdialog.h" />
-    <QtMoc Include="src\wizards\rulerpaint\rulerpaintpagetable.h" />
-    <QtMoc Include="src\wizards\rulerpaint\rulerpaintpagestation.h" />
-    <QtMoc Include="src\wizards\rulerpaint\rulerpaintwizard.h" />
-    <QtMoc Include="src\wizards\rulerpaint\rulerpaintpagestart.h" />
-    <QtMoc Include="src\viewers\trainlinedialog.h" />
-    <QtMoc Include="src\viewers\events\railsnapevents.h" />
-    <QtMoc Include="src\viewers\events\railsectionevents.h" />
-    <QtMoc Include="src\viewers\rulerrefdialog.h" />
-    <QtMoc Include="src\viewers\events\railstationeventlist.h" />
-    <QtMoc Include="src\viewers\sectioncountdialog.h" />
-    <QtMoc Include="src\viewers\events\traineventdialog.h" />
-    <QtMoc Include="src\mainwindow\mainwindow.h" />
-    <QtMoc Include="src\mainwindow\traincontext.h" />
-    <QtMoc Include="src\editors\railstationwidget.h" />
-    <QtMoc Include="src\mainwindow\railcontext.h" />
-    <QtMoc Include="src\dialogs\importtraindialog.h" />
-    <QtMoc Include="src\editors\basictrainwidget.h" />
-    <QtMoc Include="src\mainwindow\pagecontext.h" />
-    <QtMoc Include="src\dialogs\printdiagramdialog.h" />
-    <ClInclude Include="src\data\rail\railcategory.h" />
-    <QtMoc Include="src\editors\configdialog.h" />
-    <QtMoc Include="src\mainwindow\rulercontext.h" />
-    <QtMoc Include="src\editors\ruler\rulertabpy.h" />
-    <QtMoc Include="src\editors\ruler\rulerwidget.h" />
-    <QtMoc Include="src\dialogs\selectrailstationdialog.h" />
-    <QtMoc Include="src\viewers\events\stationtimetablesettled.h" />
-    <QtMoc Include="src\dialogs\exchangeintervaldialog.h" />
-    <QtMoc Include="src\dialogs\changestationnamedialog.h" />
-    <QtMoc Include="src\dialogs\rulerfromtraindialog.h" />
-    <QtMoc Include="src\dialogs\outputsubdiagramdialog.h" />
-    <QtMoc Include="src\dialogs\modifytimetabledialog.h" />
-    <QtMoc Include="src\dialogs\batchcopytraindialog.h" />
-    <QtMoc Include="src\editors\forbidwidget.h" />
-    <ClInclude Include="src\mainwindow\version.h" />
-    <QtMoc Include="src\navi\navitree.h" />
-    <QtMoc Include="src\model\diagram\railtablemodel.h" />
-    <QtMoc Include="src\navi\addpagedialog.h" />
-    <QtMoc Include="src\model\rail\railstationmodel.h" />
-    <QtMoc Include="src\model\delegate\combodelegate.h" />
-    <QtMoc Include="src\mainwindow\viewcategory.h" />
-    <ClInclude Include="src\model\delegate\generaldoublespindelegate.h" />
-    <ClInclude Include="src\model\delegate\generalspindelegate.h" />
-    <QtMoc Include="src\model\delegate\postivespindelegate.h" />
-    <ClInclude Include="src\model\delegate\qedelegate.h" />
-    <QtMoc Include="src\model\train\timetablestdmodel.h" />
-    <QtMoc Include="src\model\general\qemoveablemodel.h" />
-    <QtMoc Include="src\model\rail\rulermodel.h" />
-    <QtMoc Include="src\model\delegate\qetimedelegate.h" />
-    <QtMoc Include="src\model\rail\forbidmodel.h" />
-    <QtMoc Include="src\model\rail\intervaldatamodel.h" />
+    <QtMoc Include="src\navi\addpagedialog.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\routing\addroutingnodedialog.h">
+    </QtMoc>
+    <QtMoc Include="src\railnet\graph\adjacentlistmodel.h">
+    </QtMoc>
+    <QtMoc Include="src\railnet\graph\adjacentlistwidget.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\basictrainwidget.h">
+    </QtMoc>
+    <QtMoc Include="src\dialogs\batchcopytraindialog.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\routing\batchparseroutingdialog.h">
+    </QtMoc>
     <ClInclude Include="src\util\buttongroup.hpp" />
+    <QtMoc Include="src\dialogs\changestationnamedialog.h">
+    </QtMoc>
+    <QtMoc Include="src\model\delegate\combodelegate.h">
+    </QtMoc>
     <ClInclude Include="src\model\diagram\componentitems.h" />
     <ClInclude Include="src\data\diagram\config.h" />
+    <QtMoc Include="src\editors\configdialog.h">
+    </QtMoc>
+    <QtMoc Include="src\wizards\rulerpaint\conflictdialog.h">
+    </QtMoc>
+    <QtMoc Include="src\dialogs\correcttimetabledialog.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\routing\detectroutingdialog.h">
+    </QtMoc>
+    <QtMoc Include="src\viewers\diagnosisdialog.h">
+    </QtMoc>
     <ClInclude Include="src\data\diagram\diagram.h" />
     <QtMoc Include="src\model\diagram\diagramnavimodel.h">
     </QtMoc>
     <ClInclude Include="src\data\diagram\diagrampage.h" />
     <QtMoc Include="src\kernel\diagramwidget.h">
     </QtMoc>
+    <QtMoc Include="src\util\dialogadapter.h">
+    </QtMoc>
     <ClInclude Include="src\data\common\direction.h" />
+    <ClInclude Include="src\railnet\graph\edgedatamodels.h" />
+    <QtMoc Include="src\dialogs\exchangeintervaldialog.h">
+    </QtMoc>
     <ClInclude Include="src\data\rail\forbid.h" />
-    <QtMoc Include="src\util\qecontrolledtable.h" />
-    <QtMoc Include="src\util\dialogadapter.h" />
-    <QtMoc Include="src\util\linestylecombo.h" />
+    <QtMoc Include="src\model\rail\forbidmodel.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\forbidwidget.h">
+    </QtMoc>
+    <ClInclude Include="src\model\delegate\generaldoublespindelegate.h" />
+    <ClInclude Include="src\model\delegate\generalspindelegate.h" />
+    <ClInclude Include="src\railnet\graph\graphinterval.h" />
+    <QtMoc Include="src\railnet\path\graphpathmodel.h">
+    </QtMoc>
+    <ClInclude Include="src\railnet\graph\graphstation.h" />
+    <QtMoc Include="src\dialogs\importtraindialog.h">
+    </QtMoc>
+    <QtMoc Include="src\model\rail\intervaldatamodel.h">
+    </QtMoc>
+    <QtMoc Include="src\util\linestylecombo.h">
+    </QtMoc>
+    <ClInclude Include="src\model\delegate\linestyledelegate.h" />
+    <QtMoc Include="src\dialogs\locatedialog.h">
+    </QtMoc>
+    <QtMoc Include="src\mainwindow\mainwindow.h">
+    </QtMoc>
+    <QtMoc Include="src\dialogs\modifytimetabledialog.h">
+    </QtMoc>
+    <QtMoc Include="src\navi\navitree.h">
+    </QtMoc>
+    <QtMoc Include="src\dialogs\outputsubdiagramdialog.h">
+    </QtMoc>
+    <QtMoc Include="src\util\pagecomboforrail.h">
+    </QtMoc>
+    <QtMoc Include="src\mainwindow\pagecontext.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\routing\parseroutingdialog.h">
+    </QtMoc>
+    <ClInclude Include="src\railnet\path\pathoperation.h" />
+    <QtMoc Include="src\railnet\path\pathoperationmodel.h">
+    </QtMoc>
+    <QtMoc Include="src\railnet\path\pathselectwidget.h">
+    </QtMoc>
+    <QtMoc Include="src\model\delegate\postivespindelegate.h">
+    </QtMoc>
+    <QtMoc Include="src\dialogs\printdiagramdialog.h">
+    </QtMoc>
+    <QtMoc Include="src\util\qeballoomtip.h">
+    </QtMoc>
+    <QtMoc Include="src\util\qecontrolledtable.h">
+    </QtMoc>
+    <ClInclude Include="src\model\delegate\qedelegate.h" />
     <ClInclude Include="src\util\qeexceptions.h" />
+    <ClInclude Include="src\data\common\qeglobal.h" />
+    <QtMoc Include="src\model\general\qemoveablemodel.h">
+    </QtMoc>
+    <ClInclude Include="src\data\common\qesystem.h" />
+    <QtMoc Include="src\model\delegate\qetimedelegate.h">
+    </QtMoc>
+    <QtMoc Include="src\railnet\path\quickpathselector.h">
+    </QtMoc>
     <ClInclude Include="src\data\rail\rail.h" />
+    <ClInclude Include="src\data\rail\railcategory.h" />
+    <QtMoc Include="src\mainwindow\railcontext.h">
+    </QtMoc>
+    <ClInclude Include="src\railnet\raildb\raildb.h" />
+    <QtMoc Include="src\railnet\raildb\raildbcontext.h">
+    </QtMoc>
+    <ClInclude Include="src\railnet\raildb\raildbitems.h" />
+    <QtMoc Include="src\railnet\raildb\raildbmodel.h">
+    </QtMoc>
+    <QtMoc Include="src\railnet\raildb\raildbnavi.h">
+    </QtMoc>
+    <QtMoc Include="src\railnet\raildb\raildbwindow.h">
+    </QtMoc>
+    <ClInclude Include="src\data\rail\railinfonote.h" />
     <ClInclude Include="src\data\rail\railinterval.h" />
     <ClInclude Include="src\data\rail\railintervaldata.hpp" />
     <ClInclude Include="src\data\rail\railintervalnode.hpp" />
+    <ClInclude Include="src\railnet\graph\railnet.h" />
+    <QtMoc Include="src\railnet\path\railpreviewdialog.h">
+    </QtMoc>
+    <QtMoc Include="src\util\railrulercombo.h">
+    </QtMoc>
+    <QtMoc Include="src\viewers\events\railsectionevents.h">
+    </QtMoc>
+    <QtMoc Include="src\viewers\events\railsnapevents.h">
+    </QtMoc>
     <ClInclude Include="src\data\rail\railstation.h" />
+    <QtMoc Include="src\viewers\events\railstationeventlist.h">
+    </QtMoc>
+    <QtMoc Include="src\model\rail\railstationmodel.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\railstationwidget.h">
+    </QtMoc>
+    <QtMoc Include="src\model\diagram\railtablemodel.h">
+    </QtMoc>
+    <ClInclude Include="src\data\rail\railtrack.h" />
+    <QtMoc Include="src\model\rail\railtrackadjustmodel.h">
+    </QtMoc>
+    <QtMoc Include="src\viewers\events\railtrackwidget.h">
+    </QtMoc>
     <ClInclude Include="src\data\rail\railway.h" />
+    <QtMoc Include="src\wizards\readruler\readrulerpageconfig.h">
+    </QtMoc>
+    <QtMoc Include="src\wizards\readruler\readrulerpageinterval.h">
+    </QtMoc>
+    <QtMoc Include="src\wizards\readruler\readrulerpagepreview.h">
+    </QtMoc>
+    <QtMoc Include="src\wizards\readruler\readrulerpagetrain.h">
+    </QtMoc>
+    <QtMoc Include="src\wizards\readruler\readrulerwizard.h">
+    </QtMoc>
     <ClInclude Include="src\data\train\routing.h" />
+    <QtMoc Include="src\model\train\routingcollectionmodel.h">
+    </QtMoc>
+    <QtMoc Include="src\mainwindow\routingcontext.h">
+    </QtMoc>
+    <QtMoc Include="src\kernel\routingdiagram.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\routing\routingdiagramwidget.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\routing\routingedit.h">
+    </QtMoc>
+    <QtMoc Include="src\model\train\routingeditmodel.h">
+    </QtMoc>
+    <QtMoc Include="src\model\train\routinglistmodel.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\routing\routingwidget.h">
+    </QtMoc>
     <ClInclude Include="src\data\rail\ruler.h" />
+    <QtMoc Include="src\mainwindow\rulercontext.h">
+    </QtMoc>
+    <QtMoc Include="src\dialogs\rulerfromtraindialog.h">
+    </QtMoc>
+    <QtMoc Include="src\model\rail\rulermodel.h">
+    </QtMoc>
     <ClInclude Include="src\data\rail\rulernode.h" />
+    <QtMoc Include="src\wizards\rulerpaint\rulerpaintpagestart.h">
+    </QtMoc>
+    <QtMoc Include="src\wizards\rulerpaint\rulerpaintpagestation.h">
+    </QtMoc>
+    <QtMoc Include="src\wizards\rulerpaint\rulerpaintpagetable.h">
+    </QtMoc>
+    <QtMoc Include="src\wizards\rulerpaint\rulerpaintwizard.h">
+    </QtMoc>
+    <QtMoc Include="src\viewers\rulerrefdialog.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\ruler\rulertabpy.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\ruler\rulerwidget.h">
+    </QtMoc>
+    <QtMoc Include="src\viewers\sectioncountdialog.h">
+    </QtMoc>
+    <QtMoc Include="src\wizards\selectpath\selectpathpagepreview.h">
+    </QtMoc>
+    <QtMoc Include="src\wizards\selectpath\selectpathpagestart.h">
+    </QtMoc>
+    <QtMoc Include="src\wizards\selectpath\selectpathwizard.h">
+    </QtMoc>
+    <QtMoc Include="src\dialogs\selectrailstationdialog.h">
+    </QtMoc>
+    <QtMoc Include="src\util\selectrailwaycombo.h">
+    </QtMoc>
+    <QtMoc Include="src\util\selecttraincombo.h">
+    </QtMoc>
+    <ClInclude Include="src\data\diagram\stationbinding.h" />
     <ClInclude Include="src\data\common\stationname.h" />
+    <QtMoc Include="src\viewers\events\stationtimetablesettled.h">
+    </QtMoc>
+    <QtMoc Include="src\viewers\events\stationtraingapdialog.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\systemjsondialog.h">
+    </QtMoc>
+    <ClInclude Include="src\wizards\timeinterp\timeinterppagepreview.h" />
+    <QtMoc Include="src\wizards\timeinterp\timeinterppagetrain.h">
+    </QtMoc>
+    <QtMoc Include="src\wizards\timeinterp\timeinterpwizard.h">
+    </QtMoc>
+    <QtMoc Include="src\model\delegate\timeintervaldelegate.h">
+    </QtMoc>
+    <QtMoc Include="src\model\train\timetablequickmodel.h">
+    </QtMoc>
+    <QtMoc Include="src\viewers\timetablequickwidget.h">
+    </QtMoc>
+    <QtMoc Include="src\model\train\timetablestdmodel.h">
+    </QtMoc>
+    <QtMoc Include="src\kernel\trackdiagram.h">
+    </QtMoc>
+    <ClInclude Include="src\data\rail\trackdiagramdata.h" />
     <ClInclude Include="src\data\train\train.h" />
     <ClInclude Include="src\data\diagram\trainadapter.h" />
     <ClInclude Include="src\data\train\traincollection.h" />
+    <QtMoc Include="src\mainwindow\traincontext.h">
+    </QtMoc>
+    <ClInclude Include="src\viewers\traindiffdialog.h" />
+    <QtMoc Include="src\viewers\events\traineventdialog.h">
+    </QtMoc>
     <ClInclude Include="src\data\diagram\trainevents.h" />
+    <QtMoc Include="src\dialogs\trainfilter.h">
+    </QtMoc>
+    <ClInclude Include="src\data\train\trainfiltercore.h" />
+    <ClInclude Include="src\data\diagram\traingap.h" />
+    <QtMoc Include="src\viewers\events\traingapstatdialog.h">
+    </QtMoc>
+    <QtMoc Include="src\viewers\traininfowidget.h">
+    </QtMoc>
     <ClInclude Include="src\kernel\trainitem.h" />
     <ClInclude Include="src\data\diagram\trainline.h" />
+    <QtMoc Include="src\viewers\trainlinedialog.h">
+    </QtMoc>
     <QtMoc Include="src\model\train\trainlistmodel.h">
+    </QtMoc>
+    <QtMoc Include="src\model\train\trainlistreadmodel.h">
     </QtMoc>
     <QtMoc Include="src\editors\trainlistwidget.h">
     </QtMoc>
     <ClInclude Include="src\data\train\trainname.h" />
     <ClInclude Include="src\data\train\trainstation.h" />
+    <QtMoc Include="src\viewers\traintimetableplane.h">
+    </QtMoc>
     <ClInclude Include="src\data\train\traintype.h" />
-    <QtMoc Include="src\util\selecttraincombo.h" />
-    <QtMoc Include="src\util\railrulercombo.h" />
-    <QtMoc Include="src\util\selectrailwaycombo.h" />
+    <QtMoc Include="src\editors\typeconfigdialog.h">
+    </QtMoc>
+    <ClInclude Include="src\data\train\typemanager.h" />
+    <QtMoc Include="src\model\train\typemodel.h">
+    </QtMoc>
+    <QtMoc Include="src\editors\typeregexdialog.h">
+    </QtMoc>
     <ClInclude Include="src\util\utilfunc.h" />
+    <ClInclude Include="src\mainwindow\version.h" />
+    <QtMoc Include="src\railnet\graph\vertexlistwidget.h">
+    </QtMoc>
+    <QtMoc Include="src\railnet\graph\viewadjacentwidget.h">
+    </QtMoc>
+    <QtMoc Include="src\mainwindow\viewcategory.h">
+    </QtMoc>
+    <ClInclude Include="src\railnet\graph\xtl_graph.hpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
@@ -541,8 +648,8 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cpp.hint" />
     <None Include="rsc\icons\ETRC-dynamic.png" />
+    <None Include="rsc\icons\Graph-add.png" />
     <None Include="rsc\icons\add.png" />
     <None Include="rsc\icons\add_train.png" />
     <None Include="rsc\icons\adjust-2.png" />
@@ -557,6 +664,7 @@
     <None Include="rsc\icons\counter.png" />
     <None Include="rsc\icons\data.png" />
     <None Include="rsc\icons\database.png" />
+    <None Include="rsc\icons\diagram.png" />
     <None Include="rsc\icons\edit.png" />
     <None Include="rsc\icons\electronic-clock.png" />
     <None Include="rsc\icons\excel.png" />
@@ -571,6 +679,7 @@
     <None Include="rsc\icons\identify.png" />
     <None Include="rsc\icons\info.png" />
     <None Include="rsc\icons\joint.png" />
+    <None Include="rsc\icons\line-manage.png" />
     <None Include="rsc\icons\list.png" />
     <None Include="rsc\icons\menu.png" />
     <None Include="rsc\icons\new-file.png" />
@@ -579,9 +688,11 @@
     <None Include="rsc\icons\png.png" />
     <None Include="rsc\icons\polyline.png" />
     <None Include="rsc\icons\rail.png" />
+    <None Include="rsc\icons\redo.png" />
     <None Include="rsc\icons\refresh.png" />
     <QtRcc Include="rsc\resource.qrc">
     </QtRcc>
+    <None Include="rsc\icons\routing-diagram.png" />
     <None Include="rsc\icons\ruler.png" />
     <None Include="rsc\icons\ruler_pen.png" />
     <None Include="rsc\icons\save1.png" />
@@ -589,12 +700,19 @@
     <None Include="rsc\icons\search.png" />
     <None Include="rsc\icons\settings.png" />
     <None Include="rsc\icons\text.png" />
+    <None Include="rsc\icons\tick.png" />
     <None Include="rsc\icons\timetable.png" />
     <None Include="rsc\icons\train.png" />
+    <None Include="rsc\icons\trainline.png" />
+    <None Include="rsc\icons\undo.png" />
     <None Include="rsc\icons\v_expand.png" />
     <None Include="rsc\icons\v_shrink.png" />
+    <None Include="rsc\icons\weaken.png" />
     <None Include="rsc\icons\zoom-in.png" />
     <None Include="rsc\icons\zoom-out.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="rsc\icons\trainline.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

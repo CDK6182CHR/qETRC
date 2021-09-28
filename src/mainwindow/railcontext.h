@@ -165,6 +165,13 @@ public slots:
      */
     void actChangeOrdinate(int i);
 
+    /**
+     * seealse: actChangeOrdinate
+     * i是ruler下标（按里程为-1）。包含检查以及操作压栈过程。
+     * railway不见得是当前的。
+     */
+    void changeRailOrdinate(std::shared_ptr<Railway> railway, int idx);
+
     void openRulerWidget(std::shared_ptr<Ruler> ruler);
 
     void openForbidWidget(std::shared_ptr<Railway> railway);

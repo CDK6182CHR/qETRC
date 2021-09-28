@@ -445,7 +445,7 @@ void RailDBNavi::openRulerWidget(std::shared_ptr<Ruler> ruler)
     w->setAttribute(Qt::WA_DeleteOnClose);
     w->setWindowFlags(Qt::Dialog);
     w->resize(500, 600);
-    w->setWindowTitle(tr("标尺编辑 @ %1").arg(ruler->railway().name()));
+    w->setWindowTitle(tr("标尺编辑 @ %1").arg(ruler->railway()->name()));
     connect(w, &RulerWidget::actChangeRulerName,
         this, &RailDBNavi::actChangeRulerName);
     connect(w, &RulerWidget::actChangeRulerData,
@@ -714,7 +714,7 @@ void qecmd::InsertRailDB::redo()
 
 qecmd::UpdateForbidDB::UpdateForbidDB(std::shared_ptr<Forbid> forbid, 
     std::shared_ptr<Railway> data, QUndoCommand* parent):
-    QUndoCommand(QObject::tr("更新天窗: %1 @%2").arg(forbid->name(),forbid->railway().name()),
+    QUndoCommand(QObject::tr("更新天窗: %1 @%2").arg(forbid->name(),forbid->railway()->name()),
         parent),forbid(forbid),data(data)
 {
 }
@@ -755,7 +755,7 @@ void qecmd::AddNewRulerDB::redo()
 
 qecmd::ChangeRulerNameDB::ChangeRulerNameDB(std::shared_ptr<Ruler> ruler, 
     const QString& name, QUndoCommand* parent):
-    QUndoCommand(QObject::tr("更改标尺名称: %1 @ %2").arg(name,ruler->railway().name()),parent),
+    QUndoCommand(QObject::tr("更改标尺名称: %1 @ %2").arg(name,ruler->railway()->name()),parent),
     ruler(ruler),name(name)
 {
 }
@@ -771,7 +771,7 @@ void qecmd::ChangeRulerNameDB::redo()
 
 qecmd::UpdateRulerDataDB::UpdateRulerDataDB(std::shared_ptr<Ruler> ruler, 
     std::shared_ptr<Railway> data, QUndoCommand* parent):
-    QUndoCommand(QObject::tr("更新标尺: %1 @ %2").arg(ruler->name(),ruler->railway().name()),
+    QUndoCommand(QObject::tr("更新标尺: %1 @ %2").arg(ruler->name(),ruler->railway()->name()),
         parent),ruler(ruler),data(data)
 {
 }
@@ -787,22 +787,22 @@ void qecmd::UpdateRulerDataDB::redo()
 
 qecmd::RemoveRulerDB::RemoveRulerDB(std::shared_ptr<Ruler> ruler,
     std::shared_ptr<Railway> data, bool isOrd, RailDBNavi* navi, QUndoCommand* parent):
-    QUndoCommand(QObject::tr("删除标尺: %1 @ %2").arg(ruler->name(),ruler->railway().name()),
+    QUndoCommand(QObject::tr("删除标尺: %1 @ %2").arg(ruler->name(),ruler->railway()->name()),
         parent),ruler(ruler),data(data),isOrdinate(isOrd),navi(navi)
 {
 }
 
 void qecmd::RemoveRulerDB::undo()
 {
-    ruler->railway().undoRemoveRuler(ruler, data);
+    ruler->railway()->undoRemoveRuler(ruler, data);
     if (isOrdinate) {
-        ruler->railway().setOrdinate(ruler);
+        ruler->railway()->setOrdinate(ruler);
     }
 }
 
 void qecmd::RemoveRulerDB::redo()
 {
-    ruler->railway().removeRuler(ruler);
+    ruler->railway()->removeRuler(ruler);
     navi->closeRulerWidget(ruler);
 }
 

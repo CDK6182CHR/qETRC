@@ -1,7 +1,7 @@
 ﻿
 #pragma once
 
-#include <functional>
+#include <memory>
 #include "railintervalnode.hpp"
 #include "railway.h"
 
@@ -10,6 +10,7 @@ class Railway;
 /**
  * Ruler等的抽象类
  * 2021年7月4日 将引用改为Reference_wrapper，方便交换操作。
+ * 2021年9月28日 进一步将Railway的引用方式改为weak_ptr
  */
 template <typename _Node, typename _Data>
 class RailIntervalData{
@@ -19,7 +20,7 @@ class RailIntervalData{
 //    "Invalid Data type");
 
 protected:
-    std::reference_wrapper<Railway> _railway;
+    std::weak_ptr<Railway> _railway;
     bool _different;
     int _index;
 
@@ -28,7 +29,7 @@ protected:
     /*
      * 构造函数原则上仅允许Railway的相关函数调用
      */
-    RailIntervalData(Railway& railway,bool different,int index):
+    RailIntervalData(std::weak_ptr<Railway> railway,bool different,int index):
         _railway(railway),_different(different),_index(index){}
 
 public:
@@ -56,7 +57,7 @@ public:
      * precondition: 不存在上下行分设站
      */
     inline void copyDownToUp() {
-        for (auto p = _railway.get().firstUpInterval(); p; p = p->nextInterval()) {
+        for (auto p = railway()->firstUpInterval(); p; p = p->nextInterval()) {
             auto pinv = p->inverseInterval();
             if (pinv) {
                 auto d = p->template getDataAt<_Node>(_index);
@@ -71,7 +72,7 @@ public:
     }
 
     inline void copyUpToDown() {
-        for (auto p = _railway.get().firstDownInterval(); p; p = p->nextInterval()) {
+        for (auto p = railway()->firstDownInterval(); p; p = p->nextInterval()) {
             auto pinv = p->inverseInterval();
             if (pinv) {
                 auto d = p->template getDataAt<_Node>(_index);
@@ -86,7 +87,7 @@ public:
     }
 
     inline std::shared_ptr<_Node> firstDownNode() {
-        auto t = railway().firstDownInterval();
+        auto t = railway()->firstDownInterval();
         if (t) {
             return t->template getDataAt<_Node>(_index);
         }
@@ -95,7 +96,7 @@ public:
         }
     }
     inline std::shared_ptr<const _Node> firstDownNode()const{
-        auto t= railway().firstDownInterval();
+        auto t= railway()->firstDownInterval();
         if(t){
             return t->template getDataAt<_Node>(_index);
         }else{
@@ -103,7 +104,7 @@ public:
         }
     }
     inline std::shared_ptr<_Node> firstUpNode(){
-        auto t= railway().firstUpInterval();
+        auto t= railway()->firstUpInterval();
         if(t){
             return t->template getDataAt<_Node>(_index);
         }else{
@@ -111,7 +112,7 @@ public:
         }
     }
     inline std::shared_ptr<const _Node> firstUpNode()const{
-        auto t= railway().firstUpInterval();
+        auto t= railway()->firstUpInterval();
         if(t){
             return t->template getDataAt<_Node>(_index);
         }else{
@@ -136,9 +137,9 @@ public:
      */
     inline std::shared_ptr<_Node>
         getNode(const StationName& from,const StationName& to){
-        auto t= railway().findInterval(from,to);
+        auto t= railway()->findInterval(from,to);
         if(!t&&!_different){
-            t= railway().findInterval(to,from);
+            t= railway()->findInterval(to,from);
         }
         if(t)
             return t->template getDataAt<_Node>(_index);
@@ -148,9 +149,9 @@ public:
 
     inline std::shared_ptr<const _Node>
         getNode(const StationName& from,const StationName& to)const{
-        auto t= railway().findInterval(from,to);
+        auto t= railway()->findInterval(from,to);
         if(!t&&!_different){
-            t= railway().findInterval(to,from);
+            t= railway()->findInterval(to,from);
         }
         if(t)
             return t->template getDataAt<_Node>(_index);
@@ -205,8 +206,8 @@ public:
             return {};
     }
 
-    inline auto& railway() { return _railway.get(); }
-    inline const auto& railway()const { return _railway.get(); }
+    inline std::shared_ptr<Railway> railway() { return _railway.lock(); }
+    inline std::shared_ptr<Railway> railway()const { return _railway.lock(); }
 
 protected:
     void swap(RailIntervalData<_Node, _Data>& other) {

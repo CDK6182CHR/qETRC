@@ -1174,7 +1174,7 @@ void DiagramWidget::locateToMile(std::shared_ptr<const Railway> railway, double 
 
 void DiagramWidget::showForbid(std::shared_ptr<Forbid> forbid, Direction dir)
 {
-    int idx = _page->railwayIndex(forbid->railway());
+    int idx = _page->railwayIndex(*(forbid->railway()));
     if (idx == -1)
         return;
     showForbid(forbid, dir, idx);

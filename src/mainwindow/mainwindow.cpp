@@ -1030,8 +1030,8 @@ void MainWindow::initToolbar()
     if constexpr (true) {
         auto* cat = ribbon->addContextCategory(tr(""));
         contextRuler = new RulerContext(_diagram, cat, this);
-        connect(contextRuler, SIGNAL(ordinateRulerModified(Railway&)),
-            this, SLOT(updateRailwayDiagrams(Railway&)));
+        connect(contextRuler, &RulerContext::ordinateRulerModified,
+            this, qOverload<std::shared_ptr<Railway>>(&MainWindow::updateRailwayDiagrams));
         connect(contextRuler, &RulerContext::focusOutRuler,
             this, &MainWindow::focusOutRuler);
         connect(contextRuler, &RulerContext::rulerNameChanged,
