@@ -102,6 +102,8 @@ private slots:
 
     void actRefreshNet();
 
+    void onQuickToggled(bool on);
+
     
 };
 

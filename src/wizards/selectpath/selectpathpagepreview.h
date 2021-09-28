@@ -35,8 +35,6 @@ public:
                           QWidget* parent=nullptr);
 
 
-    virtual bool validatePage() override;
-
     /**
      * 初始化页面数据：计算径路和经由。
      */
@@ -46,14 +44,14 @@ public:
 
     auto getRailway(){return railway;}
 
-private:
-    void initUI();
-
     /**
      * @brief applyChange
      * 保存并报告结果。
      */
     bool applyChange();
+
+private:
+    void initUI();
 
 private slots:
     void actSave();

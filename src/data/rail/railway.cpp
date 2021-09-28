@@ -25,11 +25,30 @@ Railway::Railway(const QString& name) :
 //	fromJson(obj);
 //}
 
-Railway::Railway(const Railway& other):
-	_name(other._name),_notes(other._notes),_diagramHeight(other._diagramHeight),
-	numberMapEnabled(false)
+//Railway::Railway(const Railway& other):
+//	_name(other._name),_notes(other._notes),_diagramHeight(other._diagramHeight),
+//	numberMapEnabled(false)
+//{
+//	// 通过逐个添加车站的方式，构建空区间
+//	foreach(auto p, other._stations) {
+//		appendStation(*p);
+//	}
+//	// 标尺 天窗，采用addFrom的方式
+//	foreach(auto ruler, other._rulers) {
+//		addRulerFrom(ruler);
+//	}
+//	foreach(auto forbid, other._forbids) {
+//		addForbidFrom(forbid);
+//	}
+//}
+
+Railway& Railway::operator=(const Railway& other)
 {
-	// 通过逐个添加车站的方式，构建空区间
+	_name = other._name;
+	_notes = other._notes;
+	_diagramHeight = other._diagramHeight;
+	numberMapEnabled = false;
+	_stations.clear();
 	foreach(auto p, other._stations) {
 		appendStation(*p);
 	}
@@ -40,6 +59,7 @@ Railway::Railway(const Railway& other):
 	foreach(auto forbid, other._forbids) {
 		addForbidFrom(forbid);
 	}
+	return *this;
 }
 
 void Railway::moveStationInfo(Railway&& another)

@@ -87,6 +87,8 @@ void SelectPathWizard::generateInversePath()
 
 void SelectPathWizard::accept()
 {
+    bool flag = pgPreview->applyChange();
+    if (!flag)return;
     auto rail=pgPreview->getRailway();
     if(!rail){
         QMessageBox::warning(this,tr("错误"),tr("意外的空线路"));

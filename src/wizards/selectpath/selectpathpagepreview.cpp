@@ -27,13 +27,6 @@ SelectPathPagePreview::SelectPathPagePreview(const RailNet &net,
     initUI();
 }
 
-
-bool SelectPathPagePreview::validatePage()
-{
-    bool flag=applyChange();
-    return flag;
-}
-
 void SelectPathPagePreview::setupData(bool withRuler, int rulerCount)
 {
     auto rdown=net.singleRailFromPathOperations(seqDown,withRuler);

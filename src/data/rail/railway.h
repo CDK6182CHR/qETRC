@@ -75,8 +75,9 @@ public:
     /**
      * 2021.09.13实现 拷贝构造
      * 用于从RailDB导入线路的操作  手写深拷贝
+     * !!! 2021.09.28：构造Ruler的时候调用了weak_from_this!!
      */
-    Railway(const Railway& other);
+    Railway(const Railway& other) = delete;
 
     /**
      * 2021.07.04  警告！！ IntervalData持有Railway的反向引用
@@ -84,7 +85,11 @@ public:
      */
     Railway(Railway&& rail) = delete;
 
-    Railway& operator=(const Railway& rail) = delete;
+    /**
+     * 2021.09.28：因为shared_from_this的原因，
+     * 拷贝构造不安全，改为实现拷贝赋值。
+     */
+    Railway& operator=(const Railway& rail);
     Railway& operator=(Railway&& rail) = delete;
 
     /// <summary>

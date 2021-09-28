@@ -58,6 +58,8 @@ void RailDBContext::initUI()
         quickDock = new ads::CDockWidget(tr("快速切片"));
         mw->getManager()->addDockWidget(ads::LeftDockWidgetArea, quickDock);
         quickDock->closeDockWidget();    
+        connect(quickDock, &ads::CDockWidget::viewToggled,
+            this, &RailDBContext::onQuickToggled);
     }
     act = quickDock->toggleViewAction();
     act->setIcon(QIcon(":/icons/diagram.png"));
@@ -211,6 +213,13 @@ void RailDBContext::actRefreshNet()
     net.fromRailCategory(_raildb.get());
 
     // 这里放后续的刷新工作
+}
+
+void RailDBContext::onQuickToggled(bool on)
+{
+    if (on && quickSelector == nullptr) {
+        activateQuickSelector();
+    }
 }
 
 void RailDBContext::actPathSelector()

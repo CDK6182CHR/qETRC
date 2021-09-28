@@ -928,8 +928,10 @@ bool Diagram::fromTrc(QTextStream& fin)
         }
     }
     //最后：线路插入处理
-    railway->firstForbid()->copyUpToDown();
-    addRailway(railway);
+    if (railway) {
+        railway->firstForbid()->copyUpToDown();
+        addRailway(railway);
+    }
     
     using PR = QPair<int, std::shared_ptr<Train>>;
     for (auto p = rout_map.begin(); p != rout_map.end(); ++p) {

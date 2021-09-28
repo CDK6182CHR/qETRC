@@ -323,7 +323,8 @@ void NaviTree::importRailways()
 
 void NaviTree::importRailwayFromDB(std::shared_ptr<Railway> railway)
 {
-    auto r = std::make_shared<Railway>(*railway);   // copy construct!
+    auto r = std::make_shared<Railway>();   // copy construct!
+    r->operator=(*railway);
     r->setName(_model->diagram().validRailwayName(railway->name()));
     _undo->push(new qecmd::ImportRailways(_model, { r }));
     auto flag = QMessageBox::question(this, tr("qETRC主程序"),
