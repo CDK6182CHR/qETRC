@@ -6,10 +6,12 @@
 #include "data/diagram/trainadapter.h"
 #include "util/utilfunc.h"
 #include <optional>
-#include <QPrinter>
 #include "data/train/train.h"
-
 #include "mainwindow/version.h"
+
+#ifdef QT_PRINTSUPPORT_LIB
+#include <QPrinter>
+#endif
 
 RoutingDiagram::RoutingDiagram(std::shared_ptr<Routing> routing_, QWidget *parent):
     QGraphicsView(parent),routing(routing_)
@@ -33,8 +35,9 @@ bool RoutingDiagram::outPixel(const QString &filename) const
     return flag;
 }
 
-bool RoutingDiagram::outVector(const QString &filename) const
+bool RoutingDiagram::outVector(const QString &filename)
 {
+#ifdef QT_PRINTSUPPORT_LIB
     QPrinter printer(QPrinter::HighResolution);
     printer.setOutputFormat(QPrinter::PdfFormat);
     printer.setOutputFileName(filename);
@@ -42,6 +45,12 @@ bool RoutingDiagram::outVector(const QString &filename) const
     QPageSize pageSize(size);
     printer.setPageSize(pageSize);
     return renderDiagram(printer);
+#else
+    Q_UNUSED(filename)
+    QMessageBox::warning(this, tr("错误"), tr("由于当前平台不支持QtPrintSupport，无法使用"
+        "导出PDF功能。请考虑导出PNG格式。"));
+    return false;
+#endif
 }
 
 

@@ -9,8 +9,13 @@ CONFIG += c++17
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-include(../../site-packages/SARibbon/SARibbonBar.pri)
-include(../site-packages/ads/ads.pri)
+# 2021.09.28   rewrite lib pri files
+#include(../../site-packages/SARibbon/SARibbonBar.pri)
+#include(../site-packages/ads/ads.pri)
+
+include(dependencies/qETRC_SARibbonBar.pri)
+include(dependencies/qETRC_ads.pri)
+
 
 INCLUDEPATH += src
 

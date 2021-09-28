@@ -535,6 +535,12 @@ void TrainContext::commitAutoBusiness()
 
 void TrainContext::actImportTrainFromCsv()
 {
+	auto flag = QMessageBox::question(mw, tr("导入CSV时刻表"), tr("此功能提供从CSV（逗号分隔值）"
+		"格式导入时刻表。所给文件应当有4至6列，分别为车次、站名、到达时刻、出发时刻、"
+		"股道（可选）、备注（可选），不需要表头；文件应当采用UTF-8编码。\n"
+		"每行视为一个时刻数据。对既有车次，无条件、按顺序追加到原有时刻表之后；对新增车次，"
+		"以所给时刻数据创建新车次。是否确认？"));
+	if (flag != QMessageBox::Yes)return;
 	QString filename = QFileDialog::getOpenFileName(mw, tr("从CSV导入时刻表"), {},
 		tr("逗号分隔值 (*.csv)\n所有文件 (*)"));
 	if (filename.isEmpty()) return;

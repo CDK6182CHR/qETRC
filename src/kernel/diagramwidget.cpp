@@ -16,8 +16,11 @@
 #include <QVBoxLayout>
 #include <QTextBrowser>
 #include <QScroller>
-#include <QPrinter>
 #include <QMenu>
+
+#if defined(QT_PRINTSUPPORT_LIB)
+#include <QPrinter>
+#endif
 
 #include "data/diagram/diagram.h"
 #include "data/common/qesystem.h"
@@ -140,12 +143,12 @@ void DiagramWidget::clearGraph()
 
 bool DiagramWidget::toPdf(const QString& filename, const QString& title, const QString& note)
 {
-#if 0
+#if ! defined(QT_PRINTSUPPORT_LIB)
     Q_UNUSED(filename);
     Q_UNUSED(title);
     Q_UNUSED(note)
     QMessageBox::warning(this,tr("错误"),tr("由于当前平台不支持QtPrintSupport, "
-        "无法使用导出PDF功能"));
+        "无法使用导出PDF功能。请考虑使用导出PNG功能。"));
     return false;
 #else
     using namespace std::chrono_literals;

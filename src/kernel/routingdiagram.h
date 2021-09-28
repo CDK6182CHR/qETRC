@@ -44,7 +44,7 @@ class RoutingDiagram : public QGraphicsView
 public:
     RoutingDiagram(std::shared_ptr<Routing> routing_, QWidget* parent=nullptr);
     bool outPixel(const QString& filename)const;
-    bool outVector(const QString& filename)const;
+    bool outVector(const QString& filename);
     const auto& getSizes()const{return sizes;}
     auto& getSizes(){return sizes;}
     const auto& getYValues()const{return stationYValues;}
