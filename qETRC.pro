@@ -360,3 +360,5 @@ RESOURCES += \
 
 DISTFILES += \
     rsc/icons/trainline.png
+
+TRANSLATIONS += rsc/tr/en.ts rsc/tr/ch.ts

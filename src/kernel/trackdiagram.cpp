@@ -82,6 +82,7 @@ void TrackDiagram::_initXAxis(double width, double height, const QColor& gridCol
 
 void TrackDiagram::_initYAxis(double width, const QPen& defaultPen, const QPen& boldPen)
 {
+	Q_UNUSED(boldPen)
 	int i = 0;
     foreach(const auto & track, _data.getTrackOrder()) {
 		double y = margins.top + (i + 1) * row_height;

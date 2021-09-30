@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QHeaderView>
+#include <chrono>
 #include "data/common/qesystem.h"
 #include "railnet/graph/railnet.h"
 
@@ -99,6 +100,7 @@ QVector<QString> QuickPathSelector::pathFromModel(const QEMoveableModel *model)
 
 void QuickPathSelector::actGenerate()
 {
+    using namespace std::chrono_literals;
     QString report;
     bool withRuler=ckRuler->isChecked();
     int rulerCount=spRuler->value();
@@ -110,6 +112,7 @@ void QuickPathSelector::actGenerate()
     }
 
     RailNet::rail_ret_t ret;
+    auto start = std::chrono::system_clock::now();
 
     if(gpUp->get(0)->isChecked()){
         // 单向径路
@@ -126,6 +129,8 @@ void QuickPathSelector::actGenerate()
         QString pathString = QString("正向径路：\n%1\n\n反向径路：\n%2\n").arg(
             net.pathToString(ret.downPath), net.pathToString(ret.upPath));
         emit railGenerated(ret.railway, pathString);
+        auto end = std::chrono::system_clock::now();
+        emit showStatus(tr("径路生成完成  用时%1毫秒").arg((end - start) / 1ms));
     }else{
         QMessageBox::warning(this,tr("错误"),tr("径路未能生成，原因如下：\n%1")
                              .arg(report));

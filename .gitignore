@@ -66,3 +66,6 @@ config.json
 sample.json
 ReleaseNote.pdf
 
+# ignore translation files, since no translation provided currently.
+rsc/tr
+

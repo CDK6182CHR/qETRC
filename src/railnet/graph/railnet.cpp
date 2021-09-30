@@ -261,7 +261,6 @@ RailNet::singleRailFromPath(const QVector<QString>& points,
 std::shared_ptr<Railway> RailNet::singleRailFromPath(
         const path_t &path, bool withRuler)const
 {
-    double mile=0;
     if(path.size()<=1) return {};
     auto res=std::make_shared<Railway>(QString("%1-%2")
          .arg(path.front()->from.lock()->data.name.toSingleLiteral(),

@@ -35,6 +35,7 @@
 #include "data/train/traintype.h"
 #include "dialogs/locatedialog.h"
 #include "dialogs/correcttimetabledialog.h"
+#include "util/pagecomboforrail.h"
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
 	MainWindow* mw_) :
@@ -495,12 +496,39 @@ void TrainContext::actRemoveInterpolation()
 void TrainContext::locateToBoundStation(const QVector<TrainStationBounding>& boudings, 
 	const QTime& time)
 {
-	if (!dlgLocate) {
-		dlgLocate = new LocateBoundingDialog(diagram, mw);
-		connect(dlgLocate, &LocateBoundingDialog::locateOnStation,
-			mw, &MainWindow::locateDiagramOnStation);
+	// 入参已经保证非空
+	if (boudings.size() == 1) {
+		// 没得选，考虑直接执行
+		const auto& b = boudings.front();
+		auto line = b.line.lock();
+		if (!line) {
+			QMessageBox::warning(mw, tr("错误"), tr("非法状态：意外的空TrainLine指针"));
+			return;
+		}
+		auto rail = line->railway();
+		if (!rail) {
+			QMessageBox::warning(mw, tr("错误"), tr("非法状态：意外的空Railway指针"));
+			return;
+		}
+		auto st = b.railStation.lock();
+		if (!st) {
+			QMessageBox::warning(mw, tr("错误"), tr("非法状态：意外的空RailStation指针"));
+		}
+		int idx = PageComboForRail::dlgGetPageIndex(diagram, rail, mw, tr("选择运行图"),
+			tr("当前铺画点可能存在于多张运行图中。请选择要定位到的运行图："));
+		if (idx != -1) {
+			mw->locateDiagramOnStation(idx, rail, st, time);
+		}
 	}
-	dlgLocate->showForStation(boudings, time);
+	else  {
+		if (!dlgLocate) {
+			dlgLocate = new LocateBoundingDialog(diagram, mw);
+			connect(dlgLocate, &LocateBoundingDialog::locateOnStation,
+				mw, &MainWindow::locateDiagramOnStation);
+		}
+		dlgLocate->showForStation(boudings, time);
+	}
+
 }
 
 void TrainContext::actAutoBusiness()

@@ -158,13 +158,15 @@ void RailDBContext::activateQuickSelector()
             QMessageBox::warning(mw,tr("警告"),tr("当前有向图模型为空，无法进行常规经由选择。"
             "但仍可使用强制生成径路的功能。\n"
             "出现此问题，可能是因为当前打开的线路数据库（或默认线路数据库）为空。"
-            "可先打开线路数据库管理器 (Ctrl+H)，正确加载后，在执行本功能。"));
+            "可先打开线路数据库管理器 (Ctrl+H)，正确加载后，再执行本功能。"));
         }
     }
     if (quickSelector==nullptr){
         quickSelector=new QuickPathSelector(net);
         connect(quickSelector,&QuickPathSelector::railGenerated,
                 this,&RailDBContext::previewRail);
+        connect(quickSelector, &QuickPathSelector::showStatus,
+            mw, &MainWindow::showStatus);
         quickDock->setWidget(quickSelector);
         quickDock->toggleView(true);
         quickDock->setFloating();

@@ -74,7 +74,6 @@ void RailDBWindow::initMenuBar()
 {
     auto* menubar = new QMenuBar(this);
     setMenuBar(menubar);
-    QAction* act;
 
     auto* menu = menubar->addMenu(tr("文件"));
     menu->addAction(tr("新建"), navi, &RailDBNavi::actNewDB);

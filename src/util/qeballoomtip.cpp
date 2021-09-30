@@ -135,6 +135,7 @@ QEBalloonTip::QEBalloonTip(const QIcon& icon, const QString& title,
 
 void QEBalloonTip::paintEvent(QPaintEvent * e)
 {
+    Q_UNUSED(e)
     QPainter painter(this);
     painter.drawPixmap(rect(), pixmap);
 }
@@ -246,6 +247,7 @@ void QEBalloonTip::setContents(const QString& title, const QString& msg)
 }
 void QEBalloonTip::mousePressEvent(QMouseEvent *e)
 {
+    Q_UNUSED(e)
     close();
 //    if(e->button() == Qt::LeftButton)
 //        emit trayIcon->messageClicked();

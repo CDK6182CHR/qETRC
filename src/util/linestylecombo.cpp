@@ -27,6 +27,7 @@ void QPenCssEditor::SetDrawParameters(Qt::PenStyle ps, int isize)
 
 void QPenCssEditor::paintEvent(QPaintEvent* event)
 {
+    Q_UNUSED(event)
     QSize size = this->size();
     QPainter painter(this);
     QPen pen;
@@ -79,6 +80,7 @@ void QPenWidget::updatePen(const int& index, Qt::PenStyle ps)
 
 void QPenWidget::mousePressEvent(QMouseEvent* event)
 {
+    Q_UNUSED(event)
     emit click(m_index);
 }
 

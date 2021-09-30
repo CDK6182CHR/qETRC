@@ -37,6 +37,7 @@ private:
 
 signals:
     void railGenerated(std::shared_ptr<Railway>, const QString& pathString);
+    void showStatus(const QString& msg);
 private slots:
     void actGenerate();
     void actForce();
