@@ -92,7 +92,7 @@ void AddPageDialog::okClicked()
         rails.append(diagram.railways().at(p.row()));
     }
 
-    auto page = std::make_shared<DiagramPage>(rails, name, edNote->toPlainText());
+    auto page = std::make_shared<DiagramPage>(diagram.config(), rails, name, edNote->toPlainText());
     emit creationDone(page);
     done(QDialog::Accepted);
 }

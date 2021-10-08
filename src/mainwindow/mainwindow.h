@@ -270,6 +270,8 @@ private slots:
      */
     void updateAllDiagrams();
 
+    void updatePageDiagram(std::shared_ptr<DiagramPage> pg);
+
     /**
      * 导入车次。刷新相关面板，重新铺画运行图。
      */

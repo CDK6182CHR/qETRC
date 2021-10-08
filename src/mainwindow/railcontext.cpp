@@ -290,7 +290,7 @@ void RailContext::changeRailOrdinate(std::shared_ptr<Railway> railway, int idx)
 	if (oldindex == idx) return;
 	//第一次操作要现场执行，试一下能不能行
 	railway->setOrdinateIndex(idx);
-	bool flag = railway->calStationYValue(diagram.config());
+	bool flag = railway->calStationYCoeff();
 	if (flag) {
 		//设置成功，cmd压栈，然后更新运行图
 		mw->getUndoStack()->push(new qecmd::ChangeOrdinate(this, railway, oldindex));

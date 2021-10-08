@@ -30,7 +30,7 @@
 #include "data/rail/forbid.h"
 
 DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page, QWidget* parent):
-    QGraphicsView(parent), _page(page),_diagram(diagram),startTime(diagram.config().start_hour,0,0)
+    QGraphicsView(parent), _page(page),_diagram(diagram),startTime(page->config().start_hour,0,0)
 {
     QScroller::grabGesture(this, QScroller::TouchGesture);
     setRenderHint(QPainter::Antialiasing, true);
@@ -77,8 +77,8 @@ void DiagramWidget::paintGraph()
     //暂定上下边距只算一次
     double height = (_page->railwayCount()-1) * cfg.margins.gap_between_railways;
     for (const auto& p : _page->railways()) {
-        p->calStationYValue(cfg);
-        height += p->diagramHeight();
+        p->calStationYCoeff();
+        height += p->diagramHeight(cfg);
     }
     const QColor& gridColor = cfg.grid_color;
     
@@ -95,9 +95,9 @@ void DiagramWidget::paintGraph()
         auto p = _page->railways().at(i);
         _page->startYs().append(ystart);
         setHLines(p, ystart, width, leftItems, rightItems);
-        scene()->addRect(cfg.totalLeftMargin(), ystart, width, p->diagramHeight(), gridColor);
-        railYRanges.append(qMakePair(ystart, ystart + p->diagramHeight()));
-        ystart += p->diagramHeight() + margins.gap_between_railways;
+        scene()->addRect(cfg.totalLeftMargin(), ystart, width, p->diagramHeight(cfg), gridColor);
+        railYRanges.append(qMakePair(ystart, ystart + p->diagramHeight(cfg)));
+        ystart += p->diagramHeight(cfg) + margins.gap_between_railways;
     }
 
     setVLines(width, hour_count, railYRanges);
@@ -436,15 +436,16 @@ void DiagramWidget::mouseMoveEvent(QMouseEvent* e)
     }
 
     auto line = item->trainLine();
+    auto rail = line->railway();
 
-    double y = pos.y() - item->getStartY();
+    double y = pos.y() - item->getStartY();  // 绝对坐标
     auto itr = line->stationFromYValue(y);
     const auto& dq = line->stations();
     if (itr == dq.end())
         return;
     static constexpr double STATION_SPAN = 5;
     //第一种情况：属于站内
-    if (std::abs(itr->yValue() - y) <= STATION_SPAN) {
+    if (std::abs(rail->yValueFromCoeff(itr->yCoeff(), config()) - y) <= STATION_SPAN) {
         stationToolTip(itr, *line);
         return;
     }
@@ -452,7 +453,7 @@ void DiagramWidget::mouseMoveEvent(QMouseEvent* e)
     if (itr == dq.begin())
         return;
     auto prev = itr; --prev;    //区间前一个站
-    if (std::abs(prev->yValue() - y) <= STATION_SPAN) {
+    if (std::abs(rail->yValueFromCoeff(prev->yCoeff(), config()) - y) <= STATION_SPAN) {
         stationToolTip(prev, *line);
         return;
     }
@@ -478,7 +479,7 @@ void DiagramWidget::resizeEvent(QResizeEvent* e)
 bool DiagramWidget::event(QEvent* e)
 {
     bool flag = QGraphicsView::event(e);
-    if (e->type() == QEvent::WindowActivate) {
+    if (e->type() == QEvent::WindowActivate || e->type() == QEvent::FocusIn) {
         emit pageFocussedIn(_page);
         return true;
     }
@@ -502,7 +503,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     brushColor.setAlpha(200);
     double label_start_x = cfg.leftStationBarX();
 
-    double height = rail->diagramHeight();   //注意这只是当前线路的高度
+    double height = rail->diagramHeight(cfg);   //注意这只是当前线路的高度
 
     auto* rectLeft = scene()->addRect(0,
         start_y - margins.title_row_height - margins.first_row_append,
@@ -674,10 +675,10 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
 
     //铺画车站。以前已经完成了绑定，这里只需要简单地把所有有y坐标的全画出来就好
     for (auto p : rail->stations()) {
-        if (p->y_value.has_value() && p->_show) {
+        if (p->y_coeff.has_value() && p->_show) {
             const auto& pen = p->level <= cfg.bold_line_level ?
                 boldPen : defaultPen;
-            double h = start_y + p->y_value.value();
+            double h = start_y + rail->yValueFromCoeff(p->y_coeff.value(), cfg);
             drawSingleHLine(textFont, h, p->name.toDisplayLiteral(),
                 pen, width, leftItems, rightItems, label_start_x);
             //延长公里
@@ -719,7 +720,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
         if (!p->isDown()) x += margins.ruler_label_width / 2.0;
         double xright = scene()->width() - margins.right_white - margins.count_label_width;
         if (!p->isDown())xright += margins.count_label_width / 2.0;
-        double y = p->toStation()->y_value.value() + start_y;
+        double y = rail->yValueFromCoeff(p->toStation()->y_coeff.value(), cfg) + start_y;
         if (p->toStation()->_show) {
             if (cfg.show_ruler_bar)
                 leftItems.append(scene()->addLine(
@@ -1027,12 +1028,12 @@ void DiagramWidget::drawSingleHLine(const QFont& textFont, double y,
 
 const MarginConfig& DiagramWidget::margins() const
 {
-    return _diagram.config().margins;
+    return _page->margins();
 }
 
 const Config &DiagramWidget::config() const
 {
-    return _diagram.config();
+    return _page->config();
 }
 
 QGraphicsSimpleTextItem* DiagramWidget::alignedTextItem(const QString& text, 
@@ -1143,7 +1144,8 @@ void DiagramWidget::locateToStation(std::shared_ptr<const Railway> railway,
         return;
     }
     x += config().totalLeftMargin();
-    double y = _page->railwayStartY(*railway) + station->y_value.value();
+    double y = _page->railwayStartY(*railway) +
+        railway->yValueFromCoeff(station->y_coeff.value(), config());
     QString text = tr("线路：%1\n车站：%2\n时刻：%3")
         .arg(railway->name(), station->name.toSingleLiteral(), tm.toString("hh:mm:ss"));
     centerOn(x, y);
@@ -1234,9 +1236,10 @@ void DiagramWidget::removeForbid(std::shared_ptr<Forbid> forbid, Direction dir)
 void DiagramWidget::addForbidNode(std::shared_ptr<Forbid> forbid, 
     std::shared_ptr<ForbidNode> node, const QBrush& brush, const QPen& pen, double start_y)
 {
+    auto rail = forbid->railway();
     auto& railint = node->railInterval();
-    double y1 = railint.fromStation()->y_value.value(),
-        y2 = railint.toStation()->y_value.value();
+    double y1 = rail->yValueFromCoeff(railint.fromStation()->y_coeff.value(), config()),
+        y2 = rail->yValueFromCoeff(railint.toStation()->y_coeff.value(), config());
     if (y1 > y2)
         std::swap(y1, y2);
     //保证y1<=y2  方便搞方框

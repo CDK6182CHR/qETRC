@@ -46,7 +46,7 @@ Railway& Railway::operator=(const Railway& other)
 {
 	_name = other._name;
 	_notes = other._notes;
-	_diagramHeight = other._diagramHeight;
+	_diagramHeightCoeff = other._diagramHeightCoeff;
 	numberMapEnabled = false;
 	_stations.clear();
 	foreach(auto p, other._stations) {
@@ -985,18 +985,18 @@ int Railway::ordinateIndex() const
 	return _ordinate ? _ordinate->index() : -1;
 }
 
-bool Railway::calStationYValue(const Config& config)
+bool Railway::calStationYCoeff()
 {
 	clearYValues();
 	if (!ordinate()) {
-		calStationYValueByMile(config);
+		calStationYCoeffByMile();
 		return true;
 	}
 	//标尺排图
 	auto ruler = ordinate();
 	double y = 0;
 	auto p = ruler->firstDownNode();
-	p->railInterval().fromStation()->y_value = y;  //第一站
+	p->railInterval().fromStation()->y_coeff = y;  //第一站
 	//下行
 	for (; p; p = p->nextNode()) {
 		if (p->isNull()) {
@@ -1004,33 +1004,33 @@ bool Railway::calStationYValue(const Config& config)
 				<< "Ruler [" << ruler->name() << "] not complate, cannot be used as"
 				<< "ordinate ruler. Interval: " << p->railInterval() << Qt::endl;
 			resetOrdinate();
-			calStationYValueByMile(config);
+			calStationYCoeffByMile();
 			return false;
 		}
-		y += p->interval / config.seconds_per_pix_y;
-		p->railInterval().toStation()->y_value = y;
+		y += p->interval;
+		p->railInterval().toStation()->y_coeff = y;
 	}
-	_diagramHeight = y;
+	_diagramHeightCoeff = y;
 	//上行，仅补缺漏
 	//这里利用了最后一站必定是双向的条件！
 	for (p = ruler->firstUpNode(); p; p = p->nextNode()) {
 		auto toStation = p->railInterval().toStation();
-		if (!toStation->y_value.has_value()) {
+		if (!toStation->y_coeff.has_value()) {
 			if (p->isNull()) {
 				qDebug() << "Railway::calStationYValue: WARNING: "
 					<< "Ruler [" << ruler->name() << "] not complate, cannot be used as"
 					<< "ordinate ruler. Interval: " << p->railInterval() << Qt::endl;
 				resetOrdinate();
-				calStationYValueByMile(config);
+				calStationYCoeffByMile();
 				return false;
 			}
 			auto rboth = rightBothStation(toStation), lboth = leftBothStation(toStation);
 
 			int upLeft = ruler->totalInterval(toStation, lboth, Direction::Up);
 			int upRight = ruler->totalInterval(rboth, toStation, Direction::Up);
-			double toty = rboth->y_value.value() - lboth->y_value.value();
-			y = rboth->y_value.value() - toty * upRight / (upLeft + upRight);
-			toStation->y_value = y;
+			double toty = rboth->y_coeff.value() - lboth->y_coeff.value();
+			y = rboth->y_coeff.value() - toty * upRight / (upLeft + upRight);
+			toStation->y_coeff = y;
 		}
 	}
 	return true;
@@ -1159,14 +1159,14 @@ Railway::SectionInfo Railway::getSectionInfo(double mile)const
 	//现在计算y坐标
 	if (itDown) {
 		//正常插值
-		double y0 = itDown->from.lock()->y_value.value();
-		double yn = itDown->to.lock()->y_value.value();
+		double y0 = itDown->from.lock()->y_coeff.value();
+		double yn = itDown->to.lock()->y_coeff.value();
 		double scale = (mile - itDown->from.lock()->mile) / itDown->mile();
 		double yi = (yn - y0) * scale + y0;
 		return std::make_tuple(yi, itDown, itUp);
 	}
 	else if (p == _stations.begin() && (*p)->mile == mile) {
-		return std::make_tuple((*p)->y_value.value(), itDown, itUp);
+		return std::make_tuple((*p)->y_coeff.value(), itDown, itUp);
 	}
 	else {
 		return std::nullopt;
@@ -1465,6 +1465,21 @@ std::shared_ptr<Forbid> Railway::addForbid(const QJsonObject &obj)
     return forbid;
 }
 
+double Railway::yValueFromCoeff(double coeff, const Config& config) const
+{
+	if (_ordinate) {
+		return coeff / config.seconds_per_pix_y;
+	}
+	else {
+		return coeff * config.pixels_per_km;
+	}
+}
+
+double Railway::diagramHeight(const Config& cfg) const
+{
+	return yValueFromCoeff(_diagramHeightCoeff, cfg);
+}
+
 std::shared_ptr<RailInterval> Railway::nextIntervalCirc(std::shared_ptr<RailInterval> railint)
 {
 	auto t = railint->nextInterval();
@@ -1546,22 +1561,22 @@ void Railway::symmetrize()
 	}
 }
 
-double Railway::calStationYValueByMile(const Config& config)
+double Railway::calStationYCoeffByMile()
 {
 	for (auto& p : _stations) {
-		p->y_value = p->mile * config.pixels_per_km;
+		p->y_coeff = p->mile;
 	}
 	if (!_stations.empty())
-		_diagramHeight = _stations.last()->y_value.value();
-	return _diagramHeight;
+		_diagramHeightCoeff = _stations.last()->y_coeff.value();
+	return _diagramHeightCoeff;
 }
 
 void Railway::clearYValues()
 {
 	for (auto& p : _stations) {
-		p->y_value = std::nullopt;
+		p->y_coeff = std::nullopt;
 	}
-	_diagramHeight = -1;
+	_diagramHeightCoeff = -1;
 }
 
 

@@ -332,7 +332,7 @@ void NaviTree::importRailwayFromDB(std::shared_ptr<Railway> railway)
     if (flag == QMessageBox::Yes) {
         auto&& dia = _model->diagram();
         QString name = dia.validPageName(r->name());
-        auto pg = std::make_shared<DiagramPage>(
+        auto pg = std::make_shared<DiagramPage>(_model->diagram().config(),
             QList<std::shared_ptr<Railway>>{ r }, name);
         addNewPageApply(pg);
     }

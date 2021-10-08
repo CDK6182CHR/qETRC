@@ -89,7 +89,7 @@ DiagnosisList Diagram::diagnoseAllTrains(bool withIntMeet) const
 
 std::shared_ptr<DiagramPage> Diagram::createDefaultPage()
 {
-    auto t = std::make_shared<DiagramPage>(railways(),
+    auto t = std::make_shared<DiagramPage>(_config, railways(),
         validPageName(QObject::tr("默认运行图")));
     _pages.append(t);
     return t;

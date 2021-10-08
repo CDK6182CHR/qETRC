@@ -6,11 +6,10 @@
 
 
 #include "data/train/train.h"
+#include "config.h"
 
 class Railway;
 class Diagram;
-struct Config;
-struct MarginConfig;
 class TrainItem;
 class TrainLine;
 class Forbid;
@@ -51,9 +50,12 @@ struct LabelPositionInfo {
  * 注意不保存实际数据；只持有Item的指针
  * 
  * 2021.07.03：为了使Diagram的默认移动/拷贝行为正确，这里不能维护反向指针（引用）。
+ * 2021.10.08：增加Config的值类型，构造时从Diagram里面拿。
+ * 读取时，优先从文件里读，如果失败，再拷贝Diagram中的
  */
 class DiagramPage
 {
+    Config _config;
     QList<std::shared_ptr<Railway>> _railways;
     QList<double> _startYs;
     QString _name;
@@ -68,7 +70,7 @@ class DiagramPage
     QHash<const RailStation*, label_map_t> _overLabels, _belowLabels;
 
 public:
-    DiagramPage(const QList<std::shared_ptr<Railway>>& railways,
+    DiagramPage(const Config& config, const QList<std::shared_ptr<Railway>>& railways,
         const QString& name, const QString& note = "");
     /**
      * 注意这个Diagram只是借过来构造的，并不维护
@@ -81,6 +83,10 @@ public:
     auto railwayAt(int i)const { return _railways.at(i); }
     const QString& name()const { return _name; }
     void setName(const QString& s) { _name = s; }
+
+    const auto& config()const { return _config; }
+    auto& configRef() { return _config; }
+    const auto& margins()const { return _config.margins; }
 
     const QString& note()const { return _note; }
     QString& note() { return _note; }

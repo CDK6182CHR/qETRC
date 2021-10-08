@@ -440,7 +440,14 @@ void ViewCategory::commitConfigChange(Config& cfg, bool repaint)
 {
     Q_UNUSED(cfg);
     Q_UNUSED(repaint);
-    mw->updateAllDiagrams();
+    // 2021.10.08：不需要重绘了
+    //mw->updateAllDiagrams();
+}
+
+void ViewCategory::commitPageConfigChange(std::shared_ptr<DiagramPage> page, bool repaint)
+{
+    Q_UNUSED(repaint)
+    mw->updatePageDiagram(page);
 }
 
 void ViewCategory::actChangeSingleTrainShow(std::shared_ptr<Train> train, bool show)
@@ -456,6 +463,12 @@ void ViewCategory::actChangeSingleTrainShow(std::shared_ptr<Train> train, bool s
     if (!lines.empty()) {
         mw->getUndoStack()->push(new qecmd::ChangeSingleTrainShow(train, show, lines, this));
     }
+}
+
+void ViewCategory::onActPageConfigApplied(Config& cfg, const Config& newcfg, 
+    bool repaint, std::shared_ptr<DiagramPage> page)
+{
+    mw->getUndoStack()->push(new qecmd::ChangePageConfig(cfg, newcfg, repaint, page, this));
 }
 
 void ViewCategory::refreshTypeGroup()

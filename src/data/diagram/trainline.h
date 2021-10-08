@@ -29,7 +29,7 @@ struct AdapterStation{
         std::weak_ptr<RailStation> railStation_):
         trainStation(trainStation_),railStation(railStation_){}
     bool operator<(double y)const;
-    double yValue()const;
+    double yCoeff()const;
 };
 
 bool operator<(double y, const AdapterStation& adp);
@@ -327,8 +327,8 @@ private:
      */
     template <typename ForwardIter1, typename ForwardIter2>
     inline int yComp(ForwardIter1 st1, ForwardIter2 st2)const {
-        double y1 = st1->railStation.lock()->y_value.value(),
-            y2 = st2->railStation.lock()->y_value.value();
+        double y1 = st1->railStation.lock()->y_coeff.value(),
+            y2 = st2->railStation.lock()->y_coeff.value();
         if (y1 == y2)
             return 0;
         else if (y1 < y2)

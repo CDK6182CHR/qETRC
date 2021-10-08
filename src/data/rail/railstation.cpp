@@ -13,7 +13,7 @@ RailStation::RailStation(const StationName& name_,
     bool show_,
     bool passenger_, bool freight_) :
     name(name_), mile(mile_), level(level_), counter(counter_),
-    y_value(-1), direction(direction_),
+    y_coeff(std::nullopt), direction(direction_),
     _show(show_), passenger(passenger_), freight(freight_),
     tracks()
 {
@@ -26,7 +26,7 @@ RailStation::RailStation(const QJsonObject &obj)
 
 RailStation::RailStation(const RailStation& rs):
     name(rs.name),mile(rs.mile),level(rs.level),counter(rs.counter),
-    y_value(rs.y_value),direction(rs.direction),
+    y_coeff(rs.y_coeff),direction(rs.direction),
     _show(rs._show),passenger(rs.passenger),freight(rs.freight),
     tracks(rs.tracks)
 {

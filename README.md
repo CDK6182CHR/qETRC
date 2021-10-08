@@ -4,8 +4,6 @@ Electronic Train Running Chart implemented with Qt
 
 本项目是对此前的[pyETRC](https://github.com/CDK6182CHR/train_graph)项目的C++重构版本，工程名暂定为qETRC。本项目基于GPLv3协议开放源代码，在协议允许范围内，作者保留一切权利和最终解释权。
 
-**此项目尚在开发中，主要功能还远未实现**。
-
 联系方式：mxy0268@qq.com
 
 

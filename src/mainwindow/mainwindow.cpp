@@ -173,6 +173,16 @@ void MainWindow::updateAllDiagrams()
         p->paintGraph();
 }
 
+void MainWindow::updatePageDiagram(std::shared_ptr<DiagramPage> pg)
+{
+    foreach(auto w, diagramWidgets) {
+        if (w->page() == pg) {
+            w->paintGraph();
+            break;
+        }
+    }
+}
+
 void MainWindow::onTrainsImported()
 {
     updateAllDiagrams();
@@ -1630,10 +1640,10 @@ void MainWindow::actSaveGraphAs()
         tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)"));
     if (res.isNull())
         return;
+    auto start = std::chrono::system_clock::now();
     bool flag = _diagram.saveAs(res);
     if (flag) {
         using namespace std::chrono_literals;
-        auto start = std::chrono::system_clock::now();
         markUnchanged();
         undoStack->setClean();
         addRecentFile(res);

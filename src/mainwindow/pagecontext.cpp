@@ -3,6 +3,8 @@
 
 #include "dialogs/printdiagramdialog.h"
 #include "data/diagram/diagrampage.h"
+#include "editors/configdialog.h"
+#include "viewcategory.h"
 
 #include <DockWidget.h>
 #include <QLabel>
@@ -83,6 +85,12 @@ void PageContext::initUI()
     btn->setMinimumWidth(70);
     connect(act, SIGNAL(triggered()), this, SLOT(actPrint()));
 
+    act = new QAction(QIcon(":/icons/config.png"), tr("显示设置"), this);
+    btn = panel->addLargeAction(act);
+    btn->setMinimumWidth(70);
+    connect(act, &QAction::triggered, this, &PageContext::actConfig);
+    act->setToolTip(tr("显示设置\n设置当前运行图页面的显示参数，不影响其他运行图页面。"));
+
     panel = page->addPannel("");
 
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
@@ -115,6 +123,14 @@ void PageContext::actPrint()
         auto* dialog = new PrintDiagramDialog(dw, mw);
         dialog->open();
     }
+}
+
+void PageContext::actConfig()
+{
+    auto* dlg = new ConfigDialog(page->configRef(), page, mw);
+    connect(dlg, &ConfigDialog::onPageConfigApplied,
+        mw->getViewCategory(), &ViewCategory::onActPageConfigApplied);
+    dlg->show();
 }
 
 void PageContext::commitEditInfo(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> newinfo)
@@ -178,7 +194,8 @@ void EditPageDialog::actApply()
     }
     const QString& note = edNote->toPlainText();
     if (name != page->name() || note!=page->note()) {
-        auto n = std::make_shared<DiagramPage>(QList<std::shared_ptr<Railway>>{}, name, note);
+        auto n = std::make_shared<DiagramPage>(page->config(),
+            QList<std::shared_ptr<Railway>>{}, name, note);
         emit editApplied(page, n);
     }
     done(QDialog::Accepted);

@@ -9,6 +9,7 @@ class QDoubleSpinBox;
 class QCheckBox;
 class QComboBox;
 class QPushButton;
+class DiagramPage;
 
 /**
  * @brief The ConfigDialog class
@@ -27,6 +28,7 @@ class ConfigDialog : public QDialog
     Config& _cfg;
     const bool forDefault;
     bool repaint=false;
+    const std::shared_ptr<DiagramPage> page;
 
     QSpinBox* spStartHour, * spEndHour, * spVLines, * spMinMarkInter;
     QSpinBox* spMarginUp, * spMarginDown, * spRulerWidth,
@@ -41,9 +43,12 @@ class ConfigDialog : public QDialog
     QPushButton* btnGridColor, * btnTextColor;
 
     QColor gridColor, textColor;
+    
 
 public:
     ConfigDialog(Config& cfg,bool forDefault_, QWidget* parent=nullptr);
+    ConfigDialog(Config& cfg, const std::shared_ptr<DiagramPage>& page,
+        QWidget* parent = nullptr);
     auto& config(){return _cfg;}
 
 signals:
@@ -55,6 +60,8 @@ signals:
     void repaintDiagrams();
 
     void onConfigApplied(Config& cfg, const Config& newcfg, bool repaint, bool forDefault);
+    void onPageConfigApplied(Config& cfg, const Config& newcfg, bool repaint,
+        std::shared_ptr<DiagramPage>page);
 
 private:
     void initUI();
@@ -82,6 +89,7 @@ class MainWindow;
 namespace qecmd {
 
     class ChangeConfig:public QUndoCommand {
+    protected:
         Config& cfg;
         Config newcfg;
         const bool repaint;
@@ -90,6 +98,20 @@ namespace qecmd {
     public:
         ChangeConfig(Config& cfg_, const Config& newcfg_, bool repaint_, bool forDefault_,
             ViewCategory* cat_,
+            QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    /**
+     * 2021.10.08
+     * 修改页面的config，区别是后续操作只包含指定页面的重绘
+     */
+    class ChangePageConfig :public ChangeConfig {
+        std::shared_ptr<DiagramPage> page;
+    public:
+        ChangePageConfig(Config& cfg_, const Config& newcfg_, bool repaint_, 
+            std::shared_ptr<DiagramPage> page, ViewCategory* cat_,
             QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;

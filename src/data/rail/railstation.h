@@ -46,6 +46,8 @@ class QJsonObject;
 /**
  * 原pyETRC项目的LineStation类
  * 原pyETRC中直接用dict做的，这里都采用struct的模式简单实现
+ * 2021.10.08：y_value改为y_coeff，与Config解耦，不直接表示纵坐标，
+ * 而是表示用于排图的坐标值。按里程时为公里数，按标尺时为通通时分的秒数。
  */
 class RailStation
 {
@@ -66,7 +68,7 @@ public:
      * 车站位置的纵坐标（像素），此数据不写入文件。
      * 采用相对位置，即本线第一个站为0.
      */
-    std::optional<double> y_value;
+    std::optional<double> y_coeff;
     PassedDirection direction;
     bool _show;
     bool passenger,freight;

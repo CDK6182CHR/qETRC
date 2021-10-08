@@ -13,8 +13,8 @@ TrainItem::TrainItem(Diagram& diagram, std::shared_ptr<TrainLine> line,
     Railway& railway, DiagramPage& page, double startY, QGraphicsItem* parent):
     QGraphicsItem(parent),
     _line(line),_diagram(diagram),_page(page),_railway(railway),
-    startTime(diagram.config().start_hour,0,0),
-    start_x(diagram.config().totalLeftMargin()),start_y(startY)
+    startTime(page.config().start_hour,0,0),
+    start_x(page.config().totalLeftMargin()),start_y(startY)
 {
     _startAtThis = train()->isStartingStation(_line->firstStationName());
     _endAtThis = train()->isTerminalStation(_line->lastStationName());
@@ -252,12 +252,12 @@ Direction TrainItem::dir() const
 
 const Config &TrainItem::config() const
 {
-    return _diagram.config();
+    return _page.config();
 }
 
 const MarginConfig &TrainItem::margins() const
 {
-    return _diagram.config().margins;
+    return _page.margins();
 }
 
 void TrainItem::setLine()
@@ -299,7 +299,7 @@ void TrainItem::setPathItem(const QString& trainName)
     for (auto p = _line->stations().begin(); p != _line->stations().end(); ++p) {
         auto ts = p->trainStation;
         auto rs = p->railStation.lock();
-        double ycur = rs->y_value.value();
+        double ycur = _railway.yValueFromCoeff(rs->y_coeff.value(), config());   // 绝对坐标
         double xarr = calXFromStart(ts->arrive), xdep = calXFromStart(ts->depart);
 
         //首先处理到达点
@@ -696,7 +696,7 @@ void TrainItem::addTimeMarks()
     for (auto p = _line->stations().begin(); p != _line->stations().end(); ++p) {
         auto ts = p->trainStation;
         auto rs = p->railStation.lock();
-        double ycur = rs->y_value.value();
+        double ycur = _railway.yValueFromCoeff(rs->y_coeff.value(), config());
         double xarr = calXFromStart(ts->arrive), xdep = calXFromStart(ts->depart);
 
         //标注到点
@@ -780,7 +780,7 @@ void TrainItem::addLinkLine()
     double xpre = calXFromStart(last_tm);
 
     double width = config().diagramWidth();
-    double y = rs->y_value.value() + start_y;
+    double y = _railway.yValueFromCoeff(rs->y_coeff.value(), config()) + start_y;
     QPen pen = trainPen();
     pen.setWidth(1);
     pen.setStyle(Qt::DashLine);

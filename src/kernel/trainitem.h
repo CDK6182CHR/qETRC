@@ -90,6 +90,9 @@ public:
 
     inline int type()const override { return Type; }
 
+    /**
+     * 这是所在线路的起始纵坐标，绝对坐标
+     */
     double getStartY()const { return start_y; }
 
     std::shared_ptr<Train> train();

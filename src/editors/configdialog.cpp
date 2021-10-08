@@ -3,6 +3,7 @@
 
 #include "mainwindow/viewcategory.h"
 #include "mainwindow/mainwindow.h"
+#include "data/diagram/diagrampage.h"
 
 #include <QCheckBox>
 #include <QColorDialog>
@@ -13,7 +14,7 @@
 
 
 ConfigDialog::ConfigDialog(Config &cfg,bool forDefault_, QWidget *parent):
-    QDialog(parent),_cfg(cfg),forDefault(forDefault_)
+    QDialog(parent),_cfg(cfg),forDefault(forDefault_),page(nullptr)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     resize(600, 600);
@@ -22,6 +23,16 @@ ConfigDialog::ConfigDialog(Config &cfg,bool forDefault_, QWidget *parent):
     }
     else
         setWindowTitle(tr("运行图显示设置"));
+    initUI();
+    refreshData();
+}
+
+ConfigDialog::ConfigDialog(Config& cfg, const std::shared_ptr<DiagramPage>& page, QWidget* parent):
+    QDialog(parent),_cfg(cfg),forDefault(false),page(page)
+{
+    setAttribute(Qt::WA_DeleteOnClose);
+    resize(600, 600);
+    setWindowTitle(tr("运行图显示设置 - %1").arg(page->name()));
     initUI();
     refreshData();
 }
@@ -427,7 +438,13 @@ void ConfigDialog::actApply()
     cnew.grid_color = gridColor;
     cnew.text_color = textColor;
 
-    emit onConfigApplied(_cfg, cnew, repaint && !forDefault, forDefault);
+    if (page) {
+        emit onPageConfigApplied(_cfg, cnew, repaint, page);
+    }
+    else {
+        emit onConfigApplied(_cfg, cnew, repaint && !forDefault, forDefault);
+    }
+    
     done(QDialog::Accepted);
 }
 
@@ -503,4 +520,22 @@ void qecmd::ChangePassedStation::undo()
 void qecmd::ChangePassedStation::redo()
 {
     mw->commitPassedStationChange(valuenew);
+}
+
+qecmd::ChangePageConfig::ChangePageConfig(Config& cfg_, const Config& newcfg_, bool repaint_,
+    std::shared_ptr<DiagramPage> page, ViewCategory* cat_, QUndoCommand* parent):
+    ChangeConfig(cfg_,newcfg_,repaint_,false,cat_,parent),page(page)
+{
+    setText(QObject::tr("更改运行图页面设置: %1").arg(page->name()));
+}
+
+void qecmd::ChangePageConfig::undo()
+{
+    std::swap(cfg, newcfg);
+    cat->commitPageConfigChange(page, repaint);
+}
+void qecmd::ChangePageConfig::redo()
+{
+    std::swap(cfg, newcfg);
+    cat->commitPageConfigChange(page, repaint);
 }

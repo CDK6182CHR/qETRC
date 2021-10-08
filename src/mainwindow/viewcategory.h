@@ -20,6 +20,7 @@ class SARibbonCategory;
 class MainWindow;
 class TypeManager;
 class TrainFilter;
+class DiagramPage;
 
 /**
  * @brief The ViewCategory class
@@ -113,11 +114,6 @@ private slots:
     void actShowConfig();
     void actShowDefaultConfig();
 
-    /**
-     * 点击确认修改配置。压栈操作
-     */
-    void onActConfigApplied(Config& cfg, const Config& newcfg, bool repaint, bool forDefault);
-
     void actTypeConfig();
     void actTypeConfigDefault();
 
@@ -143,6 +139,14 @@ private slots:
     void trainFilterApplied();
 
 public slots:
+
+    /**
+     * 点击确认修改配置。压栈操作
+     */
+    void onActConfigApplied(Config& cfg, const Config& newcfg, bool repaint, bool forDefault);
+
+    void onActPageConfigApplied(Config& cfg, const Config& newcfg, bool repaint, 
+        std::shared_ptr<DiagramPage> page);
     
     /**
      * 刷新类型表。暂定暴力重来一遍就好
@@ -153,6 +157,8 @@ public slots:
      * 实际执行结束，只负责重新铺图
      */
     void commitConfigChange(Config& cfg, bool repaint);
+
+    void commitPageConfigChange(std::shared_ptr<DiagramPage> page, bool repaint);
 
     /**
      * 由TrainListModel调起，设置显示状态，操作压栈

@@ -64,7 +64,7 @@ class Railway:
     QHash<StationName, int> numberMap;
     bool numberMapEnabled = false;
 
-    double _diagramHeight = -1;
+    double _diagramHeightCoeff = -1;
 
 public:
     Railway(const QString& name="");
@@ -498,14 +498,22 @@ public:
      * 如果标尺不完备，reset。注意同时还要保证所有不铺画的站的yValue无效 （-1）
      * @param config  用于计算的配置表
      * @return false-指定标尺排图，但标尺不完备不能用 otherwise true （2021.07.15修改）
+     * 2021.10.08：与Config解耦，这里不乘系数。
      */
-    bool calStationYValue(const Config& config);
+    bool calStationYCoeff();
 
     /**
      * @brief diagramHeight
      * 单纯返回图高度。需保证已经调用过calStationYValue()。
      */
-    double diagramHeight()const { return _diagramHeight; }
+    double diagramHeightCoeff()const { return _diagramHeightCoeff; }
+
+    /**
+     * 2021.10.08  根据排图情况（里程或标尺），将y坐标coeff转换为y坐标
+     */
+    double yValueFromCoeff(double coeff, const Config& config)const;
+
+    double diagramHeight(const Config& cfg)const;
 
 
     /**
@@ -708,8 +716,9 @@ private:
 
     /**
      * @brief calStationYValueByMile  强制按里程计算每个站的坐标。
+     * 2021.10.08：取消Config依赖
      */
-    double calStationYValueByMile(const Config& config);
+    double calStationYCoeffByMile();
 
     /**
      * @brief clearYValues  清除所有y坐标数据

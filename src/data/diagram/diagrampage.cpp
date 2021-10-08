@@ -3,8 +3,9 @@
 #include "trainadapter.h"
 #include "kernel/trainitem.h"
 
-DiagramPage::DiagramPage(const QList<std::shared_ptr<Railway> > &railways,
-    const QString& name,const QString& note):
+
+DiagramPage::DiagramPage(const Config& config, const QList<std::shared_ptr<Railway> > &railways,
+    const QString& name,const QString& note): _config(config),
     _railways(railways),_name(name),_note(note)
 {
 
@@ -48,6 +49,18 @@ void DiagramPage::fromJson(const QJsonObject& obj, Diagram& _diagram)
 {
     _name = obj.value("name").toString();
     _note = obj.value("note").toString();
+    
+    bool succ_cfg = false;
+    const auto& obj_cfg = obj.value("config").toObject();
+    if (!obj_cfg.isEmpty()) {
+        succ_cfg = _config.fromJson(obj_cfg);
+    }
+    if (!succ_cfg) {
+        qDebug() << "DiagramPage::fromJson: WARNING: load config for page " << _name << " failed, "
+            << "use config from diagram." << Qt::endl;
+        _config = _diagram.config();
+    }
+
     QJsonArray ar = obj.value("railways").toArray();
     for (auto p = ar.begin(); p != ar.end(); ++p) {
         auto r = _diagram.railwayByName(p->toString());
@@ -70,7 +83,8 @@ QJsonObject DiagramPage::toJson() const
     return QJsonObject{
         {"name",_name},
         {"railways",ar},
-        {"note",_note}
+        {"note",_note},
+        {"config",_config.toJson()}
     };
 }
 

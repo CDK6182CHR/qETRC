@@ -340,7 +340,7 @@ void TrainLine::diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr
     else {
         // 中间站一个个来搞
         int ds = qeutil::secsTo(tprev->depart, tcur->arrive);
-        double dy = rcur->y_value.value() - rprev->y_value.value();
+        double dy = rcur->y_coeff.value() - rprev->y_coeff.value();
         if (!dy) {
             // 区间里程为0
             res.append(DiagnosisIssue(DiagnosisType::SystemError, qeutil::Error,
@@ -354,7 +354,7 @@ void TrainLine::diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr
             for (;
                 p; p = p->nextInterval()) {
                 auto ri = p->toStation();
-                double dyi = ri->y_value.value() - rprev->y_value.value();
+                double dyi = ri->y_coeff.value() - rprev->y_coeff.value();
                 int dsi = dyi * scale;
                 QTime tm = tprev->depart.addSecs(dsi);
 
@@ -411,7 +411,7 @@ void TrainLine::detectPassStations(LineEventList& res, int index, ConstAdaPtr it
         return;
     }
     //以下依赖于纵坐标！
-    double y0 = rs0->y_value.value(), yn = rsn->y_value.value();
+    double y0 = rs0->y_coeff.value(), yn = rsn->y_coeff.value();
     double dy = yn - y0;
     int ds = ts0->depart.secsTo(tsn->arrive);   //区间时间，秒数
     if (ds <= 0)ds += 24 * 3600;
@@ -423,7 +423,7 @@ void TrainLine::detectPassStations(LineEventList& res, int index, ConstAdaPtr it
     for (auto p = rs0->dirNextInterval(dir()); 
         p && p->toStation() != rsn; p = p->nextInterval()) {
         auto rsi = p->toStation();
-        double yi = rsi->y_value.value();
+        double yi = rsi->y_coeff.value();
         double rate = (yi - y0) / dy;
         double dsif = ds * rate;
         int dsi = int(std::round(dsif));
@@ -798,20 +798,20 @@ void TrainLine::diagnoWithCounter(DiagnosisList& res, const TrainLine& another, 
 double TrainLine::yMin()const
 {
     if (dir() == Direction::Down) {
-        return firstRailStation()->y_value.value();
+        return firstRailStation()->y_coeff.value();
     }
     else {
-        return lastRailStation()->y_value.value();
+        return lastRailStation()->y_coeff.value();
     }
 }
 
 double TrainLine::yMax() const
 {
     if (dir() == Direction::Down) {
-        return lastRailStation()->y_value.value();
+        return lastRailStation()->y_coeff.value();
     }
     else {
-        return firstRailStation()->y_value.value();
+        return firstRailStation()->y_coeff.value();
     }
 }
 
@@ -835,9 +835,9 @@ int TrainLine::getPreviousPassedTime(ConstAdaPtr st, std::shared_ptr<RailStation
 {
     static constexpr int msecsOfADay = 24 * 3600 * 1000;
     auto prev = std::prev(st);
-    double y0 = prev->railStation.lock()->y_value.value();
-    double yn = st->railStation.lock()->y_value.value();
-    double yi = target->y_value.value();
+    double y0 = prev->railStation.lock()->y_coeff.value();
+    double yn = st->railStation.lock()->y_coeff.value();
+    double yi = target->y_coeff.value();
 
     int x0 = prev->trainStation->depart.msecsSinceStartOfDay();
     int xn = st->trainStation->arrive.msecsSinceStartOfDay();
@@ -851,9 +851,9 @@ int TrainLine::getPreviousPassedTime(std::deque<AdapterStation>::const_reverse_i
 {
     static constexpr int msecsOfADay = 24 * 3600 * 1000;
     auto prev = std::prev(st);
-    double y0 = prev->railStation.lock()->y_value.value();
-    double yn = st->railStation.lock()->y_value.value();
-    double yi = target->y_value.value();
+    double y0 = prev->railStation.lock()->y_coeff.value();
+    double yn = st->railStation.lock()->y_coeff.value();
+    double yi = target->y_coeff.value();
 
     int x0 = prev->trainStation->arrive.msecsSinceStartOfDay();
     int xn = st->trainStation->depart.msecsSinceStartOfDay();
@@ -871,8 +871,8 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
     auto rh1 = hislast->railStation.lock(), rh2 = histhis->railStation.lock();
 
     //y值：是直接确定的
-    double ym1 = rm1->y_value.value(), ym2 = rm2->y_value.value();
-    double yh1 = rh1->y_value.value(), yh2 = rh2->y_value.value();
+    double ym1 = rm1->y_coeff.value(), ym2 = rm2->y_coeff.value();
+    double yh1 = rh1->y_coeff.value(), yh2 = rh2->y_coeff.value();
 
     //x值，按照msecs表示
     double xm1 = mylast->trainStation->depart.msecsSinceStartOfDay(),
@@ -992,8 +992,8 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
     auto rh1 = hislast->railStation.lock(), rh2 = histhis->railStation.lock();
 
     //y值：是直接确定的
-    double ym1 = rm1->y_value.value(), ym2 = rm2->y_value.value();
-    double yh1 = rh1->y_value.value(), yh2 = rh2->y_value.value();
+    double ym1 = rm1->y_coeff.value(), ym2 = rm2->y_coeff.value();
+    double yh1 = rh1->y_coeff.value(), yh2 = rh2->y_coeff.value();
 
     //x值，按照msecs表示
     double xm1 = mylast->trainStation->depart.msecsSinceStartOfDay(),
@@ -1348,7 +1348,7 @@ std::deque<AdapterStation>::const_iterator TrainLine::stationFromYValue(double y
 const AdapterStation* TrainLine::stationFromRail(std::shared_ptr<RailStation> rail) const
 {
     // 2021.09.22：不能直接lower_bound，要考虑上下行
-    auto p = stationFromYValue(rail->y_value.value());
+    auto p = stationFromYValue(rail->y_coeff.value());
     if (p!=_stations.end()&& p->railStation.lock() == rail) {
         return &(*p);
     }
@@ -1370,7 +1370,7 @@ RailStationEventList
 {
     if (isNull())return {};
     auto last = std::prev(_stations.end());
-    auto p = stationFromYValue(rail->y_value.value());   //运行方向区间后站
+    auto p = stationFromYValue(rail->y_coeff.value());   //运行方向区间后站
     if (p == _stations.end())
         return {};
     else if (p->railStation.lock() == rail) {
@@ -1421,7 +1421,7 @@ RailStationEventList
     else {
         //需要推定通过站时刻
         auto p0 = std::prev(p);
-        double y0 = p0->yValue(), yn = p->yValue(), yi = rail->y_value.value();
+        double y0 = p0->yCoeff(), yn = p->yCoeff(), yi = rail->y_coeff.value();
         double dsif = (qeutil::secsTo(p0->trainStation->depart,
             p->trainStation->arrive)) * (yi - y0) / (yn - y0);
         if (!std::isnan(dsif) && !std::isinf(dsif)) {
@@ -1441,7 +1441,7 @@ std::optional<QTime> TrainLine::sectionTime(double y) const
         return std::nullopt;
     else if (p == _stations.begin()) {
         //首站的特殊处理
-        if (p->railStation.lock()->y_value.value() == y)
+        if (p->railStation.lock()->y_coeff.value() == y)
             return dir() == Direction::Down ?
             p->trainStation->arrive :
             p->trainStation->depart;
@@ -1449,8 +1449,8 @@ std::optional<QTime> TrainLine::sectionTime(double y) const
     else {
         //正常的区间情况 根据y值计算  此时p是运行方向区间后站
         auto q = std::prev(p);
-        double y0 = q->railStation.lock()->y_value.value();
-        double yn = p->railStation.lock()->y_value.value();
+        double y0 = q->railStation.lock()->y_coeff.value();
+        double yn = p->railStation.lock()->y_coeff.value();
         int dsn = q->trainStation->depart.secsTo(p->trainStation->arrive);
         int dsi = std::round((y - y0) / (yn - y0) * dsn);
         return q->trainStation->depart.addSecs(dsi);
@@ -1604,15 +1604,15 @@ void TrainLine::timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool t
 
 bool AdapterStation::operator<(double y) const
 {
-    return railStation.lock()->y_value.value() < y;
+    return railStation.lock()->y_coeff.value() < y;
 }
 
-double AdapterStation::yValue() const
+double AdapterStation::yCoeff() const
 {
-    return railStation.lock()->y_value.value();
+    return railStation.lock()->y_coeff.value();
 }
 
 bool operator<(double y, const AdapterStation& adp)
 {
-    return y < adp.railStation.lock()->y_value.value();
+    return y < adp.railStation.lock()->y_coeff.value();
 }
