@@ -42,6 +42,8 @@ class ViewCategory : public QObject
     SARibbonGallery* gall;
 
     TrainFilter* const filter;
+
+    bool informConfig = true;
     
 public:
     explicit ViewCategory(MainWindow* mw_,SARibbonCategory* cat_,
@@ -113,6 +115,11 @@ private slots:
 
     void actShowConfig();
     void actShowDefaultConfig();
+
+    /**
+     * 应用当前的设置到所有页面；操作压栈。
+     */
+    void actApplyConfigToPages();
 
     void actTypeConfig();
     void actTypeConfigDefault();
@@ -299,5 +306,13 @@ namespace qecmd {
             manager(manager_),data(data_),cat(cat_),forDefault(forDefault_){}
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    /**
+     * 将显示设置应用到所有页面。调用子cmd，无需其他操作
+     */
+    class ApplyConfigToPages :public QUndoCommand {
+    public:
+        ApplyConfigToPages(QUndoCommand* parent = nullptr);
     };
 }

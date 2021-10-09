@@ -11,6 +11,7 @@
 #include "model/train/trainlistmodel.h"
 #include "data/diagram/config.h"
 #include "data/common/qesystem.h"
+#include "data/diagram/diagrampage.h"
 
 #include <SARibbonPannelItem.h>
 #include <SARibbonGallery.h>
@@ -155,6 +156,9 @@ void ViewCategory::initUI()
 
     ma = m->addAction(tr("保存当前运行图设置为默认"));
     connect(ma, &QAction::triggered, this, &ViewCategory::actSaveConfigAsDefault);
+
+    m->addSeparator();
+    m->addAction(tr("将显示设置应用到所有运行图页面"), this, &ViewCategory::actApplyConfigToPages);
 
     m->addSeparator();
     ma = m->addAction(tr("全局配置选项"));
@@ -340,6 +344,14 @@ void ViewCategory::applyTypeShow()
 
 void ViewCategory::actShowConfig()
 {
+    if (informConfig) {
+        QMessageBox::information(mw, tr("提示"), tr("自1.0.1版本开始，每个运行图页面（DiagramPage）"
+            "可以设置不同的运行图显示。此处的设定只决定此后新增的页面的默认设置情况，"
+            "不会影响既有运行图的设置。如需调整既有运行图页面的显示设置，"
+            "请至对应运行图页面的上下文菜单，或将当前显示设置应用到所有页面。\n"
+            "此提示在程序每次运行期间，展示一次。"));
+        informConfig = false;
+    }
     auto* dialog = new ConfigDialog(diagram.config(), false, mw);
     connect(dialog, &ConfigDialog::onConfigApplied, this,
         &ViewCategory::onActConfigApplied);
@@ -358,6 +370,20 @@ void ViewCategory::onActConfigApplied(Config& cfg, const Config& newcfg, bool re
     bool forDefault)
 {
     mw->getUndoStack()->push(new qecmd::ChangeConfig(cfg, newcfg, repaint, forDefault, this));
+}
+
+void ViewCategory::actApplyConfigToPages()
+{
+    auto flag = QMessageBox::question(mw, tr("提示"), tr("此操作将当前的运行图显示设置"
+        "应用到所有现存的运行图页面（DiagramPage）。是否确认？"));
+    if (flag != QMessageBox::Yes)
+        return;
+    auto* cmd = new qecmd::ApplyConfigToPages;
+    foreach(auto page, diagram.pages()) {
+        new qecmd::ChangePageConfig(page->configRef(),
+            diagram.config(), true, page, this, cmd);
+    }
+    mw->getUndoStack()->push(cmd);
 }
 
 void ViewCategory::actTypeConfig()
@@ -657,4 +683,10 @@ void qecmd::ChangeTrainsShowByFilter::undo()
 void qecmd::ChangeTrainsShowByFilter::redo()
 {
     cat->commitTrainsShowByFilter(lines);
+}
+
+qecmd::ApplyConfigToPages::ApplyConfigToPages(QUndoCommand* parent):
+    QUndoCommand(parent)
+{
+    setText(QObject::tr("应用显示设置至运行图页面"));
 }

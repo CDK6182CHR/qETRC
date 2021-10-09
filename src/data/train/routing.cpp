@@ -177,6 +177,13 @@ bool Routing::parseTrainName(TrainCollection& coll, const QString& t,
     bool fullOnly, QString& report, const Routing* ignore)
 {
     bool flag = false;
+
+    if (t.contains(QObject::tr("检修")) || t.contains(QObject::tr("过夜"))) {
+        report.append(QObject::tr("[INFO]    含有关键字[检修]或[过夜]，不作为车次考虑: %1")
+            .arg(t));
+        return flag;
+    }
+
     if (int idx = trainNameIndexLinear(t); idx != -1) {
         report.append(QObject::tr("[ERROR] 车次[%1]已存在于本交路第[%2]位，不予添加\n")
             .arg(t).arg(idx + 1));

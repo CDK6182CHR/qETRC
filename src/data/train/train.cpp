@@ -664,12 +664,36 @@ const AdapterStation* Train::boundStarting() const
     return nullptr;
 }
 
+const AdapterStation* Train::boundStartingAt(const Railway& rail) const
+{
+    if (_timetable.empty())
+        return nullptr;
+    for (auto p : _adapters) {
+        if (p->railway().get() == &rail) {
+            auto* first = p->firstStation();
+            if (first && first->trainStation == _timetable.begin()
+                && isStartingStation(first->trainStation->name))
+                return first;
+        }
+    }
+    return nullptr;
+}
+
 std::shared_ptr<RailStation> Train::boundStartingRail() const
 {
     auto* first = boundStarting();
     if (first)
         return first->railStation.lock();
     return nullptr;
+}
+
+
+std::shared_ptr<RailStation> Train::boundStartingAtRail(const Railway& rail) const
+{
+    if (auto* first = boundStartingAt(rail)) {
+        return first->railStation.lock();
+    }
+    else return nullptr;
 }
 
 double Train::localMile() 

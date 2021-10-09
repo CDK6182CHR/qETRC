@@ -773,9 +773,11 @@ void TrainItem::addLinkLine()
         // 2021.09.02补正  必须是本线的才绘制
         return;
     }
+    // 到这里：已经判断好了绘制条件
     const QTime& last_tm = last->depart;
     const QTime& first_tm = first->arrive;
-    auto rs = train()->boundStartingRail();
+    //2021.10.09修改：这里必须限制Railway。有可能始发站绑定到了多条线路。
+    auto rs = train()->boundStartingAtRail(_railway);
     double xcur = calXFromStart(first_tm);
     double xpre = calXFromStart(last_tm);
 

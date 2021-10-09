@@ -388,7 +388,16 @@ public:
 
     const AdapterStation* boundStarting()const;
 
+    /**
+     * 2021.10.09  性能  
+     * seealso: boundStarting
+     * 区别是：只考虑在rail所示线路的。解决起点站也可能绑定到多条线路的情况。
+     * 考虑：高南线 高兴-南充 与达成线 同时绘制时，终到南充的车。
+     */
+    const AdapterStation* boundStartingAt(const Railway& rail)const;
+
     std::shared_ptr<RailStation> boundStartingRail()const;
+    std::shared_ptr<RailStation> boundStartingAtRail(const Railway& rail)const;
 
     inline auto firstStation()const { return _timetable.begin(); }
     inline auto lastStation()const {
