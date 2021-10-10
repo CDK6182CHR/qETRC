@@ -6,6 +6,10 @@
 #include <QPushButton>
 #include <QTextBrowser>
 #include <QVBoxLayout>
+#include <QToolButton>
+#include <QApplication>
+#include <QStyle>
+#include <QMessageBox>
 
 #include "data/train/train.h"
 #include "data/train/routing.h"
@@ -41,7 +45,19 @@ void TrainInfoWidget::initUI()
     edStay=makeLineEdit(tr("图定停站时间"));
     edSpeed=makeLineEdit(tr("铺画旅行速度"));
     edTechSpeed=makeLineEdit(tr("铺画技术速度"));
-    edRouting=makeLineEdit(tr("所属交路"));
+
+    edRouting = new QLineEdit;
+    edRouting->setFocusPolicy(Qt::NoFocus);
+    auto* hlay = new QHBoxLayout;
+    hlay->addWidget(edRouting);
+    auto* tb = new QToolButton(this);
+    tb->setIcon(QIcon(qApp->style()->standardIcon(QStyle::SP_ArrowRight)));
+    connect(tb, &QToolButton::clicked, this, &TrainInfoWidget::actSwitchToRouting);
+    tb->setToolTip(tr("转到当前交路\n将当前列车所属的交路（如果存在）设置为“当前交路”，"
+        "可切换到工具栏的交路上下文页面对交路操作。"));
+    hlay->addWidget(tb);
+    flay->addRow(tr("所属交路"), hlay);
+    
     edModel=makeLineEdit(tr("车底型号"));
     edOwner=makeLineEdit(tr("担当交路"));
     edPre=makeLineEdit(tr("前序 (连线)"));
@@ -207,4 +223,15 @@ void TrainInfoWidget::actShowTimetable()
 {
     if(train)
         emit showTimetable(train);
+}
+
+void TrainInfoWidget::actSwitchToRouting()
+{
+    if (!train)return;
+    if (auto rt = train->routing().lock()) {
+        emit switchToRouting(rt);
+    }
+    else {
+        QMessageBox::warning(this, tr("错误"), tr("当前车次无交路信息，无法转到对应交路。"));
+    }
 }

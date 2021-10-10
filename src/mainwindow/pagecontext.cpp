@@ -14,6 +14,7 @@
 #include <QMessageBox>
 #include <QLineEdit>
 #include <SARibbonContextCategory.h>
+#include <SARibbonMenu.h>
 #include <QTextEdit>
 
 
@@ -89,9 +90,21 @@ void PageContext::initUI()
     btn = panel->addLargeAction(act);
     btn->setMinimumWidth(70);
     connect(act, &QAction::triggered, this, &PageContext::actConfig);
+    auto* me = new SARibbonMenu(mw);
+    me->addAction(tr("将运行图显示设置应用到当前页面"), this,
+        &PageContext::actUseDiagramConfig);
+    act->setMenu(me);
+
     act->setToolTip(tr("显示设置\n设置当前运行图页面的显示参数，不影响其他运行图页面。"));
 
     panel = page->addPannel("");
+
+    act = new QAction(qApp->style()->standardIcon(QStyle::SP_FileDialogContentsView), tr("转到..."), 
+        this);
+    act->setToolTip(tr("转到运行图页面\n打开或者切换到当前运行图页面。"));
+    connect(act, &QAction::triggered, this, &PageContext::actActivatePage);
+    btn = panel->addLargeAction(act);
+    btn->setMinimumWidth(70);
 
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
         tr("删除"), this);
@@ -131,6 +144,25 @@ void PageContext::actConfig()
     connect(dlg, &ConfigDialog::onPageConfigApplied,
         mw->getViewCategory(), &ViewCategory::onActPageConfigApplied);
     dlg->show();
+}
+
+void PageContext::actActivatePage()
+{
+    if (!page)return;
+    mw->activatePageWidget(diagram.getPageIndex(page));
+}
+
+void PageContext::actUseDiagramConfig()
+{
+    if (!page)return;
+    auto flag = QMessageBox::question(mw, tr("提示"), tr("此操作将当前运行图文件的显示设置信息覆盖到"
+        "当前运行图页面[%1]。是否确认？\n "
+        "要修改运行图文件的显示设置、或将其应用到所有运行图页面，请转到工具栏[显示]页面。")
+        .arg(page->name()));
+    if (flag != QMessageBox::Yes)
+        return;
+    mw->getUndoStack()->push(new qecmd::ChangePageConfig(page->configRef(), diagram.config(),
+        true, page, mw->getViewCategory()));
 }
 
 void PageContext::commitEditInfo(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> newinfo)

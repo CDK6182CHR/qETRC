@@ -49,6 +49,11 @@ private slots:
 
     void actConfig();
 
+    void actActivatePage();
+
+    // 使用当前运行图的Config，操作压栈
+    void actUseDiagramConfig();
+
 public slots:
     void onEditApplied(std::shared_ptr<DiagramPage> page,std::shared_ptr<DiagramPage> newinfo);
 

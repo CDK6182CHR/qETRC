@@ -8,6 +8,7 @@ class QFormLayout;
 class QTextBrowser;
 class QLineEdit;
 class Train;
+class Routing;
 /**
  * @brief The TrainInfoWidget class
  * pyETRC.TrainInfoWidget  列车信息（速览信息）
@@ -35,6 +36,9 @@ signals:
 private:
     void initUI();
     QLineEdit* makeLineEdit(const QString& title)const;
+
+signals:
+    void switchToRouting(std::shared_ptr<Routing> routing);
 public slots:
     void setTrain(std::shared_ptr<Train> train);
     void refreshData();
@@ -43,5 +47,6 @@ private slots:
     void toText();
     void actEditTrain();
     void actShowTimetable();
+    void actSwitchToRouting();
 };
 

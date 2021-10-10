@@ -513,6 +513,12 @@ public:
      */
     double yValueFromCoeff(double coeff, const Config& config)const;
 
+    /**
+     * seealso yValueFromCoeff 
+     * 反向的转换。
+     */
+    double yCoeffFromAbsValue(double val, const Config& config)const;
+
     double diagramHeight(const Config& cfg)const;
 
 

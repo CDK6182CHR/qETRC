@@ -73,6 +73,7 @@ void NaviTree::initContextMenus()
     connect(act, SIGNAL(triggered()), this, SLOT(actAddTrain()));
 
     //Page
+    mePage->addAction(tr("切换到运行图"), this, &NaviTree::onActivatePageContext);
     act = mePage->addAction(tr("删除运行图"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemovePageContext()));
 
@@ -88,6 +89,8 @@ void NaviTree::initContextMenus()
     connect(act, SIGNAL(triggered()), this, SLOT(onEditRailwayContext()));
     act = meRailway->addAction(tr("删除基线"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemoveRailwayContext()));
+    meRailway->addSeparator();
+    meRailway->addAction(tr("快速创建单线路运行图"), this, &NaviTree::onCreatePageByRailContext);
 
     //Ruler
     act = meRuler->addAction(tr("编辑标尺"));
@@ -223,6 +226,28 @@ void NaviTree::onEditRoutingContext()
     }
 }
 
+void NaviTree::onActivatePageContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::PageItem::Type) {
+        emit activatePageAt(item->row());
+    }
+}
+
+void NaviTree::onCreatePageByRailContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::RailwayItem::Type) {
+        auto railway = static_cast<navi::RailwayItem*>(item)->railway();
+        auto& dia = _model->diagram();
+        auto page = std::make_shared<DiagramPage>(dia.config(), QList<std::shared_ptr<Railway>>{railway},
+            dia.validPageName(railway->name()));
+        addNewPageApply(page);
+    }
+}
+
 void NaviTree::actAddRailway()
 {
     const QString name = _model->diagram().validRailwayName(tr("新线路"));
@@ -354,6 +379,8 @@ void NaviTree::onDoubleClicked(const QModelIndex& index)
             static_cast<navi::ForbidItem*>(item)->railway()); break;
     case navi::RoutingItem::Type:
         emit editRouting(static_cast<navi::RoutingItem*>(item)->routing()); break;
+    case navi::PageItem::Type:
+        emit activatePageAt(item->row()); break;
     }
 }
 

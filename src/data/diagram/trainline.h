@@ -192,9 +192,10 @@ public:
      * 返回车站采用std::lower_bound: iterator to he first element that not less than `y`.
      * 对上行采用反迭代器查
      * ！！注意迭代器有效性！！
+     * 2021.10.10  注意入参是coeff而不是绝对坐标
      */
     std::deque<AdapterStation>::const_iterator
-        stationFromYValue(double y)const;
+        stationFromYCoeff(double y)const;
 
     /**
      * 注意  不标注起点标签的线，首站不返回。

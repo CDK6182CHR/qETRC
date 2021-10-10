@@ -79,7 +79,7 @@ void TrainItem::highlight()
         startLabelText->setZValue(6);
         startLabelText->setBrush(Qt::white);
     }
-    if (endLabelText) {
+    if (endLabelText && config().end_label_name) {
         endRect = new QGraphicsRectItem(endLabelText->boundingRect(), this);
         endRect->setPos(endLabelText->pos());
         endRect->setZValue(5);
@@ -136,7 +136,7 @@ void TrainItem::unhighlight()
         delete startRect;
         startRect = nullptr;
     }
-    if (endLabelText) {
+    if (endLabelText && config().end_label_name) {
         //pen.setWidth(1);
         //endLabelItem->setPen(pen);
         endLabelItem->setZValue(0);
@@ -273,7 +273,7 @@ void TrainItem::setLine()
         setStartItem(trainName, labelPen);
     }
     if (_line->endLabel() && endInRange) {
-        setEndItem(config().end_label_name ? trainName : "",
+        setEndItem(config().end_label_name ? trainName : " ",
             labelPen);
     }
     addLinkLine();

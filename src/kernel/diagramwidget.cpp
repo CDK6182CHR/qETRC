@@ -439,7 +439,7 @@ void DiagramWidget::mouseMoveEvent(QMouseEvent* e)
     auto rail = line->railway();
 
     double y = pos.y() - item->getStartY();  // 绝对坐标
-    auto itr = line->stationFromYValue(y);
+    auto itr = line->stationFromYCoeff(line->railway()->yCoeffFromAbsValue(y, config()));
     const auto& dq = line->stations();
     if (itr == dq.end())
         return;

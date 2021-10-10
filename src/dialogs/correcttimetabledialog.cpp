@@ -88,7 +88,9 @@ void CorrectTimetableModel::doMoveUp()
         // 第一行不用管..
         if (item(i, ColName)->checkState() == Qt::Checked) {
             moveUp(i);
-            ar.setBit(i); ar.setBit(i - 1); ar.setBit(i + 1);
+            ar.setBit(i); ar.setBit(i - 1); 
+            [[likely]] if (i < rowCount() - 1)
+                ar.setBit(i + 1);
         }
     }
     calculateSelectedRows(ar);
@@ -330,7 +332,7 @@ void CorrectTimetableDialog::initUI()
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->setModel(model);
     table->setEditTriggers(QTableView::NoEditTriggers);
-    table->setSelectionMode(QTableView::ContiguousSelection);
+    table->setSelectionMode(QTableView::ExtendedSelection);
     vlay->addWidget(table);
     auto* dele = new QETimeDelegate(this);
     table->setItemDelegateForColumn(CorrectTimetableModel::ColArrive, dele);

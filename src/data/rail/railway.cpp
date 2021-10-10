@@ -1475,6 +1475,16 @@ double Railway::yValueFromCoeff(double coeff, const Config& config) const
 	}
 }
 
+double Railway::yCoeffFromAbsValue(double val, const Config& config) const
+{
+	if (_ordinate) {
+		return val * config.seconds_per_pix_y;
+	}
+	else {
+		return val / config.pixels_per_km;
+	}
+}
+
 double Railway::diagramHeight(const Config& cfg) const
 {
 	return yValueFromCoeff(_diagramHeightCoeff, cfg);

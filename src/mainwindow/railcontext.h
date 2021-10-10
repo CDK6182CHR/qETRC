@@ -156,6 +156,9 @@ private slots:
     void actSaveTrackToTimetable(const QVector<TrainStation*>& stations,
         const QVector<QString>& trackNames);
 
+    // 操作压栈
+    void actCreatePage();
+
 
 public slots:
 

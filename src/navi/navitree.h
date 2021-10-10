@@ -69,6 +69,7 @@ signals:
     void editRuler(std::shared_ptr<Ruler>);
     void editForbid(std::shared_ptr<Forbid>, std::shared_ptr<Railway>);
     void editRouting(std::shared_ptr<Routing>);
+    void activatePageAt(int i);
     void focusOutRailway();
     void railwayListChanged();   //只是通知主窗口更新数据  其实都不见得有必要
 
@@ -87,11 +88,6 @@ private slots:
     void showContextMenu(const QPoint& pos);
     
     void onDoubleClicked(const QModelIndex& index);
-
-    /**
-     * AddPageDialog返回后进入 操作压栈
-     */
-    void addNewPageApply(std::shared_ptr<DiagramPage> page);
 
     void onRemovePageContext();
 
@@ -112,6 +108,10 @@ private slots:
     void onEditForbidContext();
 
     void onEditRoutingContext();
+
+    void onActivatePageContext();
+
+    void onCreatePageByRailContext();
 
     void onCurrentChanged(const QModelIndex& cur, const QModelIndex& prev);
 
@@ -137,6 +137,11 @@ public slots:
     void importRailways();
     void importRailwayFromDB(std::shared_ptr<Railway> railway);
     void addNewPage();
+
+    /**
+     * AddPageDialog返回后进入 操作压栈
+     */
+    void addNewPageApply(std::shared_ptr<DiagramPage> page);
     
     void importTrains();
 

@@ -109,7 +109,7 @@ struct Config
      * 原end_label_checi
      * 结束标签是否显示车次。
      */
-    int end_label_name = true;
+    bool end_label_name = true;
 
     bool show_ruler_bar = true,
         show_mile_bar = true,

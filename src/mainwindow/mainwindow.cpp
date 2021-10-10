@@ -427,6 +427,8 @@ void MainWindow::initDockWidgets()
             this, &MainWindow::actBatchDetectRouting);
         connect(naviView, &NaviTree::actBatchParseRouting,
             this, &MainWindow::actBatchParseRouting);
+        connect(naviView, &NaviTree::activatePageAt,
+            this, &MainWindow::activatePageWidget);
     }
     auto* area = manager->addDockWidget(ads::LeftDockWidgetArea, dock);
 
@@ -506,6 +508,8 @@ void MainWindow::initDockWidgets()
         trainInfoDock = dock;
         connect(w, &TrainInfoWidget::showTimetable,
             this, &MainWindow::showQuickTimetable);
+        connect(w, &TrainInfoWidget::switchToRouting,
+            this, &MainWindow::focusInRouting);
     }
     area = manager->addDockWidget(ads::RightDockWidgetArea, dock);
 
@@ -803,6 +807,9 @@ void MainWindow::initToolbar()
         actsub = new QAction(tr("自动始发终到站适配"), this);
         menu->addAction(actsub);
         connect(actsub, SIGNAL(triggered()), this, SLOT(actAutoStartingTerminal()));
+        
+        menu->addAction(tr("自动始发终到站适配 (放宽)"), this, 
+            &MainWindow::actAutoStartingTerminalLooser);
 
         actsub = menu->addAction(tr("自动推断所有列车类型"));
         connect(actsub, &QAction::triggered, this, &MainWindow::actAutoTrainType);
@@ -1285,12 +1292,13 @@ void MainWindow::actAutoStartingTerminal()
         "（2）该车次时刻表中第一个（最后一个）站站名以始发（终到）站站名开头，" 
         "“场”字结尾；\n"
         "（3）始发（终到）站及时刻表中第一个（最后一个）站站名不含域解析符（::）。\n"
+        "如果希望对没有铺画的列车也执行这个操作，请使用[自动始发终到适配 (放宽)]功能。"
         "是否继续？");
     auto flag = QMessageBox::question(this, tr("自动始发终到站适配"), text);
     if (flag != QMessageBox::Yes)
         return;
     qecmd::StartingTerminalData data;
-    for (auto train : _diagram.trains()) {
+    foreach (auto train , _diagram.trains()) {
         if (train->empty())
             continue;
         auto* first = train->boundFirst();
@@ -1313,6 +1321,52 @@ void MainWindow::actAutoStartingTerminal()
                 data.terminals.emplace_back(std::make_pair(train, lastname));
             }
         }
+    }
+    if (data.startings.empty() && data.terminals.empty()) {
+        QMessageBox::information(this, tr("提示"), tr("没有车次受到影响。"));
+    }
+    else {
+        QMessageBox::information(this, tr("提示"), tr("设置成功。影响%1个车次的始发站和"
+            "%2个车次的终到站。").arg(data.startings.size()).arg(data.terminals.size()));
+        undoStack->push(new qecmd::AutoStartingTerminal(std::move(data), contextTrain));
+    }
+}
+
+void MainWindow::actAutoStartingTerminalLooser()
+{
+    QString text = tr("遍历所有车次，当车次满足以下条件时，将该车次的始发站调整为在本线的第一个车站，终到站调整为" \
+        "在本线的最后一个车站。\n"
+        "（1）该车次时刻表中第一个（最后一个）站站名以始发（终到）站站名开头，"
+        "“场”字结尾；\n"
+        "（2）始发（终到）站及时刻表中第一个（最后一个）站站名不含域解析符（::）。\n"
+        "此功能与[自动始发终到站适配]的区别在不要求始发终到站铺画在运行图上。"
+        "是否继续？");
+    auto flag = QMessageBox::question(this, tr("自动始发终到站适配"), text);
+    if (flag != QMessageBox::Yes)
+        return;
+    qecmd::StartingTerminalData data;
+    foreach(auto train, _diagram.trains()) {
+        if (train->empty())
+            continue;
+        auto first = train->firstStation();
+        const auto& firstname = first->name;
+        const auto& starting = train->starting();
+        if (firstname.isSingleName() && starting.isSingleName() &&
+            firstname.station().startsWith(starting.station()) &&
+            firstname.station().endsWith(tr("场"))) {
+            data.startings.emplace_back(std::make_pair(train, firstname));
+        }
+
+        auto last = train->lastStation();
+
+        const auto& lastname = last->name;
+        const auto& terminal = train->terminal();
+        if (lastname.isSingleName() && terminal.isSingleName() &&
+            lastname.station().startsWith(terminal.station()) &&
+            lastname.station().endsWith(tr("场"))) {
+            data.terminals.emplace_back(std::make_pair(train, lastname));
+        }
+
     }
     if (data.startings.empty() && data.terminals.empty()) {
         QMessageBox::information(this, tr("提示"), tr("没有车次受到影响。"));
@@ -1907,5 +1961,4 @@ void MainWindow::showStatus(const QString& msg)
 {
     statusBar()->showMessage(tr("%1 | %2").arg(QTime::currentTime().toString("hh:mm:ss"), msg));
 }
-
 

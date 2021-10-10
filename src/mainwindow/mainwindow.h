@@ -112,11 +112,6 @@ public:
      */
     void insertPageWidget(std::shared_ptr<DiagramPage> page, int index);
 
-    /**
-     * 由下标，设置指定index的运行图为当前。保证index有效。
-     */
-    void activatePageWidget(int index);
-
     auto* getManager() { return manager; }
 
     auto* getUndoStack() { return undoStack; }
@@ -346,6 +341,12 @@ private slots:
      */
     void actAutoStartingTerminal();
 
+    /**
+     * 自动始发终到站适配的宽松版本
+     * 区别是不要求铺画
+     */
+    void actAutoStartingTerminalLooser();
+
     void actTrainDiff();
 
     void actReadRulerWizard();
@@ -440,6 +441,11 @@ public slots:
         std::shared_ptr<const RailStation>, const QTime& time);
 
     void showStatus(const QString& msg);
+
+    /**
+     * 由下标，设置指定index的运行图为当前。保证index有效。
+     */
+    void activatePageWidget(int index);
 
 };
 

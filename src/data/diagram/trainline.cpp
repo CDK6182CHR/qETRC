@@ -1336,7 +1336,7 @@ RailStationEvent::Position TrainLine::passStationPos(ConstAdaPtr st) const
     else return RailStationEvent::Both;
 }
 
-std::deque<AdapterStation>::const_iterator TrainLine::stationFromYValue(double y) const
+std::deque<AdapterStation>::const_iterator TrainLine::stationFromYCoeff(double y) const
 {
     if (dir() == Direction::Down)
         return std::lower_bound(_stations.begin(), _stations.end(), y);
@@ -1348,7 +1348,7 @@ std::deque<AdapterStation>::const_iterator TrainLine::stationFromYValue(double y
 const AdapterStation* TrainLine::stationFromRail(std::shared_ptr<RailStation> rail) const
 {
     // 2021.09.22：不能直接lower_bound，要考虑上下行
-    auto p = stationFromYValue(rail->y_coeff.value());
+    auto p = stationFromYCoeff(rail->y_coeff.value());
     if (p!=_stations.end()&& p->railStation.lock() == rail) {
         return &(*p);
     }
@@ -1370,7 +1370,7 @@ RailStationEventList
 {
     if (isNull())return {};
     auto last = std::prev(_stations.end());
-    auto p = stationFromYValue(rail->y_coeff.value());   //运行方向区间后站
+    auto p = stationFromYCoeff(rail->y_coeff.value());   //运行方向区间后站
     if (p == _stations.end())
         return {};
     else if (p->railStation.lock() == rail) {
@@ -1436,7 +1436,7 @@ RailStationEventList
 
 std::optional<QTime> TrainLine::sectionTime(double y) const
 {
-    auto p = stationFromYValue(y);
+    auto p = stationFromYCoeff(y);
     if (p == _stations.end())
         return std::nullopt;
     else if (p == _stations.begin()) {

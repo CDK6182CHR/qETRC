@@ -28,6 +28,7 @@
 #include "viewers/events/stationtraingapdialog.h"
 #include "viewers/events/traingapstatdialog.h"
 #include "viewers/events/railtrackwidget.h"
+#include "navi/navitree.h"
 
 RailContext::RailContext(Diagram& diagram_, SARibbonContextCategory* context, 
 	MainWindow* mw_, QObject* parent):
@@ -213,6 +214,13 @@ void RailContext::initUI()
 	act->setToolTip(tr("列车间隔汇总\n一次性列出所有车站（分别的）以及全局的各类最小间隔。"
 		"可能有较大的计算代价。"));
 	panel->addMediumAction(act);
+
+	act = new QAction(QIcon(":/icons/diagram.png"), tr("快速创建"), this);
+	connect(act, &QAction::triggered, this, & RailContext::actCreatePage);
+	act->setToolTip(tr("快速创建单线路运行图\n一键创建新的运行图页面，新运行图页面\n"
+		"仅包含当前线路，以当前线路命名。"));
+	btn = panel->addLargeAction(act);
+	btn->setMinimumWidth(80);
 
 	panel = page->addPannel("");
 	act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
@@ -528,6 +536,14 @@ void RailContext::actSaveTrackOrder(std::shared_ptr<Railway> railway, std::share
 void RailContext::actSaveTrackToTimetable(const QVector<TrainStation*>& stations, const QVector<QString>& trackNames)
 {
 	mw->getUndoStack()->push(new qecmd::SaveTrackToTimetable(stations, trackNames, this));
+}
+
+void RailContext::actCreatePage()
+{
+	if (!railway)return;
+	auto page = std::make_shared<DiagramPage>(diagram.config(), QList<std::shared_ptr<Railway>>{railway},
+		diagram.validPageName(railway->name()));
+	mw->naviView->addNewPageApply(page);
 }
 
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
