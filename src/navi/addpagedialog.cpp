@@ -14,14 +14,26 @@ AddPageDialog::AddPageDialog(Diagram &diagram_, QWidget *parent):
     QDialog(parent),diagram(diagram_),model(new RailTableModel(diagram, this)),
     table(new QTableView),editName(new QLineEdit),editPrev(new QLineEdit)
 {
+    setWindowTitle(tr("添加运行图视窗"));
     setAttribute(Qt::WA_DeleteOnClose, true);
     initUI();
     resize(800, 600);
 }
 
+AddPageDialog::AddPageDialog(Diagram& diagram_, std::shared_ptr<DiagramPage> page_, QWidget* parent):
+    QDialog(parent),diagram(diagram_),page(page_),
+    model(new RailTableModel(diagram,this)),
+    table(new QTableView),editName(new QLineEdit),editPrev(new QLineEdit)
+{
+    setWindowTitle(tr("修改运行图视窗 - %1").arg(page->name()));
+    setAttribute(Qt::WA_DeleteOnClose, true);
+    initUI();
+    resize(800, 600);
+    setData();
+}
+
 void AddPageDialog::initUI()
 {
-    setWindowTitle(tr("添加运行图视窗"));
     auto* vlay = new QVBoxLayout;
     auto* form = new QFormLayout;
     form->addRow(tr("运行图名称"), editName);
@@ -56,6 +68,12 @@ void AddPageDialog::initUI()
     setLayout(vlay);
 }
 
+void AddPageDialog::setData()
+{
+    editName->setText(page->name());
+    edNote->setText(page->note());
+}
+
 void AddPageDialog::preview(const QItemSelection& )
 {
     auto* sel = table->selectionModel();
@@ -75,7 +93,7 @@ void AddPageDialog::preview(const QItemSelection& )
 void AddPageDialog::okClicked()
 {
     const QString& name = editName->text();
-    if (name.isEmpty() || diagram.pageNameExisted(name)) {
+    if (name.isEmpty() || diagram.pageNameExisted(name, page)) {
         QMessageBox::warning(this, tr("错误"), tr("运行图名称为空或已存在，请重新设置"));
         return;
     }
@@ -92,8 +110,13 @@ void AddPageDialog::okClicked()
         rails.append(diagram.railways().at(p.row()));
     }
 
-    auto page = std::make_shared<DiagramPage>(diagram.config(), rails, name, edNote->toPlainText());
-    emit creationDone(page);
+    auto npage = std::make_shared<DiagramPage>(diagram.config(), rails, name, edNote->toPlainText());
+    if (page) {
+        emit modificationDone(page, npage);
+    }
+    else {
+        emit creationDone(npage);
+    }
     done(QDialog::Accepted);
 }
 

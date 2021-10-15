@@ -84,6 +84,10 @@ signals:
     void actBatchParseRouting();
     void actBatchDetectRouting();
 
+    void onEditRailwayFromPageContext();
+    void onSwitchToRailwayFromPageContext();
+
+
 private slots:
     void showContextMenu(const QPoint& pos);
     
@@ -112,6 +116,8 @@ private slots:
     void onActivatePageContext();
 
     void onCreatePageByRailContext();
+
+    void onSwitchToTrainRoutingContext();
 
     void onCurrentChanged(const QModelIndex& cur, const QModelIndex& prev);
 

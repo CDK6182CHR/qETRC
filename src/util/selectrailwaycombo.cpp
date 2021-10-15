@@ -50,6 +50,18 @@ std::shared_ptr<Railway> SelectRailwayCombo::dialogGetRailway(RailCategory& cat,
     return res;
 }
 
+std::shared_ptr<Railway> SelectRailwayCombo::dialogGetRailway(const QList<std::shared_ptr<Railway>>& railways, 
+    QWidget* parent, const QString& title, const QString& prompt)
+{
+    if (railways.empty())
+        return nullptr;
+    else if (railways.size() == 1)
+        return railways.front();
+    RailCategory cat;
+    cat.railways() = railways;
+    return dialogGetRailway(cat, parent, title, prompt);
+}
+
 void SelectRailwayCombo::onIndexChanged(int i)
 {
     if(0<=i && i<cat.railways().size()){

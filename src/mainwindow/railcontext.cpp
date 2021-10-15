@@ -734,6 +734,7 @@ void RailContext::actOpenForbidWidget()
 		openForbidWidget(railway);
 }
 
+[[deprecated]]
 void RailContext::actRemoveRailway()
 {
 	if (railway) {

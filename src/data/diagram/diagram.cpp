@@ -104,6 +104,15 @@ bool Diagram::pageNameExisted(const QString& name) const
     return false;
 }
 
+bool Diagram::pageNameExisted(const QString& name, std::shared_ptr<DiagramPage> ignore) const
+{
+    foreach(auto p, _pages) {
+        if (p->name() == name && p != ignore)
+            return true;
+    }
+    return false;
+}
+
 bool Diagram::pageNameIsValid(const QString& name, std::shared_ptr<DiagramPage> page)
 {
     if (name.isEmpty())return false;
@@ -161,6 +170,7 @@ int Diagram::getPageIndex(std::shared_ptr<DiagramPage> page) const
     return -1;
 }
 
+[[deprecated]]
 void Diagram::removeRailwayAt(int i)
 {
     auto rail = railways().takeAt(i);

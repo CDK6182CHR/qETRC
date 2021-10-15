@@ -228,6 +228,7 @@ public:
     std::shared_ptr<DiagramPage> createDefaultPage();
 
     bool pageNameExisted(const QString& name)const;
+    bool pageNameExisted(const QString& name, std::shared_ptr<DiagramPage> ignore)const;
 
     bool pageNameIsValid(const QString& name, std::shared_ptr<DiagramPage> page);
 
@@ -262,6 +263,7 @@ public:
      * 删除指定下标的线路，同时清理列车、运行图中的数据。
      * 不考虑撤销
      */
+    [[deprecated]]
     void removeRailwayAt(int i);
 
     /**

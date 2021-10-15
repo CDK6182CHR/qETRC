@@ -204,6 +204,23 @@ void DiagramPage::swapBaseInfo(DiagramPage& other)
     std::swap(_note, other._note);
 }
 
+#define _SWAP(_key) std::swap(_key,other._key)
+
+void DiagramPage::swap(DiagramPage& other)
+{
+    swapBaseInfo(other);
+    std::swap(_railways, other._railways);
+
+    // Items
+    _SWAP(_startYs);
+    _SWAP(_itemMap);
+    _SWAP(_forbidDMap);
+    _SWAP(_forbidUMap);
+    _SWAP(_overLabels);
+    _SWAP(_belowLabels);
+}
+
+
 bool DiagramPage::hasTrain(const Train& train) const
 {
     for (auto r : _railways) {

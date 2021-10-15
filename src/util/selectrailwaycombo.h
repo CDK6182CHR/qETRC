@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <QComboBox>
+#include <QList>
 
 #include "data/rail/railcategory.h"
 
@@ -18,6 +19,13 @@ public:
     auto railway(){return _railway;}
     static std::shared_ptr<Railway> dialogGetRailway(RailCategory& cat, QWidget* parent,
         const QString& title = tr("选择线路"), const QString& prompt = "");
+
+    /**
+     * 2021.10.11  重载版本  用QList<Railway>构造临时对象
+     * 注意考虑入参。空和仅有一个的都直接返回。
+     */
+    static std::shared_ptr<Railway> dialogGetRailway(const QList<std::shared_ptr<Railway>>& railways,
+        QWidget* parent, const QString& title = tr("选择线路"), const QString& prompt = "");
 signals:
     void currentRailwayChanged(std::shared_ptr<Railway>);
 private slots:

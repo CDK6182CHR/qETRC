@@ -5,6 +5,8 @@
 #include "data/diagram/diagrampage.h"
 #include "editors/configdialog.h"
 #include "viewcategory.h"
+#include "util/selectrailwaycombo.h"
+#include "navi/addpagedialog.h"
 
 #include <DockWidget.h>
 #include <QLabel>
@@ -77,9 +79,15 @@ void PageContext::initUI()
     panel = page->addPannel(tr("基本"));
 
     auto* act = new QAction(QIcon(":/icons/edit.png"), tr("编辑"), this);
+    connect(act, SIGNAL(triggered()), this, SLOT(actEdit()));
+
+    auto* me = new SARibbonMenu(mw);
+    me->addAction(tr("重设页面"), this, &PageContext::actResetPage);
+    act->setMenu(me);
+
     auto* btn = panel->addLargeAction(act);
     btn->setMinimumWidth(70);
-    connect(act, SIGNAL(triggered()), this, SLOT(actEdit()));
+  
 
     act = new QAction(QIcon(":/icons/pdf.png"), tr("导出"), this);
     btn = panel->addLargeAction(act);
@@ -90,14 +98,14 @@ void PageContext::initUI()
     btn = panel->addLargeAction(act);
     btn->setMinimumWidth(70);
     connect(act, &QAction::triggered, this, &PageContext::actConfig);
-    auto* me = new SARibbonMenu(mw);
+    me = new SARibbonMenu(mw);
     me->addAction(tr("将运行图显示设置应用到当前页面"), this,
         &PageContext::actUseDiagramConfig);
     act->setMenu(me);
 
     act->setToolTip(tr("显示设置\n设置当前运行图页面的显示参数，不影响其他运行图页面。"));
 
-    panel = page->addPannel("");
+    panel = page->addPannel("导航");
 
     act = new QAction(qApp->style()->standardIcon(QStyle::SP_FileDialogContentsView), tr("转到..."), 
         this);
@@ -105,6 +113,17 @@ void PageContext::initUI()
     connect(act, &QAction::triggered, this, &PageContext::actActivatePage);
     btn = panel->addLargeAction(act);
     btn->setMinimumWidth(70);
+
+    act = new QAction(QIcon(":/icons/rail.png"), tr("编辑线路"), this);
+    act->setToolTip(tr("编辑线路\n编辑当前运行图页面中的线路数据"));
+    connect(act, &QAction::triggered, this, &PageContext::actEditRailway);
+    me = new SARibbonMenu(mw);
+    me->addAction(tr("转到线路"), this, &PageContext::actSwitchToRailway);
+    act->setMenu(me);
+    btn = panel->addLargeAction(act);
+    btn->setMinimumWidth(80);
+
+    panel = page->addPannel("");
 
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
         tr("删除"), this);
@@ -119,6 +138,14 @@ void PageContext::initUI()
     connect(act, &QAction::triggered, mw, &MainWindow::focusOutPage);
     btn = panel->addLargeAction(act);
     btn->setMinimumWidth(80);
+}
+
+std::shared_ptr<Railway> PageContext::selectRailway()
+{
+    if (!page)return nullptr;
+    auto rail = SelectRailwayCombo::dialogGetRailway(page->railways(), mw, tr("选择线路"),
+        tr("本运行图包含多条线路，请选择一条线路"));
+    return rail;
 }
 
 void PageContext::actEdit()
@@ -163,6 +190,46 @@ void PageContext::actUseDiagramConfig()
         return;
     mw->getUndoStack()->push(new qecmd::ChangePageConfig(page->configRef(), diagram.config(),
         true, page, mw->getViewCategory()));
+}
+
+void PageContext::commitResetPage(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> newinfo)
+{
+    page->swap(*newinfo);
+    if (page->name() != newinfo->name()) {
+        int i = mw->_diagram.getPageIndex(page);
+        mw->diagramDocks.at(i)->setWindowTitle(tr("运行图 - ") + page->name());
+        emit pageNameChanged(i);
+    }
+    mw->updatePageDiagram(page);
+    refreshData();
+}
+
+void PageContext::actEditRailway()
+{
+    if (auto rail = selectRailway()) {
+        mw->actOpenRailStationWidget(rail);
+    }
+}
+
+void PageContext::actSwitchToRailway()
+{
+    if (auto rail = selectRailway()) {
+        mw->focusInRailway(rail);
+    }
+}
+
+void PageContext::actResetPage()
+{
+    if (!page)return;
+    auto* dlg = new AddPageDialog(diagram, page, mw);
+    connect(dlg, &AddPageDialog::modificationDone,
+        this, &PageContext::onResetApplied);
+    dlg->show();
+}
+
+void PageContext::onResetApplied(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> data)
+{
+    mw->getUndoStack()->push(new qecmd::ResetPage(page, data, this));
 }
 
 void PageContext::commitEditInfo(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> newinfo)
@@ -248,4 +315,21 @@ void qecmd::EditPageInfo::undo()
 void qecmd::EditPageInfo::redo()
 {
     cont->commitEditInfo(page, newpage);
+}
+
+qecmd::ResetPage::ResetPage(std::shared_ptr<DiagramPage> page, 
+    std::shared_ptr<DiagramPage> newpage, PageContext* context, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("修改运行图: %1").arg(newpage->name()),parent),
+    page(page),data(newpage),cont(context)
+{
+}
+
+void qecmd::ResetPage::undo()
+{
+    cont->commitResetPage(page, data);
+}
+
+void qecmd::ResetPage::redo()
+{
+    cont->commitResetPage(page, data);
 }

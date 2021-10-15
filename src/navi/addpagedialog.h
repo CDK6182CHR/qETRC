@@ -54,14 +54,28 @@ class AddPageDialog : public QDialog
     QTableView* table;
     QLineEdit* editName, * editPrev;
     QTextEdit* edNote;
+    std::shared_ptr<DiagramPage> page = nullptr;   // 非空表示执行修改操作
 public:
     AddPageDialog(Diagram& diagram_, QWidget* parent=nullptr);
+
+    /**
+     * 2021.10.15
+     * 此版本提供为修订
+     */
+    AddPageDialog(Diagram& diagram_, std::shared_ptr<DiagramPage> page_,
+        QWidget* parent = nullptr);
 
 private:
     void initUI();
 
+    /**
+     * 用于reset情况调用；设置数据
+     */
+    void setData();
+
 signals:
     void creationDone(std::shared_ptr<DiagramPage> page);
+    void modificationDone(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> data);
 
 private slots:
     void okClicked();

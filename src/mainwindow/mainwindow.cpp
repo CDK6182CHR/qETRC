@@ -9,6 +9,7 @@
 #include <QSpinBox>
 #include <QStatusBar>
 #include <QLabel>
+#include <QStyleFactory>
 #include <chrono>
 
 #include "model/train/trainlistmodel.h"
@@ -69,13 +70,14 @@ MainWindow::MainWindow(QWidget* parent)
     undoStack(new QUndoStack(this)),
     naviModel(new DiagramNaviModel(_diagram, this))
 {
+    qApp->setStyle(QStyleFactory::create(SystemJson::instance.app_style));
     auto start = std::chrono::system_clock::now();
     ads::CDockManager::setConfigFlag(ads::CDockManager::OpaqueSplitterResize, true);
     ads::CDockManager::setConfigFlag(ads::CDockManager::XmlCompressionEnabled, false);
     ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
     manager = new ads::CDockManager(this);
     _diagram.readDefaultConfigs();
-    undoStack->setUndoLimit(100);
+    undoStack->setUndoLimit(200);
     connect(undoStack, SIGNAL(indexChanged(int)), this, SLOT(markChanged()));
 
     initUI();
@@ -544,6 +546,12 @@ void MainWindow::initToolbar()
         act->setShortcut(Qt::CTRL + Qt::Key_Y);
         ribbon->quickAccessBar()->addAction(act);
 
+        act = new QAction(qApp->style()->standardIcon(QStyle::SP_DialogCloseButton),
+            tr("关闭当前面面板 (Ctrl+W)"), this);
+        act->setShortcut(Qt::CTRL + Qt::Key_W);
+        connect(act, &QAction::triggered, this, &MainWindow::closeCurrentTab);
+        ribbon->quickAccessBar()->addAction(act);
+
         auto* menu = new QMenu();
         act = menu->addAction(tr("使用Office风格Ribbon"));
         connect(act, SIGNAL(triggered()), this, SLOT(useOfficeStyle()));
@@ -985,6 +993,10 @@ void MainWindow::initToolbar()
             naviView, &NaviTree::removePage);
         connect(contextPage, &PageContext::pageNameChanged,
             naviModel, &DiagramNaviModel::onPageNameChanged);
+        connect(naviView, &NaviTree::onEditRailwayFromPageContext,
+            contextPage, &PageContext::actEditRailway);
+        connect(naviView, &NaviTree::onSwitchToRailwayFromPageContext,
+            contextPage, &PageContext::actSwitchToRailway);
     }
 
     //context: train 6 7
@@ -1501,6 +1513,13 @@ void MainWindow::actRailDBDock()
     contextDB->activateDB();
 }
 
+void MainWindow::closeCurrentTab()
+{
+    if (auto* w = manager->focusedDockWidget()) {
+        w->closeDockWidget();
+    }
+}
+
 void MainWindow::updateWindowTitle()
 {
     QString filename = _diagram.filename();
@@ -1884,6 +1903,7 @@ void MainWindow::focusInRuler(std::shared_ptr<Ruler> ruler)
 {
     contextRuler->setRuler(ruler);
     ribbonBar()->showContextCategory(contextRuler->context());
+    showStatus(tr("切换到标尺 [%1]  可至工具栏标尺上下文菜单进一步操作").arg(ruler->name()));
 }
 
 void MainWindow::focusOutRuler()
@@ -1895,6 +1915,7 @@ void MainWindow::focusInRouting(std::shared_ptr<Routing> routing)
 {
     contextRouting->setRouting(routing);
     ribbonBar()->showContextCategory(contextRouting->context());
+    showStatus(tr("切换到交路 [%1]  可至工具栏交路上下文菜单进一步操作").arg(routing->name()));
 }
 
 void MainWindow::focusOutRouting()

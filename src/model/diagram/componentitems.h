@@ -151,6 +151,7 @@ namespace navi {
          * @brief removeRailwayAt
          * 删除指定下标的基线数据，同时触发删除既有车次、运行图中的数据，不可撤销。
          */
+		[[deprecated]]
         void removeRailwayAt(int i);
 	};
 

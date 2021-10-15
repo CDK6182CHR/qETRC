@@ -81,6 +81,7 @@ void navi::RailwayListItem::removeTailRailways(int cnt)
     }
 }
 
+[[deprecated]]
 void navi::RailwayListItem::removeRailwayAt(int i)
 {
     _diagram.removeRailwayAt(i);

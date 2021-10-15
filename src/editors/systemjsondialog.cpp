@@ -10,6 +10,8 @@
 #include "util/buttongroup.hpp"
 #include <data/common/qesystem.h>
 #include <SARibbonBar.h>
+#include <QStyleFactory>
+#include <QApplication>
 
 SystemJsonDialog::SystemJsonDialog(QWidget *parent):
     QDialog(parent)
@@ -49,6 +51,11 @@ void SystemJsonDialog::initUI()
     cbRibbonStyle->addItems({tr("Office风格"),tr("WPS风格")});
     flay->addRow(tr("Ribbon工具栏风格"),cbRibbonStyle);
 
+    cbSysStyle = new QComboBox;
+    cbSysStyle->setToolTip(tr("界面风格\n选择程序采用的界面风格。这里列出当前系统所支持的风格。"));
+    cbSysStyle->addItems(QStyleFactory::keys());
+    flay->addRow(tr("界面风格"), cbSysStyle);
+
     ckWeaken=new QCheckBox(tr("启用"));
     ckWeaken->setToolTip(tr("虚化非选择运行线\n在选择运行线时，是否虚化其他的未显示运行线。"));
     flay->addRow(tr("虚化非选择运行线"),ckWeaken);
@@ -85,6 +92,7 @@ void SystemJsonDialog::setData()
     ckWeaken->setChecked(t.weaken_unselected);
     ckTooltip->setChecked(t.show_train_tooltip);
     ckCentral->setChecked(t.use_central_widget);
+    cbSysStyle->setCurrentText(t.app_style);
 }
 
 void SystemJsonDialog::actApply()
@@ -96,6 +104,11 @@ void SystemJsonDialog::actApply()
         t.ribbon_style = SARibbonBar::OfficeStyle;
     }else{
         t.ribbon_style = SARibbonBar::WpsLiteStyle;
+    }
+    if (t.app_style != cbSysStyle->currentText()) {
+        t.app_style = cbSysStyle->currentText();
+        auto* sty = QStyleFactory::create(t.app_style);
+        qApp->setStyle(sty);
     }
     t.weaken_unselected = ckWeaken->isChecked();
     t.show_train_tooltip = ckTooltip->isChecked();

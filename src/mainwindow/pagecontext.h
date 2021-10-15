@@ -11,6 +11,7 @@ class SARibbonContextCategory;
 class DiagramPage;
 class Diagram;
 class MainWindow;
+class Railway;
 
 /**
  * @brief The PageContext class
@@ -40,6 +41,11 @@ public:
 private:
     void initUI();
 
+    /**
+     * 选择当前运行图包含的线路。弹出对话框。
+     */
+    std::shared_ptr<Railway> selectRailway();
+
 private slots:
     void actRemovePage();
 
@@ -54,10 +60,28 @@ private slots:
     // 使用当前运行图的Config，操作压栈
     void actUseDiagramConfig();
 
+    /**
+     * 允许修改线路表的更新操作；相当于新建了。
+     * 但是Page的地址保持不变。
+     */
+    void actResetPage();
+
+    void onResetApplied(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> data);
+
 public slots:
     void onEditApplied(std::shared_ptr<DiagramPage> page,std::shared_ptr<DiagramPage> newinfo);
 
     void commitEditInfo(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> newinfo);
+
+    /**
+     * 2021.10.15
+     * 与EditInfo的区别是，多一个重绘
+     */
+    void commitResetPage(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> newinfo);
+
+    void actEditRailway();
+
+    void actSwitchToRailway();
 
 signals:
     void pageRemoved(int i);
@@ -98,6 +122,18 @@ namespace qecmd {
     public:
         EditPageInfo(std::shared_ptr<DiagramPage> page,std::shared_ptr<DiagramPage> newpage,
             PageContext* context, QUndoCommand* parent=nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+
+    class ResetPage : public QUndoCommand 
+    {
+        std::shared_ptr<DiagramPage> page, data;
+        PageContext* const cont;
+    public:
+        ResetPage(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> newpage,
+            PageContext* context, QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
     };

@@ -294,6 +294,7 @@ void DiagramNaviModel::undoRemoveSingleTrain(int i, std::shared_ptr<Train> train
     emit trainRowsInserted(i, i);
 }
 
+[[deprecated]]
 void DiagramNaviModel::removeRailwayAt(int i)
 {
     QModelIndex par = index(navi::DiagramItem::RowRailways, 0);

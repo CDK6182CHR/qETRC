@@ -371,6 +371,11 @@ private slots:
 
     void actRailDBDock();
 
+    /**
+     * Ctrl+W 关闭当前的窗口
+     */
+    void closeCurrentTab();
+
 public slots:
 
     /**

@@ -117,6 +117,7 @@ public slots:
      * 删除由下标指定的线路数据
      * 由NaviTree调用。注意此操作不支持撤销，因此直接执行
      */
+    [[deprecated]]
     void removeRailwayAt(int i);
 
     /**

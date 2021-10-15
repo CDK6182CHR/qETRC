@@ -173,6 +173,11 @@ public:
     void swapBaseInfo(DiagramPage& other);
 
     /**
+     * 交换所有数据；包括Item这些。
+     */
+    void swap(DiagramPage& other);
+
+    /**
      * 列车是否在本运行图所含线路中铺画。
      */
     bool hasTrain(const Train& train)const;

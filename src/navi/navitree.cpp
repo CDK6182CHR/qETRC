@@ -76,12 +76,17 @@ void NaviTree::initContextMenus()
     mePage->addAction(tr("切换到运行图"), this, &NaviTree::onActivatePageContext);
     act = mePage->addAction(tr("删除运行图"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemovePageContext()));
+    mePage->addSeparator();
+    mePage->addAction(tr("编辑包含的线路"), this, &NaviTree::onEditRailwayFromPageContext);
+    mePage->addAction(tr("转到包含的线路"), this, &NaviTree::onSwitchToRailwayFromPageContext);
 
     //Train
     act = meTrain->addAction(tr("编辑时刻表"));
     connect(act, SIGNAL(triggered()), this, SLOT(onEditTrainContext()));
     act = meTrain->addAction(tr("删除列车"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemoveSingleTrainContext()));
+    meTrain->addSeparator();
+    meTrain->addAction(tr("转到交路"), this, &NaviTree::onSwitchToTrainRoutingContext);
 
     //Railway
     meRailway->addActions(common);
@@ -148,6 +153,7 @@ void NaviTree::onRemoveSingleTrainContext()
     }
 }
 
+[[deprecated]]
 void NaviTree::onRemoveRailwayContext()
 {
     auto res = QMessageBox::question(this, tr("删除基线"),
@@ -245,6 +251,22 @@ void NaviTree::onCreatePageByRailContext()
         auto page = std::make_shared<DiagramPage>(dia.config(), QList<std::shared_ptr<Railway>>{railway},
             dia.validPageName(railway->name()));
         addNewPageApply(page);
+    }
+}
+
+void NaviTree::onSwitchToTrainRoutingContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::TrainModelItem::Type) {
+        auto train = static_cast<navi::TrainModelItem*>(item)->train();
+        if (auto rt = train->routing().lock()) {
+            emit focusInRouting(rt);
+        }
+        else {
+            QMessageBox::warning(this, tr("错误"), 
+                tr("当前车次[%1]无交路。").arg(train->trainName().full()));
+        }
     }
 }
 
