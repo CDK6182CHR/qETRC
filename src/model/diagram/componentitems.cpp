@@ -73,6 +73,17 @@ void navi::RailwayListItem::appendRailway(std::shared_ptr<Railway> rail)
     _rails.emplace_back(std::make_unique<RailwayItem>(rail,row,this));
 }
 
+void navi::RailwayListItem::insertRailwayAt(int i, std::shared_ptr<Railway> rail)
+{
+    _diagram.insertRailwayAt(i, rail);
+    auto p = _rails.begin();
+    std::advance(p, i);
+    p = _rails.emplace(p, std::make_unique<RailwayItem>(rail, i, this));
+    for (++p; p != _rails.end(); ++p) {
+        (*p)->setRow((*p)->row() + 1);
+    }
+}
+
 void navi::RailwayListItem::removeTailRailways(int cnt)
 {
 	for (int i = 0; i < cnt; i++) {
@@ -90,6 +101,17 @@ void navi::RailwayListItem::removeRailwayAt(int i)
     p=_rails.erase(p);
     for(;p!=_rails.end();++p){
         (*p)->setRow((*p)->row()-1);
+    }
+}
+
+void navi::RailwayListItem::removeRailwayAtU(int i)
+{
+    _diagram.removeRailwayAt(i);
+    auto p = _rails.begin();
+    std::advance(p, i);
+    p = _rails.erase(p);
+    for (; p != _rails.end(); ++p) {
+        (*p)->setRow((*p)->row() - 1);
     }
 }
 

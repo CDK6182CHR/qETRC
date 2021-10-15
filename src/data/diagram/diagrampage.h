@@ -77,6 +77,13 @@ public:
      */
     DiagramPage(const QJsonObject& obj, Diagram& _diagram);
 
+    /**
+     * 删除指定Railway后的副本。用于删除线路的操作。
+     * 保证：删除后非空；不检查；
+     * 注意新生成的对象不包含Item
+     */
+    std::shared_ptr<DiagramPage> takenRailCopy(std::shared_ptr<Railway> rail)const;
+
     auto& railways(){return _railways;}
     const auto& railways()const{return _railways;}
     auto& startYs(){return _startYs;}

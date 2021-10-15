@@ -288,7 +288,10 @@ private slots:
 
     void undoAddNewTrain(std::shared_ptr<Train> train);
 
-    void onActRailwayRemoved(std::shared_ptr<Railway> rail);
+    //[[deprecated]]
+    //void onActRailwayRemoved(std::shared_ptr<Railway> rail);
+
+    void onActRailwayRemovedU(std::shared_ptr<Railway> rail);
 
     void removeRailStationWidget(std::shared_ptr<Railway> rail);
 

@@ -98,7 +98,8 @@ signals:
 private slots:
     void actOpenStationWidget();
     void actOpenForbidWidget();
-    void actRemoveRailway();
+    // [[deprecated]] void actRemoveRailway();
+    void actRemoveRailwayU();
 
 
     /**
@@ -158,6 +159,9 @@ private slots:
 
     // 操作压栈
     void actCreatePage();
+
+
+
 
 
 public slots:
@@ -269,6 +273,20 @@ public slots:
      * 保存股道表的后续：实际上只需要更新一下窗口。
      */
     void commitSaveTrackToTimetable();
+
+    /**
+     * 2021.10.15  集中在这里处理删除线路的问题；操作压栈。
+     * 注意这里操作压栈比较复杂
+     * 后缀U表示支持Undo的新版本
+     */
+    void removeRailwayAtU(int i);
+
+    /**
+     * 删除线路的操作。包含实际执行。
+     */
+    void commitRemoveRailwayU(std::shared_ptr<Railway> railway, int index);
+
+    void undoRemoveRailwayU(std::shared_ptr<Railway> railway, int index);
 };
 
 
@@ -392,5 +410,22 @@ namespace qecmd {
         void undo()override;
         void redo()override;
         void commit();
+    };
+
+ 
+    /**
+     * 2021.10.15
+     * 本类undo/redo直接处理跟线路删除相关的；
+     * 采用children的方式处理Page相关的操作
+     */
+    class RemoveRailway :public QUndoCommand {
+        std::shared_ptr<Railway> railway;
+        int index;
+        RailContext* const cont;
+    public:
+        RemoveRailway(std::shared_ptr<Railway> railway, int index,
+            RailContext* context, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
     };
 }

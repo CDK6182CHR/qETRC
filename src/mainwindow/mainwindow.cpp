@@ -247,6 +247,8 @@ void MainWindow::undoAddNewTrain(std::shared_ptr<Train> train)
         focusOutTrain();
 }
 
+#if 0
+[[deprecated]]
 void MainWindow::onActRailwayRemoved(std::shared_ptr<Railway> rail)
 {
     removeRailStationWidget(rail);
@@ -256,6 +258,14 @@ void MainWindow::onActRailwayRemoved(std::shared_ptr<Railway> rail)
     updateAllDiagrams();
     trainListWidget->getModel()->updateAllMileSpeed();
     undoStack->clear();
+}
+#endif
+
+void MainWindow::onActRailwayRemovedU(std::shared_ptr<Railway> rail)
+{
+    removeRailStationWidget(rail);
+    contextRail->removeRulerWidgetsForRailway(rail);
+    trainListWidget->getModel()->updateAllMileSpeed();
 }
 
 void MainWindow::removeRailStationWidget(std::shared_ptr<Railway> rail)
@@ -419,8 +429,8 @@ void MainWindow::initDockWidgets()
         connect(naviModel, &DiagramNaviModel::undoneTrainRemove,
             this, &MainWindow::undoRemoveTrain);
 
-        connect(naviModel, &DiagramNaviModel::railwayRemoved,
-            this, &MainWindow::onActRailwayRemoved);
+        connect(naviModel, &DiagramNaviModel::railwayRemovedU,
+            this, &MainWindow::onActRailwayRemovedU);
 
         connect(naviView, &NaviTree::focusInRouting,
             this, &MainWindow::focusInRouting);
@@ -472,6 +482,8 @@ void MainWindow::initDockWidgets()
             tw->getModel(), &TrainListModel::onBeginRemoveRows);
         connect(naviModel, &DiagramNaviModel::trainRowsRemoved,
             tw->getModel(), &TrainListModel::onEndRemoveRows);
+        connect(naviModel, &DiagramNaviModel::nonEmptyRailwayAdded,
+            tw->getModel(), &TrainListModel::updateAllMileSpeed);
     }
 
     // 交路管理
@@ -1053,6 +1065,8 @@ void MainWindow::initToolbar()
             naviModel, &DiagramNaviModel::removeRulerAt);
         connect(naviView, &NaviTree::editForbid,
             contextRail, &RailContext::openForbidWidgetTab);
+        connect(naviView, &NaviTree::actRemoveRailwayAt,
+            contextRail, &RailContext::removeRailwayAtU);
     }
 
     //context: ruler 9

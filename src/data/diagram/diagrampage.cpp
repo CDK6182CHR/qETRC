@@ -16,6 +16,17 @@ DiagramPage::DiagramPage(const QJsonObject& obj, Diagram& _diagram)
     fromJson(obj, _diagram);
 }
 
+std::shared_ptr<DiagramPage> DiagramPage::takenRailCopy(std::shared_ptr<Railway> rail) const
+{
+    decltype(_railways) rails;
+    rails.reserve(_railways.size() - 1);
+    foreach(auto r, _railways) {
+        if (r != rail)
+            rails.push_back(r);
+    }
+    return std::make_shared<DiagramPage>(_config, rails, _name, _note);
+}
+
 QString DiagramPage::railNameString() const
 {
     if (_railways.empty())

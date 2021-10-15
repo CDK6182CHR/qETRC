@@ -175,6 +175,8 @@ public:
      */
     void addRailway(std::shared_ptr<Railway> rail);
 
+    void insertRailwayAt(int i, std::shared_ptr<Railway> rail);
+
     /**
      * 添加Collection中的所有列车到本运行图的列车集合中
      * 同时完成与线路的绑定
@@ -265,6 +267,13 @@ public:
      */
     [[deprecated]]
     void removeRailwayAt(int i);
+
+    /**
+     * 2021.10.15
+     * 考虑撤销的删除线路操作。
+     * 保证Page中已经移除了线路。这里需要删除线路以及更新列车绑定
+     */
+    void removeRailwayAtU(int i);
 
     /**
      * 更新参数（最大跨越站数）时执行

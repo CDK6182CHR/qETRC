@@ -145,6 +145,11 @@ namespace navi {
 
         void appendRailway(std::shared_ptr<Railway> rail);
 
+		/**
+		 * 2021.10.15  撤销删除线路
+		 */
+		void insertRailwayAt(int i, std::shared_ptr<Railway> rail);
+
 		void removeTailRailways(int cnt);
 
         /**
@@ -153,6 +158,8 @@ namespace navi {
          */
 		[[deprecated]]
         void removeRailwayAt(int i);
+
+		void removeRailwayAtU(int i);
 	};
 
 	class PageItem;

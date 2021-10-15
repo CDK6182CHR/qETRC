@@ -87,6 +87,8 @@ signals:
     void onEditRailwayFromPageContext();
     void onSwitchToRailwayFromPageContext();
 
+    void actRemoveRailwayAt(int index);
+
 
 private slots:
     void showContextMenu(const QPoint& pos);
@@ -124,6 +126,7 @@ private slots:
     void actExpand();
 
     void actCollapse();
+
     
 public slots:
     void actAddRailway();
@@ -230,7 +233,6 @@ namespace qecmd {
         virtual void undo()override;
         virtual void redo()override;
     };
-
     
 
 }

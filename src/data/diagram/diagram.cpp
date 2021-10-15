@@ -23,6 +23,14 @@ void Diagram::addRailway(std::shared_ptr<Railway> rail)
     }
 }
 
+void Diagram::insertRailwayAt(int i, std::shared_ptr<Railway> rail)
+{
+    railways().insert(i, rail);
+    foreach(auto p, trains()) {
+        p->bindToRailway(rail, _config);
+    }
+}
+
 void Diagram::addTrains(const TrainCollection& coll)
 {
     //复制语义
@@ -185,6 +193,15 @@ void Diagram::removeRailwayAt(int i)
     }
     //与列车解除绑定
     foreach (auto p , _trainCollection.trains()) {
+        p->unbindToRailway(rail);
+    }
+}
+
+void Diagram::removeRailwayAtU(int i)
+{
+    auto rail = railways().takeAt(i);
+    //与列车解除绑定
+    foreach(auto p, _trainCollection.trains()) {
         p->unbindToRailway(rail);
     }
 }

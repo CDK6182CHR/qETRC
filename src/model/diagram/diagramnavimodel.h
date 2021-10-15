@@ -54,11 +54,17 @@ signals:
     void newRailwayAdded(std::shared_ptr<Railway> rail);
 
     /**
+     * 2021.10.15
+     * 删除线路的重做操作：暂时只用于更新列车的里程、速度
+     */
+    void nonEmptyRailwayAdded(std::shared_ptr<Railway> rail);
+
+    /**
      * 发给主窗口，关闭编辑页面
      */
     void undoneAddRailway(std::shared_ptr<Railway> rail);
 
-    void railwayRemoved(std::shared_ptr<Railway> rail);
+    void railwayRemovedU(std::shared_ptr<Railway> rail);
 
     void trainRemoved(std::shared_ptr<Train> train);
 
@@ -86,7 +92,8 @@ public slots:
 
     void resetTrainList();
     //void resetRailwayList();
-    void resetPageList();
+
+    [[deprecated]] void resetPageList();
 
     void insertPage(std::shared_ptr<DiagramPage> page, int index);
     void removePageAt(int index);
@@ -96,6 +103,12 @@ public slots:
     void onRailNameChanged(std::shared_ptr<Railway> rail);
 
     void commitAddRailway(std::shared_ptr<Railway> rail);
+
+    /**
+     * 2021.10.15
+     * 撤销删除线路操作。只需要管线路数据维护以及Train的绑定数据维护
+     */
+    void commitInsertRailway(int i, std::shared_ptr<Railway> rail);
 
     void undoAddRailway();
 
@@ -117,8 +130,10 @@ public slots:
      * 删除由下标指定的线路数据
      * 由NaviTree调用。注意此操作不支持撤销，因此直接执行
      */
-    [[deprecated]]
-    void removeRailwayAt(int i);
+    //[[deprecated]]
+    //void removeRailwayAt(int i);
+
+    void commitRemoveRailwayAtU(int i);
 
     /**
      * 已知在指定索引处增加标尺，更新model。

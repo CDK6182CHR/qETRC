@@ -213,6 +213,18 @@ void DiagramNaviModel::commitAddRailway(std::shared_ptr<Railway> rail)
     emit newRailwayAdded(rail);
 }
 
+void DiagramNaviModel::commitInsertRailway(int i, std::shared_ptr<Railway> rail)
+{
+    auto idx = index(navi::DiagramItem::RowRailways, 0);
+    beginInsertRows(idx, i, i);
+    navi::RailwayListItem* it = static_cast<navi::RailwayListItem*>(idx.internalPointer());
+    it->insertRailwayAt(i, rail);
+    endInsertRows();
+    //emit newRailwayAdded(rail);
+    if(!rail->empty())
+        emit nonEmptyRailwayAdded(rail);
+}
+
 void DiagramNaviModel::undoAddRailway()
 {
     auto rail = _diagram.railways().last();
@@ -294,6 +306,7 @@ void DiagramNaviModel::undoRemoveSingleTrain(int i, std::shared_ptr<Train> train
     emit trainRowsInserted(i, i);
 }
 
+#if 0
 [[deprecated]]
 void DiagramNaviModel::removeRailwayAt(int i)
 {
@@ -304,6 +317,18 @@ void DiagramNaviModel::removeRailwayAt(int i)
     item->removeRailwayAt(i);
     endRemoveRows();
     emit railwayRemoved(rail);
+}
+#endif
+
+void DiagramNaviModel::commitRemoveRailwayAtU(int i)
+{
+    QModelIndex par = index(navi::DiagramItem::RowRailways, 0);
+    auto* item = static_cast<navi::RailwayListItem*>(par.internalPointer());
+    auto rail = _diagram.railwayAt(i);
+    beginRemoveRows(par, i, i);
+    item->removeRailwayAtU(i);
+    endRemoveRows();
+    emit railwayRemovedU(rail);
 }
 
 void DiagramNaviModel::insertRulerAt(const Railway& rail, int i)

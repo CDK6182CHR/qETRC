@@ -29,6 +29,9 @@
 #include "viewers/events/traingapstatdialog.h"
 #include "viewers/events/railtrackwidget.h"
 #include "navi/navitree.h"
+#include "mainwindow/pagecontext.h"
+#include "navi/addpagedialog.h"
+
 
 RailContext::RailContext(Diagram& diagram_, SARibbonContextCategory* context, 
 	MainWindow* mw_, QObject* parent):
@@ -229,7 +232,7 @@ void RailContext::initUI()
 		"\n此操作波及面较广且不可撤销，请谨慎操作。"));
 	btn = panel->addLargeAction(act);
 	btn->setMinimumWidth(70);
-	connect(act, SIGNAL(triggered()), this, SLOT(actRemoveRailway()));
+	connect(act, &QAction::triggered, this, &RailContext::actRemoveRailwayU);
 
 	act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
 		tr("关闭面板"), this);
@@ -734,6 +737,15 @@ void RailContext::actOpenForbidWidget()
 		openForbidWidget(railway);
 }
 
+void RailContext::actRemoveRailwayU()
+{
+	if (!railway)return;
+	if (int i = diagram.railCategory().getRailwayIndex(railway); i != -1) {
+		removeRailwayAtU(i);
+	}
+}
+
+#if 0
 [[deprecated]]
 void RailContext::actRemoveRailway()
 {
@@ -750,6 +762,7 @@ void RailContext::actRemoveRailway()
 		}
 	}
 }
+#endif
 
 void RailContext::openForbidWidgetTab(std::shared_ptr<Forbid> forbid, 
 	std::shared_ptr<Railway> railway)
@@ -778,6 +791,39 @@ void RailContext::commitSaveTrackToTimetable()
 	mw->contextTrain->refreshCurrentTrainWidgets();
 }
 
+
+void RailContext::removeRailwayAtU(int i)
+{
+	auto& dia = diagram;
+	auto rail = dia.railwayAt(i);
+	auto* cmd = new qecmd::RemoveRailway(rail, i, this);
+	// 注意这里只会删除一条线路
+	// 可能会涉及多个Page的删除！倒着来
+	for (int i = dia.pages().size() - 1; i >= 0; i--) {
+		auto page = dia.pages().at(i);
+		if (page->containsRailway(rail)) {
+			if (page->railwayCount() > 1) {
+				// 修订Page
+				new qecmd::ResetPage(page, page->takenRailCopy(rail), mw->contextPage, cmd);
+			}
+			else {
+				new qecmd::RemovePage(dia, i, mw->naviView, cmd);
+			}
+		}
+	}
+	mw->getUndoStack()->push(cmd);
+}
+
+void RailContext::commitRemoveRailwayU(std::shared_ptr<Railway> railway, int index)
+{
+	Q_UNUSED(railway)
+	mw->naviModel->commitRemoveRailwayAtU(index);
+}
+
+void RailContext::undoRemoveRailwayU(std::shared_ptr<Railway> railway, int index)
+{
+	mw->naviModel->commitInsertRailway(index, railway);
+}
 
 
 
@@ -962,4 +1008,27 @@ void qecmd::SaveTrackToTimetable::commit()
 		std::swap((*it1++)->track, (*it2++));
 	}
 	cont->commitSaveTrackToTimetable();
+}
+
+qecmd::RemoveRailway::RemoveRailway(std::shared_ptr<Railway> railway, int index,
+	RailContext* context, QUndoCommand* parent) :
+	QUndoCommand(QObject::tr("删除线路: %1").arg(railway->name()), parent),
+	railway(railway), index(index), cont(context)
+{
+}
+
+void qecmd::RemoveRailway::undo()
+{
+	// 这里先执行Railway的删除undo  （重新添加）
+	cont->undoRemoveRailwayU(railway, index);
+	QUndoCommand::undo();    
+}
+
+void qecmd::RemoveRailway::redo()
+{
+	QUndoCommand::redo();    // 先redo （执行所有的Page修订删除）
+	
+	// 这里是Railway的删除操作
+	cont->commitRemoveRailwayU(railway, index);
+
 }

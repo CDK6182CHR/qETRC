@@ -6,7 +6,6 @@
 #include "dialogs/importtraindialog.h"
 #include "util/buttongroup.hpp"
 
-
 NaviTree::NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget* parent) :
     QWidget(parent), mePageList(new QMenu(this)), meRailList(new QMenu(this)),
     meTrainList(new QMenu(this)), mePage(new QMenu(this)), meTrain(new QMenu(this)),
@@ -153,6 +152,7 @@ void NaviTree::onRemoveSingleTrainContext()
     }
 }
 
+#if 0
 [[deprecated]]
 void NaviTree::onRemoveRailwayContext()
 {
@@ -167,6 +167,17 @@ void NaviTree::onRemoveRailwayContext()
         _model->removeRailwayAt(idx.row());
     }
 }
+#endif
+
+void NaviTree::onRemoveRailwayContext()
+{
+    auto idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::RailwayItem::Type) {
+        emit actRemoveRailwayAt(item->row());
+    }
+}
+
 
 void NaviTree::onRemoveRulerContext()
 {
