@@ -95,13 +95,13 @@ void PageContext::initUI()
     connect(act, SIGNAL(triggered()), this, SLOT(actPrint()));
 
     act = new QAction(QIcon(":/icons/config.png"), tr("显示设置"), this);
-    btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(70);
     connect(act, &QAction::triggered, this, &PageContext::actConfig);
     me = new SARibbonMenu(mw);
     me->addAction(tr("将运行图显示设置应用到当前页面"), this,
         &PageContext::actUseDiagramConfig);
     act->setMenu(me);
+    btn = panel->addLargeAction(act);
+    btn->setMinimumWidth(80);
 
     act->setToolTip(tr("显示设置\n设置当前运行图页面的显示参数，不影响其他运行图页面。"));
 

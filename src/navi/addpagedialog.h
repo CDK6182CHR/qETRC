@@ -1,17 +1,18 @@
 ﻿#pragma once
 
 #include <QDialog>
-#include <QTableView>
-#include <QLineEdit>
-#include <QTextEdit>
-#include <QItemSelection>
 #include <QUndoCommand>
 
-#include "data/diagram/diagram.h"
-#include "data/diagram/diagrampage.h"
-#include "model/diagram/railtablemodel.h"
 
 class NaviTree;
+class Diagram;
+class DiagramPage;
+class RailListModel;
+class QTableView;
+class QLineEdit;
+class QTextEdit;
+
+
 namespace qecmd {
     class AddPage :public QUndoCommand {
         Diagram& diagram;
@@ -40,13 +41,14 @@ namespace qecmd {
     };
 }
 
+#if 0
 
 /**
  * @brief The AddPageDialog class
  * 添加运行图视窗 （DiagramPage）的临时对话框
  * 暂定 临时创建，用完删除
  */
-class AddPageDialog : public QDialog
+class AddPageDialogV1 : public QDialog
 {
     Q_OBJECT
     Diagram& diagram;
@@ -56,13 +58,13 @@ class AddPageDialog : public QDialog
     QTextEdit* edNote;
     std::shared_ptr<DiagramPage> page = nullptr;   // 非空表示执行修改操作
 public:
-    AddPageDialog(Diagram& diagram_, QWidget* parent=nullptr);
+    AddPageDialogV1(Diagram& diagram_, QWidget* parent=nullptr);
 
     /**
      * 2021.10.15
      * 此版本提供为修订
      */
-    AddPageDialog(Diagram& diagram_, std::shared_ptr<DiagramPage> page_,
+    AddPageDialogV1(Diagram& diagram_, std::shared_ptr<DiagramPage> page_,
         QWidget* parent = nullptr);
 
 private:
@@ -78,7 +80,59 @@ signals:
     void modificationDone(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> data);
 
 private slots:
-    void okClicked();
+    void okClicked(); 
     void preview(const QItemSelection& sel);
+};
+
+#endif
+
+
+/**
+ * 2021.10.16  第二版的实现 重新设计界面
+ */
+class AddPageDialog : public QDialog
+{
+    Q_OBJECT;
+    Diagram& diagram;
+    RailListModel* const mdUnsel, * const mdSel;
+
+    QTableView* tbUnsel, * tbSel;
+
+    QLineEdit* edName, * edPrev;
+    QTextEdit* edNote;
+    std::shared_ptr<DiagramPage> page = nullptr;   // 非空表示执行修改操作
+public:
+
+    AddPageDialog(Diagram& diagram_, QWidget* parent);
+
+    /**
+     * 此版本提供为修订
+     */
+    AddPageDialog(Diagram& diagram_, std::shared_ptr<DiagramPage> page_,
+        QWidget* parent);
+
+private:
+    void initUI();
+
+    /**
+     * 用于reset情况调用；设置数据
+     */
+    void setData();
+
+signals:
+    void creationDone(std::shared_ptr<DiagramPage> page);
+    void modificationDone(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> data);
+
+private slots:
+    void okClicked();
+
+    void selectAll();
+    void deselectAll();
+    void moveUp();
+    void moveDown();
+    
+    void select();
+    void deselect();
+
 };
 

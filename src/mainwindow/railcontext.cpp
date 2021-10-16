@@ -229,7 +229,7 @@ void RailContext::initUI()
 	act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
 		tr("删除基线"), this);
 	act->setToolTip(tr("删除基线\n删除当前基线，并且从所有运行图中移除（空白运行图将被删除）。"
-		"\n此操作波及面较广且不可撤销，请谨慎操作。"));
+		"\n自V1.0.1版本起，此操作支持撤销/重做。"));
 	btn = panel->addLargeAction(act);
 	btn->setMinimumWidth(70);
 	connect(act, &QAction::triggered, this, &RailContext::actRemoveRailwayU);

@@ -1,10 +1,18 @@
 ﻿#include "navitree.h"
 
-#include <QtWidgets>
+
 #include "model/diagram/diagramnavimodel.h"
 #include "addpagedialog.h"
 #include "dialogs/importtraindialog.h"
 #include "util/buttongroup.hpp"
+#include "data/train/train.h"
+#include "data/diagram/diagram.h"
+#include "data/diagram/diagrampage.h"
+
+#include <QFileDialog>
+#include <QMenu>
+#include <QMessageBox>
+#include <QTreeView>
 
 NaviTree::NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget* parent) :
     QWidget(parent), mePageList(new QMenu(this)), meRailList(new QMenu(this)),

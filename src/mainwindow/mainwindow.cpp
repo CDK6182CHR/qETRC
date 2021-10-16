@@ -16,6 +16,7 @@
 #include "editors/trainlistwidget.h"
 #include "model/diagram/diagramnavimodel.h"
 #include "data/common/qesystem.h"
+#include "data/diagram/diagrampage.h"
 #include "navi/navitree.h"
 #include "navi/addpagedialog.h"
 #include "editors/configdialog.h"
