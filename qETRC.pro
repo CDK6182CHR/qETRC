@@ -63,6 +63,7 @@ SOURCES += \
     src/dialogs/trainfilter.cpp \
     src/editors/basictrainwidget.cpp \
     src/editors/configdialog.cpp \
+    src/editors/edittrainwidget.cpp \
     src/editors/forbidwidget.cpp \
     src/editors/railstationwidget.cpp \
     src/editors/routing/addroutingnodedialog.cpp \
@@ -226,6 +227,7 @@ HEADERS += \
     src/dialogs/trainfilter.h \
     src/editors/basictrainwidget.h \
     src/editors/configdialog.h \
+    src/editors/edittrainwidget.h \
     src/editors/forbidwidget.h \
     src/editors/railstationwidget.h \
     src/editors/routing/addroutingnodedialog.h \

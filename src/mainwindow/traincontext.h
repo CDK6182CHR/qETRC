@@ -17,6 +17,7 @@ class QDoubleSpinBox;
 class Diagram;
 class PenStyleCombo;
 class BasicTrainWidget;
+class EditTrainWidget;
 class Routing;
 class TrainType;
 
@@ -58,7 +59,8 @@ class TrainContext : public QObject
     QColor tmpColor;
 
     QList<BasicTrainWidget*> basicWidgets;
-    QList<ads::CDockWidget*> basicDocks;
+    QList<EditTrainWidget*> editWidgets;
+    QList<ads::CDockWidget*> basicDocks, editDocks;
 
     LocateBoundingDialog* dlgLocate = nullptr;
 public:
@@ -87,6 +89,8 @@ private:
 
     int getBasicWidgetIndex(std::shared_ptr<Train> t);
 
+    int getEditWidgetIndex(std::shared_ptr<Train> t);
+
     /**
      * 由所给dock查找下标，用于关闭面板时删除
      */
@@ -94,9 +98,13 @@ private:
 
     /**
      * 更新指定车次打开的时刻表窗口。未见得是当前车次。
+     * 2021.10.17：加上EditWidget的更新。
      */
     void updateTrainWidget(std::shared_ptr<Train> t);
 
+    /**
+     * 2021.10.17  加上EditWidget的基础信息刷新
+     */
     void updateTrainWidgetTitles(std::shared_ptr<Train> t);
 
 public slots:
@@ -150,6 +158,13 @@ public slots:
     void actShowBasicWidget();
 
     void showBasicWidget(std::shared_ptr<Train> train);
+
+    void actShowEditWidget();
+
+    /**
+     * 显示/创建完全编辑面板
+     */
+    void showEditWidget(std::shared_ptr<Train> train);
 
     /**
      * 清理运行图时，关闭所有既有的面板
@@ -222,7 +237,11 @@ private slots:
 
     void onTrainDockClosed();
 
+    void onEditDockClosed();
+
     void removeBasicDockAt(int idx);
+
+    void removeEditDockAt(int idx);
 
     void onFullNameChanged();
 
@@ -235,6 +254,11 @@ private slots:
     void refreshData();
 
     void actRemoveCurrentTrain();
+
+    /**
+     * 2021.10.17  从Edit里面删除列车
+     */
+    void actRemoveTrainFromEdit(std::shared_ptr<Train> train);
 
     void actShowTrainLineDialog();
 

@@ -281,6 +281,25 @@ void TrainCollection::refreshTypeCount()
 	}
 }
 
+void TrainCollection::updateTrainInfo(std::shared_ptr<Train> train, std::shared_ptr<Train> info)
+{
+	// 注意 不能直接调用removeMapInfo。地址不同。
+	const TrainName& n1 = train->trainName(), & n2 = info->trainName();
+	if (n1.full() != n2.full()) {
+		fullNameMap.remove(n2.full());
+		fullNameMap.insert(n1.full(), train);
+	}
+	updateSingleNameMapItem(train, n1.full(), n2.full());
+	updateSingleNameMapItem(train, n1.down(), n2.down());
+	updateSingleNameMapItem(train, n1.up(), n2.up());
+	//类型
+	if (train->type() != info->type()) {
+		--_typeCount[info->type()];
+		++_typeCount[train->type()];
+	}
+}
+
+
 void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 {
 	fullNameMap.insert(t->trainName().full(), t);
@@ -315,6 +334,20 @@ void TrainCollection::removeMapInfo(std::shared_ptr<Train> t)
 	}
 	--_typeCount[t->type()];
 }
+
+void TrainCollection::updateSingleNameMapItem(std::shared_ptr<Train> train,
+	const QString& oldName, const QString& newName)
+{
+	if (oldName != newName) {
+		if (!oldName.isEmpty()) {
+			singleNameMap[oldName].removeAll(train);
+		}
+		if (!newName.isEmpty()) {
+			singleNameMap[newName].append(train);
+		}
+	}
+}
+
 
 void TrainCollection::resetMapInfo()
 {

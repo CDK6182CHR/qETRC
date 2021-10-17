@@ -31,20 +31,21 @@ public:
     auto getTrain(){return train;}
 signals:
     void editTrain(std::shared_ptr<Train> train);
+    void editTimetable(std::shared_ptr<Train> train);
     void showTimetable(std::shared_ptr<Train> train);
+    void switchToRouting(std::shared_ptr<Routing> routing);
 
 private:
     void initUI();
     QLineEdit* makeLineEdit(const QString& title)const;
-
-signals:
-    void switchToRouting(std::shared_ptr<Routing> routing);
+    
 public slots:
     void setTrain(std::shared_ptr<Train> train);
     void refreshData();
 
 private slots:
     void toText();
+    void actEditTimetable();
     void actEditTrain();
     void actShowTimetable();
     void actSwitchToRouting();

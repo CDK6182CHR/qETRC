@@ -31,6 +31,7 @@
 #include <chrono>
 
 #include "editors/basictrainwidget.h"
+#include "editors/edittrainwidget.h"
 #include "wizards/timeinterp/timeinterpwizard.h"
 #include "data/train/traintype.h"
 #include "dialogs/locatedialog.h"
@@ -262,9 +263,16 @@ void TrainContext::initUI()
 
 
 		act = new QAction(QIcon(":/icons/timetable.png"), tr("时刻表"), this);
+		act->setToolTip(tr("时刻表编辑\n显示简洁的、仅包含时刻表的编辑页面"));
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(80);
 		connect(act, SIGNAL(triggered()), this, SLOT(actShowBasicWidget()));
+
+		act = new QAction(QIcon(":/icons/edit.png"), tr("编辑"), this);
+		act->setToolTip(tr("列车编辑\n显示（pyETRC风格的）完整列车编辑页面"));
+		btn = panel->addLargeAction(act);
+		btn->setMinimumWidth(80);
+		connect(act, &QAction::triggered, this, &TrainContext::actShowEditWidget);
 
 		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
 			tr("删除"), this);
@@ -310,6 +318,16 @@ int TrainContext::getBasicWidgetIndex(std::shared_ptr<Train> t)
 	return -1;
 }
 
+int TrainContext::getEditWidgetIndex(std::shared_ptr<Train> t)
+{
+	for (int i = 0; i < editWidgets.size(); i++) {
+		auto p = editWidgets.at(i);
+		if (p->train() == t)
+			return i;
+	}
+	return -1;
+}
+
 int TrainContext::getBasicWidgetIndex(ads::CDockWidget* dock)
 {
 	for (int i = 0; i < basicDocks.size(); i++) {
@@ -325,6 +343,10 @@ void TrainContext::updateTrainWidget(std::shared_ptr<Train> t)
 		if (p->train() == t)
 			p->refreshData();
 	}
+	for (auto p : editWidgets) {
+		if (p->train() == t)
+			p->refreshData();
+	}
 }
 
 void TrainContext::updateTrainWidgetTitles(std::shared_ptr<Train> t)
@@ -335,12 +357,23 @@ void TrainContext::updateTrainWidgetTitles(std::shared_ptr<Train> t)
 			basicDocks.at(i)->setWindowTitle(tr("时刻表编辑 - %1").arg(t->trainName().full()));
 		}
 	}
+
+	for (int i = 0; i < editWidgets.size(); i++) {
+		auto p = editWidgets.at(i);
+		if (p->train() == t) {
+			editDocks.at(i)->setWindowTitle(tr("列车编辑 - % 1").arg(t->trainName().full()));
+			p->refreshBasicData();
+		}
+	}
 }
 
 void TrainContext::refreshAllData()
 {
 	refreshData();
-	for (auto p : basicWidgets) {
+	foreach (auto p , basicWidgets) {
+		p->refreshData();
+	}
+	foreach (auto p , editWidgets) {
 		p->refreshData();
 	}
 }
@@ -348,6 +381,7 @@ void TrainContext::refreshAllData()
 void TrainContext::removeTrainWidget(std::shared_ptr<Train> train)
 {
 	removeBasicDockAt(getBasicWidgetIndex(train));
+	removeEditDockAt(getEditWidgetIndex(train));
 }
 
 void TrainContext::onTrainTimetableChanged(std::shared_ptr<Train> train, std::shared_ptr<Train> table)
@@ -398,6 +432,8 @@ void TrainContext::afterTimetableChanged(std::shared_ptr<Train> train)
 void TrainContext::commitTraininfoChange(std::shared_ptr<Train> train, std::shared_ptr<Train> info)
 {
 	train->swapBaseInfo(*info);
+	//2021.10.17：如果车次修改，需要处理车次映射表
+	diagram.trainCollection().updateTrainInfo(train, info);
 	if (train == this->train) {
 		refreshData();
 	}
@@ -699,6 +735,46 @@ void TrainContext::showBasicWidget(std::shared_ptr<Train> train)
 	}
 }
 
+void TrainContext::actShowEditWidget()
+{
+	if (train)
+		showEditWidget(train);
+}
+
+void TrainContext::showEditWidget(std::shared_ptr<Train> train)
+{
+	int idx = getEditWidgetIndex(train);
+	if (idx == -1) {
+		//创建
+		auto* w = new EditTrainWidget(diagram.trainCollection(), train);
+		w->setTrain(train);
+		auto* dock = new ads::CDockWidget(tr("列车编辑 - %1").arg(train->trainName().full()));
+		dock->setWidget(w);
+		dock->resize(600, 800);
+		connect(dock, &ads::CDockWidget::closed, this, &TrainContext::onEditDockClosed);
+		connect(w->getModel(), &TimetableStdModel::timetableChanged,
+			this, &TrainContext::onTrainTimetableChanged);
+		connect(w, &EditTrainWidget::trainInfoChanged,
+			this, &TrainContext::onTrainInfoChanged);
+		connect(w, &EditTrainWidget::switchToRouting,
+			mw, &MainWindow::focusInRouting);
+		connect(w, &EditTrainWidget::removeTrain,
+			this, &TrainContext::actRemoveTrainFromEdit);
+		mw->getManager()->addDockWidgetFloating(dock);
+		editWidgets.append(w);
+		editDocks.append(dock);
+	}
+	else {
+		//保证可见
+		auto* dock = basicDocks.at(idx);
+		if (dock->isClosed()) {
+			dock->toggleView(true);
+		}
+		else
+			dock->setAsCurrentTab();
+	}
+}
+
 void TrainContext::onTrainDockClosed()
 {
 	auto* dock = static_cast<ads::CDockWidget*>(sender());
@@ -710,12 +786,34 @@ void TrainContext::onTrainDockClosed()
 	}
 }
 
+void TrainContext::onEditDockClosed()
+{
+	auto* dock = static_cast<ads::CDockWidget*>(sender());
+	if (dock) {
+		for (int i = 0; i < editDocks.size(); i++) {
+			if (editDocks.at(i) == dock) {
+				removeEditDockAt(i);
+				break;
+			}
+		}
+	}
+}
+
 void TrainContext::removeBasicDockAt(int idx)
 {
 	if (idx == -1)
 		return;
 	auto* dock = basicDocks.takeAt(idx);
 	basicWidgets.removeAt(idx);
+	dock->deleteDockWidget();
+}
+
+void TrainContext::removeEditDockAt(int idx)
+{
+	if (idx == -1)
+		return;
+	auto* dock = editDocks.takeAt(idx);
+	editWidgets.removeAt(idx);
 	dock->deleteDockWidget();
 }
 
@@ -817,6 +915,17 @@ void TrainContext::refreshData()
 }
 
 void TrainContext::actRemoveCurrentTrain()
+{
+	if (train) {
+		int idx = diagram.trainCollection().getTrainIndex(train);
+		if (idx != -1) {
+			emit actRemoveTrain(idx);
+		}
+	}
+}
+
+
+void TrainContext::actRemoveTrainFromEdit(std::shared_ptr<Train> train)
 {
 	if (train) {
 		int idx = diagram.trainCollection().getTrainIndex(train);

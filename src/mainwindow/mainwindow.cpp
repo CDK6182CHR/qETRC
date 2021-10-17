@@ -235,8 +235,9 @@ void MainWindow::undoAddNewRailway(std::shared_ptr<Railway> rail)
 
 void MainWindow::onNewTrainAdded(std::shared_ptr<Train> train)
 {
+    // 2021.10.17：新车次添加改为显示EditWidget
     if(train->empty())
-        contextTrain->showBasicWidget(train);
+        contextTrain->showEditWidget(train);
     addTrainLine(*train);
 }
 
@@ -1032,8 +1033,10 @@ void MainWindow::initToolbar()
             this, &MainWindow::undoAddNewTrain);
         connect(contextTrain, &TrainContext::focusInRouting,
             this, &MainWindow::focusInRouting);
-        connect(trainInfoWidget, &TrainInfoWidget::editTrain,
+        connect(trainInfoWidget, &TrainInfoWidget::editTimetable,
             contextTrain, &TrainContext::showBasicWidget);
+        connect(trainInfoWidget, &TrainInfoWidget::editTrain,
+            contextTrain, &TrainContext::showEditWidget);
 
         connect(timetableQuickWidget->getModel(),
             &TimetableQuickEditableModel::trainStationTimeUpdated,

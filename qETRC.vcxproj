@@ -193,6 +193,7 @@
     </QtRcc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\editors\edittrainwidget.cpp" />
     <ClCompile Include="src\navi\addpagedialog.cpp" />
     <ClCompile Include="src\editors\routing\addroutingnodedialog.cpp" />
     <ClCompile Include="src\railnet\graph\adjacentlistmodel.cpp" />
@@ -365,6 +366,7 @@
     </QtMoc>
     <QtMoc Include="src\editors\routing\batchparseroutingdialog.h">
     </QtMoc>
+    <QtMoc Include="src\editors\edittrainwidget.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <QtMoc Include="src\dialogs\changestationnamedialog.h">
     </QtMoc>

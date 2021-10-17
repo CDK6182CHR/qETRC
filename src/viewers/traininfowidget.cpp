@@ -64,14 +64,22 @@ void TrainInfoWidget::initUI()
     edPost=makeLineEdit(tr("后序 (连线)"));
 
     auto* btn=new QPushButton(tr("点击查看"));
-    flay->addRow(tr("查看时刻表"),btn);
+    flay->addRow(tr("时刻表"),btn);
     btn->setMaximumWidth(150);
     connect(btn,&QPushButton::clicked,this,&TrainInfoWidget::actShowTimetable);
 
-    btn=new QPushButton(tr("点击编辑"));
-    flay->addRow(tr("编辑时刻表"),btn);
-    btn->setMaximumWidth(150);
-    connect(btn,&QPushButton::clicked,this,&TrainInfoWidget::actEditTrain);
+    hlay = new QHBoxLayout;
+    btn = new QPushButton(tr("时刻"));
+    hlay->addWidget(btn);
+    btn->setMaximumWidth(60);
+    connect(btn,&QPushButton::clicked,this,&TrainInfoWidget::actEditTimetable);
+
+    btn = new QPushButton(tr("全部"));
+    hlay->addWidget(btn);
+    btn->setMaximumWidth(60);
+    connect(btn, &QPushButton::clicked, this, &TrainInfoWidget::actEditTrain);
+
+    flay->addRow(tr("编辑"), hlay);
 
     vlay->addLayout(flay);
     vlay->addWidget(new QLabel(tr("交路序列")));
@@ -140,7 +148,6 @@ void TrainInfoWidget::refreshData()
         edRouting->setText(rt->name());
         edModel->setText(rt->model());
         edOwner->setText(rt->owner());
-        // todo 前序后序
         edPre->setText(rt->preOrderString(*train));
         edPost->setText(rt->postOrderString(*train));
         edOrder->setText(rt->orderString());
@@ -211,6 +218,12 @@ void TrainInfoWidget::toText()
     auto* dialog=new DialogAdapter(t);
     dialog->resize(400,400);
     dialog->show();
+}
+
+void TrainInfoWidget::actEditTimetable()
+{
+    if (train)
+        emit editTimetable(train);
 }
 
 void TrainInfoWidget::actEditTrain()

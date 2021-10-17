@@ -215,6 +215,13 @@ public:
      */
     void refreshTypeCount();
 
+    /**
+     * 2021.10.17   更新车次查找表和类型统计表
+     * 当列车信息更新后调用。调用之前，已经完成信息的修改。
+     * info里面装的是旧版信息
+     */
+    void updateTrainInfo(std::shared_ptr<Train> train, std::shared_ptr<Train> info);
+
 private:
     /**
      * @brief addMapInfo
@@ -228,6 +235,12 @@ private:
      * 删除车次时，删除映射表信息
      */
     void removeMapInfo(std::shared_ptr<Train> t);
+
+    /**
+     * 2021.10.17  更新单个条目的单车次映射表。
+     */
+    void updateSingleNameMapItem(std::shared_ptr<Train> train,
+        const QString& oldName, const QString& newName);
 
     /**
      * @brief resetMapInfo 重置所有映射表信息

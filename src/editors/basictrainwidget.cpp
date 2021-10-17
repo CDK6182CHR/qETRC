@@ -34,7 +34,7 @@ void BasicTrainWidget::refreshData()
 
 void BasicTrainWidget::refreshBasicData()
 {
-    table->resizeColumnsToContents();
+    //table->resizeColumnsToContents();
 }
 
 void BasicTrainWidget::initUI()
@@ -54,6 +54,11 @@ void BasicTrainWidget::initUI()
     table->setItemDelegateForColumn(TimetableStdModel::ColDepart,
         new QETimeDelegate(this));
     vlay->addWidget(ctable);
+
+    int c = 0;
+    for (int w : {120, 100, 100, 40, 60, 60, 60}) {
+        table->setColumnWidth(c++, w);
+    }
 
     auto* g = new ButtonGroup<2>({ "确定","还原"});
     vlay->addLayout(g);
