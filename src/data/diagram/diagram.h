@@ -219,9 +219,19 @@ public:
      */
     TrainEventList listTrainEvents(const Train& train)const;
 
-    DiagnosisList diagnoseTrain(const Train& train, bool withIntMeet)const;
+    /**
+     * 2021.10.23 新增按线路筛选，有两级，
+     * 即Railway和Range。为空表示不筛选。
+     * Railway的筛选直接作用于TrainLine (Adapter)，可以显著减少计算量；
+     * 但Range只用来后筛选。i.e. TrainLine的API不变
+     */
+    DiagnosisList diagnoseTrain(const Train& train, bool withIntMeet,
+        std::shared_ptr<Railway> railway, std::shared_ptr<RailStation> start,
+        std::shared_ptr<RailStation> end)const;
 
-    DiagnosisList diagnoseAllTrains(bool withIntMeet)const;
+    DiagnosisList diagnoseAllTrains(bool withIntMeet,
+        std::shared_ptr<Railway> railway, std::shared_ptr<RailStation> start,
+        std::shared_ptr<RailStation> end)const;
 
 
     /**

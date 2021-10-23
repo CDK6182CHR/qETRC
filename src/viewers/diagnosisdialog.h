@@ -5,6 +5,9 @@
 
 #include "data/diagram/trainevents.h"
 
+class Railway;
+class RailRangeCombo;
+class SelectRailwayCombo;
 class QTableView;
 class QCheckBox;
 class QRadioButton;
@@ -34,8 +37,14 @@ public:
 private:
     void setupModel();
 public slots:
-    void setupForTrain(std::shared_ptr<Train> train, bool withIntMeet);
-    void setupForAll(bool withIntMeet);
+    void setupForTrain(std::shared_ptr<Train> train, bool withIntMeet,
+                       std::shared_ptr<Railway> railway,
+                       std::shared_ptr<RailStation> start,
+                       std::shared_ptr<RailStation> end);
+    void setupForAll(bool withIntMeet,
+                     std::shared_ptr<Railway> railway,
+                     std::shared_ptr<RailStation> start,
+                     std::shared_ptr<RailStation> end);
 };
 
 class SelectTrainCombo;
@@ -54,17 +63,31 @@ class DiagnosisDialog : public QDialog
     QRadioButton* rdSingle;
     QCheckBox* ckIntMeet;
     QTableView* table;
+
+    SelectRailwayCombo* cbRail;
+    RailRangeCombo* cbRange;
+    QCheckBox* ckFiltRail,*ckFiltRange;
 public:
     DiagnosisDialog(Diagram& diagram_, QWidget* parent = nullptr);
     DiagnosisDialog(Diagram& diagram_, std::shared_ptr<Train> train, 
         QWidget* parent = nullptr);
 private:
     void initUI();
+
+    /**
+     * 如果勾选了筛选线路，返回线路；否则返回空
+     */
+    std::shared_ptr<Railway> getFilterRailway();
+    std::pair<std::shared_ptr<RailStation>,std::shared_ptr<RailStation>>
+        getFilterRange();
 signals:
     void showStatus(const QString&);
 private slots:
     void actApply();
     void onSingleToggled(bool on);
     void actHelp();
+
+    void onFiltRailChanged(bool on);
+    void onFiltRangeChanged(bool on);
 };
 

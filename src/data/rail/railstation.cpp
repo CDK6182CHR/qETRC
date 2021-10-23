@@ -5,6 +5,22 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
+Direction qeutil::passedDirToDir(PassedDirection d1) {
+    switch (d1)
+    {
+    case PassedDirection::NoVia: return Direction::Undefined;
+        break;
+    case PassedDirection::DownVia:return Direction::Down;
+        break;
+    case PassedDirection::UpVia:return Direction::Up;
+        break;
+    case PassedDirection::BothVia:return Direction::Undefined;
+        break;
+    default:return Direction::Undefined;
+        break;
+    }
+}
+
 RailStation::RailStation(const StationName& name_,
     double mile_,
     int level_,

@@ -14,6 +14,9 @@
 #include <QTableView>
 #include <chrono>
 
+#include <util/railrangecombo.h>
+#include <util/selectrailwaycombo.h>
+
 DiagnosisModel::DiagnosisModel(Diagram &diagram_, QObject *parent):
     QStandardItemModel(parent), diagram(diagram_)
 {
@@ -52,15 +55,21 @@ void DiagnosisModel::setupModel()
     }
 }
 
-void DiagnosisModel::setupForTrain(std::shared_ptr<Train> train, bool withIntMeet)
+void DiagnosisModel::setupForTrain(std::shared_ptr<Train> train, bool withIntMeet,
+                                   std::shared_ptr<Railway> railway,
+                                   std::shared_ptr<RailStation> start,
+                                   std::shared_ptr<RailStation> end)
 {
-    lst = diagram.diagnoseTrain(*train,withIntMeet);
+    lst = diagram.diagnoseTrain(*train,withIntMeet,railway,start,end);
     setupModel();
 }
 
-void DiagnosisModel::setupForAll(bool withIntMeet)
+void DiagnosisModel::setupForAll(bool withIntMeet,
+                                 std::shared_ptr<Railway> railway,
+                                 std::shared_ptr<RailStation> start,
+                                 std::shared_ptr<RailStation> end)
 {
-    lst=diagram.diagnoseAllTrains(withIntMeet);
+    lst=diagram.diagnoseAllTrains(withIntMeet,railway,start,end);
     setupModel();
 }
 
@@ -95,7 +104,7 @@ void DiagnosisDialog::initUI()
     auto* hlay = new QHBoxLayout;
     auto* flay = new QFormLayout;
 
-    auto* g = new RadioButtonGroup<2, QVBoxLayout>({ "单车次","所有车次" }, this);
+    auto* g = new RadioButtonGroup<2, QHBoxLayout>({ "单车次","所有车次" }, this);
     rdSingle = static_cast<QRadioButton*>(g->get(0));
     flay->addRow(tr("范围"), g);
     rdSingle->setChecked(true);
@@ -104,6 +113,24 @@ void DiagnosisDialog::initUI()
 
     cbTrain = new SelectTrainCombo(diagram.trainCollection());
     flay->addRow(tr("选择车次"), cbTrain);
+
+    ckFiltRail=new QCheckBox(tr("限定线路"));
+    connect(ckFiltRail,&QCheckBox::toggled,this,&DiagnosisDialog::onFiltRailChanged);
+
+    cbRail=new SelectRailwayCombo(diagram.railCategory());
+    cbRail->setEnabled(false);
+    flay->addRow(ckFiltRail, cbRail);
+
+    ckFiltRange=new QCheckBox(tr("指定范围"));
+    connect(ckFiltRange,&QCheckBox::toggled,this,
+            &DiagnosisDialog::onFiltRangeChanged);
+    cbRange=new RailRangeCombo();
+    cbRange->setRailway(cbRail->railway());
+    cbRange->setEnabled(false);
+    flay->addRow(ckFiltRange, cbRange);
+
+    connect(cbRail,&SelectRailwayCombo::currentRailwayChanged,
+            cbRange,&RailRangeCombo::setRailway);
 
     ckIntMeet = new QCheckBox(tr("检测区间会车 （单线线路）"));
     flay->addRow(tr("选项"), ckIntMeet);
@@ -134,20 +161,36 @@ void DiagnosisDialog::initUI()
     vlay->addWidget(table);
 }
 
+std::shared_ptr<Railway> DiagnosisDialog::getFilterRailway()
+{
+    if (ckFiltRail->isChecked()){
+        return cbRail->railway();
+    }else return nullptr;
+}
+
+std::pair<std::shared_ptr<RailStation>, std::shared_ptr<RailStation> > DiagnosisDialog::getFilterRange()
+{
+    if (ckFiltRail->isChecked() && ckFiltRange->isChecked()){
+        return std::make_pair(cbRange->start(),cbRange->end());
+    }else return {};
+}
+
 void DiagnosisDialog::actApply()
 {
     using namespace std::chrono_literals;
     auto start = std::chrono::system_clock::now();
+    auto [sst,est]=getFilterRange();
     if (rdSingle->isChecked()) {
         auto train = cbTrain->train();
         if (!train) {
             QMessageBox::warning(this, tr("错误"), tr("请先选择车次!"));
             return;
         }
-        model->setupForTrain(train, ckIntMeet->isChecked());
+        model->setupForTrain(train, ckIntMeet->isChecked(),
+                             getFilterRailway(),sst,est);
     }
     else {
-        model->setupForAll(ckIntMeet->isChecked());
+        model->setupForAll(ckIntMeet->isChecked(),getFilterRailway(),sst,est);
     }
     auto end = std::chrono::system_clock::now();
     emit showStatus(tr("时刻诊断  用时%1毫秒").arg((end - start) / 1ms));
@@ -177,4 +220,15 @@ void DiagnosisDialog::actHelp()
         "提示内容仅供参考。"
     );
     QMessageBox::information(this, tr("提示"), text);
+}
+
+void DiagnosisDialog::onFiltRailChanged(bool on)
+{
+    cbRail->setEnabled(on);
+    ckFiltRange->setEnabled(on);
+}
+
+void DiagnosisDialog::onFiltRangeChanged(bool on)
+{
+    cbRange->setEnabled(on);
 }

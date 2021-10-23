@@ -38,6 +38,18 @@ namespace qeutil {
     inline QString passDirStr(int dir) {
         return passDirStr(static_cast<PassedDirection>(dir));
     }
+
+    /**
+     * 2021.10.23
+     * 相当于operator & 
+     * 判断两方向是否存在交集
+     */
+    inline bool directionIntersected(PassedDirection d1, PassedDirection d2)
+    {
+        return static_cast<int>(d1) & static_cast<int>(d2);
+    }
+
+    Direction passedDirToDir(PassedDirection d1);
 }
 
 

@@ -211,7 +211,6 @@ void TrainAdapter::autoLines(const Config& config)
 	//qDebug() << "TrainAdapter::autoLines: INFO: binding " << train().trainName().full() <<
 	//	" @ " << rail.name() << Qt::endl;
 
-
 	for (auto tcur = table.begin(); tcur != table.end(); ++tcur) {
         std::shared_ptr rcur = rail->stationByGeneralName(tcur->name);
 		bool bound = false;   //本站是否成功绑定
@@ -221,13 +220,18 @@ void TrainAdapter::autoLines(const Config& config)
 				line->addStation(tcur, rcur);
 				bound = true;
 			}
-			else if (loccnt == 1 && !rlast->isDirectionVia(rail->gapDirection(rlast, rcur))) {
+			else if (loccnt == 1 && (!qeutil::directionIntersected(rlast->direction,rcur->direction) ||
+				!rlast->isDirectionVia(rail->gapDirection(rlast, rcur))) ){
 				//首先判断是否要撤销第一站的绑定 （应当很少见的特殊情况）
 				//第一个站是非法绑定，即它的行别不匹配 （例如上行经过下行单向站）
 				//此时应当撤销上一站的绑定，当前站的绑定按照第一站的规则进行；但行别已经确定
 				//注意这也是唯一一种允许locdir不匹配时绑定的情况
+				//2021.10.23注意：这里的行别判断只依据里程，并不可靠。
+				//现在增加方向不交的判定条件
 				qDebug() << "TrainAdapter::autoItem: WARNING: Invalid direction bound encountered" <<
-					rlast->name << Qt::endl;
+					rlast->name << ", unbound previous station "
+					<< line->_stations.back().trainStation->name.toSingleLiteral()
+					<< ", for train " << train()->trainName().full() << Qt::endl;
 				line->_stations.pop_back();
 				loccnt--;
 			}
@@ -260,7 +264,21 @@ void TrainAdapter::autoLines(const Config& config)
 					bound = true;
 				}
 				else {  //不是跨越区间数截断的情况
+					
 					if (DirFunc::isValid(line->_dir) && DirFunc::isValid(locdir) &&
+						!qeutil::directionIntersected(rlast->direction, rcur->direction)) {
+						// 2021.10.23新增：如果本站和上站的行别不交叉（例如下行单向站和上行单向站）
+						// 则按照行别翻转处理，但新运行线不包含上一运行线终点。
+						_lines.append(line);
+						line = std::make_shared<TrainLine>(*this);
+						// 因为是单向站，所以运行线方向可以直接断定
+						locdir = qeutil::passedDirToDir(rcur->direction);
+						loccnt = 0;   
+						line->addStation(tcur, rcur);
+						line->_dir = locdir;
+						bound = true;
+					}
+					else if (DirFunc::isValid(line->_dir) && DirFunc::isValid(locdir) &&
 						line->_dir != locdir && rcur->isDirectionVia(locdir)) {  //行别变化
 						//注意新一段运行线要包含上一段的最后一个
 						//注意必须是合法经过当前站 （rcur->isDirectionVia），否则直接忽略处理

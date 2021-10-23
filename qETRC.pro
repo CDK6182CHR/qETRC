@@ -7,7 +7,7 @@ CONFIG += c++17
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 # 2021.09.28   rewrite lib pri files
 #include(../../site-packages/SARibbon/SARibbonBar.pri)
@@ -117,6 +117,7 @@ SOURCES += \
     src/railnet/raildb/raildbwindow.cpp \
     src/util/pagecomboforrail.cpp \
     src/util/qeballoomtip.cpp \
+    src/util/railrangecombo.cpp \
     src/util/railrulercombo.cpp \
     src/util/selectrailwaycombo.cpp \
     src/util/selecttraincombo.cpp \
@@ -282,6 +283,7 @@ HEADERS += \
     src/railnet/raildb/raildbwindow.h \
     src/util/pagecomboforrail.h \
     src/util/qeballoomtip.h \
+    src/util/railrangecombo.h \
     src/util/railrulercombo.h \
     src/util/selectrailwaycombo.h \
     src/util/selecttraincombo.h \

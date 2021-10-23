@@ -33,7 +33,6 @@ void RailStationWidget::setRailway(std::shared_ptr<Railway> rail)
 	railway = rail;
 	model->setRailway(rail);
 	if (railway) {
-		ctable->table()->resizeColumnsToContents();
 		edName->setText(railway->name());
 	}
 	else {
@@ -53,7 +52,6 @@ void RailStationWidget::refreshData()
 {
 	if (!railway)return;
 	model->refreshData();
-	ctable->table()->resizeColumnsToContents();
 	edName->setText(railway->name());
 	_changed = false;
 }
@@ -93,6 +91,11 @@ void RailStationWidget::initUI()
 		new GeneralDoubleSpinDelegate(this));
     ctable->table()->verticalHeader()->setDefaultSectionSize(
                 SystemJson::instance.table_row_height);
+
+	int c = 0;
+	for (int w : {120, 80, 80, 50, 40, 60, 40, 40}) {
+		ctable->table()->setColumnWidth(c++, w);
+	}
 
 	vlay->addWidget(ctable);
 

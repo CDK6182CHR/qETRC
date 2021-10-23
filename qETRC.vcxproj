@@ -206,6 +206,7 @@
     <ClCompile Include="src\model\diagram\componentitems.cpp" />
     <ClCompile Include="src\data\diagram\config.cpp" />
     <ClCompile Include="src\editors\configdialog.cpp" />
+    <ClCompile Include="src\util\railrangecombo.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\conflictdialog.cpp" />
     <ClCompile Include="src\dialogs\correcttimetabledialog.cpp" />
     <ClCompile Include="src\editors\routing\detectroutingdialog.cpp" />
@@ -566,6 +567,7 @@
     </QtMoc>
     <QtMoc Include="src\editors\systemjsondialog.h">
     </QtMoc>
+    <QtMoc Include="src\util\railrangecombo.h" />
     <ClInclude Include="src\wizards\timeinterp\timeinterppagepreview.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterppagetrain.h">
     </QtMoc>

@@ -75,22 +75,38 @@ TrainEventList Diagram::listTrainEvents(const Train& train) const
     return res;
 }
 
-DiagnosisList Diagram::diagnoseTrain(const Train& train, bool withIntMeet) const
+DiagnosisList Diagram::diagnoseTrain(const Train& train, bool withIntMeet,
+    std::shared_ptr<Railway> railway, std::shared_ptr<RailStation> start,
+    std::shared_ptr<RailStation> end) const
 {
     DiagnosisList res;
+    bool filtByRange = railway && start && end;
     foreach(auto adp, train.adapters()) {
-        foreach(auto line, adp->lines()) {
-            res.append(line->diagnoseLine(_trainCollection, withIntMeet));
+        if (!railway || adp->railway() == railway) {
+            foreach(auto line, adp->lines()) {
+                auto sub = line->diagnoseLine(_trainCollection, withIntMeet);
+                if (filtByRange) {
+                    foreach(auto ev, sub) {
+                        if (ev.inRange(start,end)) {
+                            res.push_back(ev);
+                        }
+                    }
+                }
+                else {
+                    res.append(sub);
+                }
+            }
         }
     }
     return res;
 }
 
-DiagnosisList Diagram::diagnoseAllTrains(bool withIntMeet) const
+DiagnosisList Diagram::diagnoseAllTrains(bool withIntMeet, std::shared_ptr<Railway> railway, std::shared_ptr<RailStation> start,
+    std::shared_ptr<RailStation> end) const
 {
     DiagnosisList res;
     foreach(auto t, _trainCollection.trains()) {
-        res.append(diagnoseTrain(*t, withIntMeet));
+        res.append(diagnoseTrain(*t, withIntMeet, railway, start, end));
     }
     return res;
 }

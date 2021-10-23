@@ -213,3 +213,20 @@ QString DiagnosisIssue::posString() const
 		return std::get<std::shared_ptr<const RailInterval>>(pos)->toString();
 	}
 }
+
+bool DiagnosisIssue::inRange(std::shared_ptr<RailStation> start, std::shared_ptr<RailStation> end) const
+{
+	double m_min = start->mile, m_max = end->mile;
+	if (std::holds_alternative<std::shared_ptr<const RailStation>>(pos)) {
+		auto st = std::get<std::shared_ptr<const RailStation>>(pos);
+		return m_min <= st->mile && st->mile <= m_max;
+	}
+	else {
+		auto railint = std::get<std::shared_ptr<const RailInterval>>(pos);
+		double inter_min = railint->fromStation()->mile,
+			inter_max = railint->toStation()->mile;
+		if (inter_min > inter_max)
+			std::swap(inter_min, inter_max);
+		return std::max(m_min, inter_min) < std::min(m_max, inter_max);
+	}
+}

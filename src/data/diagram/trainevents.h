@@ -274,6 +274,13 @@ struct DiagnosisIssue {
         description(description_){}
 
     QString posString()const;
+
+    /**
+     * 2021.10.23  判定当前的Issure是否属于指定的车站范围，
+     * 即mile范围有所交集；分为Station和Interval两种情况。
+     * 用于筛选Issue；输入应保证属于同一条线路（但无所谓）；保证start, end非空（不做检查）
+     */
+    bool inRange(std::shared_ptr<RailStation> start, std::shared_ptr<RailStation> end)const;
 };
 
 static_assert(std::is_same_v<SnapEvent::pos_t, DiagnosisIssue::pos_t>, "");
