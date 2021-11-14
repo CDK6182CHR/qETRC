@@ -37,7 +37,7 @@ public:
     inline std::shared_ptr<_Node> nextNode() {
         auto t = _railint.nextInterval();
         if (t) {
-            return t->getDataAt<_Node>(_data.index());
+            return t->template getDataAt<_Node>(_data.index());
         }
         else {
             return std::shared_ptr<_Node>();
@@ -46,7 +46,7 @@ public:
     inline std::shared_ptr<const _Node> nextNode()const{
         auto t=_railint.nextInterval();
         if(t){
-            return t->getDataAt<_Node>(_data.index());
+            return t->template getDataAt<_Node>(_data.index());
         }else{
             return std::shared_ptr<_Node>();
         }

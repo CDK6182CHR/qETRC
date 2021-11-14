@@ -72,7 +72,7 @@ void ConfigDialog::initUI()
         sdScaleX=sd;
 
         sp=new QSpinBox;
-        sp->setRange(1,1000);
+        sp->setRange(0,59);
         sp->setToolTip(tr("每小时的时长范围内纵线的数目，不包括整点线"));
         form->addRow(tr("每小时纵线数"),sp);
         spVLines=sp;

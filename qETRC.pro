@@ -13,6 +13,13 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 #include(../../site-packages/SARibbon/SARibbonBar.pri)
 #include(../site-packages/ads/ads.pri)
 
+android {
+DEFINES += QETRC_MOBILE
+}
+
+!defined(QETRC_MOBILE){
+}
+
 include(dependencies/qETRC_SARibbonBar.pri)
 include(dependencies/qETRC_ads.pri)
 
@@ -39,7 +46,6 @@ SOURCES += \
     src/data/rail/railway.cpp \
     src/data/rail/ruler.cpp \
     src/data/rail/rulernode.cpp \
-    src/data/common/stationname.cpp \
     src/data/rail/trackdiagramdata.cpp \
     src/data/train/routing.cpp \
     src/data/train/train.cpp \
@@ -81,6 +87,9 @@ SOURCES += \
     src/kernel/routingdiagram.cpp \
     src/kernel/trackdiagram.cpp \
     src/mainwindow/routingcontext.cpp \
+    src/mobile/adiagrampage.cpp \
+    src/mobile/amainwindow.cpp \
+    src/mobile/astartpage.cpp \
     src/model/delegate/generaldoublespindelegate.cpp \
     src/model/delegate/generalspindelegate.cpp \
     src/model/delegate/linestyledelegate.cpp \
@@ -246,6 +255,9 @@ HEADERS += \
     src/kernel/routingdiagram.h \
     src/kernel/trackdiagram.h \
     src/mainwindow/routingcontext.h \
+    src/mobile/adiagrampage.h \
+    src/mobile/amainwindow.h \
+    src/mobile/astartpage.h \
     src/model/delegate/generaldoublespindelegate.h \
     src/model/delegate/generalspindelegate.h \
     src/model/delegate/linestyledelegate.h \
@@ -363,6 +375,10 @@ RESOURCES += \
     rsc/resource.qrc
 
 DISTFILES += \
+    Android_source/AndroidManifest.xml \
     rsc/icons/trainline.png
 
 TRANSLATIONS += rsc/tr/en.ts rsc/tr/ch.ts
+
+ANDROID_EXTRA_LIBS = D:/QTProject/qETRC/qETRC/lib/ads/Qt5.15.2-android-clang/libqtadvanceddocking.so $$PWD/lib/SARibbon/Qt5.15.2-android-clang/libSARibbonBar.so
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/Android_source

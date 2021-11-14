@@ -415,3 +415,4 @@ void qecmd::BatchChangeRoutings::redo()
 {
     cont->commitBatchRoutingUpdate(indexes, routings);
 }
+

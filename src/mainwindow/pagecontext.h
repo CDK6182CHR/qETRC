@@ -138,3 +138,4 @@ namespace qecmd {
         virtual void redo()override;
     };
 }
+

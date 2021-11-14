@@ -1142,3 +1142,5 @@ void qecmd::AutoBusiness::commit()
 		train->swapTimetableWithAdapters(*d);
 	}
 }
+
+

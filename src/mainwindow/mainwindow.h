@@ -53,6 +53,7 @@ class MainWindow : public SARibbonMainWindow
     ads::CDockWidget* naviDock, * trainListDock, * routingDock, * timetableQuickDock;
     ads::CDockWidget* trainInfoDock;
     ads::CDockWidget* undoDock, * centralDock;
+    QWidget* centralOccupyWidget;
     ads::CDockAreaWidget* centralArea = nullptr;
     TrainListWidget* trainListWidget;
     QList<RailStationWidget*> railStationWidgets;

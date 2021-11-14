@@ -333,3 +333,4 @@ void qecmd::ResetPage::redo()
 {
     cont->commitResetPage(page, data);
 }
+

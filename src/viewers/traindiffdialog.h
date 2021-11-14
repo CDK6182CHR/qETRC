@@ -4,6 +4,7 @@
 #include <QStandardItemModel>
 #include <memory>
 #include <map>
+#include <unordered_map>
 
 class SelectTrainCombo;
 class SelectRailwayCombo;

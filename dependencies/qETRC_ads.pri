@@ -12,7 +12,7 @@ CONFIG(debug, debug|release){
         LIBS += -lqtadvanceddocking_debug
     }
     else {
-        LIBS += -lqtadvanceddocking
+        LIBS += -lqtadvanceddockingd
     }
 }
 else{

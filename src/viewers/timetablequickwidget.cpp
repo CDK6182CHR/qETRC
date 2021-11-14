@@ -8,6 +8,7 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QMenu>
+#include <QScroller>
 
 #include <data/common/qesystem.h>
 #include "data/train/train.h"
@@ -18,6 +19,8 @@ TimetableQuickWidget::TimetableQuickWidget(QUndoStack* undo_, QWidget *parent):
     model(new TimetableQuickEditableModel(undo_,this))
 {
     initUI();
+    QScroller::grabGesture(table, QScroller::TouchGesture);
+    table->setAttribute(Qt::WA_AcceptTouchEvents);
 }
 
 void TimetableQuickWidget::initUI()
@@ -65,6 +68,8 @@ void TimetableQuickWidget::initUI()
 
 void TimetableQuickWidget::onStopOnlyChanged(bool on)
 {
+    if (!train)
+        return;
     for(int i=0;i<train->stationCount();i++){
         bool hide = (on && !model->isAlwaysShow(2 * i));
         table->setRowHidden(2*i,hide);

@@ -67,7 +67,7 @@
 
 
 MainWindow::MainWindow(QWidget* parent)
-    : SARibbonMainWindow(parent),
+    : SARibbonMainWindow(parent, true),
     undoStack(new QUndoStack(this)),
     naviModel(new DiagramNaviModel(_diagram, this))
 {
@@ -390,6 +390,10 @@ void MainWindow::initDockWidgets()
     if (SystemJson::instance.use_central_widget || true) {
         dock = new ads::CDockWidget(tr("运行图窗口"));
         dock->setFeature(ads::CDockWidget::NoTab, true);
+        auto* w = new QWidget;
+        dock->setWidget(w);
+        centralOccupyWidget = w;
+
         auto* c = manager->setCentralWidget(dock);
         centralArea = c;
     }
@@ -453,8 +457,13 @@ void MainWindow::initDockWidgets()
         auto* dock = new ads::CDockWidget(tr("历史记录"));
         dock->setWidget(view);
         undoDock = dock;
-        manager->addDockWidget(ads::BottomDockWidgetArea, dock, area);
+        area = manager->addDockWidget(ads::BottomDockWidgetArea, dock, area);
     }
+
+#ifdef Q_OS_ANDROID
+    naviDock->closeDockWidget();
+    undoDock->closeDockWidget();
+#endif
 
     //列车管理
     if constexpr (true) {
@@ -1126,6 +1135,16 @@ void MainWindow::initToolbar()
             &RailDBContext::actPathSelector);
     }
 
+    if constexpr (true) {
+        auto* w = centralOccupyWidget;
+        auto* vlay = new QVBoxLayout(w);
+        auto* btn = new SARibbonToolButton(sharedActions.open, this);
+        vlay->addWidget(btn);
+
+        btn = new SARibbonToolButton(sharedActions.newfile, this);
+        vlay->addWidget(btn);
+    }
+
     //ApplicationMenu的初始化放在最后，因为可能用到前面的..
     initAppMenu();
     connect(ribbon->applicationButton(), SIGNAL(clicked()), this,
@@ -1133,6 +1152,20 @@ void MainWindow::initToolbar()
 
     ribbon->setRibbonStyle(
         static_cast<SARibbonBar::RibbonStyle>(SystemJson::instance.ribbon_style));
+
+#ifdef Q_OS_ANDROID
+    // test of menubar ...
+    if constexpr (true){
+        auto* mb=menuBar();
+        auto* me=mb->addMenu(tr("文件"));
+        me->addAction(sharedActions.newfile);
+        me->addAction(sharedActions.open);
+        me->addAction(sharedActions.save);
+        me=mb->addMenu(tr("编辑"));
+        me->addAction(tr("车次管理"));
+        me->addAction(tr("线路管理"));
+    }
+#endif
 }
 
 void MainWindow::initAppMenu()
@@ -2000,4 +2033,5 @@ void MainWindow::showStatus(const QString& msg)
 {
     statusBar()->showMessage(tr("%1 | %2").arg(QTime::currentTime().toString("hh:mm:ss"), msg));
 }
+
 

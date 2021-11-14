@@ -10,6 +10,7 @@
 #include <QApplication>
 #include <QStyle>
 #include <QMessageBox>
+#include <QScroller>
 
 #include "data/train/train.h"
 #include "data/train/routing.h"
@@ -23,6 +24,7 @@ TrainInfoWidget::TrainInfoWidget(QWidget *parent) : QScrollArea(parent)
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setWidgetResizable(true);
     initUI();
+    QScroller::grabGesture(this, QScroller::TouchGesture);
 }
 
 void TrainInfoWidget::initUI()

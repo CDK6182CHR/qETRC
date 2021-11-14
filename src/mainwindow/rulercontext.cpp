@@ -217,3 +217,4 @@ void qecmd::RemoveRuler::redo()
     ruler->railway()->removeRuler(ruler);
     cont->commitRemoveRuler(ruler, isOrd);
 }
+

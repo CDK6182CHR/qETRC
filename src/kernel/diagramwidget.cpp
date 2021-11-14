@@ -40,6 +40,7 @@ DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page
     paintGraph();
 
     setMouseTracking(true);
+    setAttribute(Qt::WA_AcceptTouchEvents);
 }
 
 DiagramWidget::~DiagramWidget() noexcept

@@ -690,3 +690,5 @@ qecmd::ApplyConfigToPages::ApplyConfigToPages(QUndoCommand* parent):
 {
     setText(QObject::tr("应用显示设置至运行图页面"));
 }
+
+

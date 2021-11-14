@@ -1032,3 +1032,5 @@ void qecmd::RemoveRailway::redo()
 	cont->commitRemoveRailwayU(railway, index);
 
 }
+
+
