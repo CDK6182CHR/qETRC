@@ -23,6 +23,12 @@ TimetableQuickWidget::TimetableQuickWidget(QUndoStack* undo_, QWidget *parent):
     table->setAttribute(Qt::WA_AcceptTouchEvents);
 }
 
+void TimetableQuickWidget::setReadonly()
+{
+    ckEdit->setChecked(false);
+    ckEdit->setEnabled(false);
+}
+
 void TimetableQuickWidget::initUI()
 {
     auto* vlay=new QVBoxLayout(this);

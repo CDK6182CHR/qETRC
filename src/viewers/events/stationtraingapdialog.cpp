@@ -12,6 +12,7 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <QAction>
+#include <QScroller>
 #include "util/buttongroup.hpp"
 #include <data/common/qesystem.h>
 #include "util/utilfunc.h"
@@ -209,6 +210,7 @@ void StationTrainGapDialog::initUI()
             qOverload<int,Qt::SortOrder>(&QTableView::sortByColumn)
             );
     vlay->addWidget(table);
+    QScroller::grabGesture(table,QScroller::TouchGesture);
 
     auto* act = new QAction(tr("定位到前事件"), table);
     connect(act, &QAction::triggered, this, &StationTrainGapDialog::locateLeft);

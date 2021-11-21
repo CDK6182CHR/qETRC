@@ -7,6 +7,7 @@
 #include <QFormLayout>
 #include <QCheckBox>
 #include <QSpinBox>
+#include <QScroller>
 #include <data/common/qesystem.h>
 #include "model/delegate/timeintervaldelegate.h"
 #include "data/diagram/diagram.h"
@@ -78,6 +79,7 @@ void TrainGapStatDialog::initUI()
     table->setEditTriggers(QTableView::NoEditTriggers);
     table->setItemDelegateForColumn(TrainGapStatModel::ColValue,
         new TimeIntervalDelegate(this));
+    QScroller::grabGesture(table,QScroller::TouchGesture);
 
     connect(table->horizontalHeader(),
         qOverload<int, Qt::SortOrder>(&QHeaderView::sortIndicatorChanged),

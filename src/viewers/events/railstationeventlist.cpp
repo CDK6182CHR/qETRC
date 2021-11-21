@@ -19,6 +19,7 @@
 #include <QLabel>
 #include <QCheckBox>
 #include <QAction>
+#include <QScroller>
 
 RailStationEventListModel::RailStationEventListModel(Diagram& diagram, const std::shared_ptr<Railway>& rail, const std::shared_ptr<RailStation>& station, QObject* parent) : QStandardItemModel(parent),
 diagram(diagram),
@@ -131,6 +132,7 @@ void RailStationEventListDialog::initUI()
 	table->resizeColumnsToContents();
 	table->setEditTriggers(QTableView::NoEditTriggers);
 	table->horizontalHeader()->setSortIndicatorShown(true);
+    QScroller::grabGesture(table,QScroller::TouchGesture);
 	connect(table->horizontalHeader(),
 		SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), table,
 		SLOT(sortByColumn(int, Qt::SortOrder)));

@@ -16,6 +16,7 @@
 #include <QEvent>
 #include <QPlainTextEdit>
 #include <QLabel>
+#include <QScroller>
 
 
 RailStationWidget::RailStationWidget(RailCategory& cat_, bool inplace, QWidget* parent) :
@@ -59,7 +60,14 @@ void RailStationWidget::refreshData()
 bool RailStationWidget::applyChange()
 {
 	actApply();
-	return !_changed;
+    return !_changed;
+}
+
+void RailStationWidget::setReadOnly()
+{
+    edName->setReadOnly(true);
+    edName->setAttribute(Qt::WA_InputMethodEnabled,false);
+    ctable->table()->setEditTriggers(QTableView::NoEditTriggers);
 }
 
 bool RailStationWidget::event(QEvent* e)
@@ -91,6 +99,7 @@ void RailStationWidget::initUI()
 		new GeneralDoubleSpinDelegate(this));
     ctable->table()->verticalHeader()->setDefaultSectionSize(
                 SystemJson::instance.table_row_height);
+    QScroller::grabGesture(ctable->table(),QScroller::TouchGesture);
 
 	int c = 0;
 	for (int w : {120, 80, 80, 50, 40, 60, 40, 40}) {

@@ -115,6 +115,7 @@ void RailSnapEventsDialog::initUI()
     connect(table->horizontalHeader(),SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
             table,SLOT(sortByColumn(int,Qt::SortOrder)));
     table->setContextMenuPolicy(Qt::ActionsContextMenu);
+    QScroller::grabGesture(table,QScroller::TouchGesture);
     vlay->addWidget(table);
     auto* g=new ButtonGroup<2>({"导出CSV","关闭"});
     g->connectAll(SIGNAL(clicked()),this,{SLOT(toCsv()),SLOT(close())});

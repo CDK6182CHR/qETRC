@@ -60,5 +60,6 @@
         <file>icons/line-manage.png</file>
         <file>icons/weaken.png</file>
         <file>icons/routing-diagram.png</file>
+        <file>icons/mobile-icon.png</file>
     </qresource>
 </RCC>

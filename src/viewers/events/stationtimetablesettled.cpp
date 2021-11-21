@@ -3,6 +3,7 @@
 #include <QLabel>
 #include <QTableView>
 #include <QHeaderView>
+#include <QScroller>
 
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"
@@ -101,6 +102,7 @@ void StationTimetableSettledDialog::initUI()
     table->setModel(model);
     table->resizeColumnsToContents();
     vlay->addWidget(table);
+    QScroller::grabGesture(table,QScroller::TouchGesture);
 
     auto* g=new ButtonGroup<2>({"导出CSV","关闭"});
     g->connectAll(SIGNAL(clicked()),this,{SLOT(outputCsv()),SLOT(close())});

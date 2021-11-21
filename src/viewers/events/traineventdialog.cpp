@@ -20,6 +20,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTextBrowser>
+#include <QScroller>
 
 TrainEventModel::TrainEventModel(std::shared_ptr<Train> train_, Diagram& diagram_, QObject* parent):
 	QStandardItemModel(parent),train(train_),diagram(diagram_)
@@ -185,6 +186,7 @@ void TrainEventDialog::initUI()
 	table->addAction(act);
 	connect(act, &QAction::triggered, this, &TrainEventDialog::actLocate);
 	table->setContextMenuPolicy(Qt::ActionsContextMenu);
+    QScroller::grabGesture(table,QScroller::TouchGesture);
 
     auto* g = new ButtonGroup<5>({ "ETRC风格","导出Excel","导出CSV", "导出文本","关闭" });
 	vlay->addLayout(g);

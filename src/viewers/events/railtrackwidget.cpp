@@ -18,6 +18,8 @@
 
 #include <model/rail/railtrackadjustmodel.h>
 
+#include <QScroller>
+
 RailTrackSetupWidget::RailTrackSetupWidget(TrackDiagramData &data, QWidget *parent):
     QWidget(parent), _data(data)
 {
@@ -62,6 +64,7 @@ void RailTrackSetupWidget::initUI()
     model->setHorizontalHeaderLabels({tr("股道名称")});
     table->setModel(model);
     table->setEditTriggers(QTableView::AllEditTriggers);
+    QScroller::grabGesture(table,QScroller::TouchGesture);
     vlay->addWidget(ctable);
 
     auto* g=new ButtonGroup<3>({"铺画","刷新","保存"});

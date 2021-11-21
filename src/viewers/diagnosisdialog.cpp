@@ -13,7 +13,7 @@
 #include <QMessageBox>
 #include <QTableView>
 #include <chrono>
-
+#include <QScroller>
 #include <util/railrangecombo.h>
 #include <util/selectrailwaycombo.h>
 
@@ -159,6 +159,7 @@ void DiagnosisDialog::initUI()
         qOverload<int, Qt::SortOrder>(&QTableView::sortByColumn));
     table->horizontalHeader()->setSortIndicatorShown(true);
     vlay->addWidget(table);
+    QScroller::grabGesture(table,QScroller::TouchGesture);
 }
 
 std::shared_ptr<Railway> DiagnosisDialog::getFilterRailway()

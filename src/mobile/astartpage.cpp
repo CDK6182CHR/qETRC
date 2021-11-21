@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QPicture>
 #include <QVBoxLayout>
 
 #include <util/buttongroup.hpp>
@@ -20,27 +21,32 @@ void AStartPage::initUI()
 {
     auto* vlay=new QVBoxLayout(this);
 
-    auto* lab=new QLabel(tr("qETRC-Mobile"));
+    vlay->addStretch(2);
+    auto* lab=new QLabel();
+    lab->setPixmap(QPixmap(":/icons/mobile-icon.png"));
     lab->setAlignment(Qt::AlignCenter);
     vlay->addWidget(lab);
+    lab=new QLabel(tr("qETRC_%1_%2").arg(qespec::VERSION.data(),
+                   qespec::DATE.data()));
+    lab->setAlignment(Qt::AlignCenter);
+    vlay->addWidget(lab);
+    vlay->addStretch(2);
 
-    lab=new QLabel(tr("当前运行图文件"));
-    lab->setAlignment(Qt::AlignCenter);
-    vlay->addWidget(lab);
+//    lab=new QLabel(tr("当前运行图文件"));
+//    lab->setAlignment(Qt::AlignCenter);
+//    vlay->addWidget(lab);
 
     edDiaName=new QLineEdit;
     edDiaName->setFocusPolicy(Qt::NoFocus);
     vlay->addWidget(edDiaName);
 
-    auto* g=new ButtonGroup<2>({"打开","重置"});
+    auto* g=new ButtonGroup<2,QVBoxLayout>({"打开","重置"});
     vlay->addLayout(g);
+    vlay->addStretch(2);
 
     g->connectAll(SIGNAL(clicked()),this,{SLOT(actOpen()),SLOT(actClear())});
 
-    lab=new QLabel(tr("qETRC_%1_%2").arg(qespec::VERSION.data(),
-                   qespec::DATE.data()));
-    lab->setAlignment(Qt::AlignCenter);
-    vlay->addWidget(lab);
+
 
     lab=new QLabel(tr("qETRC移动版目前仅提供部分查看功能，不提供编辑功能。"));
     lab->setWordWrap(true);
@@ -82,6 +88,7 @@ void AStartPage::actClear()
     if (flag!=QMessageBox::Yes)
         return;
     diagram.clear();
+    diagram.setFilename("");
     emit diagramRefreshed();
 }
 

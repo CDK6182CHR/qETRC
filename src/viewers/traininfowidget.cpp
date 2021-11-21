@@ -98,6 +98,8 @@ QLineEdit *TrainInfoWidget::makeLineEdit(const QString &title) const
 {
     auto* ed=new QLineEdit;
     ed->setFocusPolicy(Qt::NoFocus);
+    ed->setReadOnly(true);
+    ed->setAttribute(Qt::WA_InputMethodEnabled,false);
     flay->addRow(title,ed);
     return ed;
 }

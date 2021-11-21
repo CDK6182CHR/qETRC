@@ -35,6 +35,7 @@ public:
     explicit TimetableQuickWidget(QUndoStack* undo_, QWidget *parent = nullptr);
     auto getTrain(){return train;}
     auto getModel() { return model; }
+    void setReadonly();
 private:
     void initUI();
 signals:

@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QScroller>
 
 SectionCountModel::SectionCountModel(Diagram& diagram_,
 	std::shared_ptr<Railway> railway_,
@@ -66,6 +67,7 @@ void SectionCountDialog::initUI()
 		SystemJson::instance.table_row_height);
 	table->resizeColumnsToContents();
 	table->setEditTriggers(QTableView::NoEditTriggers);
+    QScroller::grabGesture(table,QScroller::TouchGesture);
 
 	vlay->addWidget(table);
 

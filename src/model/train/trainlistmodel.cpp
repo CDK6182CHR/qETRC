@@ -184,6 +184,12 @@ void TrainListModel::updateAllTrainStartingTerminal()
 void TrainListModel::updateAllTrainTypes()
 {
 	emit dataChanged(index(0, ColType), index(coll.trainCount() - 1, ColType), 
-		{ Qt::DisplayRole });
+                     { Qt::DisplayRole });
+}
+
+void TrainListModel::refreshData()
+{
+    beginResetModel();
+    endResetModel();
 }
 

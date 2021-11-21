@@ -9,6 +9,7 @@
 #include <QTableView>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QScroller>
 
 #include <model/rail/railstationmodel.h>
 
@@ -27,6 +28,9 @@ std::shared_ptr<RailStation> SelectRailStationDialog::getStation(
 {
     auto* dlg = new SelectRailStationDialog(rail, parent);
     dlg->setAttribute(Qt::WA_DeleteOnClose, false);
+#ifdef QETRC_MOBILE
+    dlg->showMaximized();
+#endif
     int flag = dlg->exec();
     std::shared_ptr<RailStation> res{};
     if (flag) {
@@ -57,6 +61,7 @@ void SelectRailStationDialog::initUI()
     connect(table,&QTableView::doubleClicked,
             this,&SelectRailStationDialog::onItemDoubleClicked);
     vlay->addWidget(table);
+    QScroller::grabGesture(table,QScroller::TouchGesture);
 
     auto* g=new ButtonGroup<2>({"确定","取消"});
     vlay->addLayout(g);

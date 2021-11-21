@@ -3,7 +3,9 @@
 #ifdef QETRC_MOBILE
 
 #include <QWidget>
+#include <memory>
 
+class Train;
 class Diagram;
 class DiagramWidget;
 class QComboBox;
@@ -24,10 +26,13 @@ private:
 
     void clearPages();
 
+    DiagramWidget* currentPage();
 signals:
-
+    void switchToTrain(std::shared_ptr<Train>);
 public slots:
     void refreshData();
+private:
+    void actToTrain();
 
 };
 

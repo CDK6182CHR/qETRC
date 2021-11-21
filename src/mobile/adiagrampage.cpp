@@ -4,6 +4,8 @@
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <QStackedWidget>
+#include <QPushButton>
+#include <QMessageBox>
 #include <kernel/diagramwidget.h>
 #include <data/diagram/diagram.h>
 #include <data/diagram/diagrampage.h>
@@ -18,8 +20,14 @@ void ADiagramPage::initUI()
 {
     auto* vlay=new QVBoxLayout(this);
 
+    auto* hlay=new QHBoxLayout;
     cbPages=new QComboBox;
-    vlay->addWidget(cbPages);
+    hlay->addWidget(cbPages);
+
+    auto* btn=new QPushButton(tr("转到车次"));
+    hlay->addWidget(btn);
+    vlay->addLayout(hlay);
+    connect(btn,&QPushButton::clicked,this,&ADiagramPage::actToTrain);
 
     stack=new QStackedWidget;
     vlay->addWidget(stack);
@@ -40,11 +48,16 @@ void ADiagramPage::clearPages()
     cbPages->clear();
 }
 
+DiagramWidget *ADiagramPage::currentPage()
+{
+    return static_cast<DiagramWidget*>(stack->currentWidget());
+}
+
 void ADiagramPage::refreshData()
 {
     clearPages();
 
-    if (diagram.pages().empty()){
+    if (diagram.pages().empty() && ! diagram.isNull()){
         diagram.createDefaultPage();
     }
 
@@ -54,6 +67,20 @@ void ADiagramPage::refreshData()
         pages.push_back(w);
         cbPages->addItem(page->name());
     }
+}
+
+void ADiagramPage::actToTrain()
+{
+    auto* w=currentPage();
+    if (!w){
+        QMessageBox::warning(this,tr("错误"),tr("没有打开的运行图"));
+        return;
+    }
+    auto t=w->selectedTrain();
+    if(!t){
+        QMessageBox::warning(this,tr("错误"),tr("没有选中的车次！"));
+    }
+    emit switchToTrain(t);
 }
 
 

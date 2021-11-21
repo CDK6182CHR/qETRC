@@ -112,6 +112,8 @@ public slots:
     void updateAllTrainStartingTerminal();
 
     void updateAllTrainTypes();
+
+    void refreshData();
 };
 
 

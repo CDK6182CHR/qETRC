@@ -12,6 +12,7 @@
 #include <QTableView>
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QScroller>
 
 TrainLineListModel::TrainLineListModel(std::shared_ptr<Train> train_, QObject *parent):
     QStandardItemModel(parent), train(train_)
@@ -207,6 +208,7 @@ void TrainLineDialog::initUI()
         mdList, &TrainLineListModel::onCurrentRowChanged);
     tbList->resizeColumnsToContents();
     sp->addWidget(tbList);
+    QScroller::grabGesture(tbList,QScroller::TouchGesture);
 
     tbDetail = new QTableView;
     tbDetail->setModel(mdDetail);
@@ -215,6 +217,7 @@ void TrainLineDialog::initUI()
     connect(mdList, &TrainLineListModel::currentTrainLineChanged,
         mdDetail, &TrainLineDetailModel::setLine);
     sp->addWidget(tbDetail);
+    QScroller::grabGesture(tbDetail,QScroller::TouchGesture);
 
     if (mdList->rowCount()) {
         tbList->setCurrentIndex(mdList->index(0, 0));

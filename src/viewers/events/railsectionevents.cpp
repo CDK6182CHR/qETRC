@@ -10,6 +10,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QAction>
+#include <QScroller>
 #include "model/delegate/qetimedelegate.h"
 #include "util/pagecomboforrail.h"
 #include "data/common/qesystem.h"
@@ -129,6 +130,7 @@ void RailSectionEventsDialog::initUI()
     table->setEditTriggers(QTableView::NoEditTriggers);
     table->setItemDelegateForColumn(RailSectionEventsModel::ColTime,
         new QETimeDelegate(this));
+    QScroller::grabGesture(table,QScroller::TouchGesture);
 
     connect(table->horizontalHeader(),SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
             table,SLOT(sortByColumn(int,Qt::SortOrder)));

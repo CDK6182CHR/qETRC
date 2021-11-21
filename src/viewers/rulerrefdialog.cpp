@@ -6,6 +6,7 @@
 #include <QHeaderView>
 #include <QVBoxLayout>
 #include <initializer_list>
+#include <QScroller>
 #include "data/diagram/trainadapter.h"
 #include "util/utilfunc.h"
 #include "data/common/qesystem.h"
@@ -179,6 +180,7 @@ void RulerRefDialog::initUI()
     table->setModel(model);
     table->resizeColumnsToContents();
     vlay->addWidget(table);
+    QScroller::grabGesture(table,QScroller::TouchGesture);
 
     connect(model, SIGNAL(modelReset()), table, SLOT(resizeColumnsToContents()));
     setLayout(vlay);
@@ -194,7 +196,7 @@ void RulerRefDialog::onRailIndexChanged(int i)
 
     cbRuler->clear();
     cbRuler->addItem(tr("(空)"));
-    for (auto t : adp->railway()->rulers()) {
+    foreach (auto t , adp->railway()->rulers()) {
         cbRuler->addItem(t->name());
     }
 

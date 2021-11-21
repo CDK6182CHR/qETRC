@@ -71,6 +71,12 @@ public:
      */
     bool applyChange();
 
+    /**
+     * @brief setReadOnly
+     * 对移动端使用。
+     */
+    void setReadOnly();
+
 protected:
     bool event(QEvent* e)override;
 

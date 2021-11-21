@@ -13,11 +13,12 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 #include(../../site-packages/SARibbon/SARibbonBar.pri)
 #include(../site-packages/ads/ads.pri)
 
-android {
+#android {
 DEFINES += QETRC_MOBILE
-}
+#}
 
 !defined(QETRC_MOBILE){
+RC_ICONS = rsc/icons/desktop-icon.ico
 }
 
 include(dependencies/qETRC_SARibbonBar.pri)
@@ -89,7 +90,11 @@ SOURCES += \
     src/mainwindow/routingcontext.cpp \
     src/mobile/adiagrampage.cpp \
     src/mobile/amainwindow.cpp \
+    src/mobile/arailanalysis.cpp \
+    src/mobile/arailpage.cpp \
     src/mobile/astartpage.cpp \
+    src/mobile/atrainoptions.cpp \
+    src/mobile/atrainpage.cpp \
     src/model/delegate/generaldoublespindelegate.cpp \
     src/model/delegate/generalspindelegate.cpp \
     src/model/delegate/linestyledelegate.cpp \
@@ -257,7 +262,11 @@ HEADERS += \
     src/mainwindow/routingcontext.h \
     src/mobile/adiagrampage.h \
     src/mobile/amainwindow.h \
+    src/mobile/arailanalysis.h \
+    src/mobile/arailpage.h \
     src/mobile/astartpage.h \
+    src/mobile/atrainoptions.h \
+    src/mobile/atrainpage.h \
     src/model/delegate/generaldoublespindelegate.h \
     src/model/delegate/generalspindelegate.h \
     src/model/delegate/linestyledelegate.h \
@@ -382,3 +391,5 @@ TRANSLATIONS += rsc/tr/en.ts rsc/tr/ch.ts
 
 ANDROID_EXTRA_LIBS = D:/QTProject/qETRC/qETRC/lib/ads/Qt5.15.2-android-clang/libqtadvanceddocking.so $$PWD/lib/SARibbon/Qt5.15.2-android-clang/libSARibbonBar.so
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/Android_source
+
+
