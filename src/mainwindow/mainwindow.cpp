@@ -1020,6 +1020,8 @@ void MainWindow::initToolbar()
             contextPage, &PageContext::actEditRailway);
         connect(naviView, &NaviTree::onSwitchToRailwayFromPageContext,
             contextPage, &PageContext::actSwitchToRailway);
+        connect(contextPage, &PageContext::dulplicatePage,
+            naviView, &NaviTree::actDulplicatePage);
     }
 
     //context: train 6 7
@@ -1060,6 +1062,9 @@ void MainWindow::initToolbar()
 
         connect(actImportTimetableCsv, &QAction::triggered,
             contextTrain, &TrainContext::actImportTrainFromCsv);
+
+        connect(contextTrain, &TrainContext::dulplicateTrain,
+            naviView, &NaviTree::actDulplicateTrain);
     }
 
     //context: rail 8
@@ -1080,6 +1085,8 @@ void MainWindow::initToolbar()
             contextRail, &RailContext::openForbidWidgetTab);
         connect(naviView, &NaviTree::actRemoveRailwayAt,
             contextRail, &RailContext::removeRailwayAtU);
+        connect(contextRail, &RailContext::dulplicateRailway,
+            naviView, &NaviTree::actDulplicateRailway);
     }
 
     //context: ruler 9
@@ -1096,6 +1103,8 @@ void MainWindow::initToolbar()
             contextRail, &RailContext::openRulerWidget);
         connect(naviView, &NaviTree::removeRulerNavi,
             contextRuler, &RulerContext::actRemoveRulerNavi);
+        connect(naviView, &NaviTree::dulplicateRuler,
+            contextRuler, &RulerContext::dulplicateRuler);
     }
 
     //context: routing 0

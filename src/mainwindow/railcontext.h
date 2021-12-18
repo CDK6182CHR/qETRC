@@ -94,12 +94,14 @@ signals:
      */
     void rulerInsertedAt(const Railway& rail, int i);
     void rulerRemovedAt(const Railway& rail, int i);
+    void dulplicateRailway(std::shared_ptr<Railway> railway);
 
 private slots:
     void actOpenStationWidget();
     void actOpenForbidWidget();
     // [[deprecated]] void actRemoveRailway();
     void actRemoveRailwayU();
+    void actDulplicateRailway();
 
 
     /**

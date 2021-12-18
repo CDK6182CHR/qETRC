@@ -253,3 +253,9 @@ void DiagramPage::removeRailway(std::shared_ptr<Railway> rail)
             ++p;
     }
 }
+
+std::shared_ptr<DiagramPage> DiagramPage::clone() const
+{
+    auto page = std::make_shared<DiagramPage>(config(), _railways, _name, _note);
+    return page;
+}

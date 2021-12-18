@@ -5,6 +5,8 @@
 #include "dialogs/rulerfromtraindialog.h"
 #include <QApplication>
 #include <QStyle>
+#include <QInputDialog>
+#include <QMessageBox>
 
 RulerContext::RulerContext(Diagram& diagram_, SARibbonContextCategory *context, MainWindow *mw_):
     QObject(mw_),diagram(diagram_), cont(context),mw(mw_)
@@ -70,6 +72,12 @@ void RulerContext::initUI()
     btn = panel->addLargeAction(act);
     btn->setMinimumWidth(80);
     connect(act, SIGNAL(triggered()), this, SLOT(actSetAsOrdinate()));
+
+    act = new QAction(QIcon(":/icons/copy.png"), tr("副本"), this);
+    act->setToolTip(tr("创建标尺副本\n使用输入的标尺名称，在本线路下创建当前标尺副本"));
+    btn = panel->addLargeAction(act);
+    btn->setMinimumWidth(80);
+    connect(act, &QAction::triggered, this, &RulerContext::actDulplicateRuler);
 
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
         tr("删除标尺"), this);
@@ -147,6 +155,8 @@ void RulerContext::actRemoveRulerNavi(std::shared_ptr<Ruler> ruler)
         this));
 }
 
+
+
 void RulerContext::actSetAsOrdinate()
 {
     if (mw->getRailContext()->getRailway()==(ruler->railway()))
@@ -172,6 +182,37 @@ void RulerContext::actReadFromSingleTrain()
     connect(dialog, &RulerFromTrainDialog::rulerUpdated,
         this, &RulerContext::actChangeRulerData);
     dialog->show();
+}
+
+void RulerContext::dulplicateRuler(std::shared_ptr<Ruler> ruler)
+{
+    if (!ruler)
+        return;
+    auto rail = ruler->railway();
+
+    bool ok;
+    auto name = QInputDialog::getText(mw, tr("创建标尺副本"), tr("现在创建基线[%1]中标尺[%2]的副本。"
+        "请输入新标尺名称。").arg(rail->name(), ruler->name()), QLineEdit::Normal,
+        ruler->name() + tr("_副本"), &ok);
+    if (!ok)return;
+    if (name.isEmpty() || rail->rulerNameExisted(name)) {
+        QMessageBox::warning(mw, tr("错误"), tr("标尺名称为空或已存在！"));
+        return;
+    }
+    std::shared_ptr<Railway> data = ruler->clone();
+    data->getRuler(0)->setName(name);
+
+    auto* stk = mw->getUndoStack();
+    stk->beginMacro(tr("创建标尺副本: %1").arg(name));
+    stk->push(new qecmd::AddNewRuler(name, rail, mw->getRailContext()));
+    auto newruler = rail->rulers().last();
+    stk->push(new qecmd::UpdateRuler(newruler, data, this));
+    stk->endMacro();
+}
+
+void RulerContext::actDulplicateRuler()
+{
+    dulplicateRuler(this->ruler);
 }
 
 void RulerContext::actShowEditWidget()

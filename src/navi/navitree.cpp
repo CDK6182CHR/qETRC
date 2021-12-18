@@ -13,6 +13,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QTreeView>
+#include <QInputDialog>
 
 NaviTree::NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget* parent) :
     QWidget(parent), mePageList(new QMenu(this)), meRailList(new QMenu(this)),
@@ -83,6 +84,7 @@ void NaviTree::initContextMenus()
     mePage->addAction(tr("切换到运行图"), this, &NaviTree::onActivatePageContext);
     act = mePage->addAction(tr("删除运行图"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemovePageContext()));
+    mePage->addAction(tr("创建运行图页面副本"), this, &NaviTree::onDulplicatePageContext);
     mePage->addSeparator();
     mePage->addAction(tr("编辑包含的线路"), this, &NaviTree::onEditRailwayFromPageContext);
     mePage->addAction(tr("转到包含的线路"), this, &NaviTree::onSwitchToRailwayFromPageContext);
@@ -92,6 +94,7 @@ void NaviTree::initContextMenus()
     connect(act, SIGNAL(triggered()), this, SLOT(onEditTrainContext()));
     act = meTrain->addAction(tr("删除列车"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemoveSingleTrainContext()));
+    meTrain->addAction(tr("创建列车副本"), this, &NaviTree::onDulplicateTrainContext);
     meTrain->addSeparator();
     meTrain->addAction(tr("转到交路"), this, &NaviTree::onSwitchToTrainRoutingContext);
 
@@ -101,6 +104,7 @@ void NaviTree::initContextMenus()
     connect(act, SIGNAL(triggered()), this, SLOT(onEditRailwayContext()));
     act = meRailway->addAction(tr("删除基线"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemoveRailwayContext()));
+    meRailway->addAction(tr("创建基线副本"), this, &NaviTree::onDulplicateRailwayContext);
     meRailway->addSeparator();
     meRailway->addAction(tr("快速创建单线路运行图"), this, &NaviTree::onCreatePageByRailContext);
 
@@ -109,6 +113,7 @@ void NaviTree::initContextMenus()
     connect(act, SIGNAL(triggered()), this, SLOT(onEditRulerContext()));
     act = meRuler->addAction(tr("删除标尺"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemoveRulerContext()));
+    meRuler->addAction(tr("创建标尺副本"), this, &NaviTree::onDulplicateRulerContext);
 
     //Forbid
     act = meForbid->addAction(tr("编辑天窗"));
@@ -183,6 +188,46 @@ void NaviTree::onRemoveRailwayContext()
     ACI* item = getItem(idx);
     if (item && item->type() == navi::RailwayItem::Type) {
         emit actRemoveRailwayAt(item->row());
+    }
+}
+
+void NaviTree::onDulplicateRailwayContext()
+{
+    auto idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::RailwayItem::Type) {
+        auto rail = static_cast<navi::RailwayItem*>(item)->railway();
+        actDulplicateRailway(rail);
+    }
+}
+
+void NaviTree::onDulplicateTrainContext()
+{
+    auto idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::TrainModelItem::Type) {
+        auto train = static_cast<navi::TrainModelItem*>(item)->train();
+        actDulplicateTrain(train);
+    }
+}
+
+void NaviTree::onDulplicateRulerContext()
+{
+    auto idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::RulerItem::Type) {
+        auto r = static_cast<navi::RulerItem*>(item)->ruler();
+        emit dulplicateRuler(r);
+    }
+}
+
+void NaviTree::onDulplicatePageContext()
+{
+    auto idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::PageItem::Type) {
+        auto r = static_cast<navi::PageItem*>(item)->page();
+        actDulplicatePage(r);
     }
 }
 
@@ -346,6 +391,63 @@ void NaviTree::undoRemovePage(std::shared_ptr<DiagramPage> page, int index)
 {
     _model->insertPage(page, index);
     emit pageInserted(page, index);
+}
+
+void NaviTree::actDulplicateRailway(std::shared_ptr<Railway> origin)
+{
+    if (!origin)
+        return;
+    bool ok;
+    auto name = QInputDialog::getText(this, tr("创建线路副本"),
+        tr("创建线路[%1]的副本。请输入新线路名称：").arg(origin->name()), QLineEdit::Normal,
+        origin->name()+tr("_副本"), &ok);
+    if (!ok)return;
+    if (!_model->diagram().railCategory().railNameIsValid(name, nullptr)) {
+        QMessageBox::warning(this, tr("错误"), tr("请输入非空且不与既有重复的线名!"));
+        return;
+    }
+    auto rail = std::make_shared<Railway>();
+    rail->operator=(*origin);
+    rail->setName(name);
+    _undo->push(new qecmd::ImportRailways(_model, { rail }));
+}
+
+void NaviTree::actDulplicateTrain(std::shared_ptr<Train> origin)
+{
+    if (!origin)return;
+    bool ok;
+    auto name = QInputDialog::getText(this, tr("创建列车副本"),
+        tr("创建列车[%1]的副本。请输入新列车的全车次：").arg(origin->trainName().full()), QLineEdit::Normal,
+        origin->trainName().full() + tr("_副本"), &ok);
+    if (!ok)return;
+    if (!_model->diagram().trainCollection().trainNameIsValid(name, nullptr)) {
+        QMessageBox::warning(this, tr("错误"), tr("请输入非空且不与既有重复的全车次!"));
+        return;
+    }
+
+    auto train = std::make_shared<Train>(*origin);
+    train->setTrainName(TrainName(name));
+    auto& dia = _model->diagram();
+    dia.updateTrain(train);
+    _undo->push(new qecmd::AddNewTrain(_model, train));
+}
+
+void NaviTree::actDulplicatePage(std::shared_ptr<DiagramPage> origin)
+{
+    if (!origin)return;
+    bool ok;
+    auto name = QInputDialog::getText(this, tr("创建运行图副本"),
+        tr("创建运行图页面[%1]的副本。请输入新页面名称：").arg(origin->name()), QLineEdit::Normal,
+        origin->name() + tr("_副本"), &ok);
+    if (!ok)return;
+    if (!_model->diagram().pageNameIsValid(name,nullptr)) {
+        QMessageBox::warning(this, tr("错误"), tr("请输入非空且不与既有重复的运行图页面名称！"));
+        return;
+    }
+
+    auto page = origin->clone();
+    page->setName(name);
+    _undo->push(new qecmd::AddPage(_model->diagram(), page, this));
 }
 
 void NaviTree::actAddTrain()

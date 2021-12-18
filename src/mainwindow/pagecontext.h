@@ -68,6 +68,8 @@ private slots:
 
     void onResetApplied(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> data);
 
+    void actDulplicate();
+
 public slots:
     void onEditApplied(std::shared_ptr<DiagramPage> page,std::shared_ptr<DiagramPage> newinfo);
 
@@ -86,6 +88,7 @@ public slots:
 signals:
     void pageRemoved(int i);
     void pageNameChanged(int index);
+    void dulplicatePage(std::shared_ptr<DiagramPage>);
 };
 
 

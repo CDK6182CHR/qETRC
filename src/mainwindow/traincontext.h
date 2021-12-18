@@ -74,6 +74,7 @@ signals:
     void timetableChanged(std::shared_ptr<Train> train);
     void actRemoveTrain(int index);
     void focusInRouting(std::shared_ptr<Routing>);
+    void dulplicateTrain(std::shared_ptr<Train>);
     
 private:
     void initUI();
@@ -281,6 +282,8 @@ private slots:
     void actToRouting();
 
     void actCorrection();
+
+    void actDulplicateTrain();
 };
 
 

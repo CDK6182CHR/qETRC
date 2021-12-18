@@ -85,6 +85,8 @@ public slots:
     void actRemoveRulerNavi(std::shared_ptr<Ruler> ruler);
 
 
+    void dulplicateRuler(std::shared_ptr<Ruler> ruler);
+
 private slots:
 
     void actShowEditWidget();
@@ -94,6 +96,13 @@ private slots:
     void actRemoveRuler();
 
     void actReadFromSingleTrain();
+
+    /**
+     * 创建当前标尺副本。
+     * 先创建新标尺，再修订它。
+     */
+    void actDulplicateRuler();
+
 
 };
 

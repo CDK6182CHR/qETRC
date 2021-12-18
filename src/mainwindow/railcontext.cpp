@@ -234,6 +234,12 @@ void RailContext::initUI()
 	btn->setMinimumWidth(70);
 	connect(act, &QAction::triggered, this, &RailContext::actRemoveRailwayU);
 
+	act = new QAction(QIcon(":/icons/copy.png"), tr("副本"), this);
+	act->setToolTip(tr("创建基线副本\n以输入的名称，创建于当前基线数据一致的副本。"));
+	btn = panel->addLargeAction(act);
+	btn->setMinimumWidth(70);
+	connect(act, &QAction::triggered, this, &RailContext::actDulplicateRailway);
+
 	act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
 		tr("关闭面板"), this);
 	connect(act, &QAction::triggered, mw, &MainWindow::focusOutRailway);
@@ -743,6 +749,12 @@ void RailContext::actRemoveRailwayU()
 	if (int i = diagram.railCategory().getRailwayIndex(railway); i != -1) {
 		removeRailwayAtU(i);
 	}
+}
+
+void RailContext::actDulplicateRailway()
+{
+	if (railway)
+		emit dulplicateRailway(railway);
 }
 
 #if 0

@@ -78,6 +78,13 @@ public:
     DiagramPage(const QJsonObject& obj, Diagram& _diagram);
 
     /**
+     * 2021.12.18 NOTE: 构建副本应使用clone()方法。
+     */
+    DiagramPage(const DiagramPage& other) = delete;
+
+    DiagramPage(DiagramPage&& other) = delete;
+
+    /**
      * 删除指定Railway后的副本。用于删除线路的操作。
      * 保证：删除后非空；不检查；
      * 注意新生成的对象不包含Item
@@ -193,6 +200,13 @@ public:
      * 将指定线路从本运行图的线路表中移除。如果本线没有它，则不管。
      */
     void removeRailway(std::shared_ptr<Railway> rail);
+
+    /**
+     * 创建副本。2021年12月18日用于实现dulplicate功能
+     * 实际上和直接调用一个构造函数没多大区别。
+     * 因为图元部分（语义上）不能复制，所以没有写成拷贝构造。
+     */
+    std::shared_ptr<DiagramPage> clone()const;
 
 };
 

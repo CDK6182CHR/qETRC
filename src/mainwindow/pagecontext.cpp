@@ -125,6 +125,11 @@ void PageContext::initUI()
 
     panel = page->addPannel("");
 
+    act = new QAction(QIcon(":/icons/copy.png"), tr("副本"), this);
+    act->setToolTip(tr("创建运行图页面副本\n创建当前运行图页面的副本。注意页面中的基线并不会被复制。"));
+    panel->addLargeAction(act);
+    connect(act, &QAction::triggered, this, &PageContext::actDulplicate);
+
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
         tr("删除"), this);
     act->setToolTip(tr("删除运行图\n删除当前运行图页面，"
@@ -230,6 +235,12 @@ void PageContext::actResetPage()
 void PageContext::onResetApplied(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> data)
 {
     mw->getUndoStack()->push(new qecmd::ResetPage(page, data, this));
+}
+
+void PageContext::actDulplicate()
+{
+    if (page)
+        emit dulplicatePage(page);
 }
 
 void PageContext::commitEditInfo(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> newinfo)

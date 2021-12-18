@@ -89,6 +89,10 @@ signals:
 
     void actRemoveRailwayAt(int index);
 
+    /**
+     * 创建标尺副本比较特殊，发送给RulerContext处理
+     */
+    void dulplicateRuler(std::shared_ptr<Ruler>);
 
 private slots:
     void showContextMenu(const QPoint& pos);
@@ -100,6 +104,14 @@ private slots:
     void onRemoveSingleTrainContext();
 
     void onRemoveRailwayContext();
+
+    void onDulplicateRailwayContext();
+
+    void onDulplicateTrainContext();
+
+    void onDulplicateRulerContext();
+
+    void onDulplicatePageContext();
 
     void onRemoveRulerContext();
 
@@ -174,6 +186,20 @@ public slots:
     void commitRemovePage(int index);
 
     void undoRemovePage(std::shared_ptr<DiagramPage> page, int index);
+
+    /**
+     * 2021.12.18
+     * 创建线路副本。这里要求输入名称，然后压栈。
+     */
+    void actDulplicateRailway(std::shared_ptr<Railway> origin);
+
+    /**
+     * 2021.12.18
+     * 绑定线路和压栈
+     */
+    void actDulplicateTrain(std::shared_ptr<Train> origin);
+
+    void actDulplicatePage(std::shared_ptr<DiagramPage> origin);
     
 };
 
@@ -200,6 +226,10 @@ namespace qecmd {
         virtual void redo()override;
     };
 
+    /**
+     * 添加列车。并不限制是空白的。
+     * 构造本类之前，应当先完成绑定操作。
+     */
     class AddNewTrain :public QUndoCommand {
         DiagramNaviModel* const navi;
         std::shared_ptr<Train> train;

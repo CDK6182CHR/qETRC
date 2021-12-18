@@ -274,6 +274,12 @@ void TrainContext::initUI()
 		btn->setMinimumWidth(80);
 		connect(act, &QAction::triggered, this, &TrainContext::actShowEditWidget);
 
+		act = new QAction(QIcon(":/icons/copy.png"), tr("副本"), this);
+		act->setToolTip(tr("创建列车副本\n以新输入的全车次创建当前车次的副本。"));
+		btn = panel->addLargeAction(act);
+		btn->setMinimumWidth(70);
+		connect(act, &QAction::triggered, this, &TrainContext::actDulplicateTrain);
+
 		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
 			tr("删除"), this);
 		connect(act, SIGNAL(triggered()), this, SLOT(actRemoveCurrentTrain()));
@@ -1014,6 +1020,12 @@ void TrainContext::actCorrection()
 	connect(dlg, &CorrectTimetableDialog::correctionApplied,
 		this, &TrainContext::onTrainTimetableChanged);
 	dlg->show();
+}
+
+void TrainContext::actDulplicateTrain()
+{
+	if (!train)return;
+	emit dulplicateTrain(train);
 }
 
 void TrainContext::setTrain(std::shared_ptr<Train> train_)

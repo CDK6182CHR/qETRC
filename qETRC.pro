@@ -13,9 +13,9 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 #include(../../site-packages/SARibbon/SARibbonBar.pri)
 #include(../site-packages/ads/ads.pri)
 
-#android {
+android {
 DEFINES += QETRC_MOBILE
-#}
+}
 
 !defined(QETRC_MOBILE){
 RC_ICONS = rsc/icons/desktop-icon.ico
