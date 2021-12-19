@@ -190,8 +190,12 @@
       <InitFuncName>resource</InitFuncName>
       <QtRccDir>$(Configuration)</QtRccDir>
       <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
+      <AdditionalOptions>RC_ICONS = rsc/icons/desktop-icon.ico</AdditionalOptions>
     </QtRcc>
   </ItemDefinitionGroup>
+   <ItemGroup>
+    <ResourceCompile Include="icon.rc" />
+  </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\editors\edittrainwidget.cpp" />
     <ClCompile Include="src\navi\addpagedialog.cpp" />

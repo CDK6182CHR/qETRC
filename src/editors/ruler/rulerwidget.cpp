@@ -69,7 +69,7 @@ void RulerWidget::initUI()
     table=new QTableView;
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->setModel(model);
-    table->resizeColumnsToContents();
+    //table->resizeColumnsToContents();
     table->setEditTriggers(QTableView::AllEditTriggers);
 
     table->setItemDelegateForColumn(RulerModel::ColMinute,
@@ -89,6 +89,11 @@ void RulerWidget::initUI()
     connect(act, SIGNAL(triggered()), this, SLOT(copyFromUpToDown()));
     table->addAction(act);
     table->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+    int c = 0;
+    for (int w : {120, 50, 50, 60, 60, 80, 80}) {
+        table->setColumnWidth(c++, w);
+    }
 
 
     vlay->addWidget(table);
