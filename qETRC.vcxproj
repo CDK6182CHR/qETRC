@@ -190,10 +190,11 @@
       <InitFuncName>resource</InitFuncName>
       <QtRccDir>$(Configuration)</QtRccDir>
       <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
-      <AdditionalOptions>RC_ICONS = rsc/icons/desktop-icon.ico</AdditionalOptions>
+      <AdditionalOptions>
+      </AdditionalOptions>
     </QtRcc>
   </ItemDefinitionGroup>
-   <ItemGroup>
+  <ItemGroup>
     <ResourceCompile Include="icon.rc" />
   </ItemGroup>
   <ItemGroup>

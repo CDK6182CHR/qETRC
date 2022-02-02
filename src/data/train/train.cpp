@@ -943,6 +943,17 @@ bool Train::indexValid(int i) const
     return 0 <= i && i < _timetable.size();
 }
 
+bool Train::isLocalTrain(const RailCategory& cat)const
+{
+    for (const auto& tst : _timetable) {
+        foreach(auto rail, cat.railways()) {
+            if (rail->containsGeneralStation(tst.name)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 bool Train::ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
 {

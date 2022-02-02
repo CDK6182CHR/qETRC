@@ -218,7 +218,18 @@ void TrainCollection::removeUnboundTrains()
 	}
 }
 
-bool TrainCollection::routingNameExisted(const QString& name, 
+void TrainCollection::removeNonLocal(const RailCategory& cat)
+{
+	//倒序遍历
+	for (int i = _trains.size() - 1; i >= 0; i--) {
+		auto t = _trains.at(i);
+		if (!t->isLocalTrain(cat)) {
+			removeTrainAt(i);
+		}
+	}
+}
+
+bool TrainCollection::routingNameExisted(const QString& name,
 	std::shared_ptr<Routing> ignore) const
 {
 	for (auto p : _routings)

@@ -108,7 +108,9 @@ void IntervalDataModel::copyFromUpToDown()
 
 void IntervalDataModel::updateRailIntervals(std::shared_ptr<Railway> railway, bool equiv)
 {
-    if (railway==_railway)
+    //2022.02.02  原版这里似乎笔误
+    //应当是检查对于同一线路，才能执行更新！
+    if (railway!=_railway)
         return;
     if (equiv) {
         int row = 0;

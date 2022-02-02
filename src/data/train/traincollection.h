@@ -12,6 +12,7 @@ class Railway;
 class Train;
 class Routing;
 class TrainType;
+class RailCategory;
 
 /**
  * @brief The TrainCollection class
@@ -184,6 +185,13 @@ public:
      * 用于导入车次。
      */
     void removeUnboundTrains();
+
+    /**
+     * 2022年1月23日
+     * 删除非运行图车次。用于导入车次。
+     * 原实现removeUnboundTrains()并不合适，因为受到最大跨越站数的影响。
+     */
+    void removeNonLocal(const RailCategory& cat);
 
     inline bool isNull()const { return _trains.isEmpty(); }
 

@@ -20,8 +20,8 @@ protected:
     bool updating=false;
 public:
     explicit IntervalDataModel(std::shared_ptr<Railway> railway, QObject *parent = nullptr);
-protected:
     auto railway(){return _railway;}
+protected:
     void setRailway(std::shared_ptr<Railway> r){_railway=r;}
 
     /**
@@ -70,6 +70,7 @@ public slots:
     /**
      * 当线路的站表变化时，更新区间表。
      * equiv: 更新前后是否topo等价。如果等价，则只更新区间名称；否则直接刷新。
+     * railway: 这里放的是
      */
     void updateRailIntervals(std::shared_ptr<Railway> railway, bool equiv);
 

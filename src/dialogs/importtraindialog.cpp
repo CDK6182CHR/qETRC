@@ -97,9 +97,14 @@ void ImportTrainDialog::actView()
 		QMessageBox::warning(this, tr("错误"), tr("文件错误或为空，请检查！"));
 		return;
 	}
-	diagram.applyBindOn(other);
-	if (ckLocal->isChecked())
-		other.removeUnboundTrains();
+    //2022.01.23：清除非本线车次算法修改
+	//diagram.applyBindOn(other);
+	//if (ckLocal->isChecked())
+	//	other.removeUnboundTrains();
+    if (ckLocal->isChecked()) {
+        other.removeNonLocal(diagram.railCategory());
+    }
+    diagram.applyBindOn(other);
 	widget->refreshData();
 	edFile->setText(filename);
 }

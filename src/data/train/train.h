@@ -13,6 +13,7 @@ class RailStation;
 class Railway;
 class QJsonObject;
 struct Config;
+class RailCategory;
 
 enum class TrainPassenger:
         std::int8_t{
@@ -516,6 +517,14 @@ public:
      * 返回是否变更。
      */
     bool autoBusiness();
+
+    /**
+     * 2022.01.23
+     * 本车次时刻表与cat所示线路表的车站是否有交集。
+     * 这里不考虑跨越站数，直接比对时刻表站名。
+     * 有一个交集就返回true。
+     */
+    bool isLocalTrain(const RailCategory& cat)const;
 
 
     //static比较函数 用来排序
