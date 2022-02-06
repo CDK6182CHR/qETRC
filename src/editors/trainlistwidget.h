@@ -16,6 +16,7 @@ class TrainCollection;
 class TrainListModel;
 class QTableView;
 class QLineEdit;
+class TrainType;
 
 namespace qecmd {
 
@@ -65,6 +66,20 @@ namespace qecmd {
         virtual void redo()override;
         virtual int id()const override { return ID; }
         virtual bool mergeWith(const QUndoCommand* another)override;
+    };
+
+    class BatchChangeType :public QUndoCommand {
+        TrainCollection& coll;
+        QVector<int> indexes;
+        QVector<std::shared_ptr<TrainType>> types;
+        TrainListModel* const model;
+    public:
+        BatchChangeType(TrainCollection& coll_, const QVector<int>& indexes_, std::shared_ptr<TrainType> type,
+            TrainListModel* model_, QUndoCommand* parent = nullptr);
+        virtual void undo()override { commit(); }
+        virtual void redo()override { commit(); }
+    private:
+        void commit();
     };
 }
 
@@ -116,6 +131,10 @@ private slots:
     void searchTrain();
     void clearFilter();
     void editButtonClicked();
+
+    /**
+     * 2022.02.06  实现为批量更改类型
+     */
     void batchChange();
 
     /**

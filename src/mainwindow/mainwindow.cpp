@@ -1065,6 +1065,9 @@ void MainWindow::initToolbar()
 
         connect(contextTrain, &TrainContext::dulplicateTrain,
             naviView, &NaviTree::actDulplicateTrain);
+
+        connect(trainListWidget->getModel(), &TrainListModel::onTypeBatchChanged,
+            contextTrain, &TrainContext::refreshData);
     }
 
     //context: rail 8

@@ -193,3 +193,11 @@ void TrainListModel::refreshData()
     endResetModel();
 }
 
+void TrainListModel::commitBatchChangeType(const QVector<int>& rows)
+{
+	foreach(int r, rows) {
+		emit dataChanged(index(r, ColType), index(r, ColType));
+	}
+	emit onTypeBatchChanged();
+}
+

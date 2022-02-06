@@ -199,8 +199,8 @@ void TypeManager::initDefaultTypes()
     appendRegex(QRegExp(R"([1-5]\d{3}\D)"), QObject::tr("普快"), true);
     appendRegex(QRegExp(R"(6\d{3}$)"), QObject::tr("普客"), true);
     appendRegex(QRegExp(R"(6\d{3}\D)"), QObject::tr("普客"), true);
-    appendRegex(QRegExp(R"(7[1-5]\d{2}$)"), QObject::tr("普客"), true);
-    appendRegex(QRegExp(R"(7[1-5]\d{2}\D)"), QObject::tr("普客"), true);
+    appendRegex(QRegExp(R"(7[0-5]\d{2}$)"), QObject::tr("普客"), true);
+    appendRegex(QRegExp(R"(7[0-5]\d{2}\D)"), QObject::tr("普客"), true);
     appendRegex(QRegExp(R"(7\d{3}$)"), QObject::tr("通勤"), true);
     appendRegex(QRegExp(R"(7\d{3}\D)"), QObject::tr("通勤"), true);
     appendRegex(QRegExp(R"(8\d{3}$)"), QObject::tr("通勤"), true);

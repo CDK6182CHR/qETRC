@@ -7,6 +7,8 @@
 #include <QLineEdit>
 #include <QTableView>
 #include <QHeaderView>
+#include <QMessageBox>
+#include <QInputDialog>
 
 #include <model/train/trainlistmodel.h>
 
@@ -59,7 +61,7 @@ void TrainListWidget::initUI()
 	//vlay->addLayout(h);
 	//todo: connect
 
-	auto* g = new ButtonGroup<4>({ "编辑","批量调整","添加","删除" });
+	auto* g = new ButtonGroup<4>({ "编辑","分类","添加","删除" });
 	g->setMinimumWidth(50);
 	vlay->addLayout(g);
 	g->connectAll(SIGNAL(clicked()), this, {
@@ -100,7 +102,26 @@ void TrainListWidget::editButtonClicked()
 
 void TrainListWidget::batchChange()
 {
+	auto lst = table->selectionModel()->selectedRows();
+	QVector<int> rows;
+	foreach (const auto& t , lst) {
+		rows.push_back(t.row());
+	}
+	if (rows.empty()) {
+		QMessageBox::warning(this, tr("错误"), tr("批量设置列车类型：请先选择至少一个车次！"));
+		return;
+	}
+	auto types = coll.typeNames();
+	bool ok;
+	auto nty_s = QInputDialog::getItem(this, tr("批量设置类型"), tr("将选中的[%1]个车次类型设置为：").arg(rows.count()),
+		types, 0, true, &ok);
+	auto nty = coll.typeManager().findOrCreate(nty_s);
+	if (!ok)return;
 
+	//操作压栈
+	_undo->push(new qecmd::BatchChangeType(coll, rows, nty, model));
+	QMessageBox::information(this, tr("提示"), tr("类型更新完毕。此功能不会自动重新铺画运行图，如果需要，"
+		"请手动重新铺画或刷新运行图。"));
 }
 
 
@@ -194,4 +215,22 @@ bool qecmd::SortTrains::mergeWith(const QUndoCommand* another)
 		return true;
 	}
 	return false;
+}
+
+qecmd::BatchChangeType::BatchChangeType(TrainCollection& coll_, const QVector<int>& indexes_, std::shared_ptr<TrainType> type,
+	TrainListModel* model_, QUndoCommand* parent) :
+	QUndoCommand(QObject::tr("批量更新%1个车次类型").arg(indexes_.size()), parent),
+	coll(coll_), indexes(indexes_), types(indexes_.size(), type), model(model_)
+{
+}
+
+void qecmd::BatchChangeType::commit()
+{
+	for (int i = 0; i < indexes.size(); i++) {
+		int index = indexes.at(i);
+		auto train = coll.trainAt(index);
+		std::swap(train->typeRef(), types[i]);
+		coll.updateTrainType(train, types[i]);
+	}
+	model->commitBatchChangeType(indexes);
 }

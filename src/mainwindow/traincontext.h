@@ -111,6 +111,8 @@ private:
 public slots:
     void setTrain(std::shared_ptr<Train> train_);
 
+    void refreshData();
+
     /**
      * 更新所有数据，包括自己的数据和下设的widget
      */
@@ -251,8 +253,6 @@ private slots:
     void actSelectColor();
 
     void actApply();
-
-    void refreshData();
 
     void actRemoveCurrentTrain();
 

@@ -1,6 +1,7 @@
 ﻿#include "traincollection.h"
 #include "routing.h"
 #include "train.h"
+#include "traintype.h"
 
 #include <QJsonArray>
 #include <QFile>
@@ -308,6 +309,25 @@ void TrainCollection::updateTrainInfo(std::shared_ptr<Train> train, std::shared_
 		--_typeCount[info->type()];
 		++_typeCount[train->type()];
 	}
+}
+
+void TrainCollection::updateTrainType(std::shared_ptr<Train> train, std::shared_ptr<TrainType> prev_type)
+{
+	if (auto nty = train->type(); nty != prev_type) {
+		--_typeCount[prev_type];
+		++_typeCount[nty];
+	}
+}
+
+QList<QString> TrainCollection::typeNames() const
+{
+	QList<QString> res{};
+	for (auto p = _typeCount.begin(); p != _typeCount.end(); ++p) {
+		if (p.value() >= 0) {
+			res.push_back(p.key()->name());
+		}
+	}
+	return res;
 }
 
 

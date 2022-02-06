@@ -64,6 +64,12 @@ signals:
     void trainsRemovedUndone(const QList<std::shared_ptr<Train>>& trains);
     void trainsRemovedRedone(const QList<std::shared_ptr<Train>>& trains);
 
+    /**
+     * 2022.02.06 批量更新类型
+     * 通知TrainContext更新一下数据即可
+     */
+    void onTypeBatchChanged();
+
 public slots:
     /**
      * 撤销或重做排序，操作都一样。由UndoCommand调用
@@ -114,6 +120,12 @@ public slots:
     void updateAllTrainTypes();
 
     void refreshData();
+
+    /**
+     * 2022.02.06
+     * 批量更新列车类型后调用，即更新表的内容。
+     */
+    void commitBatchChangeType(const QVector<int>& rows);
 };
 
 

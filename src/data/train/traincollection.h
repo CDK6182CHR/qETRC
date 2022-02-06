@@ -230,6 +230,19 @@ public:
      */
     void updateTrainInfo(std::shared_ptr<Train> train, std::shared_ptr<Train> info);
 
+    /**
+     * 2022.02.06  更新类型。
+     * updateTrainInfo()的类型统计部分。
+     * prev_type: 以前的类型。
+     */
+    void updateTrainType(std::shared_ptr<Train> train, std::shared_ptr<TrainType> prev_type);
+
+    /**
+     * 2022.02.06
+     * 返回所有存在车次的类型名称。依据查找表。
+     */
+    QList<QString> typeNames()const;
+
 private:
     /**
      * @brief addMapInfo
