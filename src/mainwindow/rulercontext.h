@@ -87,6 +87,12 @@ public slots:
 
     void dulplicateRuler(std::shared_ptr<Ruler> ruler);
 
+    /**
+     * 标尺合并；操作压栈
+     * 并不要求ruler是当前的。
+     */
+    void mergeWith(std::shared_ptr<Ruler> ruler);
+
 private slots:
 
     void actShowEditWidget();
@@ -103,6 +109,7 @@ private slots:
      */
     void actDulplicateRuler();
 
+    void mergeCurrent();
 
 };
 

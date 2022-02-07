@@ -41,6 +41,8 @@ public:
     inline bool isNull()const { return interval == 0 && start == 0 && stop == 0; }
 
     void swap(RulerNode& other);
+
+    void mergeWith(const RulerNode& other, bool cover);
 };
 
 

@@ -16,6 +16,7 @@
 #include "railnet/path/railpreviewdialog.h"
 #include "railnet/graph/viewadjacentwidget.h"
 #include "wizards/selectpath/selectpathwizard.h"
+#include "util/selectrailwaystable.h"
 
 RailDBContext::RailDBContext(SARibbonContextCategory *cont, MainWindow *mw_):
     QObject(mw_), cont(cont),mw(mw_),
@@ -23,6 +24,8 @@ RailDBContext::RailDBContext(SARibbonContextCategory *cont, MainWindow *mw_):
 {
     connect(window->getNavi(), &RailDBNavi::deactivated,
         this, &RailDBContext::onWindowDeactivated);
+    connect(window->getNavi(), &RailDBNavi::importFromCurrent,
+        this, &RailDBContext::actImportFromCurrent);
     initUI();
 }
 
@@ -51,8 +54,7 @@ void RailDBContext::initUI()
     act->setText(tr("数据库面板"));
     act->setToolTip(tr("线路数据库面板 (Ctrl+H)\n"
         "显示或隐藏线路数据库管理面板。"));
-    btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
+    panel->addLargeAction(act);
 
     if constexpr (true) {
         quickDock = new ads::CDockWidget(tr("快速切片"));
@@ -65,31 +67,54 @@ void RailDBContext::initUI()
     act->setIcon(QIcon(":/icons/diagram.png"));
     act->setToolTip(tr("快速径路选择 (Ctrl+J)\n"
         "给出关键点，用最短路算法计算径路，生成切片。"));
-    btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
+    panel->addLargeAction(act);
 
     act = new QAction(QIcon(":/icons/polyline.png"), tr("经由选择"), this);
     connect(act, &QAction::triggered, this, &RailDBContext::actPathSelector);
     act->setToolTip(tr("经由选择器 (Ctrl+K)\n"
         "弹出向导，从线网中手动选择径路，生成线路及其运行图。"));
-    btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
+    panel->addLargeAction(act);
 
     panel = page->addPannel(tr("查看"));
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileDialogContentsView),
         tr("邻接表"), this);
-    btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
+    panel->addLargeAction(act);
     act->setToolTip(tr("查看邻接表\n查看当前数据库的有向图模型邻接表"));
     connect(act, &QAction::triggered, this, &RailDBContext::actShowAdj);
 
     panel = page->addPannel(tr("调整"));
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_BrowserReload),
         tr("刷新线网"), this);
-    btn = panel->addLargeAction(act);
+    panel->addLargeAction(act);
     connect(act, &QAction::triggered, this, &RailDBContext::actRefreshNet);
     act->setToolTip(tr("刷新线网\n从当前线路数据库中重新读取有向图模型。"));
-    btn->setMinimumWidth(80);
+
+
+    panel = page->addPannel(tr("线路"));
+    act = new QAction(QIcon(":/icons/diagram.png"), tr("导出运行图"), this);
+    act->setToolTip(tr("导出到运行图\n将数据库中当前所选线路导出至当前打开的运行图。"));
+    panel->addLargeAction(act);
+    connect(act, &QAction::triggered, getNavi(), &RailDBNavi::actExportToDiagram);
+
+    act = new QAction(qApp->style()->standardIcon(QStyle::SP_FileIcon), tr("导出文件"), this);
+    act->setToolTip(tr("导出到文件\n导出数据库中当前所选线路为单线路运行图文件。"));
+    panel->addMediumAction(act);
+    connect(act, &QAction::triggered, getNavi(), &RailDBNavi::actExportRailToFile);
+
+    act = new QAction(qApp->style()->standardIcon(QStyle::SP_TrashIcon), tr("删除线路"), this);
+    act->setToolTip(tr("删除线路\n从数据库中删除当前所选线路。"));
+    panel->addMediumAction(act);
+    connect(act, &QAction::triggered, getNavi(), &RailDBNavi::actRemoveRail);
+
+    act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺"), this);
+    act->setToolTip(tr("编辑标尺\n编辑数据库所选线路下属标尺。"));
+    panel->addMediumAction(act);
+    connect(act, &QAction::triggered, getNavi(), &RailDBNavi::actRuler);
+
+    act = new QAction(QIcon(":/icons/forbid.png"), tr("天窗"), this);
+    act->setToolTip(tr("编辑天窗\n编辑数据库所选线路下属的天窗。"));
+    panel->addMediumAction(act);
+    connect(act, &QAction::triggered, getNavi(), &RailDBNavi::actForbid);
 
 
     panel = page->addPannel(tr(""));
@@ -98,8 +123,7 @@ void RailDBContext::initUI()
     act->setToolTip(tr("关闭线路数据库\n关闭线路数据库面板，关闭打开的文件，清空数据。\n"
         "下次打开时，需要重新读取文件。"));
     connect(act, &QAction::triggered, this, &RailDBContext::deactivateDB);
-    btn=panel->addLargeAction(act);
-    btn->setMinimumWidth(70);
+    panel->addLargeAction(act);
 }
 
 bool RailDBContext::deactiveOnClose()
@@ -264,4 +288,25 @@ void RailDBContext::previewRail(std::shared_ptr<Railway> railway, const QString&
     }
     dlgPreview->setRailway(railway, pathString);
     dlgPreview->open();
+}
+
+void RailDBContext::actImportFromCurrent(const std::deque<int>& path, int path_count)
+{
+    bool ok;
+    auto rails = SelectRailwaysTable::dlgGetRailways(mw, mw->diagram(), tr("选择线路"),
+        tr("请选择要导入到数据库的线路，可多选"), &ok);
+    if (!ok)return;
+    if (rails.empty()) {
+        QMessageBox::warning(mw, tr("错误"), tr("没有选择线路。请选择至少一条线路来导入。"));
+        return;
+    }
+
+    // 下面：实施导入操作
+    for (auto p : rails) {
+        p->setName(_raildb->validRailwayNameRec(p->name()));
+    }
+
+    auto np = path;
+    np.push_back(path_count);
+    getNavi()->undoStack()->push(new qecmd::ImportRailsDB(rails, np, getNavi()->getModel()));
 }

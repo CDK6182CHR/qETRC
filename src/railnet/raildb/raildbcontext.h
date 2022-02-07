@@ -74,6 +74,16 @@ public slots:
 
     void actPathSelector();
 
+    /**
+     * 2022.02.07
+     * 这里破例使用Diagram接口。
+     * 从当前的Diagram中选择（一部分）线路导入path所示的分类下；
+     * path: 要导入的分类。这里不检查path的性质。
+     * path_count: 当前分类下的线路子对象数目，用于确定新增线路的位置。
+     * 如果重名，自动重命名。操作压栈。
+     */
+    void actImportFromCurrent(const std::deque<int>& path, int path_count);
+
 private:
 
     /**

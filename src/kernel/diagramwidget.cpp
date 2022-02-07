@@ -63,6 +63,8 @@ void DiagramWidget::paintGraph()
     auto clock_start = std::chrono::system_clock::now();
     updating = true;
     clearGraph();
+    // 2022.02.07：更改页面设置后，这个可能会变
+    startTime = QTime(config().start_hour, 0, 0);
     _selectedTrain = nullptr;
     emit showNewStatus(QString("正在铺画运行图"));
 
@@ -1161,7 +1163,7 @@ void DiagramWidget::locateToMile(std::shared_ptr<const Railway> railway, double 
             "可能是因为所给里程标不在有效范围内。"));
         return;
     }
-    double y = std::get<0>(info.value()) + _page->railwayStartY(*railway);
+    double y = railway->yValueFromCoeff(std::get<0>(info.value()), config()) + _page->railwayStartY(*railway);
     double x = calXFromStart(tm);
     if (x > config().diagramWidth()) {
         QMessageBox::warning(this, tr("错误"), tr("无法定位到所给时刻，"

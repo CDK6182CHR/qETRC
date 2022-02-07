@@ -1,10 +1,10 @@
 ﻿#pragma once
 
 #include <QHBoxLayout>
+#include <QComboBox>
 #include <memory>
 
 class RailCategory;
-class QComboBox;
 class Railway;
 class Ruler;
 /**
@@ -58,3 +58,20 @@ public slots:
     void refreshRailwayList();
 };
 
+
+/**
+ * 2022.02.07  对指定Railway中的Ruler的Combo
+ */
+class RulerCombo :public QComboBox
+{
+    Q_OBJECT
+    std::shared_ptr<Railway> _railway;
+    std::shared_ptr<Ruler> _ruler{};
+public:
+    RulerCombo(std::shared_ptr<Railway> railway, QWidget* parent = nullptr);
+    auto ruler() { return _ruler; }
+private:
+    void refreshData();
+private slots:
+    void onCurrentChanged(int i);
+};

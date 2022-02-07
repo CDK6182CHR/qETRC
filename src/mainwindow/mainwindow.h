@@ -96,6 +96,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    /**
+     * 2022.02.07  这个接口尽量不要用
+     */
+    auto& diagram() { return _diagram; }
+
 
     /**
      * 注意既然是Undo，这个就肯定在栈顶，直接删除最后一个就好了

@@ -86,12 +86,12 @@ void PageContext::initUI()
     act->setMenu(me);
 
     auto* btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(70);
+    //btn->setMinimumWidth(70);
   
 
     act = new QAction(QIcon(":/icons/pdf.png"), tr("导出"), this);
     btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(70);
+    //btn->setMinimumWidth(70);
     connect(act, SIGNAL(triggered()), this, SLOT(actPrint()));
 
     act = new QAction(QIcon(":/icons/config.png"), tr("显示设置"), this);
@@ -101,7 +101,7 @@ void PageContext::initUI()
         &PageContext::actUseDiagramConfig);
     act->setMenu(me);
     btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
+    //btn->setMinimumWidth(80);
 
     act->setToolTip(tr("显示设置\n设置当前运行图页面的显示参数，不影响其他运行图页面。"));
 
@@ -112,7 +112,7 @@ void PageContext::initUI()
     act->setToolTip(tr("转到运行图页面\n打开或者切换到当前运行图页面。"));
     connect(act, &QAction::triggered, this, &PageContext::actActivatePage);
     btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(70);
+    //btn->setMinimumWidth(70);
 
     act = new QAction(QIcon(":/icons/rail.png"), tr("编辑线路"), this);
     act->setToolTip(tr("编辑线路\n编辑当前运行图页面中的线路数据"));
@@ -121,7 +121,7 @@ void PageContext::initUI()
     me->addAction(tr("转到线路"), this, &PageContext::actSwitchToRailway);
     act->setMenu(me);
     btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
+    //btn->setMinimumWidth(80);
 
     panel = page->addPannel("");
 
@@ -142,7 +142,7 @@ void PageContext::initUI()
     act->setToolTip(tr("关闭面板\n关闭当前的运行图页面上下文工具栏页面"));
     connect(act, &QAction::triggered, mw, &MainWindow::focusOutPage);
     btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
+    //btn->setMinimumWidth(80);
 }
 
 std::shared_ptr<Railway> PageContext::selectRailway()
@@ -248,7 +248,7 @@ void PageContext::commitEditInfo(std::shared_ptr<DiagramPage> page, std::shared_
     page->swapBaseInfo(*newinfo);
     if (page->name() != newinfo->name()) {
         int i = mw->_diagram.getPageIndex(page);
-        mw->diagramDocks.at(i)->setWindowTitle(tr("运行图 - ") + page->name());
+        mw->diagramDocks.at(i)->setWindowTitle(page->name());
         emit pageNameChanged(i);
     }
         

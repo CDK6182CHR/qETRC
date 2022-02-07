@@ -209,6 +209,20 @@ public:
     inline std::shared_ptr<Railway> railway() { return _railway.lock(); }
     inline std::shared_ptr<Railway> railway()const { return _railway.lock(); }
 
+    /**
+     * 2022.02.07
+     * 合并数据，利用_Node下面的swapWith()方法
+     * 不要求跟自己属于同一线路。
+     * cover: 如果冲突，是否用对方的覆盖自己的
+     */
+    void mergeWith(RailIntervalData<_Node, _Data>& other, bool cover) {
+        for (auto n1 = firstDownNode(), n2 = other.firstDownNode();
+            n1 && n2; n1 = n1->nextNodeCirc(), n2 = n2->nextNodeCirc())
+        {
+            n1->mergeWith(*n2, cover);
+        }
+    }
+
 protected:
     void swap(RailIntervalData<_Node, _Data>& other) {
         std::swap(_different, other._different);

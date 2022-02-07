@@ -41,4 +41,5 @@ QString GeneralDoubleSpinDelegate::displayText(const QVariant &value,
 void GeneralDoubleSpinDelegate::setupSpin(QDoubleSpinBox *sp) const
 {
     sp->setRange(-1000000,100000);
+    sp->setDecimals(_decimals);
 }

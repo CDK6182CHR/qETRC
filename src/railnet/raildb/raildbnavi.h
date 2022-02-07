@@ -90,6 +90,9 @@ signals:
      * 退出DB模式；提示Main关闭相关页面
      */
     void deactivated();
+
+    void importFromCurrent(const std::deque<int>& path, int path_count);
+
 private slots:
     void showContextMenu(const QPoint& pos);
     
@@ -155,6 +158,12 @@ public slots:
     void actImportFromLib();
 
     void actRenameCategory();
+
+    /**
+     * 2022.02.07  从当前运行图导入
+     * 操作主要交给RailDBContext实施
+     */
+    void actImportFromCurrent();
 
     /**
      * 从当前运行图导入线路

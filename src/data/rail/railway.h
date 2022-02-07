@@ -562,6 +562,10 @@ public:
      * 同时交换Ruler/Forbid中的Railway引用！！
      * 此操作后，与列车的绑定数据失效
      * precondition: 标尺、天窗的数目一致。
+     * 2022.02.07新增要求：标尺、天窗头结点数据分别一致。
+     * other的标尺、天窗数据实际上来自于mergeIntervalData()。
+     * postcondition: 有效的ruler, forbid（头结点）地址不变。
+     * （实际上就是ruler根本不变）
      */
     void swapBaseWith(Railway& other);
 

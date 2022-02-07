@@ -26,8 +26,16 @@ void ADiagramPage::initUI()
 
     auto* btn=new QPushButton(tr("转到车次"));
     hlay->addWidget(btn);
-    vlay->addLayout(hlay);
     connect(btn,&QPushButton::clicked,this,&ADiagramPage::actToTrain);
+
+//    btn=new QPushButton("+");
+//    hlay->addWidget(btn);
+//    connect(btn,&QPushButton::clicked,this,&ADiagramPage::actZoomIn);
+//    btn=new QPushButton("-");
+//    hlay->addWidget(btn);
+//    connect(btn,&QPushButton::clicked,this,&ADiagramPage::actZoomOut);
+
+    vlay->addLayout(hlay);
 
     stack=new QStackedWidget;
     vlay->addWidget(stack);
@@ -81,6 +89,20 @@ void ADiagramPage::actToTrain()
         QMessageBox::warning(this,tr("错误"),tr("没有选中的车次！"));
     }
     emit switchToTrain(t);
+}
+
+void ADiagramPage::actZoomIn()
+{
+    if (auto* pg=currentPage()){
+        pg->zoomIn();
+    }
+}
+
+void ADiagramPage::actZoomOut()
+{
+    if (auto* pg=currentPage()){
+        pg->zoomOut();
+    }
 }
 
 

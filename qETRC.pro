@@ -134,6 +134,7 @@ SOURCES += \
     src/util/railrangecombo.cpp \
     src/util/railrulercombo.cpp \
     src/util/selectrailwaycombo.cpp \
+    src/util/selectrailwaystable.cpp \
     src/util/selecttraincombo.cpp \
     src/viewers/diagnosisdialog.cpp \
     src/viewers/events/railsectionevents.cpp \
@@ -307,6 +308,7 @@ HEADERS += \
     src/util/railrangecombo.h \
     src/util/railrulercombo.h \
     src/util/selectrailwaycombo.h \
+    src/util/selectrailwaystable.h \
     src/util/selecttraincombo.h \
     src/viewers/diagnosisdialog.h \
     src/viewers/events/railsectionevents.h \

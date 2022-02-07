@@ -124,4 +124,10 @@ void ForbidNode::swap(ForbidNode& other)
     std::swap(endTime, other.endTime);
 }
 
+void ForbidNode::mergeWith(const ForbidNode& other, bool cover)
+{
+    if (isNull() || (cover && !other.isNull()))
+        *this = other;
+}
+
 

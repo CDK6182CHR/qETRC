@@ -212,6 +212,7 @@
     <ClCompile Include="src\data\diagram\config.cpp" />
     <ClCompile Include="src\editors\configdialog.cpp" />
     <ClCompile Include="src\util\railrangecombo.cpp" />
+    <ClCompile Include="src\util\selectrailwaystable.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\conflictdialog.cpp" />
     <ClCompile Include="src\dialogs\correcttimetabledialog.cpp" />
     <ClCompile Include="src\editors\routing\detectroutingdialog.cpp" />
@@ -573,6 +574,7 @@
     <QtMoc Include="src\editors\systemjsondialog.h">
     </QtMoc>
     <QtMoc Include="src\util\railrangecombo.h" />
+    <QtMoc Include="src\util\selectrailwaystable.h" />
     <ClInclude Include="src\wizards\timeinterp\timeinterppagepreview.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterppagetrain.h">
     </QtMoc>

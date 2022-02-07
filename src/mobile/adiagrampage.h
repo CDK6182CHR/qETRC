@@ -31,8 +31,10 @@ signals:
     void switchToTrain(std::shared_ptr<Train>);
 public slots:
     void refreshData();
-private:
+private slots:
     void actToTrain();
+    void actZoomIn();
+    void actZoomOut();
 
 };
 

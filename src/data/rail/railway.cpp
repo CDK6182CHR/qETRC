@@ -1100,16 +1100,18 @@ bool Railway::mergeIntervalData(const Railway& other)
 void Railway::swapBaseWith(Railway& other)
 {
 	std::swap(_stations, other._stations);   //浅拷贝（移动）
-	std::swap(_rulers, other._rulers);
-	std::swap(_forbids, other._forbids);
+	// 2022.02.07：不能直接交换头结点引用。
+	// 按照约定，Ruler对象的地址应当保持不变
+	//std::swap(_rulers, other._rulers);
+	//std::swap(_forbids, other._forbids);
 	std::swap(nameMap, other.nameMap);
 	std::swap(fieldMap, other.fieldMap);
-	for (int i = 0; i < _rulers.count(); i++) {
-		std::swap(_rulers[i]->_railway, other._rulers[i]->_railway);
-	}
-	for (int i = 0; i < _forbids.count(); i++) {
-		std::swap(_forbids[i]->_railway, other._forbids[i]->_railway);
-	}
+	//for (int i = 0; i < _rulers.count(); i++) {
+	//	std::swap(_rulers[i]->_railway, other._rulers[i]->_railway);
+	//}
+	//for (int i = 0; i < _forbids.count(); i++) {
+	//	std::swap(_forbids[i]->_railway, other._forbids[i]->_railway);
+	//}
 	//ordinate
 	if (_ordinate) {
 		_ordinate = _rulers.at(_ordinate->index());

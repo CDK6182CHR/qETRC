@@ -84,7 +84,7 @@ QTime TimetableQuickModel::arriveTimeForRow(int row) const
 
 QTime TimetableQuickModel::departTimeForRow(int row) const
 {
-    if (row % 2 != 0)row++;
+    if (row % 2 == 0)row++;
     return item(row, ColTime)->data(qeutil::TimeDataRole).toTime();
 }
 

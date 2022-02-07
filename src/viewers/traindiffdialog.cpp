@@ -102,6 +102,8 @@ void TrainDiffModel::setTrainMap(std::shared_ptr<Train> train, intermap_t& imap)
     if (!train)
         return;
     auto adp = train->adapterFor(*railway);
+    if (!adp)
+        return;
     foreach(auto line, adp->lines()) {
         if (line->count() > 1) {
             auto pr = line->stations().begin();

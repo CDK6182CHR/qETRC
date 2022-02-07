@@ -114,3 +114,29 @@ void RailRulerCombo::refreshRailwayList()
         cbRail->addItem(p->name());
     }
 }
+
+RulerCombo::RulerCombo(std::shared_ptr<Railway> railway, QWidget* parent):
+    QComboBox(parent),_railway(railway)
+{
+    refreshData();
+    connect(this, qOverload<int>(&QComboBox::currentIndexChanged),
+        this, &RulerCombo::onCurrentChanged);
+}
+
+void RulerCombo::refreshData()
+{
+    clear();
+    foreach(auto ruler, _railway->rulers()) {
+        addItem(ruler->name());
+    }
+}
+
+void RulerCombo::onCurrentChanged(int index)
+{
+    if (index >= 0) {
+        _ruler = _railway->rulers().at(index);
+    }
+    else {
+        _ruler.reset();
+    }
+}

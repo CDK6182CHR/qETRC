@@ -111,6 +111,7 @@ void NaviTree::initContextMenus()
     //Ruler
     act = meRuler->addAction(tr("编辑标尺"));
     connect(act, SIGNAL(triggered()), this, SLOT(onEditRulerContext()));
+    meRuler->addAction(tr("合并标尺"), this, &NaviTree::onMergeRulerContext);
     act = meRuler->addAction(tr("删除标尺"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemoveRulerContext()));
     meRuler->addAction(tr("创建标尺副本"), this, &NaviTree::onDulplicateRulerContext);
@@ -274,6 +275,15 @@ void NaviTree::onEditRulerContext()
     ACI* item = getItem(idx);
     if (item && item->type() == navi::RulerItem::Type) {
         emit editRuler(static_cast<navi::RulerItem*>(item)->ruler());
+    }
+}
+
+void NaviTree::onMergeRulerContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::RulerItem::Type) {
+        emit mergeRuler(static_cast<navi::RulerItem*>(item)->ruler());
     }
 }
 

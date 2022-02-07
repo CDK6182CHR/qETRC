@@ -640,7 +640,7 @@ void MainWindow::initToolbar()
         act->setToolTip(tr("导航面板 (F3)\n打开或关闭运行图总导航面板。"));
         act->setIcon(QIcon(":/icons/Graph-add.png"));
         auto* btn = panel->addLargeAction(act);
-        btn->setMinimumWidth(80);
+        //btn->setMinimumWidth(80);
 
         act = trainListDock->toggleViewAction();
         actTrainList = act;
@@ -648,7 +648,7 @@ void MainWindow::initToolbar()
         act->setToolTip(tr("列车管理\n打开或关闭（pyETRC风格的）列车管理列表面板。"));
         act->setIcon(QApplication::style()->standardIcon(QStyle::SP_FileDialogListView));
         btn = panel->addLargeAction(act);
-        btn->setMinimumWidth(80);
+        //btn->setMinimumWidth(80);
 
         SARibbonMenu* menu = new SARibbonMenu(this);
         pageMenu = menu;
@@ -656,7 +656,7 @@ void MainWindow::initToolbar()
         menu->setTitle(QObject::tr("运行图窗口"));
         menu->setIcon(QIcon(":/icons/diagram.png"));
         btn = panel->addLargeMenu(menu);
-        btn->setMinimumWidth(80);
+        //btn->setMinimumWidth(80);
 
         //undo  试一下把dock也放在这里初始化...
 
@@ -666,13 +666,13 @@ void MainWindow::initToolbar()
         act->setToolTip(tr("历史记录\n打开或关闭历史记录面板。\n" 
             "历史记录面板记录了可撤销的针对运行图文档的操作记录，可以查看、撤销、重做。"));
         btn = panel->addLargeAction(act);
-        btn->setMinimumWidth(80);
+        //btn->setMinimumWidth(80);
 
         act = new QAction(QIcon(":/icons/add.png"), tr("添加运行图"), this);
         act->setToolTip(tr("添加运行图\n选择既有基线数据，建立新的运行图页面。"));
         connect(act, SIGNAL(triggered()), naviView, SLOT(addNewPage()));
         btn = panel->addLargeAction(act);
-        btn->setMinimumWidth(80);
+        //btn->setMinimumWidth(80);
 
         panel = cat->addPannel(tr("更新"));
         act = new QAction(QApplication::style()->standardIcon(QStyle::SP_BrowserReload),
@@ -692,7 +692,7 @@ void MainWindow::initToolbar()
         addAction(act);
         connect(act, SIGNAL(triggered()), this, SLOT(actChangeStationName()));
         btn = panel->addLargeAction(act);
-        btn->setMinimumWidth(80);
+        //btn->setMinimumWidth(80);
 
         panel = cat->addPannel(tr("系统"));
         act = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation),
@@ -1108,6 +1108,8 @@ void MainWindow::initToolbar()
             contextRuler, &RulerContext::actRemoveRulerNavi);
         connect(naviView, &NaviTree::dulplicateRuler,
             contextRuler, &RulerContext::dulplicateRuler);
+        connect(naviView, &NaviTree::mergeRuler,
+            contextRuler, &RulerContext::mergeWith);
     }
 
     //context: routing 0
@@ -1852,7 +1854,8 @@ void MainWindow::insertPageWidget(std::shared_ptr<DiagramPage> page, int index)
     using namespace std::chrono_literals;
     auto start = std::chrono::system_clock::now();
     DiagramWidget* dw = new DiagramWidget(_diagram, page);
-    auto* dock = new ads::CDockWidget(tr("运行图 - %1").arg(page->name()));
+    auto* dock = new ads::CDockWidget(page->name());
+    dock->setIcon(QIcon(":/icons/diagram.png"));
     dock->setWidget(dw);
     
     if (SystemJson::instance.use_central_widget) {

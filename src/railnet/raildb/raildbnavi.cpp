@@ -104,6 +104,7 @@ void RailDBNavi::initContext()
     meCat->addAction(tr("导出为子数据库文件"), this,
         &RailDBNavi::actExportCategoryToLib);
     meCat->addSeparator();
+    meCat->addAction(tr("从当前运行图导入线路"), this, &RailDBNavi::actImportFromCurrent);
     meCat->addAction(tr("从运行图文件导入线路"), this, &RailDBNavi::actImportFromDiagram);
     meCat->addAction(tr("导入子数据库文件"), this, &RailDBNavi::actImportFromLib);
 
@@ -380,7 +381,6 @@ void RailDBNavi::actImportFromDiagram()
         path.emplace_back(it->childCount());
         _undo->push(new qecmd::ImportRailsDB(lst, path, model));
     }
-
     else {
         QMessageBox::warning(this, tr("错误"), tr("文件格式错误或为空，无法读取线路数据。"));
     }
@@ -437,6 +437,16 @@ void RailDBNavi::actRenameCategory()
     else {
         _undo->push(new qecmd::UpdateCategoryNameDB(cat, name, it->path(), model));
     }
+}
+
+void RailDBNavi::actImportFromCurrent()
+{
+    auto* it = currentItem();
+    if (!it)return;
+    if (it->type() == navi::RailwayItemDB::Type)it = it->parent();
+    auto cat = static_cast<navi::RailCategoryItem*>(it)->category();
+
+    emit importFromCurrent(it->path(), it->childCount());
 }
 
 void RailDBNavi::openRulerWidget(std::shared_ptr<Ruler> ruler)

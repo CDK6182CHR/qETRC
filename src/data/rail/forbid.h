@@ -39,6 +39,8 @@ public:
     }
 
     void swap(ForbidNode& other);
+
+    void mergeWith(const ForbidNode& other, bool cover);
 };
 
 

@@ -55,4 +55,13 @@ void RulerNode::swap(RulerNode& other)
     std::swap(stop, other.stop);
 }
 
+#define MERGE(_key) if(! _key || (cover && other._key)) _key=other._key
+
+void RulerNode::mergeWith(const RulerNode& other, bool cover)
+{
+    MERGE(interval);
+    MERGE(start);
+    MERGE(stop);
+}
+
 

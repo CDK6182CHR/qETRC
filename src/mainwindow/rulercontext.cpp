@@ -3,10 +3,14 @@
 #include "railcontext.h"
 
 #include "dialogs/rulerfromtraindialog.h"
+#include "util/railrulercombo.h"
 #include <QApplication>
 #include <QStyle>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QLabel>
+#include <QCheckBox>
+#include <QDialogButtonBox>
 
 RulerContext::RulerContext(Diagram& diagram_, SARibbonContextCategory *context, MainWindow *mw_):
     QObject(mw_),diagram(diagram_), cont(context),mw(mw_)
@@ -65,6 +69,11 @@ void RulerContext::initUI()
         "从单个车次在本线的运行情况提取标尺数据，并覆盖到本标尺中。"));
     connect(act, SIGNAL(triggered()), this, SLOT(actReadFromSingleTrain()));
     btn = panel->addMediumAction(act);
+
+    act = new QAction(qApp->style()->standardIcon(QStyle::SP_ArrowBack), tr("合并标尺"), this);
+    act->setToolTip(tr("合并标尺\n与本线路的其他标尺合并。"));
+    connect(act, &QAction::triggered, this, &RulerContext::mergeCurrent);
+    panel->addMediumAction(act);
 
     panel = page->addPannel(tr("设置"));
     act = new QAction(QIcon(":/icons/ruler.png"), tr("排图标尺"), this);
@@ -210,9 +219,51 @@ void RulerContext::dulplicateRuler(std::shared_ptr<Ruler> ruler)
     stk->endMacro();
 }
 
+void RulerContext::mergeWith(std::shared_ptr<Ruler> ruler)
+{
+    auto rail = ruler->railway();
+    // 现在：现场构造一个Dialog..
+    auto* dialog = new QDialog(mw);
+    dialog->setWindowTitle(tr("合并标尺"));
+    auto* vlay = new QVBoxLayout(dialog);
+    auto* lab = new QLabel(tr("从本线路的下列标尺合并数据到当前标尺[%1]").arg(ruler->name()));
+    vlay->addWidget(lab);
+    auto* cb = new RulerCombo(rail);
+    vlay->addWidget(cb);
+    auto* ck = new QCheckBox(tr("对重复的数据，覆盖当前标尺既有数据"));
+    vlay->addWidget(ck);
+    auto* box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal);
+    connect(box, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+    connect(box, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+    vlay->addWidget(box);
+    auto t = dialog->exec();
+    ////
+    auto ref = cb->ruler();
+    if (!t || !ref) 
+        return;
+    else if (ref == ruler) {
+        QMessageBox::warning(mw, tr("错误"), tr("源数据标尺和当前标尺重复，无需合并。"));
+        return;
+    }
+    auto data_r = ruler->clone();   // 更新在这个对象里面
+    auto data = data_r->getRuler(0);
+    
+    data->mergeWith(*ref, ck->isChecked());
+    mw->getUndoStack()->push(new qecmd::UpdateRuler(ruler, data_r, this));
+
+    // 清理掉dialog
+    dialog->setParent(nullptr);
+    dialog->deleteLater();
+}
+
 void RulerContext::actDulplicateRuler()
 {
     dulplicateRuler(this->ruler);
+}
+
+void RulerContext::mergeCurrent()
+{
+    mergeWith(this->ruler);
 }
 
 void RulerContext::actShowEditWidget()

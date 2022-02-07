@@ -4,7 +4,7 @@
 
 namespace qespec {
 	inline constexpr std::string_view TITLE = "qETRC";
-	inline constexpr std::string_view VERSION = "V1.0.4";
-	inline constexpr std::string_view RELEASE = "R9";
-    inline constexpr std::string_view DATE = "20220202";
+	inline constexpr std::string_view VERSION = "V1.0.5";
+	inline constexpr std::string_view RELEASE = "R10";
+    inline constexpr std::string_view DATE = "20220207";
 }

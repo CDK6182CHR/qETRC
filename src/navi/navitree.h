@@ -67,6 +67,7 @@ signals:
     void editRailway(std::shared_ptr<Railway>);
     void editTrain(std::shared_ptr<Train>);
     void editRuler(std::shared_ptr<Ruler>);
+    void mergeRuler(std::shared_ptr<Ruler>);
     void editForbid(std::shared_ptr<Forbid>, std::shared_ptr<Railway>);
     void editRouting(std::shared_ptr<Routing>);
     void activatePageAt(int i);
@@ -122,6 +123,8 @@ private slots:
     void onEditTrainContext();
 
     void onEditRulerContext();
+
+    void onMergeRulerContext();
 
     void onEditForbidContext();
 
