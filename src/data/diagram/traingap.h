@@ -86,6 +86,16 @@ struct TrainGap{
 
     static bool ltSecs(const std::shared_ptr<TrainGap>& gap1,
         const std::shared_ptr<TrainGap>& gap2);
+
+    /**
+     * 2022.03.06
+     * 根据前后两事件，判断两个事件之间的间隔类型。
+     * 如果两事件之间不构成间隔，则返回空。
+     * @param singleLine  单线标记。此标记下判定反向间隔，否则忽略。
+     */
+    static std::optional< std::pair<RailStationEvent::Positions, TrainGap::GapTypes>>
+        gapTypeBetween(std::shared_ptr<RailStationEvent> left, std::shared_ptr<RailStationEvent> right, 
+            bool singleLine);
 };
 
 Q_DECLARE_METATYPE(std::shared_ptr<TrainGap>);

@@ -123,9 +123,23 @@ struct RailStationEvent {
      * 当前事件是否对应于有标尺的附加时分参与
      */
     bool hasAppend()const;
+
+    struct PtrTimeComparator {
+        bool operator()(const std::shared_ptr<RailStationEvent>& ev1,
+            const std::shared_ptr<RailStationEvent>& ev2)const {
+            return ev1->time.msecsSinceStartOfDay() < ev2->time.msecsSinceStartOfDay();
+        }
+        bool operator()(const QTime& tm, const std::shared_ptr<RailStationEvent>& ev2)const{
+            return tm.msecsSinceStartOfDay() < ev2->time.msecsSinceStartOfDay();
+        }
+        bool operator()(const std::shared_ptr<RailStationEvent>& ev1, const QTime& tm)const{
+            return ev1->time.msecsSinceStartOfDay()<tm.msecsSinceStartOfDay();
+        }
+    };
 };
 
-using RailStationEventList = QVector<std::shared_ptr<RailStationEvent>>;
+//2022.03.06  改为继承 see stationeventaxis.h
+//using RailStationEventList = QVector<std::shared_ptr<RailStationEvent>>;
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(RailStationEvent::Positions)
 

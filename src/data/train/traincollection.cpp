@@ -330,6 +330,28 @@ QList<QString> TrainCollection::typeNames() const
 	return res;
 }
 
+diagram_diff_t TrainCollection::diffWith(const TrainCollection& other)
+{
+	diagram_diff_t res{};
+	auto anotherFullMap = other.fullNameMap;   // copy construct
+	foreach(auto train, _trains) {
+		const auto& name = train->trainName().full();
+		if (auto itr = anotherFullMap.find(name); itr == anotherFullMap.end()) {
+            res.emplace_back(std::make_shared<TrainDifference>(
+                                 TrainDifference::Deleted, train));
+		}
+		else {
+            res.emplace_back(std::make_shared<TrainDifference>(train, itr.value()));  // 最慢
+			anotherFullMap.erase(itr);
+		}
+	}
+	for (auto itr = anotherFullMap.begin(); itr != anotherFullMap.end(); ++itr) {
+        res.emplace_back(std::make_shared<TrainDifference>(
+                             TrainDifference::NewAdded, itr.value()));
+	}
+	return res;
+}
+
 
 void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 {

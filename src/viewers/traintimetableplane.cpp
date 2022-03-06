@@ -7,7 +7,7 @@
 #include "data/train/train.h"
 
 TrainTimetablePlane::TrainTimetablePlane(QWidget *parent) :
-    QTableView(parent), model(new TimetableStdModel(false,this))
+    QTableView(parent), model(new TimetableConstModel(this))
 {
     setModel(model);
     verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
@@ -18,7 +18,7 @@ TrainTimetablePlane::TrainTimetablePlane(QWidget *parent) :
         new QETimeDelegate(this));
 }
 
-void TrainTimetablePlane::setTrain(std::shared_ptr<Train> train_)
+void TrainTimetablePlane::setTrain(std::shared_ptr<const Train> train_)
 {
     train=train_;
     model->setTrain(train);

@@ -59,7 +59,8 @@ void TimetableStdModel::setupModel()
     for(auto p=_train->timetable().begin();p!=_train->timetable().end();
         ++p,++row)
     {
-        setItem(row,ColName,new SI(p->name.toSingleLiteral()));
+        auto* itname = new SI(p->name.toSingleLiteral());
+        setItem(row, ColName, itname);
 
         auto* it=new SI;
         it->setData(p->arrive,Qt::EditRole);
@@ -85,6 +86,13 @@ void TimetableStdModel::setupModel()
         }
         else {
             takeItem(row, ColStopTime);
+        }
+
+        if (p->business) {
+            itname->setForeground(Qt::red);
+        }
+        else if(sec){
+            itname->setForeground(Qt::blue);
         }
     }
     updating = false;
@@ -125,6 +133,25 @@ void TimetableStdModel::updateRowStopTime(int row)
     else {
         takeItem(row, ColStopTime);
     }
+    setRowColor(row);
+}
+
+void TimetableStdModel::setRowColor(int row)
+{
+    auto* it = item(row, ColName);
+    if (item(row, ColBusiness)->checkState() == Qt::Checked) {
+        it->setForeground(Qt::red);
+    }
+    else {
+        const QTime& arr = qvariant_cast<QTime>(item(row, ColArrive)->data(Qt::EditRole));
+        const QTime& dep = qvariant_cast<QTime>(item(row, ColDepart)->data(Qt::EditRole));
+        if (arr != dep) {
+            it->setForeground(Qt::blue);
+        }
+        else {
+            it->setForeground(Qt::black);
+        }
+    }
 }
 
 void TimetableStdModel::actCancel()
@@ -145,6 +172,11 @@ void TimetableStdModel::onDataChanged(const QModelIndex& leftTop, const QModelIn
             updateRowStopTime(i);
         }
     }
+    else if (col1 <= static_cast<int>(ColBusiness) && static_cast<int>(ColBusiness) <= col2) {
+        for (int i = std::max(row1, 0); i <= std::min(row2, rowCount() - 1); i++) {
+            setRowColor(i);
+        }
+    }
 }
 
 void TimetableStdModel::actApply()
@@ -156,3 +188,87 @@ void TimetableStdModel::actApply()
         return;
     emit timetableChanged(_train, t);
 }
+
+TimetableConstModel::TimetableConstModel(QObject* parent):
+    QStandardItemModel(parent)
+{
+    setHorizontalHeaderLabels({
+    tr("站名"),tr("到点"),tr("开点"),tr("营业"),tr("股道"),tr("备注"),tr("停时")
+        });
+}
+
+void TimetableConstModel::setTrain(std::shared_ptr<const Train> train)
+{
+    _train = train;
+    setupModel();
+}
+
+void TimetableConstModel::refreshData()
+{
+    setupModel();
+}
+
+void TimetableConstModel::setupModel()
+{
+    if (!_train) {
+        setRowCount(0);
+        return;
+    }
+    using SI = QStandardItem;
+    setRowCount(static_cast<int>(_train->timetable().size()));
+    setColumnCount(ColMAX);
+    int row = 0;
+
+    //注意Timetable是std::list，不能用随机访问
+    for (auto p = _train->timetable().begin(); p != _train->timetable().end();
+        ++p, ++row)
+    {
+        auto* itname = new SI(p->name.toSingleLiteral());
+        setItem(row, ColName, itname);
+
+        auto* it = new SI;
+        it->setData(p->arrive, Qt::EditRole);
+        setItem(row, ColArrive, it);
+
+        it = new SI;
+        it->setData(p->depart, Qt::EditRole);
+        setItem(row, ColDepart, it);
+
+        it = makeCheckItem();
+        it->setCheckState(qeutil::boolToCheckState(p->business));
+        setItem(row, ColBusiness, it);
+
+        setItem(row, ColTrack, new SI(p->track));
+        setItem(row, ColNote, new SI(p->note));
+
+        //停时那一列，如果没有就不设置Item!
+        int sec = p->stopSec();
+        if (sec) {
+            it = new SI(p->stopString());
+            it->setEditable(false);
+            setItem(row, ColStopTime, it);
+        }
+        else {
+            takeItem(row, ColStopTime);
+        }
+
+        if (p->business) {
+            itname->setForeground(Qt::red);
+        }
+        else if (sec) {
+            itname->setForeground(Qt::blue);
+        }
+    }
+}
+
+QStandardItem* TimetableConstModel::makeCheckItem()
+{
+    auto* it = new QStandardItem;
+    it->setEditable(false);
+    it->setCheckState(Qt::Unchecked);
+    it->setCheckable(false);
+    return it;
+}
+
+
+

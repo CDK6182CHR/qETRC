@@ -57,6 +57,12 @@ private:
 
     void updateRowStopTime(int row);
 
+    /**
+     * 2022.02.10补充
+     * 根据是否停车/营业，更新站名列的颜色
+     */
+    void setRowColor(int row);
+
 public slots:
 
     /**
@@ -75,3 +81,37 @@ public slots:
 
 };
 
+
+/**
+ * 2022.02.10  只读的Model
+ * 为了和shared_ptr<const Train>配合使用。
+ */
+class TimetableConstModel :public QStandardItemModel
+{
+    Q_OBJECT;
+    std::shared_ptr<const Train> _train{};
+public:
+    enum Columns {
+        ColName = 0,
+        ColArrive,
+        ColDepart,
+        ColBusiness,
+        ColTrack,
+        ColNote,
+        ColStopTime,
+        ColMAX
+    };
+
+    explicit TimetableConstModel(QObject* parent = nullptr);
+
+    auto train() { return _train; }
+    void setTrain(std::shared_ptr<const Train> train);
+
+    void refreshData();
+
+private:
+    void setupModel();
+
+    static QStandardItem* makeCheckItem();
+
+};

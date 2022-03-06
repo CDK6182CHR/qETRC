@@ -7,6 +7,7 @@
 #include <QMap>
 
 #include "data/train/typemanager.h"
+#include "data/diagram/diadiff.h"
 
 class Railway;
 class Train;
@@ -242,6 +243,13 @@ public:
      * 返回所有存在车次的类型名称。依据查找表。
      */
     QList<QString> typeNames()const;
+
+    /**
+     * 2022年2月8日
+     * pyETRC.Graph.diffWith
+     * 基于DP的运行图对比算法
+     */
+    diagram_diff_t diffWith(const TrainCollection& other);
 
 private:
     /**

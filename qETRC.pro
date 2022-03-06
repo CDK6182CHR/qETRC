@@ -28,9 +28,13 @@ include(dependencies/qETRC_ads.pri)
 INCLUDEPATH += src
 
 SOURCES += \
+    src/data/calculation/gapconstraints.cpp \
+    src/data/calculation/greedypainter.cpp \
+    src/data/calculation/stationeventaxis.cpp \
     src/data/common/qesystem.cpp \
     src/data/common/stationname.cpp \
     src/data/diagram/config.cpp \
+    src/data/diagram/diadiff.cpp \
     src/data/diagram/diagram.cpp \
     src/data/diagram/diagrampage.cpp \
     src/data/diagram/stationbinding.cpp \
@@ -136,6 +140,8 @@ SOURCES += \
     src/util/selectrailwaycombo.cpp \
     src/util/selectrailwaystable.cpp \
     src/util/selecttraincombo.cpp \
+    src/viewers/compare/diagramcomparedialog.cpp \
+    src/viewers/compare/traincomparedialog.cpp \
     src/viewers/diagnosisdialog.cpp \
     src/viewers/events/railsectionevents.cpp \
     src/viewers/events/railsnapevents.cpp \
@@ -196,11 +202,15 @@ SOURCES += \
     src/wizards/timeinterp/timeinterpwizard.cpp
 
 HEADERS += \
+    src/data/calculation/gapconstraints.h \
+    src/data/calculation/greedypainter.h \
+    src/data/calculation/stationeventaxis.h \
     src/data/common/direction.h \
     src/data/common/qeglobal.h \
     src/data/common/qesystem.h \
     src/data/common/stationname.h \
     src/data/diagram/config.h \
+    src/data/diagram/diadiff.h \
     src/data/diagram/diagram.h \
     src/data/diagram/diagrampage.h \
     src/data/diagram/stationbinding.h \
@@ -208,6 +218,7 @@ HEADERS += \
     src/data/diagram/trainevents.h \
     src/data/diagram/traingap.h \
     src/data/diagram/trainline.h \
+    src/data/diagram/xtl_matrix.hpp \
     src/data/rail/forbid.h \
     src/data/rail/rail.h \
     src/data/rail/railcategory.h \
@@ -310,6 +321,8 @@ HEADERS += \
     src/util/selectrailwaycombo.h \
     src/util/selectrailwaystable.h \
     src/util/selecttraincombo.h \
+    src/viewers/compare/diagramcomparedialog.h \
+    src/viewers/compare/traincomparedialog.h \
     src/viewers/diagnosisdialog.h \
     src/viewers/events/railsectionevents.h \
     src/viewers/events/railsnapevents.h \

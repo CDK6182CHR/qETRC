@@ -8,7 +8,7 @@
 #include "traingap.h"
 #include "data/diagram/trainline.h"    // for: alias
 #include "data/rail/railcategory.h"
-
+#include "data/calculation/stationeventaxis.h"
 
 class Train;
 class Railway;
@@ -331,6 +331,15 @@ public:
         stationEventsForRail(std::shared_ptr<Railway> railway)const;
 
     /**
+     * 2022.03.06
+     * see also: stationEventsForRail
+     * 算法基本一样，只是使用了子类，增加一项排序操作。
+     * 此版本用于处理贪心排图。
+     */
+    RailwayStationEventAxis
+        stationEventAxisForRail(std::shared_ptr<Railway> railway)const;
+
+    /**
      * 2021.09.06
      * 基于车站事件表，转换成间隔表。
      * 暂时只处理同向事件。
@@ -395,6 +404,7 @@ public:
      * 返回包含所给线路的Page的下标集合。
      */
     QVector<int> pageIndexWithRail(std::shared_ptr<const Railway> railway)const;
+
 
 private:
     void bindAllTrains();

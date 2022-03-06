@@ -340,6 +340,19 @@ std::map<std::shared_ptr<RailStation>, RailStationEventList>
     return res;
 }
 
+RailwayStationEventAxis Diagram::stationEventAxisForRail(std::shared_ptr<Railway> railway) const
+{
+    RailwayStationEventAxis res;
+    foreach(auto p, qAsConst(railway->stations())) {
+        if (p->direction != PassedDirection::NoVia) {
+            StationEventAxis staxis=stationEvents(railway,p);
+            staxis.sortEvents();
+            res.emplace(p, std::move(staxis));
+        }
+    }
+    return res;
+}
+
 std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>> Diagram::sectionEvents(std::shared_ptr<Railway> railway, double y) const
 {
     SectionEventList res;

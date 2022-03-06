@@ -64,6 +64,7 @@
 #include "railnet/raildb/raildbnavi.h"
 #include "railnet/raildb/raildbwindow.h"
 #include "railnet/raildb/raildbcontext.h"
+#include "viewers/compare/diagramcomparedialog.h"
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -968,6 +969,11 @@ void MainWindow::initToolbar()
         connect(act, &QAction::triggered, this, &MainWindow::actDiagnose);
         panel->addMediumAction(act);
 
+        act = new QAction(QIcon(":/icons/compare.png"), tr("运行图对比"), this);
+        act->setToolTip(tr("运行图对比\n对比本运行图和指定运行图文件的列车时刻表差异。"));
+        connect(act, &QAction::triggered, this, &MainWindow::actDiagramCompare);
+        panel->addLargeAction(act);
+
         panel = cat->addPannel(tr("排图"));
 
         act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("标尺排图"), this);
@@ -1458,6 +1464,14 @@ void MainWindow::actAutoStartingTerminalLooser()
 void MainWindow::actTrainDiff()
 {
     auto* dialog = new TrainDiffDialog(_diagram, this);
+    dialog->open();
+}
+
+void MainWindow::actDiagramCompare()
+{
+    auto* dialog = new DiagramCompareDialog(_diagram, this);
+    connect(dialog, &DiagramCompareDialog::showStatus, this, &MainWindow::showStatus);
+    dialog->resize(800, 800);
     dialog->open();
 }
 

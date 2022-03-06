@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "data/diagram/traingap.h"
+#include "data/calculation/stationeventaxis.h"
 #include "data/common/qeglobal.h"
 
 class QCheckBox;

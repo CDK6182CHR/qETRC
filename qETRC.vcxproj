@@ -198,6 +198,10 @@
     <ResourceCompile Include="icon.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\data\calculation\gapconstraints.cpp" />
+    <ClCompile Include="src\data\calculation\greedypainter.cpp" />
+    <ClCompile Include="src\data\calculation\stationeventaxis.cpp" />
+    <ClCompile Include="src\data\diagram\diadiff.cpp" />
     <ClCompile Include="src\editors\edittrainwidget.cpp" />
     <ClCompile Include="src\navi\addpagedialog.cpp" />
     <ClCompile Include="src\editors\routing\addroutingnodedialog.cpp" />
@@ -213,6 +217,8 @@
     <ClCompile Include="src\editors\configdialog.cpp" />
     <ClCompile Include="src\util\railrangecombo.cpp" />
     <ClCompile Include="src\util\selectrailwaystable.cpp" />
+    <ClCompile Include="src\viewers\compare\diagramcomparedialog.cpp" />
+    <ClCompile Include="src\viewers\compare\traincomparedialog.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\conflictdialog.cpp" />
     <ClCompile Include="src\dialogs\correcttimetabledialog.cpp" />
     <ClCompile Include="src\editors\routing\detectroutingdialog.cpp" />
@@ -374,6 +380,11 @@
     <QtMoc Include="src\editors\routing\batchparseroutingdialog.h">
     </QtMoc>
     <QtMoc Include="src\editors\edittrainwidget.h" />
+    <ClInclude Include="src\data\calculation\gapconstraints.h" />
+    <ClInclude Include="src\data\calculation\greedypainter.h" />
+    <ClInclude Include="src\data\calculation\stationeventaxis.h" />
+    <ClInclude Include="src\data\diagram\diadiff.h" />
+    <ClInclude Include="src\data\diagram\xtl_matrix.hpp" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <QtMoc Include="src\dialogs\changestationnamedialog.h">
     </QtMoc>
@@ -575,6 +586,8 @@
     </QtMoc>
     <QtMoc Include="src\util\railrangecombo.h" />
     <QtMoc Include="src\util\selectrailwaystable.h" />
+    <QtMoc Include="src\viewers\compare\diagramcomparedialog.h" />
+    <QtMoc Include="src\viewers\compare\traincomparedialog.h" />
     <ClInclude Include="src\wizards\timeinterp\timeinterppagepreview.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterppagetrain.h">
     </QtMoc>

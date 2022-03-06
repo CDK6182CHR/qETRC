@@ -9,6 +9,7 @@
 #include <QList>
 
 #include "trainevents.h"
+#include "data/calculation/stationeventaxis.h"
 #include "data/common/direction.h"
 
 class Ruler;

@@ -3,6 +3,7 @@
 #include <QDialog>
 #include <QStandardItemModel>
 #include "data/diagram/traingap.h"
+#include "data/calculation/stationeventaxis.h"
 
 class Railway;
 class QCheckBox;
