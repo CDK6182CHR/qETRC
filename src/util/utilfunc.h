@@ -89,6 +89,25 @@ bool timeRangeIntersectedExcl(const QTime& start1, const QTime& end1, const QTim
 	const QTime& end2);
 
 /**
+ * @brief timeCompare  全局函数 考虑周期边界条件下的时间比较
+ * 采用能够使得两时刻之间所差时长最短的理解方式来消歧
+ * 2022.03.09 从trainevents.h/.cpp 移动过来
+ * @return tm1 < tm2  tm1是否被认为在tm2之前
+ */
+bool timeCompare(const QTime& tm1, const QTime& tm2);
+
+/**
+ * 2022.03.09
+ * 由两对(start,to)指示的两条同一区间同向运行线是否交叉。
+ * 交叉等价于前后发生互换：(start1 < start2) != (end1 < end2) 
+ * 考虑PBC比较
+ * 边界说明：如果两个start与两个end一个相等一个不相等（一端相交），返回false，
+ * 这种情况由间隔来约束。如果两端都不相等就是正常的判断；如果两端都相等则返回true。
+ */
+bool timeCrossed(const QTime& start1, const QTime& start2,
+	const QTime& end1, const QTime& end2);
+
+/**
  * 两个时间范围是否存在交叉。包含边界。不考虑周期边界条件：
  * 即是保证start<=end。直接做简单的范围判断。
  * seealso: TrainStation::stopRangeIntersected

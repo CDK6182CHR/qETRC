@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <map>
+#include <unordered_map>
 #include "data/diagram/trainevents.h"
 
 class GapConstraints;
@@ -14,14 +15,29 @@ class GapConstraints;
 class StationEventAxis:
         public QVector<std::shared_ptr<RailStationEvent>>
 {
+    using line_map_t = std::unordered_map<std::shared_ptr<const TrainLine>, std::shared_ptr<RailStationEvent>>;
+    /**
+     * 2022.03.09
+     * 构建运行线->事件的查找表。
+     * 显然，同一运行线在站前或站后分别最多只出现一次。通过事件同时算站前和站后。
+     */
+     line_map_t _preEvents, _postEvents;
 public:
     using QVector<std::shared_ptr<RailStationEvent>>::QVector;
 
+    const auto& preEvents()const { return _preEvents; }
+    const auto& postEvents()const { return _postEvents; }
+
     /**
-     * @brief sortEvents
-     * 按事件的时间进行排序。
+     * 根据pre还是Post选择一个映射表。
+     * 注意这里必须是pre或者post，不能是Both；否则出错 （暂定直接抛异常）
      */
-    void sortEvents();
+    const line_map_t & positionEvents(RailStationEventBase::Position pos)const;
+
+    /**
+     * 实行排序并建立映射表
+     */
+    void buildAxis();
 
     /**
      * @brief insertEvent
@@ -40,24 +56,30 @@ public:
      * 即从ev时刻开始，先左后右向两边遍历。
      */
     std::shared_ptr<RailStationEvent>
-        conflictEvent(std::shared_ptr<RailStationEvent> ev,
+        conflictEvent(std::shared_ptr<RailStationEventBase> ev,
                       const GapConstraints& constraint) const;
 
 private:
 
-    bool isConflict(std::shared_ptr<RailStationEvent> left,
-                    std::shared_ptr<RailStationEvent> right,
+    /**
+     * @brief sortEvents
+     * 按事件的时间进行排序。
+     */
+    void sortEvents();
+
+    /**
+     * 生成运行线到事件的映射表
+     */
+    void constructLineMap();
+
+    bool isConflict(std::shared_ptr<RailStationEventBase> left,
+                    std::shared_ptr<RailStationEventBase> right,
                     const GapConstraints& constraint) const;
+
+
 };
 
 using RailStationEventList = StationEventAxis;
-
-
-/**
- * 指定线路所有车站的事件顺序表。
- * 暂定直接using
- */
-using RailwayStationEventAxis=std::map<std::shared_ptr<RailStation>,StationEventAxis>;
 
 
 

@@ -346,7 +346,7 @@ RailwayStationEventAxis Diagram::stationEventAxisForRail(std::shared_ptr<Railway
     foreach(auto p, qAsConst(railway->stations())) {
         if (p->direction != PassedDirection::NoVia) {
             StationEventAxis staxis=stationEvents(railway,p);
-            staxis.sortEvents();
+            staxis.buildAxis();
             res.emplace(p, std::move(staxis));
         }
     }

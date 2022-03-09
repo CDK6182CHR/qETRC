@@ -195,6 +195,27 @@ bool qeutil::timeRangeIntersectedNoPBCExcl(const QTime& start1, const QTime& end
 	return (std::max(xm1, xh1) < std::min(xm2, xh2));
 }
 
+bool qeutil::timeCompare(const QTime& tm1, const QTime& tm2)
+{
+	static constexpr int secsOfADay = 3600 * 24;
+	int secs = tm1.secsTo(tm2);
+	bool res = (secs > 0);
+	if (std::abs(secs) > secsOfADay / 2)
+		return !res;
+	return res;
+}
+
+
+bool qeutil::timeCrossed(const QTime& start1, const QTime& start2,
+	const QTime& end1, const QTime& end2)
+{
+	if (start1 == start2 && end1 == end2)
+		return true;
+	else
+		return timeCompare(start1, start2) != timeCompare(end1, end2)
+			&& ((start1 != start2) == (end1 != end2));
+}
+
 QString qeutil::secsToStringHour(int secs)
 {
     return QString::asprintf("%d:%02d:%02d",secs/3600,secs%3600/60,secs%60);

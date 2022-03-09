@@ -192,12 +192,12 @@ bool TrainGap::ltSecs(const std::shared_ptr<TrainGap>& gap1,
 }
 
 std::optional<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>> 
-    TrainGap::gapTypeBetween(std::shared_ptr<RailStationEvent> left, 
-        std::shared_ptr<RailStationEvent> right, bool singleLine)
+    TrainGap::gapTypeBetween(std::shared_ptr<RailStationEventBase> left, 
+        std::shared_ptr<RailStationEventBase> right, bool singleLine)
 {
     //先排除无关的事件，然后直接套用构造函数那一套就行了
     auto pos = left->pos & right->pos;
-    if (!singleLine && left->line->dir() != right->line->dir()) {
+    if (!singleLine && left->dir != right->dir) {
         // 双线反向两车次不构成间隔
         return std::nullopt;
     }
@@ -211,9 +211,9 @@ std::optional<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>>
         type |= LeftAppend;
     if (right->hasAppend())
         type |= RightAppend;
-    if (left->line->dir() == Direction::Down)
+    if (left->dir == Direction::Down)
         type |= LeftDown;
-    if (right->line->dir() == Direction::Down)
+    if (right->dir == Direction::Down)
         type |= RightDown;
     return std::make_pair(pos, type);
 }

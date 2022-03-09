@@ -28,8 +28,11 @@ include(dependencies/qETRC_ads.pri)
 INCLUDEPATH += src
 
 SOURCES += \
+    src/data/calculation/calculationlog.cpp \
     src/data/calculation/gapconstraints.cpp \
     src/data/calculation/greedypainter.cpp \
+    src/data/calculation/intervalconflictreport.cpp \
+    src/data/calculation/railwaystationeventaxis.cpp \
     src/data/calculation/stationeventaxis.cpp \
     src/data/common/qesystem.cpp \
     src/data/common/stationname.cpp \
@@ -202,8 +205,11 @@ SOURCES += \
     src/wizards/timeinterp/timeinterpwizard.cpp
 
 HEADERS += \
+    src/data/calculation/calculationlog.h \
     src/data/calculation/gapconstraints.h \
     src/data/calculation/greedypainter.h \
+    src/data/calculation/intervalconflictreport.h \
+    src/data/calculation/railwaystationeventaxis.h \
     src/data/calculation/stationeventaxis.h \
     src/data/common/direction.h \
     src/data/common/qeglobal.h \

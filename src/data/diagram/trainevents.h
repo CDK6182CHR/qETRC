@@ -13,6 +13,7 @@
 #include <QTime>
 #include <optional>
 
+#include <data/common/direction.h>
 
 
 /**
@@ -42,12 +43,7 @@ class RailInterval;
 namespace qeutil {
     QString eventTypeString(TrainEventType t);
 
-    /**
-     * @brief timeCompare  全局函数 考虑周期边界条件下的时间比较
-     * 采用能够使得两时刻之间所差时长最短的理解方式来消歧
-     * @return tm1 < tm2  tm1是否被认为在tm2之前
-     */
-    bool timeCompare(const QTime& tm1, const QTime& tm2);
+   
 }
 
 
@@ -82,18 +78,13 @@ struct StationEvent {
     QString toString()const;
 };
 
-class TrainLine;
-
 /**
- * 用于处理车站事件。比车次的事件多一个站前还是站后的标志位。
- * another位置用来放相关车次，固定非null。
- * pos: 1-站前事件（小里程端事件）; 2-站后；3-both
- * 2021.09.06：取消继承。修改API。
+ * 2022.03.07
+ * 包含事件最基本的信息，但不依赖于TrainLine的版本
  */
-struct RailStationEvent {
-
+struct RailStationEventBase {
     enum Position {
-        NoPos=0b00,   // 都不是：基本上用于处理Avoid类型的间隔
+        NoPos = 0b00,   // 都不是：基本上用于处理Avoid类型的间隔
         Pre = 0b01,   // 小里程端
         Post = 0b10,  // 大里程端
         Both = Pre | Post
@@ -102,46 +93,81 @@ struct RailStationEvent {
 
     TrainEventType type;
     QTime time;
-    std::weak_ptr<const RailStation> station;
-    std::shared_ptr<const TrainLine> line;
     Positions pos;
-    QString note;
-    
-    RailStationEvent(TrainEventType type_,
-        const QTime& time_, std::weak_ptr<const RailStation> station_,
-        std::shared_ptr<const TrainLine> line_,
-        Positions pos_, const QString& note_ = "") :
-        type(type_),time(time_),station(station_),line(line_),pos(pos_),
-        note(note_){}
+    Direction dir;
 
-    QString posString()const;
-    QString toString()const;
+    RailStationEventBase(TrainEventType type_,
+        const QTime& time_, Positions pos_, Direction dir_):
+        type(type_),time(time_),pos(pos_),dir(dir_){}
 
-    static QString posToString(const Positions& pos);
+
+    struct PtrTimeComparator {
+        bool operator()(const std::shared_ptr<const RailStationEventBase>& ev1,
+            const std::shared_ptr<const RailStationEventBase>& ev2)const {
+            return ev1->time.msecsSinceStartOfDay() < ev2->time.msecsSinceStartOfDay();
+        }
+        bool operator()(const QTime& tm, const std::shared_ptr<const RailStationEventBase>& ev2)const {
+            return tm.msecsSinceStartOfDay() < ev2->time.msecsSinceStartOfDay();
+        }
+        bool operator()(const std::shared_ptr<const RailStationEventBase>& ev1, const QTime& tm)const {
+            return ev1->time.msecsSinceStartOfDay() < tm.msecsSinceStartOfDay();
+        }
+    };
 
     /**
      * 当前事件是否对应于有标尺的附加时分参与
      */
     bool hasAppend()const;
 
-    struct PtrTimeComparator {
-        bool operator()(const std::shared_ptr<RailStationEvent>& ev1,
-            const std::shared_ptr<RailStationEvent>& ev2)const {
-            return ev1->time.msecsSinceStartOfDay() < ev2->time.msecsSinceStartOfDay();
-        }
-        bool operator()(const QTime& tm, const std::shared_ptr<RailStationEvent>& ev2)const{
-            return tm.msecsSinceStartOfDay() < ev2->time.msecsSinceStartOfDay();
-        }
-        bool operator()(const std::shared_ptr<RailStationEvent>& ev1, const QTime& tm)const{
-            return ev1->time.msecsSinceStartOfDay()<tm.msecsSinceStartOfDay();
-        }
-    };
+    QString posString()const;
+    static QString posToString(const Positions& pos);
+
+};
+
+namespace qeutil {
+
+    /**
+     * 列车运行方向（相对于车站）先经过一侧的绝对位置。
+     * 下行为Pre，上行为Post
+     */
+    RailStationEventBase::Position dirFormerPos(Direction dir);
+
+    /**
+     * 列车运行方向（相对于车站）后经过一侧的绝对位置。
+     * 下行为Post，上行为Pre
+     */
+    RailStationEventBase::Position dirLatterPos(Direction dir);
+}
+
+class TrainLine;
+
+/**
+ * 用于处理车站事件。比车次的事件多一个站前还是站后的标志位。
+ * another位置用来放相关车次，固定非null。
+ * pos: 1-站前事件（小里程端事件）; 2-站后；3-both
+ * 2021.09.06：取消继承。修改API。
+ */
+struct RailStationEvent: public RailStationEventBase {
+
+    std::weak_ptr<const RailStation> station;
+    std::shared_ptr<const TrainLine> line;
+    
+    QString note;
+    
+    RailStationEvent(TrainEventType type_,
+        const QTime& time_, std::weak_ptr<const RailStation> station_,
+        std::shared_ptr<const TrainLine> line_,
+        Positions pos_, const QString& note_ = "");
+
+
+    QString toString()const;
+
 };
 
 //2022.03.06  改为继承 see stationeventaxis.h
 //using RailStationEventList = QVector<std::shared_ptr<RailStationEvent>>;
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(RailStationEvent::Positions)
+Q_DECLARE_OPERATORS_FOR_FLAGS(RailStationEventBase::Positions)
 
 
 struct AdapterStation;

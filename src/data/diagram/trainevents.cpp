@@ -4,16 +4,7 @@
 #include "trainline.h"
 #include "data/rail/railstation.h"
 #include "data/train/train.h"
-
-bool qeutil::timeCompare(const QTime& tm1, const QTime& tm2)
-{
-	static constexpr int secsOfADay = 3600 * 24;
-	int secs = tm1.secsTo(tm2);
-	bool res = (secs > 0);
-	if (std::abs(secs) > secsOfADay / 2)
-		return !res;
-	return res;
-}
+#include "util/utilfunc.h"
 
 bool StationEvent::operator<(const StationEvent& another) const
 {
@@ -126,7 +117,15 @@ QString qeutil::eventTypeString(TrainEventType t)
 	}
 }
 
-QString RailStationEvent::posString() const
+RailStationEvent::RailStationEvent(TrainEventType type_, const QTime& time_, 
+	std::weak_ptr<const RailStation> station_, std::shared_ptr<const TrainLine> line_,
+	Positions pos_, const QString& note_):
+	RailStationEventBase(type_,time_,pos_,line_->dir()),
+	station(station_),line(line_),note(note_)
+{
+}
+
+QString RailStationEventBase::posString() const
 {
 	switch (pos) {
 	case Pre:return QObject::tr("站前");
@@ -143,7 +142,7 @@ QString RailStationEvent::toString() const
 		.arg(qeutil::eventTypeString(type));
 }
 
-QString RailStationEvent::posToString(const Positions& pos)
+QString RailStationEventBase::posToString(const Positions& pos)
 {
 	switch (pos) {
 	case Pre:return QObject::tr("站前");
@@ -153,7 +152,7 @@ QString RailStationEvent::posToString(const Positions& pos)
 	}
 }
 
-bool RailStationEvent::hasAppend() const
+bool RailStationEventBase::hasAppend() const
 {
 	switch (type)
 	{
@@ -228,5 +227,31 @@ bool DiagnosisIssue::inRange(std::shared_ptr<RailStation> start, std::shared_ptr
 		if (inter_min > inter_max)
 			std::swap(inter_min, inter_max);
 		return std::max(m_min, inter_min) < std::min(m_max, inter_max);
+	}
+}
+
+RailStationEventBase::Position qeutil::dirFormerPos(Direction dir)
+{
+	switch (dir)
+	{
+	case Direction::Down: return RailStationEventBase::Pre;
+		break;
+	case Direction::Up:return RailStationEventBase::Post;
+		break;
+	default:return RailStationEventBase::NoPos;
+		break;
+	}
+}
+
+RailStationEventBase::Position qeutil::dirLatterPos(Direction dir)
+{
+	switch (dir)
+	{
+	case Direction::Down: return RailStationEventBase::Post;
+		break;
+	case Direction::Up:return RailStationEventBase::Pre;
+		break;
+	default:return RailStationEventBase::NoPos;
+		break;
 	}
 }

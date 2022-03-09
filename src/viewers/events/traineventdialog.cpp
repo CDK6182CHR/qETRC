@@ -12,6 +12,7 @@
 #include "data/diagram/diagram.h"
 #include "data/common/qesystem.h"
 #include "data/train/train.h"
+#include "util/utilfunc.h"
 
 #include <QFile>
 #include <QTableView>

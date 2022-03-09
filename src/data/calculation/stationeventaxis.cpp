@@ -1,10 +1,47 @@
 ﻿#include "stationeventaxis.h"
 #include "gapconstraints.h"
 #include <util/utilfunc.h>
+#include <qDebug>
 
 void StationEventAxis::sortEvents()
 {
     std::sort(begin(),end(),RailStationEvent::PtrTimeComparator());
+}
+
+void StationEventAxis::constructLineMap()
+{
+    _preEvents.clear();
+    _postEvents.clear();
+    for (auto ev : *this) {
+        if (ev->pos & RailStationEventBase::Pre) {
+            _preEvents.emplace(ev->line, ev);
+        }
+        if (ev->pos & RailStationEventBase::Post) {
+            _postEvents.emplace(ev->line, ev);
+        }
+    }
+}
+
+const typename StationEventAxis::line_map_t&
+    StationEventAxis::positionEvents(RailStationEventBase::Position pos) const
+{
+    switch (pos)
+    {
+    case RailStationEventBase::Pre: return preEvents();
+        break;
+    case RailStationEventBase::Post:return postEvents();
+        break;
+    default:
+        qDebug() << "StationEventAxis::positionEvents: INVALID pos " << pos << Qt::endl;
+        return preEvents();
+        break;
+    }
+}
+
+void StationEventAxis::buildAxis()
+{
+    sortEvents();
+    constructLineMap();
 }
 
 void StationEventAxis::insertEvent(std::shared_ptr<RailStationEvent> ev)
@@ -12,10 +49,16 @@ void StationEventAxis::insertEvent(std::shared_ptr<RailStationEvent> ev)
     //如果有时刻一样的，新的在后面
     auto itr=std::upper_bound(begin(),end(),ev,RailStationEvent::PtrTimeComparator());
     insert(itr,ev);
+    if (ev->pos & RailStationEventBase::Pre) {
+        _preEvents.emplace(ev->line, ev);
+    }
+    if (ev->pos & RailStationEventBase::Post) {
+        _postEvents.emplace(ev->line, ev);
+    }
 }
 
 std::shared_ptr<RailStationEvent> StationEventAxis::conflictEvent(
-        std::shared_ptr<RailStationEvent> ev,
+        std::shared_ptr<RailStationEventBase> ev,
         const GapConstraints &constraint) const
 {
     int bound=constraint.correlationRange();
@@ -67,8 +110,8 @@ std::shared_ptr<RailStationEvent> StationEventAxis::conflictEvent(
     return nullptr;
 }
 
-bool StationEventAxis::isConflict(std::shared_ptr<RailStationEvent> left,
-                                  std::shared_ptr<RailStationEvent> right,
+bool StationEventAxis::isConflict(std::shared_ptr<RailStationEventBase> left,
+                                  std::shared_ptr<RailStationEventBase> right,
                                   const GapConstraints &constraint) const
 {
     auto gap_type = TrainGap::gapTypeBetween(left,right, constraint.isSingleLine());

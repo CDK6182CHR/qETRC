@@ -94,7 +94,7 @@ struct TrainGap{
      * @param singleLine  单线标记。此标记下判定反向间隔，否则忽略。
      */
     static std::optional< std::pair<RailStationEvent::Positions, TrainGap::GapTypes>>
-        gapTypeBetween(std::shared_ptr<RailStationEvent> left, std::shared_ptr<RailStationEvent> right, 
+        gapTypeBetween(std::shared_ptr<RailStationEventBase> left, std::shared_ptr<RailStationEventBase> right, 
             bool singleLine);
 };
 

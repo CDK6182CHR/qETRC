@@ -8,7 +8,7 @@
 #include "traingap.h"
 #include "data/diagram/trainline.h"    // for: alias
 #include "data/rail/railcategory.h"
-#include "data/calculation/stationeventaxis.h"
+#include "data/calculation/railwaystationeventaxis.h"
 
 class Train;
 class Railway;

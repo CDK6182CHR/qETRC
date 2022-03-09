@@ -198,8 +198,11 @@
     <ResourceCompile Include="icon.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\data\calculation\calculationlog.cpp" />
     <ClCompile Include="src\data\calculation\gapconstraints.cpp" />
     <ClCompile Include="src\data\calculation\greedypainter.cpp" />
+    <ClCompile Include="src\data\calculation\intervalconflictreport.cpp" />
+    <ClCompile Include="src\data\calculation\railwaystationeventaxis.cpp" />
     <ClCompile Include="src\data\calculation\stationeventaxis.cpp" />
     <ClCompile Include="src\data\diagram\diadiff.cpp" />
     <ClCompile Include="src\editors\edittrainwidget.cpp" />
@@ -380,8 +383,11 @@
     <QtMoc Include="src\editors\routing\batchparseroutingdialog.h">
     </QtMoc>
     <QtMoc Include="src\editors\edittrainwidget.h" />
+    <ClInclude Include="src\data\calculation\calculationlog.h" />
     <ClInclude Include="src\data\calculation\gapconstraints.h" />
     <ClInclude Include="src\data\calculation\greedypainter.h" />
+    <ClInclude Include="src\data\calculation\intervalconflictreport.h" />
+    <ClInclude Include="src\data\calculation\railwaystationeventaxis.h" />
     <ClInclude Include="src\data\calculation\stationeventaxis.h" />
     <ClInclude Include="src\data\diagram\diadiff.h" />
     <ClInclude Include="src\data\diagram\xtl_matrix.hpp" />
