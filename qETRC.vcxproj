@@ -222,6 +222,7 @@
     <ClCompile Include="src\util\selectrailwaystable.cpp" />
     <ClCompile Include="src\viewers\compare\diagramcomparedialog.cpp" />
     <ClCompile Include="src\viewers\compare\traincomparedialog.cpp" />
+    <ClCompile Include="src\wizards\greedypaint\greedypaintfasttest.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\conflictdialog.cpp" />
     <ClCompile Include="src\dialogs\correcttimetabledialog.cpp" />
     <ClCompile Include="src\editors\routing\detectroutingdialog.cpp" />
@@ -594,6 +595,7 @@
     <QtMoc Include="src\util\selectrailwaystable.h" />
     <QtMoc Include="src\viewers\compare\diagramcomparedialog.h" />
     <QtMoc Include="src\viewers\compare\traincomparedialog.h" />
+    <QtMoc Include="src\wizards\greedypaint\greedypaintfasttest.h" />
     <ClInclude Include="src\wizards\timeinterp\timeinterppagepreview.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterppagetrain.h">
     </QtMoc>

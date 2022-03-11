@@ -8,6 +8,7 @@ class Diagram;
 class TrainName;
 class Railway;
 class Ruler;
+class RulerNode;
 /**
  * @brief The GreedyPainter class
  * 贪心算法全自动铺画运行线。
@@ -20,7 +21,10 @@ class GreedyPainter
 	std::shared_ptr<Railway> _railway;
 	std::shared_ptr<Ruler> _ruler;
 	std::shared_ptr<RailStation> _anchor, _start, _end;
+	bool _localStarting, _localTerminal;
+	Direction _dir;
 	QTime _anchorTime;
+	std::map<std::shared_ptr<RailStation>, int> _settledStops;
 
 	/**
 	 * @brief _train
@@ -39,14 +43,24 @@ public:
 	auto anchor() { return _anchor; }
 	auto start() { return _start; }
 	auto end() { return _end; }
+	auto dir() { return _dir; }
+	bool localStarting() { return _localStarting; }
+	bool localTerminal() { return _localTerminal; }
 	void setRailway(std::shared_ptr<Railway> railway) { _railway = railway; }
 	void setRuler(std::shared_ptr<Ruler> ruler) { _ruler = ruler; }
 	void setAnchor(std::shared_ptr<RailStation> anchor) { _anchor = anchor; }
 	void setStart(std::shared_ptr<RailStation> value) { _start = value; }
 	void setEnd(std::shared_ptr<RailStation> value) { _end = value; }
+	void setLocalStarting(bool on) { _localStarting = on; }
+	void setLocalTerminal(bool on) { _localTerminal = on; }
+	void setDir(Direction d) { _dir = d; }
+	void setAnchorTime(const QTime& t) { _anchorTime = t; }
 	auto& constraints() { return _constraints; }
 	const auto& constraints()const { return _constraints; }
+	auto& settledStops() { return _settledStops; }
+	const auto& settledStops()const { return _settledStops; }
 	auto train() { return _train; }
+	auto& logs() { return _logs; }
 
 	/**
 	 * @brief paint  核心接口函数，铺画运行线。
@@ -59,5 +73,16 @@ public:
 
 private:
 	void addLog(std::unique_ptr<CalculationLogAbstract> log);
+
+	/**
+	 * 递归正向推线算法。
+	 * 递归基本约定：每次调用时，_train中最后一个站是node的前站。
+	 * 向下递归时压入新的站；回溯调整时弹出。
+	 * 原始算法中的starting, anchor其实可以通过比较算出，不用递归传递
+	 * @param node 排图标尺的当前区间，同时包含区间的所有数据
+	 * @param tm node前站的预告到达时刻
+	 * @param stop node前站是否已包含停车附加时分，即该站是否停车
+	 */
+	bool calForward(std::shared_ptr<RailInterval> railint, const QTime& tm, bool stop);
 };
 

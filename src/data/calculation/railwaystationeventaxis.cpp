@@ -1,5 +1,6 @@
 ﻿#include "railwaystationeventaxis.h"
 #include <util/utilfunc.h>
+#include <qDebug>
 
 IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_ptr<RailStation> from, 
     std::shared_ptr<RailStation> to, const RailStationEventBase& ev_start, 
@@ -15,7 +16,7 @@ IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_p
 
     // 这里使用UpperBound，相等的放到左边处理
     // 相等的要特殊处理一下，主要是不能直接break。除了区间共线外，不必相等的在这里不构成冲突。
-    auto citr = std::upper_bound(ax_from.begin(), ax_from.end(), ev_start.time,
+    auto citr = std::lower_bound(ax_from.begin(), ax_from.end(), ev_start.time,
         RailStationEventBase::PtrTimeComparator());
     auto rcitr = std::make_reverse_iterator(citr);
 
@@ -27,7 +28,7 @@ IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_p
             return { IntervalConflictReport::CoverConflict,nullptr };
         }
         else {
-            ++rcitr;  // 跳过这个中间的
+            ++citr;  // 跳过这个中间的
         }
     }
 
@@ -118,10 +119,11 @@ RailwayStationEventAxis::isConflictedWith(
     const auto& corr_ev_map = axis_to.positionEvents(qeutil::dirFormerPos(ev_start.dir));
     if (auto itr = corr_ev_map.find(ev_ex_start->line); itr != corr_ev_map.end()) {
         // 成功找到同一运行线对面的事件
+        //qDebug() << "Another event: " << itr->second->time << Qt::endl;
         if (ev_ex_start->dir == ev_start.dir) {
             // 同向运行
-            if (qeutil::timeCrossed(ev_start.time, tm_to, 
-                ev_ex_start->time, itr->second->time)) {
+            if (qeutil::timeCrossed(ev_start.time, ev_ex_start->time,
+                tm_to, itr->second->time)) {
                 // 发生同向越行
                 return std::make_pair(itr->second, false);
             }
@@ -132,7 +134,7 @@ RailwayStationEventAxis::isConflictedWith(
         }
         else if(singleLine) {
             // 只有单线需要考虑反向的 和同向的区别是，对方运行线的两站时刻反着来
-            if (qeutil::timeCrossed(ev_start.time, tm_to, itr->second->time, ev_ex_start->time)) {
+            if (qeutil::timeCrossed(ev_start.time, ev_ex_start->time, tm_to, itr->second->time)) {
                 return std::make_pair(itr->second, false);
             }
             else {

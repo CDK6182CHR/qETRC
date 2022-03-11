@@ -2,6 +2,7 @@
 #include "util/utilfunc.h"
 #include "trainline.h"
 #include <QObject>
+#include <initializer_list>
 
 TrainGap::TrainGap(std::shared_ptr<const RailStationEvent> left_, 
     std::shared_ptr<const RailStationEvent> right_) :
@@ -192,12 +193,12 @@ bool TrainGap::ltSecs(const std::shared_ptr<TrainGap>& gap1,
 }
 
 std::optional<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>> 
-    TrainGap::gapTypeBetween(std::shared_ptr<RailStationEventBase> left, 
-        std::shared_ptr<RailStationEventBase> right, bool singleLine)
+    TrainGap::gapTypeBetween(const RailStationEventBase& left, 
+        const RailStationEventBase& right, bool singleLine)
 {
     //先排除无关的事件，然后直接套用构造函数那一套就行了
-    auto pos = left->pos & right->pos;
-    if (!singleLine && left->dir != right->dir) {
+    auto pos = left.pos & right.pos;
+    if (!singleLine && left.dir != right.dir) {
         // 双线反向两车次不构成间隔
         return std::nullopt;
     }
@@ -207,13 +208,70 @@ std::optional<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>>
     }
 
     GapTypes type = NoAppend;
-    if (left->hasAppend())
+    if (left.hasAppend())
         type |= LeftAppend;
-    if (right->hasAppend())
+    if (right.hasAppend())
         type |= RightAppend;
-    if (left->dir == Direction::Down)
+    if (left.dir == Direction::Down)
         type |= LeftDown;
-    if (right->dir == Direction::Down)
+    if (right.dir == Direction::Down)
         type |= RightDown;
     return std::make_pair(pos, type);
+}
+
+typename TrainGap::GapTypes 
+    TrainGap::generateType(Direction left_dir, Direction right_dir, bool left_append, bool right_append)
+{
+    GapTypes res = NoAppend;
+    if (left_dir == Direction::Down)
+        res |= LeftDown;
+    if (right_dir == Direction::Down)
+        res |= RightDown;
+    if (left_append)
+        res |= LeftAppend;
+    if (right_append) {
+        res |= RightAppend;
+    }
+    return res;
+}
+
+typename TrainGap::GapTypes 
+TrainGap::genDirGapType(Direction left_dir, Direction right_dir, GapTypes base)
+{
+    if (left_dir == Direction::Down)
+        base |= LeftDown;
+    if (right_dir == Direction::Down)
+        base |= RightDown;
+    return base;
+}
+
+std::vector<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>> 
+    TrainGap::allPossibleGaps(bool singleLine)
+{
+    std::vector<GapTypes> baseTypes;
+    auto appendTypes = { NoAppend,LeftAppend,RightAppend,BothAppend };
+    if (singleLine) {
+        for (auto tp : appendTypes) {
+            for (auto a : { Direction::Down,Direction::Up }) {
+                for (auto b : { Direction::Down,Direction::Up }) {
+                    baseTypes.push_back(genDirGapType(a, b, tp));
+                }
+            }
+        }
+    }
+    else {
+        for (auto tp : appendTypes) {
+            for (auto a : { Direction::Down,Direction::Up }) {
+                baseTypes.push_back(genDirGapType(a, a, tp));
+            }
+        }
+    }
+
+    std::vector<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>> res;
+    for (auto t : { RailStationEventBase::Pre,RailStationEventBase::Post }) {
+        for (auto s : baseTypes) {
+            res.emplace_back(t, s);
+        }
+    }
+    return res;
 }

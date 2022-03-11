@@ -76,7 +76,7 @@ QString CalculationLogGap::objectString() const
 
 CalculationLogInterval::CalculationLogInterval(Reason reason, std::shared_ptr<RailStation> station, 
     const QTime time, ModifiedField field, IntervalConflictReport::ConflictType type,
-    std::shared_ptr<RailInterval> railint, std::shared_ptr<TrainLine> line):
+    std::shared_ptr<RailInterval> railint, std::shared_ptr<const TrainLine> line):
     CalculationLogAbstract(reason,station,time,field),_type(type),_railint(railint),_line(line)
 {
 }
@@ -94,5 +94,7 @@ QString CalculationLogInterval::reasonString() const
 
 QString CalculationLogInterval::objectString() const
 {
-    return _line->train()->trainName().full();
+    if (_line)
+        return _line->train()->trainName().full();
+    else return "";
 }

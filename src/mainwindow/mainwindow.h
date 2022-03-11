@@ -328,6 +328,8 @@ private slots:
 
     void actRulerPaint();
 
+    void actGreedyPaint();
+
     /**
      * 向所有运行图窗口添加指定运行线。
      * （简单封装）

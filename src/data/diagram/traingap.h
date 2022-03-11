@@ -94,8 +94,25 @@ struct TrainGap{
      * @param singleLine  单线标记。此标记下判定反向间隔，否则忽略。
      */
     static std::optional< std::pair<RailStationEvent::Positions, TrainGap::GapTypes>>
-        gapTypeBetween(std::shared_ptr<RailStationEventBase> left, std::shared_ptr<RailStationEventBase> right, 
+        gapTypeBetween(const RailStationEventBase& left, const RailStationEventBase& right, 
             bool singleLine);
+
+    /**
+     * 2022.03.11
+     * 生成间隔类型（不考虑站前站后）
+     */
+    static GapTypes generateType(Direction left_dir, Direction right_dir,
+        bool left_append, bool right_append);
+
+    static GapTypes genDirGapType(Direction left_dir, Direction right_dir, GapTypes base);
+
+    /**
+     * 2022.03.11
+     * 生成（用于排图约束的）所有可能间隔类型。
+     * 按单双线区分
+     */
+    static std::vector<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>>
+        allPossibleGaps(bool singleLine);
 };
 
 Q_DECLARE_METATYPE(std::shared_ptr<TrainGap>);

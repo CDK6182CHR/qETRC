@@ -526,6 +526,8 @@ public:
      */
     bool isLocalTrain(const RailCategory& cat)const;
 
+    void clear();
+
 
     //static比较函数 用来排序
     static bool ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);

@@ -370,6 +370,16 @@ void MainWindow::actRulerPaint()
     wzd->show();
 }
 
+#include <wizards/greedypaint/greedypaintfasttest.h>
+
+void MainWindow::actGreedyPaint()
+{
+    auto* w = new GreedyPaintFastTest(_diagram, this);
+    connect(w, &GreedyPaintFastTest::trainAdded,
+        naviView, &NaviTree::actAddPaintedTrain);
+    w->show();
+}
+
 
 //void MainWindow::undoAddPage(std::shared_ptr<DiagramPage> page)
 //{
@@ -1003,6 +1013,14 @@ void MainWindow::initToolbar()
         act->setMenu(menu);
         btn = panel->addMediumAction(act);
         btn->setPopupMode(QToolButton::DelayedPopup);
+
+        act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("贪心排图（测试）"), this);
+        addAction(act);
+        act->setShortcut(Qt::CTRL + Qt::Key_T);
+        act->setToolTip(tr("自动贪心排图向导 (Ctrl+T)\n使用指定线路的指定标尺，"
+            "采用贪心算法自动计算运行线。"));
+        btn = panel->addLargeAction(act);
+        connect(act, &QAction::triggered, this, &MainWindow::actGreedyPaint);
         
     }
 

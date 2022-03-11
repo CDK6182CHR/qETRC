@@ -56,7 +56,7 @@ public:
      * 即从ev时刻开始，先左后右向两边遍历。
      */
     std::shared_ptr<RailStationEvent>
-        conflictEvent(std::shared_ptr<RailStationEventBase> ev,
+        conflictEvent(const RailStationEventBase& ev,
                       const GapConstraints& constraint) const;
 
 private:
@@ -72,8 +72,8 @@ private:
      */
     void constructLineMap();
 
-    bool isConflict(std::shared_ptr<RailStationEventBase> left,
-                    std::shared_ptr<RailStationEventBase> right,
+    bool isConflict(const RailStationEventBase& left,
+                    const RailStationEventBase& right,
                     const GapConstraints& constraint) const;
 
 

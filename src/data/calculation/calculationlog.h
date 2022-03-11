@@ -77,11 +77,11 @@ public:
 class CalculationLogInterval : public CalculationLogAbstract {
     IntervalConflictReport::ConflictType _type;
     std::shared_ptr<RailInterval> _railint;
-    std::shared_ptr<TrainLine> _line;
+    std::shared_ptr<const TrainLine> _line;
 public:
     CalculationLogInterval(Reason reason, std::shared_ptr<RailStation> station,
         const QTime time, ModifiedField field, IntervalConflictReport::ConflictType type, 
-        std::shared_ptr<RailInterval> railint, std::shared_ptr<TrainLine> line);
+        std::shared_ptr<RailInterval> railint, std::shared_ptr<const TrainLine> line);
     virtual QString reasonString()const override;
     virtual QString objectString()const override;
 };

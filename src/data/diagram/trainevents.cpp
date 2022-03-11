@@ -117,6 +117,16 @@ QString qeutil::eventTypeString(TrainEventType t)
 	}
 }
 
+TrainEventType qeutil::formerEventType(bool isStop)
+{
+	return isStop ? TrainEventType::Arrive : TrainEventType::SettledPass;
+}
+
+TrainEventType qeutil::latterEventType(bool isStop)
+{
+	return isStop ? TrainEventType::Depart : TrainEventType::SettledPass;
+}
+
 RailStationEvent::RailStationEvent(TrainEventType type_, const QTime& time_, 
 	std::weak_ptr<const RailStation> station_, std::shared_ptr<const TrainLine> line_,
 	Positions pos_, const QString& note_):

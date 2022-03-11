@@ -187,6 +187,7 @@ SOURCES += \
     src/viewers/traininfowidget.cpp \
     src/viewers/trainlinedialog.cpp \
     src/viewers/traintimetableplane.cpp \
+    src/wizards/greedypaint/greedypaintfasttest.cpp \
     src/wizards/readruler/readrulerpageconfig.cpp \
     src/wizards/readruler/readrulerpageinterval.cpp \
     src/wizards/readruler/readrulerpagepreview.cpp \
@@ -374,6 +375,7 @@ HEADERS += \
     src/viewers/traininfowidget.h \
     src/viewers/trainlinedialog.h \
     src/viewers/traintimetableplane.h \
+    src/wizards/greedypaint/greedypaintfasttest.h \
     src/wizards/readruler/readrulerpageconfig.h \
     src/wizards/readruler/readrulerpageinterval.h \
     src/wizards/readruler/readrulerpagepreview.h \

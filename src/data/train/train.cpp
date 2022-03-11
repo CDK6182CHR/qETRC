@@ -955,6 +955,13 @@ bool Train::isLocalTrain(const RailCategory& cat)const
     return false;
 }
 
+void Train::clear()
+{
+    _timetable.clear();
+    _starting = StationName();
+    _terminal = StationName();
+}
+
 bool Train::ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
 {
     return t1->trainName().full() < t2->trainName().full();

@@ -43,7 +43,8 @@ class RailInterval;
 namespace qeutil {
     QString eventTypeString(TrainEventType t);
 
-   
+    TrainEventType formerEventType(bool isStop);
+    TrainEventType latterEventType(bool isStop);
 }
 
 
