@@ -205,7 +205,13 @@
     <ClCompile Include="src\data\calculation\railwaystationeventaxis.cpp" />
     <ClCompile Include="src\data\calculation\stationeventaxis.cpp" />
     <ClCompile Include="src\data\diagram\diadiff.cpp" />
+    <ClCompile Include="src\data\gapset\crgroups.cpp" />
+    <ClCompile Include="src\data\gapset\crset.cpp" />
+    <ClCompile Include="src\data\gapset\gapgroupabstract.cpp" />
+    <ClCompile Include="src\data\gapset\gapsetabstract.cpp" />
     <ClCompile Include="src\editors\edittrainwidget.cpp" />
+    <ClCompile Include="src\editors\rail\gapconstraintwidget.cpp" />
+    <ClCompile Include="src\model\rail\gapconstraintmodel.cpp" />
     <ClCompile Include="src\navi\addpagedialog.cpp" />
     <ClCompile Include="src\editors\routing\addroutingnodedialog.cpp" />
     <ClCompile Include="src\railnet\graph\adjacentlistmodel.cpp" />
@@ -392,6 +398,12 @@
     <ClInclude Include="src\data\calculation\stationeventaxis.h" />
     <ClInclude Include="src\data\diagram\diadiff.h" />
     <ClInclude Include="src\data\diagram\xtl_matrix.hpp" />
+    <ClInclude Include="src\data\gapset\crgroups.h" />
+    <ClInclude Include="src\data\gapset\crset.h" />
+    <ClInclude Include="src\data\gapset\gapgroupabstract.h" />
+    <ClInclude Include="src\data\gapset\gapsetabstract.h" />
+    <QtMoc Include="src\editors\rail\gapconstraintwidget.h" />
+    <ClInclude Include="src\model\rail\gapconstraintmodel.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <QtMoc Include="src\dialogs\changestationnamedialog.h">
     </QtMoc>

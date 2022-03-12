@@ -45,6 +45,10 @@ SOURCES += \
     src/data/diagram/trainevents.cpp \
     src/data/diagram/traingap.cpp \
     src/data/diagram/trainline.cpp \
+    src/data/gapset/crgroups.cpp \
+    src/data/gapset/crset.cpp \
+    src/data/gapset/gapgroupabstract.cpp \
+    src/data/gapset/gapsetabstract.cpp \
     src/data/rail/forbid.cpp \
     src/data/rail/railcategory.cpp \
     src/data/rail/railinfonote.cpp \
@@ -79,6 +83,7 @@ SOURCES += \
     src/editors/configdialog.cpp \
     src/editors/edittrainwidget.cpp \
     src/editors/forbidwidget.cpp \
+    src/editors/rail/gapconstraintwidget.cpp \
     src/editors/railstationwidget.cpp \
     src/editors/routing/addroutingnodedialog.cpp \
     src/editors/routing/batchparseroutingdialog.cpp \
@@ -107,6 +112,7 @@ SOURCES += \
     src/model/delegate/linestyledelegate.cpp \
     src/model/delegate/qetimedelegate.cpp \
     src/model/delegate/timeintervaldelegate.cpp \
+    src/model/rail/gapconstraintmodel.cpp \
     src/model/rail/railtrackadjustmodel.cpp \
     src/model/train/timetablequickmodel.cpp \
     src/model/train/typemodel.cpp \
@@ -226,6 +232,10 @@ HEADERS += \
     src/data/diagram/traingap.h \
     src/data/diagram/trainline.h \
     src/data/diagram/xtl_matrix.hpp \
+    src/data/gapset/crgroups.h \
+    src/data/gapset/crset.h \
+    src/data/gapset/gapgroupabstract.h \
+    src/data/gapset/gapsetabstract.h \
     src/data/rail/forbid.h \
     src/data/rail/rail.h \
     src/data/rail/railcategory.h \
@@ -263,6 +273,7 @@ HEADERS += \
     src/editors/configdialog.h \
     src/editors/edittrainwidget.h \
     src/editors/forbidwidget.h \
+    src/editors/rail/gapconstraintwidget.h \
     src/editors/railstationwidget.h \
     src/editors/routing/addroutingnodedialog.h \
     src/editors/routing/batchparseroutingdialog.h \
@@ -291,6 +302,7 @@ HEADERS += \
     src/model/delegate/linestyledelegate.h \
     src/model/delegate/qetimedelegate.h \
     src/model/delegate/timeintervaldelegate.h \
+    src/model/rail/gapconstraintmodel.h \
     src/model/rail/railtrackadjustmodel.h \
     src/model/train/timetablequickmodel.h \
     src/model/train/typemodel.h \

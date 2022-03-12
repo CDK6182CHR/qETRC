@@ -44,3 +44,11 @@ protected:
     virtual void setupSpin(QSpinBox* sp)const override;
 };
 
+class TrainGapSpinDelegate: public GeneralSpinDelegate
+{
+public:
+    using GeneralSpinDelegate::GeneralSpinDelegate;
+    virtual void setupSpin(QSpinBox* sp)const override;
+    virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
+};
+

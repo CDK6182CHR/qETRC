@@ -1,0 +1,2 @@
+﻿#include "gapgroupabstract.h"
+

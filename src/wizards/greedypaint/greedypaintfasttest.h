@@ -9,6 +9,8 @@ class QLineEdit;
 class RailRulerCombo;
 class QTextBrowser;
 class QCheckBox;
+class QTableView;
+class GapConstraintModel;
 class GreedyPaintFastTest : public QDialog
 {
     Q_OBJECT
@@ -19,8 +21,10 @@ class GreedyPaintFastTest : public QDialog
     QSpinBox* spInt,*spBack;
     QCheckBox* ckDown,*ckSingle,*ckStarting,*ckTerminal,*ckForbid;
     QTextBrowser* txtOut;
+    QTableView* table;
 
     GreedyPainter painter;
+    GapConstraintModel* const _model;
 public:
     explicit GreedyPaintFastTest(Diagram& diagram, QWidget *parent = nullptr);
 
@@ -32,5 +36,6 @@ signals:
 
 private slots:
     void onApply();
+    void onSingleLineChanged(bool on);
 };
 

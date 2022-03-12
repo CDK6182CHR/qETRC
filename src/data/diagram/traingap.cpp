@@ -176,7 +176,7 @@ bool TrainGap::isTypeLeftFormer(const GapTypes& type, const RailStationEvent::Po
 
 bool TrainGap::isTypeRightFormer(const GapTypes& type, const RailStationEvent::Positions& pos)
 {
-    return  (type & RightDown && (pos & RailStationEvent::Pre)) ||
+    return  ((type & RightDown) && (pos & RailStationEvent::Pre)) ||
         (!(type & RightDown) && (pos & RailStationEvent::Post));
 }
 

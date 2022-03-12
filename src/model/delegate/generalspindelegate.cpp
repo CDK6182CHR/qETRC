@@ -1,6 +1,6 @@
 ﻿#include "generalspindelegate.h"
 #include <QSpinBox>
-
+#include <util/utilfunc.h>
 
 GeneralSpinDelegate::GeneralSpinDelegate(QObject *parent) : QStyledItemDelegate(parent)
 {
@@ -56,4 +56,18 @@ void SecondSpinDelegate::setupSpin(QSpinBox *sp) const
     sp->setRange(0,59);
     sp->setSingleStep(10);
     sp->setWrapping(true);
+}
+
+void TrainGapSpinDelegate::setupSpin(QSpinBox *sp) const
+{
+    sp->setRange(0,10*3600);
+    sp->setSingleStep(30);
+    sp->setSuffix(tr(" 秒 (s)"));
+}
+
+QString TrainGapSpinDelegate::displayText(const QVariant &value,
+                                          const QLocale &locale) const
+{
+    Q_UNUSED(locale);
+    return qeutil::secsDiffToString(value.toInt());
 }

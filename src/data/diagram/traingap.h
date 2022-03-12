@@ -78,8 +78,13 @@ struct TrainGap{
 
     /**
      * 针对Type的判定：不依赖具体事件。
+     * 下行站前或上行站后；就是先经过的那个；也即到或者通
      */
     static bool isTypeLeftFormer(const GapTypes& type, const RailStationEvent::Positions& pos);
+
+    /**
+     * 下行站后或者上行站前；发或者通
+     */
     static bool isTypeRightFormer(const GapTypes& type, const RailStationEvent::Positions& pos);
 
     bool operator<(const TrainGap& gap)const;

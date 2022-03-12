@@ -30,5 +30,7 @@ public:
     bool isSingleLine()const{return _singleLine;}
 
     void setSingleLine(bool on){_singleLine=on;}
+
+    QString toString()const;
 };
 

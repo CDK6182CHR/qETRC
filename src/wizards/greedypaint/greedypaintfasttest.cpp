@@ -8,6 +8,8 @@
 #include <QTextBrowser>
 #include <QTimeEdit>
 #include <QVBoxLayout>
+#include <QTableView>
+#include <QHeaderView>
 
 #include <util/buttongroup.hpp>
 #include <util/railrulercombo.h>
@@ -15,11 +17,15 @@
 #include <data/diagram/diagram.h>
 #include <data/train/trainname.h>
 #include <data/train/train.h>
-
+#include <data/common/qesystem.h>
+#include <model/rail/gapconstraintmodel.h>
+#include <data/gapset/crset.h>
+#include <model/delegate/generalspindelegate.h>
 #include <chrono>
 
 GreedyPaintFastTest::GreedyPaintFastTest(Diagram& diagram_, QWidget *parent):
-    QDialog(parent),diagram(diagram_), painter(diagram_)
+    QDialog(parent),diagram(diagram_), painter(diagram_),
+    _model(new GapConstraintModel(std::make_unique<gapset::cr::CRSet>()))
 {
     setWindowTitle(tr("贪心推线 - 快速测试"));
     resize(800, 800);
@@ -29,7 +35,8 @@ GreedyPaintFastTest::GreedyPaintFastTest(Diagram& diagram_, QWidget *parent):
 
 void GreedyPaintFastTest::initUI()
 {
-    auto* vlay=new QVBoxLayout(this);
+    auto* toplay = new QHBoxLayout(this);
+    auto* vlay=new QVBoxLayout();
     auto* flay=new QFormLayout;
 
     cbRuler=new RailRulerCombo(diagram.railCategory());
@@ -72,12 +79,26 @@ void GreedyPaintFastTest::initUI()
     hlay->addWidget(ckTerminal);
     vlay->addLayout(hlay);
 
-    txtOut=new QTextBrowser;
-    vlay->addWidget(txtOut);
+    table = new QTableView;
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->setEditTriggers(QTableView::AllEditTriggers);
+    table->setModel(_model);
+    table->setItemDelegateForColumn(GapConstraintModel::ColLimit,
+        new TrainGapSpinDelegate(this));
+    onSingleLineChanged(false);
+    vlay->addWidget(table);
 
-    auto* g=new ButtonGroup<2>({"排图","关闭"});
+    connect(ckSingle, &QCheckBox::toggled, this, &GreedyPaintFastTest::onSingleLineChanged);
+
+
+    auto* g = new ButtonGroup<2>({ "排图","关闭" });
     vlay->addLayout(g);
-    g->connectAll(SIGNAL(clicked()),this,{SLOT(onApply()),SLOT(close())});
+    g->connectAll(SIGNAL(clicked()), this, { SLOT(onApply()),SLOT(close()) });
+
+    toplay->addLayout(vlay);
+
+    txtOut=new QTextBrowser;
+    toplay->addWidget(txtOut);
 }
 
 void GreedyPaintFastTest::onApply()
@@ -111,10 +132,19 @@ void GreedyPaintFastTest::onApply()
         }
     }
 
-    auto allGaps=TrainGap::allPossibleGaps(cns.isSingleLine());
-    for(auto gap:allGaps){
-        cns[gap]=spInt->value();
+    // 设置间隔
+    painter.constraints().clear();
+    auto* gs = _model->gapSet();
+    for (const auto& gapgroup : *gs) {
+        for (const auto& t : *gapgroup) {
+            painter.constraints()[t] = gapgroup->limit();
+        }
     }
+
+    for (auto t : gs->remainTypes()) {
+        painter.constraints()[t] = 0;
+    }
+
 
     if(ckDown->isChecked()){
         painter.setAnchor(rail->stations().front());
@@ -135,6 +165,8 @@ void GreedyPaintFastTest::onApply()
 
     // 整理报告
     QString report;
+    report.append(tr("已配置间隔约束：\n%1\n").arg(painter.constraints().toString()));
+    report.append(tr("\n--------------------------------------\n运行记录：\n"));
 
     int i=0;
     for(const auto& t:painter.logs()){
@@ -156,4 +188,9 @@ void GreedyPaintFastTest::onApply()
         "已保留最后尝试状态。"));
     }
 
+}
+
+void GreedyPaintFastTest::onSingleLineChanged(bool on)
+{
+    _model->refreshData(on);
 }
