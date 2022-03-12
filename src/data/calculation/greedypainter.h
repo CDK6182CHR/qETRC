@@ -9,6 +9,7 @@ class TrainName;
 class Railway;
 class Ruler;
 class RulerNode;
+class Forbid;
 /**
  * @brief The GreedyPainter class
  * 贪心算法全自动铺画运行线。
@@ -35,6 +36,10 @@ class GreedyPainter
 	RailwayStationEventAxis _railAxis;
 
 	std::vector<std::unique_ptr<CalculationLogAbstract>> _logs;
+	std::vector<std::shared_ptr<Forbid>> _usedForbids;
+
+	int _maxBackoffTimes;
+	int backoffCount = 0;
 
 public:
 	GreedyPainter(Diagram& diagram);
@@ -46,6 +51,7 @@ public:
 	auto dir() { return _dir; }
 	bool localStarting() { return _localStarting; }
 	bool localTerminal() { return _localTerminal; }
+	int maxBackoffTimes() { return _maxBackoffTimes; }
 	void setRailway(std::shared_ptr<Railway> railway) { _railway = railway; }
 	void setRuler(std::shared_ptr<Ruler> ruler) { _ruler = ruler; }
 	void setAnchor(std::shared_ptr<RailStation> anchor) { _anchor = anchor; }
@@ -55,12 +61,14 @@ public:
 	void setLocalTerminal(bool on) { _localTerminal = on; }
 	void setDir(Direction d) { _dir = d; }
 	void setAnchorTime(const QTime& t) { _anchorTime = t; }
+	void setMaxBackoffTimes(int t) { _maxBackoffTimes = t; }
 	auto& constraints() { return _constraints; }
 	const auto& constraints()const { return _constraints; }
 	auto& settledStops() { return _settledStops; }
 	const auto& settledStops()const { return _settledStops; }
 	auto train() { return _train; }
 	auto& logs() { return _logs; }
+	auto& usedForbids() { return _usedForbids; }
 
 	/**
 	 * @brief paint  核心接口函数，铺画运行线。

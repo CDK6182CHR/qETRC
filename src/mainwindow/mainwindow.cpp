@@ -377,6 +377,8 @@ void MainWindow::actGreedyPaint()
     auto* w = new GreedyPaintFastTest(_diagram, this);
     connect(w, &GreedyPaintFastTest::trainAdded,
         naviView, &NaviTree::actAddPaintedTrain);
+    connect(w, &GreedyPaintFastTest::showStatus,
+        this, &MainWindow::showStatus);
     w->show();
 }
 

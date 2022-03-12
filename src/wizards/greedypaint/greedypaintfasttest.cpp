@@ -4,6 +4,7 @@
 #include <QFormLayout>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QSpinBox>
 #include <QTextBrowser>
 #include <QTimeEdit>
 #include <QVBoxLayout>
@@ -14,6 +15,8 @@
 #include <data/diagram/diagram.h>
 #include <data/train/trainname.h>
 #include <data/train/train.h>
+
+#include <chrono>
 
 GreedyPaintFastTest::GreedyPaintFastTest(Diagram& diagram_, QWidget *parent):
     QDialog(parent),diagram(diagram_), painter(diagram_)
@@ -40,6 +43,18 @@ void GreedyPaintFastTest::initUI()
     edTime->setDisplayFormat("hh:mm:ss");
     flay->addRow(tr("锚点时刻"),edTime);
 
+    spInt=new QSpinBox;
+    spInt->setSuffix(tr(" 秒 (s)"));
+    spInt->setSingleStep(30);
+    spInt->setRange(0,10*3600-1);
+    spInt->setValue(6*60);
+    flay->addRow(tr("列车间隔"),spInt);
+
+    spBack=new QSpinBox;
+    spBack->setRange(0,10000000);
+    spBack->setValue(3);
+    flay->addRow(tr("最大尝试回溯次数"),spBack);
+
     auto* hlay=new QHBoxLayout;
     ckDown=new QCheckBox(tr("下行"));
     ckDown->setChecked(true);
@@ -47,6 +62,9 @@ void GreedyPaintFastTest::initUI()
 
     ckSingle=new QCheckBox(tr("单线"));
     hlay->addWidget(ckSingle);
+
+    ckForbid=new QCheckBox(tr("启用天窗"));
+    hlay->addWidget(ckForbid);
 
     ckStarting=new QCheckBox(tr("在本线始发"));
     hlay->addWidget(ckStarting);
@@ -84,18 +102,36 @@ void GreedyPaintFastTest::onApply()
     painter.setAnchorTime(edTime->time());
     painter.setRailway(rail);
     painter.setRuler(ruler);
+    painter.setMaxBackoffTimes(spBack->value());
 
-    auto allGaps=TrainGap::allPossibleGaps(cns.isSingleLine());
-    constexpr static const int GAP_SECS=6*60;
-    for(auto gap:allGaps){
-        cns[gap]=GAP_SECS;
+    painter.usedForbids().clear();
+    if(ckForbid->isChecked()){
+        foreach(auto forbid, rail->forbids()){
+            painter.usedForbids().push_back(forbid);
+        }
     }
 
-    painter.setAnchor(rail->stations().front());
-    painter.setEnd(rail->stations().back());
-    painter.setStart(rail->stations().front());
+    auto allGaps=TrainGap::allPossibleGaps(cns.isSingleLine());
+    for(auto gap:allGaps){
+        cns[gap]=spInt->value();
+    }
 
+    if(ckDown->isChecked()){
+        painter.setAnchor(rail->stations().front());
+        painter.setEnd(rail->stations().back());
+        painter.setStart(rail->stations().front());
+    }else{
+        painter.setAnchor(rail->stations().back());
+        painter.setEnd(rail->stations().front());
+        painter.setStart(rail->stations().back());
+    }
+
+
+    using namespace std::chrono_literals;
+    auto tm_start=std::chrono::system_clock::now();
     bool res=painter.paint(tn);
+    auto tm_end=std::chrono::system_clock::now();
+    emit showStatus(tr("自动推线 用时 %1 毫秒").arg((tm_end-tm_start)/1ms));
 
     // 整理报告
     QString report;
@@ -116,7 +152,8 @@ void GreedyPaintFastTest::onApply()
     if (res){
         QMessageBox::information(this,tr("提示"),tr("排图成功"));
     }else{
-        QMessageBox::warning(this,tr("提示"),tr("排图失败"));
+        QMessageBox::warning(this,tr("提示"),tr("排图失败，可能因为没有满足约束条件的线位。"
+        "已保留最后尝试状态。"));
     }
 
 }

@@ -1377,7 +1377,10 @@ RailStationEventList
         // 2021.09.09新增规则：运行线首站到达、末站出发不算进来
         bool localFirst = (p == _stations.begin());
         bool localLast = (p == last);
-        if (startLabel() || !localFirst) {
+        // 2022.03.12修改规则：多段运行线交接点的，出发算后段、到达算前段
+        // 实际上和普通运行线没区别了
+        //if (startLabel() || !localFirst) {
+        if (true || !localFirst) {
             auto ts = p->trainStation;
             if (ts->isStopped()) {
                 //只要有停车，一律按到达出发处理

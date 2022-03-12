@@ -21,7 +21,7 @@ IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_p
     auto rcitr = std::make_reverse_iterator(citr);
 
     // 首先处理共线的情况
-    if ((*citr)->time == ev_start.time) {
+    if (citr!=ax_from.end() && (*citr)->time == ev_start.time) {
         auto [res, _] = isConflictedWith(ev_start, tm_to, *citr, ax_to, singleLine);
         if (res) {
             // 注意发站时刻相同的情况下还被定冲突了，只能是共线

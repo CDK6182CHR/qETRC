@@ -3,6 +3,7 @@
 #include <QDialog>
 #include <data/calculation/greedypainter.h>
 
+class QSpinBox;
 class QTimeEdit;
 class QLineEdit;
 class RailRulerCombo;
@@ -15,7 +16,8 @@ class GreedyPaintFastTest : public QDialog
     RailRulerCombo* cbRuler;
     QLineEdit* edTrainName;
     QTimeEdit* edTime;
-    QCheckBox* ckDown,*ckSingle,*ckStarting,*ckTerminal;
+    QSpinBox* spInt,*spBack;
+    QCheckBox* ckDown,*ckSingle,*ckStarting,*ckTerminal,*ckForbid;
     QTextBrowser* txtOut;
 
     GreedyPainter painter;
@@ -26,6 +28,7 @@ private:
     void initUI();
 signals:
     void trainAdded(std::shared_ptr<Train>);
+    void showStatus(const QString&);
 
 private slots:
     void onApply();
