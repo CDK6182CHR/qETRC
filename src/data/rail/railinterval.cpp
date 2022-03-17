@@ -94,6 +94,11 @@ std::shared_ptr<RulerNode> RailInterval::getRulerNode(std::shared_ptr<Ruler> rul
     return rulerNodeAt(ruler->index());
 }
 
+std::shared_ptr<const RulerNode> RailInterval::getRulerNode(std::shared_ptr<const Ruler> ruler) const
+{
+    return rulerNodeAt(ruler->index());
+}
+
 std::shared_ptr<RulerNode> RailInterval::getRulerNode(const Ruler& ruler)
 {
     return rulerNodeAt(ruler.index());

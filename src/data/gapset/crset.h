@@ -1,5 +1,4 @@
-﻿#ifndef GAPSET_CR_CRSET_H
-#define GAPSET_CR_CRSET_H
+﻿#pragma once
 
 #include "gapsetabstract.h"
 
@@ -21,4 +20,3 @@ public:
 } // namespace cr
 } // namespace gapset
 
-#endif // GAPSET_CR_CRSET_H

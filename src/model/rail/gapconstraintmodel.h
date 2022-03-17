@@ -9,22 +9,23 @@ class GapSetAbstract;
 
 /**
  * @brief The GapConstraintModel class
- * 分类别的列车间隔限制编辑器；直接持有GapSet的所有权。
+ * 分类别的列车间隔限制编辑器
  * 构造方式什么的问题，一会再想想。
+ * 2022.03.14：不再持有GapSet的所有权；这个所有权交给外面来搞。
  */
 class GapConstraintModel : public QAbstractTableModel
 {
-    std::unique_ptr<gapset::GapSetAbstract> _gapSet{};
+    //std::unique_ptr<gapset::GapSetAbstract> _gapSet{};
+    gapset::GapSetAbstract* _gapSet{};
 public:
     enum {
         ColName=0,
         ColLimit=1,
         ColMAX
     };
-    explicit GapConstraintModel(std::unique_ptr<gapset::GapSetAbstract>&& gapSet,
-                                QObject *parent = nullptr);
+    explicit GapConstraintModel(QObject *parent = nullptr);
 
-    auto* gapSet(){return _gapSet.get();}
+    auto* gapSet(){return _gapSet;}
 
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual int columnCount(const QModelIndex &parent) const override;
@@ -34,7 +35,9 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    void refreshData(bool singleLine);
+public slots:
+    void setSingleLine(bool singleLine);
+    void setGapSet(gapset::GapSetAbstract* gapSet, bool singleLine);
 
 };
 

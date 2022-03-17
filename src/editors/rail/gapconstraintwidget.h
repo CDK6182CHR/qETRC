@@ -18,7 +18,6 @@ class GapConstraintWidget : public QWidget
     QTableView* table;
 public:
     explicit GapConstraintWidget(GapConstraints& constraints,
-                                 std::unique_ptr<gapset::GapSetAbstract>&& _gapset,
                                  QWidget *parent = nullptr);
     void refreshData();
 private:

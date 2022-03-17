@@ -11,6 +11,9 @@ class QTextBrowser;
 class QCheckBox;
 class QTableView;
 class GapConstraintModel;
+namespace gapset {
+class GapSetAbstract;
+}
 class GreedyPaintFastTest : public QDialog
 {
     Q_OBJECT
@@ -25,8 +28,11 @@ class GreedyPaintFastTest : public QDialog
 
     GreedyPainter painter;
     GapConstraintModel* const _model;
+
+    std::unique_ptr<gapset::GapSetAbstract> _crSet;
 public:
     explicit GreedyPaintFastTest(Diagram& diagram, QWidget *parent = nullptr);
+    //~GreedyPaintFastTest();
 
 private:
     void initUI();

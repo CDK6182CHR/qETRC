@@ -52,6 +52,26 @@ public:
         }
     }
 
+    inline std::shared_ptr<_Node> prevNode() {
+        auto t = _railint.prevInterval();
+        if (t) {
+            return t->template getDataAt<_Node>(_data.index());
+        }
+        else {
+            return std::shared_ptr<_Node>();
+        }
+    }
+
+    inline std::shared_ptr<const _Node> prevNode()const {
+        auto t = _railint.prevInterval();
+        if (t) {
+            return t->template getDataAt<_Node>(_data.index());
+        }
+        else {
+            return std::shared_ptr<_Node>();
+        }
+    }
+
     inline std::shared_ptr<_Node> nextNodeCirc(){
         auto t=nextNode();
         if(!t&&isDownInterval()){

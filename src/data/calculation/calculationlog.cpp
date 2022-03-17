@@ -17,7 +17,7 @@ QString CalculationLogAbstract::objectString() const
 }
 
 
-CalculationLogStation::CalculationLogStation(Reason reason, std::shared_ptr<RailStation> station, 
+CalculationLogStation::CalculationLogStation(Reason reason, std::shared_ptr<const RailStation> station, 
     const QTime time, ModifiedField field):
     CalculationLogAbstract(reason),_station(station),_time(time),_field(field)
 {
@@ -81,9 +81,9 @@ QString CalculationLogGap::objectString() const
     return _event->line->train()->trainName().full();
 }
 
-CalculationLogInterval::CalculationLogInterval(Reason reason, std::shared_ptr<RailStation> station, 
+CalculationLogInterval::CalculationLogInterval(Reason reason, std::shared_ptr<const RailStation> station, 
     const QTime time, ModifiedField field, IntervalConflictReport::ConflictType type,
-    std::shared_ptr<RailInterval> railint, std::shared_ptr<const TrainLine> line):
+    std::shared_ptr<const RailInterval> railint, std::shared_ptr<const TrainLine> line):
     CalculationLogStation(reason,station,time,field),_type(type),_railint(railint),_line(line)
 {
 }
@@ -106,8 +106,8 @@ QString CalculationLogInterval::objectString() const
     else return "";
 }
 
-CalculationLogForbid::CalculationLogForbid(std::shared_ptr<RailStation> station, const QTime& time, 
-    std::shared_ptr<RailInterval> railint, std::shared_ptr<Forbid> forbid):
+CalculationLogForbid::CalculationLogForbid(std::shared_ptr<const RailStation> station, const QTime& time, 
+    std::shared_ptr<const RailInterval> railint, std::shared_ptr<Forbid> forbid):
     CalculationLogStation(ForbidConflict,station,time,Depart),_railint(railint), _forbid(forbid)
 {
 }

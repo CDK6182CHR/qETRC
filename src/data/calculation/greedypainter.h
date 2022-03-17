@@ -21,11 +21,11 @@ class GreedyPainter
 	Diagram& diagram;
 	std::shared_ptr<Railway> _railway;
 	std::shared_ptr<Ruler> _ruler;
-	std::shared_ptr<RailStation> _anchor, _start, _end;
-	bool _localStarting, _localTerminal;
+	std::shared_ptr<const RailStation> _anchor, _start, _end;
+	bool _localStarting, _localTerminal, _anchorAsArrive;
 	Direction _dir;
 	QTime _anchorTime;
-	std::map<std::shared_ptr<RailStation>, int> _settledStops;
+	std::map<std::shared_ptr<const RailStation>, int> _settledStops;
 
 	/**
 	 * @brief _train
@@ -54,14 +54,15 @@ public:
 	int maxBackoffTimes() { return _maxBackoffTimes; }
 	void setRailway(std::shared_ptr<Railway> railway) { _railway = railway; }
 	void setRuler(std::shared_ptr<Ruler> ruler) { _ruler = ruler; }
-	void setAnchor(std::shared_ptr<RailStation> anchor) { _anchor = anchor; }
-	void setStart(std::shared_ptr<RailStation> value) { _start = value; }
-	void setEnd(std::shared_ptr<RailStation> value) { _end = value; }
+	void setAnchor(std::shared_ptr<const RailStation> anchor) { _anchor = anchor; }
+	void setStart(std::shared_ptr<const RailStation> value) { _start = value; }
+	void setEnd(std::shared_ptr<const RailStation> value) { _end = value; }
 	void setLocalStarting(bool on) { _localStarting = on; }
 	void setLocalTerminal(bool on) { _localTerminal = on; }
 	void setDir(Direction d) { _dir = d; }
 	void setAnchorTime(const QTime& t) { _anchorTime = t; }
 	void setMaxBackoffTimes(int t) { _maxBackoffTimes = t; }
+	void setAnchorAsArrive(bool on) { _anchorAsArrive = on; }
 	auto& constraints() { return _constraints; }
 	const auto& constraints()const { return _constraints; }
 	auto& settledStops() { return _settledStops; }
@@ -91,6 +92,6 @@ private:
 	 * @param tm node前站的预告到达时刻
 	 * @param stop node前站是否已包含停车附加时分，即该站是否停车
 	 */
-	bool calForward(std::shared_ptr<RailInterval> railint, const QTime& tm, bool stop);
+	bool calForward(std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
 };
 

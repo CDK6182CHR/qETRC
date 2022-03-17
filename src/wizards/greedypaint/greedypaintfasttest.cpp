@@ -25,13 +25,19 @@
 
 GreedyPaintFastTest::GreedyPaintFastTest(Diagram& diagram_, QWidget *parent):
     QDialog(parent),diagram(diagram_), painter(diagram_),
-    _model(new GapConstraintModel(std::make_unique<gapset::cr::CRSet>()))
+    _model(new GapConstraintModel(this)),
+    _crSet(std::make_unique<gapset::cr::CRSet>())
 {
     setWindowTitle(tr("贪心推线 - 快速测试"));
     resize(800, 800);
     setAttribute(Qt::WA_DeleteOnClose);
     initUI();
 }
+
+//GreedyPaintFastTest::~GreedyPaintFastTest()
+//{
+//    _crSet.reset();
+//}
 
 void GreedyPaintFastTest::initUI()
 {
@@ -82,6 +88,7 @@ void GreedyPaintFastTest::initUI()
     table = new QTableView;
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->setEditTriggers(QTableView::AllEditTriggers);
+    _model->setGapSet(_crSet.get(),false);
     table->setModel(_model);
     table->setItemDelegateForColumn(GapConstraintModel::ColLimit,
         new TrainGapSpinDelegate(this));
@@ -192,5 +199,5 @@ void GreedyPaintFastTest::onApply()
 
 void GreedyPaintFastTest::onSingleLineChanged(bool on)
 {
-    _model->refreshData(on);
+    _model->setSingleLine(on);
 }

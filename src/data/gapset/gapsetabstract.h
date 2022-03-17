@@ -24,6 +24,11 @@ public:
     bool singleLine()const {return _singleLine;}
     void setSingleLine(bool on){_singleLine=on;}
 
+    /**
+     * 设置是否单线；如果改变了，则重新构建set。
+     */
+    void setSingleLineAndBuild(bool on);
+
 
     /**
      * @brief remainTypes

@@ -2,9 +2,8 @@
 
 #include <data/gapset/gapsetabstract.h>
 
-GapConstraintModel::GapConstraintModel(std::unique_ptr<gapset::GapSetAbstract>&& gapSet,
-                                       QObject *parent) :
-    QAbstractTableModel(parent),_gapSet(std::move(gapSet))
+GapConstraintModel::GapConstraintModel(QObject *parent) :
+    QAbstractTableModel(parent)
 {
 
 }
@@ -12,7 +11,7 @@ GapConstraintModel::GapConstraintModel(std::unique_ptr<gapset::GapSetAbstract>&&
 int GapConstraintModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return _gapSet->size();
+    return _gapSet ? _gapSet->size():0;
 }
 
 int GapConstraintModel::columnCount(const QModelIndex &parent) const
@@ -59,7 +58,7 @@ QVariant GapConstraintModel::headerData(int section, Qt::Orientation orientation
         case ColLimit: return QObject::tr("最小间隔");
         }
     }
-    return {};
+    return QAbstractTableModel::headerData(section, orientation, role);
 }
 
 Qt::ItemFlags GapConstraintModel::flags(const QModelIndex &index) const
@@ -73,11 +72,18 @@ Qt::ItemFlags GapConstraintModel::flags(const QModelIndex &index) const
     return flag;
 }
 
-void GapConstraintModel::refreshData(bool singleLine)
+void GapConstraintModel::setSingleLine(bool singleLine)
 {
     beginResetModel();
-    _gapSet->setSingleLine(singleLine);
-    _gapSet->buildSet();
+    _gapSet->setSingleLineAndBuild(singleLine);
+    endResetModel();
+}
+
+void GapConstraintModel::setGapSet(gapset::GapSetAbstract *gapSet, bool singleLine)
+{
+    beginResetModel();
+    _gapSet=gapSet;
+    _gapSet->setSingleLineAndBuild(singleLine);
     endResetModel();
 }
 

@@ -27,14 +27,26 @@ bool GreedyPainter::paint(const TrainName& trainName)
 	_logs.clear();
 	backoffCount = 0;
 
+	// 首站的处理
+	QTime tm_arr = _anchorTime, tm_dep = _anchorTime;
+	if (auto itr = _settledStops.find(_anchor); itr != _settledStops.end()) {
+		if (_anchorAsArrive) {
+			tm_dep = _anchorTime.addSecs(itr->second);
+		}
+		else {
+			tm_arr = _anchorTime.addSecs(-itr->second);
+		}
+	}
+
 	// 正向推线
 	auto railint = _anchor->dirNextInterval(_dir);
 	_train->clear();
-	_train->appendStation(_anchor->name, _anchorTime, _anchorTime);
+	_train->appendStation(_anchor->name, tm_arr, tm_dep);
 
 	bool flag = false;
 	try {
-		flag = calForward(railint, _anchorTime, _anchor == _start && _localStarting);
+		flag = calForward(railint, _anchorTime, 
+			(_anchor == _start && _localStarting) || tm_arr != tm_dep );
 	}
 	catch (const BackoffExeed& ) {
 		addLog(std::make_unique<CalculationLogSimple>(CalculationLogAbstract::BadTermination));
@@ -42,12 +54,18 @@ bool GreedyPainter::paint(const TrainName& trainName)
 	
 
 
-	if (flag) {
+	if (flag && !_train->empty()) {
 		if (_localStarting) {
 			_train->setStarting(_start->name);
+			auto& first = _train->timetable().front();
+			first.arrive = first.depart;
+			first.business = true;
 		}
 		if (_localTerminal) {
 			_train->setTerminal(_end->name);
+			auto& last = _train->timetable().back();
+			last.depart = last.arrive;
+			last.business = true;
 		}
 	}
 
@@ -57,11 +75,13 @@ bool GreedyPainter::paint(const TrainName& trainName)
 void GreedyPainter::addLog(std::unique_ptr<CalculationLogAbstract> log)
 {
 	qDebug() << log->toString() << Qt::endl;
-
+	//if (log->toString() == "[区间自动推线] 将[李市镇]站[到达]时刻设置为[12:32:50]") {
+	//	qDebug() << "李市镇!";
+	//}
 	_logs.emplace_back(std::move(log));
 }
 
-bool GreedyPainter::calForward(std::shared_ptr<RailInterval> railint, const QTime& _tm, bool stop)
+bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, const QTime& _tm, bool stop)
 {
 	if (!railint || railint->fromStation() == _end) {
 		addLog(std::make_unique<CalculationLogSimple>(
@@ -92,10 +112,16 @@ bool GreedyPainter::calForward(std::shared_ptr<RailInterval> railint, const QTim
 				CalculationLogAbstract::SetStop, st_from, ev_start.time,
 				CalculationLogAbstract::Depart
 				));
+			_train->timetable().back().business = true;
 		}
 	}
 
 	int tot_delay = qeutil::secsTo(_tm, ev_start.time);
+
+	// 这个Flag标记to站是否要尝试停车。
+	// 在第一次通过to站发现停车间隔冲突时，需尝试是否要在后站停车；
+	// 此时必须重来一遍循环，设置此flag为true，表示下一轮不再尝试通过。
+	bool to_try_stop = false;
 
 	while (true) {
 		qDebug() << railint->toString() << "  delay: " << tot_delay << ", " << tot_delay / 3600. << Qt::endl;
@@ -217,14 +243,21 @@ bool GreedyPainter::calForward(std::shared_ptr<RailInterval> railint, const QTim
 		tm_to = ev_start.time.addSecs(int_secs);
 		RailStationEventBase ev_stop(TrainEventType::SettledPass, tm_to, qeutil::dirFormerPos(_dir), _dir);
 		auto to_conf = ax_to.conflictEvent(ev_stop, _constraints);
-		if (!next_stop && !to_conf) {
+		if (!to_try_stop && !next_stop && !to_conf) {
 			addLog(std::make_unique<CalculationLogBasic>(
 				CalculationLogAbstract::Predicted, st_to, tm_to,
 				CalculationLogAbstract::Arrive
 				));
-			_train->appendStation(st_to->name, tm_to, tm_to);
+			_train->appendStation(st_to->name, tm_to, tm_to, false);
 			bool flag = calForward(railint->nextInterval(), tm_to, false);
 			if (flag) return true;
+		}
+
+		// 如果走到这里，说明通过的尝试失败
+		// 如果本轮循环是尝试通过的，则下一轮不用再试通过。
+		if (!to_try_stop) {
+			to_try_stop = true;
+			continue;
 		}
 
 		// 下面：后站需要停车的情况。注意根据递归基本约定，
@@ -235,13 +268,16 @@ bool GreedyPainter::calForward(std::shared_ptr<RailInterval> railint, const QTim
 		ev_stop.type = TrainEventType::Arrive;
 		to_conf = ax_to.conflictEvent(ev_stop, _constraints);
 
+		// 只要尝试过一次原时刻停车了，不论结果如何，下一轮都优先考虑通过
+		to_try_stop = false;
+
 		if (!to_conf) {
 			// 可以停车
 			addLog(std::make_unique<CalculationLogBasic>(
 				CalculationLogAbstract::Predicted, st_to, tm_to,
 				CalculationLogAbstract::Arrive
 				));
-			_train->appendStation(st_to->name, tm_to, tm_to);
+			_train->appendStation(st_to->name, tm_to, tm_to, false);
 			bool flag = calForward(railint->nextInterval(), tm_to, true);
 			if (flag) {
 				return true;

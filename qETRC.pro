@@ -49,6 +49,7 @@ SOURCES += \
     src/data/gapset/crset.cpp \
     src/data/gapset/gapgroupabstract.cpp \
     src/data/gapset/gapsetabstract.cpp \
+    src/data/gapset/transparentset.cpp \
     src/data/rail/forbid.cpp \
     src/data/rail/railcategory.cpp \
     src/data/rail/railinfonote.cpp \
@@ -112,6 +113,7 @@ SOURCES += \
     src/model/delegate/linestyledelegate.cpp \
     src/model/delegate/qetimedelegate.cpp \
     src/model/delegate/timeintervaldelegate.cpp \
+    src/model/rail/forbidlistmodel.cpp \
     src/model/rail/gapconstraintmodel.cpp \
     src/model/rail/railtrackadjustmodel.cpp \
     src/model/train/timetablequickmodel.cpp \
@@ -194,6 +196,9 @@ SOURCES += \
     src/viewers/trainlinedialog.cpp \
     src/viewers/traintimetableplane.cpp \
     src/wizards/greedypaint/greedypaintfasttest.cpp \
+    src/wizards/greedypaint/greedypaintpageconstraint.cpp \
+    src/wizards/greedypaint/greedypaintpagepaint.cpp \
+    src/wizards/greedypaint/greedypaintwizard.cpp \
     src/wizards/readruler/readrulerpageconfig.cpp \
     src/wizards/readruler/readrulerpageinterval.cpp \
     src/wizards/readruler/readrulerpagepreview.cpp \
@@ -236,6 +241,7 @@ HEADERS += \
     src/data/gapset/crset.h \
     src/data/gapset/gapgroupabstract.h \
     src/data/gapset/gapsetabstract.h \
+    src/data/gapset/transparentset.h \
     src/data/rail/forbid.h \
     src/data/rail/rail.h \
     src/data/rail/railcategory.h \
@@ -302,6 +308,7 @@ HEADERS += \
     src/model/delegate/linestyledelegate.h \
     src/model/delegate/qetimedelegate.h \
     src/model/delegate/timeintervaldelegate.h \
+    src/model/rail/forbidlistmodel.h \
     src/model/rail/gapconstraintmodel.h \
     src/model/rail/railtrackadjustmodel.h \
     src/model/train/timetablequickmodel.h \
@@ -388,6 +395,9 @@ HEADERS += \
     src/viewers/trainlinedialog.h \
     src/viewers/traintimetableplane.h \
     src/wizards/greedypaint/greedypaintfasttest.h \
+    src/wizards/greedypaint/greedypaintpageconstraint.h \
+    src/wizards/greedypaint/greedypaintpagepaint.h \
+    src/wizards/greedypaint/greedypaintwizard.h \
     src/wizards/readruler/readrulerpageconfig.h \
     src/wizards/readruler/readrulerpageinterval.h \
     src/wizards/readruler/readrulerpagepreview.h \

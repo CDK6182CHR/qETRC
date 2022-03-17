@@ -65,8 +65,9 @@ void SelectTrainCombo::resetTrain()
 void SelectTrainCombo::initUI()
 {
     edName=new QLineEdit;
-    edName->setToolTip(tr("请输入部分或完整车次，编辑结束后将在右侧下拉列表中显示"
+    edName->setToolTip(tr("请输入部分或完整车次，编辑结束后（可按Tab键结束）将在右侧下拉列表中显示"
             "符合条件的车次。"));
+    edName->setPlaceholderText(tr("按Tab键结束输入"));
     connect(edName,&QLineEdit::editingFinished,
             this,&SelectTrainCombo::onEditingFinished);
     addWidget(edName,1);

@@ -209,8 +209,10 @@
     <ClCompile Include="src\data\gapset\crset.cpp" />
     <ClCompile Include="src\data\gapset\gapgroupabstract.cpp" />
     <ClCompile Include="src\data\gapset\gapsetabstract.cpp" />
+    <ClCompile Include="src\data\gapset\transparentset.cpp" />
     <ClCompile Include="src\editors\edittrainwidget.cpp" />
     <ClCompile Include="src\editors\rail\gapconstraintwidget.cpp" />
+    <ClCompile Include="src\model\rail\forbidlistmodel.cpp" />
     <ClCompile Include="src\model\rail\gapconstraintmodel.cpp" />
     <ClCompile Include="src\navi\addpagedialog.cpp" />
     <ClCompile Include="src\editors\routing\addroutingnodedialog.cpp" />
@@ -229,6 +231,9 @@
     <ClCompile Include="src\viewers\compare\diagramcomparedialog.cpp" />
     <ClCompile Include="src\viewers\compare\traincomparedialog.cpp" />
     <ClCompile Include="src\wizards\greedypaint\greedypaintfasttest.cpp" />
+    <ClCompile Include="src\wizards\greedypaint\greedypaintpageconstraint.cpp" />
+    <ClCompile Include="src\wizards\greedypaint\greedypaintpagepaint.cpp" />
+    <ClCompile Include="src\wizards\greedypaint\greedypaintwizard.cpp" />
     <ClCompile Include="src\wizards\rulerpaint\conflictdialog.cpp" />
     <ClCompile Include="src\dialogs\correcttimetabledialog.cpp" />
     <ClCompile Include="src\editors\routing\detectroutingdialog.cpp" />
@@ -403,6 +408,8 @@
     <ClInclude Include="src\data\gapset\gapgroupabstract.h" />
     <ClInclude Include="src\data\gapset\gapsetabstract.h" />
     <QtMoc Include="src\editors\rail\gapconstraintwidget.h" />
+    <QtMoc Include="src\model\rail\forbidlistmodel.h" />
+    <ClInclude Include="src\data\gapset\transparentset.h" />
     <ClInclude Include="src\model\rail\gapconstraintmodel.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <QtMoc Include="src\dialogs\changestationnamedialog.h">
@@ -608,6 +615,9 @@
     <QtMoc Include="src\viewers\compare\diagramcomparedialog.h" />
     <QtMoc Include="src\viewers\compare\traincomparedialog.h" />
     <QtMoc Include="src\wizards\greedypaint\greedypaintfasttest.h" />
+    <QtMoc Include="src\wizards\greedypaint\greedypaintpageconstraint.h" />
+    <QtMoc Include="src\wizards\greedypaint\greedypaintwizard.h" />
+    <QtMoc Include="src\wizards\greedypaint\greedypaintpagepaint.h" />
     <ClInclude Include="src\wizards\timeinterp\timeinterppagepreview.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterppagetrain.h">
     </QtMoc>

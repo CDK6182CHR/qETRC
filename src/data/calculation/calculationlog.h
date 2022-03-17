@@ -52,12 +52,12 @@ class CalculationLogStation:
     public CalculationLogAbstract
 {
 protected:
-    std::shared_ptr<RailStation> _station;
+    std::shared_ptr<const RailStation> _station;
     QTime _time;
     ModifiedField _field;
 
 public:
-    CalculationLogStation(Reason reason, std::shared_ptr<RailStation> station,
+    CalculationLogStation(Reason reason, std::shared_ptr<const RailStation> station,
         const QTime time, ModifiedField field);
 
     auto station()const{return _station;}
@@ -96,12 +96,12 @@ public:
 
 class CalculationLogInterval : public CalculationLogStation {
     IntervalConflictReport::ConflictType _type;
-    std::shared_ptr<RailInterval> _railint;
+    std::shared_ptr<const RailInterval> _railint;
     std::shared_ptr<const TrainLine> _line;
 public:
-    CalculationLogInterval(Reason reason, std::shared_ptr<RailStation> station,
+    CalculationLogInterval(Reason reason, std::shared_ptr<const RailStation> station,
         const QTime time, ModifiedField field, IntervalConflictReport::ConflictType type, 
-        std::shared_ptr<RailInterval> railint, std::shared_ptr<const TrainLine> line);
+        std::shared_ptr<const RailInterval> railint, std::shared_ptr<const TrainLine> line);
     virtual QString reasonString()const override;
     virtual QString objectString()const override;
 };
@@ -109,11 +109,11 @@ public:
 class Forbid;
 
 class CalculationLogForbid : public CalculationLogStation {
-    std::shared_ptr<RailInterval> _railint;
+    std::shared_ptr<const RailInterval> _railint;
     std::shared_ptr<Forbid> _forbid;
 public:
-    CalculationLogForbid(std::shared_ptr<RailStation> station,
-        const QTime& time, std::shared_ptr<RailInterval> railint, std::shared_ptr<Forbid> forbid);
+    CalculationLogForbid(std::shared_ptr<const RailStation> station,
+        const QTime& time, std::shared_ptr<const RailInterval> railint, std::shared_ptr<Forbid> forbid);
 
     virtual QString reasonString()const override;
 };

@@ -9,10 +9,9 @@
 #include <data/calculation/gapconstraints.h>
 #include <util/buttongroup.hpp>
 
-GapConstraintWidget::GapConstraintWidget(GapConstraints &constraints,
-            std::unique_ptr<gapset::GapSetAbstract> &&_gapset, QWidget *parent):
+GapConstraintWidget::GapConstraintWidget(GapConstraints &constraints,QWidget *parent):
     QWidget(parent), _constraints(constraints),
-    _model(new GapConstraintModel(std::move(_gapset),this))
+    _model(new GapConstraintModel(this))
 {
     resize(600,600);
     setWindowTitle(tr("列车间隔编辑"));

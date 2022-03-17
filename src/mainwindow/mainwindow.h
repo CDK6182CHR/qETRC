@@ -32,6 +32,7 @@ class CDockManager;
 class CDockAreaWidget;
 class CDockWidget;
 }
+class  GreedyPaintWizard;
 
 /**
  * @brief The MainWindow class
@@ -72,6 +73,7 @@ class MainWindow : public SARibbonMainWindow
 
     QSpinBox* spPassedStations;
     LocateDialog* locateDialog = nullptr;
+    GreedyPaintWizard* greedyWidget = nullptr;
 
     /**
      * 可能在多个地方使用到的action，包装一下
@@ -327,6 +329,8 @@ private slots:
     void useOfficeStyle();
 
     void actRulerPaint();
+
+    void actGreedyPaintFast();
 
     void actGreedyPaint();
 

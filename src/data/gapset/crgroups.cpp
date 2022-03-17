@@ -15,8 +15,7 @@ bool GroupMeet::matches(const TrainGapTypePair &type) const
 {
     return (bool(type.second & TrainGap::LeftDown) != bool(type.second & TrainGap::RightDown))
             && TrainGap::isTypeLeftFormer(type.second,type.first)
-            && !TrainGap::isTypeRightFormer(type.second,type.first)
-            && type.second & TrainGap::RightAppend;
+            && !TrainGap::isTypeRightFormer(type.second,type.first);
 }
 
 bool GroupArrive::matches(const TrainGapTypePair &type) const
