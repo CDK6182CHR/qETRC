@@ -40,12 +40,12 @@ void GreedyPaintConfigModel::setRuler(std::shared_ptr<Ruler> ruler)
 
 int GreedyPaintConfigModel::startRow()const
 {
-    return _startRow >= 0 ? _startRow : _availableFirstRow;
+    return _startRow >= 0 ? _startRow : _anchorRow;
 }
 
 int GreedyPaintConfigModel::endRow()const
 {
-    return _endRow >= 0 ? _endRow : _availableLastRow;
+    return _endRow >= 0 ? _endRow : _anchorRow;
 }
 
 void GreedyPaintConfigModel::refreshData()
@@ -101,7 +101,7 @@ void GreedyPaintConfigModel::refreshData()
     setRowCount(row);
     //blockSignals(false);
 
-    setAnchorRow(0);
+    setAnchorRowNoSignal(0);
 
 }
 
@@ -222,6 +222,21 @@ void GreedyPaintConfigModel::setEndRow(int row)
 
 void GreedyPaintConfigModel::setAnchorRow(int row)
 {
+    setAnchorRowNoSignal(row);
+
+    // 检查/处理始发终到站
+    if (_startRow < _availableFirstRow) {
+        setStartRow(_anchorRow);
+    }
+    if (_endRow<0 || _endRow>_availableLastRow) {
+        setEndRow(_anchorRow);
+    }
+
+    emit anchorStationChanged(anchorStation());
+}
+
+void GreedyPaintConfigModel::setAnchorRowNoSignal(int row)
+{
     blockSignals(true);
     unsetAnchorRow(_anchorRow);
     _anchorRow = row;
@@ -279,19 +294,9 @@ void GreedyPaintConfigModel::setAnchorRow(int row)
     setRowBackground(row, color);
     item(row, ColAnchor)->setCheckState(Qt::Checked);
     blockSignals(false);
-
-    // 检查/处理始发终到站
-    if (_startRow < _availableFirstRow) {
-        setStartRow(_availableFirstRow);
-    }
-    if (_endRow<0 || _endRow>_availableLastRow) {
-        setEndRow(_availableLastRow);
-    }
-
-    emit anchorStationChanged(anchorStation());
 }
 
-void GreedyPaintConfigModel::onDataChanged(const QModelIndex& topLeft, 
+void GreedyPaintConfigModel::onDataChanged(const QModelIndex& topLeft,
     const QModelIndex& bottomRight, const QVector<int>& roles)
 {
     int c1 = topLeft.column(), c2 = bottomRight.column();
@@ -329,15 +334,21 @@ void GreedyPaintConfigModel::onDataChanged(const QModelIndex& topLeft,
 
 void GreedyPaintConfigModel::onStopTimeChanged(int row)
 {
+    bool rangechanged = false;
     if (row < _anchorRow) {
         if (row >= _availableFirstRow && row < _startRow) {
             setStartRow(row);
+            rangechanged = true;
         }
     }
     else if(row>_anchorRow) {
         if (row <= _availableLastRow && row > _endRow) {
             setEndRow(row);
+            rangechanged = true;
         }
+    }
+    if (!rangechanged) {
+        emit stopTimeChanged();
     }
 }
 
@@ -367,6 +378,14 @@ GreedyPaintPagePaint::GreedyPaintPagePaint(Diagram &diagram_,
     _model(new GreedyPaintConfigModel(this))
 {
     initUI();
+    connect(_model, &GreedyPaintConfigModel::startStationChanged,
+        this, &GreedyPaintPagePaint::onStartChanged);
+    connect(_model, &GreedyPaintConfigModel::endStationChanged,
+        this, &GreedyPaintPagePaint::onEndChanged);
+    connect(_model, &GreedyPaintConfigModel::anchorStationChanged,
+        this, &GreedyPaintPagePaint::onAnchorChanged);
+    connect(_model, &GreedyPaintConfigModel::stopTimeChanged,
+        this, &GreedyPaintPagePaint::paintTmpTrain);
 }
 
 void GreedyPaintPagePaint::initUI()
@@ -390,12 +409,15 @@ void GreedyPaintPagePaint::initUI()
 
     ckStarting = new QCheckBox(tr("在本段运行线始发"));
     ckTerminal = new QCheckBox(tr("在本段运行线终到"));
+    ckInstaneous = new QCheckBox(tr("即时模式 (较慢)"));
+    ckInstaneous->setChecked(true);
 
     gpDir=new RadioButtonGroup<2>({"下行","上行"},this);
     flay->addRow(tr("方向"),gpDir);
     gpDir->addStretch(1);
     gpDir->addWidget(ckStarting);
     gpDir->addWidget(ckTerminal);
+    gpDir->addWidget(ckInstaneous);
 
     vlay->addLayout(flay);
 
@@ -429,10 +451,10 @@ void GreedyPaintPagePaint::initUI()
     txtOut->setWindowTitle(tr("排图报告"));
 
     hlay=new QHBoxLayout;
-    auto* btn=new QPushButton(tr("排图"));
+    auto* btn=new QPushButton(tr("提交"));
     hlay->addStretch(1);
     hlay->addWidget(btn);
-    connect(btn,&QPushButton::clicked,this,&GreedyPaintPagePaint::onPaint);
+    connect(btn,&QPushButton::clicked,this,&GreedyPaintPagePaint::onApply);
     btn = new QPushButton(tr("报告"));
     hlay->addWidget(btn);
     connect(btn, &QPushButton::clicked, txtOut, &QWidget::show);
@@ -442,23 +464,12 @@ void GreedyPaintPagePaint::initUI()
     vlay->addLayout(hlay);
 }
 
-void GreedyPaintPagePaint::onDirChanged(bool down)
+std::shared_ptr<Train> GreedyPaintPagePaint::doPaintTrain()
 {
-    _model->setDir(DirFunc::fromIsDown(down));
-    _model->refreshData();
-}
-
-void GreedyPaintPagePaint::onPaint()
-{
-    if (!painter.ruler()) {
-        // 终止条件，或许不止这个
-        QMessageBox::warning(this, tr("错误"), tr("无效标尺！"));
-        return;
-    }
     TrainName tn(edTrainName->text());
     if (!diagram.trainCollection().trainNameIsValid(tn, nullptr)) {
         QMessageBox::warning(this, tr("错误"), tr("非法车次"));
-        return;
+        return nullptr;
     }
 
     painter.setDir(DirFunc::fromIsDown(gpDir->get(0)->isChecked()));
@@ -490,13 +501,6 @@ void GreedyPaintPagePaint::onPaint()
 
     txtOut->setText(report);
 
-    if (auto train = painter.train(); !train->empty()) {
-        _model->setTimetable(train);
-        diagram.updateTrain(train);
-        emit trainAdded(train);
-    }
-
-
     if (res) {
         //QMessageBox::information(this, tr("提示"), tr("排图成功"));
     }
@@ -504,4 +508,119 @@ void GreedyPaintPagePaint::onPaint()
         QMessageBox::warning(this, tr("提示"), tr("排图失败，可能因为没有满足约束条件的线位。"
             "已保留最后尝试状态。"));
     }
+
+    return painter.train();
+}
+
+void GreedyPaintPagePaint::resetTmpTrain()
+{
+    if (trainRef) {
+        trainTmp = std::make_shared<Train>(*trainRef);
+    }
+    else {
+        trainTmp = std::make_shared<Train>(painter.train()->trainName());
+        trainTmp->setType(diagram.trainCollection().typeManager().fromRegex(trainTmp->trainName()));
+    }
+}
+
+void GreedyPaintPagePaint::mergeTmpTrain()
+{
+    resetTmpTrain();
+
+    if (true) {
+        // only new train for now
+        trainTmp->timetable() = std::move(painter.train()->timetable());
+    }
+
+    if (painter.localStarting()) {
+        trainTmp->setStarting(painter.train()->starting());
+    }
+    if (painter.localTerminal()) {
+        trainTmp->setTerminal(painter.train()->terminal());
+    }
+}
+
+void GreedyPaintPagePaint::onDirChanged(bool down)
+{
+    _model->setDir(DirFunc::fromIsDown(down));
+    _model->refreshData();
+}
+
+void GreedyPaintPagePaint::paintTmpTrain()
+{
+    if (!ckInstaneous->isChecked())
+        return;
+    if (!painter.ruler()) {
+        // 终止条件，或许不止这个
+        QMessageBox::warning(this, tr("错误"), tr("无效标尺！"));
+        return;
+    }
+
+    if (_model->startRow() == _model->endRow()) {
+        // 空车次拒绝铺画
+        return;
+    }
+
+    if (trainTmp) {
+        emit removeTmpTrainLine(*trainTmp);
+    }
+
+    auto train = doPaintTrain();
+    if (!train)return;
+
+    _model->setTimetable(train);
+
+    mergeTmpTrain();
+
+    diagram.updateTrain(trainTmp);
+    emit paintTmpTrainLine(*trainTmp);
+
+}
+
+void GreedyPaintPagePaint::onApply()
+{
+    if (!painter.ruler()) {
+        // 终止条件，或许不止这个
+        QMessageBox::warning(this, tr("错误"), tr("无效标尺！"));
+        return;
+    }
+
+    if (trainTmp) {
+        emit removeTmpTrainLine(*trainTmp);
+    }
+
+    auto train = doPaintTrain();
+    if (!train)return;
+
+    _model->setTimetable(train);
+
+    mergeTmpTrain();
+
+    // 采用新的对象来添加，因为当前窗口现在不会被立即销毁
+    auto newtrain = std::make_shared<Train>(std::move(*trainTmp));
+    trainTmp.reset();
+
+    diagram.updateTrain(newtrain);
+    emit trainAdded(newtrain);
+
+}
+
+void GreedyPaintPagePaint::onStartChanged(std::shared_ptr<const RailStation>)
+{
+    paintTmpTrain();
+}
+
+void GreedyPaintPagePaint::onEndChanged(std::shared_ptr<const RailStation>)
+{
+    paintTmpTrain();
+}
+
+void GreedyPaintPagePaint::onAnchorChanged(std::shared_ptr<const RailStation>)
+{
+    paintTmpTrain();
+}
+
+void GreedyPaintPagePaint::setupStationLabels()
+{
+    //todo..
 }

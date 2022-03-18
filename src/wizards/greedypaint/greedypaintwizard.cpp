@@ -29,14 +29,21 @@ void GreedyPaintWizard::initUI()
         this, &GreedyPaintWizard::trainAdded);
     connect(pgPaint, &GreedyPaintPagePaint::showStatus,
         this, &GreedyPaintWizard::showStatus);
+    connect(pgPaint, &GreedyPaintPagePaint::removeTmpTrainLine,
+        this, &GreedyPaintWizard::removeTmpTrainLine);
+    connect(pgPaint, &GreedyPaintPagePaint::paintTmpTrainLine,
+        this, &GreedyPaintWizard::paintTmpTrainLine);
     addTab(pgPaint,tr("铺画"));
 }
 
 void GreedyPaintWizard::onConstraintChanged()
 {
     setCurrentIndex(1);
-    pgPaint->model()->setRuler(painter.ruler());
-    pgPaint->model()->refreshData();
+    if (painter.ruler() != pgPaint->model()->ruler()) {
+        pgPaint->model()->setRuler(painter.ruler());
+        pgPaint->model()->refreshData();
+        pgPaint->setupStationLabels();
+    }
 }
 
 void GreedyPaintWizard::onClose()

@@ -82,6 +82,7 @@ signals:
     void startStationChanged(std::shared_ptr<const RailStation>);
     void endStationChanged(std::shared_ptr<const RailStation>);
     void anchorStationChanged(std::shared_ptr<const RailStation>);
+    void stopTimeChanged();
 
 private slots:
 
@@ -93,6 +94,11 @@ private slots:
      * 锚点行是核心的参考行；向前向后找到有数据的范围。
      */
     void setAnchorRow(int row);
+
+    /**
+     * 此版本专用于初始化，不发射信号
+     */
+    void setAnchorRowNoSignal(int row);
 
     void onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight,
         const QVector<int>& roles = QVector<int>());
@@ -119,11 +125,14 @@ class GreedyPaintPagePaint : public QWidget
 
     QTimeEdit* edAnchorTime;
     RadioButtonGroup<2>* gpDir, * gpAnchorRole;
-    QCheckBox *ckStarting,*ckTerminal;
+    QCheckBox* ckStarting, * ckTerminal, * ckInstaneous;
     QTableView* table;
     QTextBrowser* txtOut;
 
     GreedyPaintConfigModel* const _model;
+
+    std::shared_ptr<const Train> trainRef;
+    std::shared_ptr<Train> trainTmp;
 
 public:
     explicit GreedyPaintPagePaint(Diagram& diagram_,
@@ -133,15 +142,49 @@ public:
 private:
     void initUI();
 
+    /**
+     * 进行铺画计算，生成临时的列车对象
+     */
+    std::shared_ptr<Train> doPaintTrain();
+
+    /**
+     * 开始计算前，重置临时对象
+     */
+    void resetTmpTrain();
+
+    /**
+     * 将临时对象和和painter.train()进行合并
+     */
+    void mergeTmpTrain();
+
 signals:
     void showStatus(const QString& );
     void trainAdded(std::shared_ptr<Train>);
+
+    void removeTmpTrainLine(const Train& train);
+    void paintTmpTrainLine(Train& train);
+
     void actClose();
 
 private slots:
     void onDirChanged(bool down);
-    void onPaint();
 
+    /**
+     * 当铺画条件改变时，生成临时运行线
+     */
+    void paintTmpTrain();
+
+    void onApply();
+
+    void onStartChanged(std::shared_ptr<const RailStation>);
+    void onEndChanged(std::shared_ptr<const RailStation>);
+    void onAnchorChanged(std::shared_ptr<const RailStation>);
+
+public slots:
+    /**
+     * 为一组数据初始化时，设定起始站-锚点站-终止站的标签
+     */
+    void setupStationLabels();
 
 };
 

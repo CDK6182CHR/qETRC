@@ -53,19 +53,22 @@ bool GreedyPainter::paint(const TrainName& trainName)
 	}
 	
 
-
 	if (flag && !_train->empty()) {
 		if (_localStarting) {
 			_train->setStarting(_start->name);
 			auto& first = _train->timetable().front();
-			first.arrive = first.depart;
-			first.business = true;
+			if (first.name == _start->name) {
+				first.arrive = first.depart;
+				first.business = true;
+			}
 		}
 		if (_localTerminal) {
 			_train->setTerminal(_end->name);
 			auto& last = _train->timetable().back();
-			last.depart = last.arrive;
-			last.business = true;
+			if (last.name == _end->name) {
+				last.depart = last.arrive;
+				last.business = true;
+			}
 		}
 	}
 

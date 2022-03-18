@@ -29,6 +29,8 @@ private:
 signals:
     void trainAdded(std::shared_ptr<Train>);
     void showStatus(const QString&);
+    void removeTmpTrainLine(const Train& train);
+    void paintTmpTrainLine(Train& train);
 private slots:
     void onConstraintChanged();
     void onClose();

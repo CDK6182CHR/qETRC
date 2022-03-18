@@ -389,6 +389,10 @@ void MainWindow::actGreedyPaint()
 		greedyWidget = new GreedyPaintWizard(_diagram, this);
 		greedyWidget->setWindowFlag(Qt::Dialog);
 		greedyWidget->resize(800,800);
+		connect(greedyWidget, &GreedyPaintWizard::removeTmpTrainLine,
+			this, &MainWindow::removeTrainLine);
+		connect(greedyWidget, &GreedyPaintWizard::paintTmpTrainLine,
+			this, &MainWindow::addTrainLine);
 		connect(greedyWidget, &GreedyPaintWizard::trainAdded,
 			naviView, &NaviTree::actAddPaintedTrain);
 		connect(greedyWidget, &GreedyPaintWizard::showStatus,

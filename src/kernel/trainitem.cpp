@@ -22,6 +22,7 @@ TrainItem::TrainItem(Diagram& diagram, std::shared_ptr<TrainLine> line,
     endLabelInfo = _page.terminalNullLabel(_line->lastRailStation().get(), _line->dir());
     pen = trainPen();
 
+    // 如果这里报QtGui.dll的错误，考虑trainType()是不是空！
     setLine();
 }
 
