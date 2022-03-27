@@ -35,12 +35,17 @@ void TrainStation::fromJson(const QJsonObject &obj)
 
 QJsonObject TrainStation::toJson() const
 {
-    return QJsonObject{
+    QJsonObject res{
         {"zhanming",name.toSingleLiteral()},
         {"ddsj",arrive.toString("hh:mm:ss")},
         {"cfsj",depart.toString("hh:mm:ss")},
+        {"business",business},
         {"note",note}
     };
+    if (!track.isEmpty()) {
+        res.insert("track", track);
+    }
+    return res;
 }
 
 int TrainStation::stopSec() const

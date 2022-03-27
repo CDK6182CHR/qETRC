@@ -31,7 +31,7 @@ void RulerPaintWizard::reject()
 void RulerPaintWizard::accept()
 {
     if (trainTmp)
-        removeTmpTrainLine(*trainTmp);
+        emit removeTmpTrainLine(*trainTmp);
     else {
         QMessageBox::warning(this, tr("错误"), tr("未铺画列车运行图。请在排图表格中，"
             "双击指定行排图，或者更改排图范围选项。"));

@@ -35,6 +35,7 @@ void TrackDiagramData::_makeList()
     if (_manual) {
         _allowMainStay = true;
         _doubleLine = false;
+        trackOrder.clear();   // 2022.03.27  手动模式也应当先清空？
     }
     else {
         trackOrder.clear();

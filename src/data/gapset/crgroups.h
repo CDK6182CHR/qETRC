@@ -26,7 +26,10 @@ class GroupMeet: public ::gapset::GapGroupAbstract
 public:
     GroupMeet():
         ::gapset::GapGroupAbstract("会车间隔",
-                                   "对向的前车到达（通过）和后车发车（通过）之间的间隔"){}
+                                   //"对向的前车到达（通过）和后车发车（通过）之间的间隔"
+            "所有对向列车间隔"
+        
+        ){}
     virtual bool matches(const TrainGapTypePair &type) const override;
 };
 

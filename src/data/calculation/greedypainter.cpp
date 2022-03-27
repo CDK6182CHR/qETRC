@@ -78,8 +78,8 @@ bool GreedyPainter::paint(const TrainName& trainName)
 void GreedyPainter::addLog(std::unique_ptr<CalculationLogAbstract> log)
 {
 	qDebug() << log->toString() << Qt::endl;
-	//if (log->toString() == "[区间自动推线] 将[李市镇]站[到达]时刻设置为[12:32:50]") {
-	//	qDebug() << "李市镇!";
+	//if (log->toString() == "[史家乡->内江区间运行冲突 右冲突] 将[史家乡]站[出发]时刻设置为[20:39:20] (对象: K9406)") {
+	//	qDebug() << "史家乡!";
 	//}
 	_logs.emplace_back(std::move(log));
 }
@@ -103,6 +103,9 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 	auto st_to = node->railInterval().toStation();
 	const auto& ax_from = _railAxis.at(st_from);
 	const auto& ax_to = _railAxis.at(st_to);
+
+	auto itr = _settledStops.find(st_to);
+	bool next_stop = ((itr != _settledStops.end()) || (st_to == _end && _localTerminal));
 
 	// 注意以后的出发时间以这里面的为准！
 	RailStationEventBase ev_start(qeutil::latterEventType(stop), _tm, qeutil::dirLatterPos(_dir)
@@ -176,6 +179,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 						));
 				}
 				// 到这里只能说解决了当前冲突，并不一定符合出发条件，还要进一步循环！
+				to_try_stop = false;   // 出发时刻改变后优先尝试通过
 				continue;
 			}
 
@@ -186,6 +190,10 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 		//tot_delay这个判据用来解决anchor站被迫停车时的附加
 		if (stop || tot_delay) 
 			int_secs += node->start;
+		if (next_stop || to_try_stop) {
+			// 本轮循环中后站尝试停车，因此带附加时分
+			int_secs += node->stop;
+		}
 
 		// 区间天窗冲突
 		auto tm_to = ev_start.time.addSecs(int_secs);
@@ -240,8 +248,6 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 		_train->timetable().back().depart = ev_start.time;
 
 		// 后站 首先检测是否能通过
-		auto itr = _settledStops.find(st_to);
-		bool next_stop = ((itr != _settledStops.end()) || (st_to == _end && _localTerminal));
 
 		tm_to = ev_start.time.addSecs(int_secs);
 		RailStationEventBase ev_stop(TrainEventType::SettledPass, tm_to, qeutil::dirFormerPos(_dir), _dir);
@@ -265,7 +271,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 
 		// 下面：后站需要停车的情况。注意根据递归基本约定，
 		// 此时后站尚未入栈
-		int_secs += node->stop;
+		//int_secs += node->stop; // 2022.03.19：现在不用再加，因为前面加过了
 		tm_to = ev_start.time.addSecs(int_secs);
 		ev_stop.time = tm_to;
 		ev_stop.type = TrainEventType::Arrive;

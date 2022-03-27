@@ -20,7 +20,7 @@ class GreedyPaintConfigModel : public QStandardItemModel
 {
     Q_OBJECT;
     std::shared_ptr<Ruler> _ruler;
-    int _startRow = -1, _endRow = -1, _anchorRow = 0;
+    int _startRow = -1, _endRow = -1, _anchorRow = -1;
     int _availableFirstRow = 0, _availableLastRow = 0;
     Direction _dir = Direction::Down;
 public:
@@ -125,7 +125,7 @@ class GreedyPaintPagePaint : public QWidget
 
     QTimeEdit* edAnchorTime;
     RadioButtonGroup<2>* gpDir, * gpAnchorRole;
-    QCheckBox* ckStarting, * ckTerminal, * ckInstaneous;
+    QCheckBox* ckStarting, * ckTerminal, * ckInstaneous, * ckTop;
     QTableView* table;
     QTextBrowser* txtOut;
 
@@ -133,6 +133,8 @@ class GreedyPaintPagePaint : public QWidget
 
     std::shared_ptr<const Train> trainRef;
     std::shared_ptr<Train> trainTmp;
+
+    QLineEdit* edStart, * edAnchor, * edEnd;
 
 public:
     explicit GreedyPaintPagePaint(Diagram& diagram_,
@@ -166,6 +168,8 @@ signals:
 
     void actClose();
 
+    void actExit();
+
 private slots:
     void onDirChanged(bool down);
 
@@ -179,6 +183,10 @@ private slots:
     void onStartChanged(std::shared_ptr<const RailStation>);
     void onEndChanged(std::shared_ptr<const RailStation>);
     void onAnchorChanged(std::shared_ptr<const RailStation>);
+
+    void onClearTmp();
+
+    void setTopLevel(bool on);
 
 public slots:
     /**

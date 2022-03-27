@@ -78,7 +78,7 @@ public:
         QAction* refreshAll;
         QAction* search,* rulerRef, * trainRef, * eventList;
         QAction* timeAdjust, * batchCopy, * intervalExchange;
-        QAction* addTrain, * rulerPaint;
+        QAction* addTrain, * rulerPaint, * greedyPaint;
         SharedActions() = default;
         SharedActions(const SharedActions&) = delete;
     };

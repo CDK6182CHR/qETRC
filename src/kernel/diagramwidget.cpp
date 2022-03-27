@@ -405,6 +405,7 @@ void DiagramWidget::setupMenu(const SharedActions& actions)
         m->addSeparator();
         m->addAction(actions.addTrain);
         m->addAction(actions.rulerPaint);
+        m->addAction(actions.greedyPaint);
     }
 }
 

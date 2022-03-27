@@ -7,6 +7,7 @@
 #include <QHeaderView>
 #include <QTimeEdit>
 #include <QMessageBox>
+#include <QLabel>
 #include <QTextBrowser>
 
 #include <data/train/trainname.h>
@@ -100,6 +101,8 @@ void GreedyPaintConfigModel::refreshData()
     }
     setRowCount(row);
     //blockSignals(false);
+
+    _anchorRow = _startRow = _endRow = -1;
 
     setAnchorRowNoSignal(0);
 
@@ -198,25 +201,29 @@ std::map<std::shared_ptr<const RailStation>, int> GreedyPaintConfigModel::stopSe
 
 void GreedyPaintConfigModel::setStartRow(int row)
 {
-    blockSignals(true);
+    //blockSignals(true);
+    if (row == _startRow)
+        return;
     if (_startRow >= 0) {
         item(_startRow, ColStart)->setCheckState(Qt::Unchecked);
     }
     item(row, ColStart)->setCheckState(Qt::Checked);
     _startRow = row;
-    blockSignals(false);
+    //blockSignals(false);
     emit startStationChanged(startStation());
 }
 
 void GreedyPaintConfigModel::setEndRow(int row)
 {
-    blockSignals(true);
+    //blockSignals(true);
+    if (row == _endRow)
+        return;
     if (_endRow >= 0) {
         item(_endRow, ColEnd)->setCheckState(Qt::Unchecked);
     }
     item(row, ColEnd)->setCheckState(Qt::Checked);
     _endRow = row;
-    blockSignals(false);
+    //blockSignals(false);
     emit endStationChanged(endStation());
 }
 
@@ -237,8 +244,12 @@ void GreedyPaintConfigModel::setAnchorRow(int row)
 
 void GreedyPaintConfigModel::setAnchorRowNoSignal(int row)
 {
-    blockSignals(true);
-    unsetAnchorRow(_anchorRow);
+    //blockSignals(true);
+    if (row == _anchorRow) {
+        return;
+    }
+    if (_anchorRow >= 0)
+        unsetAnchorRow(_anchorRow);
     _anchorRow = row;
 
     // 设置文字颜色
@@ -293,7 +304,7 @@ void GreedyPaintConfigModel::setAnchorRowNoSignal(int row)
     color.setAlpha(55);
     setRowBackground(row, color);
     item(row, ColAnchor)->setCheckState(Qt::Checked);
-    blockSignals(false);
+    //blockSignals(false);
 }
 
 void GreedyPaintConfigModel::onDataChanged(const QModelIndex& topLeft,
@@ -394,7 +405,11 @@ void GreedyPaintPagePaint::initUI()
     auto* flay=new QFormLayout;
 
     edTrainName=new QLineEdit;
-    flay->addRow(tr("车次"),edTrainName);
+
+    gpDir = new RadioButtonGroup<2>({ "下行","上行" }, this);
+    gpDir->insertStretch(0, 1);
+    gpDir->insertWidget(0, edTrainName);
+    flay->addRow(tr("车次"), gpDir);
 
     auto* hlay=new QHBoxLayout;
     edAnchorTime=new QTimeEdit;
@@ -406,18 +421,48 @@ void GreedyPaintPagePaint::initUI()
     hlay->addStretch(1);
     hlay->addLayout(gpAnchorRole);
     flay->addRow(tr("锚点时刻"),hlay);
+    connect(edAnchorTime, &QTimeEdit::timeChanged, this, &GreedyPaintPagePaint::paintTmpTrain);
+    connect(gpAnchorRole->get(0), &QRadioButton::toggled, this, &GreedyPaintPagePaint::paintTmpTrain);
 
     ckStarting = new QCheckBox(tr("在本段运行线始发"));
     ckTerminal = new QCheckBox(tr("在本段运行线终到"));
     ckInstaneous = new QCheckBox(tr("即时模式 (较慢)"));
     ckInstaneous->setChecked(true);
+    ckTop = new QCheckBox(tr("窗口置顶"));
 
-    gpDir=new RadioButtonGroup<2>({"下行","上行"},this);
-    flay->addRow(tr("方向"),gpDir);
-    gpDir->addStretch(1);
-    gpDir->addWidget(ckStarting);
-    gpDir->addWidget(ckTerminal);
-    gpDir->addWidget(ckInstaneous);
+    connect(ckStarting, &QCheckBox::toggled, this, &GreedyPaintPagePaint::paintTmpTrain);
+    connect(ckTerminal, &QCheckBox::toggled, this, &GreedyPaintPagePaint::paintTmpTrain);
+
+
+    hlay = new QHBoxLayout;
+    hlay->addWidget(ckStarting);
+    hlay->addWidget(ckTerminal);
+    hlay->addWidget(ckInstaneous);
+    hlay->addWidget(ckTop);
+    connect(ckTop, &QCheckBox::toggled, this, &GreedyPaintPagePaint::setTopLevel);
+    flay->addRow(tr("选项"), hlay);
+
+    hlay = new QHBoxLayout;
+    edStart = new QLineEdit;
+    edStart->setReadOnly(true);
+    edAnchor = new QLineEdit;
+    edAnchor->setReadOnly(true);
+    edEnd = new QLineEdit;
+    edEnd->setReadOnly(true);
+
+    hlay->addWidget(new QLabel(tr("起始站")));
+    hlay->addWidget(edStart);
+    hlay->addStretch(1);
+    hlay->addWidget(new QLabel("->"));
+    hlay->addStretch(1);
+    hlay->addWidget(new QLabel(tr("锚点站")));
+    hlay->addWidget(edAnchor);
+    hlay->addStretch(1);
+    hlay->addWidget(new QLabel("->"));
+    hlay->addStretch(1);
+    hlay->addWidget(new QLabel(tr("终止站")));
+    hlay->addWidget(edEnd);
+    flay->addRow(tr("铺画范围"), hlay);
 
     vlay->addLayout(flay);
 
@@ -460,7 +505,16 @@ void GreedyPaintPagePaint::initUI()
     connect(btn, &QPushButton::clicked, txtOut, &QWidget::show);
     btn=new QPushButton(tr("关闭"));
     connect(btn,&QPushButton::clicked,this,&GreedyPaintPagePaint::actClose);
+    btn = new QPushButton(tr("清理"));
+    connect(btn, &QPushButton::clicked, this, &GreedyPaintPagePaint::onClearTmp);
+    btn->setToolTip(tr("清除当前未提交的临时列车运行线"));
     hlay->addWidget(btn);
+    //btn = new QPushButton(tr("退出"));
+    //btn->setToolTip(tr("退出贪心排图模式并关闭（删除）当前窗口"));
+    //connect(btn, &QPushButton::clicked, this, &GreedyPaintPagePaint::actExit);
+    //hlay->addWidget(btn);
+    //hlay->addWidget(btn);
+
     vlay->addLayout(hlay);
 }
 
@@ -468,7 +522,9 @@ std::shared_ptr<Train> GreedyPaintPagePaint::doPaintTrain()
 {
     TrainName tn(edTrainName->text());
     if (!diagram.trainCollection().trainNameIsValid(tn, nullptr)) {
-        QMessageBox::warning(this, tr("错误"), tr("非法车次"));
+        QMessageBox::warning(this, tr("错误"), 
+            tr("非法车次：请输入一个非空且不重复的车次。\n" 
+                "注：如果当前车次已经提交排图，请撤销后再重新排图。"));
         return nullptr;
     }
 
@@ -589,6 +645,12 @@ void GreedyPaintPagePaint::onApply()
         emit removeTmpTrainLine(*trainTmp);
     }
 
+    if (_model->startStation() != _model->anchorStation()) {
+        QMessageBox::information(this, tr("提示"),
+            tr("此预览版暂未实现反推运行线功能，锚点站将被作为实际的起始站；"
+                "设置的起始站至锚点站之间的运行线不会被计算。"));
+    }
+
     auto train = doPaintTrain();
     if (!train)return;
 
@@ -605,22 +667,42 @@ void GreedyPaintPagePaint::onApply()
 
 }
 
-void GreedyPaintPagePaint::onStartChanged(std::shared_ptr<const RailStation>)
+void GreedyPaintPagePaint::onStartChanged(std::shared_ptr<const RailStation> st)
 {
+    edStart->setText(st->name.toSingleLiteral());
     paintTmpTrain();
 }
 
-void GreedyPaintPagePaint::onEndChanged(std::shared_ptr<const RailStation>)
+void GreedyPaintPagePaint::onEndChanged(std::shared_ptr<const RailStation> st)
 {
+    edEnd->setText(st->name.toSingleLiteral());
     paintTmpTrain();
 }
 
-void GreedyPaintPagePaint::onAnchorChanged(std::shared_ptr<const RailStation>)
+void GreedyPaintPagePaint::onAnchorChanged(std::shared_ptr<const RailStation> st)
 {
+    edAnchor->setText(st->name.toSingleLiteral());
     paintTmpTrain();
+}
+
+void GreedyPaintPagePaint::onClearTmp()
+{
+    if (trainTmp) {
+        emit removeTmpTrainLine(*trainTmp);
+    }
+}
+
+void GreedyPaintPagePaint::setTopLevel(bool on)
+{
+    nativeParentWidget()->setWindowFlag(Qt::WindowStaysOnTopHint, on);
+    if (on) {
+        nativeParentWidget()->show();
+    }
 }
 
 void GreedyPaintPagePaint::setupStationLabels()
 {
-    //todo..
+    edStart->setText(_model->startStation()->name.toSingleLiteral());
+    edEnd->setText(_model->endStation()->name.toSingleLiteral());
+    edAnchor->setText(_model->anchorStation()->name.toSingleLiteral());
 }

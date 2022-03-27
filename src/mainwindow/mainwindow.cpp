@@ -401,6 +401,22 @@ void MainWindow::actGreedyPaint()
 	greedyWidget->show();
 }
 
+void MainWindow::actExitGreedyPaint()
+{
+	if (!greedyWidget) {
+		QMessageBox::warning(this, tr("错误"), tr("当前没有进入贪心推线模式，无需退出。"));
+	}
+	else {
+		auto t = QMessageBox::question(this, tr("提示"), tr("退出贪心推线模式，关闭对话框并释放资源。\n"
+			"已经配置的排图约束数据将丢失，是否确认？"), QMessageBox::Yes | QMessageBox::No);
+		if (t == QMessageBox::Yes) {
+			greedyWidget->close();
+			greedyWidget->deleteLater();
+			greedyWidget = nullptr;
+		}
+	}
+}
+
 
 //void MainWindow::undoAddPage(std::shared_ptr<DiagramPage> page)
 //{
@@ -1040,6 +1056,7 @@ void MainWindow::initToolbar()
 		act->setShortcut(Qt::CTRL + Qt::Key_T);
 		act->setToolTip(tr("自动贪心排图向导 (Ctrl+T)\n使用指定线路的指定标尺，"
 			"采用贪心算法自动计算运行线。"));
+		diaActions.greedyPaint = act;
 		btn = panel->addLargeAction(act);
 		connect(act, &QAction::triggered, this, &MainWindow::actGreedyPaint);
 
