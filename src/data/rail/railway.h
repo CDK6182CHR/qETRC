@@ -566,6 +566,9 @@ public:
      * other的标尺、天窗数据实际上来自于mergeIntervalData()。
      * postcondition: 有效的ruler, forbid（头结点）地址不变。
      * （实际上就是ruler根本不变）
+     * 2022.04.03新增要求：必须以要用的数据为this指针调用本函数，即this和参数地位不等价。
+     * this指针保证调用后所有Ruler/Forbid结点的头结点引用正确，
+     * 但other不保证（只要有数据就一定不满足）。
      */
     void swapBaseWith(Railway& other);
 
@@ -736,6 +739,13 @@ private:
      * 同时清除标签占位信息
      */
     void clearYValues();
+
+    /**
+     * 2022.04.03  非平凡操作！
+     * swapBase()之后调用，保证所有Ruler/Forbid的数据结点
+     * 中的引用正确指向对应的父节点。
+     */
+    void setupIntervalNodeDatas();
 
 };
 

@@ -174,7 +174,7 @@ std::shared_ptr<const RailStation> RailStationModel::getRowStation(int row)
     return qvariant_cast<std::shared_ptr<const RailStation>>(v);
 }
 
-#include <data/rail/forbid.h>
+//#include <data/rail/forbid.h>
 
 bool RailStationModel::applyChange()
 {
@@ -195,11 +195,9 @@ bool RailStationModel::applyChange()
         //支持撤销，则交给Context处理
         emit actStationTableChanged(railway, rail, equiv);
     }
-    qDebug() << "AFTER EMIT";
-    railway->showStations();
-    railway->showIntervals();
-    qDebug() << railway.get() << ", " << railway->forbids().at(0)->railway().get() << Qt::endl;
-    railway->getForbid(0)->_show();
+    //qDebug() << "AFTER EMIT";
+    //qDebug() << railway.get() << ", " << railway->forbids().at(0)->railway().get() << Qt::endl;
+    //railway->getForbid(0)->_show();
     return true;
 }
 

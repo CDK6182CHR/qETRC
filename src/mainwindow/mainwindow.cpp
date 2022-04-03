@@ -502,6 +502,7 @@ void MainWindow::initDockWidgets()
 	if constexpr (true) {
 		QUndoView* view = new QUndoView(undoStack);
 		undoView = view;
+		view->setCleanIcon(qApp->style()->standardIcon(QStyle::SP_DialogSaveButton));
 		auto* dock = new ads::CDockWidget(tr("历史记录"));
 		dock->setWidget(view);
 		undoDock = dock;

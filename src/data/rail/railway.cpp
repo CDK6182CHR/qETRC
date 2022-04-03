@@ -1106,6 +1106,11 @@ void Railway::swapBaseWith(Railway& other)
 	//std::swap(_forbids, other._forbids);
 	std::swap(nameMap, other.nameMap);
 	std::swap(fieldMap, other.fieldMap);
+
+	// 2022.04.03：保证Ruler/Forbid中的头结点引用正确。
+	// 这里不需要考虑对方的，即要求调用的this指针是起作用的那个。
+	setupIntervalNodeDatas();
+
 	//for (int i = 0; i < _rulers.count(); i++) {
 	//	std::swap(_rulers[i]->_railway, other._rulers[i]->_railway);
 	//}
@@ -1589,6 +1594,20 @@ void Railway::clearYValues()
 		p->y_coeff = std::nullopt;
 	}
 	_diagramHeightCoeff = -1;
+}
+
+void Railway::setupIntervalNodeDatas()
+{
+	for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
+		// Ruler
+		for (int i = 0; i < _rulers.size(); i++) {
+			p->rulerNodeAt(i)->setDataNode(std::ref(*(_rulers.at(i))));
+		}
+		// Forbid
+		for (int i = 0; i < _forbids.size(); i++) {
+			p->_forbidNodes.at(i)->setDataNode(std::ref(*(_forbids.at(i))));
+		}
+	}
 }
 
 

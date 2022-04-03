@@ -68,8 +68,8 @@ void navi::RailwayListItem::appendRailways(const QList<std::shared_ptr<Railway>>
 
 void navi::RailwayListItem::appendRailway(std::shared_ptr<Railway> rail)
 {
-    _diagram.railways().append(rail);
     int row = _diagram.railwayCount();
+    _diagram.railways().append(rail);
     _rails.emplace_back(std::make_unique<RailwayItem>(rail,row,this));
 }
 
