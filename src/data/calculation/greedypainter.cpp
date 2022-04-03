@@ -203,10 +203,17 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 				if (qeutil::timeRangeIntersectedExcl(fbdnode->beginTime, fbdnode->endTime, 
 					ev_start.time, tm_to)) {
 					// 发生天窗冲突
-					tot_delay += qeutil::secsTo(ev_start.time, fbdnode->endTime);
-					ev_start.time = fbdnode->endTime;
-					addLog(std::make_unique<CalculationLogForbid>(st_from, ev_start.time, railint, forbid));
-					continue;
+					if (!stop && st_from != _anchor) {
+						_train->timetable().pop_back();
+						return false;
+					}
+					else {
+						tot_delay += qeutil::secsTo(ev_start.time, fbdnode->endTime);
+						ev_start.time = fbdnode->endTime;
+						addLog(std::make_unique<CalculationLogForbid>(st_from, ev_start.time, railint, forbid));
+						to_try_stop = false;
+						continue;
+					}
 				}
 			}
 		}
@@ -242,6 +249,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 				st_from, ev_start.time, CalculationLogAbstract::Depart,
 				rep.type, railint, rep.conflictEvent ? rep.conflictEvent->line : nullptr
 				));
+			to_try_stop = false;
 			continue;
 		}
 		// 到现在为止，前站时刻可以暂时确定了
