@@ -22,8 +22,10 @@ public:
         Predicted,   // 区间推线的直接结果
         Backoff,  // 排图异常终止，一般是因为排不下去
         BadTermination,
+        ForwardFinished,
         Finished,
         NoData,   // 无标尺数据
+        Description,
     };
 protected:
     Reason _reason;
@@ -126,5 +128,18 @@ public:
     CalculationLogBackoff(std::shared_ptr<RailStation> station,
         const QTime time, ModifiedField field, int _count);
     virtual QString reasonString()const override;
+};
+
+
+/**
+ * 2022.04.10新增
+ * 任意字符串描述。
+ */
+class CalculationLogDescription : public CalculationLogAbstract
+{
+    QString _descrip;
+public:
+    CalculationLogDescription(const QString& description);
+    virtual QString toString()const override;
 };
 

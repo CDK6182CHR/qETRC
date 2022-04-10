@@ -1318,6 +1318,14 @@ void MainWindow::clearDiagramUnchecked()
 	undoStack->clear();
 	undoStack->resetClean();
 
+	//2022.04.10：如果有贪心推线窗口在运行，取消掉
+	if (greedyWidget) {
+		greedyWidget->close();
+		greedyWidget->deleteLater();
+		greedyWidget = nullptr;
+
+	}
+
 	//最后：清理数据
 	_diagram.clear();
 }

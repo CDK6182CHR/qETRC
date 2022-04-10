@@ -75,6 +75,8 @@ bool GreedyPainter::paint(const TrainName& trainName)
 		// 只有一种情况会触发循环，即正推不停车且反推失败
 		if (!flag2 && !anchor_stop) {
 			anchor_stop = true;   // 下一轮强行停车
+			addLog(std::make_unique<CalculationLogDescription>(
+				QObject::tr("[重新进行正向推线] 反向推线要求锚点站停车，以锚点站停车重排正向运行线")));
 		}
 		else {
 			break;
@@ -100,8 +102,6 @@ bool GreedyPainter::paint(const TrainName& trainName)
 		}
 	}
 
-	_train->show();
-
 	return flag;
 }
 
@@ -118,7 +118,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 {
 	if (!railint || railint->fromStation() == _end) {
 		addLog(std::make_unique<CalculationLogSimple>(
-			CalculationLogAbstract::Finished
+			CalculationLogAbstract::ForwardFinished
 			));
 		return true;
 	}
@@ -485,10 +485,10 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 		int int_secs = node->interval;
 		//tot_delay这个判据用来解决anchor站被迫停车时的附加
 		if (stop || tot_delay)
-			int_secs += node->start;
+			int_secs += node->stop;
 		if (next_stop || to_try_stop) {
 			// 本轮循环中后站尝试停车，因此带附加时分
-			int_secs += node->stop;
+			int_secs += node->start;
 		}
 
 		// 区间天窗冲突
@@ -613,7 +613,7 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 				return false;
 			}
 
-			int_secs -= node->stop;
+			int_secs -= node->start;
 			TrainGapTypePair type;
 			if (qeutil::timeCompare(to_conf->time, tm_dep)) {
 				// 反向左冲突事件，设置出发时间使得到达时间为冲突时刻的时间

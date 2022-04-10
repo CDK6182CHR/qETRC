@@ -645,12 +645,6 @@ void GreedyPaintPagePaint::onApply()
         emit removeTmpTrainLine(*trainTmp);
     }
 
-    if (_model->startStation() != _model->anchorStation()) {
-        QMessageBox::information(this, tr("提示"),
-            tr("此预览版暂未实现反推运行线功能，锚点站将被作为实际的起始站；"
-                "设置的起始站至锚点站之间的运行线不会被计算。"));
-    }
-
     auto train = doPaintTrain();
     if (!train)return;
 

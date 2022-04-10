@@ -142,6 +142,7 @@ QString CalculationLogSimple::toString() const
     {
     case CalculationLogAbstract::BadTermination: return QObject::tr("[回溯次数已达上限] 排图异常终止");
         break;
+    case CalculationLogAbstract::ForwardFinished: return QObject::tr("[正向排图成功] 进入反向排图");
     case CalculationLogAbstract::Finished: return QObject::tr("[排图成功]");
         break;
     case CalculationLogAbstract::NoData: return QObject::tr("[标尺无数据] 排图结束");
@@ -149,4 +150,14 @@ QString CalculationLogSimple::toString() const
     default: return "ERROR: Non-simple type";
         break;
     }
+}
+
+CalculationLogDescription::CalculationLogDescription(const QString& description):
+    CalculationLogAbstract(Description), _descrip(description)
+{
+}
+
+QString CalculationLogDescription::toString() const
+{
+    return _descrip;
 }
