@@ -78,6 +78,9 @@ public slots:
      */
     void onDataChanged(const QModelIndex& leftTop, const QModelIndex& rightBottom);
 
+    void copyToDepart(int row);
+    void copyToArrive(int row);
+
 
 };
 

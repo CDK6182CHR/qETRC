@@ -24,12 +24,14 @@
 #include <data/train/traincollection.h>
 #include <data/train/routing.h>
 
+#include "timetablewidget.h"
+
 
 EditTrainWidget::EditTrainWidget(TrainCollection &coll,
                                  std::shared_ptr<Train> train,
                                  QWidget *parent):
     QWidget(parent),coll(coll),_train(train),
-    model(new TimetableStdModel(false,this))
+    ctable(new TimetableWidget(false,this))
 {
     initUI();
     setTrain(train);
@@ -38,7 +40,7 @@ EditTrainWidget::EditTrainWidget(TrainCollection &coll,
 void EditTrainWidget::setTrain(const std::shared_ptr<Train> &train)
 {
     _train=train;
-    model->setTrain(train);
+    ctable->model()->setTrain(train);
 
     //暂定更改/初始化Train时才更新一次TypeCombo。
     setupTypeCombo();
@@ -48,7 +50,7 @@ void EditTrainWidget::setTrain(const std::shared_ptr<Train> &train)
 void EditTrainWidget::refreshData()
 {
     refreshBasicData();
-    model->refreshData();
+    ctable->model()->refreshData();
 }
 
 void EditTrainWidget::refreshBasicData()
@@ -79,6 +81,11 @@ void EditTrainWidget::refreshBasicData()
         btnToRouting->setEnabled(false);
     }
 
+}
+
+TimetableStdModel* EditTrainWidget::getModel()
+{
+    return ctable->model();
 }
 
 void EditTrainWidget::initUI()
@@ -152,20 +159,8 @@ void EditTrainWidget::initUI()
     flay->addRow(tr("车底交路"),hlay);
     vlay->addLayout(flay);
 
-    ctable=new QEControlledTable;
     table=ctable->table();
     vlay->addWidget(ctable);
-    table->setModel(model);
-    table->setEditTriggers(QTableView::AllEditTriggers);
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
-    auto* dele=new QETimeDelegate(this);
-    table->setItemDelegateForColumn(TimetableStdModel::ColArrive,dele);
-    table->setItemDelegateForColumn(TimetableStdModel::ColDepart,dele);
-
-    int c=0;
-    for(int w:{120,100,100,40,60,60,60}){
-        table->setColumnWidth(c++,w);
-    }
 
     auto* h=new ButtonGroup<3>({"确定","还原","删除车次"});
     vlay->addLayout(h);
@@ -214,7 +209,7 @@ void EditTrainWidget::actApply()
     }
     emit trainInfoChanged(_train,t);
 
-    model->actApply();
+    ctable->model()->actApply();
 }
 
 void EditTrainWidget::actCancel()

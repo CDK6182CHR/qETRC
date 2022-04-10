@@ -73,6 +73,13 @@ public:
         int start, int stop);
 
     /**
+     * 2022.04.10
+     * 从均速提取标尺。
+     */
+    void fromSpeed(double speed, int start, int stop,
+        bool asmax, int prec);
+
+    /**
      * 2021.09.25  非空节点数
      */
     int validNodeCount()const;

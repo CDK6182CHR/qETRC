@@ -113,7 +113,7 @@ class CalculationLogForbid : public CalculationLogStation {
     std::shared_ptr<Forbid> _forbid;
 public:
     CalculationLogForbid(std::shared_ptr<const RailStation> station,
-        const QTime& time, std::shared_ptr<const RailInterval> railint, std::shared_ptr<Forbid> forbid);
+        const QTime& time, ModifiedField field, std::shared_ptr<const RailInterval> railint, std::shared_ptr<Forbid> forbid);
 
     virtual QString reasonString()const override;
 };

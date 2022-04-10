@@ -1104,10 +1104,12 @@ void MainWindow::initToolbar()
 			trainListWidget->getModel(), &TrainListModel::onTrainChanged);
 		connect(contextTrain, &TrainContext::actRemoveTrain,
 			naviView, &NaviTree::removeSingleTrain);
+		connect(naviView, &NaviTree::editTimetable,
+			contextTrain, &TrainContext::actShowBasicWidget);
 		connect(naviView, &NaviTree::editTrain,
-			contextTrain, &TrainContext::actShowBasicWidget);
+			contextTrain, &TrainContext::actShowEditWidget);
 		connect(trainListWidget, &TrainListWidget::editTrain,
-			contextTrain, &TrainContext::actShowBasicWidget);
+			contextTrain, &TrainContext::actShowEditWidget);
 
 		connect(naviModel, &DiagramNaviModel::newTrainAdded,
 			this, &MainWindow::onNewTrainAdded);

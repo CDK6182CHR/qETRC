@@ -30,12 +30,13 @@ public:
      * 将同时决定取用from站的pre事件表还是post事件表，对to亦然。
      * @param secs 区间运行标尺
      * @param singleLine 是否单线，即是否检测对向敌对进路
+     * @param backward 是否反向推线。如果反向推线，则返回的事件与原来相反，其他不变。
      * @return 发现冲突的运行线的相关事件；该事件的时刻为下一尝试时刻。
      */
     IntervalConflictReport
         intervalConflicted(
-            std::shared_ptr<RailStation> from, std::shared_ptr<RailStation> to,
-            const RailStationEventBase& ev_start, int secs, bool singleLine)const;
+            std::shared_ptr<RailStation> from, std::shared_ptr<RailStation> to, Direction dir,
+            const QTime& tm_start, int secs, bool singleLine, bool backward)const;
 
 private:
 
@@ -53,7 +54,7 @@ private:
      * 表明搜索已经超过必要范围，可以停止
      */
     std::pair<std::shared_ptr<RailStationEvent>, bool>
-        isConflictedWith(const RailStationEventBase& ev_start, const QTime& tm_to,
+        isConflictedWith(const QTime& tm_start, const QTime& tm_to, Direction dir, 
             std::shared_ptr<RailStationEvent> ev_ex_start, const StationEventAxis& axis_to, bool singleLine)const;
 };
 

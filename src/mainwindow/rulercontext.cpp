@@ -3,6 +3,7 @@
 #include "railcontext.h"
 
 #include "dialogs/rulerfromtraindialog.h"
+#include "dialogs/rulerfromspeeddialog.h"
 #include "util/railrulercombo.h"
 #include <QApplication>
 #include <QStyle>
@@ -69,6 +70,12 @@ void RulerContext::initUI()
         "从单个车次在本线的运行情况提取标尺数据，并覆盖到本标尺中。"));
     connect(act, SIGNAL(triggered()), this, SLOT(actReadFromSingleTrain()));
     btn = panel->addMediumAction(act);
+
+    act = new QAction(QIcon(":/icons/clock.png"), tr("从速度计算"), this);
+    act->setToolTip(tr("从运行速度计算\n"
+        "从通通运行速度（不含起停附加时分）计算近似标尺，并覆盖到本标尺中。"));
+    connect(act, &QAction::triggered, this, &RulerContext::actFromSpeed);
+    panel->addMediumAction(act);
 
     act = new QAction(qApp->style()->standardIcon(QStyle::SP_ArrowBack), tr("合并标尺"), this);
     act->setToolTip(tr("合并标尺\n与本线路的其他标尺合并。"));
@@ -189,6 +196,15 @@ void RulerContext::actReadFromSingleTrain()
         return;
     auto* dialog = new RulerFromTrainDialog(diagram.trainCollection(), ruler, mw);
     connect(dialog, &RulerFromTrainDialog::rulerUpdated,
+        this, &RulerContext::actChangeRulerData);
+    dialog->show();
+}
+
+void RulerContext::actFromSpeed()
+{
+    if (!ruler)return;
+    auto* dialog = new RulerFromSpeedDialog(ruler, mw);
+    connect(dialog, &RulerFromSpeedDialog::rulerUpdated,
         this, &RulerContext::actChangeRulerData);
     dialog->show();
 }

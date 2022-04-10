@@ -14,7 +14,7 @@ class QEControlledTable;
 class TimetableStdModel;
 class Train;
 class TrainCollection;
-
+class TimetableWidget;
 
 /**
  * @brief The EditTrainWidget class
@@ -27,8 +27,6 @@ class EditTrainWidget : public QWidget
     Q_OBJECT
     TrainCollection& coll;
     std::shared_ptr<Train> _train;
-
-    TimetableStdModel* const model;
 
     QLineEdit* edTrainName,*edDownName,*edUpName;
     QLineEdit* edStaring,*edTerminal;
@@ -43,7 +41,7 @@ class EditTrainWidget : public QWidget
 
     QPushButton* btnToRouting;
 
-    QEControlledTable* ctable;
+    TimetableWidget* ctable;
     QTableView* table;
 
     QColor tmpColor;
@@ -54,7 +52,7 @@ public:
     void setTrain(const std::shared_ptr<Train>& train);
     void refreshData();
     void refreshBasicData();
-    auto* getModel(){return model;}
+    TimetableStdModel* getModel();
 
 private:
     void initUI();

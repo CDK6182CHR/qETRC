@@ -65,6 +65,7 @@ signals:
     void focusInRuler(std::shared_ptr<Ruler>);
     void focusInRouting(std::shared_ptr<Routing>);
     void editRailway(std::shared_ptr<Railway>);
+    void editTimetable(std::shared_ptr<Train>);
     void editTrain(std::shared_ptr<Train>);
     void editRuler(std::shared_ptr<Ruler>);
     void mergeRuler(std::shared_ptr<Ruler>);
@@ -121,6 +122,8 @@ private slots:
     void onEditRailwayContext();
 
     void onEditTrainContext();
+
+    void onEditTimetableContext();
 
     void onEditRulerContext();
 

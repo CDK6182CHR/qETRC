@@ -107,8 +107,8 @@ QString CalculationLogInterval::objectString() const
 }
 
 CalculationLogForbid::CalculationLogForbid(std::shared_ptr<const RailStation> station, const QTime& time, 
-    std::shared_ptr<const RailInterval> railint, std::shared_ptr<Forbid> forbid):
-    CalculationLogStation(ForbidConflict,station,time,Depart),_railint(railint), _forbid(forbid)
+    ModifiedField field, std::shared_ptr<const RailInterval> railint, std::shared_ptr<Forbid> forbid):
+    CalculationLogStation(ForbidConflict,station,time,field),_railint(railint), _forbid(forbid)
 {
 }
 

@@ -195,6 +195,28 @@ bool qeutil::timeRangeIntersectedNoPBCExcl(const QTime& start1, const QTime& end
 	return (std::max(xm1, xh1) < std::min(xm2, xh2));
 }
 
+int qeutil::iround(double x, int m)
+{
+	double r = std::fmod(x, m);
+	int flr = ifloor(x, m);
+	if (r >= m / 2.0) {
+		return flr + m;
+	}
+	else {
+		return flr;
+	}
+}
+
+int qeutil::ifloor(double x, int m)
+{
+	return static_cast<int>(std::floor(x / m)) * m;
+}
+
+int qeutil::iceil(double x, int m)
+{
+	return static_cast<int>(std::ceil(x / m)) * m;
+}
+
 bool qeutil::timeCompare(const QTime& tm1, const QTime& tm2)
 {
 	static constexpr int secsOfADay = 3600 * 24;

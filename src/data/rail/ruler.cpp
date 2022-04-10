@@ -113,6 +113,24 @@ int Ruler::fromSingleTrain(std::shared_ptr<const TrainAdapter> adp, int start, i
     return cnt;
 }
 
+void Ruler::fromSpeed(double speed, int start, int stop, bool asmax, int prec)
+{
+    for (auto n = firstDownNode(); n; n = n->nextNodeCirc()) {
+        double mile = n->railInterval().mile();
+        double secs_f = mile / speed * 3600;
+        int secs_i;
+        if (asmax) {
+            secs_i = qeutil::iceil(secs_f, prec);
+        }
+        else {
+            secs_i = qeutil::iround(secs_f, prec);
+        }
+        n->interval = secs_i;
+        n->start = start;
+        n->stop = stop;
+    }
+}
+
 int Ruler::validNodeCount() const
 {
     int cnt = 0;

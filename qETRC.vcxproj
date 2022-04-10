@@ -210,8 +210,10 @@
     <ClCompile Include="src\data\gapset\gapgroupabstract.cpp" />
     <ClCompile Include="src\data\gapset\gapsetabstract.cpp" />
     <ClCompile Include="src\data\gapset\transparentset.cpp" />
+    <ClCompile Include="src\dialogs\rulerfromspeeddialog.cpp" />
     <ClCompile Include="src\editors\edittrainwidget.cpp" />
     <ClCompile Include="src\editors\rail\gapconstraintwidget.cpp" />
+    <ClCompile Include="src\editors\timetablewidget.cpp" />
     <ClCompile Include="src\model\rail\forbidlistmodel.cpp" />
     <ClCompile Include="src\model\rail\gapconstraintmodel.cpp" />
     <ClCompile Include="src\navi\addpagedialog.cpp" />
@@ -410,6 +412,8 @@
     <QtMoc Include="src\editors\rail\gapconstraintwidget.h" />
     <QtMoc Include="src\model\rail\forbidlistmodel.h" />
     <ClInclude Include="src\data\gapset\transparentset.h" />
+    <QtMoc Include="src\editors\timetablewidget.h" />
+    <QtMoc Include="src\dialogs\rulerfromspeeddialog.h" />
     <ClInclude Include="src\model\rail\gapconstraintmodel.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <QtMoc Include="src\dialogs\changestationnamedialog.h">

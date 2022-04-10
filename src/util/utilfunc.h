@@ -122,4 +122,14 @@ inline Qt::CheckState boolToCheckState(bool d) {
     return d ? Qt::Checked : Qt::Unchecked;
 }
 
+/**
+ * 对指定基数m求最接近的整数解。
+ * std::round理解为m=1的特殊情况。
+ * 注意这里返回整数。
+ */
+int iround(double x, int m);
+
+int ifloor(double x, int m);
+
+int iceil(double x, int m);
 }

@@ -93,5 +93,7 @@ private:
 	 * @param stop node前站是否已包含停车附加时分，即该站是否停车
 	 */
 	bool calForward(std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
+
+	bool calBackward(std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
 };
 

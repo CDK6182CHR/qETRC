@@ -3,26 +3,26 @@
 #include <qDebug>
 
 IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_ptr<RailStation> from, 
-    std::shared_ptr<RailStation> to, const RailStationEventBase& ev_start, 
-    int secs, bool singleLine) const
+    std::shared_ptr<RailStation> to, Direction dir, const QTime& tm_start, 
+    int secs, bool singleLine, bool backward) const
 {
     auto& ax_from = this->at(from);
     auto& ax_to = this->at(to);
-    QTime tm_to = ev_start.time.addSecs(secs);
+    QTime tm_to = tm_start.addSecs(secs);
 
     // 搜索范围界限
-    QTime leftBound = ev_start.time.addSecs(-secs * INTERVAL_SEARCH_SCALE);
-    QTime rightBound = ev_start.time.addSecs(secs * INTERVAL_SEARCH_SCALE);
+    QTime leftBound = tm_start.addSecs(-secs * INTERVAL_SEARCH_SCALE);
+    QTime rightBound = tm_start.addSecs(secs * INTERVAL_SEARCH_SCALE);
 
     // 这里使用UpperBound，相等的放到左边处理
     // 相等的要特殊处理一下，主要是不能直接break。除了区间共线外，不必相等的在这里不构成冲突。
-    auto citr = std::lower_bound(ax_from.begin(), ax_from.end(), ev_start.time,
+    auto citr = std::lower_bound(ax_from.begin(), ax_from.end(), tm_start,
         RailStationEventBase::PtrTimeComparator());
     auto rcitr = std::make_reverse_iterator(citr);
 
     // 首先处理共线的情况
-    if (citr!=ax_from.end() && (*citr)->time == ev_start.time) {
-        auto [res, _] = isConflictedWith(ev_start, tm_to, *citr, ax_to, singleLine);
+    if (citr!=ax_from.end() && (*citr)->time == tm_start) {
+        auto [res, _] = isConflictedWith(tm_start, tm_to, dir, *citr, ax_to, singleLine);
         if (res) {
             // 注意发站时刻相同的情况下还被定冲突了，只能是共线
             return { IntervalConflictReport::CoverConflict,nullptr };
@@ -33,12 +33,12 @@ IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_p
     }
 
     // 首先向左搜索，解决区间越行的情况
-    if (leftBound < ev_start.time) {
+    if (leftBound < tm_start) {
         // 没发生左越界的情况
         for (auto ritr = rcitr; ritr != ax_from.rend(); ++ritr) {
             if ((*ritr)->time < leftBound)break;
-            auto [res, exeed] = isConflictedWith(ev_start, tm_to, *ritr, ax_to, singleLine);
-            if (res)return { IntervalConflictReport::LeftConflict,res };
+            auto [res, exeed] = isConflictedWith(tm_start, tm_to, dir,  *ritr, ax_to, singleLine);
+            if (res)return { IntervalConflictReport::LeftConflict, backward ? *ritr : res };
             else if (exeed) break;
         }
     }
@@ -46,9 +46,9 @@ IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_p
         // 存在左越界的，跨日界线
         bool flag = false;
         for (auto ritr = rcitr; ritr != ax_from.rend(); ++ritr) {
-            auto [res, exeed] = isConflictedWith(ev_start, tm_to, *ritr, ax_to, singleLine);
+            auto [res, exeed] = isConflictedWith(tm_start, tm_to, dir, *ritr, ax_to, singleLine);
             if (res)
-                return { IntervalConflictReport::LeftConflict,res };
+                return { IntervalConflictReport::LeftConflict,backward ? *ritr : res };
             else if (exeed) {
                 flag = true;
                 break;
@@ -58,21 +58,21 @@ IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_p
             for (auto ritr = ax_from.rbegin(); ritr != ax_from.rend(); ++ritr) {
                 if ((*ritr)->time < leftBound)
                     break;
-                auto [res, exeed] = isConflictedWith(ev_start, tm_to, *ritr, ax_to, singleLine);
-                if (res)return { IntervalConflictReport::LeftConflict,res };
+                auto [res, exeed] = isConflictedWith(tm_start, tm_to, dir, *ritr, ax_to, singleLine);
+                if (res)return { IntervalConflictReport::LeftConflict, backward ? *ritr : res };
                 else if (exeed) break;
             }
         }
     }
 
     // 向右搜索  注意右冲突返回的是from轴的事件！
-    if (rightBound > ev_start.time) {
+    if (rightBound > tm_start) {
         // 不存在右跨日
         for (auto itr = citr; itr != ax_from.end(); ++itr) {
             if ((*itr)->time > rightBound)break;
-            auto [res, exeed] = isConflictedWith(ev_start, tm_to, *itr, ax_to, singleLine);
+            auto [res, exeed] = isConflictedWith(tm_start, tm_to, dir, *itr, ax_to, singleLine);
             if (res) {
-                return { IntervalConflictReport::RightConflict,*itr };
+                return { IntervalConflictReport::RightConflict, backward? res: *itr };
             }
             else if (exeed)break;
         }
@@ -81,9 +81,9 @@ IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_p
         // 存在右跨日
         bool flag = false;
         for (auto itr = citr; itr != ax_from.end(); ++itr) {
-            auto [res, exeed] = isConflictedWith(ev_start, tm_to, *itr, ax_to, singleLine);
+            auto [res, exeed] = isConflictedWith(tm_start, tm_to, dir, *itr, ax_to, singleLine);
             if (res) {
-                return { IntervalConflictReport::RightConflict,*itr };
+                return { IntervalConflictReport::RightConflict, backward ? res : *itr };
             }
             else if (exeed) {
                 flag = true;
@@ -92,9 +92,9 @@ IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_p
         }
         if (!flag) {
             for (auto itr = ax_from.begin(); itr != citr; ++itr) {
-                auto [res, exeed] = isConflictedWith(ev_start, tm_to, *itr, ax_to, singleLine);
+                auto [res, exeed] = isConflictedWith(tm_start, tm_to, dir, *itr, ax_to, singleLine);
                 if (res) {
-                    return { IntervalConflictReport::RightConflict,*itr };
+                    return { IntervalConflictReport::RightConflict, backward ? res : *itr };
                 }
                 else if (exeed)break;
             }
@@ -107,22 +107,22 @@ IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_p
 
 std::pair<std::shared_ptr<RailStationEvent>, bool>
 RailwayStationEventAxis::isConflictedWith(
-    const RailStationEventBase& ev_start, const QTime& tm_to, 
+    const QTime& tm_start, const QTime& tm_to, Direction dir,
     std::shared_ptr<RailStationEvent> ev_ex_start, const StationEventAxis& axis_to,
     bool singleLine) const
 {
     // 首先排除不相关事件
-    if (!(ev_ex_start->pos & qeutil::dirLatterPos(ev_start.dir))) {
+    if (!(ev_ex_start->pos & qeutil::dirLatterPos(dir))) {
         return {};
     }
 
-    const auto& corr_ev_map = axis_to.positionEvents(qeutil::dirFormerPos(ev_start.dir));
+    const auto& corr_ev_map = axis_to.positionEvents(qeutil::dirFormerPos(dir));
     if (auto itr = corr_ev_map.find(ev_ex_start->line); itr != corr_ev_map.end()) {
         // 成功找到同一运行线对面的事件
         //qDebug() << "Another event: " << itr->second->time << Qt::endl;
-        if (ev_ex_start->dir == ev_start.dir) {
+        if (ev_ex_start->dir == dir) {
             // 同向运行
-            if (qeutil::timeCrossed(ev_start.time, ev_ex_start->time,
+            if (qeutil::timeCrossed(tm_start, ev_ex_start->time,
                 tm_to, itr->second->time)) {
                 // 发生同向越行
                 return std::make_pair(itr->second, false);
@@ -134,7 +134,7 @@ RailwayStationEventAxis::isConflictedWith(
         }
         else if(singleLine) {
             // 只有单线需要考虑反向的 和同向的区别是，对方运行线的两站时刻反着来
-            if (qeutil::timeCrossed(ev_start.time, ev_ex_start->time, tm_to, itr->second->time)) {
+            if (qeutil::timeCrossed(tm_start, ev_ex_start->time, tm_to, itr->second->time)) {
                 return std::make_pair(itr->second, false);
             }
             else {

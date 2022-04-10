@@ -103,6 +103,8 @@ private slots:
 
     void actReadFromSingleTrain();
 
+    void actFromSpeed();
+
     /**
      * 创建当前标尺副本。
      * 先创建新标尺，再修订它。

@@ -77,6 +77,7 @@ SOURCES += \
     src/dialogs/modifytimetabledialog.cpp \
     src/dialogs/outputsubdiagramdialog.cpp \
     src/dialogs/printdiagramdialog.cpp \
+    src/dialogs/rulerfromspeeddialog.cpp \
     src/dialogs/rulerfromtraindialog.cpp \
     src/dialogs/selectrailstationdialog.cpp \
     src/dialogs/trainfilter.cpp \
@@ -96,6 +97,7 @@ SOURCES += \
     src/editors/ruler/rulertabpy.cpp \
     src/editors/ruler/rulerwidget.cpp \
     src/editors/systemjsondialog.cpp \
+    src/editors/timetablewidget.cpp \
     src/editors/typeconfigdialog.cpp \
     src/editors/typeregexdialog.cpp \
     src/kernel/routingdiagram.cpp \
@@ -272,6 +274,7 @@ HEADERS += \
     src/dialogs/modifytimetabledialog.h \
     src/dialogs/outputsubdiagramdialog.h \
     src/dialogs/printdiagramdialog.h \
+    src/dialogs/rulerfromspeeddialog.h \
     src/dialogs/rulerfromtraindialog.h \
     src/dialogs/selectrailstationdialog.h \
     src/dialogs/trainfilter.h \
@@ -291,6 +294,7 @@ HEADERS += \
     src/editors/ruler/rulertabpy.h \
     src/editors/ruler/rulerwidget.h \
     src/editors/systemjsondialog.h \
+    src/editors/timetablewidget.h \
     src/editors/typeconfigdialog.h \
     src/editors/typeregexdialog.h \
     src/kernel/routingdiagram.h \

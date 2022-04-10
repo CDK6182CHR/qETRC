@@ -3,10 +3,10 @@
 #include <QWidget>
 #include <memory>
 
-class QEControlledTable;
-class TimetableStdModel;
 class Train;
 class TrainCollection;
+class TimetableWidget;
+class TimetableStdModel;
 class QTableView;
 
 /**
@@ -20,8 +20,7 @@ class BasicTrainWidget : public QWidget
     TrainCollection& coll;
     std::shared_ptr<Train> _train;
     const bool commitInPlace;
-    TimetableStdModel* model;
-    QEControlledTable* ctable;
+    TimetableWidget* ctable;
     QTableView* table;
 public:
     explicit BasicTrainWidget(TrainCollection &coll_, bool commitInPlace_,
@@ -31,7 +30,7 @@ public:
     void setTrain(std::shared_ptr<Train> train);
     void refreshData();
     void refreshBasicData();
-    auto* timetableModel(){return model;}
+    TimetableStdModel* timetableModel();
     ~BasicTrainWidget()noexcept = default;
 
 private:

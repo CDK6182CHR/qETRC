@@ -77,18 +77,16 @@ void TimetableStdModel::setupModel()
         setItem(row,ColTrack,new SI(p->track));
         setItem(row,ColNote,new SI(p->note));
 
-        //停时那一列，如果没有就不设置Item!
+        //停时那一列，有没有都要弄个不可编辑的Item在那里
+        it = new SI;
+        it->setEditable(false);
         int sec=p->stopSec();
         if(sec){
             it=new SI(p->stopString());
-            it->setEditable(false);
-            setItem(row,ColStopTime,it);
         }
-        else {
-            takeItem(row, ColStopTime);
-        }
+        setItem(row, ColStopTime, it);
 
-        if (p->business) {
+        if (p->business && sec) {
             itname->setForeground(Qt::red);
         }
         else if(sec){
@@ -125,13 +123,13 @@ void TimetableStdModel::updateRowStopTime(int row)
 {
     const QTime& arr = qvariant_cast<QTime>(item(row, ColArrive)->data(Qt::EditRole));
     const QTime& dep = qvariant_cast<QTime>(item(row, ColDepart)->data(Qt::EditRole));
+    auto* it = item(row, ColStopTime);
+
     if (arr != dep) {
-        auto* it = new QStandardItem(qeutil::secsToString(arr, dep));
-        it->setEditable(false);
-        setItem(row, ColStopTime, it);
+        it->setText(qeutil::secsToString(arr, dep));
     }
     else {
-        takeItem(row, ColStopTime);
+        it->setText("");
     }
     setRowColor(row);
 }
@@ -176,6 +174,20 @@ void TimetableStdModel::onDataChanged(const QModelIndex& leftTop, const QModelIn
         for (int i = std::max(row1, 0); i <= std::min(row2, rowCount() - 1); i++) {
             setRowColor(i);
         }
+    }
+}
+
+void TimetableStdModel::copyToDepart(int row)
+{
+    if (0 <= row && row < rowCount()) {
+        item(row, ColDepart)->setData(item(row, ColArrive)->data(Qt::EditRole), Qt::EditRole);
+    }
+}
+
+void TimetableStdModel::copyToArrive(int row)
+{
+    if (0 <= row && row < rowCount()) {
+        item(row, ColArrive)->setData(item(row, ColDepart)->data(Qt::EditRole), Qt::EditRole);
     }
 }
 

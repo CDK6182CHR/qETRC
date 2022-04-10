@@ -90,8 +90,8 @@ void NaviTree::initContextMenus()
     mePage->addAction(tr("转到包含的线路"), this, &NaviTree::onSwitchToRailwayFromPageContext);
 
     //Train
-    act = meTrain->addAction(tr("编辑时刻表"));
-    connect(act, SIGNAL(triggered()), this, SLOT(onEditTrainContext()));
+    meTrain->addAction(tr("编辑列车"), this, &NaviTree::onEditTrainContext);
+    meTrain->addAction(tr("编辑时刻表"), this, &NaviTree::onEditTimetableContext);
     act = meTrain->addAction(tr("删除列车"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemoveSingleTrainContext()));
     meTrain->addAction(tr("创建列车副本"), this, &NaviTree::onDulplicateTrainContext);
@@ -266,6 +266,15 @@ void NaviTree::onEditTrainContext()
     ACI* item = getItem(idx);
     if (item && item->type() == navi::TrainModelItem::Type) {
         emit editTrain(static_cast<navi::TrainModelItem*>(item)->train());
+    }
+}
+
+void NaviTree::onEditTimetableContext()
+{
+    auto idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::TrainModelItem::Type) {
+        emit editTimetable(static_cast<navi::TrainModelItem*>(item)->train());
     }
 }
 
