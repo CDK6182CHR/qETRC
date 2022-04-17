@@ -28,6 +28,10 @@ include(dependencies/qETRC_ads.pri)
 INCLUDEPATH += src
 
 SOURCES += \
+    src/data/analysis/inttrains/intervalcounter.cpp \
+    src/data/analysis/inttrains/intervaltraininfo.cpp \
+    src/util/combos/railstationcombo.cpp \
+    src/viewers/stats/intervaltraintable.cpp \
     src/data/calculation/calculationlog.cpp \
     src/data/calculation/gapconstraints.cpp \
     src/data/calculation/greedypainter.cpp \
@@ -191,6 +195,8 @@ SOURCES += \
     src/util/qecontrolledtable.cpp \
     src/util/utilfunc.cpp \
     src/viewers/sectioncountdialog.cpp \
+    src/viewers/stats/intervalcountdialog.cpp \
+    src/viewers/stats/intervaltraindialog.cpp \
     src/viewers/timetablequickwidget.cpp \
     src/viewers/traindiffdialog.cpp \
     src/viewers/events/traineventdialog.cpp \
@@ -219,6 +225,10 @@ SOURCES += \
     src/wizards/timeinterp/timeinterpwizard.cpp
 
 HEADERS += \
+    src/data/analysis/inttrains/intervalcounter.h \
+    src/data/analysis/inttrains/intervaltraininfo.h \
+    src/util/combos/railstationcombo.h \
+    src/viewers/stats/intervaltraintable.h \
     src/data/calculation/calculationlog.h \
     src/data/calculation/gapconstraints.h \
     src/data/calculation/greedypainter.h \
@@ -392,6 +402,8 @@ HEADERS += \
     src/util/qeexceptions.h \
     src/util/utilfunc.h \
     src/viewers/sectioncountdialog.h \
+    src/viewers/stats/intervalcountdialog.h \
+    src/viewers/stats/intervaltraindialog.h \
     src/viewers/timetablequickwidget.h \
     src/viewers/traindiffdialog.h \
     src/viewers/events/traineventdialog.h \

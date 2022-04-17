@@ -368,6 +368,10 @@ private slots:
 
     void actDiagramCompare();
 
+    void actIntervalTrains();
+    
+    void actIntervalCount();
+
     void actReadRulerWizard();
 
     void actBatchParseRouting();

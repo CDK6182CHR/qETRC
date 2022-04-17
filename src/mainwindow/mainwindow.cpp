@@ -66,6 +66,7 @@
 #include "railnet/raildb/raildbcontext.h"
 #include "viewers/compare/diagramcomparedialog.h"
 #include "wizards/greedypaint/greedypaintwizard.h"
+#include "viewers/stats/intervaltraindialog.h"
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -1022,6 +1023,11 @@ void MainWindow::initToolbar()
 		connect(act, &QAction::triggered, this, &MainWindow::actDiagramCompare);
 		panel->addLargeAction(act);
 
+		act = new QAction(QIcon(":/icons/train.png"), tr("区间车次"), this);
+		act->setToolTip(tr("区间车次表\n查询任意两站之间的列车表。"));
+		connect(act, &QAction::triggered, this, &MainWindow::actIntervalTrains);
+		panel->addMediumAction(act);
+
 		panel = cat->addPannel(tr("排图"));
 
 		act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("标尺排图"), this);
@@ -1548,6 +1554,16 @@ void MainWindow::actDiagramCompare()
 	connect(dialog, &DiagramCompareDialog::showStatus, this, &MainWindow::showStatus);
 	dialog->resize(800, 800);
 	dialog->open();
+}
+
+void MainWindow::actIntervalTrains()
+{
+	auto* dlg = new IntervalTrainDialog(_diagram, this);
+	dlg->show();
+}
+
+void MainWindow::actIntervalCount()
+{
 }
 
 void MainWindow::actReadRulerWizard()
