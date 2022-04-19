@@ -50,11 +50,17 @@ void IntervalTrainModel::resetData(IntervalTrainList &&data_)
     setupModel();
 }
 
+void IntervalTrainModel::resetData(const IntervalTrainList& data_)
+{
+    _data = data_;
+    setupModel();
+}
+
 
 IntervalTrainTable::IntervalTrainTable(QWidget *parent):
     model(new IntervalTrainModel(parent))
 {
-
+    initUI();
 }
 
 void IntervalTrainTable::initUI()

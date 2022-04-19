@@ -67,7 +67,7 @@
 #include "viewers/compare/diagramcomparedialog.h"
 #include "wizards/greedypaint/greedypaintwizard.h"
 #include "viewers/stats/intervaltraindialog.h"
-
+#include "viewers/stats/intervalcountdialog.h"
 
 MainWindow::MainWindow(QWidget* parent)
 	: SARibbonMainWindow(parent, true),
@@ -1023,7 +1023,12 @@ void MainWindow::initToolbar()
 		connect(act, &QAction::triggered, this, &MainWindow::actDiagramCompare);
 		panel->addLargeAction(act);
 
-		act = new QAction(QIcon(":/icons/train.png"), tr("区间车次"), this);
+		act = new QAction(QIcon(":/icons/counter.png"), tr("区间对数表"), this);
+		act->setToolTip(tr("区间车次表\n查询指定线路从指定站出发（到达指定站）的列车对数。"));
+		connect(act, &QAction::triggered, this, &MainWindow::actIntervalCount);
+		panel->addMediumAction(act);
+
+		act = new QAction(QIcon(":/icons/train.png"), tr("区间车次表"), this);
 		act->setToolTip(tr("区间车次表\n查询任意两站之间的列车表。"));
 		connect(act, &QAction::triggered, this, &MainWindow::actIntervalTrains);
 		panel->addMediumAction(act);
@@ -1564,6 +1569,8 @@ void MainWindow::actIntervalTrains()
 
 void MainWindow::actIntervalCount()
 {
+	auto* dlg = new IntervalCountDialog(_diagram, this);
+	dlg->show();
 }
 
 void MainWindow::actReadRulerWizard()

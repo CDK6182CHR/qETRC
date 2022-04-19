@@ -11,10 +11,18 @@ class Diagram;
 class TrainFilter;
 class QCheckBox;
 
+/**
+ * Model: 每个站都设置做好数据，但只显示需要的部分
+ * （显示由table来控制）
+ */
 class IntervalCountModel: public QStandardItemModel
 {
     Q_OBJECT
     RailIntervalCount _data;
+    IntervalCounter& counter;
+    std::shared_ptr<const RailStation> center;
+    std::shared_ptr<const Railway> railway;
+    bool isStart = false;
 public:
     enum {
         ColFrom=0,
@@ -25,9 +33,10 @@ public:
         ColStartEnd,
         ColMAX
     };
-    IntervalCountModel(QObject* parent=nullptr);
-    void resetData(RailIntervalCount&& data_);
-    IntervalCountInfo& dataForRow(int i)const;
+    IntervalCountModel(IntervalCounter& counter, QObject* parent=nullptr);
+    void resetData(RailIntervalCount&& data_, std::shared_ptr<const RailStation> center, bool isStart, 
+        std::shared_ptr<const Railway> rail);
+    const auto& getData()const { return _data; }
     std::shared_ptr<const RailStation> stationForRow(int i)const;
 public slots:
     void refreshData();
@@ -47,11 +56,11 @@ class IntervalCountDialog : public QDialog
     QCheckBox* ckBusiness,*ckStop;
     TrainFilter* const filter;
 
-    IntervalCountModel* const model;
     QTableView* table;
     IntervalTrainTable* detailTable=nullptr;
 
     IntervalCounter counter;
+    IntervalCountModel* const model;
 
 public:
     IntervalCountDialog(Diagram& diagram,QWidget* parent=nullptr);
@@ -59,6 +68,7 @@ private:
     void initUI();
 private slots:
     void refreshData();
+    void refreshShow();
     void onDoubleClicked();
     void toCsv();
 };

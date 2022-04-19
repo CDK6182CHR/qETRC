@@ -58,6 +58,7 @@ public:
     void clear();
 
     const auto& list()const{return _list;}
+    int count()const { return (int)_list.size(); }
 
     int startCount()const{return _startCount;}
     int endCount()const{return _endCount;}

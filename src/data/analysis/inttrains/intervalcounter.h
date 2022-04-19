@@ -87,6 +87,12 @@ public:
             std::shared_ptr<const RailStation> drain
             )const;
 
+    /**
+     * 确定指定站是否要符合办客站/办货站限制
+     * （是否要显示出来）
+     */
+    bool checkStation(const std::shared_ptr<const RailStation>& st)const;
+
 private:
     /**
      * @brief checkStopBusiness
@@ -94,7 +100,7 @@ private:
      */
     bool checkStopBusiness(const IntervalTrainInfo& info)const;
 
-    bool checkStation(const std::shared_ptr<const RailStation>& st)const;
+
 
 };
 

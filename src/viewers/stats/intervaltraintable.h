@@ -29,6 +29,7 @@ public:
     void refreshData();
     void setupModel();
     void resetData(IntervalTrainList&& data_);
+    void resetData(const IntervalTrainList& data_);
     const auto& getData()const{return _data;}
 };
 
