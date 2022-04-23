@@ -105,4 +105,14 @@ qETRC目前免费开源。
 
 感谢支持！
 
-<img src="img/QRcode.jpg" style="zoom:50%;" />
+<div>
+    <div>
+        <img src="img/QRcode.jpg" width="200px"/>
+    </div>
+    <div>
+        <img src="img/myoisinh.png" width="200px" />
+    </div>
+</div>
+
+
+
