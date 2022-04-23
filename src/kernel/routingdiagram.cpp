@@ -166,7 +166,7 @@ void RoutingDiagram::_setVLines()
         l=scene()->addLine(x,sizes.top,x,sizes.height-sizes.bottom);
         l->setPen(pen);
 
-        auto* text=scene()->addText(QString::number(day));
+        auto* text=scene()->addText(QString::number(day+1));
         auto&& rect=text->boundingRect();
         text->setPos(x-rect.width(),sizes.top-rect.height());
     }
