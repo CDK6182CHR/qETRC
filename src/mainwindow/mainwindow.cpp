@@ -11,6 +11,9 @@
 #include <QLabel>
 #include <QStyleFactory>
 #include <chrono>
+#include <SARibbonActionsManager.h>
+#include <SARibbonCustomizeDialog.h>
+#include <QXmlStreamWriter>
 
 #include "model/train/trainlistmodel.h"
 #include "editors/trainlistwidget.h"
@@ -111,6 +114,7 @@ void MainWindow::initUI()
 {
 	initDockWidgets();
 	initToolbar();
+	sa_apply_customize_from_xml_file("customize.xml", this, actMgr);
 }
 
 void MainWindow::undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains)
@@ -356,6 +360,37 @@ void MainWindow::useOfficeStyle()
 	SystemJson::instance.ribbon_style = SARibbonBar::OfficeStyle;
 }
 
+void MainWindow::actCustomizeRibbon()
+{
+	SARibbonCustomizeDialog dlg(this);
+	dlg.setupActionsManager(actMgr);
+	dlg.fromXml("customize.xml");
+	if (SARibbonCustomizeDialog::Accepted == dlg.exec()) {
+		dlg.applys();
+		QByteArray str;
+		QXmlStreamWriter xml(&str);
+		xml.setAutoFormatting(true);
+		xml.setAutoFormattingIndent(2);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)  // QXmlStreamWriter always encodes XML in UTF-8.
+		xml.setCodec("utf-8");
+#endif
+		xml.writeStartDocument();
+		bool isok = dlg.toXml(&xml);
+		xml.writeEndDocument();
+		if (isok) {
+			QFile f("customize.xml");
+			if (f.open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate)) {
+				QTextStream s(&f);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)  // QTextStream always encodes XML in UTF-8.
+				s.setCodec("utf-8");
+#endif
+				s << str;
+				s.flush();
+			}
+		}
+	}
+}
+
 void MainWindow::actRulerPaint()
 {
 	auto* wzd = new RulerPaintWizard(_diagram, this);
@@ -372,6 +407,7 @@ void MainWindow::actRulerPaint()
 	wzd->show();
 }
 
+#ifdef QETRC_GREEDYPAINT_TEST
 #include <wizards/greedypaint/greedypaintfasttest.h>
 
 void MainWindow::actGreedyPaintFast()
@@ -383,6 +419,7 @@ void MainWindow::actGreedyPaintFast()
 		this, &MainWindow::showStatus);
 	w->show();
 }
+#endif
 
 void MainWindow::actGreedyPaint()
 {
@@ -631,6 +668,14 @@ void MainWindow::initToolbar()
 		act = menu->addAction(tr("使用WPS风格Ribbon"));
 		connect(act, SIGNAL(triggered()), this, SLOT(useWpsStyle()));
 		ribbon->quickAccessBar()->addMenu(menu);
+
+		// Customize 似乎还不太对，先留在这
+#if 0
+		act = new QAction(QIcon(":/icons/customize.svg"), tr("自定义Ribbon"), this);
+		act->setToolTip(tr("自定义Ribbon\n自定义工具栏按钮的排列组合"));
+		connect(act, &QAction::triggered, this, &MainWindow::actCustomizeRibbon);
+		ribbon->quickAccessBar()->addAction(act);
+#endif
 
 	}
 
@@ -1072,6 +1117,7 @@ void MainWindow::initToolbar()
 		btn = panel->addLargeAction(act);
 		connect(act, &QAction::triggered, this, &MainWindow::actGreedyPaint);
 
+#ifdef QETRC_GREEDYPAINT_TEST
 		act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("贪心排图（测试）"), this);
 		addAction(act);
 		act->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_T);
@@ -1079,8 +1125,10 @@ void MainWindow::initToolbar()
 			"采用贪心算法自动计算运行线。"));
 		btn = panel->addLargeAction(act);
 		connect(act, &QAction::triggered, this, &MainWindow::actGreedyPaintFast);
+#endif
 
 	}
+
 
 	//显示
 	if constexpr (true) {
@@ -1251,20 +1299,10 @@ void MainWindow::initToolbar()
 	ribbon->setRibbonStyle(
 		static_cast<SARibbonBar::RibbonStyle>(SystemJson::instance.ribbon_style));
 
-#ifdef Q_OS_ANDROID
-	// test of menubar ...
-	if constexpr (true) {
-		auto* mb = menuBar();
-		auto* me = mb->addMenu(tr("文件"));
-		me->addAction(sharedActions.newfile);
-		me->addAction(sharedActions.open);
-		me->addAction(sharedActions.save);
-		me = mb->addMenu(tr("编辑"));
-		me->addAction(tr("车次管理"));
-		me->addAction(tr("线路管理"));
-	}
-#endif
-	}
+	// 2022.04.24：测试ActionManager
+	actMgr = new SARibbonActionsManager(this);
+	actMgr->autoRegisteActions(this);
+}
 
 void MainWindow::initAppMenu()
 {

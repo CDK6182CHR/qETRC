@@ -3,6 +3,8 @@
 #include <QDialog>
 #include <data/calculation/greedypainter.h>
 
+#ifdef QETRC_GREEDYPAINT_TEST
+
 class QSpinBox;
 class QTimeEdit;
 class QLineEdit;
@@ -45,3 +47,4 @@ private slots:
     void onSingleLineChanged(bool on);
 };
 
+#endif

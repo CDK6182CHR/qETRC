@@ -1,5 +1,7 @@
 ﻿#include "greedypaintfasttest.h"
 
+#ifdef QETRC_GREEDYPAINT_TEST
+
 #include <QCheckBox>
 #include <QFormLayout>
 #include <QLineEdit>
@@ -201,3 +203,6 @@ void GreedyPaintFastTest::onSingleLineChanged(bool on)
 {
     _model->setSingleLine(on);
 }
+
+#endif
+

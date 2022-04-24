@@ -1,4 +1,4 @@
-﻿<RCC>
+<RCC>
     <qresource prefix="/">
         <file>icons/list.png</file>
         <file>icons/timetable.png</file>
@@ -61,5 +61,6 @@
         <file>icons/weaken.png</file>
         <file>icons/routing-diagram.png</file>
         <file>icons/mobile-icon.png</file>
+        <file>icons/customize.svg</file>
     </qresource>
 </RCC>

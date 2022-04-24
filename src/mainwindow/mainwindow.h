@@ -33,6 +33,7 @@ class CDockAreaWidget;
 class CDockWidget;
 }
 class  GreedyPaintWizard;
+class SARibbonActionsManager;
 
 /**
  * @brief The MainWindow class
@@ -93,6 +94,8 @@ class MainWindow : public SARibbonMainWindow
     bool changed = false;
 
     DiagramWidget::SharedActions diaActions;
+
+    SARibbonActionsManager* actMgr;
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -328,10 +331,17 @@ private slots:
     void useWpsStyle();
     void useOfficeStyle();
 
+    /**
+     * 自定义Ribbon界面
+     * @see SARibbon demo
+     */
+    void actCustomizeRibbon();
+
     void actRulerPaint();
 
+#ifdef QETRC_GREEDYPAINT_TEST
     void actGreedyPaintFast();
-
+#endif
     void actGreedyPaint();
 
     void actExitGreedyPaint();
