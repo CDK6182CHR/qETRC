@@ -34,12 +34,25 @@ void IntervalTrainDialog::initUI()
     auto* vlay=new QVBoxLayout(this);
     auto* flay=new QFormLayout;
 
+    auto* hlay = new QHBoxLayout;
     edFrom=new QLineEdit;
-    edTo=new QLineEdit;
-    flay->addRow(tr("发站"),edFrom);
-    flay->addRow(tr("到站"),edTo);
+    ckMultiStart = new QCheckBox(tr("使用多车站分隔符|"));
+    connect(ckMultiStart, &QCheckBox::toggled, this, &IntervalTrainDialog::onMultiChecked);
+    hlay->addWidget(edFrom);
+    hlay->addWidget(ckMultiStart);
+    
+    flay->addRow(tr("发站"),hlay);
 
-    auto* hlay=new QHBoxLayout;
+    hlay = new QHBoxLayout;
+    edTo = new QLineEdit;
+    ckMultiEnd = new QCheckBox(tr("使用多车站分隔符|"));
+    connect(ckMultiEnd, &QCheckBox::toggled, this, &IntervalTrainDialog::onMultiChecked);
+    hlay->addWidget(edTo);
+    hlay->addWidget(ckMultiEnd);
+    flay->addRow(tr("到站"),hlay);
+
+
+    hlay=new QHBoxLayout;
     ckStop=new QCheckBox(tr("仅停车（含始发终到）车次"));
     ckBusiness=new QCheckBox("仅营业车次");
     hlay->addWidget(ckBusiness);
@@ -72,6 +85,8 @@ void IntervalTrainDialog::updateData()
     }
     counter.setBusinessOnly(ckBusiness->isChecked());
     counter.setStopOnly(ckStop->isChecked());
+    counter.setMultiStart(ckMultiStart->isChecked());
+    counter.setMultiEnd(ckMultiEnd->isChecked());
 
     auto&& data=counter.getIntervalTrains(from_name,to_name);
     table->getModel()->resetData(std::move(data));
@@ -83,4 +98,17 @@ void IntervalTrainDialog::toCsv()
     qeutil::exportTableToCsv(table->getModel(), this,
                              tr("区间车次表%1-%2").arg(edFrom->text(),
                                                   edTo->text()));
+}
+
+void IntervalTrainDialog::onMultiChecked(bool on)
+{
+    if (informMultiCheck && on) {
+        QMessageBox::information(this, tr("提示"), tr("此功能允许一次使用多个车站查询，"
+            "输入的多个车站以垂直线| （U+007C，标准键盘\\符号上方）分隔，分隔符两端请不要加"
+            "空格等其他任何符号。"
+            "启用本功能时，如果车站站名内存在此符号，则会被当做两个站处理。\n"
+            "输入的多个车站为“或”的关系，只要列车时刻表内存在一个车站，就能匹配。\n"
+            "此提示在本窗口运行期间仅展示一次。"));
+        informMultiCheck = false;
+    }
 }

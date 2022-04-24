@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "intervaltraininfo.h"
+#include <vector>
+#include <QString>
 
 class StationName;
 class Railway;
@@ -21,10 +23,12 @@ class TrainFilterCore;
 class IntervalCounter
 {
     const TrainCollection& coll;
-    bool _businessOnly,_stopOnly;
+    bool _businessOnly=false,_stopOnly=false;
     // 这两个仅用来处理区间对数表
-    bool _passenterOnly,_freightOnly;
+    bool _passenterOnly=false,_freightOnly=false;
     const TrainFilterCore& _filter;
+    // 区间车次表多选车站
+    bool _multiStart=false, _multiEnd=false;
 public:
     IntervalCounter(const TrainCollection& coll, const TrainFilterCore& filter);
     const auto& filter()const{return _filter;}
@@ -34,6 +38,8 @@ public:
     void setStopOnly(bool on){_stopOnly=on;}
     void setPassengerOnly(bool on){_passenterOnly=on;}
     void setFreightOnly(bool on){_freightOnly=on;}
+    void setMultiStart(bool on) { _multiStart = on; }
+    void setMultiEnd(bool on) { _multiEnd = on; }
 
     /**
      * @brief getIntervalTrains
@@ -56,10 +62,11 @@ public:
      * 区间车次表（全局）
      * 仅用站名判定的版本。需要全局遍历列车时刻表，而不管线路问题。
      * 暂定使用equalOrBelongTo()判定站名，即支持域解析符
+     * 2022.04.24：入参改为QString，考虑多车站选择情况
      */
     IntervalTrainList getIntervalTrains(
-            const StationName& from,
-            const StationName& to
+            const QString& from,
+            const QString& to
             );
 
     /**
@@ -100,7 +107,11 @@ private:
      */
     bool checkStopBusiness(const IntervalTrainInfo& info)const;
 
+    bool checkStationStopBusiness(const TrainStation& st, bool isStartEnd);
 
+    bool checkStationName(const StationName& name, const std::vector<StationName>& std_names)const;
+
+    std::vector<StationName> transSearchStation(const QString& input, bool useMulti)const;
 
 };
 

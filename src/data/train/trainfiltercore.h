@@ -18,14 +18,14 @@ class TrainFilterCore
     friend class TrainFilter;
     Diagram& diagram;
 
-    bool useType, useInclude, useExclude;
-    bool useRouting, showOnly, useInverse;
-    TrainPassenger passengerType;
+    bool useType=false, useInclude=false, useExclude=false;
+    bool useRouting=false, showOnly=false, useInverse=false;
+    TrainPassenger passengerType = TrainPassenger::Auto;
 
     QSet<std::shared_ptr<const TrainType>> types;
     QVector<QRegExp> includes, excludes;
     QSet<std::shared_ptr<const Routing>> routings;
-    bool selNullRouting;
+    bool selNullRouting=false;
 
     explicit TrainFilterCore(Diagram& diagram_);
 public:

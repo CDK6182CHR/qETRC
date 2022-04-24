@@ -20,6 +20,9 @@ class IntervalTrainDialog : public QDialog
 
     QLineEdit* edFrom,*edTo;
     QCheckBox* ckStop,*ckBusiness;
+    QCheckBox* ckMultiStart, * ckMultiEnd;
+
+    bool informMultiCheck = true;
 public:
     IntervalTrainDialog(Diagram& diagram, QWidget* parent=nullptr);
 private:
@@ -27,5 +30,6 @@ private:
 private slots:
     void updateData();
     void toCsv();
+    void onMultiChecked(bool on);
 };
 

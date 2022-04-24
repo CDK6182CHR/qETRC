@@ -141,11 +141,19 @@ std::shared_ptr<Railway> RailStationModel::generateRailway() const
     auto rail = std::make_shared<Railway>(railway->name());
     QWidget* p = qobject_cast<QWidget*>(parent());
     for (int i = 0; i < rowCount(); i++) {
-        auto name = StationName::fromSingleLiteral(item(i, ColName)->text());
+        const auto& name_str = item(i, ColName)->text();
+        auto name = StationName::fromSingleLiteral(name_str);
         if (name.empty() || rail->stationNameExisted(name)) {
             QMessageBox::warning(p, tr("错误"), 
                 tr("站名为空或已存在：\n第%1行: %2").arg(i+1).arg(name.toSingleLiteral()));
             return nullptr;
+        }
+        else if (name_str.contains('|')) {
+            QMessageBox::information(p, tr("提醒"),
+                tr("站名包含垂直线|(U+007): 第%1行: %2\n"
+                    "自1.1.3版本开始，垂直线符号在某些功能将被用于多车站分隔符，" 
+                    "强烈不建议在站名中包含此符号，否则可能产生异常结果。\n" 
+                    "本提示不影响当前结果的提交。").arg(i + 1).arg(name_str));
         }
 
         double mile = qvariant_cast<double>(item(i, ColMile)->data(Qt::EditRole));
