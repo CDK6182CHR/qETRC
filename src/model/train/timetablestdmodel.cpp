@@ -41,6 +41,10 @@ void TimetableStdModel::setupNewRow(int row)
     setItem(row,ColBusiness,makeCheckItem());
     setItem(row,ColTrack,new SI);
     setItem(row,ColNote,new SI);
+
+    it = new SI;
+    it->setEditable(false);
+    setItem(row, ColStopTime, it);
 }
 
 void TimetableStdModel::setupModel()
