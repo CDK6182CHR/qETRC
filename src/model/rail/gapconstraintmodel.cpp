@@ -87,3 +87,11 @@ void GapConstraintModel::setGapSet(gapset::GapSetAbstract *gapSet, bool singleLi
     endResetModel();
 }
 
+void GapConstraintModel::setConstrainFromCurrent(const std::map<TrainGapTypePair, int>& mingap,
+    int minSecs, int maxSecs)
+{
+    beginResetModel();
+    _gapSet->setConstraintFromMinimal(mingap, minSecs, maxSecs);
+    endResetModel();
+}
+

@@ -27,8 +27,15 @@ class TrainFilterCore
     QSet<std::shared_ptr<const Routing>> routings;
     bool selNullRouting=false;
 
-    explicit TrainFilterCore(Diagram& diagram_);
+
 public:
+
+    /**
+     * 2022.04.30
+     * 从private改为public
+     * 直接构造出来的结果将是空白筛选器，对任何列车都通过。
+     */
+    explicit TrainFilterCore(Diagram& diagram_);
     TrainFilterCore(const TrainFilterCore&) = delete;
     TrainFilterCore& operator=(const TrainFilterCore&) = delete;
     TrainFilterCore(TrainFilterCore&&) = delete;

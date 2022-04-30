@@ -43,6 +43,22 @@ public:
      */
     virtual void buildSet()=0;
 
+    /**
+     * @brief minimalGapByGroup
+     * 2022.04.30  将全局的最小间隔重组为各个Group的最小。
+     * @param mingap  按TrainGapTypePair分类的最小间隔
+     * @param minSecs  最小的间隔，用于填充无数据的。通常用截断时长代替。
+     * @param maxSecs  最大数值，防止出现很离谱的结果
+     * @return 按Group分类的最小间隔，会包含所有的Group，但不管_remainTypes；
+     * 无数据的实现为minSecs
+     */
+    std::map<const GapGroupAbstract*, int>
+        minimalGapByGroup(const std::map<TrainGapTypePair,int>& mingap,
+                          int minSecs, int maxSecs)const;
+
+    void setConstraintFromMinimal(const std::map<TrainGapTypePair,int>& mingap,
+                                  int minSecs, int maxSecs);
+
 };
 
 

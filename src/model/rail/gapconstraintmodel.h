@@ -2,6 +2,7 @@
 
 #include <QAbstractTableModel>
 #include <memory>
+#include <data/diagram/traingap.h>
 
 namespace gapset{
 class GapSetAbstract;
@@ -38,6 +39,7 @@ public:
 public slots:
     void setSingleLine(bool singleLine);
     void setGapSet(gapset::GapSetAbstract* gapSet, bool singleLine);
-
+    void setConstrainFromCurrent(const std::map<TrainGapTypePair, int>& mingap,
+        int minSecs, int maxSecs);
 };
 

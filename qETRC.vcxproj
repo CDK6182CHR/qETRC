@@ -200,6 +200,7 @@
   <ItemGroup>
     <ClCompile Include="src\data\analysis\inttrains\intervalcounter.cpp" />
     <ClCompile Include="src\data\analysis\inttrains\intervaltraininfo.cpp" />
+    <ClCompile Include="src\data\analysis\traingap\traingapana.cpp" />
     <ClCompile Include="src\data\calculation\calculationlog.cpp" />
     <ClCompile Include="src\data\calculation\gapconstraints.cpp" />
     <ClCompile Include="src\data\calculation\greedypainter.cpp" />
@@ -405,6 +406,7 @@
     <QtMoc Include="src\editors\edittrainwidget.h" />
     <ClInclude Include="src\data\analysis\inttrains\intervalcounter.h" />
     <ClInclude Include="src\data\analysis\inttrains\intervaltraininfo.h" />
+    <ClInclude Include="src\data\analysis\traingap\traingapana.h" />
     <ClInclude Include="src\data\calculation\calculationlog.h" />
     <ClInclude Include="src\data\calculation\gapconstraints.h" />
     <ClInclude Include="src\data\calculation\greedypainter.h" />

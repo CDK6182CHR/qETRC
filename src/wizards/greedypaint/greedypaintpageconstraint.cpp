@@ -14,11 +14,14 @@
 #include <QMessageBox>
 #include <QListView>
 #include <QLabel>
+#include <QGroupBox>
 #include <util/railrulercombo.h>
 #include <data/diagram/diagram.h>
 #include <data/common/qesystem.h>
 #include <model/delegate/generalspindelegate.h>
 #include <data/calculation/greedypainter.h>
+#include <dialogs/trainfilter.h>
+#include <data/analysis/traingap/traingapana.h>
 
 
 GreedyPaintPageConstraint::GreedyPaintPageConstraint(Diagram& diagram_, GreedyPainter &_painter,
@@ -75,14 +78,47 @@ void GreedyPaintPageConstraint::initUI()
     gpGapSet->get(0)->setChecked(true);   // 此操作导致table的刷新
 
     vlay->addWidget(new QLabel(tr("列车间隔规定：")));
-    vlay->addWidget(table,3);
+
+    auto* gp = new QGroupBox(tr("提取本线既有最小间隔"), this);
+    hlay = new QHBoxLayout;
+    spMinGap = new QSpinBox;
+    spMinGap->setRange(0, 100000);
+    spMinGap->setSingleStep(30);
+    spMinGap->setPrefix(tr("最小间隔  "));
+    spMinGap->setSuffix(tr("  秒 (s)"));
+    spMinGap->setValue(0);
+    hlay->addWidget(spMinGap);
+
+    spMaxGap = new QSpinBox;
+    spMaxGap->setRange(0, 100000);
+    spMaxGap->setSingleStep(30);
+    spMaxGap->setValue(1200);
+    spMaxGap->setPrefix(tr("最大间隔  "));
+    spMaxGap->setSuffix(tr("  秒 (s)"));
+    hlay->addWidget(spMaxGap);
+
+    hlay->addStretch(1);
+
+    filter = new TrainFilter(diagram, this);
+    auto* btn = new QPushButton(tr("车次筛选器"));
+    hlay->addWidget(btn);
+    connect(btn, &QPushButton::clicked, filter, &TrainFilter::show);
+    hlay->addStretch(3);
+
+    btn = new QPushButton(tr("提取"));
+    connect(btn, &QPushButton::clicked, this, &GreedyPaintPageConstraint::onGetGapFromCurrent);
+    hlay->addWidget(btn);
+    gp->setLayout(hlay);
+    vlay->addWidget(gp);
+
+    vlay->addWidget(table, 3);
 
     connect(ckSingle, &QCheckBox::toggled,
             this, &GreedyPaintPageConstraint::onSingleLineChanged);
 
     hlay=new QHBoxLayout;
     hlay->addStretch(1);
-    auto* btn=new QPushButton(tr("确定"));
+    btn=new QPushButton(tr("确定"));
     connect(btn,&QPushButton::clicked,this,&GreedyPaintPageConstraint::onApply);
     hlay->addWidget(btn);
 
@@ -146,4 +182,15 @@ void GreedyPaintPageConstraint::onGapSetToggled(int id, bool on)
         _model->setGapSet(_availableGapSets[id].get(),ckSingle->isChecked());
     }
 
+}
+
+void GreedyPaintPageConstraint::onGetGapFromCurrent()
+{
+    TrainGapAna gapana(diagram, filter->getCore());
+    gapana.setSingleLine(ckSingle->isChecked());
+    gapana.setCutSecs(spMinGap->value());
+
+    auto res = gapana.globalMinimal(cbRuler->railway());
+
+    _model->setConstrainFromCurrent(res, spMinGap->value(), spMaxGap->value());
 }

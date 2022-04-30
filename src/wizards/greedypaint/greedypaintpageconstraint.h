@@ -3,6 +3,7 @@
 #include <util/buttongroup.hpp>
 #include <array>
 
+
 class SelectForbidModel;
 class QListView;
 class Diagram;
@@ -11,6 +12,7 @@ class QTableView;
 class GreedyPainter;
 class QCheckBox;
 class QSpinBox;
+class TrainFilter;
 class RailRulerCombo;
 namespace gapset {
 class GapSetAbstract;
@@ -35,6 +37,9 @@ class GreedyPaintPageConstraint : public QWidget
     static constexpr const int GAP_SET_COUNT=2;
     RadioButtonGroup<GAP_SET_COUNT>* gpGapSet;
     std::array<std::unique_ptr<gapset::GapSetAbstract>,GAP_SET_COUNT> _availableGapSets;
+
+    TrainFilter* filter;
+    QSpinBox* spMinGap, * spMaxGap;
 public:
     explicit GreedyPaintPageConstraint(
             Diagram& _diagram,
@@ -58,5 +63,6 @@ private slots:
     void onApply();
     void onSingleLineChanged(bool on);
     void onGapSetToggled(int id, bool on);
+    void onGetGapFromCurrent();
 };
 

@@ -30,6 +30,7 @@ INCLUDEPATH += src
 SOURCES += \
     src/data/analysis/inttrains/intervalcounter.cpp \
     src/data/analysis/inttrains/intervaltraininfo.cpp \
+    src/data/analysis/traingap/traingapana.cpp \
     src/util/combos/railstationcombo.cpp \
     src/viewers/stats/intervaltraintable.cpp \
     src/data/calculation/calculationlog.cpp \
@@ -227,6 +228,7 @@ SOURCES += \
 HEADERS += \
     src/data/analysis/inttrains/intervalcounter.h \
     src/data/analysis/inttrains/intervaltraininfo.h \
+    src/data/analysis/traingap/traingapana.h \
     src/util/combos/railstationcombo.h \
     src/viewers/stats/intervaltraintable.h \
     src/data/calculation/calculationlog.h \
