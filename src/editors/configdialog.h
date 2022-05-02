@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#ifndef QETRC_MOBILE_2
 #include <QDialog>
 #include <QUndoCommand>
 #include "data/diagram/config.h"
@@ -135,3 +136,4 @@ namespace qecmd {
     };
 }
 
+#endif

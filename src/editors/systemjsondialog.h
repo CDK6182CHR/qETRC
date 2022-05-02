@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#ifndef QETRC_MOBILE_2
 #include <QDialog>
 
 class QCheckBox;
@@ -27,4 +28,4 @@ private slots:
     void setData();
     void actApply();
 };
-
+#endif

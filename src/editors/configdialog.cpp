@@ -1,4 +1,5 @@
-﻿#include "configdialog.h"
+﻿#ifndef QETRC_MOBILE_2
+#include "configdialog.h"
 #include "util/buttongroup.hpp"
 
 #include "mainwindow/viewcategory.h"
@@ -539,3 +540,4 @@ void qecmd::ChangePageConfig::redo()
     std::swap(cfg, newcfg);
     cat->commitPageConfigChange(page, repaint);
 }
+#endif

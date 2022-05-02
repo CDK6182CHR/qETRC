@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#ifndef QETRC_MOBILE_2
 #include <QObject>
 
 #include "railnet/graph/railnet.h"
@@ -117,3 +118,4 @@ private slots:
     
 };
 
+#endif

@@ -1,4 +1,5 @@
-﻿#include "rulercontext.h"
+﻿#ifndef QETRC_MOBILE_2
+#include "rulercontext.h"
 #include "mainwindow.h"
 #include "railcontext.h"
 
@@ -326,3 +327,4 @@ void qecmd::RemoveRuler::redo()
     cont->commitRemoveRuler(ruler, isOrd);
 }
 
+#endif

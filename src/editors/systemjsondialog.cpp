@@ -1,4 +1,5 @@
 ﻿#include "systemjsondialog.h"
+#ifndef QETRC_MOBILE_2
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -115,3 +116,4 @@ void SystemJsonDialog::actApply()
     t.use_central_widget = ckCentral->isChecked();
 }
 
+#endif

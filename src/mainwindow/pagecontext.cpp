@@ -1,4 +1,5 @@
-﻿#include "pagecontext.h"
+﻿#ifndef QETRC_MOBILE_2
+#include "pagecontext.h"
 #include "mainwindow.h"
 
 #include "dialogs/printdiagramdialog.h"
@@ -344,4 +345,4 @@ void qecmd::ResetPage::redo()
 {
     cont->commitResetPage(page, data);
 }
-
+#endif

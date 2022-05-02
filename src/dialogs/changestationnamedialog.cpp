@@ -1,4 +1,6 @@
-﻿#include "changestationnamedialog.h"
+﻿#ifndef QETRC_MOBILE_2
+
+#include "changestationnamedialog.h"
 
 #include <QtWidgets>
 #include "data/diagram/diagram.h"
@@ -146,3 +148,5 @@ void qecmd::ChangeStationNameGlobal::redo()
     data.commit();
     mw->refreshAll();
 }
+
+#endif

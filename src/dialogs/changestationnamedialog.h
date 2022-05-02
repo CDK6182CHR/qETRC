@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#ifndef QETRC_MOBILE_2
 #include <QDialog>
 #include <QObject>
 #include <QList>
@@ -70,3 +71,4 @@ namespace qecmd {
         virtual void redo()override;
     };
 }
+#endif

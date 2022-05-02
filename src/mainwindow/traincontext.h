@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#ifndef QETRC_MOBILE_2
 #include <QObject>
 #include <memory>
 #include <QColor>
@@ -424,3 +425,4 @@ namespace qecmd {
     };
 }
 
+#endif

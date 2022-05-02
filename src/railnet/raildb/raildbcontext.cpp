@@ -1,4 +1,5 @@
-﻿#include "raildbcontext.h"
+﻿#ifndef QETRC_MOBILE_2
+#include "raildbcontext.h"
 #include "raildbnavi.h"
 #include "raildbwindow.h"
 #include "raildb.h"
@@ -310,3 +311,4 @@ void RailDBContext::actImportFromCurrent(const std::deque<int>& path, int path_c
     np.push_back(path_count);
     getNavi()->undoStack()->push(new qecmd::ImportRailsDB(rails, np, getNavi()->getModel()));
 }
+#endif

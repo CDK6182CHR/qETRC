@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#ifndef QETRC_MOBILE_2
 #include <QObject>
 #include <SARibbonContextCategory.h>
 #include <QUndoCommand>
@@ -150,3 +151,4 @@ namespace qecmd {
 
 }
 
+#endif

@@ -1,4 +1,5 @@
-﻿#include "routingcontext.h"
+﻿#ifndef QETRC_MOBILE_2
+#include "routingcontext.h"
 #include "mainwindow.h"
 
 #include "data/train/routing.h"
@@ -416,3 +417,4 @@ void qecmd::BatchChangeRoutings::redo()
     cont->commitBatchRoutingUpdate(indexes, routings);
 }
 
+#endif

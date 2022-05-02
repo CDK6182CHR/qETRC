@@ -1,5 +1,6 @@
 ﻿#include "mainwindow.h"
 
+#ifndef QETRC_MOBILE_2
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QString>
@@ -2200,3 +2201,4 @@ void MainWindow::showStatus(const QString& msg)
 }
 
 
+#endif

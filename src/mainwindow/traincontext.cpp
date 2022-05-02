@@ -1,4 +1,5 @@
-﻿#include "traincontext.h"
+﻿#ifndef QETRC_MOBILE_2
+#include "traincontext.h"
 
 #include "viewers/events/traineventdialog.h"
 #include "mainwindow.h"
@@ -1156,3 +1157,4 @@ void qecmd::AutoBusiness::commit()
 }
 
 
+#endif

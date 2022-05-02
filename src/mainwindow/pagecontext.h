@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#ifndef QETRC_MOBILE_2
 #include <QObject>
 #include <QDialog>
 #include <memory>
@@ -142,3 +143,4 @@ namespace qecmd {
     };
 }
 
+#endif

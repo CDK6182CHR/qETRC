@@ -2,7 +2,7 @@
 #include <QWidget>
 #include <util/buttongroup.hpp>
 #include <array>
-
+#include <data/gapset/gapsetabstract.h>
 
 class SelectForbidModel;
 class QListView;
@@ -14,9 +14,6 @@ class QCheckBox;
 class QSpinBox;
 class TrainFilter;
 class RailRulerCombo;
-namespace gapset {
-class GapSetAbstract;
-}
 /**
  * @brief The GreedyPaintPageConstraint class
  */

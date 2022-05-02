@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#ifndef QETRC_MOBILE_2
 #include <QList>
 
 #include "kernel/diagramwidget.h"
@@ -487,3 +488,4 @@ public slots:
 
 };
 
+#endif

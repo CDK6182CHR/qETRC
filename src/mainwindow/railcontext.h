@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#ifndef QETRC_MOBILE_2
 #include <QObject>
 #include <QUndoCommand>
 #include <QList>
@@ -433,3 +433,4 @@ namespace qecmd {
 }
 
 
+#endif

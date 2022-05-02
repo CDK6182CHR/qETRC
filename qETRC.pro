@@ -15,15 +15,17 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 android {
 DEFINES += QETRC_MOBILE
+DEFINES += QETRC_MOBILE_2
 }
 
-!defined(QETRC_MOBILE){
+! android {
 RC_ICONS = rsc/icons/desktop-icon.ico
 }
 
+! android {
 include(dependencies/qETRC_SARibbonBar.pri)
 include(dependencies/qETRC_ads.pri)
-
+}
 
 INCLUDEPATH += src
 
@@ -452,7 +454,9 @@ DISTFILES += \
 
 TRANSLATIONS += rsc/tr/en.ts rsc/tr/ch.ts
 
+! defined(QETRC_MOBILE_2){
 ANDROID_EXTRA_LIBS = D:/QTProject/qETRC/qETRC/lib/ads/Qt5.15.2-android-clang/libqtadvanceddocking.so $$PWD/lib/SARibbon/Qt5.15.2-android-clang/libSARibbonBar.so
+}
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/Android_source
 
 

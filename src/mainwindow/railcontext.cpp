@@ -1,4 +1,5 @@
-﻿#include "railcontext.h"
+﻿#ifndef QETRC_MOBILE_2
+#include "railcontext.h"
 #include "mainwindow.h"
 #include "rulercontext.h"
 #include "traincontext.h"
@@ -1045,4 +1046,4 @@ void qecmd::RemoveRailway::redo()
 
 }
 
-
+#endif

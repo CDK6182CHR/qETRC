@@ -1,4 +1,5 @@
-﻿#include "viewcategory.h"
+﻿#ifndef QETRC_MOBILE_2
+#include "viewcategory.h"
 #include "mainwindow.h"
 #include "data/diagram/trainadapter.h"
 #include "editors/configdialog.h"
@@ -691,4 +692,4 @@ qecmd::ApplyConfigToPages::ApplyConfigToPages(QUndoCommand* parent):
     setText(QObject::tr("应用显示设置至运行图页面"));
 }
 
-
+#endif
