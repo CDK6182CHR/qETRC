@@ -5,6 +5,7 @@
 #include <QStandardItemModel>
 #include <QTextStream>
 #include <QFileDialog>
+#include <cmath>
 
 
 //QTime qeutil::parseTime(const QString& tm)

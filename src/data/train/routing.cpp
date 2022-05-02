@@ -399,7 +399,8 @@ const QString &RoutingNode::name() const
 //    return *this;
 //}
 
-Routing::Routing(const Routing& other)
+Routing::Routing(const Routing& other):
+    std::enable_shared_from_this<Routing>(other)
 {
     _name = other._name;
     _model = other._model;

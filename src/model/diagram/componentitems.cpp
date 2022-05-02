@@ -92,6 +92,7 @@ void navi::RailwayListItem::removeTailRailways(int cnt)
     }
 }
 
+#if 0
 [[deprecated]]
 void navi::RailwayListItem::removeRailwayAt(int i)
 {
@@ -103,10 +104,11 @@ void navi::RailwayListItem::removeRailwayAt(int i)
         (*p)->setRow((*p)->row()-1);
     }
 }
+#endif
 
 void navi::RailwayListItem::removeRailwayAtU(int i)
 {
-    _diagram.removeRailwayAt(i);
+    _diagram.removeRailwayAtU(i);
     auto p = _rails.begin();
     std::advance(p, i);
     p = _rails.erase(p);

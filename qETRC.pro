@@ -459,4 +459,6 @@ ANDROID_EXTRA_LIBS = D:/QTProject/qETRC/qETRC/lib/ads/Qt5.15.2-android-clang/lib
 }
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/Android_source
 
+ANDROID_EXTRA_LIBS =
+
 

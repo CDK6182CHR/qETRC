@@ -12,7 +12,7 @@ RailRulerCombo::RailRulerCombo(RailCategory &cat_, QWidget *parent):
 }
 
 RailRulerCombo::RailRulerCombo(RailCategory& cat_, const QString& emptyName_, QWidget* parent):
-    QHBoxLayout(parent),cat(cat_),emptyName(emptyName_),withEmptyRuler(true)
+    QHBoxLayout(parent),cat(cat_),withEmptyRuler(true),emptyName(emptyName_)
 {
     initUI();
 }

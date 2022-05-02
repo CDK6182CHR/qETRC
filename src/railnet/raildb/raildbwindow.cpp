@@ -107,6 +107,7 @@ void RailDBWindow::initMenuBar()
     menu->addAction(tr("全部折叠"), navi->getTree(), &QTreeView::collapseAll);
 
     menu = menubar->addMenu(tr("导入"));
+    menu->addAction(tr("从当前运行图导入"), navi, &RailDBNavi::actImportFromCurrent);
     menu->addAction(tr("从运行图文件导入"), navi, &RailDBNavi::actImportFromDiagram);
     menu->addAction(tr("从子数据库文件导入"), navi, &RailDBNavi::actImportFromLib);
 

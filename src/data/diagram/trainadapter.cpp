@@ -155,12 +155,12 @@ void TrainAdapter::timetableInterpolation(std::shared_ptr<const Ruler> ruler,
 		auto line = _lines.at(i);
 		bool toBegin = false, toEnd = false;
 		if (i == 0) {
-			toBegin = (line->dir() == Direction::Down && toRailStart ||
-				line->dir() == Direction::Up && toRailEnd);
+            toBegin = ((line->dir() == Direction::Down && toRailStart) ||
+                (line->dir() == Direction::Up && toRailEnd));
 		}
 		if (i == _lines.size() - 1) {
-			toEnd = (line->dir() == Direction::Down && toRailEnd ||
-				line->dir() == Direction::Up && toRailStart);
+            toEnd = ((line->dir() == Direction::Down && toRailEnd) ||
+                (line->dir() == Direction::Up && toRailStart));
 		}
 		line->timetaleInterpolation(ruler, toBegin, toEnd, prec);
 	}

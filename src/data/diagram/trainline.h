@@ -363,8 +363,8 @@ private:
             hislast = phe;
             ++phe;
         }
-        else if (dir() == Direction::Down && ycond < 0 ||
-            dir() == Direction::Up && ycond>0) {
+        else if ((dir() == Direction::Down && ycond < 0) ||
+            (dir() == Direction::Up && ycond>0)) {
             //下行时，我的y较小，即比较落后，因此进一步
             mylast = pme;
             ++index;

@@ -25,6 +25,7 @@ Train::Train(const QJsonObject &obj, TypeManager& manager)
 }
 
 Train::Train(const Train& another):
+    std::enable_shared_from_this<Train>(another),
     _trainName(another._trainName),_starting(another._starting),_terminal(another._terminal),
     _type(another._type),_pen(another._pen),
     _passenger(another._passenger),_show(another._show),
@@ -940,7 +941,7 @@ bool Train::anyLineShown() const
 
 bool Train::indexValid(int i) const
 {
-    return 0 <= i && i < _timetable.size();
+    return 0 <= i && i < static_cast<int>(_timetable.size());
 }
 
 bool Train::isLocalTrain(const RailCategory& cat)const

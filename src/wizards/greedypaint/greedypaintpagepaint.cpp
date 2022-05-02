@@ -164,7 +164,6 @@ void GreedyPaintConfigModel::setTimetable(std::shared_ptr<Train> train)
     if (!train || train->empty())
         return;
     int row = rowForStation(train->timetable().front().name);
-    using SI = QStandardItem;
     for (const auto& st:train->timetable()) {
         item(row, ColActualStop)->setData(st.stopSec(), Qt::EditRole);
         item(row, ColArrive)->setData(st.arrive, Qt::EditRole);
@@ -371,12 +370,14 @@ void GreedyPaintConfigModel::unsetAnchorRow(int row)
 
 void GreedyPaintConfigModel::unsetStartRow(int row)
 {
+    Q_UNUSED(row);
     _startRow = -1;
     emit startStationChanged(startStation());
 }
 
 void GreedyPaintConfigModel::unsetEndRow(int row)
 {
+    Q_UNUSED(row);
     _endRow = -1;
     emit endStationChanged(endStation());
 }

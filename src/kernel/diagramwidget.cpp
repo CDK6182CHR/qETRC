@@ -79,7 +79,7 @@ void DiagramWidget::paintGraph()
 
     //暂定上下边距只算一次
     double height = (_page->railwayCount()-1) * cfg.margins.gap_between_railways;
-    for (const auto& p : _page->railways()) {
+    foreach (const auto& p , _page->railways()) {
         p->calStationYCoeff();
         height += p->diagramHeight(cfg);
     }
@@ -161,7 +161,7 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
     printer.setOutputFileName(filename);
     constexpr double note_apdx = 80;
 
-    QSize size(scene()->width(), scene()->height() + 200);
+    QSize size(scene()->width(), scene()->height() + 100 + note_apdx);
     QPageSize pageSize(size);
     printer.setPageSize(pageSize);
 

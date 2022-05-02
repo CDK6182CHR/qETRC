@@ -28,8 +28,9 @@ StationTrainGapModel::StationTrainGapModel(Diagram& diagram,
     const RailStationEventList& events, 
     const TrainFilterCore& filter, QObject* parent, bool useSingleLine,int cutSecs_):
     QStandardItemModel(parent),diagram(diagram), railway(railway_),
-    station(station_),events(events),
-    filter(filter),singleLine(useSingleLine),_cutSecs(cutSecs_)
+    station(station_),
+    singleLine(useSingleLine),_cutSecs(cutSecs_),
+    events(events),filter(filter)
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({
@@ -55,7 +56,7 @@ void StationTrainGapModel::setupModel()
 {
     using SI = QStandardItem;
     setRowCount(data.size());
-    for (int i = 0; i < data.size(); i++) {
+    for (size_t i = 0; i < data.size(); i++) {
         const auto& ev = *(data.at(i));
         auto* it = new SI(ev.typeString());
         QVariant v;
@@ -122,9 +123,9 @@ StationTrainGapDialog::StationTrainGapDialog(Diagram& diagram,
     TrainFilter* filter_, QWidget* parent,bool useSingleLine,
     int cutSecs):
     QDialog(parent), railway(railway_), station(station_),
+    filter(filter_),
     model(new StationTrainGapModel(diagram,railway_,station_,events,
-        filter_->getCore(),this,useSingleLine,cutSecs)),
-    filter(filter_)
+        filter_->getCore(),this,useSingleLine,cutSecs))
 {
     setWindowTitle(tr("车站间隔分析 - %1 @ %2").arg(station->name.toSingleLiteral(),
         railway->name()));

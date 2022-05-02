@@ -21,7 +21,7 @@ protected:
     std::array<_Button*,_Num> buttons;
 public:
     ButtonGroup(const std::array<const char*,_Num>& labels){
-        for(int i=0;i<_Num;i++){
+        for(size_t i=0;i<_Num;i++){
             this->buttons[i]=new _Button(QObject::tr(labels[i]));
             this->addWidget(buttons[i]);
         }
@@ -78,21 +78,21 @@ public:
 template<size_t _Num, typename _Layout, typename _Button>
 void ButtonGroup<_Num, _Layout, _Button>::setMinimumWidth(int w)
 {
-    for(int i=0;i<_Num;i++)
+    for(size_t i=0;i<_Num;i++)
         buttons[i]->setMinimumWidth(w);
 }
 
 template<size_t _Num, typename _Layout, typename _Button>
 void ButtonGroup<_Num, _Layout, _Button>::setFixedWidth(int w)
 {
-    for(int i=0;i<_Num;i++)
+    for(size_t i=0;i<_Num;i++)
         buttons[i]->setFixedWidth(w);
 }
 
 template<size_t _Num, typename _Layout, typename _Button>
 void ButtonGroup<_Num, _Layout, _Button>::setMaximumWidth(int w)
 {
-    for(int i=0;i<_Num;i++)
+    for(size_t i=0;i<_Num;i++)
         buttons[i]->setMaximumWidth(w);
 }
 
@@ -110,7 +110,7 @@ public:
     RadioButtonGroup(const std::array<const char*, _Num>& labels, QWidget* parent) :
         ButtonGroup<_Num,_Layout,_Button>(labels), _group(new QButtonGroup(parent))
     {
-        for (int i = 0; i < _Num; i++) {
+        for (size_t i = 0; i < _Num; i++) {
             _group->addButton(this->buttons[i], i);
         }
     }

@@ -197,12 +197,12 @@ void RoutingContext::actRoutingDiagram()
 void RoutingContext::openRoutingDiagramWidget(std::shared_ptr<Routing> routing)
 {
     QString report;
-    if (!_routing->checkForDiagram(report)) {
+    if (!routing->checkForDiagram(report)) {
         QMessageBox::warning(mw, tr("错误"), tr("当前交路[%1]无法绘制交路图，原因如下：\n%2")
-            .arg(_routing->name(), report));
+            .arg(routing->name(), report));
         return;
     }
-    auto* d = new RoutingDiagramWidget(_routing);
+    auto* d = new RoutingDiagramWidget(routing);
     auto* dock = new ads::CDockWidget(d->windowTitle());
     dock->setWidget(d);
     diagramWidgets.push_back(d);

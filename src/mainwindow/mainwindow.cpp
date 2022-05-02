@@ -680,7 +680,7 @@ void MainWindow::initToolbar()
 
 	}
 
-	QAction* actTrainList, * qactChangeStationName;
+    QAction* actTrainList;
 	//开始
 	if constexpr (true) {
 		SARibbonCategory* cat = ribbon->addCategoryPage(QObject::tr("开始(&1)"));
@@ -735,7 +735,7 @@ void MainWindow::initToolbar()
 		act->setText(QObject::tr("导航"));
 		act->setToolTip(tr("导航面板 (F3)\n打开或关闭运行图总导航面板。"));
 		act->setIcon(QIcon(":/icons/Graph-add.png"));
-		auto* btn = panel->addLargeAction(act);
+        panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
 
 		act = trainListDock->toggleViewAction();
@@ -743,7 +743,7 @@ void MainWindow::initToolbar()
 		act->setText(tr("列车管理"));
 		act->setToolTip(tr("列车管理\n打开或关闭（pyETRC风格的）列车管理列表面板。"));
 		act->setIcon(QApplication::style()->standardIcon(QStyle::SP_FileDialogListView));
-		btn = panel->addLargeAction(act);
+        panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
 
 		SARibbonMenu* menu = new SARibbonMenu(this);
@@ -751,7 +751,7 @@ void MainWindow::initToolbar()
 		menu->setToolTip(tr("运行图窗口\n导航、打开或关闭现有运行图窗口。"));
 		menu->setTitle(QObject::tr("运行图窗口"));
 		menu->setIcon(QIcon(":/icons/diagram.png"));
-		btn = panel->addLargeMenu(menu);
+        panel->addLargeMenu(menu);
 		//btn->setMinimumWidth(80);
 
 		//undo  试一下把dock也放在这里初始化...
@@ -761,13 +761,13 @@ void MainWindow::initToolbar()
 		act->setIcon(QIcon(":/icons/clock.png"));
 		act->setToolTip(tr("历史记录\n打开或关闭历史记录面板。\n"
 			"历史记录面板记录了可撤销的针对运行图文档的操作记录，可以查看、撤销、重做。"));
-		btn = panel->addLargeAction(act);
+        panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
 
 		act = new QAction(QIcon(":/icons/add.png"), tr("添加运行图"), this);
 		act->setToolTip(tr("添加运行图\n选择既有基线数据，建立新的运行图页面。"));
 		connect(act, SIGNAL(triggered()), naviView, SLOT(addNewPage()));
-		btn = panel->addLargeAction(act);
+        panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
 
 		panel = cat->addPannel(tr("更新"));
@@ -778,16 +778,16 @@ void MainWindow::initToolbar()
 		diaActions.refreshAll = act;
 		addAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(refreshAll()));
-		btn = panel->addLargeAction(act);
+        panel->addLargeAction(act);
 
 		act = new QAction(QIcon(":/icons/brush.png"), tr("更改站名"), this);
 		act->setToolTip(tr("全局站名修改 (Ctrl+U)\n"
 			"在整个运行图的所有线路、所有车次中，将旧站名改为新站名。"));
-		qactChangeStationName = act;
+        //qactChangeStationName = act;
 		act->setShortcut(Qt::CTRL + Qt::Key_U);
 		addAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actChangeStationName()));
-		btn = panel->addLargeAction(act);
+        auto* btn = panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
 
 		panel = cat->addPannel(tr("系统"));
@@ -799,7 +799,7 @@ void MainWindow::initToolbar()
 		menu->addAction(QApplication::style()->standardIcon(QStyle::SP_TitleBarMenuButton),
 			tr("关于Qt"), QApplication::aboutQt);
 		act->setMenu(menu);
-		btn = panel->addLargeAction(act);
+        btn = panel->addLargeAction(act);
 
 		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_BrowserStop),
 			tr("退出"), this);

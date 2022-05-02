@@ -39,7 +39,6 @@ void RailDBContext::initUI()
 {
     auto* page=cont->addCategoryPage(tr("路网管理"));
     QAction* act;
-    SARibbonToolButton* btn;
 
     auto* panel = page->addPannel(tr("功能"));
 

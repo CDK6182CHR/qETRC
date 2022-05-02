@@ -104,7 +104,7 @@ LineEventList TrainLine::listLineEvents(const TrainCollection& coll) const
 {
     LineEventList res;
     res.reserve(static_cast<int>(_stations.size()));
-    for (int i = 0; i < _stations.size(); i++) {
+    for (size_t i = 0; i < _stations.size(); i++) {
         res.push_back(StationEventList());
     }
 
@@ -513,8 +513,8 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
             //ylast = ycond;
         }
         else {
-            if (ycond > 0 && dir() == Direction::Down ||
-                ycond < 0 && dir() == Direction::Up) {
+            if ((ycond > 0 && dir() == Direction::Down) ||
+                (ycond < 0 && dir() == Direction::Up)) {
                 //本次列车领先，推定出在前面那个站有无交叉
                 if (pme != _stations.begin()) {
                     int passedTime = getPreviousPassedTime(pme, rhe);
@@ -643,8 +643,8 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
             }
         }
         else {
-            if (ycond > 0 && dir() == Direction::Down ||
-                ycond < 0 && dir() == Direction::Up) {
+            if ((ycond > 0 && dir() == Direction::Down) ||
+                (ycond < 0 && dir() == Direction::Up)) {
                 //本次列车领先，推定出在前面那个站有无交叉
                 //注意单向站。判断一下对方那个站是不是本次列车方向也经过的
                 if (rhe->isDirectionVia(dir())) {
@@ -733,8 +733,8 @@ void TrainLine::diagnoWithSameDir(DiagnosisList& res, const TrainLine& another, 
             }
         }
 
-        auto tme = pme->trainStation, the = phe->trainStation;
-        auto rme = pme->railStation.lock(), rhe = phe->railStation.lock();
+        //auto tme = pme->trainStation, the = phe->trainStation;
+        //auto rme = pme->railStation.lock(), rhe = phe->railStation.lock();
         //判断站内有没有发生什么事情 这个复杂一点
         //麻烦在：可能出现一趟车站内停车，另一趟车通过但这里没有停点的情况
         if (ycond == 0 && (index != 0 || startLabel())) {
@@ -781,8 +781,8 @@ void TrainLine::diagnoWithCounter(DiagnosisList& res, const TrainLine& another, 
             }
         }
 
-        auto tme = pme->trainStation, the = phe->trainStation;
-        auto rme = pme->railStation.lock(), rhe = phe->railStation.lock();
+        //auto tme = pme->trainStation, the = phe->trainStation;
+        //auto rme = pme->railStation.lock(), rhe = phe->railStation.lock();
         //判断站内有没有发生什么事情 这个复杂一点
         //麻烦在：可能出现一趟车站内停车，另一趟车通过但这里没有停点的情况
         if (ycond == 0 && (index != 0 || startLabel())) {

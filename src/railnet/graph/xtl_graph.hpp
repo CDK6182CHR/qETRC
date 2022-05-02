@@ -49,15 +49,17 @@ namespace xtl
             template <class = std::enable_if_t<std::is_default_constructible_v<_EData>>>
             edge(std::weak_ptr<vertex> from, std::weak_ptr<vertex> to) :data(), from(from), to(to) {}
             edge(std::weak_ptr<vertex> from, std::weak_ptr<vertex> to,
-                const edge_data_type& data) :from(from), to(to), data(data) {}
+                const edge_data_type& data) : data(data), from(from), to(to){}
             edge(std::weak_ptr<vertex> from, std::weak_ptr<vertex> to,
-                edge_data_type&& data) :from(from), to(to),
-                data(std::forward<edge_data_type>(data)) {}
+                edge_data_type&& data) :data(std::forward<edge_data_type>(data)),
+                from(from), to(to)
+                 {}
 
             template <typename... Args>
             edge(const std::weak_ptr<vertex>& from, const std::weak_ptr<vertex>& to,
-                Args&&... args) : from(from), to(to),
-                data(std::forward<Args>(args)...) {}
+                Args&&... args) :  data(std::forward<Args>(args)...),
+                from(from), to(to)
+                {}
         };
 
     private:
@@ -261,7 +263,7 @@ namespace xtl
         choice.emplace(source, (_Val)0);
 
         // 注：数值为空表示不可达/无穷大
-        for (int i = 0; i < size(); i++) {
+        for (size_t i = 0; i < size(); i++) {
             auto mi = get_min_dist<_Val>(choice, MAX);
             if (mi) {
                 // 此节点被固定

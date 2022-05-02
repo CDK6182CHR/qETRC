@@ -17,7 +17,7 @@ navi::RailCategoryItem::RailCategoryItem(std::shared_ptr<RailCategory> cat,
 
 navi::AbstractComponentItem *navi::RailCategoryItem::child(int i)
 {
-    if (i<_subcats.size()){
+    if (i<static_cast<int>(_subcats.size())){
         return _subcats.at(i).get();
     }else{
         return _railways.at(i-_subcats.size()).get();

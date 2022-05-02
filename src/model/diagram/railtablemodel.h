@@ -10,8 +10,7 @@ class Diagram;
  * 线路列表，做成表格形式，与导航栏中的不一样。
  * 主要用在各种选择线路的场合。
  */
-QT_DEPRECATED
-class  RailTableModel : public QAbstractTableModel
+class RailTableModel : public QAbstractTableModel
 {
     Q_OBJECT
     Diagram& diagram;

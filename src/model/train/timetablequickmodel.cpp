@@ -18,7 +18,6 @@ void TimetableQuickModel::setupModel()
     }
     updating = true;
     train->refreshStationFlags();
-    using SI = QStandardItem;
     setRowCount(2 * train->timetable().size());
     int row = 0;
     for (auto p = train->timetable().begin(); p != train->timetable().end(); ++p) {
