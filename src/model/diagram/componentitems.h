@@ -81,6 +81,8 @@ namespace navi {
          * 根据path，从当前结点开始查找，返回对应结点
          */
         AbstractComponentItem* itemByPath(const path_t& path);
+
+        virtual ~AbstractComponentItem()=default;
 	};
 
 	class RailwayListItem;

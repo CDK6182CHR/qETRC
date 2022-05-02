@@ -1,6 +1,6 @@
 ﻿#include "railwaystationeventaxis.h"
 #include <util/utilfunc.h>
-#include <qDebug>
+#include <QDebug>
 
 IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_ptr<RailStation> from, 
     std::shared_ptr<RailStation> to, Direction dir, const QTime& tm_start, 

@@ -1,6 +1,6 @@
 ﻿#include "crgroups.h"
 
-#include <qDebug>
+#include <QDebug>
 
 namespace gapset {
 namespace cr {

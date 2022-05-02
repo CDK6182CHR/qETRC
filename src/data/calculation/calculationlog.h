@@ -36,6 +36,8 @@ public:
     virtual QString objectString()const;
 
     virtual QString toString()const=0;
+
+    virtual ~CalculationLogAbstract()=default;
 };
 
 

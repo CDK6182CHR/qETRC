@@ -167,6 +167,7 @@ ReadRulerDetailModel::ReadRulerDetailModel(QObject* parent):
 void ReadRulerDetailModel::setupModel(std::shared_ptr<RailInterval> railint, 
     const readruler::IntervalReport& itrep, bool useAverage)
 {
+    Q_UNUSED(railint);
     using SI = QStandardItem;
     setRowCount(static_cast<int>(itrep.raw.size()));
     int row = 0;

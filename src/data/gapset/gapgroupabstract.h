@@ -26,6 +26,8 @@ public:
     void setDescription(const QString& d){_description=d;}
 
     virtual bool matches(const TrainGapTypePair& type)const=0;
+
+    virtual ~GapGroupAbstract()=default;
 };
 
 /**

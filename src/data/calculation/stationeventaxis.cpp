@@ -1,7 +1,7 @@
 ﻿#include "stationeventaxis.h"
 #include "gapconstraints.h"
 #include <util/utilfunc.h>
-#include <qDebug>
+#include <QDebug>
 
 void StationEventAxis::sortEvents()
 {

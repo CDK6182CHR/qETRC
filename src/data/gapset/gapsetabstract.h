@@ -59,6 +59,8 @@ public:
     void setConstraintFromMinimal(const std::map<TrainGapTypePair,int>& mingap,
                                   int minSecs, int maxSecs);
 
+    virtual ~GapSetAbstract()=default;
+
 };
 
 

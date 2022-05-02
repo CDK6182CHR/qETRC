@@ -441,8 +441,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 msvc {
-    QMAKE_CXXFLAGS += /utf-8
-    QMAKE_CFLAGS += /utf-8
+    QMAKE_CXXFLAGS += /utf-8 /wd"4267"
+    QMAKE_CFLAGS   += /utf-8 /wd"4267"
 }
 
 RESOURCES += \
