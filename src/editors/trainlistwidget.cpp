@@ -1,8 +1,8 @@
 ﻿#include "trainlistwidget.h"
 #include "util/buttongroup.hpp"
 
-#include "mainwindow/mainwindow.h"
 #include "data/train/train.h"
+#include "data/train/traincollection.h"
 
 #include <QLineEdit>
 #include <QTableView>
