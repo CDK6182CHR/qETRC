@@ -3,6 +3,7 @@
 #include "intervaltraininfo.h"
 #include <vector>
 #include <QString>
+#include <QRegularExpression>
 
 class StationName;
 class Railway;
@@ -29,6 +30,7 @@ class IntervalCounter
     const TrainFilterCore& _filter;
     // 区间车次表多选车站
     bool _multiStart=false, _multiEnd=false;
+    bool _regexStart = false, _regexEnd = false;
 public:
     IntervalCounter(const TrainCollection& coll, const TrainFilterCore& filter);
     const auto& filter()const{return _filter;}
@@ -40,6 +42,8 @@ public:
     void setFreightOnly(bool on){_freightOnly=on;}
     void setMultiStart(bool on) { _multiStart = on; }
     void setMultiEnd(bool on) { _multiEnd = on; }
+    void setRegexStart(bool on) { _regexStart = on; }
+    void setRegexEnd(bool on) { _regexEnd = on; }
 
     /**
      * @brief getIntervalTrains
@@ -109,9 +113,13 @@ private:
 
     bool checkStationStopBusiness(const TrainStation& st, bool isStartEnd);
 
-    bool checkStationName(const StationName& name, const std::vector<StationName>& std_names)const;
+    bool checkStationName(const StationName& name, const std::vector<QRegularExpression>& std_names, bool useReg)const;
 
-    std::vector<StationName> transSearchStation(const QString& input, bool useMulti)const;
+    /**
+     * 2022.05.06：改为正则表达式的列表。
+     * 如果不启用正则，就直接按pattern()解释为站名。
+     */
+    std::vector<QRegularExpression> transSearchStation(const QString& input, bool useMulti)const;
 
 };
 

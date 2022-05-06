@@ -25,6 +25,9 @@ void ReadRulerWizard::initializePage(int id)
     if (id == PagePreview) {
         calculate();
     }
+    else if (id == PageTrain) {
+        pgTrain->refreshForRail(pgInterval->railway());
+    }
 }
 
 void ReadRulerWizard::initUI()

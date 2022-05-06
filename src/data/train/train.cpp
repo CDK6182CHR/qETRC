@@ -283,6 +283,16 @@ void Train::unbindToRailway(std::shared_ptr<const Railway> railway)
     }
 }
 
+bool Train::isBoundToRailway(std::shared_ptr<const Railway> railway)
+{
+    foreach(auto adp, _adapters) {
+        if (adp->railway() == railway) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Train::clearBoundRailways()
 {
     _adapters.clear();

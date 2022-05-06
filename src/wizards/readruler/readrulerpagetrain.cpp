@@ -31,6 +31,15 @@ bool ReadRulerPageTrain::validatePage()
     return true;
 }
 
+void ReadRulerPageTrain::refreshForRail(std::shared_ptr<Railway> railway)
+{
+    if (_rail != railway && railway) {
+        _rail = railway;
+        mdUnsel->resetList(coll.boundTrains(railway));
+        mdSel->clearTrains();
+    }
+}
+
 void ReadRulerPageTrain::initUI()
 {
     setTitle(tr("选择车次"));

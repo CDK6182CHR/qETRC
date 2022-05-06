@@ -21,8 +21,9 @@ class IntervalTrainDialog : public QDialog
     QLineEdit* edFrom,*edTo;
     QCheckBox* ckStop,*ckBusiness;
     QCheckBox* ckMultiStart, * ckMultiEnd;
+    QCheckBox* ckRegexStart, * ckRegexEnd;
 
-    bool informMultiCheck = true;
+    bool informMultiCheck = true, informRegexCheck = true;
 public:
     IntervalTrainDialog(Diagram& diagram, QWidget* parent=nullptr);
 private:
@@ -31,5 +32,6 @@ private slots:
     void updateData();
     void toCsv();
     void onMultiChecked(bool on);
+    void onRegexChecked(bool on);
 };
 

@@ -65,7 +65,7 @@ IntervalTrainList IntervalCounter::getIntervalTrains(
         for(auto itr=train->timetable().begin();
             itr!=train->timetable().end();++itr){
             //if (itr->name.equalOrBelongsTo(from)){
-            if (checkStationName(itr->name, search_start)){
+            if (checkStationName(itr->name, search_start, _regexStart)){
                 // 2022.04.24：允许多车站后，替代需要条件
                 // 如果上一站满足停车和营业条件但本站不满足，不替换；否则替换
                 auto* this_station = &*itr;
@@ -76,7 +76,7 @@ IntervalTrainList IntervalCounter::getIntervalTrains(
                     start_is_starting = this_is_starting;
                 }
             }else if(start_station &&
-                    checkStationName(itr->name, search_end)){    
+                    checkStationName(itr->name, search_end, _regexEnd)){    
                 IntervalTrainInfo info(
                             train, start_station, &*itr, start_is_starting,
                             train->isTerminalStation(itr->name));
@@ -188,18 +188,27 @@ bool IntervalCounter::checkStationStopBusiness(const TrainStation& st, bool isSt
         (!_businessOnly || st.business);
 }
 
-bool IntervalCounter::checkStationName(const StationName& name, const std::vector<StationName>& std_names) const
+bool IntervalCounter::checkStationName(const StationName& name, 
+    const std::vector<QRegularExpression>& std_names, bool useReg) const
 {
     for (const auto& n : std_names) {
-        if (name.equalOrBelongsTo(n))
-            return true;
+        if (useReg) {
+            auto mat = n.match(name.toSingleLiteral());
+            if (mat.hasMatch())
+                return true;
+        }
+        else {
+            if (name.equalOrBelongsTo(n.pattern()))
+                return true;
+        }
+        
     }
     return false;
 }
 
-std::vector<StationName> IntervalCounter::transSearchStation(const QString& input, bool useMulti) const
+std::vector<QRegularExpression> IntervalCounter::transSearchStation(const QString& input, bool useMulti) const
 {
-    std::vector<StationName> res{};
+    std::vector<QRegularExpression> res{};
     if (useMulti) {
         auto spt = input.split('|');
         foreach(const auto & s, spt) {

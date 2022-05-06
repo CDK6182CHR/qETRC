@@ -236,7 +236,7 @@ public:
      */
     void unbindToRailway(std::shared_ptr<const Railway> railway);
 
-    //inline bool isBoundToRailway()const { return !_boundRail.expired(); }
+    bool isBoundToRailway(std::shared_ptr<const Railway> railway);
 
     /**
      * @brief autoLines 自动设置运行线数据

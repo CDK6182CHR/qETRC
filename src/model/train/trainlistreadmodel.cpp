@@ -134,3 +134,10 @@ void TrainListReadModel::appendTrains(const QList<std::shared_ptr<Train> > train
     endInsertRows();
 }
 
+void TrainListReadModel::resetList(QList<std::shared_ptr<Train>>&& trains)
+{
+    beginResetModel();
+    _trains = std::move(trains);
+    endResetModel();
+}
+

@@ -251,6 +251,11 @@ public:
      */
     diagram_diff_t diffWith(const TrainCollection& other);
 
+    /**
+     * 绑定到指定线路的列车集合
+     */
+    QList<std::shared_ptr<Train>> boundTrains(std::shared_ptr<Railway> railway);
+
 private:
     /**
      * @brief addMapInfo

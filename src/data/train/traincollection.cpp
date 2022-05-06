@@ -345,9 +345,21 @@ diagram_diff_t TrainCollection::diffWith(const TrainCollection& other)
 			anotherFullMap.erase(itr);
 		}
 	}
+
 	for (auto itr = anotherFullMap.begin(); itr != anotherFullMap.end(); ++itr) {
         res.emplace_back(std::make_shared<TrainDifference>(
                              TrainDifference::NewAdded, itr.value()));
+	}
+	return res;
+}
+
+QList<std::shared_ptr<Train>> TrainCollection::boundTrains(std::shared_ptr<Railway> railway)
+{
+	QList<std::shared_ptr<Train>> res{};
+	foreach(auto train, _trains) {
+		if (train->isBoundToRailway(railway)) {
+			res.push_back(train);
+		}
 	}
 	return res;
 }

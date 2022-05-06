@@ -9,7 +9,8 @@ class Train;
 /**
  * @brief The TrainListStdModel class
  * 对一组任意的Train的数据展示，并不借用TrainCollection。
- * 数据提供只读接口；暂时也不考虑刷新问题。
+ * 数据提供只读接口
+ * 2022.05.06  增加刷新接口
  */
 class TrainListReadModel : public QAbstractTableModel
 {
@@ -42,5 +43,7 @@ public:
     std::shared_ptr<Train> takeTrainAt(int i);
     void clearTrains();
     void appendTrains(const QList<std::shared_ptr<Train>> train);
+
+    void resetList(QList<std::shared_ptr<Train>>&& trains);
 };
 
