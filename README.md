@@ -6,6 +6,8 @@ Electronic Train Running Chart implemented with Qt
 
 联系方式：mxy0268@qq.com
 
+在线文档（尚未完成）：https://qetrc.readthedocs.io/
+
 
 
 ## 环境
@@ -57,32 +59,75 @@ qETRC远期计划完全替代pyETRC，实现绝大多数的pyETRC既有功能，
 
 ## 项目结构
 
-项目目前的文件结构大致为：
+以下为开发者提供一些初步的信息。关于具体的文件、类、函数的结构及其说明，可以采用Doxygen等工具生成文档浏览。以下给出基本的文件结构（至文件夹层次）及其划分逻辑：
 
 - `data` 数据部分。运行图、基线、列车等数据结构的实现。
   - `common` 比较简单的公共数据结构，例如站名`StationName`
+  
   - `rail` 铁路线路数据。总成在`Railway`类中，包含以下几个部分：
+    
     - `RailStation` 一个车站，包括站名、延长公里等。
     - `RailInterval` 两个车站的一个区间。这是相比于pyETRC新增的数据结构。
     - 基于线路区间的数据，包括标尺`Ruler`、天窗`Forbid`。
+    
   - `train` 列车数据结构。主要包括
     - `Train` 列车，包含车次、时刻表以及始发终到站等数据。
     - `Routing` 交路。是一组列车的序列。
     - `TrainCollection` 列车集合。包含一组列车、一组交路和一套列车类型系统。
+    
   - `diagram` 运行图级别数据结构。主要包括运行图`Diagram`和运行图页面`DiagramPage`等。
+  
+  - `calculation` 此部分主要与贪心推线算法有关。
+  
+  - `analysis` 运行图分析相关算法。
+  
+    - `inttrains` 区间对数表/车次表
+    - `traingap` 列车间隔计算相关。
+  
+    注意由于历史原因，大量相关的算法（例如列车间隔计算的核心代码，标尺综合等）仍在`Diagram`或`TrainGap`等类中。原则上应当留待重构。
+  
+  - `gapset` 列车间隔分组相关。
+    注意由于历史原因，`traingap.h/.cpp`文件目前在`diagram`目录下，但逻辑上认为它应属于本文件夹。
+  
 - `dialogs` 一些基于对话框实现的较为简单的功能，例如导入车次`ImportTrainDialog`。
+
 - `editors` 原pyETRC中采用停靠面板实现的、核心数据结构的编辑控件，例如线路里程编辑、车次编辑等。
+
 - `kernel` 绘图核心模块，实现运行图绘制。
+
 - `mainwindow` 程序主窗口以及相关的界面逻辑类。
+  注意本目录下的所有文件及少量其他类在移动版中不编译。
+
 - `model` 基于Qt的Model/View框架设计的数据模型。其中
   - `delegate` 编辑的代理类。
   - `train` 与列车相关的模型，例如时刻表。
   - `rail` 与线路相关的模型，例如线路里程表。
   - `diagram` 超过以上两个抽象层次的模型。
+  
+- `mobile` 专为移动版设计的界面类，目前主要是主界面以及对相关功能的调用。
+  
 - `navi` 是qETRC新增部分，与导航窗口相关的界面程序。
+
+- `railnet` 路网管理部分，包含原pyETRC中的线路数据库以及（外置）路网管理模块的对应实现。
+
+  - `raildb` 线路数据库。包含数据和界面。
+  - `graph` 线网有向图模型，包括数据实现和有向图模型浏览器等。
+  - `path` 路径选择算法、快速线路生成功能实现。
+
 - `viewers` 原pyETRC中，运行图分析的功能，例如事件表等。
+
 - `railnet` 中远期规划，原pyETRC线网管理模块的功能。
+
 - `util` 一些杂项，对Qt的轻度扩展等。
+
+- `wizards` 向导，或按照类似向导逻辑实现的功能。
+
+  - `readruler` 标尺综合。
+  - `selectpath` 经由选择器。
+  - `timeinterp` 时刻插值算法。
+  - `rulerpaint` 标尺排图向导。
+  - `greedypaint` 贪心推线向导。
+
 
 
 
@@ -113,6 +158,5 @@ qETRC目前免费开源。
         <img src="img/myoisinh.png" width="200px" />
     </div>
 </div>
-
 
 
