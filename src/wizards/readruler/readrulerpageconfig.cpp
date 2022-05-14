@@ -1,5 +1,7 @@
 ﻿#include "readrulerpageconfig.h"
 
+#ifndef QETRC_MOBILE_2
+
 #include <QtWidgets>
 
 
@@ -103,3 +105,5 @@ void ReadRulerPageConfig::onCutStdToggled(bool on)
 {
     spCutStd->setEnabled(on);
 }
+
+#endif

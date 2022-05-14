@@ -8,7 +8,6 @@
 #include <QMessageBox>
 
 #include <model/train/trainlistmodel.h>
-
 #include <viewers/diagnosisdialog.h>
 #include <viewers/rulerrefdialog.h>
 #include <viewers/timetablequickwidget.h>

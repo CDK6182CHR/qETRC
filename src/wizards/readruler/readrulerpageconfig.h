@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#ifndef QETRC_MOBILE_2
 #include <QWizardPage>
 #include "util/buttongroup.hpp"
 
@@ -30,3 +31,5 @@ private slots:
     void onCutSecToggled(bool on);
     void onCutStdToggled(bool on);
 };
+
+#endif

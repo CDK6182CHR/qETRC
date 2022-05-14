@@ -1,4 +1,7 @@
 ﻿#include "readrulerpageinterval.h"
+
+#ifndef QETRC_MOBILE_2
+
 #include "util/buttongroup.hpp"
 
 #include <QtWidgets>
@@ -130,3 +133,5 @@ void ReadRulerPageInterval::setRailway(std::shared_ptr<Railway> railway)
     }
     mdUp->setRowCount(row);
 }
+
+#endif

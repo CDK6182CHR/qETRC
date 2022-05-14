@@ -1,5 +1,7 @@
 ﻿#include "readrulerpagepreview.h"
 
+#ifndef QETRC_MOBILE_2
+
 #include "data/common/qesystem.h"
 #include "util/utilfunc.h"
 #include "util/dialogadapter.h"
@@ -227,4 +229,6 @@ void ReadRulerSummaryModel::setupModel(const readruler::IntervalReport& itrep)
         row++;
     }
 }
+
+#endif
 

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#ifndef QETRC_MOBILE_2
 #include <QWizardPage>
 #include <memory>
 
@@ -47,3 +48,4 @@ private slots:
     void deselect();
 };
 
+#endif

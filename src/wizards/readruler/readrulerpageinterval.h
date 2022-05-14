@@ -1,4 +1,7 @@
 ﻿#pragma once
+
+#ifndef QETRC_MOBILE_2
+
 #include <QWizardPage>
 #include <QVector>
 
@@ -41,3 +44,4 @@ private slots:
     void deselectAllUp();
 };
 
+#endif

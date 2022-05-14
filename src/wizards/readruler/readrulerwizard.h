@@ -1,4 +1,7 @@
 ﻿#pragma once
+
+#ifndef QETRC_MOBILE_2
+
 #include <QWizard>
 
 #include "readrulerpageinterval.h"
@@ -45,3 +48,4 @@ public slots:
     virtual void reject()override;
 };
 
+#endif

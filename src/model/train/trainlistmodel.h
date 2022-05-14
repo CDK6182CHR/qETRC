@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+
 #include <QAbstractTableModel>
 #include <QUndoCommand>
 #include <memory>
@@ -8,6 +9,9 @@ class Train;
 class TrainCollection;
 
 struct Config;
+
+
+
 
 /**
  * @brief The TrainListModel class
@@ -127,5 +131,76 @@ public slots:
      */
     void commitBatchChangeType(const QVector<int>& rows);
 };
+
+class TrainType;
+
+namespace qecmd {
+
+    /**
+     * 删除一组列车。在TrainListWidget中调用。
+     * 暂定持有TrainCollection的引用，undo/redo有权限执行添加删除操作。
+     * 注意indexes应当排好序，并且和trains一一对应！
+     */
+    class RemoveTrains :
+        public QUndoCommand
+    {
+        QList<std::shared_ptr<Train>> _trains;
+        QList<int> _indexes;
+        TrainCollection& coll;
+        TrainListModel* const model;
+    public:
+        RemoveTrains(const QList<std::shared_ptr<Train>>& trains,
+            const QList<int>& indexes, TrainCollection& coll_,
+            TrainListModel* model_,
+            QUndoCommand* parent = nullptr);
+
+        virtual void undo()override;
+
+        /**
+         * 注意push操作会执行这个函数！
+         * 因为TrainListWidget必须保证删除按钮是有效的（无论是否有Slot接受这个CMD）
+         * 所以第一次的redo不能在这里做。置标志位。
+         */
+        virtual void redo()override;
+
+        const auto& trains()const { return _trains; }
+        auto& trains() { return _trains; }
+    };
+
+    /**
+     * 排序。支持合并
+     */
+    class SortTrains :public QUndoCommand {
+        QList<std::shared_ptr<Train>> ord;
+        TrainListModel* const model;
+        static constexpr int ID = 100;
+        bool first = true;
+    public:
+        SortTrains(const QList<std::shared_ptr<Train>>& ord_, TrainListModel* model_,
+            QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+        virtual int id()const override { return ID; }
+        virtual bool mergeWith(const QUndoCommand* another)override;
+    };
+
+    class BatchChangeType :public QUndoCommand {
+        TrainCollection& coll;
+        QVector<int> indexes;
+        QVector<std::shared_ptr<TrainType>> types;
+        TrainListModel* const model;
+    public:
+        BatchChangeType(TrainCollection& coll_, const QVector<int>& indexes_, std::shared_ptr<TrainType> type,
+            TrainListModel* model_, QUndoCommand* parent = nullptr);
+        virtual void undo()override { commit(); }
+        virtual void redo()override { commit(); }
+    private:
+        void commit();
+    };
+
+    struct StartingTerminalData;
+
+}
+
 
 

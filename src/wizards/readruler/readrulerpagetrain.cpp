@@ -1,4 +1,7 @@
 ﻿#include "readrulerpagetrain.h"
+
+#ifndef QETRC_MOBILE_2
+
 #include "data/diagram/diagram.h"
 #include "util/buttongroup.hpp"
 #include "dialogs/trainfilter.h"
@@ -159,3 +162,5 @@ void ReadRulerPageTrain::deselect()
     mdUnsel->appendTrains(lst);
     resizeTables();
 }
+
+#endif

@@ -1,8 +1,9 @@
 ﻿#pragma once
 
+#ifndef QETRC_MOBILE_2
+
 #include <QDialog>
 #include <QUndoCommand>
-
 
 class NaviTree;
 class Diagram;
@@ -136,3 +137,4 @@ private slots:
 
 };
 
+#endif

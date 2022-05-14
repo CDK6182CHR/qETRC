@@ -67,7 +67,7 @@ void TrainListWidget::initUI()
 	//vlay->addLayout(h);
 	//todo: connect
 
-	auto* g = new ButtonGroup<4>({ "编辑","添加","删除","批量.."});
+	auto* g = new ButtonGroup<4>({ "编辑","添加","删除","批量"});
 	g->setMinimumWidth(50);
 	vlay->addLayout(g);
 	g->connectFront(SIGNAL(clicked()), this, {
@@ -75,6 +75,11 @@ void TrainListWidget::initUI()
 		});
 
 	auto* menu = new QMenu(this);
+	menu->addAction(tr("全选"), this, &TrainListWidget::selectAll);
+	menu->addAction(tr("全不选"), this, &TrainListWidget::deselectAll);
+	menu->addAction(tr("反选"), this, &TrainListWidget::selectInverse);
+	menu->addSeparator();
+
 	menu->addAction(tr("批量分类"), this, &TrainListWidget::batchChange);
 	menu->addSeparator();
 	menu->addAction(tr("按时刻表重设始发终到"), this, &TrainListWidget::actResetStartingTerminalFromTimetableBat);
@@ -400,6 +405,27 @@ void TrainListWidget::actAutoBusinessBat()
 	}
 }
 
+void TrainListWidget::selectAll()
+{
+	auto* sel = table->selectionModel();
+	sel->select(QItemSelection(model->index(0, 0),
+		model->index(coll.trainCount() - 1, TrainListModel::MAX_COLUMNS - 1)), QItemSelectionModel::Select);
+}
+
+void TrainListWidget::deselectAll()
+{
+	auto* sel = table->selectionModel();
+	sel->select(QItemSelection(model->index(0, 0),
+		model->index(coll.trainCount() - 1, TrainListModel::MAX_COLUMNS - 1)), QItemSelectionModel::Deselect);
+}
+
+void TrainListWidget::selectInverse()
+{
+	auto* sel = table->selectionModel();
+	sel->select(QItemSelection(model->index(0, 0),
+		model->index(coll.trainCount() - 1, TrainListModel::MAX_COLUMNS - 1)), QItemSelectionModel::Toggle);
+}
+
 void TrainListWidget::actResetStartingTerminalFromTimetableAll()
 {
 	resetStartingTerminalFromTimetable(coll.trains());
@@ -420,76 +446,6 @@ void TrainListWidget::actAutoTrainTypeAll()
 	autoTrainType(coll.trains());
 }
 
-
-
-qecmd::RemoveTrains::RemoveTrains(const QList<std::shared_ptr<Train>>& trains,
-	const QList<int>& indexes, TrainCollection& coll_, TrainListModel* model_,
-	QUndoCommand* parent) :
-	QUndoCommand(QObject::tr("删除") + QString::number(trains.size()) + QObject::tr("个车次"), parent),
-	_trains(trains), _indexes(indexes), coll(coll_), model(model_)
-{
-}
-
-void qecmd::RemoveTrains::undo()
-{
-	model->undoRemoveTrains(_trains, _indexes);
-}
-
-void qecmd::RemoveTrains::redo()
-{
-	model->redoRemoveTrains(_trains, _indexes);
-}
-
-qecmd::SortTrains::SortTrains(const QList<std::shared_ptr<Train>>& ord_, 
-	TrainListModel* model_, QUndoCommand* parent):
-	QUndoCommand(QObject::tr("列车排序"),parent),ord(ord_),model(model_)
-{
-}
-
-void qecmd::SortTrains::undo()
-{
-	model->undoRedoSort(ord);
-}
-
-void qecmd::SortTrains::redo()
-{
-	if (first) {
-		first = false;
-		return;
-	}
-	model->undoRedoSort(ord);
-}
-
-bool qecmd::SortTrains::mergeWith(const QUndoCommand* another)
-{
-	if (id() != another->id())
-		return false;
-	auto cmd = static_cast<const qecmd::SortTrains*>(another);
-	if (model == cmd->model) {
-		//只针对同一个model的排序做合并
-		//成功合并：抛弃中间状态
-		return true;
-	}
-	return false;
-}
-
-qecmd::BatchChangeType::BatchChangeType(TrainCollection& coll_, const QVector<int>& indexes_, std::shared_ptr<TrainType> type,
-	TrainListModel* model_, QUndoCommand* parent) :
-	QUndoCommand(QObject::tr("批量更新%1个车次类型").arg(indexes_.size()), parent),
-	coll(coll_), indexes(indexes_), types(indexes_.size(), type), model(model_)
-{
-}
-
-void qecmd::BatchChangeType::commit()
-{
-	for (int i = 0; i < indexes.size(); i++) {
-		int index = indexes.at(i);
-		auto train = coll.trainAt(index);
-		std::swap(train->typeRef(), types[i]);
-		coll.updateTrainType(train, types[i]);
-	}
-	model->commitBatchChangeType(indexes);
-}
 
 #endif
 

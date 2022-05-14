@@ -1,5 +1,6 @@
 ﻿#include "readrulerwizard.h"
 
+#ifndef QETRC_MOBILE_2
 
 #include "data/diagram/diagram.h"
 #include "data/rail/rulernode.h"
@@ -149,3 +150,5 @@ void ReadRulerWizard::reject()
     }
     QWizard::reject();
 }
+
+#endif

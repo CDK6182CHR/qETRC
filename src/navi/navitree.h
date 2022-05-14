@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#ifndef QETRC_MOBILE_2
+
 #include <QUndoCommand>
 #include <QWidget>
 
@@ -272,3 +274,5 @@ namespace qecmd {
     
 
 }
+
+#endif

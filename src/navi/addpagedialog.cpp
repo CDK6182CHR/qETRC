@@ -1,5 +1,7 @@
 ﻿#include "addpagedialog.h"
 
+#ifndef QETRC_MOBILE_2
+
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
 #include <QFormLayout>
@@ -347,3 +349,5 @@ void qecmd::RemovePage::redo()
 {
     navi->commitRemovePage(index);
 }
+
+#endif

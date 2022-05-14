@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#ifndef QETRC_MOBILE_2
+
 #include <QStandardItemModel>
 #include <QWizardPage>
 #include <QList>
@@ -103,4 +105,5 @@ private slots:
 	void onDoubleClicked(const QModelIndex& idx);
 };
 
+#endif
 

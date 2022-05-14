@@ -1,5 +1,6 @@
 ﻿#include "navitree.h"
 
+#ifndef QETRC_MOBILE_2
 
 #include "model/diagram/diagramnavimodel.h"
 #include "addpagedialog.h"
@@ -689,3 +690,5 @@ void qecmd::RemoveSingleTrain::redo()
 {
            navi->commitRemoveSingleTrain(index);
        }
+
+#endif
