@@ -118,9 +118,11 @@ void RailRulerCombo::refreshRailwayList()
 RulerCombo::RulerCombo(std::shared_ptr<Railway> railway, QWidget* parent):
     QComboBox(parent),_railway(railway)
 {
-    refreshData();
+    // 2022.05.14注：添加第一条数据应当触发改变，
+    // 这样默认初始化所得的ruler()是合法的。
     connect(this, qOverload<int>(&QComboBox::currentIndexChanged),
         this, &RulerCombo::onCurrentChanged);
+    refreshData();
 }
 
 void RulerCombo::refreshData()

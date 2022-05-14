@@ -316,16 +316,18 @@ bool Routing::checkForDiagram(QString &report) const
             auto* s=train->boundStarting();
             if (!s){
                 flag=false;
-                report.append(QObject::tr("交路车次[%1]缺失始发站[%2]的时刻信息\n")
-                              .arg(train->trainName().full(),
-                                   train->timetable().front().name.toSingleLiteral()));
+                report.append(QObject::tr("交路车次[%1]缺失始发站[%2]的时刻信息；时刻表首站为[%3]\n")
+                    .arg(train->trainName().full(),
+                        train->starting().toSingleLiteral(),
+                        train->timetable().front().name.toSingleLiteral()));
             }
             auto* t=train->boundTerminal();
             if(!t){
                 flag=false;
-                report.append(QObject::tr("交路车次[%1]缺失终到站[%2]的时刻信息\n")
-                              .arg(train->trainName().full(),
-                                   train->timetable().back().name.toSingleLiteral()));
+                report.append(QObject::tr("交路车次[%1]缺失终到站[%2]的时刻信息；时刻表末站为[%3]\n")
+                    .arg(train->trainName().full(),
+                        train->terminal().toSingleLiteral(),
+                        train->timetable().back().name.toSingleLiteral()));
             }
         }
     }

@@ -938,6 +938,9 @@ void MainWindow::initToolbar()
 		menu->addAction(tr("自动始发终到站适配 (放宽)"), this,
 			&MainWindow::actAutoStartingTerminalLooser);
 
+		menu->addAction(tr("按时刻表重设始发终到站"), this,
+			&MainWindow::actResetStartingTerminalFromTimetable);
+
 		actsub = menu->addAction(tr("自动推断所有列车类型"));
 		connect(actsub, &QAction::triggered, this, &MainWindow::actAutoTrainType);
 
@@ -1490,6 +1493,34 @@ void MainWindow::actBatchCopyTrain()
 	connect(dialog, &BatchCopyTrainDialog::applied,
 		naviView, &NaviTree::actBatchAddTrains);
 	dialog->show();
+}
+
+void MainWindow::actResetStartingTerminalFromTimetable()
+{
+	QString text = tr("遍历所有车次，将始发站、终到站分别改为时刻表第一站和最后一站。"
+		"是否继续？");
+	auto flag = QMessageBox::question(this, tr("重设始发终到站"), text);
+	if (flag != QMessageBox::Yes)
+		return;
+	qecmd::StartingTerminalData data;
+	foreach(auto train, _diagram.trains()) {
+		if (train->empty())
+			continue;
+		if (const auto& fn = train->timetable().front().name; train->starting() != fn ) {
+			data.startings.emplace_back(std::make_pair(train, fn));
+		}
+		if (const auto& ln = train->timetable().back().name; train->terminal() != ln) {
+			data.terminals.emplace_back(std::make_pair(train, ln));
+		}
+	}
+	if (data.startings.empty() && data.terminals.empty()) {
+		QMessageBox::information(this, tr("提示"), tr("没有车次受到影响。"));
+	}
+	else {
+		QMessageBox::information(this, tr("提示"), tr("设置成功。影响%1个车次的始发站和"
+			"%2个车次的终到站。").arg(data.startings.size()).arg(data.terminals.size()));
+		undoStack->push(new qecmd::AutoStartingTerminal(std::move(data), contextTrain));
+	}
 }
 
 void MainWindow::actAutoStartingTerminal()

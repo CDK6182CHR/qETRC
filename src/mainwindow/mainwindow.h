@@ -365,6 +365,12 @@ private slots:
     void actBatchCopyTrain();
 
     /**
+     * 按列车时刻表重置始发终到站。
+     * 将始发终到站分别设为列车时刻表首站和末站。
+     */
+    void actResetStartingTerminalFromTimetable();
+
+    /**
      * 自动始发终到站适配  cmd写在TrainContext里面
      */
     void actAutoStartingTerminal();

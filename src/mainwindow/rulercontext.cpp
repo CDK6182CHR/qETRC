@@ -256,8 +256,10 @@ void RulerContext::mergeWith(std::shared_ptr<Ruler> ruler)
     auto t = dialog->exec();
     ////
     auto ref = cb->ruler();
-    if (!t || !ref) 
+    if (!t || !ref) {
+        qDebug() << "merge ruler cancled" << Qt::endl;
         return;
+    }
     else if (ref == ruler) {
         QMessageBox::warning(mw, tr("错误"), tr("源数据标尺和当前标尺重复，无需合并。"));
         return;
