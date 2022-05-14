@@ -381,6 +381,8 @@ private slots:
      */
     void actAutoStartingTerminalLooser();
 
+    void actBatchExportTrainEventsAll();
+
     void actTrainDiff();
 
     void actDiagramCompare();

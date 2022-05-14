@@ -368,7 +368,7 @@ void TrainContext::updateTrainWidgetTitles(std::shared_ptr<Train> t)
 	for (int i = 0; i < editWidgets.size(); i++) {
 		auto p = editWidgets.at(i);
 		if (p->train() == t) {
-			editDocks.at(i)->setWindowTitle(tr("列车编辑 - % 1").arg(t->trainName().full()));
+			editDocks.at(i)->setWindowTitle(tr("列车编辑 - %1").arg(t->trainName().full()));
 			p->refreshBasicData();
 		}
 	}
@@ -462,6 +462,16 @@ void TrainContext::commitExchangeTrainInterval(std::shared_ptr<Train> train1, st
 {
 	afterTimetableChanged(train1);
 	afterTimetableChanged(train2);
+}
+
+void TrainContext::actBatchChangeStartingTerminal(qecmd::StartingTerminalData& data)
+{
+	mw->getUndoStack()->push(new qecmd::AutoStartingTerminal(std::move(data), this));
+}
+
+void TrainContext::actBatchAutoTrainType(qecmd::AutoTrainType::data_t& data)
+{
+	mw->getUndoStack()->push(new qecmd::AutoTrainType(std::move(data), this));
 }
 
 void TrainContext::commitAutoStartingTerminal(qecmd::StartingTerminalData& data)
@@ -576,14 +586,24 @@ void TrainContext::locateToBoundStation(const QVector<TrainStationBounding>& bou
 
 void TrainContext::actAutoBusiness()
 {
+	actAutoBusinessBat(diagram.trains());
+}
+
+void TrainContext::actAutoBusinessBat(const QList<std::shared_ptr<Train>>& trainRange)
+{
 	QVector<std::shared_ptr<Train>> modified, data;
-	foreach(auto train, diagram.trains()) {
+	foreach(auto train, trainRange) {
 		auto t = std::make_shared<Train>(*train);
 		diagram.updateTrain(t);
 		bool flag = t->autoBusiness();
 		if (flag) {
 			modified.push_back(train);
 			data.push_back(t);
+		}
+		else {
+			// 析构掉
+			t->clearBoundRailways();
+			t.reset();
 		}
 	}
 	if (modified.empty()) {
@@ -700,6 +720,75 @@ void TrainContext::actImportTrainFromCsv()
 	else {
 		QMessageBox::information(mw, tr("导入CSV时刻表"), tr("无有效数据导入。"));
 	}
+}
+
+void TrainContext::actImportTrainFromTrf()
+{
+	auto flag = QMessageBox::question(mw, tr("从trf导入列车"), tr("此功能提供从ETRC的列车描述文件(*.trf)中导入车次。"
+		"请使用新版ETRC (版本号3.0以后) 所使用的的文件格式。"
+		"每个文件仅包含一个车次，可以批量选择多个文件同时导入。请自行确保所导入的车次中，全车次互不重复，否则可能引发" 
+		"未定义行为。\n" 
+		"目前暂不支持交路读取。\n是否继续？"));
+	if (flag != QMessageBox::Yes)return;
+	QStringList files = QFileDialog::getOpenFileNames(mw, tr("从trf导入时刻表"), {},
+		tr("ETRC列车描述文件 (*.trf)\n所有文件 (*)"));
+	if (files.isEmpty()) return;
+
+	QVector<std::shared_ptr<Train>> newTrains;
+	foreach(const QString & filename, files) {
+		auto train = Train::fromTrf(filename);
+		if (train) {
+			const auto& t = diagram.trainCollection().validTrainFullName(train->trainName().full());
+			train->trainName().setFull(t.full());
+			newTrains.push_back(train);
+			diagram.updateTrain(train);
+			train->setType(diagram.trainCollection().typeManager().fromRegex(train->trainName()));
+		}
+	}
+
+	if (!newTrains.empty()) {
+		mw->naviView->actBatchAddTrains(newTrains);
+		QMessageBox::information(mw, tr("导入trf文件"), tr("成功读入%1个车次。").arg(newTrains.size()));
+	}
+	else {
+		QMessageBox::information(mw, tr("导入trf文件"), tr("无有效数据读入"));
+	}
+		
+}
+
+void TrainContext::batchExportTrainEvents(const QList<std::shared_ptr<Train>>& trains)
+{
+	auto flag = QMessageBox::question(mw, tr("批量导出列车事件表"), tr("将所选车次事件表导出到"
+		"指定的一个CSV文件中，所有数据顺次排列在同一张表中。\n"
+		"是否确认？"));
+	if (flag != QMessageBox::Yes)return;
+	QString filename = QFileDialog::getSaveFileName(mw, tr("批量导出事件表"), {},
+		tr("逗号分隔值 (*.csv)\n所有文件 (*)"));
+	if (filename.isEmpty()) return;
+
+	QFile file(filename);
+	file.open(QFile::WriteOnly);
+	if (!file.isOpen())return;
+	QTextStream s(&file);
+
+	// 标题: 
+	// 车次  线名  时间  地点  里程  事件  客体  备注
+	s << tr("车次,线名,时间,地点,里程,事件,客体,备注\n");
+
+	using namespace std::chrono_literals;
+
+	auto clk_s = std::chrono::system_clock::now();
+
+	foreach(auto train, trains) {
+		TrainEventList evlst = diagram.listTrainEvents(*train);
+		TrainEventModel::exportToCsvBatch(s, evlst);
+	}
+
+	file.close();
+
+	auto clk_e = std::chrono::system_clock::now();
+
+	mw->showStatus(tr("批量导出事件表 用时 %1 ms").arg((clk_e - clk_s) / 1ms));
 }
 
 void TrainContext::actShowTrainLine()

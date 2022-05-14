@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#ifndef QETRC_MOBILE_2
+
 #include <QDialog>
 
 #include "util/buttongroup.hpp"
@@ -57,4 +59,4 @@ private slots:
     void actCancel();
 };
 
-
+#endif

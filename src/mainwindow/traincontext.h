@@ -30,6 +30,24 @@ namespace ads {
 class CDockWidget;
 }
 
+class TrainContext;
+
+namespace qecmd {
+    class AutoTrainType :public QUndoCommand {
+    public:
+        using data_t = std::deque<std::pair<std::shared_ptr<Train>, std::shared_ptr<TrainType>>>;
+        AutoTrainType(data_t&& d, TrainContext* context, QUndoCommand* parent = nullptr) :
+            QUndoCommand(QObject::tr("自动推断列车类型"), parent), data(std::forward<data_t>(d)),
+            cont(context) {}
+        virtual void undo()override;
+        virtual void redo()override;
+    private:
+        data_t data;
+        TrainContext* const cont;
+        void commit();
+    };
+}
+
 
 class MainWindow;
 class LocateBoundingDialog;
@@ -182,6 +200,17 @@ public slots:
         std::shared_ptr<Train> train2);
 
     /**
+     * 2022.05.14：操作压栈，
+     * 由TrainListWidget那边来connect。
+     */
+    void actBatchChangeStartingTerminal(qecmd::StartingTerminalData& data);
+
+    /**
+     * 2022.05.14：操作压栈。
+     */
+    void actBatchAutoTrainType(qecmd::AutoTrainType::data_t& data);
+
+    /**
      * 自动始发终到的执行：执行始发终到站变更；铺画运行线；更新TrainList和相关Widget
      */
     void commitAutoStartingTerminal(qecmd::StartingTerminalData& data);
@@ -217,6 +246,12 @@ public slots:
     void actAutoBusiness();
 
     /**
+     * 自动营业站，批选而不是全选
+     * 2022.05.14  由TrainListWidget调起
+     */
+    void actAutoBusinessBat(const QList<std::shared_ptr<Train>>& trainRange);
+
+    /**
      * 自动营业站 执行 似乎不需要重新铺画，只需要刷新数据。
      */
     void commitAutoBusiness();
@@ -235,8 +270,21 @@ public slots:
      */
     void actImportTrainFromCsv();
 
+    /**
+     * 2022.05.14
+     * 从ETRC的trf格式批量导入；每个文件
+     */
+    void actImportTrainFromTrf();
+
+    /**
+     * 批量导出列车事件表到csv。
+     * 直接解析返回的数据包写csv，不用其他的复杂API
+     */
+    void batchExportTrainEvents(const QList<std::shared_ptr<Train>>& trains);
+
 private slots:
     void showTrainEvents();
+
     void actShowTrainLine();
 
     void onTrainDockClosed();
@@ -364,19 +412,7 @@ namespace qecmd {
         void commit();
     };
 
-    class AutoTrainType :public QUndoCommand {
-    public:
-        using data_t = std::deque<std::pair<std::shared_ptr<Train>, std::shared_ptr<TrainType>>>;
-        AutoTrainType(data_t&& d, TrainContext* context, QUndoCommand* parent = nullptr) :
-            QUndoCommand(QObject::tr("自动推断列车类型"), parent), data(std::forward<data_t>(d)),
-            cont(context) {}
-        virtual void undo()override;
-        virtual void redo()override;
-    private:
-        data_t data;
-        TrainContext* const cont; 
-        void commit();
-    };
+
 
     class TimetableInterpolation :public QUndoCommand {
         QVector<std::shared_ptr<Train>> trains, data;

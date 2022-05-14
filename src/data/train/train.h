@@ -548,6 +548,14 @@ public:
     static bool gtTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
     static bool gtTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
 
+    /**
+     * 2022.05.14
+     * 从单个trf文件读取单个列车。读取成功列车，失败返回空。
+     * 暂时不管交路。
+     * 注意  没有设置类型！！
+     */
+    static std::shared_ptr<Train> fromTrf(const QString& filename);
+
 private:
 
     /**

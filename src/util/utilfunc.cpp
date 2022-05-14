@@ -99,7 +99,7 @@ bool qeutil::tableToCsv(const QStandardItemModel* model, const QString& filename
 
 bool qeutil::exportTableToCsv(const QStandardItemModel* model, QWidget* parent, const QString& initName)
 {
-	QString fn = QFileDialog::getSaveFileName(parent, QObject::tr("导出列车事件表"), initName,
+	QString fn = QFileDialog::getSaveFileName(parent, QObject::tr("导出CSV数据"), initName,
 		QObject::tr("逗号分隔文件 (*.csv)\n 所有文件 (*)"));
 	if (fn.isEmpty())return false;
 	bool flag = tableToCsv(model, fn);

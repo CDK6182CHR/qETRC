@@ -22,6 +22,7 @@
 #include <QMessageBox>
 #include <QTextBrowser>
 #include <QScroller>
+#include <QTextStream>
 
 TrainEventModel::TrainEventModel(std::shared_ptr<Train> train_, Diagram& diagram_, QObject* parent):
 	QStandardItemModel(parent),train(train_),diagram(diagram_)
@@ -67,6 +68,39 @@ std::shared_ptr<Railway> TrainEventModel::railForRow(int row) const
 double TrainEventModel::mileForRow(int row) const
 {
 	return item(row, ColMile)->data(Qt::EditRole).toDouble();
+}
+
+void TrainEventModel::exportToCsvBatch(QTextStream& s, const TrainEventList& evlst)
+{
+	for (auto p = evlst.begin(); p != evlst.end(); ++p) {
+		auto adp = p->first;
+		const AdapterEventList& lst = p->second;
+		for (const StationEventList& st : lst) {
+			//采用MergeSort的办法处理...
+			auto pst = st.stEvents.begin();
+			auto pit = st.itEvents.begin();
+			while (pst != st.stEvents.end() && pit != st.itEvents.end()) {
+				if (qeutil::timeCompare(pit->time, pst->time)) {
+					// setIntervalRow(row++, adp, *(pit++));
+					exportIntervalRow(s, adp, *(pit++));
+				}
+					
+				else {
+					// setStationRow(row++, adp, *(pst++));
+					exportStationRow(s, adp, *(pst++));
+				}
+					
+			}
+			for (; pst != st.stEvents.end(); ++pst) {
+				// setStationRow(row++, adp, *pst);
+				exportStationRow(s, adp, *pst);
+			}
+			for (; pit != st.itEvents.end(); ++pit) {
+				// setIntervalRow(row++, adp, *pit);
+				exportIntervalRow(s, adp, *pit);
+			}
+		}
+	}
 }
 
 void TrainEventModel::setupModel()
@@ -153,6 +187,35 @@ void TrainEventModel::setIntervalRow(int row, std::shared_ptr<TrainAdapter> adp,
 	setItem(row, ColOther, new SI(t.another.get().trainName().full()));
 	setItem(row, ColNote, new SI(t.note));
 	etrcReport += QString::number(row + 1) + ". " + t.toString() + '\n';
+}
+
+void TrainEventModel::exportStationRow(QTextStream& s, std::shared_ptr<TrainAdapter> adp, const StationEvent& e)
+{
+	// 车次  线名  时间  地点  里程  事件  客体  备注
+	auto st = e.station.lock();
+	s << adp->train()->trainName().full() << "," << adp->railway()->name() << ",";
+	s << e.time.toString("hh:mm:ss") << ","
+		<< st->name.toSingleLiteral() << ","
+		<< st->mile << ","
+		<< qeutil::eventTypeString(e.type) << ",";
+	if (e.another.has_value()) {
+		s << e.another.value().get().trainName().full();
+	}
+	s << ","
+		<< e.note << "\n";
+}
+
+void TrainEventModel::exportIntervalRow(QTextStream& s, std::shared_ptr<TrainAdapter> adp, const IntervalEvent& e)
+{
+	// 车次  线名  时间  地点  里程  事件  客体  备注
+	s << adp->train()->trainName().full() << ","
+		<< adp->railway()->name() << ","
+		<< e.time.toString("hh:mm:ss") << ","
+		<< tr("%1-%2").arg(e.former->name.toSingleLiteral(), e.latter->name.toSingleLiteral()) << ","
+		<< e.mile << ","
+		<< qeutil::eventTypeString(e.type) << ","
+		<< e.another.get().trainName().full() << ","
+		<< e.note << "\n";
 }
 
 TrainEventDialog::TrainEventDialog(Diagram& diagram_, std::shared_ptr<Train> train_, QWidget* parent) :

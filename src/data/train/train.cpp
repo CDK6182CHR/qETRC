@@ -8,6 +8,8 @@
 #include "routing.h"
 #include "util/utilfunc.h"
 #include "typemanager.h"
+#include <QFile>
+#include <QTextStream>
 
 Train::Train(const TrainName &trainName,
              const StationName &starting,
@@ -1046,6 +1048,58 @@ bool Train::gtTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<
 bool Train::gtTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
 {
     return t1->localTechSpeed() > t2->localTechSpeed();
+}
+
+#define TRC_WARNING qDebug()<<"Train::fromTrf: WARNING: "
+
+std::shared_ptr<Train> Train::fromTrf(const QString& filename)
+{
+    QFile file(filename);
+    file.open(QFile::ReadOnly);
+    [[unlikely]] if (!file.isOpen()) {
+        TRC_WARNING << "open file " << filename << " failed" << Qt::endl;
+        return {};
+    }
+    QTextStream fin(&file);
+    fin.setCodec("utf-8");
+    QString line;
+
+    // 标题行
+    fin.readLineInto(&line);
+
+    auto s = line.split(",");
+    if (s.size() < 4) {
+        TRC_WARNING << "Invalid train header: " << line << Qt::endl;
+        return {};
+    }
+
+    const QString& star = fin.readLine(), term = fin.readLine();
+    auto train = std::make_shared<Train>(TrainName(s.at(1), s.at(2), s.at(3)),
+        star, term);
+    
+    while (!fin.atEnd()) {
+        fin.readLineInto(&line);
+        line = line.trimmed();
+        //天津南,12:31,12:33,true,NA,0
+           //站名, 到点, 开点, 营业, <不读取>, 站台
+        auto t = line.split(",");
+        if (t.size() >= 3) {
+            bool business = true;
+            if (t.size() >= 4) {
+                business = (t.at(3) == "true");
+            }
+            QString track;
+            if (t.size() >= 6)
+                track = t.at(5);
+            train->appendStation(t.at(0), qeutil::parseTime(t.at(1)),
+                qeutil::parseTime(t.at(2)), business, track);
+        }
+        else {
+            TRC_WARNING << "Invalid train station line: " << line << Qt::endl;
+        }
+    }
+
+    return train;
 }
 
 bool Train::gtMile(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)

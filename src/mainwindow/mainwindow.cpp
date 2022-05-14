@@ -912,14 +912,19 @@ void MainWindow::initToolbar()
 		actSelector = act;
 	}
 
-	QAction* actRemoveInterp, * actAutoBusiness, * actImportTimetableCsv;
+	QAction* actRemoveInterp, * actAutoBusiness, * actImportTimetableCsv, * actImportTrainTrf;
 	//列车
 	if constexpr (true) {
 		auto* cat = ribbon->addCategoryPage(tr("列车(&3)"));
 		auto* panel = cat->addPannel(tr("车次管理"));
 
 		auto* act = actTrainList;
-		auto* menu = new QMenu(tr("列车管理扩展"), this);
+		auto* btn = panel->addLargeAction(act);
+
+		act = new QAction(QIcon(":/icons/copy.png"), tr("批量操作"), this);
+
+		auto* menu = new SARibbonMenu(tr("列车管理扩展"), this);
+		act->setMenu(menu);
 
 		auto* actsub = new QAction(tr("删除所有车次"), this);
 		connect(actsub, SIGNAL(triggered()), this, SLOT(removeAllTrains()));
@@ -946,10 +951,12 @@ void MainWindow::initToolbar()
 
 		actAutoBusiness = menu->addAction(tr("自动设置所有营业站"));
 
-		act->setMenu(menu);
-		auto* btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
+		menu->addSeparator();
+		menu->addAction(tr("批量导出列车事件表 (csv)"),this,
+			&MainWindow::actBatchExportTrainEventsAll);
 
+		panel->addLargeAction(act);
+		
 		act = new QAction(QIcon(":/icons/add_train.png"), tr("导入车次"), this);
 		act->setToolTip(tr("导入车次 (Ctrl+D)\n从既有运行图或者车次数据库文件中导入部分或全部的车次。"));
 		act->setShortcut(Qt::CTRL + Qt::Key_D);
@@ -958,9 +965,9 @@ void MainWindow::initToolbar()
 
 		menu = new SARibbonMenu(this);
 		actImportTimetableCsv = menu->addAction(tr("导入时刻表 (CSV)"));
+		actImportTrainTrf = menu->addAction(tr("批量导入车次 (trf)"));
 		act->setMenu(menu);
-		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
+		panel->addLargeAction(act);
 
 		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileDialogContentsView),
 			tr("搜索车次"), this);
@@ -1199,11 +1206,27 @@ void MainWindow::initToolbar()
 		connect(actImportTimetableCsv, &QAction::triggered,
 			contextTrain, &TrainContext::actImportTrainFromCsv);
 
+		connect(actImportTrainTrf, &QAction::triggered,
+			contextTrain, &TrainContext::actImportTrainFromTrf);
+
 		connect(contextTrain, &TrainContext::dulplicateTrain,
 			naviView, &NaviTree::actDulplicateTrain);
 
 		connect(trainListWidget->getModel(), &TrainListModel::onTypeBatchChanged,
 			contextTrain, &TrainContext::refreshData);
+
+		// 原则上这种用到了局部变量的都必须得DirectConnection才内存安全，虽然这是默认行为
+		connect(trainListWidget, &TrainListWidget::batchChangeStartingTerminal,
+			contextTrain, &TrainContext::actBatchChangeStartingTerminal, Qt::DirectConnection);
+
+		connect(trainListWidget, &TrainListWidget::batchAutoChangeType,
+			contextTrain, &TrainContext::actBatchAutoTrainType, Qt::DirectConnection);
+
+		connect(trainListWidget, &TrainListWidget::batchExportTrainEventList,
+			contextTrain, &TrainContext::batchExportTrainEvents, Qt::DirectConnection);
+
+		connect(trainListWidget, &TrainListWidget::batchAutoBusiness,
+			contextTrain, &TrainContext::actAutoBusinessBat, Qt::DirectConnection);
 	}
 
 	//context: rail 8
@@ -1497,124 +1520,22 @@ void MainWindow::actBatchCopyTrain()
 
 void MainWindow::actResetStartingTerminalFromTimetable()
 {
-	QString text = tr("遍历所有车次，将始发站、终到站分别改为时刻表第一站和最后一站。"
-		"是否继续？");
-	auto flag = QMessageBox::question(this, tr("重设始发终到站"), text);
-	if (flag != QMessageBox::Yes)
-		return;
-	qecmd::StartingTerminalData data;
-	foreach(auto train, _diagram.trains()) {
-		if (train->empty())
-			continue;
-		if (const auto& fn = train->timetable().front().name; train->starting() != fn ) {
-			data.startings.emplace_back(std::make_pair(train, fn));
-		}
-		if (const auto& ln = train->timetable().back().name; train->terminal() != ln) {
-			data.terminals.emplace_back(std::make_pair(train, ln));
-		}
-	}
-	if (data.startings.empty() && data.terminals.empty()) {
-		QMessageBox::information(this, tr("提示"), tr("没有车次受到影响。"));
-	}
-	else {
-		QMessageBox::information(this, tr("提示"), tr("设置成功。影响%1个车次的始发站和"
-			"%2个车次的终到站。").arg(data.startings.size()).arg(data.terminals.size()));
-		undoStack->push(new qecmd::AutoStartingTerminal(std::move(data), contextTrain));
-	}
+	trainListWidget->actResetStartingTerminalFromTimetableAll();
 }
 
 void MainWindow::actAutoStartingTerminal()
 {
-	QString text = tr("遍历所有车次，当车次满足以下条件时，将该车次的始发站调整为在本线的第一个车站，终到站调整为" \
-		"在本线的最后一个车站。\n"
-		"（1）该车次在时刻表中的第一个（最后一个）站铺画在运行图上；\n"
-		"（2）该车次时刻表中第一个（最后一个）站站名以始发（终到）站站名开头，"
-		"“场”字结尾；\n"
-		"（3）始发（终到）站及时刻表中第一个（最后一个）站站名不含域解析符（::）。\n"
-		"如果希望对没有铺画的列车也执行这个操作，请使用[自动始发终到适配 (放宽)]功能。"
-		"是否继续？");
-	auto flag = QMessageBox::question(this, tr("自动始发终到站适配"), text);
-	if (flag != QMessageBox::Yes)
-		return;
-	qecmd::StartingTerminalData data;
-	foreach(auto train, _diagram.trains()) {
-		if (train->empty())
-			continue;
-		auto* first = train->boundFirst();
-		if (first) {
-			const auto& firstname = first->trainStation->name;
-			const auto& starting = train->starting();
-			if (firstname.isSingleName() && starting.isSingleName() &&
-				firstname.station().startsWith(starting.station()) &&
-				firstname.station().endsWith(tr("场"))) {
-				data.startings.emplace_back(std::make_pair(train, firstname));
-			}
-		}
-		auto* last = train->boundLast();
-		if (last) {
-			const auto& lastname = last->trainStation->name;
-			const auto& terminal = train->terminal();
-			if (lastname.isSingleName() && terminal.isSingleName() &&
-				lastname.station().startsWith(terminal.station()) &&
-				lastname.station().endsWith(tr("场"))) {
-				data.terminals.emplace_back(std::make_pair(train, lastname));
-			}
-		}
-	}
-	if (data.startings.empty() && data.terminals.empty()) {
-		QMessageBox::information(this, tr("提示"), tr("没有车次受到影响。"));
-	}
-	else {
-		QMessageBox::information(this, tr("提示"), tr("设置成功。影响%1个车次的始发站和"
-			"%2个车次的终到站。").arg(data.startings.size()).arg(data.terminals.size()));
-		undoStack->push(new qecmd::AutoStartingTerminal(std::move(data), contextTrain));
-	}
+	trainListWidget->actAutoStartingTerminalAll();
 }
 
 void MainWindow::actAutoStartingTerminalLooser()
 {
-	QString text = tr("遍历所有车次，当车次满足以下条件时，将该车次的始发站调整为在本线的第一个车站，终到站调整为" \
-		"在本线的最后一个车站。\n"
-		"（1）该车次时刻表中第一个（最后一个）站站名以始发（终到）站站名开头，"
-		"“场”字结尾；\n"
-		"（2）始发（终到）站及时刻表中第一个（最后一个）站站名不含域解析符（::）。\n"
-		"此功能与[自动始发终到站适配]的区别在不要求始发终到站铺画在运行图上。"
-		"是否继续？");
-	auto flag = QMessageBox::question(this, tr("自动始发终到站适配"), text);
-	if (flag != QMessageBox::Yes)
-		return;
-	qecmd::StartingTerminalData data;
-	foreach(auto train, _diagram.trains()) {
-		if (train->empty())
-			continue;
-		auto first = train->firstStation();
-		const auto& firstname = first->name;
-		const auto& starting = train->starting();
-		if (firstname.isSingleName() && starting.isSingleName() &&
-			firstname.station().startsWith(starting.station()) &&
-			firstname.station().endsWith(tr("场"))) {
-			data.startings.emplace_back(std::make_pair(train, firstname));
-		}
+	trainListWidget->actAutoStartingTerminalLooserAll();
+}
 
-		auto last = train->lastStation();
-
-		const auto& lastname = last->name;
-		const auto& terminal = train->terminal();
-		if (lastname.isSingleName() && terminal.isSingleName() &&
-			lastname.station().startsWith(terminal.station()) &&
-			lastname.station().endsWith(tr("场"))) {
-			data.terminals.emplace_back(std::make_pair(train, lastname));
-		}
-
-	}
-	if (data.startings.empty() && data.terminals.empty()) {
-		QMessageBox::information(this, tr("提示"), tr("没有车次受到影响。"));
-	}
-	else {
-		QMessageBox::information(this, tr("提示"), tr("设置成功。影响%1个车次的始发站和"
-			"%2个车次的终到站。").arg(data.startings.size()).arg(data.terminals.size()));
-		undoStack->push(new qecmd::AutoStartingTerminal(std::move(data), contextTrain));
-	}
+void MainWindow::actBatchExportTrainEventsAll()
+{
+	contextTrain->batchExportTrainEvents(_diagram.trainCollection().trains());
 }
 
 void MainWindow::actTrainDiff()
@@ -1694,30 +1615,7 @@ void MainWindow::showQuickTimetable(std::shared_ptr<Train> train)
 
 void MainWindow::actAutoTrainType()
 {
-	auto flag = QMessageBox::question(this, tr("提示"), tr("此操作根据当前的列车类型管理器，"
-		"对所有列车，根据其全车次，使用正则表达式匹配到列车类型。\n如果以前有手动设置的列车"
-		"类型，数据将被覆盖。\n是否确认？"));
-	if (flag != QMessageBox::Yes) return;
-
-	qecmd::AutoTrainType::data_t data;
-
-	auto& coll = _diagram.trainCollection();
-	foreach(auto train, coll.trains()) {
-		auto type = coll.typeManager().fromRegex(train->trainName());
-		if (type != train->type()) {
-			data.emplace_back(train, type);
-		}
-	}
-	if (data.empty()) {
-		QMessageBox::information(this, tr("提示"), tr("自动类型推断应用完成，"
-			"没有产生任何变化。"));
-	}
-	else {
-		int sz = data.size();
-		undoStack->push(new qecmd::AutoTrainType(std::move(data), contextTrain));
-		QMessageBox::information(this, tr("提示"), tr("自动类型推断应用完成，"
-			"%1个车次的类型发生变化。如有问题，可以撤销。").arg(sz));
-	}
+	trainListWidget->actAutoTrainTypeAll();
 }
 
 void MainWindow::actLocateDiagram()

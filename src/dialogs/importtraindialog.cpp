@@ -1,4 +1,6 @@
 ﻿#include "importtraindialog.h"
+
+#ifndef QETRC_MOBILE_2
 #include "util/utilfunc.h"
 #include "data/train/routing.h"
 #include "data/diagram/diagram.h"
@@ -206,3 +208,5 @@ void ImportTrainDialog::actCancel()
 {
 	done(QDialog::Rejected);
 }
+
+#endif

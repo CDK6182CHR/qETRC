@@ -4,12 +4,16 @@
 #include <QDialog>
 #include <QStandardItemModel>
 
+#include <data/diagram/trainevents.h>
+
 struct IntervalEvent;
 struct StationEvent;
 class TrainAdapter;
 class Railway;
 class Diagram;
 class Train;
+class QTextStream;
+
 
 /**
  * @brief The TrainEventModel class
@@ -52,10 +56,19 @@ public:
     std::shared_ptr<Railway> railForRow(int row)const;
     double mileForRow(int row)const;
 
+    /**
+     * 2022.05.14：导出到CSV文件，批量导出的核心算法部分。
+     * 由于与setupModel()的算法相当一致，所以定义在这个类里面。
+     */
+    static void exportToCsvBatch(QTextStream& s, const TrainEventList& evlst);
+
 private:
     void setupModel();
     void setStationRow(int row, std::shared_ptr<TrainAdapter> adp, const StationEvent& e);
     void setIntervalRow(int row, std::shared_ptr<TrainAdapter> adp, const IntervalEvent& e);
+    
+    static void exportStationRow(QTextStream& s, std::shared_ptr<TrainAdapter> adp, const StationEvent& e);
+    static void exportIntervalRow(QTextStream& s, std::shared_ptr<TrainAdapter> adp, const IntervalEvent& e);
 };
 
 class QTableView;
