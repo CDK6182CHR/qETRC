@@ -4,6 +4,10 @@
 #include "railwaystationeventaxis.h"
 #include "calculationlog.h"
 
+namespace _greedypaint_detail {
+	class _RecurseLogger;
+}
+
 class Diagram;
 class TrainName;
 class Railway;
@@ -26,6 +30,8 @@ class GreedyPainter
 	Direction _dir;
 	QTime _anchorTime;
 	std::map<std::shared_ptr<const RailStation>, int> _settledStops;
+
+	friend class _greedypaint_detail::_RecurseLogger;
 
 	/**
 	 * @brief _train

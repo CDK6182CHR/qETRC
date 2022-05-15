@@ -26,6 +26,8 @@ public:
         Finished,
         NoData,   // 无标尺数据
         Description,
+        SubEnter,   // 进入/退出子问题
+        SubExit,
     };
 protected:
     Reason _reason;
@@ -144,4 +146,23 @@ public:
     CalculationLogDescription(const QString& description);
     virtual QString toString()const override;
 };
+
+class RailInterval;
+
+class CalculationLogSub :public CalculationLogAbstract
+{
+    const RailInterval* railint;
+    QTime time;
+    bool stop;
+    bool isBack;
+public:
+    CalculationLogSub(Reason reason, const RailInterval* railint, const QTime& time,
+        bool stop,bool isBack):
+        CalculationLogAbstract(reason),
+        railint(railint),time(time),stop(stop),isBack(isBack){}
+
+    QString reasonString()const;
+    virtual QString toString()const override;
+};
+
 

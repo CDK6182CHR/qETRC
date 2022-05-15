@@ -161,3 +161,34 @@ QString CalculationLogDescription::toString() const
 {
     return _descrip;
 }
+
+QString CalculationLogSub::reasonString() const
+{
+    switch (_reason)
+    {
+    case CalculationLogAbstract::SubEnter:
+        if (isBack) {
+            return QObject::tr("反向推线递归子问题");
+        }
+        else {
+            return QObject::tr("正向推线递归子问题");
+        }
+        break;
+    case CalculationLogAbstract::SubExit:
+        if (isBack) {
+            return QObject::tr("反向推线递归返回");
+        }
+        else {
+            return QObject::tr("正向推线递归返回");
+        }
+    default:
+        return "ERROR: non-sub type";
+        break;
+    }
+}
+
+QString CalculationLogSub::toString() const
+{
+    return QObject::tr("[%1] 区间=(%2) 起始时刻=%3 stop=%4").arg(reasonString(), railint->toString(),
+        time.toString("hh:mm:ss")).arg(stop);
+}
