@@ -700,7 +700,8 @@ void TrainItem::addTimeMarks()
         double ycur = _railway.yValueFromCoeff(rs->y_coeff.value(), config());
         double xarr = calXFromStart(ts->arrive), xdep = calXFromStart(ts->depart);
 
-        //标注到点
+        //标注到点  
+        //注意最后一站如果无停点是按照到达来标注的
         if (ts->isStopped() || p == lastIter) {
             if (_line->startLabel() || p != _line->stations().begin()) {
                 markArriveTime(xarr, ycur, ts->arrive);
@@ -708,10 +709,11 @@ void TrainItem::addTimeMarks()
         }
 
         //标注开点
-        if (ts->isStopped() || p != lastIter) {
-            if (_line->endLabel()) {
-                markDepartTime(xdep, ycur, ts->depart);
-            }
+        //2022.05.18修正逻辑：无论有没有停点，都要标注开点；
+        //除非是结束无标签的最后一站。
+        //最后一站：仅当有停点且有结束标签时，才标记开点
+        if (p != lastIter || (ts->isStopped() && _line->endLabel())) {
+            markDepartTime(xdep, ycur, ts->depart);
         }
     }
 }

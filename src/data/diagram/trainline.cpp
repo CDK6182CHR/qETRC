@@ -345,7 +345,7 @@ void TrainLine::diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr
             // 区间里程为0
             res.append(DiagnosisIssue(DiagnosisType::SystemError, qeutil::Error,
                 rcur, shared_from_this(), QObject::tr("区间[%1-%2]的纵坐标变化为0，"
-                    "无法推定中间站时刻。").arg(rprev->name, rcur->name)));
+                    "无法推定中间站时刻。").arg(rprev->name.toSingleLiteral(), rcur->name.toSingleLiteral())));
         }
         else {
             double scale = ds / dy;
