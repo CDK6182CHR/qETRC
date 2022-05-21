@@ -1394,6 +1394,9 @@ void MainWindow::clearDiagramUnchecked()
 	undoStack->clear();
 	undoStack->resetClean();
 
+	// 2022.05.19 新增
+	focusOutRuler();
+
 	//2022.04.10：如果有贪心推线窗口在运行，取消掉
 	if (greedyWidget) {
 		greedyWidget->close();

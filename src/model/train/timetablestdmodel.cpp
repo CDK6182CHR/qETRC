@@ -86,7 +86,7 @@ void TimetableStdModel::setupModel()
         it->setEditable(false);
         int sec=p->stopSec();
         if(sec){
-            it=new SI(p->stopString());
+            it->setText(p->stopString());
         }
         setItem(row, ColStopTime, it);
 

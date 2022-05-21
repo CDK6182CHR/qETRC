@@ -220,14 +220,17 @@ void TrainAdapter::autoLines(const Config& config)
 				line->addStation(tcur, rcur);
 				bound = true;
 			}
-			else if (loccnt == 1 && (!qeutil::directionIntersected(rlast->direction,rcur->direction) ||
-				!rlast->isDirectionVia(rail->gapDirection(rlast, rcur))) ){
+			else if (loccnt == 1 && (
+				rcur == rlast ||
+				!qeutil::directionIntersected(rlast->direction, rcur->direction) ||
+				!rlast->isDirectionVia(rail->gapDirection(rlast, rcur)))) {
 				//首先判断是否要撤销第一站的绑定 （应当很少见的特殊情况）
 				//第一个站是非法绑定，即它的行别不匹配 （例如上行经过下行单向站）
 				//此时应当撤销上一站的绑定，当前站的绑定按照第一站的规则进行；但行别已经确定
 				//注意这也是唯一一种允许locdir不匹配时绑定的情况
 				//2021.10.23注意：这里的行别判断只依据里程，并不可靠。
 				//现在增加方向不交的判定条件
+				//2022.05.21增加：本站和上站相同的条件。不允许这种同站连续绑定的情况位于运行线开头。
 				qDebug() << "TrainAdapter::autoItem: WARNING: Invalid direction bound encountered" <<
 					rlast->name << ", unbound previous station "
 					<< line->_stations.back().trainStation->name.toSingleLiteral()
@@ -236,14 +239,13 @@ void TrainAdapter::autoLines(const Config& config)
 				loccnt--;
 			}
 			else if (rcur->isDirectionVia(locdir = rail->gapDirection(rlast, rcur))) {  
-				if (rcur == rlast) {
-					//如果本站和上一站是同一站...直接绑定
-					//此时不对方向有任何判断
-					line->addStation(tcur, rcur);
-					bound = true;
-				}
+
+				// 2022.05.21：必须先处理跨越站数截断，再管行别的问题。
+				// 否则支线+折返的情况会导致分支站被错误绑定而没有截断运行线。
+				// 调换了下面的前两个分支顺序。
+
 				// !rlast  此前已经有过绑定
-                else if (rail->stationsBetween(rlast, rcur) + tpass >
+                if (rail->stationsBetween(rlast, rcur) + tpass >
 					config.max_passed_stations) {
 					//跨越区间数量超限，截断运行线
 					if (loccnt >= 2) {  
@@ -260,6 +262,12 @@ void TrainAdapter::autoLines(const Config& config)
 					line = std::make_shared<TrainLine>(*this);
 					loccnt = 0;
 					locdir = Direction::Undefined;
+					line->addStation(tcur, rcur);
+					bound = true;
+				}
+				else if (rcur == rlast) {
+					//如果本站和上一站是同一站...直接绑定
+					//此时不对方向有任何判断
 					line->addStation(tcur, rcur);
 					bound = true;
 				}
