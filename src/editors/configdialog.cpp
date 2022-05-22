@@ -541,3 +541,19 @@ void qecmd::ChangePageConfig::redo()
     cat->commitPageConfigChange(page, repaint);
 }
 #endif
+
+qecmd::ChangePageScale::ChangePageScale(Config& cfg_, const Config& newcfg_,
+    bool repaint_, std::shared_ptr<DiagramPage> page, ViewCategory* cat_, QUndoCommand* parent):
+    ChangePageConfig(cfg_,newcfg_,repaint_,page,cat_,parent)
+{
+    setText(QObject::tr("更改运行图显示比例: %1").arg(page->name()));
+}
+
+bool qecmd::ChangePageScale::mergeWith(const QUndoCommand* cmd)
+{
+    if (id() != cmd->id()) {
+        return false;
+    }
+    auto* another = static_cast<const qecmd::ChangePageScale*>(cmd);
+    return page == another->page;
+}

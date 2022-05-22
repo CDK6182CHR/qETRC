@@ -71,6 +71,14 @@ private slots:
 
     void actDulplicate();
 
+    void hExpand();
+
+    void hShrink();
+
+    void vExpand();
+
+    void vShrink();
+
 public slots:
     void onEditApplied(std::shared_ptr<DiagramPage> page,std::shared_ptr<DiagramPage> newinfo);
 

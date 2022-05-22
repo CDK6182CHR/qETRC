@@ -109,6 +109,7 @@ namespace qecmd {
      * 修改页面的config，区别是后续操作只包含指定页面的重绘
      */
     class ChangePageConfig :public ChangeConfig {
+    protected:
         std::shared_ptr<DiagramPage> page;
     public:
         ChangePageConfig(Config& cfg_, const Config& newcfg_, bool repaint_, 
@@ -116,6 +117,23 @@ namespace qecmd {
             QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    /**
+     * 修改页面比例。
+     * 实质性操作都一样，只是增加操作合并
+     */
+    class ChangePageScale : public ChangePageConfig {
+        static constexpr int ID = 101;
+    public:
+        ChangePageScale(Config& cfg_, const Config& newcfg_, bool repaint_,
+            std::shared_ptr<DiagramPage> page, ViewCategory* cat_,
+            QUndoCommand* parent = nullptr);
+
+        virtual int id()const override { return ID; }
+
+        virtual bool mergeWith(const QUndoCommand* cmd)override;
+
     };
 
     /**

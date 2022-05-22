@@ -155,6 +155,12 @@ public slots:
 
     void onActPageConfigApplied(Config& cfg, const Config& newcfg, bool repaint, 
         std::shared_ptr<DiagramPage> page);
+
+    /**
+     * 运行图比例调整专用，Context上面的那几个专用按钮调用
+     */
+    void onActPageScaleApplied(Config& cfg, const Config& newcfg, bool repaint,
+        std::shared_ptr<DiagramPage> page);
     
     /**
      * 刷新类型表。暂定暴力重来一遍就好

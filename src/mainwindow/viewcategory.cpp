@@ -498,6 +498,12 @@ void ViewCategory::onActPageConfigApplied(Config& cfg, const Config& newcfg,
     mw->getUndoStack()->push(new qecmd::ChangePageConfig(cfg, newcfg, repaint, page, this));
 }
 
+void ViewCategory::onActPageScaleApplied(Config& cfg, const Config& newcfg, 
+    bool repaint, std::shared_ptr<DiagramPage> page)
+{
+    mw->getUndoStack()->push(new qecmd::ChangePageScale(cfg, newcfg, repaint, page, this));
+}
+
 void ViewCategory::refreshTypeGroup()
 {
     auto& coll = diagram.trainCollection();

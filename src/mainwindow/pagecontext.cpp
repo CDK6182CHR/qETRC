@@ -124,6 +124,23 @@ void PageContext::initUI()
     panel->addLargeAction(act);
     //btn->setMinimumWidth(80);
 
+    panel = page->addPannel(tr("比例控制"));
+    act = new QAction(QIcon(":/icons/h_expand.png"), tr("水平放大"), this);
+    panel->addMediumAction(act);
+    connect(act, &QAction::triggered, this, &PageContext::hExpand);
+
+    act = new QAction(QIcon(":/icons/h_shrink.png"), tr("水平缩小"), this);
+    panel->addMediumAction(act);
+    connect(act, &QAction::triggered, this, &PageContext::hShrink);
+
+    act = new QAction(QIcon(":/icons/v_expand.png"), tr("垂直放大"), this);
+    panel->addMediumAction(act);
+    connect(act, &QAction::triggered, this, &PageContext::vExpand);
+
+    act = new QAction(QIcon(":/icons/v_shrink.png"), tr("垂直缩小"), this);
+    panel->addMediumAction(act);
+    connect(act, &QAction::triggered, this, &PageContext::vShrink);
+
     panel = page->addPannel("");
 
     act = new QAction(QIcon(":/icons/copy.png"), tr("副本"), this);
@@ -242,6 +259,47 @@ void PageContext::actDulplicate()
 {
     if (page)
         emit dulplicatePage(page);
+}
+
+void PageContext::hExpand()
+{
+    auto& cfg = page->configRef();
+    if (cfg.seconds_per_pix > 1) {
+        Config newcfg(cfg);    // default copy ctor
+        newcfg.seconds_per_pix -= 1;
+        mw->getViewCategory()->onActPageScaleApplied(cfg, newcfg, true, page);
+    }
+}
+
+void PageContext::hShrink()
+{
+    auto& cfg = page->configRef();
+    Config newcfg(cfg);    // default copy ctor
+    newcfg.seconds_per_pix += 1;
+    mw->getViewCategory()->onActPageScaleApplied(cfg, newcfg, true, page);
+}
+
+void PageContext::vExpand()
+{
+    auto& cfg = page->configRef();
+    Config newcfg(cfg);
+    if (cfg.seconds_per_pix_y>1) {
+        newcfg.seconds_per_pix_y -= 1;
+    }
+    newcfg.pixels_per_km += 1;
+    mw->getViewCategory()->onActPageScaleApplied(cfg, newcfg, true, page);
+}
+
+void PageContext::vShrink()
+{
+    auto& cfg = page->configRef();
+    Config newcfg(cfg);
+    newcfg.seconds_per_pix_y += 1;
+    if (cfg.pixels_per_km > 1) {
+        newcfg.pixels_per_km -= 1;
+    }
+
+    mw->getViewCategory()->onActPageScaleApplied(cfg, newcfg, true, page);
 }
 
 void PageContext::commitEditInfo(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> newinfo)
