@@ -30,6 +30,7 @@ include(dependencies/qETRC_ads.pri)
 INCLUDEPATH += src
 
 SOURCES += \
+    src/data/algo/timetablecorrector.cpp \
     src/data/analysis/inttrains/intervalcounter.cpp \
     src/data/analysis/inttrains/intervaltraininfo.cpp \
     src/data/analysis/traingap/traingapana.cpp \
@@ -228,6 +229,7 @@ SOURCES += \
     src/wizards/timeinterp/timeinterpwizard.cpp
 
 HEADERS += \
+    src/data/algo/timetablecorrector.h \
     src/data/analysis/inttrains/intervalcounter.h \
     src/data/analysis/inttrains/intervaltraininfo.h \
     src/data/analysis/traingap/traingapana.h \
