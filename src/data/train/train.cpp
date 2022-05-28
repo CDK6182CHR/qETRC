@@ -798,11 +798,18 @@ void Train::swapBaseInfo(Train& other)
     SWAP(_pen);
 }
 
+#if 0
 void Train::swapTimetableWithAdapters(Train& other)
 {
     swapTimetable(other);
     std::swap(_adapters, other._adapters);
+    for (int i = 0; i < _adapters.size(); i++) {
+        auto ad1 = _adapters.at(i);
+        auto ad2 = other._adapters.at(i);
+        ad1->trainRef().swap(ad2->trainRef());
+    }
 }
+#endif
 
 void Train::swap(Train &other)
 {

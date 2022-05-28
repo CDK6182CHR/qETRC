@@ -13,8 +13,10 @@
 #include <QBitArray>
 #include <QCheckBox>
 #include <QMessageBox>
+#include <stdexcept>
 
 #include <util/selecttraincombo.h>
+#include <data/algo/timetablecorrector.h>
 
 CorrectTimetableModel::CorrectTimetableModel(std::shared_ptr<Train> train, QObject *parent):
     QEMoveableModel(parent),train(train)
@@ -158,11 +160,11 @@ void CorrectTimetableModel::selectInverse()
     }
 }
 
-//void CorrectTimetableModel::setTrain(std::shared_ptr<Train> train)
-//{
-//    this->train = train;
-//    refreshData();
-//}
+void CorrectTimetableModel::setTrain(std::shared_ptr<Train> train)
+{
+    this->train=train;
+    refreshData();
+}
 
 void CorrectTimetableModel::setupModel()
 {
@@ -318,9 +320,10 @@ void CorrectTimetableDialog::initUI()
     vlay->addLayout(g4);
     g4->connectAll(SIGNAL(clicked()),model,{SLOT(doMoveUp()),SLOT(doMoveDown()),
                    SLOT(doToTop()),SLOT(doToBottom())});
-    auto* g2=new ButtonGroup<2>({"交换到发","区间反排"});
+    auto* g2=new ButtonGroup<3>({"交换到发","区间反排","自动更正 (测试)"});
     vlay->addLayout(g2);
-    g2->connectAll(SIGNAL(clicked()),model,{SLOT(doExchange()),SLOT(doReverse())});
+    g2->connectFront(SIGNAL(clicked()),model,{SLOT(doExchange()),SLOT(doReverse())});
+    connect(g2->get(2),&QPushButton::clicked,this,&CorrectTimetableDialog::autoCorrect);
     g4=new ButtonGroup<4>({"全选","全不选","反选","批选"});
     vlay->addLayout(g4);
     g4->connectFront(SIGNAL(clicked()),model,{SLOT(selectAll()),SLOT(deselectAll()),
@@ -371,9 +374,37 @@ void CorrectTimetableDialog::onEditToggled(bool on)
     }
 }
 
+void CorrectTimetableDialog::autoCorrect()
+{
+    if(!train)
+        return;
+    auto res=QMessageBox::question(this,tr("自动时刻更正"),
+                                   tr("此功能按一定算法尝试更正时刻表中可能存在的顺序问题。"
+                                    "由于算法较老，未经充分测试，不一定能解决所有问题。"
+                                    "建议在调用此功能之前做好数据保存与备份。"
+                                    "是否确认执行？"));
+    if (res!=QMessageBox::Yes)
+        return;
+
+    auto nt=model->appliedTrain();
+    try{
+        bool flag=TimetableCorrector::autoCorrect(nt);
+        if (flag){
+            model->setTrain(nt);
+            QMessageBox::information(this,tr("提示"),tr("自动更正执行成功，已更新表格"));
+        }else{
+            QMessageBox::information(this,tr("提示"),tr("自动更正未能修改时刻表"));
+        }
+    }catch(const std::exception& e){
+        QMessageBox::warning(this,tr("错误"),
+                             tr("程序内部错误：%1").arg(e.what()));
+    }
+
+}
+
 void CorrectTimetableDialog::refreshData()
 {
-    model->refreshData();
+    model->setTrain(train);
 }
 
 void CorrectTimetableDialog::batchSelect()

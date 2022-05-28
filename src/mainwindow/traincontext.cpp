@@ -38,6 +38,7 @@
 #include "dialogs/locatedialog.h"
 #include "dialogs/correcttimetabledialog.h"
 #include "util/pagecomboforrail.h"
+#include "data/algo/timetablecorrector.h"
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
 	MainWindow* mw_) :
@@ -617,10 +618,63 @@ void TrainContext::actAutoBusinessBat(const QList<std::shared_ptr<Train>>& train
 	}
 }
 
-void TrainContext::commitAutoBusiness()
+void TrainContext::actAutoCorrectionAll()
+{
+	actAutoCorrectionBat(diagram.trains());
+}
+
+void TrainContext::actAutoCorrectionBat(const QList<std::shared_ptr<Train>>& trainRange)
+{
+	auto res = QMessageBox::question(mw, tr("自动批量更正"),
+		tr("此功能以内置算法，尝试自动更正时刻表中可能的顺序错误问题。\n"
+			"请注意此功能未经过充分测试，不一定能解决问题。建议做好数据保存和备份。\n"
+			"是否继续？"));
+	if (res != QMessageBox::Yes)
+		return;
+	QVector<std::shared_ptr<Train>> modified, data;
+	foreach(auto train, trainRange) {
+		auto t = std::make_shared<Train>(*train);
+		bool flag = TimetableCorrector::autoCorrectSafe(t);
+		if (flag) {
+			qDebug() << "Auto correct " << train->trainName().full()<<" "<< train.get() << Qt::endl;
+			qDebug() << "Data at: " << t.get();
+			train->show();
+
+			modified.push_back(train);
+			data.push_back(t);
+		}
+		else {
+			// 析构掉
+			t.reset();
+		}
+	}
+	if (modified.empty()) {
+		QMessageBox::information(mw, tr("提示"), tr("应用完成，没有更改被执行"));
+	}
+	else {
+		int sz = modified.size();
+		mw->getUndoStack()->push(new qecmd::BatchAutoCorrection(std::move(modified), std::move(data),
+			this));
+		QMessageBox::information(mw, tr("提示"), tr("应用完成，共%1个车次受到影响。").arg(sz));
+	}
+}
+
+#if 0
+void TrainContext::commitAutoBusiness(const QVector<std::shared_ptr<Train>>& trains)
+{
+	//refreshCurrentTrainWidgets();
+	// 2022.05.28：swapTimetable操作导致TrainStation地址变了，所以必须重新铺画，才是安全的
+	commitAutoCorrection(trains);
+}
+
+void TrainContext::commitAutoCorrection(const QVector<std::shared_ptr<Train>>& trains)
 {
 	refreshCurrentTrainWidgets();
+	// 2022.05.28：由于Adapters的地址实际上变了，
+	// 删除旧运行线的算法是错误的。干脆全部重新铺画算了
+	mw->updateAllDiagrams();
 }
+#endif
 
 #include "navi/navitree.h"
 
@@ -1227,23 +1281,44 @@ void qecmd::RemoveInterpolation::redo()
 void qecmd::AutoBusiness::undo()
 {
 	commit();
-	cont->commitAutoBusiness();
 }
 
 void qecmd::AutoBusiness::redo()
 {
 	commit();
-	cont->commitAutoBusiness();
 }
 
 void qecmd::AutoBusiness::commit()
 {
-	for (int i = 0; i < trains.size(); i++) {
-		auto train = trains.at(i);
-		auto d = data.at(i);
-		train->swapTimetableWithAdapters(*d);
-	}
+	//for (int i = 0; i < trains.size(); i++) {
+	//	auto train = trains.at(i);
+	//	auto d = data.at(i);
+	//	train->swapTimetableWithAdapters(*d);
+	//}
+	//cont->commitAutoBusiness(trains);
+	cont->commitInterpolation(trains, data);
 }
 
 
 #endif
+
+void qecmd::BatchAutoCorrection::undo()
+{
+	commit();
+}
+
+void qecmd::BatchAutoCorrection::redo()
+{
+	commit();
+}
+
+void qecmd::BatchAutoCorrection::commit()
+{
+	cont->commitInterpolation(trains, data);
+	//for (int i = 0; i < trains.size(); i++) {
+	//	auto train = trains.at(i);
+	//	auto d = data.at(i);
+	//	train->swapTimetableWithAdapters(*d);
+	//}
+	//cont->commitAutoCorrection(trains);
+}

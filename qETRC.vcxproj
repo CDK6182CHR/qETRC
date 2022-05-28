@@ -198,6 +198,7 @@
     <ResourceCompile Include="icon.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\data\algo\timetablecorrector.cpp" />
     <ClCompile Include="src\data\analysis\inttrains\intervalcounter.cpp" />
     <ClCompile Include="src\data\analysis\inttrains\intervaltraininfo.cpp" />
     <ClCompile Include="src\data\analysis\traingap\traingapana.cpp" />
@@ -404,6 +405,7 @@
     <QtMoc Include="src\editors\routing\batchparseroutingdialog.h">
     </QtMoc>
     <QtMoc Include="src\editors\edittrainwidget.h" />
+    <ClInclude Include="src\data\algo\timetablecorrector.h" />
     <ClInclude Include="src\data\analysis\inttrains\intervalcounter.h" />
     <ClInclude Include="src\data\analysis\inttrains\intervaltraininfo.h" />
     <ClInclude Include="src\data\analysis\traingap\traingapana.h" />

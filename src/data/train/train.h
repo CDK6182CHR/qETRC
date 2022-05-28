@@ -448,7 +448,15 @@ public:
      */
     void swapTimetable(Train& other);
 
+#if 0
+    /**
+     * 连着Adapter一并交换
+     * 2022.05.28注意：要同时交换Adapter里面对Train的反引用指针！
+     * 2022.05.28批注2：禁用这个操作。带着TrainAdapter交换简直是在玩火！
+     * 现在的版本不允许任何带Adapter的交换操作；都要求交换Timetable后重新绑定数据。
+     */
     void swapTimetableWithAdapters(Train& other);
+#endif
 
     /**
      * 交换车次、始发终到等信息，但不交换时刻表

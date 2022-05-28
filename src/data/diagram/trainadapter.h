@@ -48,6 +48,13 @@ public:
 
     void print()const;
 
+    /**
+     * 2022.05.28：用在交换Train指针的操作，
+     * 主要是Train::swapTimetableWithAdapters()调用。
+     * 注意此为危险操作，想好再调用！！
+     */
+    auto& trainRef() { return _train; }
+
     inline bool isNull()const { return _lines.empty(); }
 
     inline auto railway()const { return _railway.lock(); }

@@ -81,6 +81,8 @@ signals:
 
     void batchAutoChangeType(std::deque<std::pair<std::shared_ptr<Train>, std::shared_ptr<TrainType>>>&);
 
+    void batchAutoCorrect(const QList<std::shared_ptr<Train>>&);
+        
 private slots:
     void searchTrain();
     void clearFilter();
@@ -121,12 +123,22 @@ private slots:
      */
     void actExportTrainEventListBat();
 
+    void actExportTrainTimetableBat();
+
+    void exportTrainTimetable(const QList<std::shared_ptr<Train>>& trains);
+
     /**
      * 2022.05.14  批量设置自动营业站
      * 和前面几个不一样；这里直接发送到TrainContext处理，
      * 因为原版实现就是在TrainContext里面的。
      */
     void actAutoBusinessBat();
+
+    /**
+     * 2022年5月28日  批量自动更正时刻表，
+     * 参照AutoBusiness的路径来实现。
+     */
+    void actAutoCorrectionBat();
 
     void selectAll();
 
@@ -146,6 +158,8 @@ public slots:
     void actAutoStartingTerminalLooserAll();
 
     void actAutoTrainTypeAll();
+
+    void actExportTrainEventListAll();
 
 };
 

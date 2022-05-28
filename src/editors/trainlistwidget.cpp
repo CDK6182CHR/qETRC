@@ -13,6 +13,9 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QMenu>
+#include <QFileDialog>
+#include <QFile>
+#include <QTextStream>
 
 #include <model/train/trainlistmodel.h>
 #include <mainwindow/traincontext.h>
@@ -86,9 +89,11 @@ void TrainListWidget::initUI()
 	menu->addAction(tr("自动始发终到站适配"), this, &TrainListWidget::actAutoStartingTerminalBat);
 	menu->addAction(tr("自动始发终到站适配 (放宽)"), this, &TrainListWidget::actAutoStartingTerminalLooserBat);
 	menu->addAction(tr("自动推断列车类型"), this, &TrainListWidget::actAutoTrainTypeBat);
-	menu->addAction(tr("自动设置营业站"), this, &TrainListWidget::actAutoBusinessBat);;
+	menu->addAction(tr("自动设置营业站"), this, &TrainListWidget::actAutoBusinessBat);
+	menu->addAction(tr("自动更正时刻表 (测试)"), this, &TrainListWidget::actAutoCorrectionBat);
 	menu->addSeparator();
 	menu->addAction(tr("导出事件表 (csv)"), this, &TrainListWidget::actExportTrainEventListBat);
+	menu->addAction(tr("导出时刻表 (csv)"), this, &TrainListWidget::actExportTrainTimetableBat);
 
 	g->get(3)->setMenu(menu);
 
@@ -397,11 +402,59 @@ void TrainListWidget::actExportTrainEventListBat()
 	}
 }
 
+void TrainListWidget::actExportTrainTimetableBat()
+{
+	auto lst = batchOpSelectedTrains();
+	if (!lst.empty()) {
+		exportTrainTimetable(lst);
+	}
+}
+
+void TrainListWidget::exportTrainTimetable(const QList<std::shared_ptr<Train>>& trains)
+{
+	auto res = QMessageBox::question(this, tr("导出时刻表"),
+		tr("此操作将所选列车时刻表导出为CSV表格，所有数据导出至同一个文件。是否继续？"));
+	if (res != QMessageBox::Yes)
+		return;
+
+	auto filename = QFileDialog::getSaveFileName(this,
+		tr("导出时刻表"), {}, tr("CSV文件 (*.csv)\n所有文件 (*)"));
+	if (filename.isEmpty())return;
+
+	QFile file(filename);
+	file.open(QFile::WriteOnly);
+	if (!file.isOpen())
+		return;
+	QTextStream sout(&file);
+
+	foreach (const auto& train, trains) {
+		// 车次，站名，到点，开点，股道，备注
+		for (const auto& st : train->timetable()) {
+			sout << train->trainName().full() << ',' <<
+				st.name.toSingleLiteral() << ',' <<
+				st.arrive.toString("hh:mm:ss") << ',' <<
+				st.depart.toString("hh:mm:ss") << ',' <<
+				st.track << ',' <<
+				st.note << '\n';
+		}
+	}
+
+	file.close();
+}
+
 void TrainListWidget::actAutoBusinessBat()
 {
 	auto lst = batchOpSelectedTrains();
 	if (!lst.empty()) {
 		emit batchAutoBusiness(lst);
+	}
+}
+
+void TrainListWidget::actAutoCorrectionBat()
+{
+	auto lst = batchOpSelectedTrains();
+	if (!lst.empty()) {
+		emit batchAutoCorrect(lst);
 	}
 }
 
@@ -444,6 +497,11 @@ void TrainListWidget::actAutoStartingTerminalLooserAll()
 void TrainListWidget::actAutoTrainTypeAll()
 {
 	autoTrainType(coll.trains());
+}
+
+void TrainListWidget::actExportTrainEventListAll()
+{
+	exportTrainTimetable(coll.trains());
 }
 
 

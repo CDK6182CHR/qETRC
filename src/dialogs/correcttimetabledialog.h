@@ -55,6 +55,13 @@ public slots:
     void selectAll();
     void deselectAll();
     void selectInverse();
+
+    /**
+     * 2022.05.28  将train引用指向参数，用于提供自动更正的接口。
+     * 我们其实并不要求this->train与实际的train是一致的。
+     * 这里给的train实际上是一个副本。
+     */
+    void setTrain(std::shared_ptr<Train> train);
 private:
     void setupModel();
 
@@ -109,4 +116,6 @@ private slots:
     void batchSelect();
     void actApply();
     void onEditToggled(bool on);
+
+    void autoCorrect();
 };

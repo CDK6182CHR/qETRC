@@ -912,7 +912,8 @@ void MainWindow::initToolbar()
 		actSelector = act;
 	}
 
-	QAction* actRemoveInterp, * actAutoBusiness, * actImportTimetableCsv, * actImportTrainTrf;
+	QAction* actRemoveInterp, * actAutoBusiness, * actImportTimetableCsv, * actImportTrainTrf,
+		* actAutoCorrection;
 	//列车
 	if constexpr (true) {
 		auto* cat = ribbon->addCategoryPage(tr("列车(&3)"));
@@ -950,10 +951,13 @@ void MainWindow::initToolbar()
 		connect(actsub, &QAction::triggered, this, &MainWindow::actAutoTrainType);
 
 		actAutoBusiness = menu->addAction(tr("自动设置所有营业站"));
+		actAutoCorrection = menu->addAction(tr("自动更正时刻表 (测试)"));
 
 		menu->addSeparator();
 		menu->addAction(tr("批量导出列车事件表 (csv)"),this,
 			&MainWindow::actBatchExportTrainEventsAll);
+		menu->addAction(tr("批量导出列车时刻表 (csv)"), trainListWidget,
+			&TrainListWidget::actExportTrainEventListAll);
 
 		panel->addLargeAction(act);
 		
@@ -1202,6 +1206,8 @@ void MainWindow::initToolbar()
 			contextTrain, &TrainContext::locateToBoundStation);
 		connect(actAutoBusiness, &QAction::triggered,
 			contextTrain, &TrainContext::actAutoBusiness);
+		connect(actAutoCorrection, &QAction::triggered,
+			contextTrain, &TrainContext::actAutoCorrectionAll);
 
 		connect(actImportTimetableCsv, &QAction::triggered,
 			contextTrain, &TrainContext::actImportTrainFromCsv);
@@ -1227,6 +1233,9 @@ void MainWindow::initToolbar()
 
 		connect(trainListWidget, &TrainListWidget::batchAutoBusiness,
 			contextTrain, &TrainContext::actAutoBusinessBat, Qt::DirectConnection);
+
+		connect(trainListWidget, &TrainListWidget::batchAutoCorrect,
+			contextTrain, &TrainContext::actAutoCorrectionBat, Qt::DirectConnection);
 	}
 
 	//context: rail 8

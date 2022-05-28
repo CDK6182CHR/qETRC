@@ -251,10 +251,26 @@ public slots:
      */
     void actAutoBusinessBat(const QList<std::shared_ptr<Train>>& trainRange);
 
+    void actAutoCorrectionAll();
+
+    void actAutoCorrectionBat(const QList<std::shared_ptr<Train>>& trainRange);
+
+#if 0
+
     /**
      * 自动营业站 执行 似乎不需要重新铺画，只需要刷新数据。
+     * 2022.05.28注：交换时刻表然后重新绑定的操作，都和commitInterpolation一样，
+     * 不再另外写实现了。
      */
-    void commitAutoBusiness();
+    void commitAutoBusiness(const QVector<std::shared_ptr<Train>>& trains);
+
+    /**
+     * 自动更正时刻表  执行
+     * 与AutoBusiness的区别是需要刷新
+     */
+    void commitAutoCorrection(const QVector<std::shared_ptr<Train>>& trains);
+
+#endif
 
     /**
      * 当列车发生大范围变化时，更新当前context, 以及速览时刻、速览信息等窗口，
@@ -453,6 +469,23 @@ namespace qecmd {
             QUndoCommand(QObject::tr("自动营业站"),parent),
             trains(std::forward<QVector<std::shared_ptr<Train>>>(trains)),
             data(std::forward<QVector<std::shared_ptr<Train>>>(data)),cont(cont){}
+
+        void undo()override;
+        void redo()override;
+    private:
+        void commit();
+    };
+
+    class BatchAutoCorrection :public QUndoCommand {
+        QVector<std::shared_ptr<Train>> trains, data;
+        TrainContext* const cont;
+    public:
+        BatchAutoCorrection(QVector<std::shared_ptr<Train>>&& trains,
+            QVector<std::shared_ptr<Train>>&& data, TrainContext* cont,
+            QUndoCommand* parent = nullptr) :
+            QUndoCommand(QObject::tr("自动更正时刻表"), parent),
+            trains(std::forward<QVector<std::shared_ptr<Train>>>(trains)),
+            data(std::forward<QVector<std::shared_ptr<Train>>>(data)), cont(cont) {}
 
         void undo()override;
         void redo()override;

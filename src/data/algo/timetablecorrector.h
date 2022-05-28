@@ -21,6 +21,11 @@ public:
      */
     static bool autoCorrect(std::shared_ptr<Train> train);
 
+    /**
+     * 加上catch的相对安全版本
+     */
+    static bool autoCorrectSafe(std::shared_ptr<Train> train);
+
 private:
 
     /**

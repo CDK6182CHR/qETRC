@@ -2,6 +2,36 @@
 #include <vector>
 #include <data/train/train.h>
 #include <util/utilfunc.h>
+#include <stdexcept>
+
+bool TimetableCorrector::autoCorrect(std::shared_ptr<Train> train)
+{
+    int i;
+    for(i=0;i<20;i++){
+        bool flag=correctCycle(train);
+        if(!flag)
+            break;
+    }
+    return i>0;
+}
+
+bool TimetableCorrector::autoCorrectSafe(std::shared_ptr<Train> train)
+{
+    int i;
+    for (i = 0; i < 20; i++) {
+        bool flag = false;
+        try {
+            flag = correctCycle(train);
+        }
+        catch (const std::exception& e) {
+            qDebug() << "TimetableCorrector::autoCorrectSafe: exception: " << e.what() << Qt::endl;
+        }
+        
+        if (!flag)
+            break;
+    }
+    return i > 0;
+}
 
 bool TimetableCorrector::correctCycle(std::shared_ptr<Train> train)
 {
