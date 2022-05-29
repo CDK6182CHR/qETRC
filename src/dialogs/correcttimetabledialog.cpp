@@ -387,7 +387,7 @@ void CorrectTimetableDialog::autoCorrect()
         return;
 
     auto nt=model->appliedTrain();
-    try{
+    //try{
         bool flag=TimetableCorrector::autoCorrect(nt);
         if (flag){
             model->setTrain(nt);
@@ -395,10 +395,10 @@ void CorrectTimetableDialog::autoCorrect()
         }else{
             QMessageBox::information(this,tr("提示"),tr("自动更正未能修改时刻表"));
         }
-    }catch(const std::exception& e){
-        QMessageBox::warning(this,tr("错误"),
-                             tr("程序内部错误：%1").arg(e.what()));
-    }
+    //}catch(const std::exception& e){
+    //    QMessageBox::warning(this,tr("错误"),
+    //                         tr("程序内部错误：%1").arg(e.what()));
+    //}
 
 }
 

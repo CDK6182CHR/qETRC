@@ -8,7 +8,7 @@ bool TimetableCorrector::autoCorrect(std::shared_ptr<Train> train)
 {
     int i;
     for(i=0;i<120;i++){
-        bool flag=correctCycle(train);
+        bool flag = correctCycle(train);
         if(!flag)
             break;
     }
@@ -25,6 +25,7 @@ bool TimetableCorrector::autoCorrectSafe(std::shared_ptr<Train> train)
         }
         catch (const std::exception& e) {
             qDebug() << "TimetableCorrector::autoCorrectSafe: exception: " << e.what() << Qt::endl;
+            break;
         }
         
         if (!flag)
@@ -104,7 +105,7 @@ bool TimetableCorrector::correctCycle(std::shared_ptr<Train> train)
                 */
                 bool found=false;
                 int t=i;
-                while (t>=1){
+                while (t>1){
                     t-=1;
                     int int_try_before = qeutil::secsTo(timelist.at(t-1).depart,
                                                         timelist.at(t).arrive);
@@ -202,6 +203,6 @@ bool TimetableCorrector::neighbourInterval(int secs)
 
 bool TimetableCorrector::errorInterval(int secs)
 {
-    constexpr const int ALLOW=20*60;
+    constexpr const int ALLOW=12*3660;
     return secs>ALLOW;
 }
