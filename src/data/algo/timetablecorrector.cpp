@@ -7,7 +7,7 @@
 bool TimetableCorrector::autoCorrect(std::shared_ptr<Train> train)
 {
     int i;
-    for(i=0;i<20;i++){
+    for(i=0;i<120;i++){
         bool flag=correctCycle(train);
         if(!flag)
             break;
@@ -18,7 +18,7 @@ bool TimetableCorrector::autoCorrect(std::shared_ptr<Train> train)
 bool TimetableCorrector::autoCorrectSafe(std::shared_ptr<Train> train)
 {
     int i;
-    for (i = 0; i < 20; i++) {
+    for (i = 0; i < 120; i++) {
         bool flag = false;
         try {
             flag = correctCycle(train);
@@ -71,7 +71,7 @@ bool TimetableCorrector::correctCycle(std::shared_ptr<Train> train)
             const auto& before_first = timelist.at(move_end).depart;
             int sec2=qeutil::secsTo(before_first, origin_first);
             if (train->starting().generalEqual(timelist[i].name) ||
-                    neighbourInterval(sec)){
+                    neighbourInterval(sec2)){
                 qDebug()<<"整体搬迁到首部 "<<train->trainName().full()<<" "<<
                           timelist.at(i).name.toSingleLiteral() <<
                           timelist.at(move_end).name.toSingleLiteral();

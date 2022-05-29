@@ -15,6 +15,7 @@
 #include <SARibbonActionsManager.h>
 #include <SARibbonCustomizeDialog.h>
 #include <QXmlStreamWriter>
+#include <QMimeData>
 
 #include "model/train/trainlistmodel.h"
 #include "editors/trainlistwidget.h"
@@ -97,6 +98,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 	loadInitDiagram(cmdFile);
 	updateWindowTitle();
+	setAcceptDrops(true);
 
 	auto end = std::chrono::system_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
@@ -1721,6 +1723,45 @@ void MainWindow::closeEvent(QCloseEvent* e)
 		e->accept();
 }
 
+void MainWindow::dragEnterEvent(QDragEnterEvent* e)
+{
+	bool flag = false;
+	const auto* mime = e->mimeData();
+	if (mime->hasUrls()) {
+		auto t = mime->urls()[0];
+		if (t.isLocalFile()) {
+			flag = true;
+		}
+	}
+	if (flag) {
+		e->acceptProposedAction();
+	}
+	else {
+		e->ignore();
+	}
+}
+
+void MainWindow::dropEvent(QDropEvent* e)
+{
+	bool flag = false;
+	const auto* mime = e->mimeData();
+	if (mime->hasUrls()) {
+		auto t = mime->urls()[0];
+		if (t.isLocalFile()) {
+			flag = true;
+			openFileChecked(t.toLocalFile());
+			e->acceptProposedAction();
+			qDebug() << "[Drop] Filename: " << t.toLocalFile() << Qt::endl;
+		}
+		else {
+			qDebug() << "[Drop] Non local file!" << Qt::endl;
+		}
+	}
+	if (!flag) {
+		e->ignore();
+	}
+}
+
 void MainWindow::informPageListChanged()
 {
 	naviModel->resetModel();
@@ -1914,23 +1955,29 @@ void MainWindow::resetRecentActions()
 
 void MainWindow::openRecentFile()
 {
-	using namespace std::chrono_literals;
+
 	QAction* act = qobject_cast<QAction*>(sender());
 	if (act) {
 		const QString& filename = act->data().toString();
-		if (!changed || saveQuestion()) {
-			auto start = std::chrono::system_clock::now();
-			bool flag = openGraph(filename);
-			if (!flag)
-				QMessageBox::warning(this, QObject::tr("错误"), QObject::tr("文件错误，请检查!"));
-			else {
-				markUnchanged();
-				resetRecentActions();
-				updateWindowTitle();
-				auto end = std::chrono::system_clock::now();
-				showStatus(tr("打开运行图文件%1成功  用时%2毫秒").arg(filename)
-					.arg((end - start) / 1ms));
-			}
+		openFileChecked(filename);
+	}
+}
+
+void MainWindow::openFileChecked(const QString& filename)
+{
+	using namespace std::chrono_literals;
+	if (!changed || saveQuestion()) {
+		auto start = std::chrono::system_clock::now();
+		bool flag = openGraph(filename);
+		if (!flag)
+			QMessageBox::warning(this, QObject::tr("错误"), QObject::tr("文件错误，请检查!"));
+		else {
+			markUnchanged();
+			resetRecentActions();
+			updateWindowTitle();
+			auto end = std::chrono::system_clock::now();
+			showStatus(tr("打开运行图文件%1成功  用时%2毫秒").arg(filename)
+				.arg((end - start) / 1ms));
 		}
 	}
 }

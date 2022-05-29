@@ -566,8 +566,9 @@ bool Train::isTerminalStation(const AdapterStation* st)const
 void Train::show() const
 {
     _trainName.show();
+    int i = 0;
     for(const auto& p:_timetable){
-        qDebug() << p << Qt::endl;
+        qDebug() << i++ << " " << p << Qt::endl;
     }
 }
 

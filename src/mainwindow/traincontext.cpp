@@ -632,13 +632,16 @@ void TrainContext::actAutoCorrectionBat(const QList<std::shared_ptr<Train>>& tra
 	if (res != QMessageBox::Yes)
 		return;
 	QVector<std::shared_ptr<Train>> modified, data;
+
+	auto clk_beg = std::chrono::system_clock::now();
+
 	foreach(auto train, trainRange) {
 		auto t = std::make_shared<Train>(*train);
 		bool flag = TimetableCorrector::autoCorrectSafe(t);
 		if (flag) {
-			qDebug() << "Auto correct " << train->trainName().full()<<" "<< train.get() << Qt::endl;
-			qDebug() << "Data at: " << t.get();
-			train->show();
+			//qDebug() << "Auto correct " << train->trainName().full()<<" "<< train.get() << Qt::endl;
+			//qDebug() << "Data at: " << t.get();
+			//train->show();
 
 			modified.push_back(train);
 			data.push_back(t);
@@ -648,6 +651,12 @@ void TrainContext::actAutoCorrectionBat(const QList<std::shared_ptr<Train>>& tra
 			t.reset();
 		}
 	}
+
+	auto clk_end = std::chrono::system_clock::now();
+
+	using namespace std::chrono_literals;
+	mw->showStatus(QObject::tr("自动时刻表更正  用时 %1 毫秒").arg((clk_end - clk_beg) / 1ms));
+
 	if (modified.empty()) {
 		QMessageBox::information(mw, tr("提示"), tr("应用完成，没有更改被执行"));
 	}

@@ -212,6 +212,13 @@ private:
 protected:
     virtual void closeEvent(QCloseEvent* e)override;
 
+    /**
+     * 从操作系统拖入文件直接打开
+     * c.f. https://blog.csdn.net/weixin_42887343/article/details/118302641
+     */
+    virtual void dragEnterEvent(QDragEnterEvent* e)override;
+
+    virtual void dropEvent(QDropEvent* e)override;
 
 private slots:
     /**
@@ -225,6 +232,7 @@ private slots:
     void addRecentFile(const QString& filename);
     void resetRecentActions();
     void openRecentFile();
+    void openFileChecked(const QString& filename);
     
 
     /**
