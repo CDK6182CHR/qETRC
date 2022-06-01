@@ -259,6 +259,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 
 		// 区间天窗冲突
 		auto tm_to = ev_start.time.addSecs(int_secs);
+		bool forbid_conf = false;
 		for (auto forbid : _usedForbids) {
 			auto fbdnode = railint->getForbidNode(forbid);
 			if (!fbdnode->isNull()) {
@@ -275,11 +276,16 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 						addLog(std::make_unique<CalculationLogForbid>(st_from, ev_start.time,
 							CalculationLogAbstract::Depart, railint, forbid));
 						to_try_stop = false;
-						continue;
+						//continue;
+						//2022.06.01：这里必须continue外层循环
+						forbid_conf = true;
+						break;
 					}
 				}
 			}
 		}
+		if (forbid_conf)
+			continue;
 
 		// 区间运行冲突
 
