@@ -39,11 +39,12 @@ void GreedyPaintWizard::initUI()
 void GreedyPaintWizard::onConstraintChanged()
 {
     setCurrentIndex(1);
-    if (painter.ruler() != pgPaint->model()->ruler()) {
-        pgPaint->model()->setRuler(painter.ruler());
-        pgPaint->model()->refreshData();
-        pgPaint->setupStationLabels();
-    }
+    //2022.06.02取消这个不等条件，原因是Ruler也可能有变化，因此每次确认都更新一下
+    //if (painter.ruler() != pgPaint->model()->ruler()) {
+    pgPaint->model()->setRuler(painter.ruler());
+    pgPaint->model()->refreshData();
+    pgPaint->setupStationLabels();
+    //}
 }
 
 void GreedyPaintWizard::onClose()
@@ -56,4 +57,12 @@ void GreedyPaintWizard::onClose()
         showCloseMsg=false;
     }
     QTabWidget::close();
+}
+
+void GreedyPaintWizard::refreshData(std::shared_ptr<Railway> rail)
+{
+    if (painter.railway() == rail && rail) {
+        pgPaint->model()->refreshData();
+        pgPaint->setupStationLabels();
+    }
 }

@@ -77,6 +77,8 @@ private slots:
      */
     void actApply();
 
+    void actOk();
+
     void onAvoidCollidChanged(bool on);
 
     void actGridColor();

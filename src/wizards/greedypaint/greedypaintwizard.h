@@ -34,5 +34,12 @@ signals:
 private slots:
     void onConstraintChanged();
     void onClose();
+
+public slots:
+    /**
+     * 2022.06.02：如果线路站表发生非等价变更，
+     * 需要重新生成标尺表格数据，调用这个。
+     */
+    void refreshData(std::shared_ptr<Railway> rail);
 };
 

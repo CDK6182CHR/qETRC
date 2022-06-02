@@ -530,6 +530,7 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 			int_secs += node->start;
 		}
 
+		bool forbid_conf = false;
 		// 区间天窗冲突
 		auto tm_dep = ev_arrive.time.addSecs(-int_secs);
 		for (auto forbid : _usedForbids) {
@@ -549,10 +550,14 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 						addLog(std::make_unique<CalculationLogForbid>(st_from, ev_arrive.time,
 							CalculationLogAbstract::Arrive,  railint, forbid));
 						to_try_stop = false;
-						continue;
+						forbid_conf = true;
+						break;
 					}
 				}
 			}
+		}
+		if (forbid_conf) {
+			continue;
 		}
 
 		// 区间运行冲突  注意区间的判定按照正向运行的逻辑传参

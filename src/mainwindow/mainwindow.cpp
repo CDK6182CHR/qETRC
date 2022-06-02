@@ -156,10 +156,13 @@ void MainWindow::undoRemoveTrain(std::shared_ptr<Train> train)
 
 void MainWindow::onStationTableChanged(std::shared_ptr<Railway> rail, bool equiv)
 {
-	Q_UNUSED(equiv);
 	_diagram.updateRailway(rail);
 	trainListWidget->getModel()->updateAllMileSpeed();
 	updateRailwayDiagrams(rail);
+	//2022.06.02：如果非equiv变化，贪心推线的要更新！
+	if (!equiv && greedyWidget) {
+		greedyWidget->refreshData(rail);
+	}
 }
 
 void MainWindow::updateRailwayDiagrams(std::shared_ptr<Railway> rail)
@@ -1131,7 +1134,12 @@ void MainWindow::initToolbar()
 		act->setToolTip(tr("自动贪心排图向导 (Ctrl+T)\n使用指定线路的指定标尺，"
 			"采用贪心算法自动计算运行线。"));
 		diaActions.greedyPaint = act;
-		btn = panel->addLargeAction(act);
+
+		menu = new SARibbonMenu(this);
+		menu->addAction(tr("退出贪心排图状态"), this, &MainWindow::actExitGreedyPaint);
+		act->setMenu(menu);
+
+		panel->addLargeAction(act);
 		connect(act, &QAction::triggered, this, &MainWindow::actGreedyPaint);
 
 #ifdef QETRC_GREEDYPAINT_TEST

@@ -310,9 +310,9 @@ void ConfigDialog::initUI()
     auto* tlay=new QVBoxLayout;   //top Layout
     tlay->addWidget(scroll);
 
-    auto* g=new ButtonGroup<3>({"确定","还原","取消"});
+    auto* g=new ButtonGroup<4>({"确定","应用","还原","取消"});
     g->connectAll(SIGNAL(clicked()),this,
-                  {SLOT(actApply()),SLOT(refreshData()), SLOT(close())});
+                  {SLOT(actOk()), SLOT(actApply()),SLOT(refreshData()), SLOT(close())});
     tlay->addLayout(g);
 
     setLayout(tlay);
@@ -445,7 +445,11 @@ void ConfigDialog::actApply()
     else {
         emit onConfigApplied(_cfg, cnew, repaint && !forDefault, forDefault);
     }
-    
+}
+
+void ConfigDialog::actOk()
+{
+    actApply();
     done(QDialog::Accepted);
 }
 
