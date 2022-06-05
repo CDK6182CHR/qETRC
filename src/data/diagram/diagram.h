@@ -70,6 +70,7 @@ class Diagram
     Config _config, _defaultConfig;
     QString _filename;
     QString _version, _note;
+    int _releaseCode = 0;
     TypeManager _defaultManager;
     QList<std::shared_ptr<DiagramPage>> _pages;
 
@@ -164,6 +165,7 @@ public:
     inline const auto& config()const{return _config;}
     inline const QString& version()const { return _version; }
     inline void setVersion(const QString& v) { _version = v; }
+    inline int releaseCode()const { return _releaseCode; }
     inline const QString& note()const { return _note; }
     inline void setNote(const QString& n) { _note = n; }
 

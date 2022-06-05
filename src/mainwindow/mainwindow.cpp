@@ -343,10 +343,10 @@ void MainWindow::actChangePassedStations()
 
 void MainWindow::showAboutDialog()
 {
-	QString text = tr("%1_%2 Release %3\n%4\n")
+	QString text = tr("%1_%2 Release R%3\n%4\n")
 		.arg(qespec::TITLE.data())
 		.arg(qespec::VERSION.data())
-		.arg(qespec::RELEASE.data())
+		.arg(qespec::RELEASE_CODE)
 		.arg(qespec::DATE.data());
 	text += tr("六方车迷会谈  萧迩珀  保留一切权利\nmxy0268@qq.com\n");
 	text += tr("QQ群：865211882\nhttps://github.com/CDK6182CHR/qETRC\n"
@@ -1894,6 +1894,12 @@ void MainWindow::actOpenGraph()
 		auto end = std::chrono::system_clock::now();
 		showStatus(tr("打开运行图文件%1成功  用时%2毫秒").arg(res)
 			.arg((end - start) / 1ms));
+		if (_diagram.releaseCode() < qespec::RELEASE_CODE) {
+			QMessageBox::information(this, tr("提示"),
+				tr("运行图打开成功，但生成当前运行图所用的软件版本[%1]高于当前软件版本[%2]，"
+					"保存数据时请注意防止数据丢失。").arg(_diagram.version(), 
+						QString(qespec::VERSION.data())));
+		}
 	}
 
 }
@@ -1986,6 +1992,10 @@ void MainWindow::openFileChecked(const QString& filename)
 			auto end = std::chrono::system_clock::now();
 			showStatus(tr("打开运行图文件%1成功  用时%2毫秒").arg(filename)
 				.arg((end - start) / 1ms));
+			QMessageBox::information(this, tr("提示"),
+				tr("运行图打开成功，但生成当前运行图所用的软件版本[%1]高于当前软件版本[%2]，"
+					"保存数据时请注意防止数据丢失。").arg(_diagram.version(),
+						QString(qespec::VERSION.data())));
 		}
 	}
 }

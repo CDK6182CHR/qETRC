@@ -7,6 +7,7 @@
 #include "data/train/trainfiltercore.h"
 #include "data/diagram/diagrampage.h"
 #include "data/rail/forbid.h"
+#include "mainwindow/version.h"
 
 #include <QFile>
 #include <QJsonObject>
@@ -1357,7 +1358,8 @@ bool Diagram::fromJson(const QJsonObject& obj)
         _config = _defaultConfig;
     }
     _note = obj.value("markdown").toString();
-    _version = obj.value("version").toString();
+    _version = obj.value("qetrc_version").toString();
+    _releaseCode = obj.value("qetrc_release").toInt(qespec::RELEASE_CODE);
 
     //线路  line作为第一个，lines作为其他，不存在就是空
     auto rail0 = std::make_shared<Railway>();
@@ -1417,7 +1419,8 @@ QJsonObject Diagram::toJson() const
     _trainCollection.typeManager().toJson(objconfig);
     obj.insert("config", objconfig);
     obj.insert("markdown", _note);
-    obj.insert("version", _version);
+    obj.insert("qetrc_version", qespec::VERSION.data());
+    obj.insert("qetrc_release", qespec::RELEASE_CODE);
     return obj;
 }
 
