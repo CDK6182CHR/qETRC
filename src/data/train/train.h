@@ -323,6 +323,16 @@ public:
     bool isTerminalStation(const AdapterStation* st)const;
 
     /**
+     * 2022.06.08新增重载
+     * 始发站判断，不但测试站名，还要求必须是时刻表首站。
+     * 看起来这样判定其实更加合理。时刻表中间即使出现始发站站名，也不该是始发站。
+     * 暂定用地址来判断，这就需要注意对象问题。
+     */
+    bool isStartingStation(const TrainStation* st)const;
+
+    bool isTerminalStation(const TrainStation* st)const;
+
+    /**
      * Train.intervalExchange() 区间换线
      * 注意start,end都包含在内
      */

@@ -572,7 +572,19 @@ void Train::show() const
     }
 }
 
-void Train::intervalExchange(Train& train2, StationPtr start1, StationPtr end1, 
+bool Train::isStartingStation(const TrainStation* st) const
+{
+    if (empty())return false;
+    return st == &_timetable.front() && isStartingStation(st->name);
+}
+
+bool Train::isTerminalStation(const TrainStation* st) const
+{
+    if (empty())return false;
+    return st == &_timetable.back() && isTerminalStation(st->name);
+}
+
+void Train::intervalExchange(Train& train2, StationPtr start1, StationPtr end1,
     StationPtr start2, StationPtr end2, bool includeStart, bool includeEnd)
 {
     if (!includeStart) {

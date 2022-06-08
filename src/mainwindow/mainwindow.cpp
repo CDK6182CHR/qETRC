@@ -1894,7 +1894,7 @@ void MainWindow::actOpenGraph()
 		auto end = std::chrono::system_clock::now();
 		showStatus(tr("打开运行图文件%1成功  用时%2毫秒").arg(res)
 			.arg((end - start) / 1ms));
-		if (_diagram.releaseCode() < qespec::RELEASE_CODE) {
+		if (_diagram.releaseCode() > qespec::RELEASE_CODE) {
 			QMessageBox::information(this, tr("提示"),
 				tr("运行图打开成功，但生成当前运行图所用的软件版本[%1]高于当前软件版本[%2]，"
 					"保存数据时请注意防止数据丢失。").arg(_diagram.version(), 
@@ -1992,10 +1992,12 @@ void MainWindow::openFileChecked(const QString& filename)
 			auto end = std::chrono::system_clock::now();
 			showStatus(tr("打开运行图文件%1成功  用时%2毫秒").arg(filename)
 				.arg((end - start) / 1ms));
-			QMessageBox::information(this, tr("提示"),
-				tr("运行图打开成功，但生成当前运行图所用的软件版本[%1]高于当前软件版本[%2]，"
-					"保存数据时请注意防止数据丢失。").arg(_diagram.version(),
-						QString(qespec::VERSION.data())));
+			if (_diagram.releaseCode() > qespec::RELEASE_CODE) {
+				QMessageBox::information(this, tr("提示"),
+					tr("运行图打开成功，但生成当前运行图所用的软件版本[%1]高于当前软件版本[%2]，"
+						"保存数据时请注意防止数据丢失。").arg(_diagram.version(),
+							QString(qespec::VERSION.data())));
+			}
 		}
 	}
 }

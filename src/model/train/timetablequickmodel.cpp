@@ -162,11 +162,12 @@ void TimetableQuickModel::setStationStopCol(const TrainStation& station, int row
         //停车的情况
         setItem(row, ColNote, NESI(qeutil::secsToString(station.stopSec())));
     }
-    else if (train->isStartingStation(station.name)) {
+    // 2022.06.08修改始发终到站的判定规则，同时要求必须是时刻表首末站。
+    else if (train->isStartingStation(&station)) {
         //标准始发站情况（停时为0）
         setItem(row, ColNote, NESI(tr("始")));
     }
-    else if (train->isTerminalStation(station.name)) {
+    else if (train->isTerminalStation(&station)) {
         //标准终到站
         setItem(row, ColNote, NESI(tr("终")));
     }
