@@ -30,7 +30,9 @@ void TrainStation::fromJson(const QJsonObject &obj)
     if(!depart.isValid()){
         depart=QTime::fromString(obj.value("cfsj").toString(),"hh:mm");
     }
-    note=obj.value("note").toString();
+    business = obj.value("business").toBool();
+    track = obj.value("track").toString();
+    note = obj.value("note").toString();
 }
 
 QJsonObject TrainStation::toJson() const

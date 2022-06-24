@@ -90,12 +90,15 @@ void TimetableStdModel::setupModel()
         }
         setItem(row, ColStopTime, it);
 
-        if (p->business && sec) {
-            itname->setForeground(Qt::red);
-        }
-        else if(sec){
-            itname->setForeground(Qt::blue);
-        }
+        // 2022.06.24  改为用统一方法设置颜色
+        setRowColor(row);
+
+        //if (p->business && sec) {
+        //    itname->setForeground(Qt::red);
+        //}
+        //else if(sec){
+        //    itname->setForeground(Qt::blue);
+        //}
     }
     updating = false;
 }
