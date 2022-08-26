@@ -194,6 +194,8 @@ double TrainAdapter::relativeError(std::shared_ptr<const Ruler> ruler) const
 	return static_cast<double>(error_time) / this_time;
 }
 
+//#define LINE_DBG_PRINT_COND train()->trainName().full() == "1001"
+
 void TrainAdapter::autoLines(const Config& config)
 {
 	//命名规则：前缀r表示rail，t表示train
@@ -212,6 +214,18 @@ void TrainAdapter::autoLines(const Config& config)
 	//	" @ " << rail.name() << Qt::endl;
 
 	for (auto tcur = table.begin(); tcur != table.end(); ++tcur) {
+
+#if defined(_DEBUG) && defined(LINE_DBG_PRINT_COND)
+		if (LINE_DBG_PRINT_COND) {
+			qDebug() << "autoLine: " << tcur->name.toSingleLiteral() << " @ " << train()->trainName().full()
+				<< ", railway: " << rail->name();
+			if (rlast) {
+				qDebug() << "rlast: " << rlast->name.toSingleLiteral();
+			}
+			qDebug() << Qt::endl;
+		}
+#endif
+
         std::shared_ptr rcur = rail->stationByGeneralName(tcur->name);
 		bool bound = false;   //本站是否成功绑定
 		if (rcur) {
@@ -237,6 +251,11 @@ void TrainAdapter::autoLines(const Config& config)
 					<< ", for train " << train()->trainName().full() << Qt::endl;
 				line->_stations.pop_back();
 				loccnt--;
+
+				// 2022.08.26：补充绑定当前站  按照第一站来搞
+				// 原则上应该有这个东西的。不知道为啥没写。
+				line->addStation(tcur, rcur);
+				bound = true;
 			}
 			else if (rcur->isDirectionVia(locdir = rail->gapDirection(rlast, rcur))) {  
 
@@ -244,11 +263,17 @@ void TrainAdapter::autoLines(const Config& config)
 				// 否则支线+折返的情况会导致分支站被错误绑定而没有截断运行线。
 				// 调换了下面的前两个分支顺序。
 
+				// 2022.08.26：必须把最大跨越判断放到最前面；最大跨越超限，即使rlast==rcur
+				// 也不能绑定。
+				// 但是如果rlast==rcur，则stationsBetween()会失效，并且造成潜在的效率问题，
+				// 所以多加一个判定。rlast==rcur时实质上假定stationsBetween()==0。
+
 				// !rlast  此前已经有过绑定
-                if (rail->stationsBetween(rlast, rcur) + tpass >
-					config.max_passed_stations) {
+				if (tpass > config.max_passed_stations ||
+					(rlast != rcur && rail->stationsBetween(rlast, rcur) + tpass >
+						config.max_passed_stations)) {
 					//跨越区间数量超限，截断运行线
-					if (loccnt >= 2) {  
+					if (loccnt >= 2) {
 						_lines.append(line);
 					}
 					else {
