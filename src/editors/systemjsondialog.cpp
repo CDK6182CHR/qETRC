@@ -73,9 +73,13 @@ void SystemJsonDialog::initUI()
         "新的运行图窗口从右侧添加。"));
     flay->addRow(tr("中心运行图面板"),ckCentral);
 
+    ckStartup = new QCheckBox(tr("显示"));
+    ckStartup->setToolTip(tr("启动程序时显示提示页面"));
+    flay->addRow(tr("启动提示页"), ckStartup);
+
     vlay->addLayout(flay);
 
-    auto* g=new ButtonGroup<3>({"确定","还原", "取消"});
+    auto* g=new ButtonGroup<3>({"确定","还原", "关闭"});
     vlay->addLayout(g);
     g->connectAll(SIGNAL(clicked()),this,{SLOT(actApply()),SLOT(setData()), SLOT(close())});
 }
@@ -93,6 +97,7 @@ void SystemJsonDialog::setData()
     ckWeaken->setChecked(t.weaken_unselected);
     ckTooltip->setChecked(t.show_train_tooltip);
     ckCentral->setChecked(t.use_central_widget);
+    ckStartup->setChecked(t.show_start_page);
     cbSysStyle->setCurrentText(t.app_style);
 }
 
@@ -114,6 +119,7 @@ void SystemJsonDialog::actApply()
     t.weaken_unselected = ckWeaken->isChecked();
     t.show_train_tooltip = ckTooltip->isChecked();
     t.use_central_widget = ckCentral->isChecked();
+    t.show_start_page = ckStartup->isChecked();
 }
 
 #endif

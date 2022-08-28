@@ -6,6 +6,8 @@
 #include <chrono>
 #include <QStandardPaths>
 
+#include "mainwindow/startuppage.h"
+
 int main(int argc, char *argv[])
 {
     {
@@ -14,10 +16,14 @@ int main(int argc, char *argv[])
     //           <<Qt::endl;
 #ifdef QETRC_MOBILE
     AMainWindow w;
-#else
-    MainWindow w;
-#endif
     w.showMaximized();
+#else
+    StartupPage::onStartup();
+    a.processEvents();
+
+    MainWindow w;
+    w.showMaximized();
+#endif
     return a.exec();
     }
 }

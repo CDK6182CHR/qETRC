@@ -62,5 +62,6 @@
         <file>icons/routing-diagram.png</file>
         <file>icons/mobile-icon.png</file>
         <file>icons/customize.svg</file>
+        <file>icons/icon-transparent.png</file>
     </qresource>
 </RCC>

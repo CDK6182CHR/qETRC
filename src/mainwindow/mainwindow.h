@@ -335,6 +335,8 @@ private slots:
      */
     void actChangePassedStations();
 
+    void showHelpDialog();
+
     void showAboutDialog();
 
     void useWpsStyle();

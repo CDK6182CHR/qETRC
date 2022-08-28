@@ -19,7 +19,7 @@ class SystemJsonDialog : public QDialog
     QLineEdit* edDefaultFile;
     QComboBox* cbRibbonStyle;
     QComboBox* cbSysStyle;
-    QCheckBox *ckWeaken, *ckTooltip,*ckCentral;
+    QCheckBox* ckWeaken, * ckTooltip, * ckCentral, * ckStartup;
 public:
     SystemJsonDialog(QWidget* parent=nullptr);
 private:

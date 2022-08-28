@@ -341,6 +341,12 @@ void MainWindow::actChangePassedStations()
 	}
 }
 
+void MainWindow::showHelpDialog()
+{
+	QString text = tr("请参见qETRC在线文档：<a href=\"%1\">%1</a>").arg(qespec::DOC_URL.data());
+	QMessageBox::about(this, tr("帮助"), text);
+}
+
 void MainWindow::showAboutDialog()
 {
 	QString text = tr("%1_%2 Release R%3\n%4\n")
@@ -796,6 +802,10 @@ void MainWindow::initToolbar()
 		//btn->setMinimumWidth(80);
 
 		panel = cat->addPannel(tr("系统"));
+		act = new QAction(qApp->style()->standardIcon(QStyle::SP_DialogHelpButton), tr("帮助"), this);
+		connect(act, &QAction::triggered, this, &MainWindow::showHelpDialog);
+		panel->addLargeAction(act);
+
 		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation),
 			tr("关于"), this);
 		connect(act, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
