@@ -4,6 +4,7 @@
 #include <QStandardItemModel>
 #include <memory>
 #include <vector>
+#include <optional>
 
 #include "data/diagram/traingap.h"
 #include "data/calculation/stationeventaxis.h"
@@ -25,7 +26,7 @@ class StationTrainGapModel: public QStandardItemModel
     Diagram& diagram;
     const std::shared_ptr<Railway> railway;
     const std::shared_ptr<RailStation> station;
-    bool singleLine=false;
+    std::optional<bool> singleLine;
     int _cutSecs = 0;
 
     /**
@@ -57,8 +58,8 @@ public:
         int cutSecs_ = 0);
     void refreshData();
     const auto& getStat()const { return stat; }
-    void setSingleLine(bool on){singleLine=on;}
-    bool isSingleLine()const { return singleLine; }
+    void setSingleLine(std::optional<bool> on){singleLine=on;}
+    auto isSingleLine()const { return singleLine; }
     void setCutSecs(int v) { _cutSecs = v; }
     int cutSecs()const { return _cutSecs; }
     std::shared_ptr<TrainGap> gapForRow(int row);

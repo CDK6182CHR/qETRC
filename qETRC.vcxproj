@@ -239,6 +239,7 @@
     <ClCompile Include="src\util\selectrailwaystable.cpp" />
     <ClCompile Include="src\viewers\compare\diagramcomparedialog.cpp" />
     <ClCompile Include="src\viewers\compare\traincomparedialog.cpp" />
+    <ClCompile Include="src\viewers\railtopotable.cpp" />
     <ClCompile Include="src\viewers\stats\intervalcountdialog.cpp" />
     <ClCompile Include="src\viewers\stats\intervaltraindialog.cpp" />
     <ClCompile Include="src\viewers\stats\intervaltraintable.cpp" />
@@ -640,6 +641,7 @@
     <QtMoc Include="src\wizards\greedypaint\greedypaintpagepaint.h" />
     <QtMoc Include="src\viewers\stats\intervaltraindialog.h" />
     <QtMoc Include="src\viewers\stats\intervalcountdialog.h" />
+    <QtMoc Include="src\viewers\railtopotable.h" />
     <ClInclude Include="src\viewers\stats\intervaltraintable.h" />
     <ClInclude Include="src\wizards\timeinterp\timeinterppagepreview.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterppagetrain.h">

@@ -346,9 +346,12 @@ public:
      * 基于车站事件表，转换成间隔表。
      * 暂时只处理同向事件。
      * 保证所给输入都是同一个站的数据。
+     * 2022.09.10
+     * 新增RailStation参数。并且，如果传入的useSingle是std::nullopt，则使用内建上下行数据。
      */
     TrainGapList getTrainGaps(const RailStationEventList& events,
-        const TrainFilterCore& filter, bool useSingle)const;
+        const TrainFilterCore& filter, std::shared_ptr<const RailStation> st, 
+        std::optional<bool> useSingle)const;
 
     /**
      * 双线模式
@@ -358,6 +361,12 @@ public:
 
     TrainGapList getTrainGapsSingle(const RailStationEventList& events,
         const TrainFilterCore& filter)const;
+
+    /**
+     * 2022.09.10  尝试添加基于线路自带单双线区间信息的版本。
+     */
+    TrainGapList getTrainGapsReal(const RailStationEventList& events,
+        const TrainFilterCore& filter, std::shared_ptr<const RailStation> st)const;
 
     /**
      * 2021.09.08

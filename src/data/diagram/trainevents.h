@@ -123,6 +123,8 @@ struct RailStationEventBase {
     QString posString()const;
     static QString posToString(const Positions& pos);
 
+    int secsTo(const RailStationEventBase& rhs)const;
+
 };
 
 namespace qeutil {

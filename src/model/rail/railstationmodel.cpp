@@ -144,9 +144,10 @@ bool RailStationModel::checkRailway(std::shared_ptr<Railway> rail)
                     QMessageBox::warning(par, tr("错误"),
                         tr("单线区间里程不自洽：\n"
                             "区间[%1->%2]被设置为单线区间，但其上下行里程不相等。"
-                            "下行里程: %1 km; 上行里程: %2 km。"
+                            "下行里程: %3 km; 上行里程: %4 km。"
                             "\n请考虑删除多余的"
-                            "[对里程]设置项。").arg(mile_down).arg(mile_up));
+                            "[对里程]设置项。").arg(p->fromStationNameLit(),p->toStationNameLit())
+                        .arg(mile_down).arg(mile_up));
                     return false;
                 }
             }

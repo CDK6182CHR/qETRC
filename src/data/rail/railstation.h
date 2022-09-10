@@ -193,6 +193,14 @@ public:
     inline bool hasDownAdjacent()const{return downNext.get();}
     inline bool hasUpAdjacent()const{return upNext.get();}
 
+    /**
+     * 2022.09.10  站前区间（里程小端）是否为单线区间。
+     * 注意这里的单线是指存在敌对径路的情况；上下行分设那种不算。
+     * 如果站前区间不存在/无意义，则返回nullopt。包括站表第一站，和不通过站。
+     */
+    std::optional<bool> isPreSingle()const;
+    std::optional<bool> isPostSingle()const;
+
     inline std::shared_ptr<RailInterval> dirNextInterval(Direction _dir) {
         switch (_dir) {
         case Direction::Down:

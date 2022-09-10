@@ -37,6 +37,7 @@ SOURCES += \
     src/mainwindow/startuppage.cpp \
     src/mainwindow/version.cpp \
     src/util/combos/railstationcombo.cpp \
+    src/viewers/railtopotable.cpp \
     src/viewers/stats/intervaltraintable.cpp \
     src/data/calculation/calculationlog.cpp \
     src/data/calculation/gapconstraints.cpp \
@@ -237,6 +238,7 @@ HEADERS += \
     src/data/analysis/traingap/traingapana.h \
     src/mainwindow/startuppage.h \
     src/util/combos/railstationcombo.h \
+    src/viewers/railtopotable.h \
     src/viewers/stats/intervaltraintable.h \
     src/data/calculation/calculationlog.h \
     src/data/calculation/gapconstraints.h \

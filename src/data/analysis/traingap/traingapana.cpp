@@ -15,7 +15,8 @@ std::map<TrainGapTypePair, int> TrainGapAna::globalMinimal(
     auto events=diagram.stationEventsForRail(rail);
     for(auto _p=events.begin();_p!=events.end();++_p){
         const RailStationEventList& lst=_p->second;
-        auto gaps=diagram.getTrainGaps(lst, filter, _singleLine);
+        // todo: the single line
+        auto gaps=diagram.getTrainGaps(lst, filter,_p->first, _singleLine);
         TrainGapStatistics stat=diagram.countTrainGaps(gaps, _cutSecs);
 
         for (auto q = stat.begin(); q != stat.end(); ++q) {

@@ -139,7 +139,7 @@ void TrainGapSummaryModel::setupHeader()
     typeCols.clear();
     for (auto _p = events.begin(); _p != events.end(); ++_p) {
         const RailStationEventList& lst = _p->second;
-        auto gaps = diagram.getTrainGaps(lst, filter, useSingle);
+        auto gaps = diagram.getTrainGaps(lst, filter, _p->first, useSingle);
         TrainGapStatistics stat = diagram.countTrainGaps(gaps, cutSecs);
         for (auto q = stat.begin(); q != stat.end(); ++q) {
             const TrainGapTypePair& tp = q->first;

@@ -10,6 +10,7 @@
 #include "viewers/events/railstationeventlist.h"
 #include "viewers/events/railsectionevents.h"
 #include "viewers/events/railsnapevents.h"
+#include "viewers/railtopotable.h"
 #include "editors/forbidwidget.h"
 #include "editors/railstationwidget.h"
 #include "data/diagram/diagrampage.h"
@@ -206,6 +207,11 @@ void RailContext::initUI()
 		"绘出可能的股道分布情况。"));
 	btn=panel->addLargeAction(act);
 	btn->setMinimumWidth(70);
+
+	act = new QAction(QIcon(":/icons/diagram.png"), tr("线路拓扑"), this);
+	connect(act, &QAction::triggered, this, &RailContext::actRailTopo);
+	act->setToolTip(tr("线路拓扑\n检查和显示基线的单向站、单双线等特征。"));
+	panel->addLargeAction(act);
 
 	panel->addSeparator();
 	act = new QAction(QIcon(":/icons/h_expand.png"), tr("间隔分析"), this);
@@ -554,6 +560,12 @@ void RailContext::actCreatePage()
 	auto page = std::make_shared<DiagramPage>(diagram.config(), QList<std::shared_ptr<Railway>>{railway},
 		diagram.validPageName(railway->name()));
 	mw->naviView->addNewPageApply(page);
+}
+
+void RailContext::actRailTopo()
+{
+	auto* w = new RailTopoTable(railway, mw);
+	w->show();
 }
 
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)

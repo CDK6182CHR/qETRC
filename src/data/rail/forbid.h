@@ -41,6 +41,9 @@ public:
     void swap(ForbidNode& other);
 
     void mergeWith(const ForbidNode& other, bool cover);
+
+    bool operator==(const ForbidNode& rhs)const;
+    bool operator!=(const ForbidNode& rhs)const;
 };
 
 

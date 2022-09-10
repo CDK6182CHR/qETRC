@@ -162,6 +162,11 @@ QString RailStationEventBase::posToString(const Positions& pos)
 	}
 }
 
+int RailStationEventBase::secsTo(const RailStationEventBase& rhs) const
+{
+	return qeutil::secsTo(time, rhs.time);
+}
+
 bool RailStationEventBase::hasAppend() const
 {
 	switch (type)

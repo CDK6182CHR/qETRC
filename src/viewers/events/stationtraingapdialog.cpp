@@ -41,7 +41,8 @@ StationTrainGapModel::StationTrainGapModel(Diagram& diagram,
 
 void StationTrainGapModel::refreshData()
 {
-    data = diagram.getTrainGaps(events, filter, singleLine);
+    data = diagram.getTrainGaps(events, filter, station, singleLine);
+    //data = diagram.getTrainGapsReal(events, filter, station);
     stat = diagram.countTrainGaps(data, _cutSecs);
     setupModel();
 }
@@ -154,7 +155,12 @@ StationTrainGapDialog::StationTrainGapDialog(Diagram& diagram,
 
 void StationTrainGapDialog::refreshData()
 {
-    model->setSingleLine(ckSingle->isChecked());
+    if (ckSingle->checkState() == Qt::PartiallyChecked) {
+        model->setSingleLine(std::nullopt);
+    }
+    else {
+        model->setSingleLine(ckSingle->isChecked());
+    }
     model->setCutSecs(spCut->value());
     model->refreshData();
     table->resizeColumnsToContents();
@@ -167,7 +173,13 @@ void StationTrainGapDialog::initUI()
     auto* flay=new QFormLayout;
     auto* hlay=new QHBoxLayout;
     ckSingle=new QCheckBox(tr("对向敌对进路 (单线模式)"));
-    ckSingle->setChecked(model->isSingleLine());
+    ckSingle->setTristate(true);
+    if (auto s = model->isSingleLine(); s.has_value()) {
+        ckSingle->setChecked(*s);
+    }
+    else {
+        ckSingle->setCheckState(Qt::PartiallyChecked);
+    }
     hlay->addWidget(ckSingle);
     auto* btn=new QPushButton(tr("车次筛选器"));
     hlay->addWidget(btn);

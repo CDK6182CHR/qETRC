@@ -141,3 +141,30 @@ std::shared_ptr<RailInterval> RailStation::adjacentIntervalTo(std::shared_ptr<co
     return nullptr;
 }
 
+std::optional<bool> RailStation::isPreSingle() const
+{
+    if (direction == PassedDirection::NoVia || (!downPrev && !upNext)) {
+        return std::nullopt;
+    }
+
+    // 注意只有双向通过站，才有可能是单线的。
+    if (direction == PassedDirection::BothVia && prevSingle) {
+        return true;
+    }
+    else return false;
+}
+
+std::optional<bool> RailStation::isPostSingle() const
+{
+    if (direction == PassedDirection::NoVia || (!downNext && !upPrev))
+        return std::nullopt;
+
+    // BothVia 且不是最后一站，则downNext 必然存在
+    if (direction == PassedDirection::BothVia && downNext->isSingleRail()) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+

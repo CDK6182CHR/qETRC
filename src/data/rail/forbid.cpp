@@ -130,4 +130,14 @@ void ForbidNode::mergeWith(const ForbidNode& other, bool cover)
         *this = other;
 }
 
+bool ForbidNode::operator==(const ForbidNode &rhs) const
+{
+    return beginTime==rhs.beginTime && endTime==rhs.endTime;
+}
+
+bool ForbidNode::operator!=(const ForbidNode &rhs) const
+{
+    return beginTime!=rhs.beginTime || endTime!=rhs.endTime;
+}
+
 
