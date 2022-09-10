@@ -100,6 +100,8 @@ void StartupPage::initUI()
 
     vlay->addStretch(1);
 
+    lab = new QLabel(tr("Please note that qETRC is a free software that comes WITHOUT ANY WARRANTY."));
+    vlay->addWidget(lab);
     hlay=new QHBoxLayout;
     ckDoNotShow=new QCheckBox(tr("不再显示此页面"));
     hlay->addWidget(ckDoNotShow);
