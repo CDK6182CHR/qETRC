@@ -102,7 +102,7 @@ void RailStationWidget::initUI()
     QScroller::grabGesture(ctable->table(),QScroller::TouchGesture);
 
 	int c = 0;
-	for (int w : {120, 80, 80, 50, 40, 60, 40, 40}) {
+	for (int w : {120, 80, 80, 50, 40, 60, 40, 40, 40}) {
 		ctable->table()->setColumnWidth(c++, w);
 	}
 

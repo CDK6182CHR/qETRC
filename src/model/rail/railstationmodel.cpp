@@ -10,7 +10,7 @@ RailStationModel::RailStationModel(bool inplace, QWidget *parent):
     QEMoveableModel(parent),commitInPlace(inplace)
 {
     setColumnCount(ColMAX);
-    setHorizontalHeaderLabels({ "站名","里程","对里程","等级","显示","单向站",
+    setHorizontalHeaderLabels({ "站名","里程","对里程","等级","显示","单向站", "单线",
         "办客","办货" });
     setupModel();
 }
@@ -20,7 +20,7 @@ RailStationModel::RailStationModel(std::shared_ptr<Railway> rail,
     QEMoveableModel(parent),commitInPlace(inplace)
 {
     setColumnCount(ColMAX);
-    setHorizontalHeaderLabels({ "站名","里程","对里程","等级","显示","单向站",
+    setHorizontalHeaderLabels({ "站名","里程","对里程","等级","显示","单向站", "单线",
         "办客","办货" });
     setRailway(rail);
 }
@@ -76,6 +76,10 @@ void RailStationModel::setupNewRow(int i)
     it->setData(3, Qt::EditRole);
     setItem(i, ColDir, it);
 
+    it = makeCheckItem();
+    it->setCheckState(Qt::Unchecked);
+    setItem(i, ColSingle, it);
+
     it = new SI;
     it->setCheckState(Qt::Unchecked);
     it->setCheckable(true);
@@ -103,7 +107,6 @@ Qt::ItemFlags RailStationModel::flags(const QModelIndex& index) const
     return QStandardItemModel::flags(index);
 }
 
-
 bool RailStationModel::checkRailway(std::shared_ptr<Railway> rail)
 {
     auto* par = qobject_cast<QWidget*>(parent());
@@ -123,6 +126,30 @@ bool RailStationModel::checkRailway(std::shared_ptr<Railway> rail)
                 tr("区间距离为负数，请重新设置里程！\n%1->%2区间，里程%3。")
                 .arg(p->fromStationNameLit()).arg(p->toStationNameLit()).arg(p->mile()));
             return false;
+        }
+        else if (p->direction() == Direction::Down && p->downAdjacentStation()->prevSingle) {
+            if (!p->isSymmetryInterval()) {
+                // 非法单线区间，终止输入
+                QMessageBox::warning(par, tr("错误"),
+                    tr("单线区间设置不自洽错误：\n区间[%1->%2]非对称区间，但区间后站[%2]被设置为"
+                        "单线区间的后站。请注意只有发、到站都是上下行通过站的区间，"
+                        "才可以是单线区间。").arg(p->fromStationNameLit(), p->toStationNameLit()));
+                return false;
+            }
+            else {
+                // 合法单线区间，检查里程
+                double mile_down = p->mile();
+                double mile_up = p->inverseInterval()->mile();
+                if (std::abs(mile_down - mile_up) > 1e-5) {
+                    QMessageBox::warning(par, tr("错误"),
+                        tr("单线区间里程不自洽：\n"
+                            "区间[%1->%2]被设置为单线区间，但其上下行里程不相等。"
+                            "下行里程: %1 km; 上行里程: %2 km。"
+                            "\n请考虑删除多余的"
+                            "[对里程]设置项。").arg(mile_down).arg(mile_up));
+                    return false;
+                }
+            }
         }
     }
 
@@ -169,8 +196,9 @@ std::shared_ptr<Railway> RailStationModel::generateRailway() const
             qvariant_cast<int>(item(i, ColDir)->data(Qt::EditRole)));
         bool passen = item(i, ColPassenger)->checkState();
         bool freigh = item(i, ColFreight)->checkState();
+        bool single = item(i, ColSingle)->checkState();
 
-        rail->appendStation(name, mile, level, counter, dir, show, passen, freigh);
+        rail->appendStation(name, mile, level, counter, dir, show, passen, freigh, single);
 
     }
     return rail;
@@ -234,10 +262,7 @@ void RailStationModel::setupModel()
 
     beginResetModel();
 
-
     setRowCount(railway->stationCount());
-
-
 
     for (int i = 0; i < rowCount(); i++) {
         //站名
@@ -284,6 +309,11 @@ void RailStationModel::setStationRow(int i, std::shared_ptr<const RailStation> s
     item = new QStandardItem;
     item->setData(static_cast<int>(st->direction), Qt::EditRole);
     setItem(i, ColDir, item);
+
+    // 单线区间
+    item = makeCheckItem();
+    item->setCheckState(st->prevSingle ? Qt::Checked : Qt::Unchecked);
+    setItem(i, ColSingle, item);
 
     //办客
     item = new QStandardItem;

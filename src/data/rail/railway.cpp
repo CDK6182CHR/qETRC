@@ -136,10 +136,10 @@ QJsonObject Railway::toJson() const
 
 void Railway::appendStation(const StationName& name, double mile, int level, 
 	std::optional<double> counter, PassedDirection direction, bool show,
-	bool passenger, bool freight)
+	bool passenger, bool freight, bool single)
 {
 	auto&& t = std::make_shared<RailStation>(
-		name, mile, level, counter, direction, show, passenger, freight);
+		name, mile, level, counter, direction, show, passenger, freight, single);
 	_stations.append(t);
 	addMapInfo(t);
 	appendInterval(t);
@@ -147,10 +147,10 @@ void Railway::appendStation(const StationName& name, double mile, int level,
 
 void Railway::insertStation(int index, const StationName& name, double mile,
 	int level, std::optional<double> counter, PassedDirection direction, bool show,
-	bool passenger, bool freight)
+	bool passenger, bool freight, bool single)
 {
 	auto&& t = std::make_shared<RailStation>(name, mile, level, counter, direction,
-		show, passenger, freight);
+		show, passenger, freight, single);
 	if (index == -1)
 		_stations.append(t);
 	else
@@ -484,6 +484,19 @@ void Railway::reverse()
 	double length = railLength(), ctlen = counterLength();
     for (auto q=_stations.begin();q!=_stations.end();++q) {
         auto p=*q;
+		//2022.09.10: 把单向区间的性质往上行端挪一位。
+		//注意这里事实上仅仅涉及双向通过站。利用RailInterval完成这一点。
+		//注意必须在调整指针关系之前。
+		if (auto nextSt = p->downAdjacent()) {
+			//qDebug() << p->name.toSingleLiteral() << " " <<
+			//	nextSt->name.toSingleLiteral() << " " <<
+			//	p->prevSingle;
+			p->prevSingle = nextSt->prevSingle;
+		}
+		else {
+			// 第一站固定false
+			p->prevSingle = false;
+		}
 		p->mile = length - p->mile;
 		if (p->counter.has_value()) {
 			p->counter = ctlen - p->counter.value();
@@ -508,6 +521,7 @@ void Railway::reverse()
         if(p->upNext){
             p->upNext->_dir=DirFunc::reverse(p->upNext->_dir);
         }
+
 	}
 	std::reverse(_stations.begin(), _stations.end());
 }
@@ -768,6 +782,7 @@ void Railway::showStations() const
 		const auto& p = _stations.at(i);
 		qDebug() << i << '\t' << p->name << '\t' << p->mile << '\t' <<
 			p->counterStr() << '\t' <<
+			p->prevSingle << '\t' <<
 			static_cast<int>(p->direction) << Qt::endl;
 	}
 }

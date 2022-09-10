@@ -26,6 +26,7 @@ public:
         ColLevel,
         ColShow,
         ColDir,
+        ColSingle,
         ColPassenger,
         ColFreight,
         ColMAX

@@ -60,13 +60,14 @@ class QJsonObject;
  * 原pyETRC中直接用dict做的，这里都采用struct的模式简单实现
  * 2021.10.08：y_value改为y_coeff，与Config解耦，不直接表示纵坐标，
  * 而是表示用于排图的坐标值。按里程时为公里数，按标尺时为通通时分的秒数。
+ * 2022.09.10：添加单双线数据开关，每个站控制的是该站的【前一个区间】（小里程端的区间）
+ * 是否为单线。如果是单线，则等价于：downPrev和upNext物理上是同一个区间。
  */
 class RailStation
 {
     friend class Railway;
     friend class RailInterval;
     //前后区间指针，暂定由Railway类负责维护
-    //todo: 详细维护算法
     std::shared_ptr<RailInterval> downPrev, downNext;
     std::shared_ptr<RailInterval> upPrev, upNext;
     
@@ -84,13 +85,21 @@ public:
     PassedDirection direction;
     bool _show;
     bool passenger,freight;
+
+    /**
+     * 单线区间开关，控制本站前区间（里程小区间）是否为单线。
+     * 仅当本站和上站都是BothVia时，才有效。
+     */
+    bool prevSingle;
+
     QList<QString> tracks;
     RailStation(const StationName& name_,
         double mile_,
         int level_ = 4,
         std::optional<double> counter_ = std::nullopt,
         PassedDirection direction_ = PassedDirection::BothVia, bool show = true,
-        bool passenger = false, bool freight = false
+        bool passenger = false, bool freight = false,
+        bool prevSingle = false
     );
     RailStation(const QJsonObject& obj);
 
@@ -101,6 +110,9 @@ public:
     RailStation(const RailStation&);
 
     RailStation(RailStation&& rs) = default;
+
+    RailStation& operator=(const RailStation& st) = delete;
+    RailStation& operator=(RailStation&& st) = default;
 
     void fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;

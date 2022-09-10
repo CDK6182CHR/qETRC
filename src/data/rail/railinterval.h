@@ -114,7 +114,29 @@ public:
      */
     std::shared_ptr<RailInterval> inverseInterval();
 
+    /**
+     * 2022.09.10
+     * 是否是对称区间，等价于前后站是否都为双向站。
+     * see also: inverseInterval
+     */
+    bool isSymmetryInterval()const;
+
+    /**
+     * 2022.09.10 单线区间判别
+     * 单线区间 iff. 本区间对称且 downAdjacentStation()->prevSingle == true
+     */
+    bool isSingleRail()const;
+
     inline Direction direction()const { return _dir; }
+
+    /**
+     * 沿dir方向的近邻站。
+     * 如果dir==this->dir就是to，否则就是from。
+     */
+    std::shared_ptr<RailStation> dirAdjacentStation(Direction dir)const;
+
+    std::shared_ptr<RailStation> downAdjacentStation()const { return dirAdjacentStation(Direction::Down); }
+    std::shared_ptr<RailStation> upAdjacentStation()const { return dirAdjacentStation(Direction::Down); }
 
 
     template <typename Node>

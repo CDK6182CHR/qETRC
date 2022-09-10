@@ -116,11 +116,31 @@ std::shared_ptr<const ForbidNode> RailInterval::getForbidNode(std::shared_ptr<co
 
 std::shared_ptr<RailInterval> RailInterval::inverseInterval()
 {
-    if (fromStation()->direction == PassedDirection::BothVia &&
-        toStation()->direction == PassedDirection::BothVia) {
+    if (isSymmetryInterval()) {
         return toStation()->dirNextInterval(DirFunc::reverse(_dir));
     }
     return nullptr;
+}
+
+bool RailInterval::isSymmetryInterval() const
+{
+    return fromStation()->direction == PassedDirection::BothVia &&
+        toStation()->direction == PassedDirection::BothVia;
+}
+
+bool RailInterval::isSingleRail() const
+{
+    return isSymmetryInterval() && downAdjacentStation()->prevSingle;
+}
+
+std::shared_ptr<RailStation> RailInterval::dirAdjacentStation(Direction dir)const
+{
+    if (dir == this->_dir) {
+        return toStation();
+    }
+    else {
+        return fromStation();
+    }
 }
 
 QDebug operator<<(QDebug debug, const RailInterval& s)

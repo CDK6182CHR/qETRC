@@ -113,14 +113,14 @@ public:
         int level = 4,
         std::optional<double> counter = std::nullopt,
         PassedDirection direction = PassedDirection::BothVia,bool show=true,
-        bool passenger = false, bool freight = false
+        bool passenger = false, bool freight = false, bool single=false
     );
     void insertStation(int index,
         const StationName& name, double mile,
         int level = 4,
         std::optional<double> counter = std::nullopt,
         PassedDirection direction = PassedDirection::BothVia, bool show = true,
-        bool passenger = false, bool freight = false
+        bool passenger = false, bool freight = false, bool single = false
     );
 
     /*

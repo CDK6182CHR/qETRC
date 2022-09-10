@@ -27,10 +27,10 @@ RailStation::RailStation(const StationName& name_,
     std::optional<double> counter_,
     PassedDirection direction_,
     bool show_,
-    bool passenger_, bool freight_) :
+    bool passenger_, bool freight_, bool prevSingle_) :
     name(name_), mile(mile_), level(level_), counter(counter_),
     y_coeff(std::nullopt), direction(direction_),
-    _show(show_), passenger(passenger_), freight(freight_),
+    _show(show_), passenger(passenger_), freight(freight_), prevSingle(prevSingle_),
     tracks()
 {
 }
@@ -43,7 +43,7 @@ RailStation::RailStation(const QJsonObject &obj)
 RailStation::RailStation(const RailStation& rs):
     name(rs.name),mile(rs.mile),level(rs.level),counter(rs.counter),
     y_coeff(rs.y_coeff),direction(rs.direction),
-    _show(rs._show),passenger(rs.passenger),freight(rs.freight),
+    _show(rs._show),passenger(rs.passenger),freight(rs.freight),prevSingle(rs.prevSingle),
     tracks(rs.tracks)
 {
     //shared_ptr直接用默认构造
@@ -63,6 +63,7 @@ void RailStation::fromJson(const QJsonObject &obj)
     _show=obj.value("show").toBool(true);
     passenger=obj.value("passenger").toBool(true);
     freight=obj.value("freight").toBool(true);
+    prevSingle = obj.value("prevSingle").toBool(false);
     const QJsonArray& ar = obj.value("tracks").toArray();
     tracks.clear();
     for (const auto& p : ar) {
@@ -86,6 +87,7 @@ QJsonObject RailStation::toJson() const
     obj.insert("show",_show);
     obj.insert("passenger",passenger);
     obj.insert("freight",freight);
+    obj.insert("prevSingle", prevSingle);
     QJsonArray ar;
     for (const auto& p : tracks) {
         ar.append(QJsonValue(p));
