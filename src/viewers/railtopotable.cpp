@@ -37,6 +37,7 @@ void RailTopoTable::refreshData()
         auto* it=new TI(st->name.toSingleLiteral());
         it->setTextAlignment(Qt::AlignCenter);
         table->setItem(i*2, ColName, it);
+        it->setBackground(QColor::fromRgb(245, 245, 245));
 
         it=new TI(QString::number(st->mile,'f',3));
         it->setTextAlignment(Qt::AlignCenter);
@@ -46,7 +47,7 @@ void RailTopoTable::refreshData()
         it->setTextAlignment(Qt::AlignCenter);
         table->setItem(i*2,ColCounter,it);
 
-        for (int c=ColName;c<=ColCounter;c++){
+        for (int c : {ColName, ColMile, ColCounter}) {
             table->setSpan(2*i,c,2,1);
         }
     }
@@ -149,7 +150,7 @@ void RailTopoTable::initUI()
 
     table->setColumnCount(ColMAX);
 
-    table->setHorizontalHeaderLabels({tr("站名"),tr("公里标"),tr("对里程"),
+    table->setHorizontalHeaderLabels({ tr("对里程"),tr("公里标"),tr("站名"),
                                      tr("下行区间"),tr("上行区间"),tr("信息")});
     {
         int c=0;

@@ -16,7 +16,8 @@ void CRSet::buildSet()
     emplace_back(std::make_unique<GroupMeet>());
     emplace_back(std::make_unique<GroupArrive>());
 
-    auto alltypes=TrainGap::allPossibleGaps(_singleLine);
+    // 2022.09.11: 暂定一律单线
+    auto alltypes=TrainGap::allPossibleGaps(true);
     for(auto itr=alltypes.begin();itr!=alltypes.end();){
         bool found=false;
         for(const auto& t:*this){

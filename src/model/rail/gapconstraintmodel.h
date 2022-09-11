@@ -38,7 +38,7 @@ public:
 
 public slots:
     void setSingleLine(bool singleLine);
-    void setGapSet(gapset::GapSetAbstract* gapSet, bool singleLine);
+    void setGapSet(gapset::GapSetAbstract* gapSet);
     void setConstrainFromCurrent(const std::map<TrainGapTypePair, int>& mingap,
         int minSecs, int maxSecs);
 };

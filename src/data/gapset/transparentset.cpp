@@ -15,7 +15,8 @@ bool gapset::TransparentGroup::matches(const TrainGapTypePair &type) const
 
 void gapset::TransparentSet::buildSet()
 {
-    auto alltypes=TrainGap::allPossibleGaps(_singleLine);
+    // 2022.09.11  删除singleLine属性，暂定直接true
+    auto alltypes=TrainGap::allPossibleGaps(true);
     for(auto type:alltypes){
         auto t=std::make_unique<TransparentGroup>(type);
         t->push_back(type);

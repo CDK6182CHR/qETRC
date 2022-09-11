@@ -72,18 +72,21 @@ Qt::ItemFlags GapConstraintModel::flags(const QModelIndex &index) const
     return flag;
 }
 
+#if 0
 void GapConstraintModel::setSingleLine(bool singleLine)
 {
     beginResetModel();
     _gapSet->setSingleLineAndBuild(singleLine);
     endResetModel();
 }
+#endif
 
-void GapConstraintModel::setGapSet(gapset::GapSetAbstract *gapSet, bool singleLine)
+void GapConstraintModel::setGapSet(gapset::GapSetAbstract *gapSet)
 {
     beginResetModel();
     _gapSet=gapSet;
-    _gapSet->setSingleLineAndBuild(singleLine);
+    _gapSet->buildSet();
+    //_gapSet->setSingleLineAndBuild(singleLine);
     endResetModel();
 }
 

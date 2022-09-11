@@ -50,6 +50,8 @@ public:
      * 如果没有冲突事件，即当前排图是许可的，则返回空。
      * @param ev  待插入的事件；或者说排图所导致的新增事件
      * @param constraint  排图约束条件
+     * @param singleLine  2022.09.11增加。这是区间的local单双线性质，由railint算出来。
+     * constraint不再包含单双线性质。
      * @return  按下列规则，**顺序**确定：
      * (1) 如果有左冲突事件（即时刻在ev之前的事件），优先返回左冲突事件。
      * (2) 暂定优先返回时刻离ev较近的事件。
@@ -57,7 +59,8 @@ public:
      */
     std::shared_ptr<RailStationEvent>
         conflictEvent(const RailStationEventBase& ev,
-                      const GapConstraints& constraint) const;
+                      const GapConstraints& constraint,
+                      bool singleLine) const;
 
 private:
 
@@ -74,7 +77,8 @@ private:
 
     bool isConflict(const RailStationEventBase& left,
                     const RailStationEventBase& right,
-                    const GapConstraints& constraint) const;
+                    const GapConstraints& constraint,
+                    bool singleLine) const;
 
 
 };

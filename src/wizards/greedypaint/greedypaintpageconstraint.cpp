@@ -51,8 +51,8 @@ void GreedyPaintPageConstraint::initUI()
     hlay->addWidget(spBack);
     hlay->addStretch(1);
 
-    ckSingle=new QCheckBox(tr("单线"));
-    hlay->addWidget(ckSingle);
+    //ckSingle=new QCheckBox(tr("单线"));
+    //hlay->addWidget(ckSingle);
 
     flay->addRow(tr("最大尝试回溯次数"),hlay);
 
@@ -113,8 +113,8 @@ void GreedyPaintPageConstraint::initUI()
 
     vlay->addWidget(table, 3);
 
-    connect(ckSingle, &QCheckBox::toggled,
-            this, &GreedyPaintPageConstraint::onSingleLineChanged);
+    //connect(ckSingle, &QCheckBox::toggled,
+    //        this, &GreedyPaintPageConstraint::onSingleLineChanged);
 
     hlay=new QHBoxLayout;
     hlay->addStretch(1);
@@ -147,8 +147,8 @@ void GreedyPaintPageConstraint::onApply()
         return;
     }
 
-    auto & cns=painter.constraints();
-    cns.setSingleLine(ckSingle->isChecked());
+    //auto & cns=painter.constraints();
+    //cns.setSingleLine(ckSingle->isChecked());
     painter.setRailway(rail);
     painter.setRuler(ruler);
     painter.setMaxBackoffTimes(spBack->value());
@@ -171,15 +171,17 @@ void GreedyPaintPageConstraint::onApply()
     emit constraintChanged();
 }
 
+#if 0
 void GreedyPaintPageConstraint::onSingleLineChanged(bool on)
 {
     _model->setSingleLine(on);
 }
+#endif
 
 void GreedyPaintPageConstraint::onGapSetToggled(int id, bool on)
 {
     if(on){
-        _model->setGapSet(_availableGapSets[id].get(),ckSingle->isChecked());
+        _model->setGapSet(_availableGapSets[id].get());
     }
 
 }

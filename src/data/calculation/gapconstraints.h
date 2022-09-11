@@ -9,7 +9,7 @@
 class GapConstraints:
         public std::map<TrainGapTypePair,int>
 {
-    bool _singleLine=false;
+    //bool _singleLine=false;
 public:
 
     /**
@@ -27,9 +27,9 @@ public:
      */
     int correlationRange()const;
 
-    bool isSingleLine()const{return _singleLine;}
+    //bool isSingleLine()const{return _singleLine;}
 
-    void setSingleLine(bool on){_singleLine=on;}
+    //void setSingleLine(bool on){_singleLine=on;}
 
     QString toString()const;
 };

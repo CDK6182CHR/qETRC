@@ -17,9 +17,9 @@ class RailTopoTable : public QWidget
     QTableWidget* table;
 public:
     enum {
-        ColName=0,
-        ColMile,
         ColCounter,
+        ColMile,
+        ColName,
         ColDown,
         ColUp,
         ColInfo,

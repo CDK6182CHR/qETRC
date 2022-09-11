@@ -22,7 +22,7 @@ class GreedyPaintPageConstraint : public QWidget
     Q_OBJECT;
     RailRulerCombo* cbRuler;
     QSpinBox* spBack;
-    QCheckBox* ckSingle;
+    //QCheckBox* ckSingle;
 
     Diagram& diagram;
     GreedyPainter& painter;
@@ -58,7 +58,7 @@ signals:
 
 private slots:
     void onApply();
-    void onSingleLineChanged(bool on);
+    //void onSingleLineChanged(bool on);
     void onGapSetToggled(int id, bool on);
     void onGetGapFromCurrent();
 };

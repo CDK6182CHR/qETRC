@@ -20,7 +20,7 @@ GapConstraintWidget::GapConstraintWidget(GapConstraints &constraints,QWidget *pa
 
 void GapConstraintWidget::refreshData()
 {
-    _model->gapSet()->setSingleLine(_constraints.isSingleLine());
+    //_model->gapSet()->setSingleLine(_constraints.isSingleLine());
     _model->gapSet()->buildSet();
 }
 

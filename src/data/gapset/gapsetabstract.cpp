@@ -1,7 +1,7 @@
 ﻿#include "gapsetabstract.h"
 
 
-
+#if 0
 void gapset::GapSetAbstract::setSingleLineAndBuild(bool on)
 {
     if (on != _singleLine){
@@ -9,6 +9,7 @@ void gapset::GapSetAbstract::setSingleLineAndBuild(bool on)
         buildSet();
     }
 }
+#endif 
 
 std::map<const gapset::GapGroupAbstract *, int>
     gapset::GapSetAbstract::minimalGapByGroup(

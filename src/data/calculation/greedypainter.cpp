@@ -207,7 +207,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 		}
 
 		// 出发时刻检测
-		auto ev_conf = ax_from.conflictEvent(ev_start, _constraints);
+		auto ev_conf = ax_from.conflictEvent(ev_start, _constraints, railint->isSingleRail());
 		if (ev_conf) {
 			// 出发时刻冲突
 			if (!stop && st_from != _anchor) {
@@ -223,13 +223,13 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 					ev_start.time = ev_conf->time;
 					addLog(std::make_unique<CalculationLogGap>(CalculationLogAbstract::GapConflict,
 						st_from, ev_start.time, CalculationLogAbstract::Depart,
-						*TrainGap::gapTypeBetween(ev_start, *ev_conf, _constraints.isSingleLine()),
+						*TrainGap::gapTypeBetween(ev_start, *ev_conf, railint->isSingleRail()),
 						st_from, ev_conf
 						));
 				}
 				else {
 					// 左冲突事件，将时刻弄到与当前不冲突的地方
-					auto type = TrainGap::gapTypeBetween(*ev_conf, ev_start, _constraints.isSingleLine());
+					auto type = TrainGap::gapTypeBetween(*ev_conf, ev_start, railint->isSingleRail());
 					qDebug() << "左冲突：" << ev_conf->toString() << Qt::endl;
 					int gap_min = _constraints.at(*type);
 					auto trial_tm = ev_conf->time.addSecs(gap_min);
@@ -289,7 +289,8 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 
 		// 区间运行冲突
 
-		auto rep = _railAxis.intervalConflicted(st_from, st_to, _dir, ev_start.time, int_secs, _constraints.isSingleLine(), false);
+		auto rep = _railAxis.intervalConflicted(st_from, st_to, _dir, ev_start.time, 
+			int_secs, railint->isSingleRail(), false);
 		if (rep.type != IntervalConflictReport::NoConflict) {
 			// 存在冲突
 			if (!stop && st_from != _anchor) {
@@ -328,7 +329,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 
 		tm_to = ev_start.time.addSecs(int_secs);
 		RailStationEventBase ev_stop(TrainEventType::SettledPass, tm_to, qeutil::dirFormerPos(_dir), _dir);
-		auto to_conf = ax_to.conflictEvent(ev_stop, _constraints);
+		auto to_conf = ax_to.conflictEvent(ev_stop, _constraints, railint->isSingleRail());
 		if (!to_try_stop && !next_stop && !to_conf) {
 			addLog(std::make_unique<CalculationLogBasic>(
 				CalculationLogAbstract::Predicted, st_to, tm_to,
@@ -352,7 +353,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 		tm_to = ev_start.time.addSecs(int_secs);
 		ev_stop.time = tm_to;
 		ev_stop.type = TrainEventType::Arrive;
-		to_conf = ax_to.conflictEvent(ev_stop, _constraints);
+		to_conf = ax_to.conflictEvent(ev_stop, _constraints, railint->isSingleRail());
 
 		// 只要尝试过一次原时刻停车了，不论结果如何，下一轮都优先考虑通过
 		to_try_stop = false;
@@ -389,11 +390,11 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 				auto trial_tm = to_conf->time.addSecs(-int_secs);
 				tot_delay += qeutil::secsTo(ev_start.time, trial_tm);
 				ev_start.time = trial_tm;
-				type = *TrainGap::gapTypeBetween(ev_stop, *to_conf, _constraints.isSingleLine());
+				type = *TrainGap::gapTypeBetween(ev_stop, *to_conf, railint->isSingleRail());
 			}
 			else {
 				// 左冲突事件，将时刻弄到与当前不冲突的地方
-				type = *TrainGap::gapTypeBetween(*to_conf, ev_stop, _constraints.isSingleLine());
+				type = *TrainGap::gapTypeBetween(*to_conf, ev_stop, railint->isSingleRail());
 				int gap_min = _constraints.at(type);
 
 				QTime trial_arr = to_conf->time.addSecs(gap_min);
@@ -479,7 +480,7 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 		}
 
 		// 到达时刻（反向出发）检测
-		auto ev_conf = ax_from.conflictEvent(ev_arrive, _constraints);
+		auto ev_conf = ax_from.conflictEvent(ev_arrive, _constraints, railint->isSingleRail());
 		if (ev_conf) {
 			// 反向出发时刻冲突
 			// 注意：anchor站也回溯
@@ -497,13 +498,13 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 					ev_arrive.time = ev_conf->time;
 					addLog(std::make_unique<CalculationLogGap>(CalculationLogAbstract::GapConflict,
 						st_from, ev_arrive.time, CalculationLogAbstract::Arrive,
-						*TrainGap::gapTypeBetween(*ev_conf, ev_arrive, _constraints.isSingleLine()),
+						*TrainGap::gapTypeBetween(*ev_conf, ev_arrive, railint->isSingleRail()),
 						st_from, ev_conf
 						));
 				}
 				else {
 					// 反向右冲突事件，将时刻弄到与当前不冲突的地方
-					auto type = TrainGap::gapTypeBetween(ev_arrive, *ev_conf, _constraints.isSingleLine());
+					auto type = TrainGap::gapTypeBetween(ev_arrive, *ev_conf, railint->isSingleRail());
 					int gap_min = _constraints.at(*type);
 					auto trial_tm = ev_conf->time.addSecs(-gap_min);
 					tot_delay += qeutil::secsTo(trial_tm, ev_arrive.time);
@@ -563,7 +564,7 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 		// 区间运行冲突  注意区间的判定按照正向运行的逻辑传参
 
 		auto rep = _railAxis.intervalConflicted(st_to, st_from, _dir, tm_dep, int_secs, 
-			_constraints.isSingleLine(), true);
+			railint->isSingleRail(), true);
 		if (rep.type != IntervalConflictReport::NoConflict) {
 			// 存在冲突
 			if (!stop) {
@@ -603,7 +604,7 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 
 		tm_dep = ev_arrive.time.addSecs(-int_secs);
 		RailStationEventBase ev_depart(TrainEventType::SettledPass, tm_dep, qeutil::dirLatterPos(_dir), _dir);
-		auto to_conf = ax_to.conflictEvent(ev_depart, _constraints);
+		auto to_conf = ax_to.conflictEvent(ev_depart, _constraints, railint->isSingleRail());
 		if (!to_try_stop && !next_stop && !to_conf) {
 			addLog(std::make_unique<CalculationLogBasic>(
 				CalculationLogAbstract::Predicted, st_to, tm_dep,
@@ -627,7 +628,7 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 		tm_dep = ev_arrive.time.addSecs(-int_secs);
 		ev_depart.time = tm_dep;
 		ev_depart.type = TrainEventType::Depart;
-		to_conf = ax_to.conflictEvent(ev_depart, _constraints);
+		to_conf = ax_to.conflictEvent(ev_depart, _constraints, railint->isSingleRail());
 
 		// 只要尝试过一次原时刻停车了，不论结果如何，下一轮都优先考虑通过
 		to_try_stop = false;
@@ -664,11 +665,11 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 				auto tm_trial = to_conf->time.addSecs(int_secs);
 				tot_delay += qeutil::secsTo(tm_trial, ev_arrive.time);
 				ev_arrive.time = tm_trial;
-				type = *TrainGap::gapTypeBetween(*to_conf, ev_depart, _constraints.isSingleLine());
+				type = *TrainGap::gapTypeBetween(*to_conf, ev_depart, railint->isSingleRail());
 			}
 			else {
 				// 反向右冲突事件，将时刻弄到与当前不冲突的地方
-				type = *TrainGap::gapTypeBetween(ev_depart, *to_conf, _constraints.isSingleLine());
+				type = *TrainGap::gapTypeBetween(ev_depart, *to_conf, railint->isSingleRail());
 				int gap_min = _constraints.at(type);
 				QTime trial_dep = to_conf->time.addSecs(-gap_min);
 				QTime trial_arr = trial_dep.addSecs(int_secs);

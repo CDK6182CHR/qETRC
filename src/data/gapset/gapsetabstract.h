@@ -15,14 +15,14 @@ class GapSetAbstract:
         public std::vector<std::unique_ptr<GapGroupAbstract>>
 {
 protected:
-    bool _singleLine=false;
+    //bool _singleLine=false;
     std::vector<TrainGapTypePair> _remainTypes;
 
 public:
     GapSetAbstract()=default;
 
-    bool singleLine()const {return _singleLine;}
-    void setSingleLine(bool on){_singleLine=on;}
+    //bool singleLine()const {return _singleLine;}
+    //void setSingleLine(bool on){_singleLine=on;}
 
     /**
      * 设置是否单线；如果改变了，则重新构建set。

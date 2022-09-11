@@ -102,6 +102,40 @@ QVariant RailStationModel::data(const QModelIndex& index, int role) const
     return QStandardItemModel::data(index, role);
 }
 
+QVariant RailStationModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Horizontal) {
+        if (role == Qt::ToolTipRole) {
+            switch (section)
+            {
+            case RailStationModel::ColName:
+                break;
+            case RailStationModel::ColMile:
+                break;
+            case RailStationModel::ColCounter:return tr("上行方向的里程标，可选");
+                break;
+            case RailStationModel::ColLevel:
+                break;
+            case RailStationModel::ColShow:return tr("是否在运行图中显示车站水平线");
+                break;
+            case RailStationModel::ColDir:
+                break;
+            case RailStationModel::ColSingle:return tr("指定当前车站的前一个区间是否为单线区间");
+                break;
+            case RailStationModel::ColPassenger:
+                break;
+            case RailStationModel::ColFreight:
+                break;
+            case RailStationModel::ColMAX:
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    return QEMoveableModel::headerData(section, orientation, role);
+}
+
 Qt::ItemFlags RailStationModel::flags(const QModelIndex& index) const
 {
     return QStandardItemModel::flags(index);
@@ -145,7 +179,7 @@ bool RailStationModel::checkRailway(std::shared_ptr<Railway> rail)
                         tr("单线区间里程不自洽：\n"
                             "区间[%1->%2]被设置为单线区间，但其上下行里程不相等。"
                             "下行里程: %3 km; 上行里程: %4 km。"
-                            "\n请考虑删除多余的"
+                            "\n请考虑调整"
                             "[对里程]设置项。").arg(p->fromStationNameLit(),p->toStationNameLit())
                         .arg(mile_down).arg(mile_up));
                     return false;
