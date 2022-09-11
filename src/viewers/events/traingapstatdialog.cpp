@@ -9,6 +9,7 @@
 #include <QSpinBox>
 #include <QScroller>
 #include <data/common/qesystem.h>
+#include <data/analysis/traingap/traingapana.h>
 #include "model/delegate/timeintervaldelegate.h"
 #include "data/diagram/diagram.h"
 #include "dialogs/trainfilter.h"
@@ -137,10 +138,11 @@ void TrainGapSummaryModel::setupHeader()
     globalMin.clear();
     localMin.clear();
     typeCols.clear();
+    TrainGapAna ana(diagram, filter);
     for (auto _p = events.begin(); _p != events.end(); ++_p) {
         const RailStationEventList& lst = _p->second;
-        auto gaps = diagram.getTrainGaps(lst, filter, _p->first, useSingle);
-        TrainGapStatistics stat = diagram.countTrainGaps(gaps, cutSecs);
+        auto gaps = ana.calTrainGaps(lst, filter, _p->first);
+        TrainGapStatistics stat = ana.countTrainGaps(gaps, cutSecs);
         for (auto q = stat.begin(); q != stat.end(); ++q) {
             const TrainGapTypePair& tp = q->first;
             std::shared_ptr<TrainGap> gap = q->second.begin().operator*();
@@ -210,8 +212,8 @@ void TrainGapSummaryDialog::initUI()
 
     auto* flay=new QFormLayout;
     auto* hlay=new QHBoxLayout;
-    ckSingle=new QCheckBox(tr("对向列车敌对进路 (单线模式)"));
-    hlay->addWidget(ckSingle);
+    //ckSingle=new QCheckBox(tr("对向列车敌对进路 (单线模式)"));
+    //hlay->addWidget(ckSingle);
     auto* btn=new QPushButton(tr("车次筛选器"));
     connect(btn,&QPushButton::clicked,filter,
             &TrainFilter::show);
@@ -261,7 +263,7 @@ void TrainGapSummaryDialog::onDoubleClicked(const QModelIndex& idx)
     auto st = model->stationForRow(idx.row());
     decltype(auto) events = model->getEvents();
     auto* dlg = new StationTrainGapDialog(model->getDiagram(), model->getRailway(),
-        st, events.at(st), filter, this, ckSingle->isChecked(), spCut->value());
+        st, events.at(st), filter, this, spCut->value());
     connect(dlg, &StationTrainGapDialog::locateToEvent,
         this, &TrainGapSummaryDialog::locateOnEvent);
     dlg->show();
@@ -275,7 +277,7 @@ void TrainGapSummaryDialog::toCsv()
 
 void TrainGapSummaryDialog::refreshData()
 {
-    model->setUseSingle(ckSingle->isChecked());
+    //model->setUseSingle(ckSingle->isChecked());
     model->setCutSecs(spCut->value());
     model->refreshData();
     

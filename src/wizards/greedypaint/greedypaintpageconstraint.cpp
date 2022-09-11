@@ -187,7 +187,7 @@ void GreedyPaintPageConstraint::onGapSetToggled(int id, bool on)
 void GreedyPaintPageConstraint::onGetGapFromCurrent()
 {
     TrainGapAna gapana(diagram, filter->getCore());
-    gapana.setSingleLine(ckSingle->isChecked());
+    //gapana.setSingleLine(ckSingle->isChecked());
     gapana.setCutSecs(spMinGap->value());
 
     auto res = gapana.globalMinimal(cbRuler->railway());

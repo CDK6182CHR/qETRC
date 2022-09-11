@@ -66,7 +66,7 @@ class TrainGapSummaryModel :
     std::map<std::shared_ptr<RailStation>, std::map<TrainGapTypePair, int>> localMin;
     int nextCol;
 
-    bool useSingle = false;
+    //bool useSingle = false;
     int  cutSecs = 0;
 public:
     enum {
@@ -78,7 +78,7 @@ public:
         TrainFilter* filter,
         QObject* parent = nullptr);
     void refreshData();
-    void setUseSingle(bool on) { useSingle = on; }
+    //void setUseSingle(bool on) { useSingle = on; }
     auto getRailway() { return railway; }
     std::shared_ptr<RailStation> stationForRow(int row);
     const auto& getEvents()const { return events; }
@@ -105,7 +105,7 @@ class TrainGapSummaryDialog : public QDialog
     TrainFilter*const filter;   // filter必须在model之前初始化
     TrainGapSummaryModel* const model;
 
-    QCheckBox* ckSingle;
+    //QCheckBox* ckSingle;
     QTableView* table;
     TimeIntervalDelegate* dele;
     QSpinBox* spCut;

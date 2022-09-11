@@ -341,6 +341,7 @@ public:
     RailwayStationEventAxis
         stationEventAxisForRail(std::shared_ptr<Railway> railway)const;
 
+#if 0
     /**
      * 2021.09.06
      * 基于车站事件表，转换成间隔表。
@@ -349,6 +350,7 @@ public:
      * 2022.09.10
      * 新增RailStation参数。并且，如果传入的useSingle是std::nullopt，则使用内建上下行数据。
      */
+    [[deprecated]]
     TrainGapList getTrainGaps(const RailStationEventList& events,
         const TrainFilterCore& filter, std::shared_ptr<const RailStation> st, 
         std::optional<bool> useSingle)const;
@@ -356,12 +358,16 @@ public:
     /**
      * 双线模式
      */
+    [[deprecated]]
     TrainGapList getTrainGapsDouble(const RailStationEventList& events,
         const TrainFilterCore& filter)const;
 
+    [[deprecated]]
     TrainGapList getTrainGapsSingle(const RailStationEventList& events,
         const TrainFilterCore& filter)const;
+#endif
 
+#if 0
     /**
      * 2022.09.10  尝试添加基于线路自带单双线区间信息的版本。
      */
@@ -373,8 +379,12 @@ public:
      * 统计各种不同类型的列车间隔。
      * Positions只取Pre, Post或者空白三种情况 （空白仅针对Avoid类型的）；
      * 通通的，同时算入两边。set按照TrainGap的间隔自动排序。
+     * 2022.09.11  moved to TrainGapAna
      */
+    [[deprecated]]
     TrainGapStatistics countTrainGaps(const TrainGapList& gaps, int curSecs)const;
+
+#endif
 
     using SectionEventList = std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>>;
 
@@ -455,6 +465,7 @@ private:
      * 倒着查，从车站事件表中查找最后一个符合指定方向、位置的事件。
      * 如果找不到（极端情况），返回空。
      */
+    [[deprecated]]  
     std::shared_ptr<const RailStationEvent>
         findLastEvent(const RailStationEventList& lst, const TrainFilterCore& filter,
             const Direction& dir,

@@ -15,6 +15,7 @@
 #include <QScroller>
 #include "util/buttongroup.hpp"
 #include <data/common/qesystem.h>
+#include <data/analysis/traingap/traingapana.h>
 #include "util/utilfunc.h"
 #include "model/delegate/timeintervaldelegate.h"
 #include "traingapstatdialog.h"
@@ -26,10 +27,10 @@ StationTrainGapModel::StationTrainGapModel(Diagram& diagram,
     std::shared_ptr<Railway> railway_,
     std::shared_ptr<RailStation> station_,
     const RailStationEventList& events, 
-    const TrainFilterCore& filter, QObject* parent, bool useSingleLine,int cutSecs_):
+    const TrainFilterCore& filter, QObject* parent, int cutSecs_):
     QStandardItemModel(parent),diagram(diagram), railway(railway_),
     station(station_),
-    singleLine(useSingleLine),_cutSecs(cutSecs_),
+    _cutSecs(cutSecs_),
     events(events),filter(filter)
 {
     setColumnCount(ColMAX);
@@ -41,9 +42,10 @@ StationTrainGapModel::StationTrainGapModel(Diagram& diagram,
 
 void StationTrainGapModel::refreshData()
 {
-    data = diagram.getTrainGaps(events, filter, station, singleLine);
-    //data = diagram.getTrainGapsReal(events, filter, station);
-    stat = diagram.countTrainGaps(data, _cutSecs);
+    //data = diagram.getTrainGaps(events, filter, station, singleLine);
+    TrainGapAna ana(diagram, filter);
+    data = ana.calTrainGaps(events, filter, station);
+    stat = ana.countTrainGaps(data, _cutSecs);
     setupModel();
 }
 
@@ -121,12 +123,12 @@ StationTrainGapDialog::StationTrainGapDialog(Diagram& diagram,
     std::shared_ptr<Railway> railway_, 
     std::shared_ptr<RailStation> station_, 
     const RailStationEventList& events, 
-    TrainFilter* filter_, QWidget* parent,bool useSingleLine,
+    TrainFilter* filter_, QWidget* parent,
     int cutSecs):
     QDialog(parent), railway(railway_), station(station_),
     filter(filter_),
     model(new StationTrainGapModel(diagram,railway_,station_,events,
-        filter_->getCore(),this,useSingleLine,cutSecs))
+        filter_->getCore(),this,cutSecs))
 {
     setWindowTitle(tr("车站间隔分析 - %1 @ %2").arg(station->name.toSingleLiteral(),
         railway->name()));
@@ -155,12 +157,12 @@ StationTrainGapDialog::StationTrainGapDialog(Diagram& diagram,
 
 void StationTrainGapDialog::refreshData()
 {
-    if (ckSingle->checkState() == Qt::PartiallyChecked) {
-        model->setSingleLine(std::nullopt);
-    }
-    else {
-        model->setSingleLine(ckSingle->isChecked());
-    }
+    //if (ckSingle->checkState() == Qt::PartiallyChecked) {
+    //    model->setSingleLine(std::nullopt);
+    //}
+    //else {
+    //    model->setSingleLine(ckSingle->isChecked());
+    //}
     model->setCutSecs(spCut->value());
     model->refreshData();
     table->resizeColumnsToContents();
@@ -172,15 +174,15 @@ void StationTrainGapDialog::initUI()
     auto* vlay=new QVBoxLayout(this);
     auto* flay=new QFormLayout;
     auto* hlay=new QHBoxLayout;
-    ckSingle=new QCheckBox(tr("对向敌对进路 (单线模式)"));
-    ckSingle->setTristate(true);
-    if (auto s = model->isSingleLine(); s.has_value()) {
-        ckSingle->setChecked(*s);
-    }
-    else {
-        ckSingle->setCheckState(Qt::PartiallyChecked);
-    }
-    hlay->addWidget(ckSingle);
+    //ckSingle=new QCheckBox(tr("对向敌对进路 (单线模式)"));
+    //ckSingle->setTristate(true);
+    //if (auto s = model->isSingleLine(); s.has_value()) {
+    //    ckSingle->setChecked(*s);
+    //}
+    //else {
+    //    ckSingle->setCheckState(Qt::PartiallyChecked);
+    //}
+    //hlay->addWidget(ckSingle);
     auto* btn=new QPushButton(tr("车次筛选器"));
     hlay->addWidget(btn);
     connect(btn,&QPushButton::clicked,filter,&TrainFilter::show);

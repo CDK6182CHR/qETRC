@@ -26,7 +26,7 @@ class StationTrainGapModel: public QStandardItemModel
     Diagram& diagram;
     const std::shared_ptr<Railway> railway;
     const std::shared_ptr<RailStation> station;
-    std::optional<bool> singleLine;
+    //std::optional<bool> singleLine;
     int _cutSecs = 0;
 
     /**
@@ -54,12 +54,11 @@ public:
         const RailStationEventList& events,
         const TrainFilterCore& filter,
         QObject* parent = nullptr,
-        bool useSingleLine = false,
         int cutSecs_ = 0);
     void refreshData();
     const auto& getStat()const { return stat; }
-    void setSingleLine(std::optional<bool> on){singleLine=on;}
-    auto isSingleLine()const { return singleLine; }
+    //void setSingleLine(std::optional<bool> on){singleLine=on;}
+    //auto isSingleLine()const { return singleLine; }
     void setCutSecs(int v) { _cutSecs = v; }
     int cutSecs()const { return _cutSecs; }
     std::shared_ptr<TrainGap> gapForRow(int row);
@@ -93,7 +92,7 @@ class StationTrainGapDialog : public QDialog
     StationTrainGapModel* const model;
 
     QTableView * table;
-    QCheckBox* ckSingle;
+    //QCheckBox* ckSingle;
     QSpinBox* spCut;
 public:
 
@@ -106,7 +105,6 @@ public:
         const RailStationEventList& events,
         TrainFilter* filter,
         QWidget* parent = nullptr,
-        bool useSingleLine = false,
         int cutSecs=0);
 
     /**

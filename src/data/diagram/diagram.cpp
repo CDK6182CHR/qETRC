@@ -376,6 +376,7 @@ std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>> Diagram::sectionEvents
     return res;
 }
 
+#if 0
 TrainGapList Diagram::getTrainGaps(const RailStationEventList& events,
     const TrainFilterCore& filter, std::shared_ptr<const RailStation> st, 
     std::optional<bool> useSingle)const
@@ -384,7 +385,7 @@ TrainGapList Diagram::getTrainGaps(const RailStationEventList& events,
         return *useSingle ?
         getTrainGapsSingle(events, filter) :
         getTrainGapsDouble(events, filter);
-    else return getTrainGapsReal(events, filter, st);
+    else return getTrainGapsSingle(events, filter);
 }
 
 
@@ -686,250 +687,8 @@ TrainGapList Diagram::getTrainGapsSingle(const RailStationEventList& events,
     return res;
 }
 
-namespace _gapdetail {
-
-    /**
-     * @brief 2022.09.10  getTrainGapsReal的helper
-     * 记录指定站(站前站后)(上行下行) 共四种类型事件的上一个遇到的。
-     * 对每一个新来的事件，判定上一个与之相关的是哪个事件。
-     */
-    struct EventStackTop {
-        const std::optional<bool> preSingle, postSingle;
-        std::shared_ptr<const RailStationEvent>
-            downFormerLast, downLatterLast, upFormerLast, upLatterLast;
-
-        EventStackTop(const RailStation& st):
-            preSingle(st.isPreSingle()),postSingle(st.isPostSingle()){}
-
-        void updateStack(const std::shared_ptr<const RailStationEvent>& ev);
-
-        /**
-         * @brief 站前事件中，与所给事件有关的上一个事件。
-         */
-        std::shared_ptr<const RailStationEvent> preRelatedEvent(const RailStationEvent& ev)const;
-        std::shared_ptr<const RailStationEvent> postRelatedEvent(const RailStationEvent& ev);
-
-        /**
-         * 判断两事件之间是否存在待避。对向判断的标准是：
-         * （潜在的）被踩的车（stay事件所示）的【出发】方向存在敌对进路。
-         * 当然，同向的肯定是算的。
-         */
-        bool hasAvoidEvent(const RailStationEvent* stay, const RailStationEvent* leave);
-
-    };
-
-    void EventStackTop::updateStack(const std::shared_ptr<const RailStationEvent>& ev)
-    {
-        if (ev->pos & RailStationEvent::Pre) {
-            if (ev->dir == Direction::Down)
-                downFormerLast = ev;
-            else
-                upLatterLast = ev;
-        }
-        if (ev->pos & RailStationEvent::Post) {
-            if (ev->dir == Direction::Down)
-                downLatterLast = ev;
-            else
-                upFormerLast = ev;
-        }
-    }
-
-    std::shared_ptr<const RailStationEvent> EventStackTop::preRelatedEvent(const RailStationEvent& ev)const
-    {
-        // 如果不是单线，则只能是同向那个；如果单线，则返回两个中较新的那个。
-        if (*preSingle) {
-            int secs1 = downFormerLast->secsTo(ev),
-                secs2 = upLatterLast->secsTo(ev);
-            if (secs1 == secs2) [[unlikely]] {
-                // 相同时优先返回同方向的
-                return ev.dir == Direction::Down ? downFormerLast : upLatterLast;
-            }
-            else if (secs1 < secs2) {
-                return downFormerLast;
-            }
-            else return upLatterLast;
-        }
-        else {
-            return ev.line->dir() == Direction::Down ? downFormerLast : upLatterLast;
-        }
-    }
-
-    std::shared_ptr<const RailStationEvent> EventStackTop::postRelatedEvent(const RailStationEvent& ev)
-    {
-        if (*postSingle) {
-            int secs1 = downLatterLast->secsTo(ev),
-                secs2 = upFormerLast->secsTo(ev);
-            if (secs1 == secs2) [[unlikely]] {
-                return ev.dir == Direction::Down ? downLatterLast : upFormerLast;
-            }
-            else if (secs1 < secs2) {
-                return downLatterLast;
-            }
-            else {
-                return upFormerLast;
-            }
-        }
-        else {
-            return ev.line->dir() == Direction::Down ? downLatterLast : upFormerLast;
-        }
-    }
-
-    bool EventStackTop::hasAvoidEvent(const RailStationEvent* stay, const RailStationEvent* leave)
-    {
-        if (stay->dir == leave->dir)
-            return true;
-        if ((stay->dir == Direction::Down && *postSingle) ||
-            (stay->dir == Direction::Up && *preSingle))
-            return true;
-        return false;
-    }
-
-}
-
-#if 1
-TrainGapList Diagram::getTrainGapsReal(const RailStationEventList& events,
-    const TrainFilterCore& filter, std::shared_ptr<const RailStation> st) const
-{
-    // 此版本尝试使用内建的单双线数据。
-    // 目前的思路是，考虑在单线基础上，筛选一下事件的相关性。
-    TrainGapList res;
-
-    _gapdetail::EventStackTop stk(*st);
-
-    stk.downFormerLast = findLastEvent(events, filter, Direction::Down, RailStationEvent::Pre);
-    stk.downLatterLast = findLastEvent(events, filter, Direction::Down, RailStationEvent::Post);
-    stk.upFormerLast = findLastEvent(events, filter, Direction::Up, RailStationEvent::Post);
-    stk.upLatterLast = findLastEvent(events, filter, Direction::Up, RailStationEvent::Pre);
-
-    // 当前站内车的情况。所有【到达】事件直接压进来。int位记录被踩了多少次。
-    // 类似队列的结构：从back插入，从front删除，但不绝对禁止中间删除。
-    std::deque<std::pair<std::shared_ptr<const RailStationEvent>, int>> down_in;
-
-    // 对向判定待避的条件：（潜在）“被踩的”那个车的出发方向存在敌对进路。
-
-    // 先预扫描一遍：把0点前进站没出站的存下来 （跨日停站的）
-    for (auto _p = events.cbegin(); _p != events.cend(); ++_p) {
-        const auto& p = *_p;
-        if (!filter.check(p->line->train()))continue;
-        if (p->type == TrainEventType::Arrive) {
-            down_in.emplace_back(std::make_pair(p, 0));
-        }
-        else if (p->type == TrainEventType::Depart) {
-            std::optional<decltype(down_in)::iterator> pitr{};   //被删除的那个的迭代器 
-            for (auto itr = down_in.begin(); itr != down_in.end(); ++itr) {
-                if (itr->first->line == p->line) {
-                    // 找到当前的进站记录
-                    pitr = down_in.erase(itr);
-                    break;
-                }
-            }
-            if (pitr.has_value()) {
-                for (auto itr = down_in.begin(); itr != pitr; ++itr) {
-                    if (stk.hasAvoidEvent(itr->first.get(),p.get()))
-                        itr->second++;
-                }
-            }
-        }
-        else if (p->type == TrainEventType::CalculatedPass ||
-            p->type == TrainEventType::SettledPass) {
-            if (p->pos == RailStationEvent::Both) {
-                // 站内所有车被踩一次
-                // todo: 这个要想清楚，单双线边界情况下什么时候算踩？
-                for (auto& q : down_in) {
-                    if (stk.hasAvoidEvent(q.first.get(), p.get()))
-                        q.second++;
-                }
-            }
-        }
-
-    }
-
-    // 注意：pre/post是说绝对位置（里程小端和大端），former latter是说运行方向前后
-    for (auto _p = events.cbegin(); _p != events.cend(); ++_p) {
-        const auto& p = *_p;
-        if (!filter.check(p->line->train())) continue;
-        if (p->pos & RailStationEvent::Pre) {
-            // 与站前有交集
-            // 既然遇到了一个，那么last一定不是空
-            // 2022.09.10: 如果出现Pre，那么pre应该是存在的，这么直接*应该不会遭起
-            auto lastRelated = stk.preRelatedEvent(*p);
-            res.emplace_back(std::make_shared<TrainGap>(lastRelated, p));
-        }
-        if (p->pos & RailStationEvent::Post) {
-            // 与站后有交集
-            if (!(p->pos & RailStationEvent::Pre)) {
-                // 这个条件是针对通通的情况，防止重复
-                auto lastRelated = stk.postRelatedEvent(*p);
-                res.emplace_back(std::make_shared<TrainGap>(lastRelated, p));
-            }
-        }
-
-        // 现在：判断进出站情况。只考虑到达出发，以及通过的。
-        if (p->type == TrainEventType::Arrive) {
-            // 车次到达：进队列
-            down_in.emplace_back(std::make_pair(p, 0));
-        }
-        else if (p->type == TrainEventType::Depart) {
-            // 出发：先是所有比它到的早但还没跑掉的，都被踩一次
-            std::optional<decltype(down_in)::iterator> pitr{};   //被删除的那个的迭代器 
-            for (auto itr = down_in.begin(); itr != down_in.end(); ++itr) {
-                if (itr->first->line == p->line) {
-                    // 找到当前的进站记录
-                    if (itr->second) {
-                        // 存在被踩情况
-                        res.emplace_back(std::make_shared<TrainGap>(
-                            itr->first, p, TrainGap::Avoid, itr->second));
-                    }
-                    pitr = down_in.erase(itr);
-                    break;
-                }
-            }
-            if (pitr.has_value()) {
-                // 删除实际发生了，所有此前列车都被踩一次
-                // 这个条件是为了防止运行线端点没有到达事件只有出发事件的情况
-                for (auto itr = down_in.begin(); itr != pitr; ++itr) {
-                    if (stk.hasAvoidEvent(itr->first.get(), p.get()))
-                        itr->second++;
-                }
-            }
-        }
-        else if (p->type == TrainEventType::CalculatedPass ||
-            p->type == TrainEventType::SettledPass) {
-            if (p->pos == RailStationEvent::Both) {
-                // 站内所有车被踩一次
-                for (auto& q : down_in) {
-                    if (stk.hasAvoidEvent(q.first.get(), p.get()))
-                        q.second++;
-                }
-            }
-        }
-
-        stk.updateStack(p);
-    }
-    return res;
-}
 #endif 
 
-TrainGapStatistics Diagram::countTrainGaps(const TrainGapList &gaps, int cutSecs) const
-{
-    TrainGapStatistics res;
-    for (const auto& p: gaps) {
-        if (p->secs() < cutSecs)
-            continue;
-        if (p->position() == RailStationEvent::NoPos) {
-            res.operator[](std::make_pair(p->position(), p->type)).emplace(p);
-        }
-        else {
-            if (p->position() & RailStationEvent::Pre) {
-                res.operator[](std::make_pair(RailStationEvent::Pre, p->type)).emplace(p);
-            }
-            if (p->position() & RailStationEvent::Post) {
-                res.operator[](std::make_pair(RailStationEvent::Post, p->type)).emplace(p);
-            }
-        }
-    }
-    return res;
-}
 
 SnapEventList Diagram::getSnapEvents(std::shared_ptr<Railway> railway, const QTime& time) const
 {
@@ -1478,6 +1237,7 @@ std::tuple<int, int, int>
         readruler::__round(z, prec));
 }
 
+[[deprecated]]
 std::shared_ptr<const RailStationEvent> Diagram::findLastEvent(
     const RailStationEventList& lst, const TrainFilterCore& filter,
     const Direction& dir,
