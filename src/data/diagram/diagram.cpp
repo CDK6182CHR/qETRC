@@ -102,12 +102,12 @@ DiagnosisList Diagram::diagnoseTrain(const Train& train, bool withIntMeet,
     return res;
 }
 
-DiagnosisList Diagram::diagnoseAllTrains(bool withIntMeet, std::shared_ptr<Railway> railway, std::shared_ptr<RailStation> start,
+DiagnosisList Diagram::diagnoseAllTrains(std::shared_ptr<Railway> railway, std::shared_ptr<RailStation> start,
     std::shared_ptr<RailStation> end) const
 {
     DiagnosisList res;
     foreach(auto t, _trainCollection.trains()) {
-        res.append(diagnoseTrain(*t, withIntMeet, railway, start, end));
+        res.append(diagnoseTrain(*t, true, railway, start, end));
     }
     return res;
 }

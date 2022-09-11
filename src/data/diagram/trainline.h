@@ -157,6 +157,7 @@ public:
     /**
      * 列车运行情况诊断，判断可能存在的问题。
      * 采用和`listLineEvents`类似的框架。
+     * 2022.09.11: withIntMeet参数暂时被忽略。
      */
     DiagnosisList diagnoseLine(const TrainCollection& coll, bool withIntMeet)const;
 
@@ -311,6 +312,7 @@ private:
     /**
      * @brief eventsWithCounter 反向列车事件表：主要是交会
      * 反向列车用反向迭代器，这样保证y的方向是单向变化的
+     * 2022.09.11新增逻辑：区间会车仅在单线区间才输出警告。
      */
     void diagnoWithCounter(DiagnosisList& res, const TrainLine& another, const Train& antrain)const;
 

@@ -37,11 +37,11 @@ public:
 private:
     void setupModel();
 public slots:
-    void setupForTrain(std::shared_ptr<Train> train, bool withIntMeet,
+    void setupForTrain(std::shared_ptr<Train> train, 
                        std::shared_ptr<Railway> railway,
                        std::shared_ptr<RailStation> start,
                        std::shared_ptr<RailStation> end);
-    void setupForAll(bool withIntMeet,
+    void setupForAll(
                      std::shared_ptr<Railway> railway,
                      std::shared_ptr<RailStation> start,
                      std::shared_ptr<RailStation> end);
@@ -61,7 +61,7 @@ class DiagnosisDialog : public QDialog
 
     SelectTrainCombo* cbTrain;
     QRadioButton* rdSingle;
-    QCheckBox* ckIntMeet;
+    //QCheckBox* ckIntMeet;
     QTableView* table;
 
     SelectRailwayCombo* cbRail;

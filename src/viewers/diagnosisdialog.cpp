@@ -55,21 +55,21 @@ void DiagnosisModel::setupModel()
     }
 }
 
-void DiagnosisModel::setupForTrain(std::shared_ptr<Train> train, bool withIntMeet,
+void DiagnosisModel::setupForTrain(std::shared_ptr<Train> train, 
                                    std::shared_ptr<Railway> railway,
                                    std::shared_ptr<RailStation> start,
                                    std::shared_ptr<RailStation> end)
 {
-    lst = diagram.diagnoseTrain(*train,withIntMeet,railway,start,end);
+    lst = diagram.diagnoseTrain(*train,true,railway,start,end);
     setupModel();
 }
 
-void DiagnosisModel::setupForAll(bool withIntMeet,
+void DiagnosisModel::setupForAll(
                                  std::shared_ptr<Railway> railway,
                                  std::shared_ptr<RailStation> start,
                                  std::shared_ptr<RailStation> end)
 {
-    lst=diagram.diagnoseAllTrains(withIntMeet,railway,start,end);
+    lst=diagram.diagnoseAllTrains(railway,start,end);
     setupModel();
 }
 
@@ -132,8 +132,8 @@ void DiagnosisDialog::initUI()
     connect(cbRail,&SelectRailwayCombo::currentRailwayChanged,
             cbRange,&RailRangeCombo::setRailway);
 
-    ckIntMeet = new QCheckBox(tr("检测区间会车 （单线线路）"));
-    flay->addRow(tr("选项"), ckIntMeet);
+    //ckIntMeet = new QCheckBox(tr("检测区间会车 （单线线路）"));
+    //flay->addRow(tr("选项"), ckIntMeet);
 
     hlay->addLayout(flay);
     auto* cv = new QVBoxLayout;
@@ -187,11 +187,11 @@ void DiagnosisDialog::actApply()
             QMessageBox::warning(this, tr("错误"), tr("请先选择车次!"));
             return;
         }
-        model->setupForTrain(train, ckIntMeet->isChecked(),
+        model->setupForTrain(train, 
                              getFilterRailway(),sst,est);
     }
     else {
-        model->setupForAll(ckIntMeet->isChecked(),getFilterRailway(),sst,est);
+        model->setupForAll(getFilterRailway(),sst,est);
     }
     auto end = std::chrono::system_clock::now();
     emit showStatus(tr("时刻诊断  用时%1毫秒").arg((end - start) / 1ms));

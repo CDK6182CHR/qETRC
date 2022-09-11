@@ -133,6 +133,7 @@ LineEventList TrainLine::listLineEvents(const TrainCollection& coll) const
 
 DiagnosisList TrainLine::diagnoseLine(const TrainCollection& coll, bool withIntMeet) const
 {
+    Q_UNUSED(withIntMeet);
     DiagnosisList res;
     
     diagnoseSelf(res);
@@ -145,7 +146,9 @@ DiagnosisList TrainLine::diagnoseLine(const TrainCollection& coll, bool withIntM
                         if (line->dir() == dir()) {
                             diagnoWithSameDir(res, *line, *t);
                         }
-                        else if (withIntMeet) {
+                        else if (true) {
+                            // 2022.09.11: 暂时忽略withIntMeet参数。
+                            // 但这可能是个可以优化的点，留着以后看。
                             diagnoWithCounter(res, *line, *t);
                         }
                     }
@@ -772,12 +775,18 @@ void TrainLine::diagnoWithCounter(DiagnosisList& res, const TrainLine& another, 
             // 区间会车
             if (pint.has_value()) {
                 auto pos = compressSnapInterval(mylast, pme, std::get<0>(*pint));
-                res.push_back(DiagnosisIssue(DiagnosisType::IntervalMeet, qeutil::Warning,
-                    pos, shared_from_this(), QObject::tr("在里程标[%1]，时刻[%2]与"
-                        "车次[%3]发生[%4]事件").arg(std::get<0>(*pint))
-                    .arg(std::get<1>(*pint).toString("hh:mm:ss"), antrain.trainName().full(),
-                        qeutil::eventTypeString(std::get<2>(*pint)))
-                ));
+                if (pos.index() == 1) {
+                    // holds interval
+                    auto railint = std::get<1>(pos);
+                    if (railint->isSingleRail()) {
+                        res.push_back(DiagnosisIssue(DiagnosisType::IntervalMeet, qeutil::Warning,
+                            pos, shared_from_this(), QObject::tr("在单线区间[%5] 里程标[%1]，时刻[%2]与"
+                                "车次[%3]发生[%4]事件").arg(std::get<0>(*pint))
+                            .arg(std::get<1>(*pint).toString("hh:mm:ss"), antrain.trainName().full(),
+                                qeutil::eventTypeString(std::get<2>(*pint)),railint->toString())
+                        ));
+                    }
+                }
             }
         }
 

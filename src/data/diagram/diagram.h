@@ -231,7 +231,11 @@ public:
         std::shared_ptr<Railway> railway, std::shared_ptr<RailStation> start,
         std::shared_ptr<RailStation> end)const;
 
-    DiagnosisList diagnoseAllTrains(bool withIntMeet,
+    /**
+     * 2022.09.11  删除withIntMeet参数
+     * 根据线路内建的单双线信息。
+     */
+    DiagnosisList diagnoseAllTrains(
         std::shared_ptr<Railway> railway, std::shared_ptr<RailStation> start,
         std::shared_ptr<RailStation> end)const;
 
