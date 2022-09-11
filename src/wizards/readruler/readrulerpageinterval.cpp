@@ -103,13 +103,13 @@ void ReadRulerPageInterval::deselectAllDown()
 void ReadRulerPageInterval::selectAllUp()
 {
     lsUp->selectionModel()->select(QItemSelection(mdUp->index(0, 0),
-        mdUp->index(mdDown->rowCount() - 1, 0)), QItemSelectionModel::Select);
+        mdUp->index(mdUp->rowCount() - 1, 0)), QItemSelectionModel::Select);
 }
 
 void ReadRulerPageInterval::deselectAllUp()
 {
     lsUp->selectionModel()->select(QItemSelection(mdUp->index(0, 0),
-        mdUp->index(mdDown->rowCount() - 1, 0)), QItemSelectionModel::Deselect);
+        mdUp->index(mdUp->rowCount() - 1, 0)), QItemSelectionModel::Deselect);
 }
 
 void ReadRulerPageInterval::setRailway(std::shared_ptr<Railway> railway)

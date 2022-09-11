@@ -27,6 +27,8 @@ public:
     enum {
         ColTrainName=0,
         ColRailway,
+        ColTime,
+        ColMile,
         ColPos,
         ColLevel,
         ColType,
@@ -36,6 +38,8 @@ public:
     DiagnosisModel(Diagram& diagram_, QObject* parent=nullptr);
 private:
     void setupModel();
+signals:
+    void locateToRailMile(std::shared_ptr<const Railway> rail, double mile, const QTime& tm);
 public slots:
     void setupForTrain(std::shared_ptr<Train> train, 
                        std::shared_ptr<Railway> railway,
@@ -45,6 +49,7 @@ public slots:
                      std::shared_ptr<Railway> railway,
                      std::shared_ptr<RailStation> start,
                      std::shared_ptr<RailStation> end);
+    void locateToRow(int row);
 };
 
 class SelectTrainCombo;
@@ -71,6 +76,7 @@ public:
     DiagnosisDialog(Diagram& diagram_, QWidget* parent = nullptr);
     DiagnosisDialog(Diagram& diagram_, std::shared_ptr<Train> train, 
         QWidget* parent = nullptr);
+    auto* getModel() { return model; }
 private:
     void initUI();
 
@@ -89,5 +95,9 @@ private slots:
 
     void onFiltRailChanged(bool on);
     void onFiltRangeChanged(bool on);
+
+    void onDoubleClicked(const QModelIndex& idx);
+    void actLocate();
+
 };
 

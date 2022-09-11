@@ -30,7 +30,7 @@ void StartupPage::onStartup()
 void StartupPage::initUI()
 {
     setFrameShape(StyledPanel);
-    resize(800,600);
+    resize(800,700);
     setWindowFlags(Qt::SplashScreen|Qt::WindowStaysOnTopHint);
 
     auto* vlay=new QVBoxLayout(this);
@@ -78,13 +78,13 @@ void StartupPage::initUI()
     vlay->addWidget(lab);
 
     hlay=new QHBoxLayout;
-    lab=new QLabel(tr("<font color=\"#41cd52\">更新日志</font>"));
+    lab=new QLabel(tr("<font color=\"#41cd52\">更新日志摘要</font>"));
     lab->setFont(font2);
     hlay->addWidget(lab);
     lab=new QLabel(tr("%1 → %2").arg(qespec::LAST_VERSION.data(),
                                      qespec::VERSION.data()));
     QFont font4;
-    font4.setPointSize(14);
+    font4.setPointSize(12);
     lab->setFont(font4);
     hlay->addStretch(1);
     hlay->addWidget(lab);

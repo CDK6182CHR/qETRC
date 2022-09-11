@@ -1625,5 +1625,19 @@ void Railway::setupIntervalNodeDatas()
 	}
 }
 
+bool Railway::isMileSorted() const
+{
+	return std::is_sorted(_stations.begin(), _stations.end(), RailStationMileLess());
+}
+
+std::shared_ptr<const RailInterval> Railway::firstNegativeInterval() const
+{
+	for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
+		if (p->mile() < 0) {
+			return p;
+		}
+	}
+	return nullptr;
+}
 
 

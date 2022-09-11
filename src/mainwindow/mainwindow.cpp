@@ -1478,6 +1478,10 @@ void MainWindow::resetDiagramPages()
 
 bool MainWindow::openGraph(const QString& filename)
 {
+	// 2022.09.11: 把打开的计时和提示都放到这里来。
+	using namespace std::chrono_literals;
+	auto start = std::chrono::system_clock::now();
+
 	clearDiagramUnchecked();
 
 	Diagram dia;
@@ -1489,6 +1493,11 @@ bool MainWindow::openGraph(const QString& filename)
 		_diagram = std::move(dia);   //move assign
 		endResetGraph();
 		addRecentFile(filename);
+		auto end = std::chrono::system_clock::now();
+		showStatus(tr("打开运行图文件%1成功  用时%2毫秒").arg(filename)
+			.arg((end - start) / 1ms));
+		// 这里面可能有输出提示的
+		checkOpenFile();
 		return true;
 	}
 	else {
@@ -1626,6 +1635,8 @@ void MainWindow::actDiagnose()
 {
 	auto* d = new DiagnosisDialog(_diagram, this);
 	connect(d, &DiagnosisDialog::showStatus, this, &MainWindow::showStatus);
+	connect(d->getModel(), &DiagnosisModel::locateToRailMile,
+		this, &MainWindow::locateToRailMile);
 	d->show();
 }
 
@@ -1653,13 +1664,26 @@ void MainWindow::actAutoTrainType()
 void MainWindow::actLocateDiagram()
 {
 	if (!locateDialog) {
-		locateDialog = new LocateDialog(_diagram, this);
-		connect(locateDialog, &LocateDialog::locateOnMile,
-			this, &MainWindow::locateDiagramOnMile);
-		connect(locateDialog, &LocateDialog::locateOnStation,
-			this, &MainWindow::locateDiagramOnStation);
+		initLocateDialog();
 	}
 	locateDialog->showDialog();
+}
+
+void MainWindow::initLocateDialog()
+{
+	locateDialog = new LocateDialog(_diagram, this);
+	connect(locateDialog, &LocateDialog::locateOnMile,
+		this, &MainWindow::locateDiagramOnMile);
+	connect(locateDialog, &LocateDialog::locateOnStation,
+		this, &MainWindow::locateDiagramOnStation);
+}
+
+void MainWindow::locateToRailMile(std::shared_ptr<const Railway> rail, double mile, const QTime& time)
+{
+	if (!locateDialog) {
+		initLocateDialog();
+	}
+	locateDialog->locateToRail(rail, mile, time);
 }
 
 
@@ -1726,6 +1750,60 @@ bool MainWindow::saveQuestion()
 		//包括Cancel和NoButton
 		return false;
 	}
+}
+
+bool MainWindow::checkOpenFile()
+{
+	QString text;
+	int level = 0;
+
+	// check rail
+	foreach(auto rail, _diagram.railways()) {
+
+		auto& sts = rail->stations();
+		auto itr = std::is_sorted_until(sts.begin(), sts.end(), RailStationMileLess());
+		if (itr != sts.end()) {
+			text.append(
+				tr("[ERROR] 线路[%1]不符合里程标单调规则，请前往线路编辑页面调整线路数据。"
+					"请检查[%2]站附近（第%3行）\n").arg(rail->name(), (*itr)->name.toSingleLiteral())
+				.arg(std::distance(sts.begin(), itr))
+			);
+			level = 2;
+		}
+
+		auto it = rail->firstNegativeInterval();
+		if (it) {
+			text.append(
+				tr("[ERROR] 线路[%1]存在非法区间：区间[%2]里程[%3] km为负值。\n")
+				.arg(rail->name(), it->toString()).arg(it->mile())
+			);
+			level = 2;
+		}
+
+	}
+
+	if (_diagram.releaseCode() > qespec::RELEASE_CODE) {
+		text.append(
+			tr("[INFO] 运行图打开成功，但生成当前运行图所用的软件版本[%1]高于当前软件版本[%2]，"
+				"保存数据时请注意防止数据丢失。\n").arg(_diagram.version(),
+					QString(qespec::VERSION.data())));
+		level = 1;
+	}
+
+	if (level) {
+		auto* box = new QMessageBox(this);
+		box->setAttribute(Qt::WA_DeleteOnClose);
+		box->setWindowTitle(tr("提示"));
+		text.prepend(tr("程序检查发现当前打开的运行图存在下列问题，请妥善处理以防止程序出现意外：\n"));
+		box->setText(text);
+		box->setWindowModality(Qt::NonModal);
+		if (level == 2) {
+			box->setIcon(QMessageBox::Warning);
+		}
+		box->show();
+	}
+	
+	return level < 2;
 }
 
 void MainWindow::closeEvent(QCloseEvent* e)
@@ -1895,23 +1973,28 @@ void MainWindow::actOpenGraph()
 		QObject::tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)"));
 	if (res.isNull())
 		return;
-	auto start = std::chrono::system_clock::now();
+	
 	bool flag = openGraph(res);
 	if (!flag)
 		QMessageBox::warning(this, QObject::tr("错误"), QObject::tr("文件错误，请检查!"));
 	else {
 		markUnchanged();
-		auto end = std::chrono::system_clock::now();
-		showStatus(tr("打开运行图文件%1成功  用时%2毫秒").arg(res)
-			.arg((end - start) / 1ms));
-		if (_diagram.releaseCode() > qespec::RELEASE_CODE) {
-			QMessageBox::information(this, tr("提示"),
-				tr("运行图打开成功，但生成当前运行图所用的软件版本[%1]高于当前软件版本[%2]，"
-					"保存数据时请注意防止数据丢失。").arg(_diagram.version(), 
-						QString(qespec::VERSION.data())));
+	}
+}
+
+
+void MainWindow::openFileChecked(const QString& filename)
+{
+	if (!changed || saveQuestion()) {
+		bool flag = openGraph(filename);
+		if (!flag)
+			QMessageBox::warning(this, QObject::tr("错误"), QObject::tr("文件错误，请检查!"));
+		else {
+			markUnchanged();
+			resetRecentActions();
+			updateWindowTitle();
 		}
 	}
-
 }
 
 void MainWindow::actSaveGraph()
@@ -1987,30 +2070,6 @@ void MainWindow::openRecentFile()
 	}
 }
 
-void MainWindow::openFileChecked(const QString& filename)
-{
-	using namespace std::chrono_literals;
-	if (!changed || saveQuestion()) {
-		auto start = std::chrono::system_clock::now();
-		bool flag = openGraph(filename);
-		if (!flag)
-			QMessageBox::warning(this, QObject::tr("错误"), QObject::tr("文件错误，请检查!"));
-		else {
-			markUnchanged();
-			resetRecentActions();
-			updateWindowTitle();
-			auto end = std::chrono::system_clock::now();
-			showStatus(tr("打开运行图文件%1成功  用时%2毫秒").arg(filename)
-				.arg((end - start) / 1ms));
-			if (_diagram.releaseCode() > qespec::RELEASE_CODE) {
-				QMessageBox::information(this, tr("提示"),
-					tr("运行图打开成功，但生成当前运行图所用的软件版本[%1]高于当前软件版本[%2]，"
-						"保存数据时请注意防止数据丢失。").arg(_diagram.version(),
-							QString(qespec::VERSION.data())));
-			}
-		}
-	}
-}
 
 void MainWindow::addPageWidget(std::shared_ptr<DiagramPage> page)
 {

@@ -14,6 +14,7 @@
 #include <QTableView>
 #include <chrono>
 #include <QScroller>
+#include <QAction>
 #include <util/railrangecombo.h>
 #include <util/selectrailwaycombo.h>
 
@@ -21,7 +22,8 @@ DiagnosisModel::DiagnosisModel(Diagram &diagram_, QObject *parent):
     QStandardItemModel(parent), diagram(diagram_)
 {
     setColumnCount(ColMAX);
-    setHorizontalHeaderLabels({tr("车次"),tr("线路"),tr("位置"), tr("等级"),tr("类型"),tr("描述")});
+    setHorizontalHeaderLabels({tr("车次"),tr("线路"),tr("时刻"),tr("里程标"),
+        tr("位置"), tr("等级"),tr("类型"),tr("描述")});
 }
 
 void DiagnosisModel::setupModel()
@@ -32,6 +34,8 @@ void DiagnosisModel::setupModel()
         const auto& iss = lst.at(i);
         auto train = iss.line->train();
         setItem(i, ColTrainName, new SI(train->trainName().full()));
+        setItem(i, ColTime, new SI(iss.time.toString("hh:mm:ss")));
+        setItem(i, ColMile, new SI(QString::number(iss.mile, 'f', 3)));
         setItem(i, ColRailway, new SI(iss.line->railway()->name()));
         setItem(i, ColPos, new SI(iss.posString()));
         setItem(i, ColLevel, new SI(qeutil::diagnoLevelString(iss.level)));
@@ -71,6 +75,12 @@ void DiagnosisModel::setupForAll(
 {
     lst=diagram.diagnoseAllTrains(railway,start,end);
     setupModel();
+}
+
+void DiagnosisModel::locateToRow(int row)
+{
+    const auto& iss = lst.at(row);
+    emit locateToRailMile(iss.line->railway(), iss.mile, iss.time);
 }
 
 
@@ -160,6 +170,13 @@ void DiagnosisDialog::initUI()
     table->horizontalHeader()->setSortIndicatorShown(true);
     vlay->addWidget(table);
     QScroller::grabGesture(table,QScroller::TouchGesture);
+
+    table->setContextMenuPolicy(Qt::ActionsContextMenu);
+    auto* act = new QAction(tr("定位 (双击)"),table);
+    table->addAction(act);
+    connect(act, &QAction::triggered, this, &DiagnosisDialog::actLocate);
+
+    connect(table, &QTableView::doubleClicked, this, &DiagnosisDialog::onDoubleClicked);
 }
 
 std::shared_ptr<Railway> DiagnosisDialog::getFilterRailway()
@@ -233,3 +250,15 @@ void DiagnosisDialog::onFiltRangeChanged(bool on)
 {
     cbRange->setEnabled(on);
 }
+
+void DiagnosisDialog::onDoubleClicked(const QModelIndex& idx)
+{
+    if (idx.isValid()) model->locateToRow(idx.row());
+}
+
+void DiagnosisDialog::actLocate()
+{
+    onDoubleClicked(table->currentIndex());
+}
+
+

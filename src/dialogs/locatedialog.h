@@ -35,7 +35,7 @@ private:
     void initUI();
     using QDialog::show;
 signals:
-    void locateOnMile(int pageIndex, std::shared_ptr<Railway>, double mile, const QTime& time);
+    void locateOnMile(int pageIndex, std::shared_ptr<const Railway>, double mile, const QTime& time);
     void locateOnStation(int pageIndex, std::shared_ptr<Railway>,
                          std::shared_ptr<RailStation>, const QTime& time);
 private slots:
@@ -47,6 +47,7 @@ public slots:
      * @brief showDialog  刷新数据后显示
      */
     void showDialog();
+    void locateToRail(std::shared_ptr<const Railway> rail, double mile, const QTime& time);
 };
 
 

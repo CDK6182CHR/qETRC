@@ -21,6 +21,11 @@ public:
         const QString& title = tr("选择线路"), const QString& prompt = "");
 
     /**
+     * 2022.09.11 设置当前状态为rail。
+     */
+    void setRailway(std::shared_ptr<const Railway> rail);
+
+    /**
      * 2021.10.11  重载版本  用QList<Railway>构造临时对象
      * 注意考虑入参。空和仅有一个的都直接返回。
      */

@@ -153,6 +153,16 @@ bool RailStationModel::checkRailway(std::shared_ptr<Railway> rail)
         return false;
     }
 
+    // 2022.09.11 新增单调性检查
+    auto it = std::is_sorted_until(rail->stations().begin(), rail->stations().end(), 
+        RailStationMileLess());
+    if (it != rail->stations().end()) {
+        QMessageBox::warning(par, tr("错误"), tr("线路里程标不满足单调递增要求，"
+            "请检查[%1]站附近 （第%2行）").arg((*it)->name.toSingleLiteral())
+            .arg(std::distance(rail->stations().begin(), it) + 1));
+        return false;
+    }
+
     //主要是检查每个区间里程非负
     for (auto p = rail->firstDownInterval(); p; p = rail->nextIntervalCirc(p)) {
         if (p->mile() < 0) {

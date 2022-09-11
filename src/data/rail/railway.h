@@ -620,6 +620,18 @@ public:
      */
     void symmetrize();
 
+    /**
+     * 2022.09.11 新增要求里程标单调不减小的要求。
+     * 如果不满足这个要求，getSectionInfo()的二分搜索有可能失败。
+     */
+    bool isMileSorted()const;
+
+    /**
+     * 2022.09.11 检查区间负里程问题。返回第一个负里程区间。
+     * 如果没有，返回空
+     */
+    std::shared_ptr<const RailInterval> firstNegativeInterval()const;
+
 private:
     /**
      * 维护nameMap和fieldMap

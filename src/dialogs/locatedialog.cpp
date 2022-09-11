@@ -108,6 +108,26 @@ void LocateDialog::onApplied()
     done(Accepted);
 }
 
+void LocateDialog::locateToRail(std::shared_ptr<const Railway> rail, double mile, const QTime& time)
+{
+    refreshData();
+    cbRailway->setRailway(rail);
+    if (cbPage->count() == 0) [[unlikely]] {
+        QMessageBox::warning(this,tr("错误"),tr("Internal error: railway %1 not found. ")
+        .arg(rail->name()));
+    }
+    else if (cbPage->count() == 1) [[likely]] {
+        // 只有一个选项，直接定位，不用弹出对话框了
+        emit locateOnMile(cbPage->pageIndex(),rail,mile,time);
+    }
+    else {
+        // 多个可能选项，需弹出对话框
+        spMile->setValue(mile);
+        edTime->setTime(time);
+        showDialog();
+    }
+}
+
 void LocateDialog::showDialog()
 {
     refreshData();

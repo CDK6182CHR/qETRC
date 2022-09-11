@@ -309,11 +309,17 @@ struct DiagnosisIssue {
     pos_t pos;
     std::shared_ptr<const TrainLine> line;
     QString description;
+
+    // 2022.09.11: add mile and time info
+    QTime time;
+    double mile;
         
     DiagnosisIssue(DiagnosisType type_,
         qeutil::DiagnosisLevel level_,
-        pos_t pos_, std::shared_ptr<const TrainLine> line_, const QString& description_ ):
-        type(type_),level(level_),pos(pos_),line(line_),
+        pos_t pos_, std::shared_ptr<const TrainLine> line_, 
+        QTime time_, double mile_,
+        const QString& description_ ):
+        type(type_),level(level_),pos(pos_),line(line_),time(time_),mile(mile_),
         description(description_){}
 
     QString posString()const;

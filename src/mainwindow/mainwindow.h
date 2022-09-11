@@ -207,6 +207,11 @@ private:
      */
     bool saveQuestion();
 
+    /**
+     * 2022.09.11 检查新打开的文件，文件已经进入diagram。
+     */
+    bool checkOpenFile();
+
     
 
 protected:
@@ -416,6 +421,10 @@ private slots:
     void actAutoTrainType();
 
     void actLocateDiagram();
+
+    void initLocateDialog();
+
+    void locateToRailMile(std::shared_ptr<const Railway> rail, double mile, const QTime& time);
 
     void actInterpolation();
 

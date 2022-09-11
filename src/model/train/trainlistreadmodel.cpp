@@ -121,6 +121,7 @@ std::shared_ptr<Train> TrainListReadModel::takeTrainAt(int i)
 
 void TrainListReadModel::clearTrains()
 {
+    if (_trains.empty()) return;
     beginRemoveRows({},0,_trains.size()-1);
     _trains.clear();
     endRemoveRows();

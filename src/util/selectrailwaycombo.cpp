@@ -50,6 +50,12 @@ std::shared_ptr<Railway> SelectRailwayCombo::dialogGetRailway(RailCategory& cat,
     return res;
 }
 
+void SelectRailwayCombo::setRailway(std::shared_ptr<const Railway> rail)
+{
+    int idx = cat.getRailwayIndex(rail);
+    setCurrentIndex(idx);
+}
+
 std::shared_ptr<Railway> SelectRailwayCombo::dialogGetRailway(const QList<std::shared_ptr<Railway>>& railways, 
     QWidget* parent, const QString& title, const QString& prompt)
 {

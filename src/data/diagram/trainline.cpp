@@ -306,12 +306,14 @@ void TrainLine::diagnoseSelf(DiagnosisList& res) const
             if (secs > 20 * 3600) {
                 res.push_back(DiagnosisIssue(DiagnosisType::StopTooLong2,
                     qeutil::Information, p->railStation.lock(), shared_from_this(),
+                    p->trainStation->arrive, p->railStation.lock()->mile,
                     QObject::tr("上一区间运行时长为[%1]，超过20小时，应考虑到开时刻是否填反。")\
                     .arg(qeutil::secsToString(secs))));
             }
             else if (secs > 12 * 3600) {
                 res.push_back(DiagnosisIssue(DiagnosisType::StopTooLong1,
                     qeutil::Warning, p->railStation.lock(), shared_from_this(),
+                    p->trainStation->arrive, p->railStation.lock()->mile,
                     QObject::tr("上一区间运行时长为[%1]，超过12小时，可能导致事件前后顺序判断出错。")\
                     .arg(qeutil::secsToString(secs))));
             }
@@ -320,12 +322,14 @@ void TrainLine::diagnoseSelf(DiagnosisList& res) const
         if (secs > 20 * 3600) {
             res.push_back(DiagnosisIssue(DiagnosisType::StopTooLong2,
                 qeutil::Information, p->railStation.lock(), shared_from_this(),
+                p->trainStation->depart, p->railStation.lock()->mile,
                 QObject::tr("本站停车时长为[%1]，超过20小时，应考虑到开时刻是否填反。")\
                 .arg(qeutil::secsToString(secs))));
         }
         else if (secs > 12 * 3600) {
             res.push_back(DiagnosisIssue(DiagnosisType::StopTooLong1,
                 qeutil::Warning, p->railStation.lock(), shared_from_this(),
+                p->trainStation->depart, p->railStation.lock()->mile,
                 QObject::tr("本站停车时长为[%1]，超过12小时，可能导致事件前后顺序判断出错。")\
                 .arg(qeutil::secsToString(secs))));
         }
@@ -347,7 +351,8 @@ void TrainLine::diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr
         if (!dy) {
             // 区间里程为0
             res.append(DiagnosisIssue(DiagnosisType::SystemError, qeutil::Error,
-                rcur, shared_from_this(), QObject::tr("区间[%1-%2]的纵坐标变化为0，"
+                rcur, shared_from_this(), tcur->arrive, rcur->mile,
+                QObject::tr("区间[%1-%2]的纵坐标变化为0，"
                     "无法推定中间站时刻。").arg(rprev->name.toSingleLiteral(), rcur->name.toSingleLiteral())));
         }
         else {
@@ -372,7 +377,8 @@ void TrainLine::diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr
             }
             if (!p) {
                 res.append(DiagnosisIssue(DiagnosisType::SystemError, qeutil::Error,
-                    rcur, shared_from_this(), QObject::tr("非预期的区间终止：在匹配站表的"
+                    rcur, shared_from_this(), 
+                    tcur->arrive, rcur->mile, QObject::tr("非预期的区间终止：在匹配站表的"
                         "[%1-%2]区间。可能是运行线行别出现问题。")
                     .arg(rprev->name, rcur->name)));
             }
@@ -394,7 +400,9 @@ void TrainLine::diagnoForbid(DiagnosisList& res, std::shared_ptr<const RailInter
             if (qeutil::timeRangeIntersected(n->beginTime, n->endTime,
                 in, out)) {
                 res.push_back(DiagnosisIssue(DiagnosisType::CollidForbid,
-                    qeutil::Error, railint, shared_from_this(), QObject::tr("与天窗[%1]冲突，"
+                    qeutil::Error, railint, shared_from_this(),
+                    out, railint->toStation()->mile,
+                    QObject::tr("与天窗[%1]冲突，"
                         "天窗时间是[%2-%3]，区间运行时间（可能包含推定）是[%4-%5]。")
                     .arg(f->name(), n->beginTime.toString("hh:mm"), n->endTime.toString("hh:mm"),
                         in.toString("hh:mm:ss"), out.toString("hh:mm:ss"))));
@@ -728,7 +736,9 @@ void TrainLine::diagnoWithSameDir(DiagnosisList& res, const TrainLine& another, 
                 //区间越行  
                 auto pos = compressSnapInterval(mylast, pme, std::get<0>(*pint));
                 res.push_back(DiagnosisIssue(DiagnosisType::IntervalOverTaking,
-                    qeutil::Error, pos, shared_from_this(), QObject::tr("在里程[%1]，时刻"
+                    qeutil::Error, pos, shared_from_this(), 
+                    std::get<1>(*pint), std::get<0>(*pint),
+                    QObject::tr("在里程[%1]，时刻"
                         "[%2]与车次[%3]发生[%4]").arg(std::get<0>(*pint)).arg(
                             std::get<1>(*pint).toString("hh:mm:ss"),
                             antrain.trainName().full(),
@@ -780,7 +790,8 @@ void TrainLine::diagnoWithCounter(DiagnosisList& res, const TrainLine& another, 
                     auto railint = std::get<1>(pos);
                     if (railint->isSingleRail()) {
                         res.push_back(DiagnosisIssue(DiagnosisType::IntervalMeet, qeutil::Warning,
-                            pos, shared_from_this(), QObject::tr("在单线区间[%5] 里程标[%1]，时刻[%2]与"
+                            pos, shared_from_this(), std::get<1>(*pint), std::get<0>(*pint),
+                            QObject::tr("在单线区间[%5] 里程标[%1]，时刻[%2]与"
                                 "车次[%3]发生[%4]事件").arg(std::get<0>(*pint))
                             .arg(std::get<1>(*pint).toString("hh:mm:ss"), antrain.trainName().full(),
                                 qeutil::eventTypeString(std::get<2>(*pint)),railint->toString())
