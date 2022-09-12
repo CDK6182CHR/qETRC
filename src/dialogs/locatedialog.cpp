@@ -53,6 +53,7 @@ void LocateDialog::initUI()
 
     g->addButton(rdStation);
     auto* rd=new QRadioButton(tr("里程标"));
+    rdMile = rd;
     g->addButton(rd);
     spMile=new QDoubleSpinBox;
     spMile->setRange(-1000000,10000000);
@@ -122,6 +123,7 @@ void LocateDialog::locateToRail(std::shared_ptr<const Railway> rail, double mile
     }
     else {
         // 多个可能选项，需弹出对话框
+        rdMile->setChecked(true);
         spMile->setValue(mile);
         edTime->setTime(time);
         showDialog();

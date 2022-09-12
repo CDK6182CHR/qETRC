@@ -23,7 +23,7 @@ class LocateDialog : public QDialog
     Q_OBJECT
     Diagram& diagram;
     SelectRailwayCombo* cbRailway;
-    QRadioButton* rdStation;
+    QRadioButton* rdStation, * rdMile;
     QComboBox* cbStation;
     PageComboForRail* cbPage;
     QDoubleSpinBox* spMile;

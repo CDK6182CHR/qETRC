@@ -1640,4 +1640,20 @@ std::shared_ptr<const RailInterval> Railway::firstNegativeInterval() const
 	return nullptr;
 }
 
+int Railway::firstInvalidNameIndex() const
+{
+	QSet<QString> fullNames;
+	for (int i = 0; i < stationCount(); i++) {
+		const auto& st = stations().at(i);
+		if (st->name.empty()) {
+			return i;
+		}
+		else if (fullNames.contains(st->name.toSingleLiteral()))
+			return i;
+		else
+			fullNames.insert(st->name.toSingleLiteral());
+	}
+	return -1;
+}
+
 

@@ -1780,6 +1780,16 @@ bool MainWindow::checkOpenFile()
 			level = 2;
 		}
 
+		int idx = rail->firstInvalidNameIndex();
+		if (idx != -1) {
+			text.append(
+				tr("[ERROR] 线路[%1]存在非法站名：与前序站名重复或为空 [%2] （第%3位）\n")
+				.arg(rail->name(), rail->stations().at(idx)->name.toSingleLiteral())
+				.arg(idx + 1)
+			);
+			level = 2;
+		}
+
 	}
 
 	if (_diagram.releaseCode() > qespec::RELEASE_CODE) {

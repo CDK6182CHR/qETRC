@@ -632,6 +632,12 @@ public:
      */
     std::shared_ptr<const RailInterval> firstNegativeInterval()const;
 
+    /**
+     * 返回第一个非法的全站名序号，用于启动检查。
+     * 如果没有，返回-1。
+     */
+    int firstInvalidNameIndex()const;
+
 private:
     /**
      * 维护nameMap和fieldMap
