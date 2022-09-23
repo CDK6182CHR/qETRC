@@ -1365,6 +1365,7 @@ bool Diagram::fromJson(const QJsonObject& obj)
     const auto& t = obj.value("config").toObject().value("ordinate");
     if (t.isString() && !t.toString().isEmpty()) {
         railways().at(0)->setOrdinate(t.toString());
+        railways().at(0)->calStationYCoeff();
     }
 
     //新增 Page

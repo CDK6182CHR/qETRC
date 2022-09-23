@@ -499,6 +499,8 @@ public:
      * @param config  用于计算的配置表
      * @return false-指定标尺排图，但标尺不完备不能用 otherwise true （2021.07.15修改）
      * 2021.10.08：与Config解耦，这里不乘系数。
+     * 2022.09.22：修改约定。y_coeff应该在Railway全程有效，所以在读取之后、修改之后就要调用本函数。
+     * 因为diagnose等程序调用了y_coeff作为判据；而这个调用并不保证在画图之后。
      */
     bool calStationYCoeff();
 

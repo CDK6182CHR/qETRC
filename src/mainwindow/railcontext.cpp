@@ -617,6 +617,7 @@ void RailContext::commitUpdateTimetable(std::shared_ptr<Railway> railway, bool e
 
 void RailContext::commitOrdinateChange(std::shared_ptr<Railway> railway)
 {
+	railway->calStationYCoeff();
 	mw->updateRailwayDiagrams(railway);
 }
 

@@ -97,6 +97,7 @@ void Railway::fromJson(const QJsonObject& obj)
     addForbid(objfor2);
 
 	_ordinate = rulerByName(obj.value("ordinate").toString());
+	calStationYCoeff();
 }
 
 QJsonObject Railway::toJson() const
@@ -1085,6 +1086,8 @@ bool Railway::mergeIntervalData(const Railway& other)
 			addRulerFrom(r);
 		for (auto f : other._forbids)
 			addForbidFrom(f);
+		// 2022.09.23: Ordinate 也转移过来，方便计算y_coeff
+		setOrdinateIndex(other.ordinateIndex());
 	}
 	else {
 		//非equiv，只能逐个区间检索。先搞空的
@@ -1109,6 +1112,7 @@ bool Railway::mergeIntervalData(const Railway& other)
 			}
 		}
 	}
+	calStationYCoeff();
 	return equiv;
 }
 
@@ -1121,6 +1125,7 @@ void Railway::swapBaseWith(Railway& other)
 	//std::swap(_forbids, other._forbids);
 	std::swap(nameMap, other.nameMap);
 	std::swap(fieldMap, other.fieldMap);
+	std::swap(_diagramHeightCoeff, other._diagramHeightCoeff);
 
 	// 2022.04.03：保证Ruler/Forbid中的头结点引用正确。
 	// 这里不需要考虑对方的，即要求调用的this指针是起作用的那个。
