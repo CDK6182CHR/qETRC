@@ -973,6 +973,8 @@ bool Diagram::fromTrc(QTextStream& fin)
     //最后：线路插入处理
     if (railway) {
         railway->firstForbid()->copyUpToDown();
+        // 2022.10.13: 增加Y坐标计算
+        railway->calStationYCoeff();
         addRailway(railway);
     }
     
@@ -1451,7 +1453,8 @@ bool Diagram::toTrc(const QString& filename, std::shared_ptr<Railway> rail, bool
     if (!rail->forbids().isEmpty()) forbid = rail->getForbid(0);
     for (auto p : rail->stations()) {
         fout << p->name.toSingleLiteral() << "," << int(std::round(p->mile)) << "," <<
-            p->level << "," << !p->_show << ",,true,4,1440,1440,";
+            p->level << "," << (p->_show ? "false" : "true")
+            << ",,true,4,1440,1440,";
         // todo: 天窗...
         if (forbid && prev) {
             //检索区间是否有天窗数据
