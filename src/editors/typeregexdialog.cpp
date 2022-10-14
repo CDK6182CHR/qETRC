@@ -7,6 +7,7 @@
 #include "util/buttongroup.hpp"
 
 #include <QLabel>
+#include <QTableView>
 #include <QHeaderView>
 
 

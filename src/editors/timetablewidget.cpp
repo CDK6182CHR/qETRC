@@ -2,6 +2,7 @@
 
 #include <model/train/timetablestdmodel.h>
 #include <QAction>
+#include <QTableView>
 #include <QHeaderView>
 #include <data/common/qesystem.h>
 #include <model/delegate/qetimedelegate.h>

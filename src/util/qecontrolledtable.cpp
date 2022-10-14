@@ -1,12 +1,49 @@
 ﻿#include "qecontrolledtable.h"
 #include "buttongroup.hpp"
 
-#include <QtWidgets>
+#include <QTableView>
+#include <QVBoxLayout>
 
 QEControlledTable::QEControlledTable(QWidget *parent, bool doubleLine) :
     QWidget(parent), doubleLine(doubleLine)
 {
 	initUI();
+}
+
+void QEControlledTable::toggleSelection()
+{
+    const auto& sel = table()->selectionModel()->selectedIndexes();
+    foreach(const auto & idx, sel) {
+        if (idx.flags() & Qt::ItemIsUserCheckable) {
+            if (qvariant_cast<Qt::CheckState>(idx.data(Qt::CheckStateRole))
+                == Qt::Checked) {
+                _table->model()->setData(idx, Qt::Unchecked, Qt::CheckStateRole);
+            }
+            else {
+                _table->model()->setData(idx, Qt::Checked, Qt::CheckStateRole);
+            }
+        }
+    }
+}
+
+void QEControlledTable::checkSelection()
+{
+    const auto& sel = table()->selectionModel()->selectedIndexes();
+    foreach(const auto & idx, sel) {
+        if (idx.flags() & Qt::ItemIsUserCheckable) {
+            _table->model()->setData(idx, Qt::Checked, Qt::CheckStateRole);
+        }
+    }
+}
+
+void QEControlledTable::uncheckSelection()
+{
+    const auto& sel = table()->selectionModel()->selectedIndexes();
+    foreach(const auto & idx, sel) {
+        if (idx.flags() & Qt::ItemIsUserCheckable) {
+            _table->model()->setData(idx, Qt::Unchecked, Qt::CheckStateRole);
+        }
+    }
 }
 
 void QEControlledTable::initUI()

@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QTableView>
 #include <QTextBrowser>
 
 #include <util/qecontrolledtable.h>

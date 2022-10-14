@@ -6,6 +6,7 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QTableView>
 #include <QMessageBox>
 #include <kernel/trackdiagram.h>
 #include "data/rail/railstation.h"

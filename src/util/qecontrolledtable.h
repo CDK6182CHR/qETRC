@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <QWidget>
-#include <QTableView>
+class QTableView;
 
 /**
  * @brief The QEControlledTable class
@@ -15,6 +15,14 @@ class QEControlledTable : public QWidget
 public:
     explicit QEControlledTable(QWidget *parent = nullptr, bool doubleLine=false);
     auto* table(){return _table;}
+
+public slots:
+    /**
+     * @brief 2022.10.14 勾选框的单元格，一次性勾选/取消勾选/切换勾选选区内所有单元格
+    */
+    void toggleSelection();
+    void checkSelection();
+    void uncheckSelection();
 
 private:
     void initUI();

@@ -910,8 +910,13 @@ bool Diagram::fromTrc(QTextStream& fin)
             if (t.size() >= 4) {
                 show = (t.at(3) == FALSE);   //ETRC中是隐藏
             }
+            // 2022.10.14：增加复线读取
+            bool single = false;
+            if (t.size() >= 6) {
+                single = (t.at(5) == FALSE);   // ETRC中是复线
+            }
             railway->appendStation(t.at(0), t.at(1).toDouble(), t.at(2).toInt(),
-                std::nullopt, PassedDirection::BothVia, show);
+                std::nullopt, PassedDirection::BothVia, show, false, false, single);
             if (t.size() >= 10 && !t.at(9).isEmpty()
                 && railway->stationCount() >= 2) {
                 //at(9)是天窗信息
@@ -1453,8 +1458,10 @@ bool Diagram::toTrc(const QString& filename, std::shared_ptr<Railway> rail, bool
     if (!rail->forbids().isEmpty()) forbid = rail->getForbid(0);
     for (auto p : rail->stations()) {
         fout << p->name.toSingleLiteral() << "," << int(std::round(p->mile)) << "," <<
-            p->level << "," << (p->_show ? "false" : "true")
-            << ",,true,4,1440,1440,";
+            p->level << "," << (p->_show ? FALSE : TRUE)
+            << ",,"
+            << (p->prevSingle ? FALSE : TRUE)
+            << ", 4, 1440, 1440, ";
         // todo: 天窗...
         if (forbid && prev) {
             //检索区间是否有天窗数据

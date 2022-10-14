@@ -4,6 +4,7 @@
 #include <QFormLayout>
 #include <QLabel>
 #include <QSpinBox>
+#include <QTableView>
 #include <QHeaderView>
 #include <chrono>
 #include "data/common/qesystem.h"

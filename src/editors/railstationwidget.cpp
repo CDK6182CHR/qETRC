@@ -11,12 +11,14 @@
 
 #include <QFormLayout>
 #include <QLineEdit>
+#include <QTableView>
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QEvent>
 #include <QPlainTextEdit>
 #include <QLabel>
 #include <QScroller>
+#include <QAction>
 
 
 RailStationWidget::RailStationWidget(RailCategory& cat_, bool inplace, QWidget* parent) :
@@ -100,6 +102,21 @@ void RailStationWidget::initUI()
     ctable->table()->verticalHeader()->setDefaultSectionSize(
                 SystemJson::instance.table_row_height);
     QScroller::grabGesture(ctable->table(),QScroller::TouchGesture);
+
+	ctable->table()->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+	// context menu
+	auto* act = new QAction(tr("批量勾选"), ctable);
+	connect(act, &QAction::triggered, ctable, &QEControlledTable::checkSelection);
+	ctable->table()->addAction(act);
+
+	act = new QAction(tr("批量取消勾选"), ctable);
+	connect(act, &QAction::triggered, ctable, &QEControlledTable::uncheckSelection);
+	ctable->table()->addAction(act);
+
+	act = new QAction(tr("批量切换选择"), ctable);
+	connect(act, &QAction::triggered, ctable, &QEControlledTable::toggleSelection);
+	ctable->table()->addAction(act);
 
 	int c = 0;
 	for (int w : {120, 80, 80, 50, 40, 60, 40, 40, 40}) {

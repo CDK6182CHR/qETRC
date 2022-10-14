@@ -12,6 +12,7 @@
 
 #include <QLabel>
 #include <QHeaderView>
+#include <QTableView>
 #include <QMessageBox>
 #include <QColorDialog>
 
