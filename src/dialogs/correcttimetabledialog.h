@@ -7,6 +7,7 @@ class TrainCollection;
 class QTableView;
 class Train;
 class QBitArray;
+class TrainStation;
 class CorrectTimetableModel: public QEMoveableModel
 {
     Q_OBJECT
@@ -52,6 +53,9 @@ public slots:
     void doToTop();
     void doToBottom();
 
+    void doPartialSortArrive();
+    void doPartialSortDepart();
+
     void selectAll();
     void deselectAll();
     void selectInverse();
@@ -79,6 +83,8 @@ private:
 
     int firstSelectedRow();
     int lastSelectedRow();
+
+    void partialSort(bool (*comp)(const TrainStation&, const TrainStation&));
 
 private slots:
     void onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight,

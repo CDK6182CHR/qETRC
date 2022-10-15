@@ -135,6 +135,16 @@ void TrainStation::updateStopFlag()
     }
 }
 
+bool TrainStation::ltArrive(const TrainStation& lhs, const TrainStation& rhs)
+{
+    return lhs.arrive < rhs.arrive;
+}
+
+bool TrainStation::ltDepart(const TrainStation& lhs, const TrainStation& rhs)
+{
+    return lhs.depart < rhs.depart;
+}
+
 QDebug operator<<(QDebug debug, const TrainStation& ts)
 {
     debug << ts.name << " " <<

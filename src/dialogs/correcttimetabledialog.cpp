@@ -133,6 +133,16 @@ void CorrectTimetableModel::doToBottom()
     calculateAllRows();
 }
 
+void CorrectTimetableModel::doPartialSortArrive()
+{
+    partialSort(&TrainStation::ltArrive);
+}
+
+void CorrectTimetableModel::doPartialSortDepart()
+{
+    partialSort(&TrainStation::ltDepart);
+}
+
 void CorrectTimetableModel::selectAll()
 {
     for (int i = 0; i < rowCount(); i++) {
@@ -274,6 +284,26 @@ int CorrectTimetableModel::lastSelectedRow()
     return -1;
 }
 
+void CorrectTimetableModel::partialSort(bool(*comp)(const TrainStation&, const TrainStation&))
+{
+    int first = firstSelectedRow(), last = lastSelectedRow();
+    if (first == -1)return;
+
+    auto nt = appliedTrain();
+    auto itr_first = nt->timetable().begin(); std::advance(itr_first, first);
+    auto itr_last = nt->timetable().begin(); std::advance(itr_last, last + 1);
+
+    std::list<TrainStation> tmp;
+    tmp.splice(tmp.begin(), nt->timetable(), itr_first, itr_last);
+    tmp.sort(comp);
+
+    nt->timetable().splice(itr_last, std::move(tmp));
+
+    setTrain(nt);
+}
+
+
+
 void CorrectTimetableModel::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
 {
     if (!roles.contains(Qt::EditRole))
@@ -316,15 +346,18 @@ void CorrectTimetableDialog::initUI()
     flay->addRow(tr("选项"),ckEdit);
     vlay->addLayout(flay);
 
-    auto* g4=new ButtonGroup<4>({"上移","下移","置顶","置底"});
-    vlay->addLayout(g4);
-    g4->connectAll(SIGNAL(clicked()),model,{SLOT(doMoveUp()),SLOT(doMoveDown()),
+    auto* g5=new ButtonGroup<5>({"上移","下移","置顶","置底","自动更正 (测试)" });
+    vlay->addLayout(g5);
+    g5->connectFront(SIGNAL(clicked()),model,{SLOT(doMoveUp()),SLOT(doMoveDown()),
                    SLOT(doToTop()),SLOT(doToBottom())});
-    auto* g2=new ButtonGroup<3>({"交换到发","区间反排","自动更正 (测试)"});
+    connect(g5->get(4), &QPushButton::clicked, this, &CorrectTimetableDialog::autoCorrect);
+
+    auto* g2=new ButtonGroup<4>({"交换到发","区间反排","到点排序","发点排序"});
     vlay->addLayout(g2);
-    g2->connectFront(SIGNAL(clicked()),model,{SLOT(doExchange()),SLOT(doReverse())});
-    connect(g2->get(2),&QPushButton::clicked,this,&CorrectTimetableDialog::autoCorrect);
-    g4=new ButtonGroup<4>({"全选","全不选","反选","批选"});
+    g2->connectAll(SIGNAL(clicked()),model,{SLOT(doExchange()),SLOT(doReverse()),
+        SLOT(doPartialSortArrive()), SLOT(doPartialSortDepart())});
+    
+    auto* g4=new ButtonGroup<4>({"全选","全不选","反选","批选"});
     vlay->addLayout(g4);
     g4->connectFront(SIGNAL(clicked()),model,{SLOT(selectAll()),SLOT(deselectAll()),
                      SLOT(selectInverse())});

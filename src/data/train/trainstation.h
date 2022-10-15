@@ -103,6 +103,9 @@ public:
      * 确保Flag的Stopped那一位准确
      */
     void updateStopFlag();
+
+    static bool ltArrive(const TrainStation& lhs, const TrainStation& rhs);
+    static bool ltDepart(const TrainStation& lhs, const TrainStation& rhs);
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(TrainStation::Flags);
