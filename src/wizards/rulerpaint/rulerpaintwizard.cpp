@@ -35,6 +35,7 @@ void RulerPaintWizard::accept()
     else {
         QMessageBox::warning(this, tr("错误"), tr("未铺画列车运行图。请在排图表格中，"
             "双击指定行排图，或者更改排图范围选项。"));
+        return;
     }
     auto m = pgStart->getMode();
     if (m == RulerPaintPageStart::NewTrain) {
