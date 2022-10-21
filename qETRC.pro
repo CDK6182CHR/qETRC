@@ -238,6 +238,7 @@ HEADERS += \
     src/data/analysis/traingap/traingapana.h \
     src/mainwindow/startuppage.h \
     src/util/combos/railstationcombo.h \
+    src/util/helper_templates.hpp \
     src/viewers/railtopotable.h \
     src/viewers/stats/intervaltraintable.h \
     src/data/calculation/calculationlog.h \

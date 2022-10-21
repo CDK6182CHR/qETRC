@@ -47,6 +47,9 @@ private slots:
     void copyFromUpToDown();
     void actRemove();
 
+    void batchSetStart();
+    void batchSetStop();
+
 signals:
     void actChangeRulerData(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> nr);
     void actChangeRulerName(std::shared_ptr<Ruler> ruler, const QString& name);

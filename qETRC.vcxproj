@@ -509,6 +509,7 @@
     </QtMoc>
     <ClInclude Include="src\model\delegate\qedelegate.h" />
     <QtMoc Include="src\util\combos\railstationcombo.h" />
+    <ClInclude Include="src\util\helper_templates.hpp" />
     <ClInclude Include="src\util\qeexceptions.h" />
     <ClInclude Include="src\data\common\qeglobal.h" />
     <QtMoc Include="src\model\general\qemoveablemodel.h">
