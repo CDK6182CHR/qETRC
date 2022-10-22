@@ -16,6 +16,7 @@
 
 #include "model/rail/rulermodel.h"
 #include "util/helper_templates.hpp"
+#include "util/utilfunc.h"
 
 RulerWidget::RulerWidget(std::shared_ptr<Ruler> ruler_,bool commitInPlace_, QWidget *parent) :
     QWidget(parent),ruler(ruler_),model(new RulerModel(ruler_,this)),commitInPlace(commitInPlace_)
@@ -177,22 +178,25 @@ void RulerWidget::actRemove()
 
 void RulerWidget::batchSetStart()
 {
-    const auto& sel = table->selectionModel()->selectedRows();
+    const auto& sel = table->selectionModel()->selectedIndexes();
+    auto rows = qeutil::indexRows(sel);
+    
     if (sel.isEmpty())return;
     bool ok;
     int res = QInputDialog::getInt(this,
         tr("批量设置起步附加"),
-        tr("将所选%1行的起步附加时分全部设置为（秒）：").arg(sel.size()), 120, 0, 100000, 10, &ok);
+        tr("将所选%1行的起步附加时分全部设置为（秒）：").arg(rows.size()), 120, 0, 100000, 10, &ok);
     if (!ok)return;
 
-    foreach(const auto & idx, sel) {
-        model->item(idx.row(), RulerModel::ColStart)->setData(res, Qt::EditRole);
+    for (int row : rows) {
+        model->item(row, RulerModel::ColStart)->setData(res, Qt::EditRole);
     }
 }
 
 void RulerWidget::batchSetStop()
 {
-    const auto& sel = table->selectionModel()->selectedRows();
+    const auto& sel = table->selectionModel()->selectedIndexes();
+    auto rows = qeutil::indexRows(sel);
     if (sel.isEmpty())return;
     bool ok;
     int res = QInputDialog::getInt(this,
@@ -200,8 +204,8 @@ void RulerWidget::batchSetStop()
         tr("将所选%1行的停车附加时分全部设置为（秒）：").arg(sel.size()), 120, 0, 100000, 10, &ok);
     if (!ok)return;
 
-    foreach(const auto & idx, sel) {
-        model->item(idx.row(), RulerModel::ColStop)->setData(res, Qt::EditRole);
+    for(int row:rows) {
+        model->item(row, RulerModel::ColStop)->setData(res, Qt::EditRole);
     }
 }
 

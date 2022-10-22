@@ -6,6 +6,7 @@
 #include <QTextStream>
 #include <QFileDialog>
 #include <cmath>
+#include <QModelIndex>
 
 
 //QTime qeutil::parseTime(const QString& tm)
@@ -115,6 +116,15 @@ bool qeutil::exportTableToCsv(const QStandardItemModel* model, QWidget* parent, 
 bool qeutil::ltIndexRow(const QModelIndex &idx1, const QModelIndex &idx2)
 {
     return idx1.row()<idx2.row();
+}
+
+std::set<int> qeutil::indexRows(const QList<QModelIndex>& lst)
+{
+	std::set<int> ret{};
+	foreach(const auto & idx, lst) {
+		ret.emplace(idx.row());
+	}
+	return ret;
 }
 
 bool qeutil::timeInRange(const QTime& left, const QTime& right, const QTime& t)

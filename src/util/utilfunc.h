@@ -2,6 +2,8 @@
 
 #include <QTime>
 #include <QString>
+#include <set>
+#include <QList>
 
 class QWidget;
 class QStandardItemModel;
@@ -65,6 +67,11 @@ bool tableToCsv(const QStandardItemModel* model, const QString& filename);
 bool exportTableToCsv(const QStandardItemModel* model, QWidget* parent, const QString& initName);
 
 bool ltIndexRow(const QModelIndex& idx1,const QModelIndex& idx2);
+
+/**
+ * @brief 2022.10.22  Get the (unique) rows from the QModelIndexList.
+*/
+std::set<int> indexRows(const QList<QModelIndex>& lst);
 
 static constexpr int msecsOfADay = 24 * 3600 * 1000;
 
