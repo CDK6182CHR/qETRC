@@ -283,5 +283,6 @@ private slots:
     void onDoubleClicked(const QModelIndex& idx);
     void showConflict();
     void showTimetable();
+    void loadStopTime();
 };
 

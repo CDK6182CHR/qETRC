@@ -215,6 +215,7 @@
     <ClCompile Include="src\data\gapset\gapsetabstract.cpp" />
     <ClCompile Include="src\data\gapset\transparentset.cpp" />
     <ClCompile Include="src\dialogs\rulerfromspeeddialog.cpp" />
+    <ClCompile Include="src\dialogs\selecttrainstationdialog.cpp" />
     <ClCompile Include="src\editors\edittrainwidget.cpp" />
     <ClCompile Include="src\editors\rail\gapconstraintwidget.cpp" />
     <ClCompile Include="src\editors\timetablewidget.cpp" />
@@ -430,6 +431,7 @@
     <QtMoc Include="src\editors\timetablewidget.h" />
     <QtMoc Include="src\dialogs\rulerfromspeeddialog.h" />
     <QtMoc Include="src\mainwindow\startuppage.h" />
+    <QtMoc Include="src\dialogs\selecttrainstationdialog.h" />
     <ClInclude Include="src\model\rail\gapconstraintmodel.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <QtMoc Include="src\dialogs\changestationnamedialog.h">

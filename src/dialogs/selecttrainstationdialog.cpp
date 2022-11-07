@@ -6,6 +6,7 @@
 #include <QTableView>
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QDialogButtonBox>
 #include <util/selecttraincombo.h>
 #include <data/common/qesystem.h>
 #include <util/utilfunc.h>
@@ -46,8 +47,25 @@ void SelectTrainStationsDialog::refreshData()
     model->setTrain(cbTrain->train());
 }
 
+SelectTrainStationsDialog::result_type
+    SelectTrainStationsDialog::dlgGetStation(TrainCollection &coll, QWidget *parent)
+{
+    auto* dlg=new SelectTrainStationsDialog(coll, parent);
+    dlg->setAttribute(Qt::WA_DeleteOnClose, false);
+
+    auto flag = dlg->exec();
+    result_type res;
+    if (flag){
+        res = dlg->getSelection();
+    }
+    dlg->setParent(nullptr);
+    delete dlg;
+    return res;
+}
+
 void SelectTrainStationsDialog::initUI()
 {
+    setWindowTitle(tr("选择时刻表车站"));
     auto* vlay=new QVBoxLayout(this);
     cbTrain=new SelectTrainCombo(coll);
     vlay->addLayout(cbTrain);
@@ -64,4 +82,11 @@ void SelectTrainStationsDialog::initUI()
     connect(cbTrain,&SelectTrainCombo::currentTrainChanged,
             model, &TimetableStdModel::setTrain);
     vlay->addWidget(table);
+
+    auto* box=new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
+    vlay->addWidget(box);
+    connect(box, &QDialogButtonBox::accepted,
+            this,&SelectTrainStationsDialog::accept);
+    connect(box, &QDialogButtonBox::rejected,
+            this,&QDialog::close);
 }

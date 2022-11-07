@@ -15,6 +15,10 @@ class Train;
 /**
  * @brief The SelectTrainStationDialog class
  * 2022.11.06  选择时刻表中信息，用于导入停站时长。
+ *
+ * Currently, the apply slot is NOT implemented; the only
+ * valid usage is through the static function dlgGetStation.
+ * For this reason, the constructor is declared as private.
  */
 class SelectTrainStationsDialog : public QDialog
 {
@@ -24,15 +28,22 @@ class SelectTrainStationsDialog : public QDialog
     QTableView* table;
     TimetableStdModel* const model;
 
-public:
     SelectTrainStationsDialog(TrainCollection& coll, QWidget* parent=nullptr);
-    std::vector<std::list<TrainStation>::iterator>
-        getSelection();
+
+public:
+    using result_type=std::vector<std::list<TrainStation>::iterator>;
+
+    result_type getSelection();
     void refreshData();
 
-    static std::vector<std::list<TrainStation>::iterator>
+    static result_type
         dlgGetStation(TrainCollection& coll, QWidget* parent);
+
+signals:
+//    void applied(const result_type&);
 private:
     void initUI();
+private slots:
+//    void actApply();
 };
 

@@ -12,6 +12,7 @@
 #include <QAction>
 #include <QHeaderView>
 #include "data/rail/rail.h"
+#include "data/diagram/diagram.h"
 #include "data/common/qesystem.h"
 #include "rulerpaintwizard.h"
 #include "model/delegate/qedelegate.h"
@@ -20,6 +21,7 @@
 #include "model/delegate/qetimedelegate.h"
 #include "util/utilfunc.h"
 #include "viewers/traintimetableplane.h"
+#include "dialogs/selecttrainstationdialog.h"
 
 
 RulerPaintModel::RulerPaintModel(RulerPaintPageTable *page_, QObject *parent):
@@ -552,6 +554,13 @@ void RulerPaintPageTable::initUI()
     gpAnType->get(0)->setChecked(true);
     hlay->addLayout(gpAnType);
     gpAnType->connectAllTo(SIGNAL(toggled(bool)),model,SLOT(onAnchorTypeChanged()));
+
+    auto* btn=new QPushButton(tr("导入停站"));
+    hlay->addStretch(2);
+    hlay->addWidget(btn);
+    connect(btn,&QPushButton::clicked,
+            this,&RulerPaintPageTable::loadStopTime);
+
     flay->addRow(tr("锚点时刻"),hlay);
 
     gpChecks=new ButtonGroup<3,QHBoxLayout,QCheckBox>({"在本段运行线始发","在本段运行线终到","即时铺画"});
@@ -644,6 +653,12 @@ void RulerPaintPageTable::showTimetable()
 {
     if (!timeDialog->isVisible())
         timeDialog->show();
+}
+
+void RulerPaintPageTable::loadStopTime()
+{
+    auto res=SelectTrainStationsDialog::dlgGetStation(diagram.trainCollection(),
+                                                      this);
 }
 
 void RulerPaintPageTable::onDoubleClicked(const QModelIndex &idx)
