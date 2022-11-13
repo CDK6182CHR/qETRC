@@ -503,6 +503,7 @@ void RailContext::actInverseRail()
 	auto rail = railway->cloneBase();
 	rail->mergeIntervalData(*railway);
 	rail->reverse();
+	rail->calStationYCoeff();   // 2022.11.13 fix
 	mw->getUndoStack()->push(new qecmd::UpdateRailStations(this, railway, rail, false));
 }
 

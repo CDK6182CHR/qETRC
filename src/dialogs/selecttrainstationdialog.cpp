@@ -11,13 +11,14 @@
 #include <data/common/qesystem.h>
 #include <util/utilfunc.h>
 #include <data/train/train.h>
+#include <model/delegate/qetimedelegate.h>
 
 SelectTrainStationsDialog::SelectTrainStationsDialog(TrainCollection& coll,
                                                      QWidget *parent):
     QDialog(parent), coll(coll), model(new TimetableStdModel(true, this))
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    resize(500,600);
+    resize(700,600);
     initUI();
     refreshData();
 }
@@ -76,6 +77,15 @@ void SelectTrainStationsDialog::initUI()
     table=new QTableView;
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->setModel(model);
+    {
+        int c = 0;
+        for (int w : {100, 90, 90, 40, 60, 60, 60}) {
+            table->setColumnWidth(c++, w);
+        }
+    }
+    auto* dele = new QETimeDelegate(this);
+    table->setItemDelegateForColumn(TimetableStdModel::ColArrive, dele);
+    table->setItemDelegateForColumn(TimetableStdModel::ColDepart, dele);
     table->setEditTriggers(QTableView::NoEditTriggers);
     table->setSelectionMode(QTableView::MultiSelection);
     table->setSelectionBehavior(QTableView::SelectRows);

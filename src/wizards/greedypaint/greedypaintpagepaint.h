@@ -50,6 +50,8 @@ public:
     void refreshData();
     void setDir(Direction dir) { _dir = dir; }
 
+    void updateSettledStops(const std::map<std::shared_ptr<const RailStation>, int>& secs);
+
     /**
      * 铺画完毕后，将数据设置好
      * 注意铺画不一定成功了；所以站数实际上不一定有效。
@@ -187,6 +189,8 @@ private slots:
     void onClearTmp();
 
     void setTopLevel(bool on);
+
+    void actLoadStopTime();
 
 public slots:
     /**

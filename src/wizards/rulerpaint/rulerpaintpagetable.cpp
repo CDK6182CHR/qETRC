@@ -119,6 +119,17 @@ QTime RulerPaintModel::getRowDepart(int row) const
     return item(row, ColDepart)->data(Qt::EditRole).toTime();
 }
 
+void RulerPaintModel::setStationStopSecs(const StationName& name, int secs)
+{
+    for (int i = 0; i < rowCount(); i++) {
+        const auto& name_s = item(i, ColStation)->data(Qt::DisplayRole);
+        if (name.equalOrContains(name_s.toString())) {
+            setStopSecs(i, secs);
+            break;
+        }
+    }
+}
+
 void RulerPaintModel::initRow(int row, std::shared_ptr<const RailStation> st,
     std::shared_ptr<const RulerNode> node)
 {
@@ -241,6 +252,13 @@ int RulerPaintModel::getStopSecs(int row) const
 {
     return item(row,ColMinute)->data(Qt::EditRole).toInt() * 60 +
             item(row,ColSecond)->data(Qt::EditRole).toInt();
+}
+
+void RulerPaintModel::setStopSecs(int row, int secs)
+{
+    int m = secs / 60, s = secs % 60;
+    item(row, ColMinute)->setData(m, Qt::EditRole);
+    item(row, ColSecond)->setData(s, Qt::EditRole);
 }
 
 
@@ -659,6 +677,9 @@ void RulerPaintPageTable::loadStopTime()
 {
     auto res=SelectTrainStationsDialog::dlgGetStation(diagram.trainCollection(),
                                                       this);
+    for (const auto& t : res) {
+        model->setStationStopSecs(t->name, t->stopSec());
+    }
 }
 
 void RulerPaintPageTable::onDoubleClicked(const QModelIndex &idx)

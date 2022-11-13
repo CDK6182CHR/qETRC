@@ -22,6 +22,7 @@
 #include <data/calculation/greedypainter.h>
 #include <data/diagram/diagram.h>
 #include <data/train/train.h>
+#include <dialogs/selecttrainstationdialog.h>
 
 
 GreedyPaintConfigModel::GreedyPaintConfigModel(QWidget* parent):
@@ -106,6 +107,21 @@ void GreedyPaintConfigModel::refreshData()
 
     setAnchorRowNoSignal(0);
 
+}
+
+void GreedyPaintConfigModel::updateSettledStops(const std::map<std::shared_ptr<const RailStation>, int>& secs)
+{
+    blockSignals(true);
+    for (int i = 0; i < rowCount(); i++) {
+        auto st = stationForRow(i);
+        if (auto itr = secs.find(st); itr != secs.end()) {
+            int m = itr->second / 60, s = itr->second % 60;
+            item(i, ColMinute)->setData(m, Qt::EditRole);
+            item(i, ColSecond)->setData(s, Qt::EditRole);
+        }
+    }
+    blockSignals(false);
+    emit stopTimeChanged();
 }
 
 QStandardItem* GreedyPaintConfigModel::makeCheckItem()
@@ -421,6 +437,11 @@ void GreedyPaintPagePaint::initUI()
     gpAnchorRole->get(0)->setChecked(true);
     hlay->addStretch(1);
     hlay->addLayout(gpAnchorRole);
+    hlay->addStretch(2);
+    auto* btn = new QPushButton(tr("导入停站"));
+    connect(btn, &QPushButton::clicked, this, &GreedyPaintPagePaint::actLoadStopTime);
+    hlay->addWidget(btn);
+
     flay->addRow(tr("锚点时刻"),hlay);
     connect(edAnchorTime, &QTimeEdit::timeChanged, this, &GreedyPaintPagePaint::paintTmpTrain);
     connect(gpAnchorRole->get(0), &QRadioButton::toggled, this, &GreedyPaintPagePaint::paintTmpTrain);
@@ -497,7 +518,7 @@ void GreedyPaintPagePaint::initUI()
     txtOut->setWindowTitle(tr("排图报告"));
 
     hlay=new QHBoxLayout;
-    auto* btn=new QPushButton(tr("提交"));
+    btn=new QPushButton(tr("提交"));
     hlay->addStretch(1);
     hlay->addWidget(btn);
     connect(btn,&QPushButton::clicked,this,&GreedyPaintPagePaint::onApply);
@@ -692,6 +713,24 @@ void GreedyPaintPagePaint::setTopLevel(bool on)
     nativeParentWidget()->setWindowFlag(Qt::WindowStaysOnTopHint, on);
     if (on) {
         nativeParentWidget()->show();
+    }
+}
+
+void GreedyPaintPagePaint::actLoadStopTime()
+{
+    auto res = SelectTrainStationsDialog::dlgGetStation(diagram.trainCollection(), this);
+    bool anyUpdate = false;
+    std::map<std::shared_ptr<const RailStation>, int> stopsecs;
+    for (const auto& t : res) {
+        if (int secs = t->stopSec()) {
+            if (auto railst = painter.railway()->stationByGeneralName(t->name)) {
+                stopsecs[railst] = secs;
+                anyUpdate = true;
+            }
+        }
+    }
+    if (anyUpdate) {
+        _model->updateSettledStops(stopsecs);
     }
 }
 
