@@ -11,6 +11,7 @@
 #include <QLineEdit>
 #include <QAction>
 #include <QHeaderView>
+#include <QMessageBox>
 #include "data/rail/rail.h"
 #include "data/diagram/diagram.h"
 #include "data/common/qesystem.h"
@@ -675,6 +676,12 @@ void RulerPaintPageTable::showTimetable()
 
 void RulerPaintPageTable::loadStopTime()
 {
+    auto p = QMessageBox::question(this, tr("导入停站"),
+        tr("选择车次及其时刻表部分站点，将其停站时长导入当前铺画表格中。\n"
+            "车站按站名匹配，重复站名以后出现的为准，且将覆盖当前设置。\n"
+            "是否确认？"));
+    if (p != QMessageBox::Yes)
+        return;
     auto res=SelectTrainStationsDialog::dlgGetStation(diagram.trainCollection(),
                                                       this);
     for (const auto& t : res) {

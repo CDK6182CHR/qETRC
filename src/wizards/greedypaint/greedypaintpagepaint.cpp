@@ -718,15 +718,20 @@ void GreedyPaintPagePaint::setTopLevel(bool on)
 
 void GreedyPaintPagePaint::actLoadStopTime()
 {
+    auto p = QMessageBox::question(this, tr("导入停站"),
+        tr("选择车次及其时刻表部分站点，将其停站时长导入当前铺画表格中。\n"
+            "车站按站名匹配，重复站名以后出现的为准，且将覆盖当前设置。\n"
+            "是否确认？"));
+    if (p != QMessageBox::Yes)
+        return;
     auto res = SelectTrainStationsDialog::dlgGetStation(diagram.trainCollection(), this);
     bool anyUpdate = false;
     std::map<std::shared_ptr<const RailStation>, int> stopsecs;
     for (const auto& t : res) {
-        if (int secs = t->stopSec()) {
-            if (auto railst = painter.railway()->stationByGeneralName(t->name)) {
-                stopsecs[railst] = secs;
-                anyUpdate = true;
-            }
+        int secs = t->stopSec();
+        if (auto railst = painter.railway()->stationByGeneralName(t->name)) {
+            stopsecs[railst] = secs;
+            anyUpdate = true;
         }
     }
     if (anyUpdate) {
