@@ -25,8 +25,8 @@
 
 
 GreedyPaintPageConstraint::GreedyPaintPageConstraint(Diagram& diagram_, GreedyPainter &_painter,
-                                                     QWidget *parent):
-    QWidget(parent), diagram(diagram_), painter(_painter),
+    TrainFilter* filter_, QWidget *parent):
+    QWidget(parent), diagram(diagram_), painter(_painter), filter(filter_),
     _model(new GapConstraintModel(this)),
     _mdForbid(new SelectForbidModel(this))
 {
@@ -99,7 +99,6 @@ void GreedyPaintPageConstraint::initUI()
 
     hlay->addStretch(1);
 
-    filter = new TrainFilter(diagram, this);
     auto* btn = new QPushButton(tr("车次筛选器"));
     hlay->addWidget(btn);
     connect(btn, &QPushButton::clicked, filter, &TrainFilter::show);

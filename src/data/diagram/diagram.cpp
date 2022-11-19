@@ -307,10 +307,12 @@ Diagram::stationTrainsSettled(std::shared_ptr<Railway> railway,
 
 RailStationEventList
     Diagram::stationEvents(std::shared_ptr<Railway> railway, 
-        std::shared_ptr<const RailStation> st) const
+        std::shared_ptr<const RailStation> st,
+        const ITrainFilter* filter) const
 {
     RailStationEventList res;
     foreach (auto train , _trainCollection.trains()) {
+        if (filter && !filter->check(train)) continue;
         foreach (auto adp , train->adapters()) {
             if (adp->isInSameRailway(railway)) {
                 foreach (auto line , adp->lines()) {
@@ -341,12 +343,13 @@ std::map<std::shared_ptr<RailStation>, RailStationEventList>
     return res;
 }
 
-RailwayStationEventAxis Diagram::stationEventAxisForRail(std::shared_ptr<Railway> railway) const
+RailwayStationEventAxis Diagram::stationEventAxisForRail(std::shared_ptr<Railway> railway, 
+    const ITrainFilter& filter) const
 {
     RailwayStationEventAxis res;
     foreach(auto p, qAsConst(railway->stations())) {
         if (p->direction != PassedDirection::NoVia) {
-            StationEventAxis staxis=stationEvents(railway,p);
+            StationEventAxis staxis = stationEvents(railway, p, &filter);
             staxis.buildAxis();
             res.emplace(p, std::move(staxis));
         }

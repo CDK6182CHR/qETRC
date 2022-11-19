@@ -35,12 +35,13 @@ class GreedyPaintPageConstraint : public QWidget
     RadioButtonGroup<GAP_SET_COUNT>* gpGapSet;
     std::array<std::unique_ptr<gapset::GapSetAbstract>,GAP_SET_COUNT> _availableGapSets;
 
-    TrainFilter* filter;
+    TrainFilter* const filter;
     QSpinBox* spMinGap, * spMaxGap;
 public:
     explicit GreedyPaintPageConstraint(
             Diagram& _diagram,
             GreedyPainter& _painter,
+            TrainFilter* filter_,
             QWidget *parent = nullptr);
 private:
     void initUI();

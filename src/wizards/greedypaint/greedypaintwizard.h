@@ -6,6 +6,8 @@
 
 class GreedyPaintPagePaint;
 class GreedyPaintPageConstraint;
+class TrainFilter;
+
 /**
  * @brief The GreedyPaintWizard class
  * 贪心推线的完整向导。
@@ -17,6 +19,7 @@ class GreedyPaintWizard : public QTabWidget
 {
     Q_OBJECT
     Diagram& diagram;
+    TrainFilter* const filter;
     GreedyPainter painter;
     GreedyPaintPageConstraint* pgConst;
     GreedyPaintPagePaint* pgPaint;

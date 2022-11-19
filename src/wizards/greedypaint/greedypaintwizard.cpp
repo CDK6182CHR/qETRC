@@ -1,11 +1,13 @@
 ﻿#include "greedypaintpageconstraint.h"
 #include "greedypaintpagepaint.h"
 #include "greedypaintwizard.h"
-
+#include <dialogs/trainfilter.h>
 #include <QMessageBox>
 
 GreedyPaintWizard::GreedyPaintWizard(Diagram& diagram_, QWidget *parent):
-    QTabWidget(parent),diagram(diagram_),painter(diagram_)
+    QTabWidget(parent),diagram(diagram_),
+    filter(new TrainFilter(diagram_, this)),
+    painter(diagram_, filter->getCore())
 {
     setWindowTitle(tr("贪心推线系统"));
     initUI();
@@ -13,7 +15,7 @@ GreedyPaintWizard::GreedyPaintWizard(Diagram& diagram_, QWidget *parent):
 
 void GreedyPaintWizard::initUI()
 {
-    pgConst=new GreedyPaintPageConstraint(diagram,painter,this);
+    pgConst=new GreedyPaintPageConstraint(diagram,painter,filter,this);
     addTab(pgConst,tr("排图参数"));
     connect(pgConst,&GreedyPaintPageConstraint::actClose,
             this,&GreedyPaintWizard::close);

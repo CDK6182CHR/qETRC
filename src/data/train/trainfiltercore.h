@@ -5,6 +5,8 @@
 #include <QSet>
 
 #include "train.h"
+#include "itrainfilter.h"
+
 
 class TrainFilter;
 class Diagram;
@@ -13,7 +15,8 @@ class Diagram;
  * 列车筛选器中，不带任何图形界面和SIGLAL/SLOT的数据部分。
  * 包含筛选逻辑。本身不提供修改接口；只能通过TrainFilter来修改。
  */
-class TrainFilterCore
+class TrainFilterCore:
+    public ITrainFilter
 {
     friend class TrainFilter;
     Diagram& diagram;
@@ -41,7 +44,7 @@ public:
     TrainFilterCore(TrainFilterCore&&) = delete;
     TrainFilterCore& operator=(TrainFilterCore&&) = delete;
 
-    bool check(std::shared_ptr<const Train> train)const;
+    bool check(std::shared_ptr<const Train> train)const override;
 private:
     bool checkType(std::shared_ptr<const Train> train)const;
     bool checkInclude(std::shared_ptr<const Train> train)const;

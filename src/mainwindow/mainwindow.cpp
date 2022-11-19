@@ -160,7 +160,8 @@ void MainWindow::onStationTableChanged(std::shared_ptr<Railway> rail, bool equiv
 	trainListWidget->getModel()->updateAllMileSpeed();
 	updateRailwayDiagrams(rail);
 	//2022.06.02：如果非equiv变化，贪心推线的要更新！
-	if (!equiv && greedyWidget) {
+	//2022.11.19：删除!equiv条件；单双线变化现在似乎不被认为是non-equiv，但它确实影响推线。
+	if (greedyWidget) {
 		greedyWidget->refreshData(rail);
 	}
 }

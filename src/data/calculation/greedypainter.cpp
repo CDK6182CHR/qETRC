@@ -14,15 +14,15 @@ class BackoffExeed : public std::exception
 };
 
 
-GreedyPainter::GreedyPainter(Diagram& diagram) :
-	diagram(diagram)
+GreedyPainter::GreedyPainter(Diagram& diagram, const ITrainFilter& filter_) :
+	diagram(diagram), filter(filter_)
 {
 
 }
 
 bool GreedyPainter::paint(const TrainName& trainName)
 {
-	_railAxis = diagram.stationEventAxisForRail(_railway);
+	_railAxis = diagram.stationEventAxisForRail(_railway, filter);
 	_train = std::make_shared<Train>(trainName);
 	_logs.clear();
 	backoffCount = 0;

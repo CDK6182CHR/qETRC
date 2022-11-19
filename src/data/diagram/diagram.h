@@ -14,6 +14,7 @@ class Train;
 class Railway;
 struct TrainGap;
 class TrainFilterCore;
+class ITrainFilter;
 
 
 class DiagramPage;
@@ -324,10 +325,12 @@ public:
 
     /**
      * 2021.08.01  基于事件的车站时刻表
+     * 2022.11.19: add a train filter. use null for switching off filting
      */
     RailStationEventList
         stationEvents(std::shared_ptr<Railway> railway,
-            std::shared_ptr<const RailStation> st)const;
+            std::shared_ptr<const RailStation> st,
+            const ITrainFilter* filter = nullptr)const;
 
     /**
      * 一次性获取所给线路的所有站事件表。
@@ -343,7 +346,8 @@ public:
      * 此版本用于处理贪心排图。
      */
     RailwayStationEventAxis
-        stationEventAxisForRail(std::shared_ptr<Railway> railway)const;
+        stationEventAxisForRail(std::shared_ptr<Railway> railway, 
+            const ITrainFilter& filter)const;
 
 #if 0
     /**
