@@ -101,7 +101,7 @@ void GreedyPaintPageConstraint::initUI()
 
     auto* btn = new QPushButton(tr("车次筛选器"));
     hlay->addWidget(btn);
-    connect(btn, &QPushButton::clicked, filter, &TrainFilter::show);
+    connect(btn, &QPushButton::clicked, this, &GreedyPaintPageConstraint::showTrainFilter);
     hlay->addStretch(3);
 
     btn = new QPushButton(tr("提取"));
@@ -194,4 +194,17 @@ void GreedyPaintPageConstraint::onGetGapFromCurrent()
     auto res = gapana.globalMinimal(cbRuler->railway());
 
     _model->setConstrainFromCurrent(res, spMinGap->value(), spMaxGap->value());
+}
+
+void GreedyPaintPageConstraint::showTrainFilter()
+{
+    if (!filterInformed) {
+        QMessageBox::information(this, tr("提示"),
+            tr("自1.2.4版本起，此处列车筛选器不但决定自动提取的最小间隔，"
+                "同时将决定贪心推线过程中被考虑的车次。未被筛选器选中的车次，"
+                "在贪心推线算法运行中将被直接忽略。"
+                "\n本提示在贪心推线模式本次运行期间仅展示一次。"));
+        filterInformed = true;
+    }
+    filter->show();
 }

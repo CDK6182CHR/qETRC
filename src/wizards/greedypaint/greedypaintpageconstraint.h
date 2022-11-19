@@ -37,6 +37,8 @@ class GreedyPaintPageConstraint : public QWidget
 
     TrainFilter* const filter;
     QSpinBox* spMinGap, * spMaxGap;
+
+    bool filterInformed = false;
 public:
     explicit GreedyPaintPageConstraint(
             Diagram& _diagram,
@@ -62,5 +64,7 @@ private slots:
     //void onSingleLineChanged(bool on);
     void onGapSetToggled(int id, bool on);
     void onGetGapFromCurrent();
+
+    void showTrainFilter();
 };
 
