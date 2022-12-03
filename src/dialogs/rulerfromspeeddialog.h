@@ -9,6 +9,8 @@ class Railway;
 class QComboBox;
 class QSpinBox;
 class Ruler;
+class QTableView;
+class RulerModel;
 
 /**
  * @brief 2022.04.10
@@ -23,6 +25,8 @@ class RulerFromSpeedDialog : public QDialog
     QSpinBox *spStart,*spStop;
     QComboBox* cbPrec;
     QCheckBox* ckAsMax;
+    QTableView* table;
+    RulerModel* model;
 public:
     RulerFromSpeedDialog(std::shared_ptr<Ruler> ruler, QWidget* parent=nullptr);
 signals:

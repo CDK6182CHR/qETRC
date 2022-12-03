@@ -113,9 +113,12 @@ int Ruler::fromSingleTrain(std::shared_ptr<const TrainAdapter> adp, int start, i
     return cnt;
 }
 
-void Ruler::fromSpeed(double speed, int start, int stop, bool asmax, int prec)
+void Ruler::fromSpeed(double speed, int start, int stop, bool asmax, int prec, 
+    std::vector<bool>& selrow)
 {
+    int i = 0;
     for (auto n = firstDownNode(); n; n = n->nextNodeCirc()) {
+        if (!selrow.at(i++))continue;
         double mile = n->railInterval().mile();
         double secs_f = mile / speed * 3600;
         int secs_i;

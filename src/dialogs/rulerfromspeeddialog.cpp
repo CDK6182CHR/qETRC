@@ -1,7 +1,5 @@
 ﻿#include "rulerfromspeeddialog.h"
 
-#include <data/rail/ruler.h>
-
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
@@ -11,6 +9,12 @@
 #include <QMessageBox>
 #include <QSpinBox>
 #include <QVBoxLayout>
+#include <QTableView>
+#include <QHeaderView>
+
+#include <data/common/qesystem.h>
+#include <data/rail/ruler.h>
+#include <model/rail/rulermodel.h>
 
 
 RulerFromSpeedDialog::RulerFromSpeedDialog(std::shared_ptr<Ruler> ruler,
@@ -19,7 +23,7 @@ RulerFromSpeedDialog::RulerFromSpeedDialog(std::shared_ptr<Ruler> ruler,
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("从速度计算标尺 - %1").arg(ruler->name()));
-    resize(500, 250);
+    resize(600, 800);
     initUI();
 }
 
@@ -66,6 +70,23 @@ void RulerFromSpeedDialog::initUI()
     flay->addRow(tr("停车附加"),spStop);
     vlay->addLayout(flay);
 
+    lab = new QLabel(tr("请选择要应用的区间："));
+    vlay->addWidget(lab);
+
+    table = new QTableView;
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    model = new RulerModel(ruler, this);
+    table->setModel(model);
+    table->setEditTriggers(QTableView::NoEditTriggers);
+    table->setSelectionBehavior(QTableView::SelectRows);
+    {
+        int c = 0;
+        for (int w : {150, 50, 50, 50, 50, 80, 80}) {
+            table->setColumnWidth(c++, w);
+        }
+    }
+    vlay->addWidget(table);
+
     auto* box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(box, SIGNAL(accepted()), this, SLOT(onApply()));
     connect(box, SIGNAL(rejected()), this, SLOT(close()));
@@ -74,10 +95,20 @@ void RulerFromSpeedDialog::initUI()
 
 void RulerFromSpeedDialog::onApply()
 {
+    auto sel = table->selectionModel()->selectedRows();
+    if (sel.isEmpty()) {
+        QMessageBox::information(this, tr("提示"), tr("未选择区间。\n"
+            "请先在表中选择要应用的区间，只有所选区间会被计算。"));
+        return;
+    }
+    std::vector<bool> selrows(model->rowCount(), false);
+    foreach(const auto & idx, sel) {
+        selrows.at(idx.row()) = true;
+    }
     auto r=ruler->clone();
     r->getRuler(0)->fromSpeed(spSpeed->value(),spStart->value(),spStop->value(),
-                     ckAsMax->isChecked(),cbPrec->currentData().toInt());
-    QMessageBox::information(this,tr("提示"),tr("从运行速度计算标尺完成。"));
+                     ckAsMax->isChecked(),cbPrec->currentData().toInt(), selrows);
     emit rulerUpdated(ruler, r);
+    QMessageBox::information(this, tr("提示"), tr("从运行速度计算标尺完成。"));
     done(QDialog::Accepted);
 }
