@@ -35,6 +35,7 @@ SOURCES += \
     src/data/analysis/inttrains/intervaltraininfo.cpp \
     src/data/analysis/traingap/traingapana.cpp \
     src/data/train/itrainfilter.cpp \
+    src/data/train/traingroup.cpp \
     src/dialogs/selecttrainstationdialog.cpp \
     src/mainwindow/startuppage.cpp \
     src/mainwindow/version.cpp \
@@ -239,6 +240,7 @@ HEADERS += \
     src/data/analysis/inttrains/intervaltraininfo.h \
     src/data/analysis/traingap/traingapana.h \
     src/data/train/itrainfilter.h \
+    src/data/train/traingroup.h \
     src/dialogs/selecttrainstationdialog.h \
     src/mainwindow/startuppage.h \
     src/util/combos/railstationcombo.h \
