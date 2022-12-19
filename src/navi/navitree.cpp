@@ -9,6 +9,7 @@
 #include "data/train/train.h"
 #include "data/diagram/diagram.h"
 #include "data/diagram/diagrampage.h"
+#include "util/selectrailwaystable.h"
 
 #include <QFileDialog>
 #include <QMenu>
@@ -501,8 +502,24 @@ void NaviTree::importRailways()
         return;
     }
 
-    QList<std::shared_ptr<Railway>> rails = std::move(_diatmp.railways());
-    for (auto p : rails) {
+    // 2022.12.19: add selection in case of more than 1 railway
+    QList<std::shared_ptr<Railway>> rails;
+    if (_diatmp.railways().size()>1){
+        do{
+            bool ok;
+            rails=SelectRailwaysTable::dlgGetRailways(this, _diatmp,
+                  tr("选择线路"),
+                  tr("所选文件包含多于一条线路。请选择要导入的线路。"),&ok);
+            if (!ok) return;
+            if (!rails.empty()) break;
+            QMessageBox::warning(this,tr("错误"),
+                                 tr("未选择线路"));
+        }while(true);
+    }else{
+        rails = std::move(_diatmp.railways());
+    }
+
+    foreach (auto p , rails) {
         p->setName(_model->diagram().validRailwayName(p->name()));
     }
 
