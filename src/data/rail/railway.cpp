@@ -661,6 +661,9 @@ Railway Railway::slice(int start, int end) const
 
 void Railway::jointWith(const Railway& another, bool former, bool reverse)
 {
+	if (ordinateIndex() >= 0) {
+		resetOrdinate();
+	}
 	if (reverse) {
 		this->reverse();
 	}
@@ -689,7 +692,9 @@ void Railway::jointWith(const Railway& another, bool former, bool reverse)
 		}
 	}
 
-	//todo: 标尺天窗...
+	// TODO: 合并标尺、天窗数据
+	//mergeIntervalDataInequiv(another);
+	calStationYCoeff();
 }
 
 std::shared_ptr<const RailInterval> Railway::firstDownInterval() const
@@ -1090,31 +1095,38 @@ bool Railway::mergeIntervalData(const Railway& other)
 		setOrdinateIndex(other.ordinateIndex());
 	}
 	else {
-		//非equiv，只能逐个区间检索。先搞空的
-		for (auto r : other._rulers) {
-			addEmptyRuler(r->name(), r->different());
-		}
-		for (auto f : other._forbids) {
-			addEmptyForbid(f->different());
-		}
-		for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
-			auto it = other.findInterval(p->fromStation()->name, p->toStation()->name);
-			if (it) {
-				//!! 不能直接赋值或者std::copy，这是对shared_ptr的操作！！
-				for (int i = 0; i < p->_rulerNodes.count(); i++) {
-					p->_rulerNodes[i]->operator=(*(it->_rulerNodes[i]));   //注意这里只assign了数据
-				}
-				for (int i = 0; i < p->_forbidNodes.count(); i++) {
-					p->_forbidNodes[i]->operator = (*(it->_forbidNodes[i]));
-				}
-				//std::copy(it->_rulerNodes.begin(), it->_rulerNodes.end(), p->_rulerNodes.begin());
-				//std::copy(it->_forbidNodes.begin(), it->_forbidNodes.end(), p->_forbidNodes.begin());
-			}
-		}
+		// 2022.12.29 独立成方法
+		mergeIntervalDataInequiv(other);
 	}
 	calStationYCoeff();
 	return equiv;
 }
+
+void Railway::mergeIntervalDataInequiv(const Railway& other)
+{
+	//非equiv，只能逐个区间检索。先搞空的
+	for (auto r : other._rulers) {
+		addEmptyRuler(r->name(), r->different());
+	}
+	for (auto f : other._forbids) {
+		addEmptyForbid(f->different());
+	}
+	for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
+		auto it = other.findInterval(p->fromStation()->name, p->toStation()->name);
+		if (it) {
+			//!! 不能直接赋值或者std::copy，这是对shared_ptr的操作！！
+			for (int i = 0; i < p->_rulerNodes.count(); i++) {
+				p->_rulerNodes[i]->operator=(*(it->_rulerNodes[i]));   //注意这里只assign了数据
+			}
+			for (int i = 0; i < p->_forbidNodes.count(); i++) {
+				p->_forbidNodes[i]->operator = (*(it->_forbidNodes[i]));
+			}
+			//std::copy(it->_rulerNodes.begin(), it->_rulerNodes.end(), p->_rulerNodes.begin());
+			//std::copy(it->_forbidNodes.begin(), it->_forbidNodes.end(), p->_forbidNodes.begin());
+		}
+	}
+}
+
 
 void Railway::swapBaseWith(Railway& other)
 {

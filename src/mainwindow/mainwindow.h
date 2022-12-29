@@ -146,6 +146,12 @@ public:
      */
     void repaintTrainLines(std::shared_ptr<Train> train);
 
+    /**
+     * 2022.12.29
+     * return the index of RailStationWidget by given railway.
+     */
+    int railStationWidgetIndex(std::shared_ptr<Railway> rail)const;
+
 private:
     /**
      * 程序启动，构建UI

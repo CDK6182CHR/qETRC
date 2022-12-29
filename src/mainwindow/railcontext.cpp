@@ -6,6 +6,7 @@
 
 #include "viewers/sectioncountdialog.h"
 #include "dialogs/selectrailstationdialog.h"
+#include "dialogs/jointrailwaydialog.h"
 #include "viewers/events/stationtimetablesettled.h"
 #include "viewers/events/railstationeventlist.h"
 #include "viewers/events/railsectionevents.h"
@@ -168,6 +169,10 @@ void RailContext::initUI()
 	panel = page->addPannel(tr("调整"));
 	act = new QAction(QIcon(":/icons/exchange1.png"), tr("线路反排"), this);
 	connect(act, SIGNAL(triggered()), this, SLOT(actInverseRail()));
+	panel->addMediumAction(act);
+
+	act = new QAction(QIcon(":/icons/joint.png"), tr("线路拼接"), this);
+	connect(act, &QAction::triggered, this, &RailContext::actJointRail);
 	panel->addMediumAction(act);
 
 	panel = page->addPannel(tr("分析"));
@@ -567,6 +572,28 @@ void RailContext::actRailTopo()
 {
 	auto* w = new RailTopoTable(railway, mw);
 	w->show();
+}
+
+void RailContext::actJointRail()
+{
+	auto* d = new JointRailwayDialog(diagram.railCategory(), railway, mw);
+	connect(d, &JointRailwayDialog::applied,
+		this, &RailContext::actJointRailApplied);
+	d->show();
+}
+
+void RailContext::actJointRailApplied(std::shared_ptr<Railway> rail, std::shared_ptr<Railway> data)
+{
+	// 必须直接提交，不能是打开站表后提交。因为还有其他的信息（标尺天窗）
+	
+	mw->getUndoStack()->beginMacro(tr("拼接线路: %1").arg(rail->name()));
+	// 先要取消标尺排图，如果打开了的话
+	if (rail->ordinate()) {
+		rail->resetOrdinate();
+		mw->getUndoStack()->push(new qecmd::ChangeOrdinate(this, rail, -1));
+	}
+	mw->getUndoStack()->push(new qecmd::UpdateRailStations(this, rail, data, false));
+	mw->getUndoStack()->endMacro();
 }
 
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)

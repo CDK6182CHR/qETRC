@@ -1975,6 +1975,16 @@ void MainWindow::repaintTrainLines(std::shared_ptr<Train> train)
 	}
 }
 
+int MainWindow::railStationWidgetIndex(std::shared_ptr<Railway> rail) const
+{
+	for (int i = 0; i < railStationWidgets.size(); i++) {
+		if (railStationWidgets.at(i)->getRailway() == rail) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 void MainWindow::actOpenGraph()
 {
 	using namespace std::chrono_literals;

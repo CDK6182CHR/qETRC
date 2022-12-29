@@ -164,7 +164,9 @@ private slots:
 
     void actRailTopo();
 
+    void actJointRail();
 
+    void actJointRailApplied(std::shared_ptr<Railway> rail, std::shared_ptr<Railway> data);
 
 public slots:
 

@@ -767,6 +767,13 @@ private:
      */
     void setupIntervalNodeDatas();
 
+    /**
+     * @brief 2022.12.29 强制按照inequiv的算法，添加区间数据。
+     * 用在线路合并。
+     * 注意调用约定有所不同；不清空既有的数据。
+    */
+    void mergeIntervalDataInequiv(const Railway& another);
+
 };
 
 Q_DECLARE_METATYPE(std::shared_ptr<Railway>);
