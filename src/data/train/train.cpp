@@ -988,6 +988,22 @@ bool Train::isLocalTrain(const RailCategory& cat)const
     return false;
 }
 
+bool Train::removeNonBound()
+{
+    refreshStationFlags();
+    bool flag = false;
+    for (auto itr = _timetable.begin(); itr != _timetable.end();) {
+        if (!(itr->flag & TrainStation::Bound)) {
+            itr = _timetable.erase(itr);
+            flag = true;
+        }
+        else {
+            ++itr;
+        }
+    }
+    return flag;
+}
+
 void Train::clear()
 {
     _timetable.clear();

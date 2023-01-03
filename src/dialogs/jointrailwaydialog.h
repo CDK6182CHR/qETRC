@@ -32,14 +32,10 @@ private:
     void initUI();
 
 signals:
-    void applied(std::shared_ptr<Railway> rail, std::shared_ptr<Railway> rhs);
+    void applied(std::shared_ptr<Railway> rail, std::shared_ptr<Railway> data);
 private slots:
 
-    /**
-     * @brief actApply
-     * Only emits signal, do not actually apply.
-     * This is because, it may be needed to reset ordinate before operation.
-     */
+
     void actApply();
 };
 

@@ -544,6 +544,11 @@ public:
      */
     bool isLocalTrain(const RailCategory& cat)const;
 
+    /**
+     * @brief 2023.01.03 删除非绑定车站。返回是否有实际变更。
+    */
+    bool removeNonBound();
+
     void clear();
 
 

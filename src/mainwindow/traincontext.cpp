@@ -652,6 +652,7 @@ void TrainContext::actAutoCorrectionBat(const QList<std::shared_ptr<Train>>& tra
 		}
 	}
 
+
 	auto clk_end = std::chrono::system_clock::now();
 
 	using namespace std::chrono_literals;
@@ -666,6 +667,42 @@ void TrainContext::actAutoCorrectionBat(const QList<std::shared_ptr<Train>>& tra
 			this));
 		QMessageBox::information(mw, tr("提示"), tr("应用完成，共%1个车次受到影响。").arg(sz));
 	}
+}
+
+void TrainContext::actRemoveNonBound()
+{
+	auto res = QMessageBox::question(mw, tr("删除未铺画车站"),
+		tr("删除所有列车时刻表中，没有对应到本运行图文件中线路上的车站。\n"
+			"是否继续？"));
+	if (res != QMessageBox::Yes)
+		return;
+
+	QVector<std::shared_ptr<Train>> modified, data;
+
+	foreach(auto train, diagram.trains()) {
+		auto t = std::make_shared<Train>(*train);
+		diagram.updateTrain(t);
+		bool flag = t->removeNonBound();
+		if (flag) {
+			modified.push_back(train);
+			data.push_back(t);
+		}
+		else {
+			// 析构掉
+			t.reset();
+		}
+	}
+
+	if (modified.empty()) {
+		QMessageBox::information(mw, tr("提示"), tr("应用完成，没有更改被执行"));
+	}
+	else {
+		int sz = modified.size();
+		mw->getUndoStack()->push(new qecmd::BatchAutoCorrection(std::move(modified), std::move(data),
+			this));
+		QMessageBox::information(mw, tr("提示"), tr("应用完成，共%1个车次受到影响。").arg(sz));
+	}
+
 }
 
 #if 0

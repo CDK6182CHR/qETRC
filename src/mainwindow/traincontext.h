@@ -255,6 +255,8 @@ public slots:
 
     void actAutoCorrectionBat(const QList<std::shared_ptr<Train>>& trainRange);
 
+    void actRemoveNonBound();
+
 #if 0
 
     /**
