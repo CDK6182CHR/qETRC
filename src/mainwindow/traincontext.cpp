@@ -693,6 +693,7 @@ void TrainContext::actRemoveNonBound()
 		}
 	}
 
+
 	if (modified.empty()) {
 		QMessageBox::information(mw, tr("提示"), tr("应用完成，没有更改被执行"));
 	}
@@ -703,6 +704,62 @@ void TrainContext::actRemoveNonBound()
 		QMessageBox::information(mw, tr("提示"), tr("应用完成，共%1个车次受到影响。").arg(sz));
 	}
 
+}
+
+void TrainContext::actRemoveNonBoundTrains()
+{
+	auto res = QMessageBox::question(mw, tr("删除未铺画车次"),
+		tr("删除本运行图中所有没有铺画任何运行线的车次。\n"
+			"是否继续？"));
+	if (res != QMessageBox::Yes)
+		return;
+
+	QList<std::shared_ptr<Train>> trains;
+	QList<int> indexes;
+	for (int i = 0; i < diagram.trains().size(); i++) {
+		auto train = diagram.trains().at(i);
+		if (train->adapters().empty()) {
+			trains.push_back(train);
+			indexes.push_back(i);
+		}
+	}
+
+	if (trains.empty()) {
+		QMessageBox::information(mw, tr("提示"), tr("没有更改被执行"));
+	}
+	else {
+		mw->getUndoStack()->push(new qecmd::RemoveTrains(trains, indexes, diagram.trainCollection(),
+			mw->trainListWidget->getModel()));
+		QMessageBox::information(mw, tr("提示"), tr("已删除%1个车次").arg(trains.size()));
+	}
+}
+
+void TrainContext::actRemoveEmptyTrains()
+{
+	auto res = QMessageBox::question(mw, tr("删除空白车次"),
+		tr("删除本运行图中所有时刻表为空白的车次。\n"
+			"是否继续？"));
+	if (res != QMessageBox::Yes)
+		return;
+
+	QList<std::shared_ptr<Train>> trains;
+	QList<int> indexes;
+	for (int i = 0; i < diagram.trains().size(); i++) {
+		auto train = diagram.trains().at(i);
+		if (train->timetable().empty()) {
+			trains.push_back(train);
+			indexes.push_back(i);
+		}
+	}
+
+	if (trains.empty()) {
+		QMessageBox::information(mw, tr("提示"), tr("没有更改被执行"));
+}
+	else {
+		mw->getUndoStack()->push(new qecmd::RemoveTrains(trains, indexes, diagram.trainCollection(),
+			mw->trainListWidget->getModel()));
+		QMessageBox::information(mw, tr("提示"), tr("已删除%1个车次").arg(trains.size()));
+	}
 }
 
 #if 0

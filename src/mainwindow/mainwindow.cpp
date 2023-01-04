@@ -929,7 +929,7 @@ void MainWindow::initToolbar()
 	}
 
 	QAction* actRemoveInterp, * actAutoBusiness, * actImportTimetableCsv, * actImportTrainTrf,
-		* actAutoCorrection, * actRemoveNonBound;
+		* actAutoCorrection, * actRemoveNonBound, * actRemoveNonBoundTrains, * actRemoveEmptyTrains;
 	//列车
 	if constexpr (true) {
 		auto* cat = ribbon->addCategoryPage(tr("列车(&3)"));
@@ -971,6 +971,9 @@ void MainWindow::initToolbar()
 
 		menu->addSeparator();
 		actRemoveNonBound = menu->addAction(tr("删除未铺画车站"));
+
+		actRemoveNonBoundTrains = menu->addAction(tr("删除未铺画车次"));
+		actRemoveEmptyTrains = menu->addAction(tr("删除空白车次"));
 
 		menu->addSeparator();
 		menu->addAction(tr("批量导出列车事件表 (csv)"),this,
@@ -1234,6 +1237,10 @@ void MainWindow::initToolbar()
 			contextTrain, &TrainContext::actAutoCorrectionAll);
 		connect(actRemoveNonBound, &QAction::triggered,
 			contextTrain, &TrainContext::actRemoveNonBound);
+		connect(actRemoveNonBoundTrains, &QAction::triggered,
+			contextTrain, &TrainContext::actRemoveNonBoundTrains);
+		connect(actRemoveEmptyTrains, &QAction::triggered,
+			contextTrain, &TrainContext::actRemoveEmptyTrains);
 
 		connect(actImportTimetableCsv, &QAction::triggered,
 			contextTrain, &TrainContext::actImportTrainFromCsv);

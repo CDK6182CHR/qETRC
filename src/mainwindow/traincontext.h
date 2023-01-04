@@ -257,6 +257,10 @@ public slots:
 
     void actRemoveNonBound();
 
+    void actRemoveNonBoundTrains();
+
+    void actRemoveEmptyTrains();
+
 #if 0
 
     /**
