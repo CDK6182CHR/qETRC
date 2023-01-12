@@ -61,12 +61,12 @@ QJsonObject TrainGroup::toJson() const
 
 void TrainGroup::addItem(const TrainName &name)
 {
-    _items.emplace_back(name);
+    _items.emplace_back(std::make_unique<TrainGroupItem>(name));
 }
 
 void TrainGroup::addItem(std::shared_ptr<Train> train)
 {
-    _items.emplace_back(train);
+    _items.emplace_back(std::make_unique<TrainGroupItem>(train));
 }
 
 bool TrainGroup::linearSearch(std::shared_ptr<const Train> train) const
