@@ -906,6 +906,7 @@ qecmd::UpdateRailStations::UpdateRailStations(RailContext* context,
 	std::shared_ptr<Railway> new_, bool equiv_, QUndoCommand* parent) :
 	QUndoCommand(parent), cont(context), railold(old_), railnew(new_), equiv(equiv_)
 {
+	qDebug() << "UpdateRailStations: equiv " << equiv << Qt::endl;
 	setText(QObject::tr("更新基线数据: %1").arg(old_->name()));
 	ordinateIndex = old_->ordinateIndex();
 }
@@ -913,7 +914,7 @@ qecmd::UpdateRailStations::UpdateRailStations(RailContext* context,
 void qecmd::UpdateRailStations::undo()
 {
 	railold->swapBaseWith(*railnew);
-	railold->setOrdinateIndex(ordinateIndex);
+	//railold->setOrdinateIndex(ordinateIndex);
 	cont->commitUpdateTimetable(railold, equiv);
 }
 

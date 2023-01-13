@@ -1149,6 +1149,10 @@ void Railway::swapBaseWith(Railway& other)
 	//for (int i = 0; i < _forbids.count(); i++) {
 	//	std::swap(_forbids[i]->_railway, other._forbids[i]->_railway);
 	//}
+	
+	// 2023.01.13: add swap ordinate index; is this ok?
+	std::swap(_ordinate, other._ordinate);
+
 	//ordinate
 	if (_ordinate) {
 		_ordinate = _rulers.at(_ordinate->index());

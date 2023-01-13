@@ -571,6 +571,7 @@ public:
      * 2022.04.03新增要求：必须以要用的数据为this指针调用本函数，即this和参数地位不等价。
      * this指针保证调用后所有Ruler/Forbid结点的头结点引用正确，
      * 但other不保证（只要有数据就一定不满足）。
+     * 2023.01.13：新增ordinate一并交换。
      */
     void swapBaseWith(Railway& other);
 

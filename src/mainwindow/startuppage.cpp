@@ -30,7 +30,7 @@ void StartupPage::onStartup()
 void StartupPage::initUI()
 {
     setFrameShape(StyledPanel);
-    resize(800,700);
+    resize(800,800);
     setWindowFlags(Qt::SplashScreen|Qt::WindowStaysOnTopHint);
 
     auto* vlay=new QVBoxLayout(this);

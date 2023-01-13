@@ -1551,7 +1551,7 @@ bool Diagram::save() const
         return false;
     }
     QJsonDocument doc(toJson());
-    file.write(doc.toJson());
+    file.write(doc.toJson(QJsonDocument::Compact));
     file.close();
     return true;
 }

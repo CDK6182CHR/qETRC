@@ -30,9 +30,9 @@ void TrainStation::fromJson(const QJsonObject &obj)
     if(!depart.isValid()){
         depart=QTime::fromString(obj.value("cfsj").toString(),"hh:mm");
     }
-    business = obj.value("business").toBool();
+    business = obj.value("business").toBool(false);   // 2023.01.13: default false
     track = obj.value("track").toString();
-    note = obj.value("note").toString();
+    note = obj.value("note").toString({});   // 2023.01.13: default false
 }
 
 QJsonObject TrainStation::toJson() const
@@ -41,11 +41,18 @@ QJsonObject TrainStation::toJson() const
         {"zhanming",name.toSingleLiteral()},
         {"ddsj",arrive.toString("hh:mm:ss")},
         {"cfsj",depart.toString("hh:mm:ss")},
-        {"business",business},
-        {"note",note}
+        // 2023.01.13: use default to reduce file size
+        //{"business",business},
+        //{"note",note}
     };
     if (!track.isEmpty()) {
         res.insert("track", track);
+    }
+    if (!note.isEmpty()) {
+        res.insert("note", note);
+    }
+    if (business) {
+        res.insert("business", business);
     }
     return res;
 }
