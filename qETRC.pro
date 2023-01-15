@@ -39,6 +39,8 @@ SOURCES += \
     src/data/train/traingroup.cpp \
     src/dialogs/jointrailwaydialog.cpp \
     src/dialogs/selecttrainstationdialog.cpp \
+    src/editors/train/trainfilterbasicwidget.cpp \
+    src/editors/train/trainfilterhelpers.cpp \
     src/editors/train/traingroupwidget.cpp \
     src/mainwindow/startuppage.cpp \
     src/mainwindow/version.cpp \
@@ -247,6 +249,8 @@ HEADERS += \
     src/data/train/traingroup.h \
     src/dialogs/jointrailwaydialog.h \
     src/dialogs/selecttrainstationdialog.h \
+    src/editors/train/trainfilterbasicwidget.h \
+    src/editors/train/trainfilterhelpers.h \
     src/editors/train/traingroupwidget.h \
     src/mainwindow/startuppage.h \
     src/util/combos/railstationcombo.h \

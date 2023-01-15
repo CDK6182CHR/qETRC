@@ -222,6 +222,8 @@
     <ClCompile Include="src\editors\edittrainwidget.cpp" />
     <ClCompile Include="src\editors\rail\gapconstraintwidget.cpp" />
     <ClCompile Include="src\editors\timetablewidget.cpp" />
+    <ClCompile Include="src\editors\train\trainfilterbasicwidget.cpp" />
+    <ClCompile Include="src\editors\train\trainfilterhelpers.cpp" />
     <ClCompile Include="src\mainwindow\startuppage.cpp" />
     <ClCompile Include="src\mainwindow\version.cpp" />
     <ClCompile Include="src\model\rail\forbidlistmodel.cpp" />
@@ -438,6 +440,8 @@
     <ClInclude Include="src\data\train\itrainfilter.h" />
     <QtMoc Include="src\dialogs\jointrailwaydialog.h" />
     <ClInclude Include="src\data\train\predeftrainfiltercore.h" />
+    <QtMoc Include="src\editors\train\trainfilterhelpers.h" />
+    <QtMoc Include="src\editors\train\trainfilterbasicwidget.h" />
     <ClInclude Include="src\model\rail\gapconstraintmodel.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <QtMoc Include="src\dialogs\changestationnamedialog.h">
