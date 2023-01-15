@@ -9,6 +9,7 @@
 #include "data/train/typemanager.h"
 #include "data/diagram/diadiff.h"
 
+class PredefTrainFilterCore;
 class Railway;
 class Train;
 class Routing;
@@ -27,7 +28,10 @@ class TrainCollection
 {
     QList<std::shared_ptr<Train>> _trains;
     QList<std::shared_ptr<Routing>> _routings;
+#if 0
     QVector<std::shared_ptr<TrainGroup>> _groups;
+#endif
+    QVector<std::unique_ptr<PredefTrainFilterCore>> _filters;
 
     /**
      * @brief 车次查找表  
@@ -79,8 +83,11 @@ public:
     auto& typeCount() { return _typeCount; }
     const auto& typeCount()const { return _typeCount; }
     auto routingAt(int i) { return _routings.at(i); }
+#if 0
     auto& groups() { return _groups; }
     auto& groups()const { return _groups; }
+#endif
+    auto& filters(){return _filters;}
 
     /**
      * @brief appendTrain 添加车次
@@ -203,6 +210,8 @@ public:
     bool routingNameExisted(const QString& name, std::shared_ptr<Routing> ignore = {})const;
 
     QString validRoutingName(const QString& prefix);
+
+    std::shared_ptr<const Routing> routingByName(const QString& name)const;
 
     inline int trainCount()const { return _trains.size(); }
 

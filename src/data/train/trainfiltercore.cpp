@@ -7,51 +7,6 @@ TrainFilterCore::TrainFilterCore(Diagram& diagram_):
     diagram(diagram_)
 {}
 
-#define DUMP(_Key) res.insert(#_Key, this->_Key)
-
-void TrainFilterCore::fromJson(const QJsonObject& obj)
-{
-
-}
-
-QJsonObject TrainFilterCore::toJson() const
-{
-    QJsonObject res;
-    DUMP(useType);
-    DUMP(useInclude);
-    DUMP(useExclude);
-    DUMP(useRouting);
-    DUMP(showOnly);
-    DUMP(useInverse);
-    DUMP(selNullRouting);
-    res.insert("passengerType", static_cast<int>(TrainPassenger::Auto));
-    
-    QJsonArray arTypes;
-    foreach(auto tp, types) {
-        arTypes.append(tp->name());
-    }
-    res.insert("types", arTypes);
-
-    QJsonArray arInclude;
-    foreach(const auto& reg, includes) {
-        arInclude.append(reg.pattern());
-    }
-    res.insert("includes", arInclude);
-
-    QJsonArray arExclude;
-    foreach(const auto& reg, excludes) {
-        arExclude.append(reg.pattern());
-    }
-    res.insert("excludes", arExclude);
-
-    QJsonArray arRouting;
-    foreach(const auto& rt, routings) {
-        arRouting.append(rt->name());
-    }
-    res.insert("routings", arRouting);
-    return res;
-}
-
 bool TrainFilterCore::checkType(std::shared_ptr<const Train> train) const
 {
     if(!useType) return true;

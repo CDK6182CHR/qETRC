@@ -8,7 +8,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
-#include "traingroup.h"
+#include "predeftrainfiltercore.h"
 
 TrainCollection::TrainCollection(const QJsonObject& obj, const TypeManager& defaultManager)
 {
@@ -44,6 +44,11 @@ void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaul
 		r->fromJson(p->toObject(), *this);
 		_routings.append(r);
 	}
+
+    //注意TrainFilter的读取依赖车次查找和Routing查找
+//    const auto& arfilt=obj.value("filters").toArray();
+//    for
+    // TODO here
     
 }
 
@@ -78,9 +83,16 @@ QJsonObject TrainCollection::toJson() const
 		argroup.append(p->toJson());
 	}
 #endif
+
+    QJsonArray arFilter;
+    foreach(const auto& f, _filters){
+        arFilter.append(f->toJson());
+    }
+
 	return QJsonObject{
 		{"trains",artrains},
 		{"circuits",arrouting},
+        {"filters",arFilter},
 #if 0
 		{"groups",argroup}
 #endif
@@ -265,7 +277,16 @@ QString TrainCollection::validRoutingName(const QString& prefix)
 		if (i)res += "_" + QString::number(i);
 		if (!routingNameExisted(res))
 			return res;
-	}
+    }
+}
+
+std::shared_ptr<const Routing> TrainCollection::routingByName(const QString &name) const
+{
+    foreach(const auto& rt, _routings){
+        if (rt->name()==name)
+            return rt;
+    }
+    return {};
 }
 
 int TrainCollection::getTrainIndex(std::shared_ptr<Train> train) const
