@@ -12,6 +12,7 @@
 #include "data/diagram/diadiff.h"
 #include "predeftrainfiltercore.h"   // not sure: is this neccesary?
 
+//class PredefTrainFilterCore;
 class Railway;
 class Train;
 class Routing;
@@ -33,7 +34,7 @@ class TrainCollection
 #if 0
     QVector<std::shared_ptr<TrainGroup>> _groups;
 #endif
-    std::deque<std::shared_ptr<PredefTrainFilterCore>> _filters;
+    std::deque<std::unique_ptr<PredefTrainFilterCore>> _filters;
 
     /**
      * @brief 车次查找表  

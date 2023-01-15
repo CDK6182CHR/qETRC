@@ -5,12 +5,6 @@
 #include "data/diagram/diagram.h"
 #include "data/train/traincollection.h"
 
-PredefTrainFilterCore::PredefTrainFilterCore(Diagram &diagram):
-    TrainFilterCore()
-{
-
-}
-
 #define LOAD_BOOL(_Key) this->_Key=obj.value(#_Key).toBool()
 
 void PredefTrainFilterCore::fromJson(const QJsonObject &obj, const TrainCollection& coll)

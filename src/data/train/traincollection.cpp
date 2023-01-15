@@ -21,6 +21,7 @@ void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaul
 	_manager.readForDiagram(obj.value("config").toObject(), defaultManager);
 	_routings.clear();
 	//_groups.clear();
+	_filters.clear();
 
 	//Train类型的正确设置依赖于TypeManager的正确初始化
 	const QJsonArray& artrains = obj.value("trains").toArray();
@@ -46,9 +47,12 @@ void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaul
 	}
 
     //注意TrainFilter的读取依赖车次查找和Routing查找
-//    const auto& arfilt=obj.value("filters").toArray();
-//    for
-    // TODO here
+    const auto& arfilt=obj.value("filters").toArray();
+	foreach(const auto& f, arfilt) {
+		auto fil = std::make_unique<PredefTrainFilterCore>();
+		fil->fromJson(f.toObject(), *this);
+		_filters.emplace_back(std::move(fil));
+	}
     
 }
 
@@ -85,7 +89,7 @@ QJsonObject TrainCollection::toJson() const
 #endif
 
     QJsonArray arFilter;
-    foreach(const auto& f, _filters){
+    for (const auto& f: _filters){
         arFilter.append(f->toJson());
     }
 

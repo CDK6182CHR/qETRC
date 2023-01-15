@@ -14,7 +14,7 @@ class PredefTrainFilterCore : public TrainFilterCore
 {
     QString _name,_note;
 public:
-    explicit PredefTrainFilterCore(Diagram& diagram);
+    explicit PredefTrainFilterCore()=default;
 
     auto& name()const {return _name;}
     auto& note()const {return _note;}
