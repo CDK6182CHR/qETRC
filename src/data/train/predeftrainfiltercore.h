@@ -3,6 +3,8 @@
 #include "trainfiltercore.h"
 #include <QJsonObject>
 
+class TrainCollection;
+
 /**
  * @brief The PredefTrainFilterCore class
  * 2023.01.15  The predefined TrainFilterCore, including extra fields for identification,
@@ -19,7 +21,7 @@ public:
     void setName(const QString& n){_name=n;}
     void setNote(const QString& n){_note=n;}
 
-    void fromJson(const QJsonObject& obj);
+    void fromJson(const QJsonObject& obj, const TrainCollection& coll);
     QJsonObject toJson()const;
 };
 

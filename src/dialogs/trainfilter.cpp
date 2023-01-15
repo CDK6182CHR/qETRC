@@ -19,7 +19,7 @@
 
 
 TrainFilter::TrainFilter(Diagram &diagram_, QWidget *parent):
-    QDialog(parent), diagram(diagram_), core(diagram_)
+    QDialog(parent), diagram(diagram_), core()
 {
     resize(400,500);
     setWindowTitle(tr("车次筛选器"));

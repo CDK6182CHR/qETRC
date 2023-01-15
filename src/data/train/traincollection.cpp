@@ -20,7 +20,7 @@ void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaul
 	_trains.clear();
 	_manager.readForDiagram(obj.value("config").toObject(), defaultManager);
 	_routings.clear();
-	_groups.clear();
+	//_groups.clear();
 
 	//Train类型的正确设置依赖于TypeManager的正确初始化
 	const QJsonArray& artrains = obj.value("trains").toArray();

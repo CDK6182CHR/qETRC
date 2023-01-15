@@ -22,7 +22,7 @@ class TrainFilterCore:
     friend class TrainFilter;
 
 protected:
-    Diagram& diagram;
+    //Diagram& diagram;
 
     bool useType=false, useInclude=false, useExclude=false;
     bool useRouting=false, showOnly=false, useInverse=false;
@@ -41,7 +41,7 @@ public:
      * 从private改为public
      * 直接构造出来的结果将是空白筛选器，对任何列车都通过。
      */
-    explicit TrainFilterCore(Diagram& diagram_);
+    explicit TrainFilterCore()=default;
     TrainFilterCore(const TrainFilterCore&) = delete;
     TrainFilterCore& operator=(const TrainFilterCore&) = delete;
     TrainFilterCore(TrainFilterCore&&) = delete;

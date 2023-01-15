@@ -6,14 +6,14 @@
 #include "data/train/traincollection.h"
 
 PredefTrainFilterCore::PredefTrainFilterCore(Diagram &diagram):
-    TrainFilterCore(diagram)
+    TrainFilterCore()
 {
 
 }
 
 #define LOAD_BOOL(_Key) this->_Key=obj.value(#_Key).toBool()
 
-void PredefTrainFilterCore::fromJson(const QJsonObject &obj)
+void PredefTrainFilterCore::fromJson(const QJsonObject &obj, const TrainCollection& coll)
 {
     _name=obj.value("name").toString();
     _note=obj.value("note").toString();
@@ -33,7 +33,6 @@ void PredefTrainFilterCore::fromJson(const QJsonObject &obj)
 
     passengerType=static_cast<TrainPassenger>(obj.value("passengerType").toInt(1));
 
-    const auto& coll=diagram.trainCollection();
     const auto& tps=obj.value("types").toArray();
     foreach(const auto& t,tps){
         auto tp=coll.typeManager().find(t.toString());

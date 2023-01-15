@@ -3,9 +3,11 @@
 #include "traintype.h"
 #include "routing.h"
 
+#if 0
 TrainFilterCore::TrainFilterCore(Diagram& diagram_):
     diagram(diagram_)
 {}
+#endif
 
 bool TrainFilterCore::checkType(std::shared_ptr<const Train> train) const
 {

@@ -215,7 +215,7 @@
     <ClCompile Include="src\data\gapset\gapsetabstract.cpp" />
     <ClCompile Include="src\data\gapset\transparentset.cpp" />
     <ClCompile Include="src\data\train\itrainfilter.cpp" />
-    <ClCompile Include="src\data\train\traingroup.cpp" />
+    <ClCompile Include="src\data\train\predeftrainfiltercore.cpp" />
     <ClCompile Include="src\dialogs\jointrailwaydialog.cpp" />
     <ClCompile Include="src\dialogs\rulerfromspeeddialog.cpp" />
     <ClCompile Include="src\dialogs\selecttrainstationdialog.cpp" />
@@ -437,7 +437,7 @@
     <QtMoc Include="src\dialogs\selecttrainstationdialog.h" />
     <ClInclude Include="src\data\train\itrainfilter.h" />
     <QtMoc Include="src\dialogs\jointrailwaydialog.h" />
-    <ClInclude Include="src\data\train\traingroup.h" />
+    <ClInclude Include="src\data\train\predeftrainfiltercore.h" />
     <ClInclude Include="src\model\rail\gapconstraintmodel.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <QtMoc Include="src\dialogs\changestationnamedialog.h">

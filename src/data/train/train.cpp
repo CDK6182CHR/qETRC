@@ -1,6 +1,8 @@
 ﻿#include "train.h"
 #include <QDebug>
 
+#include "data/rail/railcategory.h"
+#include "data/rail/railway.h"
 #include "data/diagram/trainline.h"
 #include "data/diagram/trainadapter.h"
 #include "data/train/traintype.h"
