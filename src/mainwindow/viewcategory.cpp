@@ -136,6 +136,7 @@ void ViewCategory::initUI()
     gall->currentViewGroup()->setGridSize(QSize(group->gridSize().width(),
         SystemJson::instance.table_row_height));
 
+    panel = cat->addPannel(tr("显示车次组"));
     act = new QAction(QIcon(":/icons/filter.png"), tr("高级"), this);
     act->setToolTip(tr("高级显示类型筛选 (Ctrl+Shift+L)\n"
         "使用（与pyETRC一致的）车次筛选器来决定显示车次的集合。"));

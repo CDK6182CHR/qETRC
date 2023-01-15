@@ -1,4 +1,5 @@
-﻿#include "traingroup.h"
+﻿#if 0
+#include "traingroup.h"
 
 #include <QJsonArray>
 
@@ -24,6 +25,11 @@ const TrainName &TrainGroupItem::name() const
     } else{
         return train.lock()->trainName();
     }
+}
+
+TrainGroup::TrainGroup(const QJsonObject& obj, TrainCollection& coll)
+{
+    fromJson(obj, coll);
 }
 
 bool TrainGroup::check(std::shared_ptr<const Train> train) const
@@ -77,3 +83,4 @@ bool TrainGroup::linearSearch(std::shared_ptr<const Train> train) const
     }
     return false;
 }
+#endif

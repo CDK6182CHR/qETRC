@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#if 0
+#pragma once
 #include <memory>
 #include <deque>
 #include <QJsonObject>
@@ -35,6 +36,7 @@ class TrainGroup: public ITrainFilter
     std::deque<std::unique_ptr<TrainGroupItem>> _items;
 public:
     TrainGroup()=default;
+    TrainGroup(const QJsonObject& obj, TrainCollection& coll);
     auto& items(){return _items;}
     const auto& items()const{return _items;}
     const auto& name()const{return _name;}
@@ -54,3 +56,4 @@ private:
     bool linearSearch(std::shared_ptr<const Train> train)const;
 };
 
+#endif

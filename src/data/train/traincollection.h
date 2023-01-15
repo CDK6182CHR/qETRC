@@ -14,6 +14,7 @@ class Train;
 class Routing;
 class TrainType;
 class RailCategory;
+class TrainGroup;
 
 /**
  * @brief The TrainCollection class
@@ -26,6 +27,7 @@ class TrainCollection
 {
     QList<std::shared_ptr<Train>> _trains;
     QList<std::shared_ptr<Routing>> _routings;
+    QVector<std::shared_ptr<TrainGroup>> _groups;
 
     /**
      * @brief 车次查找表  
@@ -77,6 +79,8 @@ public:
     auto& typeCount() { return _typeCount; }
     const auto& typeCount()const { return _typeCount; }
     auto routingAt(int i) { return _routings.at(i); }
+    auto& groups() { return _groups; }
+    auto& groups()const { return _groups; }
 
     /**
      * @brief appendTrain 添加车次

@@ -3,6 +3,7 @@
 #include <memory>
 #include <QVector>
 #include <QSet>
+#include <QJsonObject>
 
 #include "train.h"
 #include "itrainfilter.h"
@@ -45,6 +46,9 @@ public:
     TrainFilterCore& operator=(TrainFilterCore&&) = delete;
 
     bool check(std::shared_ptr<const Train> train)const override;
+
+    void fromJson(const QJsonObject& obj);
+    QJsonObject toJson()const;
 private:
     bool checkType(std::shared_ptr<const Train> train)const;
     bool checkInclude(std::shared_ptr<const Train> train)const;

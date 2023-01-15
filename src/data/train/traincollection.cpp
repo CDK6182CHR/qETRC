@@ -8,6 +8,8 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
+#include "traingroup.h"
+
 TrainCollection::TrainCollection(const QJsonObject& obj, const TypeManager& defaultManager)
 {
 	fromJson(obj, defaultManager);
@@ -18,6 +20,7 @@ void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaul
 	_trains.clear();
 	_manager.readForDiagram(obj.value("config").toObject(), defaultManager);
 	_routings.clear();
+	_groups.clear();
 
 	//Train类型的正确设置依赖于TypeManager的正确初始化
 	const QJsonArray& artrains = obj.value("trains").toArray();
@@ -26,6 +29,13 @@ void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaul
 	}
 	
 	resetMapInfo();
+
+#if 0
+	const QJsonArray& argroup = obj.value("groups").toArray();
+	foreach(const auto& a, argroup) {
+		_groups.push_back(std::make_shared<TrainGroup>(a.toObject(), *this));
+	}
+#endif
 
 	//注意Routing的读取依赖车次查找
 	const QJsonArray& arrouting = obj.value("circuits").toArray();
@@ -62,9 +72,18 @@ QJsonObject TrainCollection::toJson() const
 	for (auto p : _routings) {
 		arrouting.append(p->toJson());
 	}
+#if 0
+	QJsonArray argroup;
+	foreach(auto p, _groups) {
+		argroup.append(p->toJson());
+	}
+#endif
 	return QJsonObject{
 		{"trains",artrains},
-		{"circuits",arrouting}
+		{"circuits",arrouting},
+#if 0
+		{"groups",argroup}
+#endif
 	};
 }
 
