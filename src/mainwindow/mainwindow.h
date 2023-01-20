@@ -502,6 +502,8 @@ public slots:
      */
     void actSearchTrain();
 
+    void actEditFilters();
+
     /**
      * 系统默认配置改变后立即保存
      */

@@ -20,6 +20,7 @@ class TrainFilterCore:
     public ITrainFilter
 {
     friend class TrainFilter;
+    friend class TrainFilterBasicWidget;
 
 protected:
     //Diagram& diagram;

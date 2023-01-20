@@ -45,6 +45,7 @@ SOURCES += \
     src/mainwindow/startuppage.cpp \
     src/mainwindow/version.cpp \
     src/util/combos/railstationcombo.cpp \
+    src/util/qefoldwidget.cpp \
     src/viewers/railtopotable.cpp \
     src/viewers/stats/intervaltraintable.cpp \
     src/data/calculation/calculationlog.cpp \
@@ -255,6 +256,7 @@ HEADERS += \
     src/mainwindow/startuppage.h \
     src/util/combos/railstationcombo.h \
     src/util/helper_templates.hpp \
+    src/util/qefoldwidget.h \
     src/viewers/railtopotable.h \
     src/viewers/stats/intervaltraintable.h \
     src/data/calculation/calculationlog.h \

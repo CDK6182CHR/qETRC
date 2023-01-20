@@ -1032,6 +1032,11 @@ void MainWindow::initToolbar()
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(70);
 
+		act = new QAction(QIcon(":/icons/filter.png"), tr("预设筛选"), this);
+		act->setToolTip(tr("预设筛选器\n编辑运行图预设的列车筛选器"));
+		panel->addLargeAction(act);
+		connect(act, &QAction::triggered, this, &MainWindow::actEditFilters);
+
 		panel = cat->addPannel(tr("运行线控制"));
 
 		if constexpr (true) {
@@ -2273,6 +2278,18 @@ void MainWindow::actSearchTrain()
 		focusInTrain(train);
 		contextTrain->highlightTrainLine(train);
 	}
+}
+
+#include "editors/train/trainfilterbasicwidget.h"  // this is only for test
+
+void MainWindow::actEditFilters()
+{
+	TrainFilterCore core;
+	auto* w = new TrainFilterBasicWidget(_diagram.trainCollection(), &core, this);
+	w->setWindowFlag(Qt::Dialog);
+	w->setAttribute(Qt::WA_DeleteOnClose);
+
+	w->show();
 }
 
 void MainWindow::saveDefaultConfig()
