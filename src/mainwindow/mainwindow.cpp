@@ -2288,6 +2288,8 @@ void MainWindow::actEditFilters()
 	auto* w = new TrainFilterBasicWidget(_diagram.trainCollection(), &core, this);
 	w->setWindowFlag(Qt::Dialog);
 	w->setAttribute(Qt::WA_DeleteOnClose);
+	w->resize(500, 600);
+	w->refreshData();
 
 	w->show();
 }

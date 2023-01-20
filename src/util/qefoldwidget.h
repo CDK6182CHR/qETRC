@@ -45,5 +45,7 @@ signals:
 
 public slots:
     void toggle();
+    void expand();
+    void collapse();
 };
 

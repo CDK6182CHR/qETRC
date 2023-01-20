@@ -25,7 +25,7 @@ void QEFoldWidget::initUI()
 
     btnFold=new QToolButton;
     btnFold->setIcon(qApp->style()->standardIcon(QStyle::SP_ToolBarHorizontalExtensionButton));
-    connect(btnFold,&QToolButton::toggled,this,&QEFoldWidget::toggle);
+    connect(btnFold,&QToolButton::clicked,this,&QEFoldWidget::toggle);
     hlay->addWidget(btnFold);
     hlay->addWidget(_titleWidget);
     vlay->addLayout(hlay);
@@ -49,5 +49,26 @@ void QEFoldWidget::toggle()
         m_expanded=true;
     }
     emit toggled(m_expanded);
+}
+
+void QEFoldWidget::expand()
+{
+    if (!m_expanded){
+        btnFold->setIcon(qApp->style()->standardIcon(QStyle::SP_ToolBarVerticalExtensionButton));
+        _paneWidget->setVisible(true);
+        m_expanded=true;
+        emit toggled(m_expanded);
+    }
+}
+
+void QEFoldWidget::collapse()
+{
+    if (m_expanded){
+        // toggle collapse
+        btnFold->setIcon(qApp->style()->standardIcon(QStyle::SP_ToolBarHorizontalExtensionButton));
+        _paneWidget->setVisible(false);
+        m_expanded=false;
+        emit toggled(m_expanded);
+    }
 }
 
