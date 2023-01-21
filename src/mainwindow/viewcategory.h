@@ -15,13 +15,16 @@ class Train;
 class TrainLine;
 class SARibbonGallery;
 class SARibbonGalleryGroup;
+class SARibbonMenu;
 class Diagram;
 class SARibbonCategory;
+class PredefTrainFilterCore;
 
 class MainWindow;
 class TypeManager;
 class TrainFilter;
 class DiagramPage;
+class TrainCollection;
 
 /**
  * @brief The ViewCategory class
@@ -41,6 +44,7 @@ class ViewCategory : public QObject
 
     SARibbonGalleryGroup* group;
     SARibbonGallery* gall;
+    SARibbonMenu* meFilters;
 
     TrainFilter* const filter;
 
@@ -76,6 +80,8 @@ public:
 
 private:
     void initUI();
+
+    void setupTrainFilterMenu();
 
     /**
      * 这里负责压栈Undo，不执行真正的操作
@@ -146,6 +152,15 @@ private slots:
      */
     void trainFilterApplied();
 
+    /**
+     * 2023.01.21  直接应用预设的筛选器。
+     * 后续操作都是一样的。
+     */
+    void predefTrainFilterApplied(const PredefTrainFilterCore* core);
+
+    void actPredefFilter();
+    void actSysFilter();
+
 public slots:
 
     /**
@@ -166,6 +181,8 @@ public slots:
      * 刷新类型表。暂定暴力重来一遍就好
      */
     void refreshTypeGroup();
+
+    void refreshFilters();
 
     /**
      * 实际执行结束，只负责重新铺图
@@ -204,6 +221,18 @@ public slots:
         std::shared_ptr<TypeManager> data);
 
     void saveDefaultConfigs();
+
+    void actAddFilter(TrainCollection& coll);
+
+    void actRemoveFilter(TrainCollection& coll, int id);
+
+    void actUpdateFilter(PredefTrainFilterCore* filter, std::unique_ptr<PredefTrainFilterCore>& data);
+
+    void commitAddFilter(int place, const PredefTrainFilterCore* filter);
+
+    void commitRemoveFilter(int id, const PredefTrainFilterCore* filter);
+
+    void commitUpdateFilter(PredefTrainFilterCore* filter);
 };
 
 
@@ -321,6 +350,46 @@ namespace qecmd {
     class ApplyConfigToPages :public QUndoCommand {
     public:
         ApplyConfigToPages(QUndoCommand* parent = nullptr);
+    };
+
+    /**
+     * The actually operation on data is handled here in.
+     */
+    class AddTrainFilter :public QUndoCommand {
+        TrainCollection& coll;
+        std::unique_ptr<PredefTrainFilterCore> data;
+        ViewCategory* const cat;
+    public:
+        AddTrainFilter(TrainCollection& coll, ViewCategory* cat, QUndoCommand* parent=nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    class RemoveTrainFilter :public QUndoCommand {
+        TrainCollection& coll;
+        int id;
+        std::unique_ptr<PredefTrainFilterCore> data;
+        ViewCategory* const cat;
+    public:
+        RemoveTrainFilter(TrainCollection& coll, int id, ViewCategory* cat, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    /**
+     * The data update is applied here in. 
+     * Just like other Diagram components, the address of PredefTrainFilterCore is conserved.
+     */
+    class UpdateTrainFilter :public QUndoCommand {
+        TrainCollection& coll;
+        PredefTrainFilterCore*const core;
+        std::unique_ptr<PredefTrainFilterCore> data;
+        ViewCategory* const cat;
+    public:
+        UpdateTrainFilter(TrainCollection& coll, PredefTrainFilterCore* core,
+            std::unique_ptr<PredefTrainFilterCore>&& data_, ViewCategory* cat, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
     };
 }
 #endif

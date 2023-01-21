@@ -17,9 +17,9 @@ public:
 private:
     void initUI();
 private slots:
-//    void actApply();
-    void refreshData(const QVector<QRegExp>& _names);
+
 public slots:
+    void refreshData(const QVector<QRegExp>& _names);
     void clearNames();
 };
 

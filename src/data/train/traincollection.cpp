@@ -408,6 +408,29 @@ QList<std::shared_ptr<Train>> TrainCollection::boundTrains(std::shared_ptr<Railw
 	return res;
 }
 
+bool TrainCollection::filterNameIsValid(const QString& name, const PredefTrainFilterCore* ignore)
+{
+	if (name.isEmpty())return false;
+	for (const auto& t : _filters) {
+		if (t.get() != ignore && t->name() == name)
+			return false;
+	}
+	return true;
+}
+
+QString TrainCollection::validFilterName(const QString& prefix)
+{
+	for (int i = 0;; i++) {
+		QString name = prefix;
+		if (i) {
+			name.append(QString::number(i));
+		}
+		if (filterNameIsValid(name))
+			return name;
+	}
+	// not reachable here
+}
+
 
 void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 {

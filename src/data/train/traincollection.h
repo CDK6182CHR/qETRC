@@ -272,6 +272,10 @@ public:
      */
     QList<std::shared_ptr<Train>> boundTrains(std::shared_ptr<Railway> railway);
 
+    bool filterNameIsValid(const QString& name, const PredefTrainFilterCore* ignore=nullptr);
+
+    QString validFilterName(const QString& prefix);
+
 private:
     /**
      * @brief addMapInfo

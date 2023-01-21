@@ -15,7 +15,6 @@
 #include "data/rail/railcategory.h"
 #include "model/delegate/qedelegate.h"
 
-
 RulerPaintPageStation::RulerPaintPageStation(RailCategory &cat_, QWidget *parent):
     QWizardPage(parent),cat(cat_),model(new RailStationModel(false,this))
 {

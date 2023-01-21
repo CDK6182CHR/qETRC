@@ -6,8 +6,8 @@
 
 class SelectTrainTypeListWidget;
 class TrainFilterCore;
-class SelectRoutingDialog;
-class TrainNameRegexDialog;
+class SelectRoutingListWidget;
+class TrainNameRegexTable;
 class QCheckBox;
 class TrainCollection;
 
@@ -27,23 +27,37 @@ class TrainFilterBasicWidget : public QWidget
     RadioButtonGroup<3> *gpPassen;
 
     SelectTrainTypeListWidget* lstType=nullptr;
-    TrainNameRegexDialog* dlgInclude=nullptr,*dlgExclude=nullptr;
-    SelectRoutingDialog* dlgRouting=nullptr;
+    TrainNameRegexTable* tabInclude=nullptr,*tabExclude=nullptr;
+    SelectRoutingListWidget* lstRouting=nullptr;
 public:
     explicit TrainFilterBasicWidget(TrainCollection& coll, TrainFilterCore* core, QWidget *parent = nullptr);
     auto* core(){return _core;}
     void setCore(TrainFilterCore* core){_core=core; refreshData();}
+    void setCoreSimple(TrainFilterCore* core) { _core = core; }
+
+    /**
+     * @brief clearFilter
+     * 2023.01.21
+     * @returns whether does cleared; if rejected by user, return false.
+     */
+    bool clearFilter();
+
+    /**
+     * 2023.01.21  Set current data to the given object.
+     * This is mainly used for Predef version.
+     */
+    void appliedData(TrainFilterCore* core);
 
 private:
     void initUI();
-private slots:
-    void selectType();
-    void setInclude();
-    void setExclude();
-    void selectRouting();
-    void actApply();
+    
 public slots:
-    void clearFilter();
+    /**
+     * This is not internally called. 
+     * Set the data into corresponding core object.
+     */
+    void actApply();
+    void clearNotChecked();
     void refreshData();
 
 };

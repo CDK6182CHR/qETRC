@@ -73,6 +73,7 @@
 #include "wizards/greedypaint/greedypaintwizard.h"
 #include "viewers/stats/intervaltraindialog.h"
 #include "viewers/stats/intervalcountdialog.h"
+#include "editors/train/predeftrainfiltermanager.h"
 
 MainWindow::MainWindow(QWidget* parent)
 	: SARibbonMainWindow(parent, true),
@@ -1479,6 +1480,7 @@ void MainWindow::endResetGraph()
 	trainListWidget->refreshData();
 	routingWidget->refreshData();
 	catView->refreshTypeGroup();
+	catView->refreshFilters();
 
 	spPassedStations->setValue(_diagram.config().max_passed_stations);
 
@@ -1946,6 +1948,7 @@ void MainWindow::refreshAll()
 		p->refreshData();
 	}
 	catView->refreshTypeGroup();
+	catView->refreshFilters();
 	//更新各个context，由context负责更新自己管理的widget的数据
 	contextTrain->refreshAllData();
 	contextRail->refreshAllData();
@@ -2280,18 +2283,23 @@ void MainWindow::actSearchTrain()
 	}
 }
 
-#include "editors/train/trainfilterbasicwidget.h"  // this is only for test
 
 void MainWindow::actEditFilters()
 {
-	TrainFilterCore core;
-	auto* w = new TrainFilterBasicWidget(_diagram.trainCollection(), &core, this);
-	w->setWindowFlag(Qt::Dialog);
-	w->setAttribute(Qt::WA_DeleteOnClose);
-	w->resize(500, 600);
-	w->refreshData();
+	if (!filterManager) {
+		filterManager = new PredefTrainFilterManager(_diagram.trainCollection());
+		filterManager->setWindowFlag(Qt::Dialog);
+		filterManager->resize(800, 700);
+		filterManager->refreshData();
 
-	w->show();
+		connect(filterManager, &PredefTrainFilterManager::addFilter,
+			catView, &ViewCategory::actAddFilter);
+		connect(filterManager, &PredefTrainFilterManager::removeFilter,
+			catView, &ViewCategory::actRemoveFilter);
+		connect(filterManager, &PredefTrainFilterManager::updateFilter,
+			catView, &ViewCategory::actUpdateFilter, Qt::UniqueConnection);
+	}
+	filterManager->show();
 }
 
 void MainWindow::saveDefaultConfig()

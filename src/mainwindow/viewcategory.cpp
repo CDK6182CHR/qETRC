@@ -13,6 +13,7 @@
 #include "data/diagram/config.h"
 #include "data/common/qesystem.h"
 #include "data/diagram/diagrampage.h"
+#include "editors/train/predeftrainfiltermanager.h"
 
 #include <SARibbonPannelItem.h>
 #include <SARibbonGallery.h>
@@ -136,14 +137,17 @@ void ViewCategory::initUI()
     gall->currentViewGroup()->setGridSize(QSize(group->gridSize().width(),
         SystemJson::instance.table_row_height));
 
-    panel = cat->addPannel(tr("显示车次组"));
+    //panel = cat->addPannel(tr("显示车次组"));
     act = new QAction(QIcon(":/icons/filter.png"), tr("高级"), this);
     act->setToolTip(tr("高级显示类型筛选 (Ctrl+Shift+L)\n"
         "使用（与pyETRC一致的）车次筛选器来决定显示车次的集合。"));
     act->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_L);
+    meFilters = new SARibbonMenu(mw);
+    act->setMenu(meFilters);
     mw->addAction(act);
     connect(act, &QAction::triggered, filter, &TrainFilter::show);
     panel->addLargeAction(act);
+
 
     panel = cat->addPannel(tr("设置"));
     act = new QAction(QIcon(":/icons/config.png"), tr("显示设置"), this);
@@ -194,6 +198,25 @@ void ViewCategory::initUI()
     ma->setToolTip(tr("默认类型规则\n配置[系统默认设置]的正则表达式判定车次所述类型规则，"
         "将用于缺省的新运行图。"));
     act->setMenu(m);
+}
+
+void ViewCategory::setupTrainFilterMenu()
+{
+    meFilters->clear();
+
+    // SysFilters
+    for (int i = 0; i < PredefTrainFilterCore::MAX_FILTERS; i++) {
+        auto& name = PredefTrainFilterCore::getSysFilterName(static_cast<PredefTrainFilterCore::SysFilterId>(i));
+        auto* act = meFilters->addAction(name, this, &ViewCategory::actSysFilter);
+        act->setData(i);
+    }
+
+    meFilters->addSeparator();
+
+    for (const auto& t : diagram.trainCollection().filters()) {
+        auto* act = meFilters->addAction(t->name(), this, &ViewCategory::actPredefFilter);
+        act->setData(QVariant::fromValue(t.get()));
+    }
 }
 
 void ViewCategory::setDirTrainsShow(Direction dir, bool show)
@@ -464,6 +487,39 @@ void ViewCategory::trainFilterApplied()
         mw->getUndoStack()->push(new qecmd::ChangeTrainsShowByFilter(std::move(lines), this));
 }
 
+void ViewCategory::predefTrainFilterApplied(const PredefTrainFilterCore* core)
+{
+    QVector<std::shared_ptr<TrainLine>> lines;
+    foreach(auto train, diagram.trainCollection().trains()) {
+        bool show = core->check(train);
+        //qDebug() << train->trainName().full() << ", " << show;
+        foreach(auto adp, train->adapters()) {
+            foreach(auto line, adp->lines()) {
+                if (line->show() != show) {
+                    lines.append(line);
+                }
+            }
+        }
+    }
+    if (!lines.empty())
+        mw->getUndoStack()->push(new qecmd::ChangeTrainsShowByFilter(std::move(lines), this));
+}
+
+void ViewCategory::actPredefFilter()
+{
+    auto* s = qobject_cast<QAction*>(sender());
+    auto* core = qvariant_cast<PredefTrainFilterCore*>(s->data());  // how to do with pointer?
+    assert(core);
+    predefTrainFilterApplied(core);
+}
+
+void ViewCategory::actSysFilter()
+{
+    auto* s = qobject_cast<QAction*>(sender());
+    auto id = static_cast<typename PredefTrainFilterCore::SysFilterId>(s->data().toInt());
+    predefTrainFilterApplied(PredefTrainFilterCore::getSysFilter(id));
+}
+
 void ViewCategory::commitConfigChange(Config& cfg, bool repaint)
 {
     Q_UNUSED(cfg);
@@ -528,6 +584,11 @@ void ViewCategory::refreshTypeGroup()
     }
 }
 
+void ViewCategory::refreshFilters()
+{
+    setupTrainFilterMenu();
+}
+
 void ViewCategory::actCollTypeSetChanged(TypeManager& manager, 
     const QMap<QString, std::shared_ptr<TrainType>>& types, 
     const QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>>& modified)
@@ -587,6 +648,46 @@ void ViewCategory::actDefaultTypeRegexChanged(TypeManager& manager, std::shared_
 void ViewCategory::saveDefaultConfigs()
 {
     mw->saveDefaultConfig();
+}
+
+void ViewCategory::actAddFilter(TrainCollection& coll)
+{
+    mw->getUndoStack()->push(new qecmd::AddTrainFilter(coll, this));
+}
+
+void ViewCategory::actRemoveFilter(TrainCollection& coll, int id)
+{
+    mw->getUndoStack()->push(new qecmd::RemoveTrainFilter(coll, id, this));
+}
+
+void ViewCategory::actUpdateFilter(PredefTrainFilterCore* filter, std::unique_ptr<PredefTrainFilterCore>& data)
+{
+    mw->getUndoStack()->push(new qecmd::UpdateTrainFilter(diagram.trainCollection(), 
+        filter, std::move(data), this));
+}
+
+void ViewCategory::commitAddFilter(int place, const PredefTrainFilterCore* filter)
+{
+    setupTrainFilterMenu();
+    if (mw->filterManager) {
+        mw->filterManager->commitAddFilter(place, filter);
+    }
+}
+
+void ViewCategory::commitRemoveFilter(int id, const PredefTrainFilterCore* filter)
+{
+    setupTrainFilterMenu();
+    if (auto* a = mw->filterManager) {
+        a->commitRemoveFilter(id, filter);
+    }
+}
+
+void ViewCategory::commitUpdateFilter(PredefTrainFilterCore* filter)
+{
+    setupTrainFilterMenu();   // in cases where name may changed
+    if (auto* a = mw->filterManager) {
+        a->commitUpdateFilter(filter);
+    }
 }
 
 qecmd::ChangeTrainShow::ChangeTrainShow(const QList<std::shared_ptr<TrainLine>>& lines_,
@@ -700,3 +801,65 @@ qecmd::ApplyConfigToPages::ApplyConfigToPages(QUndoCommand* parent):
 }
 
 #endif
+
+qecmd::AddTrainFilter::AddTrainFilter(TrainCollection& coll, ViewCategory* cat, QUndoCommand* parent):
+    QUndoCommand(parent), coll(coll), data(), cat(cat)
+{
+    data.reset(new PredefTrainFilterCore);
+    const auto& name = coll.validFilterName(QObject::tr("新建筛选器"));
+    data->setName(name);
+    setText(name);
+}
+
+void qecmd::AddTrainFilter::undo()
+{
+    data = std::move(coll.filters().back());
+    coll.filters().pop_back();
+    cat->commitRemoveFilter(coll.filters().size(), data.get());
+}
+
+void qecmd::AddTrainFilter::redo()
+{
+    coll.filters().emplace_back(std::move(data));
+    cat->commitAddFilter(coll.filters().size()-1, coll.filters().back().get());
+}
+
+qecmd::RemoveTrainFilter::RemoveTrainFilter(TrainCollection& coll, int id, ViewCategory* cat, QUndoCommand* parent):
+    QUndoCommand(parent),coll(coll),id(id),data(),cat(cat)
+{
+    const auto& f = coll.filters().at(id);
+    setText(QObject::tr("删除筛选器: %1").arg(f->name()));
+}
+
+void qecmd::RemoveTrainFilter::undo()
+{
+    auto* d = data.get();
+    coll.filters().insert(coll.filters().begin() + id, std::move(data));
+    cat->commitAddFilter(id, d);
+}
+
+void qecmd::RemoveTrainFilter::redo()
+{
+    data = std::move(coll.filters().at(id));
+    coll.filters().erase(coll.filters().begin() + id);
+    cat->commitRemoveFilter(id, data.get());
+}
+
+qecmd::UpdateTrainFilter::UpdateTrainFilter(TrainCollection& coll, PredefTrainFilterCore* core, 
+    std::unique_ptr<PredefTrainFilterCore>&& data_, ViewCategory* cat, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("更新筛选器: %1").arg(data_->name()), parent),coll(coll),core(core),
+    data(std::move(data_)),cat(cat)
+{
+}
+
+void qecmd::UpdateTrainFilter::undo()
+{
+    core->swapWith(*data);
+    cat->commitUpdateFilter(core);
+}
+
+void qecmd::UpdateTrainFilter::redo()
+{
+    core->swapWith(*data);
+    cat->commitUpdateFilter(core);
+}

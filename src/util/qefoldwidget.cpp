@@ -9,7 +9,9 @@
 QEFoldWidget::QEFoldWidget(QWidget *titleWidget, QWidget *paneWidget, QWidget *parent):
     QWidget(parent), _titleWidget(titleWidget), _paneWidget(paneWidget)
 {
+    //setContentsMargins(0, 0, 0, 0);
     initUI();
+    //setStyleSheet("border: 3px solid");
 }
 
 QEFoldWidget::QEFoldWidget(const QString &title, QWidget *paneWidget, QWidget *parent):
@@ -22,6 +24,7 @@ void QEFoldWidget::initUI()
 {
     auto* vlay=new QVBoxLayout(this);
     auto* hlay=new QHBoxLayout;
+    vlay->setContentsMargins(0, 0, 0, 0);
 
     btnFold=new QToolButton;
     btnFold->setIcon(qApp->style()->standardIcon(QStyle::SP_ToolBarHorizontalExtensionButton));

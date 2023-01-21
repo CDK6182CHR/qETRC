@@ -43,10 +43,10 @@ public:
      * 直接构造出来的结果将是空白筛选器，对任何列车都通过。
      */
     explicit TrainFilterCore()=default;
-    TrainFilterCore(const TrainFilterCore&) = delete;
-    TrainFilterCore& operator=(const TrainFilterCore&) = delete;
-    TrainFilterCore(TrainFilterCore&&) = delete;
-    TrainFilterCore& operator=(TrainFilterCore&&) = delete;
+    TrainFilterCore(const TrainFilterCore&) = default;
+    TrainFilterCore& operator=(const TrainFilterCore&) = default;
+    TrainFilterCore(TrainFilterCore&&) = default;
+    TrainFilterCore& operator=(TrainFilterCore&&) = default;
 
     bool check(std::shared_ptr<const Train> train)const override;
 private:

@@ -1,4 +1,4 @@
-#include "predeftrainfiltercore.h"
+﻿#include "predeftrainfiltercore.h"
 
 #include "traintype.h"
 #include "routing.h"
@@ -95,5 +95,45 @@ QJsonObject PredefTrainFilterCore::toJson() const
         arRouting.append(rt->name());
     }
     res.insert("routings", arRouting);
+    return res;
+}
+
+std::array<std::unique_ptr<const PredefTrainFilterCore>, PredefTrainFilterCore::MAX_FILTERS> PredefTrainFilterCore::sysFilters{};
+std::array<QString, PredefTrainFilterCore::MAX_FILTERS> PredefTrainFilterCore::sysFilterNames{
+    QObject::tr("旅客列车"),QObject::tr("已显示列车")
+};
+
+const PredefTrainFilterCore* PredefTrainFilterCore::getSysFilter(SysFilterId id)
+{
+    const auto& a = sysFilters.at(id);
+    if (!a) {
+        // create new 
+        sysFilters[id] = makeSysFilter(id);
+    }
+    return sysFilters.at(id).get();
+}
+
+const QString& PredefTrainFilterCore::getSysFilterName(SysFilterId id)
+{
+    return sysFilterNames[id];
+}
+
+void PredefTrainFilterCore::swapWith(PredefTrainFilterCore& other)
+{
+    std::swap(*this, other);
+}
+
+std::unique_ptr<const PredefTrainFilterCore> PredefTrainFilterCore::makeSysFilter(SysFilterId id)
+{
+    std::unique_ptr<PredefTrainFilterCore> res(new PredefTrainFilterCore);
+    switch (id)
+    {
+    case PredefTrainFilterCore::PassengerTrains: res->passengerType = TrainPassenger::True;
+        break;
+    case PredefTrainFilterCore::ShownTrains: res->showOnly = true;
+        break;
+    default:
+        break;
+    }
     return res;
 }

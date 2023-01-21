@@ -35,6 +35,7 @@ class CDockWidget;
 }
 class  GreedyPaintWizard;
 class SARibbonActionsManager;
+class PredefTrainFilterManager;
 
 /**
  * @brief The MainWindow class
@@ -64,6 +65,7 @@ class MainWindow : public SARibbonMainWindow
     RoutingWidget* routingWidget;
     TimetableQuickWidget* timetableQuickWidget;
     TrainInfoWidget* trainInfoWidget;
+    PredefTrainFilterManager* filterManager = nullptr;
 
     PageContext* contextPage;
     TrainContext* contextTrain;

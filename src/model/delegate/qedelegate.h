@@ -3,8 +3,8 @@
 #include <optional>
 #include <QVariant>
 #include <memory>
-#include "data/rail/railstation.h"
 #include "data/diagram/trainline.h"
+#include "data/rail/railstation.h"   // this is for Metatype register of RailStation
 
 namespace qeutil {
 enum {
@@ -23,6 +23,7 @@ enum {
     RailwayRole,
     GraphVertexRole,
     GraphEdgeRole,
+    PredefTrainFilterPointerRole,
 };
 }
 

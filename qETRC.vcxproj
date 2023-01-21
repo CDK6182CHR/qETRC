@@ -222,6 +222,10 @@
     <ClCompile Include="src\editors\edittrainwidget.cpp" />
     <ClCompile Include="src\editors\rail\gapconstraintwidget.cpp" />
     <ClCompile Include="src\editors\timetablewidget.cpp" />
+    <ClCompile Include="src\editors\train\predeftrainfilterlist.cpp" />
+    <ClCompile Include="src\editors\train\predeftrainfiltermanager.cpp" />
+    <ClCompile Include="src\editors\train\predeftrainfilterwidget.cpp" />
+    <ClCompile Include="src\editors\train\selectroutinglistwidget.cpp" />
     <ClCompile Include="src\editors\train\selecttraintypelistwidget.cpp" />
     <ClCompile Include="src\editors\train\trainfilterbasicwidget.cpp" />
     <ClCompile Include="src\editors\train\trainfilterhelpers.cpp" />
@@ -447,6 +451,10 @@
     <QtMoc Include="src\editors\train\trainfilterbasicwidget.h" />
     <QtMoc Include="src\editors\train\selecttraintypelistwidget.h" />
     <QtMoc Include="src\editors\train\trainnameregextable.h" />
+    <QtMoc Include="src\editors\train\selectroutinglistwidget.h" />
+    <QtMoc Include="src\editors\train\predeftrainfilterwidget.h" />
+    <QtMoc Include="src\editors\train\predeftrainfilterlist.h" />
+    <QtMoc Include="src\editors\train\predeftrainfiltermanager.h" />
     <ClInclude Include="src\model\rail\gapconstraintmodel.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <QtMoc Include="src\dialogs\changestationnamedialog.h">

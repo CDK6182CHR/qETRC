@@ -48,6 +48,12 @@ public:
         }
     }
 
+    /**
+     * @brief 2023.01.21 try to use template for a new type-safe implementation
+     */
+    template <typename TySignal, typename TyObj, typename... Slots>
+    void connectAll(TySignal&& _signal, TyObj* obj, Slots&&... _slots);
+
     template <typename _TySignal,typename _TySlot>
     void connectFront(_TySignal _signal, QObject* _target,
         std::initializer_list<_TySlot> _slots)
@@ -72,6 +78,11 @@ public:
             QObject::connect(*bt, _signal, _target, _slot);
         }
     }
+
+private:
+    template <typename TySignal, typename TyObj, typename TySlot, typename... Args>
+    void connectFront_impl(int start, TySignal&& signal, TyObj* obj,
+                         TySlot&& slot, Args&&... args);
 };
 
 
@@ -96,6 +107,27 @@ void ButtonGroup<_Num, _Layout, _Button>::setMaximumWidth(int w)
         buttons[i]->setMaximumWidth(w);
 }
 
+template<size_t _Num, typename _Layout, typename _Button>
+template<typename TySignal, typename TyObj, typename ...Slots>
+inline void ButtonGroup<_Num, _Layout, _Button>::connectAll(TySignal&& _signal, TyObj* obj, Slots && ..._slots)
+{
+    static_assert(sizeof...(_slots) == _Num, "Invalid call number");
+    this->connectFront_impl(0, std::forward<TySignal>(_signal), obj,
+        std::forward<Slots>(_slots)...);
+}
+
+template<size_t _Num, typename _Layout, typename _Button>
+template<typename TySignal, typename TyObj, typename TySlot, typename ...Args>
+inline void ButtonGroup<_Num, _Layout, _Button>::connectFront_impl(int start, TySignal&& signal, 
+    TyObj* obj, TySlot&& slot, Args && ...args)
+{
+    QObject::connect(buttons[start], std::forward<TySignal>(signal), obj, std::forward<TySlot>(slot));
+    if constexpr (sizeof...(args)) {
+        connectFront_impl(start + 1, std::forward<TySignal>(signal), obj, std::forward<Args>(args)...);
+    }
+}
+
+
 
 /**
  * 增加添加到QButtonGroup的逻辑。
@@ -117,3 +149,4 @@ public:
 
     auto* group(){return _group;}
 };
+
