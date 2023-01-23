@@ -16,7 +16,7 @@ class RailStation;
 class Railway;
 class Diagram;
 class TrainFilterCore;
-class TrainFilter;
+class TrainFilterSelector;
 
 /**
  * 暂定这里不包括转换算法，只是个简单的展示。
@@ -33,7 +33,7 @@ class StationTrainGapModel: public QStandardItemModel
      * 2021.09.09 取消引用，改为值类型：为了保证从工具栏直接调起的操作是安全的
      */
     const RailStationEventList events;
-    const TrainFilterCore& filter;
+    const TrainFilterCore* filter=nullptr;
     TrainGapList data;
     TrainGapStatistics stat;
 public:
@@ -52,10 +52,9 @@ public:
         std::shared_ptr<Railway> railway_,
         std::shared_ptr<RailStation> station_,
         const RailStationEventList& events,
-        const TrainFilterCore& filter,
         QObject* parent = nullptr,
         int cutSecs_ = 0);
-    void refreshData();
+    void refreshData(const TrainFilterCore* core);
     const auto& getStat()const { return stat; }
     //void setSingleLine(std::optional<bool> on){singleLine=on;}
     //auto isSingleLine()const { return singleLine; }
@@ -63,6 +62,7 @@ public:
     int cutSecs()const { return _cutSecs; }
     std::shared_ptr<TrainGap> gapForRow(int row);
     auto& getDiagram() { return diagram; }
+    void setFilter(const TrainFilterCore* core) { filter = core; }
 private:
     void setupModel();
     
@@ -88,7 +88,7 @@ class StationTrainGapDialog : public QDialog
     std::shared_ptr<RailStation> station;
      
     // filter必须在model之前初始化！！
-    TrainFilter* const filter;
+    TrainFilterSelector* const filter;
     StationTrainGapModel* const model;
 
     QTableView * table;
@@ -98,12 +98,13 @@ public:
 
     /**
      * 此版本构造函数不创建新的filter，而是采用事件表页面传过来的filter对象。
+     * 2023.01.23：新版列车筛选器下，不允许传递列车筛选器对象，而只是给一个预设core用来初始化筛选器。
      */
     StationTrainGapDialog(Diagram& diagram,
         std::shared_ptr<Railway> railway_,
         std::shared_ptr<RailStation> station_,
         const RailStationEventList& events,
-        TrainFilter* filter,
+        const TrainFilterCore& filterCore,
         QWidget* parent = nullptr,
         int cutSecs=0);
 

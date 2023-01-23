@@ -8,6 +8,7 @@
 class Railway;
 class QCheckBox;
 class TrainFilterCore;
+class TrainFilterSelector;
 class QTableView;
 class TrainGapStatModel:public QStandardItemModel
 {
@@ -45,7 +46,6 @@ private:
 };
 
 class Diagram;
-class TrainFilter;
 
 /**
  * 列车间隔的全局统计：
@@ -59,7 +59,7 @@ class TrainGapSummaryModel :
     Diagram& diagram;
     const std::shared_ptr<Railway> railway;
     const std::map<std::shared_ptr<RailStation>, RailStationEventList> events;
-    const TrainFilterCore& filter;
+    const TrainFilterCore* filter;
 
     std::map<TrainGapTypePair, int> globalMin;
     std::map<TrainGapTypePair, int> typeCols;
@@ -75,9 +75,8 @@ public:
     };
 
     TrainGapSummaryModel(Diagram& diagram_, std::shared_ptr<Railway> railway_, 
-        TrainFilter* filter,
         QObject* parent = nullptr);
-    void refreshData();
+    void refreshData(const TrainFilterCore* filter);
     //void setUseSingle(bool on) { useSingle = on; }
     auto getRailway() { return railway; }
     std::shared_ptr<RailStation> stationForRow(int row);
@@ -102,7 +101,7 @@ class TrainGapSummaryDialog : public QDialog
 {
     Q_OBJECT
 
-    TrainFilter*const filter;   // filter必须在model之前初始化
+    TrainFilterSelector*const filter;   // filter必须在model之前初始化
     TrainGapSummaryModel* const model;
 
     //QCheckBox* ckSingle;

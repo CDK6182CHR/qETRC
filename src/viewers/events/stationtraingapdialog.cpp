@@ -19,7 +19,8 @@
 #include "util/utilfunc.h"
 #include "model/delegate/timeintervaldelegate.h"
 #include "traingapstatdialog.h"
-#include "dialogs/trainfilter.h"
+//#include "dialogs/trainfilterdialog.h"
+#include "editors/train/trainfilterselector.h"
 #include "util/pagecomboforrail.h"
 
 
@@ -27,11 +28,11 @@ StationTrainGapModel::StationTrainGapModel(Diagram& diagram,
     std::shared_ptr<Railway> railway_,
     std::shared_ptr<RailStation> station_,
     const RailStationEventList& events, 
-    const TrainFilterCore& filter, QObject* parent, int cutSecs_):
+    QObject* parent, int cutSecs_):
     QStandardItemModel(parent),diagram(diagram), railway(railway_),
     station(station_),
     _cutSecs(cutSecs_),
-    events(events),filter(filter)
+    events(events)
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({
@@ -40,11 +41,12 @@ StationTrainGapModel::StationTrainGapModel(Diagram& diagram,
         });
 }
 
-void StationTrainGapModel::refreshData()
+void StationTrainGapModel::refreshData(const TrainFilterCore* filter)
 {
+    this->filter = filter;
     //data = diagram.getTrainGaps(events, filter, station, singleLine);
-    TrainGapAna ana(diagram, filter);
-    data = ana.calTrainGaps(events, filter, station);
+    TrainGapAna ana(diagram, *filter);
+    data = ana.calTrainGaps(events, *filter, station);
     stat = ana.countTrainGaps(data, _cutSecs);
     setupModel();
 }
@@ -123,12 +125,12 @@ StationTrainGapDialog::StationTrainGapDialog(Diagram& diagram,
     std::shared_ptr<Railway> railway_, 
     std::shared_ptr<RailStation> station_, 
     const RailStationEventList& events, 
-    TrainFilter* filter_, QWidget* parent,
+    const TrainFilterCore& filterCore, QWidget* parent,
     int cutSecs):
     QDialog(parent), railway(railway_), station(station_),
-    filter(filter_),
+    filter(new TrainFilterSelector(diagram.trainCollection(), filterCore, this)),
     model(new StationTrainGapModel(diagram,railway_,station_,events,
-        filter_->getCore(),this,cutSecs))
+        this,cutSecs))
 {
     setWindowTitle(tr("车站间隔分析 - %1 @ %2").arg(station->name.toSingleLiteral(),
         railway->name()));
@@ -142,9 +144,9 @@ StationTrainGapDialog::StationTrainGapDialog(Diagram& diagram,
     std::shared_ptr<Railway> railway_, 
     std::shared_ptr<RailStation> station_, QWidget* parent):
     QDialog(parent),railway(railway_),station(station_),
-    filter(new TrainFilter(diagram,this)),
+    filter(new TrainFilterSelector(diagram.trainCollection(),this)),
     model(new StationTrainGapModel(diagram,railway_,station_,
-        diagram.stationEvents(railway_,station_),filter->getCore(),this))
+        diagram.stationEvents(railway_,station_),this))
 {
     setWindowTitle(tr("车站间隔分析 - %1 @ %2").arg(station->name.toSingleLiteral(),
         railway->name()));
@@ -164,7 +166,7 @@ void StationTrainGapDialog::refreshData()
     //    model->setSingleLine(ckSingle->isChecked());
     //}
     model->setCutSecs(spCut->value());
-    model->refreshData();
+    model->refreshData(filter->filter());
     table->resizeColumnsToContents();
 }
 
@@ -184,8 +186,7 @@ void StationTrainGapDialog::initUI()
     //}
     //hlay->addWidget(ckSingle);
     auto* btn=new QPushButton(tr("车次筛选器"));
-    hlay->addWidget(btn);
-    connect(btn,&QPushButton::clicked,filter,&TrainFilter::show);
+    hlay->addWidget(filter);
     hlay->addStretch(1);
     btn=new QPushButton(tr("刷新"));
     hlay->addWidget(btn);

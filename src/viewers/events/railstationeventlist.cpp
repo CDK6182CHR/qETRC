@@ -243,14 +243,11 @@ void RailStationEventListDialog::toCsv()
 
 void RailStationEventListDialog::gapAnalysis()
 {
-	// TODO here!!!
-#if 0
 	auto* dialog = new StationTrainGapDialog(diagram, rail, station, model->getData(),
-		filter, this);
+		*filter->filter(), this);
 	connect(dialog, &StationTrainGapDialog::locateToEvent,
 		this, &RailStationEventListDialog::locateOnEvent);
 	dialog->show();
-#endif
 }
 
 void RailStationEventListDialog::onFilterChanged(const TrainFilterCore* core)

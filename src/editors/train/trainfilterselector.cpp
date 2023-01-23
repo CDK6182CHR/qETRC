@@ -14,6 +14,12 @@ TrainFilterSelector::TrainFilterSelector(TrainCollection &coll, QWidget *parent)
     initUI();
 }
 
+TrainFilterSelector::TrainFilterSelector(TrainCollection& coll, const TrainFilterCore& initData, QWidget* parent):
+    TrainFilterSelector(coll,parent)
+{
+    dlg->core.operator=(initData);
+}
+
 void TrainFilterSelector::initUI()
 {
     auto* hlay=new QHBoxLayout(this);
@@ -23,12 +29,14 @@ void TrainFilterSelector::initUI()
     hlay->addWidget(btn);
 
     dlg=new TrainFilterDialog(coll,this);
+    _current = &dlg->getCore();
     connect(btn,&QPushButton::clicked,dlg,
             &TrainFilterDialog::show);
     connect(dlg,&TrainFilterDialog::filterApplied,
             this,&TrainFilterSelector::onDialogApplied);
     connect(combo,&TrainFilterCombo::filterChanged,
             this,&TrainFilterSelector::onComboChanged);
+    hlay->setContentsMargins(0, 0, 0, 0);
 }
 
 void TrainFilterSelector::onComboChanged(const PredefTrainFilterCore *core)

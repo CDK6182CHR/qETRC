@@ -19,6 +19,7 @@ class TrainFilterDialog : public QDialog
     TrainFilterCore core;
     TrainFilterBasicWidget* basic;
     TrainFilterCombo* combo;
+    friend class TrainFilterSelector;
 public:
     TrainFilterDialog(TrainCollection& coll, QWidget* parent=nullptr);
     bool check(std::shared_ptr<const Train> train)const;

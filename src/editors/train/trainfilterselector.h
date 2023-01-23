@@ -17,7 +17,13 @@ class TrainFilterSelector : public QWidget
     const TrainFilterCore* _current;
 public:
     explicit TrainFilterSelector(TrainCollection& coll, QWidget *parent = nullptr);
+
+    /**
+    * This version also initializes dialog->core with given data
+    */
+    explicit TrainFilterSelector(TrainCollection& coll, const TrainFilterCore& initData, QWidget *parent = nullptr);
     const TrainFilterCore* filter(){return _current;}
+    auto* dialog(){return dlg;}
 private:
     void initUI();
 

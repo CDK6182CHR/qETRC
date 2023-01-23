@@ -4,6 +4,7 @@
 #include <QHeaderView>
 #include <QVBoxLayout>
 #include <utility>
+#include <QPushButton>
 #include <QFormLayout>
 #include <QCheckBox>
 #include <QSpinBox>
@@ -12,10 +13,11 @@
 #include <data/analysis/traingap/traingapana.h>
 #include "model/delegate/timeintervaldelegate.h"
 #include "data/diagram/diagram.h"
-#include "dialogs/trainfilter.h"
+#include "editors/train/trainfilterselector.h"
 #include "util/utilfunc.h"
 #include "model/delegate/qedelegate.h"
 #include "stationtraingapdialog.h"
+#include "util/buttongroup.hpp"
 
 
 TrainGapStatModel::TrainGapStatModel(const TrainGapStatistics &stat_, QObject *parent):
@@ -92,16 +94,16 @@ void TrainGapStatDialog::initUI()
 }
 
 TrainGapSummaryModel::TrainGapSummaryModel(Diagram& diagram_, 
-    std::shared_ptr<Railway> railway_, TrainFilter* filter_, QObject* parent):
+    std::shared_ptr<Railway> railway_, QObject* parent):
     QStandardItemModel(parent),diagram(diagram_),railway(railway_),
-    events(diagram_.stationEventsForRail(railway_)),
-    filter(filter_->getCore())
+    events(diagram_.stationEventsForRail(railway_))
 {
     //refreshData();
 }
 
-void TrainGapSummaryModel::refreshData()
+void TrainGapSummaryModel::refreshData(const TrainFilterCore* filter)
 {
+    this->filter = filter;
     setupHeader();
     setupModel();
 }
@@ -138,10 +140,10 @@ void TrainGapSummaryModel::setupHeader()
     globalMin.clear();
     localMin.clear();
     typeCols.clear();
-    TrainGapAna ana(diagram, filter);
+    TrainGapAna ana(diagram, *filter);
     for (auto _p = events.begin(); _p != events.end(); ++_p) {
         const RailStationEventList& lst = _p->second;
-        auto gaps = ana.calTrainGaps(lst, filter, _p->first);
+        auto gaps = ana.calTrainGaps(lst, *filter, _p->first);
         TrainGapStatistics stat = ana.countTrainGaps(gaps, cutSecs);
         for (auto q = stat.begin(); q != stat.end(); ++q) {
             const TrainGapTypePair& tp = q->first;
@@ -193,8 +195,8 @@ void TrainGapSummaryModel::setupRow(int row, const QString& text,
 TrainGapSummaryDialog::TrainGapSummaryDialog(Diagram &diagram,
                                              std::shared_ptr<Railway> railway,
                                              QWidget *parent):
-    QDialog(parent),filter(new TrainFilter(diagram,this)),
-    model(new TrainGapSummaryModel(diagram,railway,filter,this)),
+    QDialog(parent),filter(new TrainFilterSelector(diagram.trainCollection(),this)),
+    model(new TrainGapSummaryModel(diagram,railway,this)),
     dele(new TimeIntervalDelegate(this))
 {
     setWindowTitle(tr("列车间隔汇总 - %1").arg(railway->name()));
@@ -214,12 +216,9 @@ void TrainGapSummaryDialog::initUI()
     auto* hlay=new QHBoxLayout;
     //ckSingle=new QCheckBox(tr("对向列车敌对进路 (单线模式)"));
     //hlay->addWidget(ckSingle);
-    auto* btn=new QPushButton(tr("车次筛选器"));
-    connect(btn,&QPushButton::clicked,filter,
-            &TrainFilter::show);
-    hlay->addWidget(btn);
+    hlay->addWidget(filter);
     hlay->addStretch(1);
-    btn=new QPushButton(tr("刷新"));
+    auto*btn=new QPushButton(tr("刷新"));
     connect(btn,&QPushButton::clicked,this,&TrainGapSummaryDialog::refreshData);
     hlay->addWidget(btn);
     flay->addRow(tr("选项"),hlay);
@@ -263,7 +262,7 @@ void TrainGapSummaryDialog::onDoubleClicked(const QModelIndex& idx)
     auto st = model->stationForRow(idx.row());
     decltype(auto) events = model->getEvents();
     auto* dlg = new StationTrainGapDialog(model->getDiagram(), model->getRailway(),
-        st, events.at(st), filter, this, spCut->value());
+        st, events.at(st), *filter->filter(), this, spCut->value());
     connect(dlg, &StationTrainGapDialog::locateToEvent,
         this, &TrainGapSummaryDialog::locateOnEvent);
     dlg->show();
@@ -279,7 +278,7 @@ void TrainGapSummaryDialog::refreshData()
 {
     //model->setUseSingle(ckSingle->isChecked());
     model->setCutSecs(spCut->value());
-    model->refreshData();
+    model->refreshData(filter->filter());
     
     for (int i = TrainGapSummaryModel::ColOTHERS; i < model->columnCount(); i++) {
         table->setItemDelegateForColumn(i, dele);
