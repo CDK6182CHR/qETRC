@@ -118,6 +118,11 @@ void TrainFilterBasicWidget::clearNotChecked()
 
 void TrainFilterBasicWidget::refreshData()
 {
+    refreshDataWith(this->_core);
+}
+
+void TrainFilterBasicWidget::refreshDataWith(const TrainFilterCore *_core)
+{
     if (!_core){
         clearNotChecked();
         return;

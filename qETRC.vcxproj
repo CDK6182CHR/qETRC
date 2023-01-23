@@ -219,6 +219,7 @@
     <ClCompile Include="src\dialogs\jointrailwaydialog.cpp" />
     <ClCompile Include="src\dialogs\rulerfromspeeddialog.cpp" />
     <ClCompile Include="src\dialogs\selecttrainstationdialog.cpp" />
+    <ClCompile Include="src\dialogs\trainfilterdialog.cpp" />
     <ClCompile Include="src\editors\edittrainwidget.cpp" />
     <ClCompile Include="src\editors\rail\gapconstraintwidget.cpp" />
     <ClCompile Include="src\editors\timetablewidget.cpp" />
@@ -228,7 +229,9 @@
     <ClCompile Include="src\editors\train\selectroutinglistwidget.cpp" />
     <ClCompile Include="src\editors\train\selecttraintypelistwidget.cpp" />
     <ClCompile Include="src\editors\train\trainfilterbasicwidget.cpp" />
+    <ClCompile Include="src\editors\train\trainfiltercombo.cpp" />
     <ClCompile Include="src\editors\train\trainfilterhelpers.cpp" />
+    <ClCompile Include="src\editors\train\trainfilterselector.cpp" />
     <ClCompile Include="src\editors\train\trainnameregextable.cpp" />
     <ClCompile Include="src\mainwindow\startuppage.cpp" />
     <ClCompile Include="src\mainwindow\version.cpp" />
@@ -455,6 +458,9 @@
     <QtMoc Include="src\editors\train\predeftrainfilterwidget.h" />
     <QtMoc Include="src\editors\train\predeftrainfilterlist.h" />
     <QtMoc Include="src\editors\train\predeftrainfiltermanager.h" />
+    <QtMoc Include="src\dialogs\trainfilterdialog.h" />
+    <QtMoc Include="src\editors\train\trainfilterselector.h" />
+    <QtMoc Include="src\editors\train\trainfiltercombo.h" />
     <ClInclude Include="src\model\rail\gapconstraintmodel.h" />
     <ClInclude Include="src\util\buttongroup.hpp" />
     <QtMoc Include="src\dialogs\changestationnamedialog.h">

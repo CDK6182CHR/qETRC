@@ -2,9 +2,9 @@
 
 namespace qespec {
 
-const std::string_view VERSION = "V1.2.6";
-const std::string_view LAST_VERSION = "V1.2.5";
-const std::string_view DATE = "20230113";
+const std::string_view VERSION = "V1.3.0-dev";
+const std::string_view LAST_VERSION = "V1.2.6";
+const std::string_view DATE = "20230122";
 const int RELEASE_CODE = 33;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";

@@ -22,7 +22,7 @@ class PredefTrainFilterCore;
 
 class MainWindow;
 class TypeManager;
-class TrainFilter;
+class TrainFilterDialog;
 class DiagramPage;
 class TrainCollection;
 
@@ -46,7 +46,7 @@ class ViewCategory : public QObject
     SARibbonGallery* gall;
     SARibbonMenu* meFilters;
 
-    TrainFilter* const filter;
+    TrainFilterDialog* const filter;
 
     bool informConfig = true;
     

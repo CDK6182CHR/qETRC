@@ -39,13 +39,16 @@ SOURCES += \
     src/data/train/traingroup.cpp \
     src/dialogs/jointrailwaydialog.cpp \
     src/dialogs/selecttrainstationdialog.cpp \
+    src/dialogs/trainfilterdialog.cpp \
     src/editors/train/predeftrainfilterlist.cpp \
     src/editors/train/predeftrainfiltermanager.cpp \
     src/editors/train/predeftrainfilterwidget.cpp \
     src/editors/train/selectroutinglistwidget.cpp \
     src/editors/train/selecttraintypelistwidget.cpp \
     src/editors/train/trainfilterbasicwidget.cpp \
+    src/editors/train/trainfiltercombo.cpp \
     src/editors/train/trainfilterhelpers.cpp \
+    src/editors/train/trainfilterselector.cpp \
     src/editors/train/traingroupwidget.cpp \
     src/editors/train/trainnameregextable.cpp \
     src/mainwindow/startuppage.cpp \
@@ -256,13 +259,16 @@ HEADERS += \
     src/data/train/traingroup.h \
     src/dialogs/jointrailwaydialog.h \
     src/dialogs/selecttrainstationdialog.h \
+    src/dialogs/trainfilterdialog.h \
     src/editors/train/predeftrainfilterlist.h \
     src/editors/train/predeftrainfiltermanager.h \
     src/editors/train/predeftrainfilterwidget.h \
     src/editors/train/selectroutinglistwidget.h \
     src/editors/train/selecttraintypelistwidget.h \
     src/editors/train/trainfilterbasicwidget.h \
+    src/editors/train/trainfiltercombo.h \
     src/editors/train/trainfilterhelpers.h \
+    src/editors/train/trainfilterselector.h \
     src/editors/train/traingroupwidget.h \
     src/editors/train/trainnameregextable.h \
     src/mainwindow/startuppage.h \

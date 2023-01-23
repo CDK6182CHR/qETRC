@@ -14,10 +14,10 @@ class QCheckBox;
 class Diagram;
 class Railway;
 class RailStation;
-class TrainFilter;
 class QLabel;
 class QTableView;
-class TrainFilter;
+class TrainFilterSelector;
+class TrainFilterCore;
 
 class RailStationEventListModel:public QStandardItemModel
 {
@@ -62,7 +62,7 @@ class RailStationEventListDialog : public QDialog
     QTableView* table;
     QCheckBox* ckPosPre, *ckPosPost;
     QLabel* lbCount;
-    TrainFilter*const filter;
+    TrainFilterSelector*const filter;
 public:
     RailStationEventListDialog(Diagram &diagram,
                                const std::shared_ptr<Railway> &rail,
@@ -103,7 +103,7 @@ private slots:
 
     void gapAnalysis();
 
-    void onFilterChanged();
+    void onFilterChanged(const TrainFilterCore* core);
 
     void actLocate();
 

@@ -6,7 +6,7 @@
 #include "data/common/qesystem.h"
 #include "data/diagram/diagram.h"
 #include "data/train/routing.h"
-#include "dialogs/trainfilter.h"
+#include "editors/train/trainfilterselector.h"
 #include "stationtraingapdialog.h"
 #include "model/delegate/qedelegate.h"
 #include "data/common/qeglobal.h"
@@ -89,7 +89,7 @@ diagram(diagram),
 rail(rail),
 station(station),
 model(new RailStationEventListModel(diagram, rail, station)),
-filter(new TrainFilter(diagram,this))
+filter(new TrainFilterSelector(diagram.trainCollection(),this))
 {
 	setWindowTitle(tr("车站事件表 - %1 @ %2").arg(station->name.toSingleLiteral())
 		.arg(rail->name()));
@@ -108,10 +108,8 @@ void RailStationEventListDialog::initUI()
 	ckPosPre = g->get(0); ckPosPost = g->get(1);
 	g->connectAllTo(SIGNAL(toggled(bool)), this,
 		SLOT(onPosShowChanged()));
-	auto* btn = new QPushButton(tr("车次筛选器"));
-	g->addWidget(btn);
-	connect(btn, &QPushButton::clicked, filter, &TrainFilter::show);
-	connect(filter, &TrainFilter::filterApplied,
+	g->addWidget(filter);
+	connect(filter, &TrainFilterSelector::filterChanged,
 		this, &RailStationEventListDialog::onFilterChanged);
 	form->addRow(tr("筛选"), g);
 	vlay->addLayout(form);
@@ -245,17 +243,20 @@ void RailStationEventListDialog::toCsv()
 
 void RailStationEventListDialog::gapAnalysis()
 {
+	// TODO here!!!
+#if 0
 	auto* dialog = new StationTrainGapDialog(diagram, rail, station, model->getData(),
 		filter, this);
 	connect(dialog, &StationTrainGapDialog::locateToEvent,
 		this, &RailStationEventListDialog::locateOnEvent);
 	dialog->show();
+#endif
 }
 
-void RailStationEventListDialog::onFilterChanged()
+void RailStationEventListDialog::onFilterChanged(const TrainFilterCore* core)
 {
-	filtTableRows([this](int row)->bool {
-		return filter->check(model->trainForRow(row));
+	filtTableRows([core,this](int row)->bool {
+		return core->check(model->trainForRow(row));
 		});
 }
 

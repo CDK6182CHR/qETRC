@@ -59,6 +59,6 @@ public slots:
     void actApply();
     void clearNotChecked();
     void refreshData();
-
+    void refreshDataWith(const TrainFilterCore* core);
 };
 

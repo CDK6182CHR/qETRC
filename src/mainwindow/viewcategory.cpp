@@ -7,13 +7,14 @@
 #include "editors/typeregexdialog.h"
 #include "data/train/traintype.h"
 #include "editors/systemjsondialog.h"
-#include "dialogs/trainfilter.h"
+#include "dialogs/trainfilterdialog.h"
 #include "editors/trainlistwidget.h"
 #include "model/train/trainlistmodel.h"
 #include "data/diagram/config.h"
 #include "data/common/qesystem.h"
 #include "data/diagram/diagrampage.h"
 #include "editors/train/predeftrainfiltermanager.h"
+#include "editors/train/trainfiltercombo.h"
 
 #include <SARibbonPannelItem.h>
 #include <SARibbonGallery.h>
@@ -28,10 +29,10 @@
 ViewCategory::ViewCategory(MainWindow *mw_,
                            SARibbonCategory *cat_, QObject *parent):
     QObject(parent),cat(cat_),diagram(mw_->_diagram),mw(mw_),
-    filter(new TrainFilter(mw_->_diagram,mw))
+    filter(new TrainFilterDialog(mw_->_diagram.trainCollection(),mw))
 {
     initUI();
-    connect(filter, &TrainFilter::filterApplied,
+    connect(filter, &TrainFilterDialog::filterApplied,
         this, &ViewCategory::trainFilterApplied);
 }
 
@@ -145,7 +146,7 @@ void ViewCategory::initUI()
     meFilters = new SARibbonMenu(mw);
     act->setMenu(meFilters);
     mw->addAction(act);
-    connect(act, &QAction::triggered, filter, &TrainFilter::show);
+    connect(act, &QAction::triggered, filter, &TrainFilterDialog::show);
     panel->addLargeAction(act);
 
 
@@ -587,6 +588,7 @@ void ViewCategory::refreshTypeGroup()
 void ViewCategory::refreshFilters()
 {
     setupTrainFilterMenu();
+    TrainFilterCombo::refreshAll();
 }
 
 void ViewCategory::actCollTypeSetChanged(TypeManager& manager, 
