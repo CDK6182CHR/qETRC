@@ -33,6 +33,8 @@ SOURCES += \
     src/data/algo/timetablecorrector.cpp \
     src/data/analysis/inttrains/intervalcounter.cpp \
     src/data/analysis/inttrains/intervaltraininfo.cpp \
+    src/data/analysis/runstat/trainintervalstat.cpp \
+    src/data/analysis/runstat/trainintervalstatresult.cpp \
     src/data/analysis/traingap/traingapana.cpp \
     src/data/train/itrainfilter.cpp \
     src/data/train/predeftrainfiltercore.cpp \
@@ -223,6 +225,7 @@ SOURCES += \
     src/viewers/sectioncountdialog.cpp \
     src/viewers/stats/intervalcountdialog.cpp \
     src/viewers/stats/intervaltraindialog.cpp \
+    src/viewers/stats/trainintervalstatdialog.cpp \
     src/viewers/timetablequickwidget.cpp \
     src/viewers/traindiffdialog.cpp \
     src/viewers/events/traineventdialog.cpp \
@@ -254,6 +257,8 @@ HEADERS += \
     src/data/algo/timetablecorrector.h \
     src/data/analysis/inttrains/intervalcounter.h \
     src/data/analysis/inttrains/intervaltraininfo.h \
+    src/data/analysis/runstat/trainintervalstat.h \
+    src/data/analysis/runstat/trainintervalstatresult.h \
     src/data/analysis/traingap/traingapana.h \
     src/data/train/itrainfilter.h \
     src/data/train/predeftrainfiltercore.h \
@@ -454,6 +459,7 @@ HEADERS += \
     src/viewers/sectioncountdialog.h \
     src/viewers/stats/intervalcountdialog.h \
     src/viewers/stats/intervaltraindialog.h \
+    src/viewers/stats/trainintervalstatdialog.h \
     src/viewers/timetablequickwidget.h \
     src/viewers/traindiffdialog.h \
     src/viewers/events/traineventdialog.h \

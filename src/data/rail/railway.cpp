@@ -1216,6 +1216,20 @@ Railway::SectionInfo Railway::getSectionInfo(double mile)const
 	}
 }
 
+std::optional<StationName> Railway::possibleBoundStationName(const StationName& name) const
+{
+	if (nameMap.contains(name)) {
+		return name;
+	}
+	else if (auto itr = fieldMap.find(name.station()); itr != fieldMap.end()) {
+		foreach(const auto & t, *itr) {
+			if (t.isBare())
+				return t;
+		}
+	}
+	return std::nullopt;
+}
+
 void Railway::addMapInfo(const std::shared_ptr<RailStation>& st)
 {
 	//nameMap  直接添加

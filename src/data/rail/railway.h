@@ -641,6 +641,14 @@ public:
      */
     int firstInvalidNameIndex()const;
 
+    /**
+     * 2023.01.24 Returns the station name is are possible to be bound to
+     * the given name (typically name from train timetable). 
+     * If their is a perfectly matched name, return that name only. Otherwise, return the one
+     * that is bare.
+     */
+    std::optional<StationName> possibleBoundStationName(const StationName& name)const;
+
 private:
     /**
      * 维护nameMap和fieldMap

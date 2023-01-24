@@ -201,6 +201,8 @@
     <ClCompile Include="src\data\algo\timetablecorrector.cpp" />
     <ClCompile Include="src\data\analysis\inttrains\intervalcounter.cpp" />
     <ClCompile Include="src\data\analysis\inttrains\intervaltraininfo.cpp" />
+    <ClCompile Include="src\data\analysis\runstat\trainintervalstat.cpp" />
+    <ClCompile Include="src\data\analysis\runstat\trainintervalstatresult.cpp" />
     <ClCompile Include="src\data\analysis\traingap\traingapana.cpp" />
     <ClCompile Include="src\data\calculation\calculationlog.cpp" />
     <ClCompile Include="src\data\calculation\gapconstraints.cpp" />
@@ -259,6 +261,7 @@
     <ClCompile Include="src\viewers\stats\intervalcountdialog.cpp" />
     <ClCompile Include="src\viewers\stats\intervaltraindialog.cpp" />
     <ClCompile Include="src\viewers\stats\intervaltraintable.cpp" />
+    <ClCompile Include="src\viewers\stats\trainintervalstatdialog.cpp" />
     <ClCompile Include="src\wizards\greedypaint\greedypaintfasttest.cpp" />
     <ClCompile Include="src\wizards\greedypaint\greedypaintpageconstraint.cpp" />
     <ClCompile Include="src\wizards\greedypaint\greedypaintpagepaint.cpp" />
@@ -427,6 +430,8 @@
     <ClInclude Include="src\data\algo\timetablecorrector.h" />
     <ClInclude Include="src\data\analysis\inttrains\intervalcounter.h" />
     <ClInclude Include="src\data\analysis\inttrains\intervaltraininfo.h" />
+    <ClInclude Include="src\data\analysis\runstat\trainintervalstat.h" />
+    <ClInclude Include="src\data\analysis\runstat\trainintervalstatresult.h" />
     <ClInclude Include="src\data\analysis\traingap\traingapana.h" />
     <ClInclude Include="src\data\calculation\calculationlog.h" />
     <ClInclude Include="src\data\calculation\gapconstraints.h" />
@@ -676,6 +681,7 @@
     <QtMoc Include="src\viewers\railtopotable.h" />
     <QtMoc Include="src\util\qefoldwidget.h" />
     <ClInclude Include="src\viewers\stats\intervaltraintable.h" />
+    <QtMoc Include="src\viewers\stats\trainintervalstatdialog.h" />
     <ClInclude Include="src\wizards\timeinterp\timeinterppagepreview.h" />
     <QtMoc Include="src\wizards\timeinterp\timeinterppagetrain.h">
     </QtMoc>

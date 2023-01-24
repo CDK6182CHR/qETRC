@@ -11,7 +11,17 @@ void RailNet::fromRailCategory(const RailCategory* cat)
 	}
 	foreach(const auto & rail, cat->railways()) {
 		addRailway(rail.get());
-	}
+    }
+}
+
+std::shared_ptr<RailNet::vertex> RailNet::stationByGeneralName(const StationName &name)
+{
+    auto v=find_vertex(name);
+    if (v){
+        return v;
+    }
+    v=find_vertex(name.station());
+    return v;
 }
 
 const RailNet::rail_ret_t RailNet::rail_ret_t::null{};

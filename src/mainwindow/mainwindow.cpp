@@ -74,6 +74,7 @@
 #include "viewers/stats/intervaltraindialog.h"
 #include "viewers/stats/intervalcountdialog.h"
 #include "editors/train/predeftrainfiltermanager.h"
+#include "viewers/stats/trainintervalstatdialog.h"
 
 MainWindow::MainWindow(QWidget* parent)
 	: SARibbonMainWindow(parent, true),
@@ -1121,6 +1122,11 @@ void MainWindow::initToolbar()
 		connect(act, &QAction::triggered, this, &MainWindow::actIntervalTrains);
 		panel->addMediumAction(act);
 
+		act = new QAction(QIcon(":/icons/data.png"), tr("运行统计"), this);
+		act->setToolTip(tr("列车区间运行统计\n计算时刻表中给定两站之间的运行时间、里程、速度等。"));
+		connect(act, &QAction::triggered, this, &MainWindow::actTrainIntervalStat);
+		panel->addLargeAction(act);
+
 		panel = cat->addPannel(tr("排图"));
 
 		act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("标尺排图"), this);
@@ -1622,6 +1628,12 @@ void MainWindow::actIntervalTrains()
 void MainWindow::actIntervalCount()
 {
 	auto* dlg = new IntervalCountDialog(_diagram, this);
+	dlg->show();
+}
+
+void MainWindow::actTrainIntervalStat()
+{
+	auto* dlg = new TrainIntervalStatDialog(_diagram, this);
 	dlg->show();
 }
 

@@ -15,6 +15,7 @@ class RailNet: public xtl::di_graph<StationName, GraphStation, GraphInterval>
 {
     using di_graph::sssp;
     using di_graph::dump_path;
+
 public:
     RailNet()=default;
 
@@ -32,6 +33,13 @@ public:
      * 注意：不会清空既有数据。
      */
     void fromRailCategory(const RailCategory* cat);
+
+    /**
+     * @brief stationByGeneralName
+     * 2023.01.24  find a vertex that could be bound to givene station name.
+     * That is, that exatly matches the name, or that contains only the station (not field).
+     */
+    std::shared_ptr<vertex> stationByGeneralName(const StationName& name);
 
     /**
      * 采用关键点最短路径算法，获取径路切片。
