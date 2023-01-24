@@ -27,6 +27,8 @@ public:
 
     bool use_central_widget = true;
 
+    bool auto_highlight_on_selected = true;
+
     bool show_start_page = true;
 
     //todo: dock show..

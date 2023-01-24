@@ -73,6 +73,12 @@ void SystemJsonDialog::initUI()
         "新的运行图窗口从右侧添加。"));
     flay->addRow(tr("中心运行图面板"),ckCentral);
 
+    ckAutoHighlight = new QCheckBox(tr("启用"));
+    ckAutoHighlight->setToolTip(tr("自动高亮选中车次的运行线\n"
+        "在运行图资源管理器、列车管理面板中，选中车次后自动在运行图中高亮该运行线（pyETRC默认行为）。"
+        "此功能导致选中车次时消耗更多资源，对于极端运行图可能导致卡顿。"));
+    flay->addRow(tr("自动高亮选中车次"), ckAutoHighlight);
+
     ckStartup = new QCheckBox(tr("显示"));
     ckStartup->setToolTip(tr("启动程序时显示提示页面"));
     flay->addRow(tr("启动提示页"), ckStartup);
@@ -97,6 +103,7 @@ void SystemJsonDialog::setData()
     ckWeaken->setChecked(t.weaken_unselected);
     ckTooltip->setChecked(t.show_train_tooltip);
     ckCentral->setChecked(t.use_central_widget);
+    ckAutoHighlight->setChecked(t.auto_highlight_on_selected);
     ckStartup->setChecked(t.show_start_page);
     cbSysStyle->setCurrentText(t.app_style);
 }
@@ -119,6 +126,7 @@ void SystemJsonDialog::actApply()
     t.weaken_unselected = ckWeaken->isChecked();
     t.show_train_tooltip = ckTooltip->isChecked();
     t.use_central_widget = ckCentral->isChecked();
+    t.auto_highlight_on_selected = ckAutoHighlight->isChecked();
     t.show_start_page = ckStartup->isChecked();
 }
 

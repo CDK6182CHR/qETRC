@@ -537,6 +537,14 @@ public:
     bool autoBusiness();
 
     /**
+     * 2023.01.24 for RulerPaint. 
+     * Determine business in the newly painted part of the timetable.
+     * The newly painted part (i.e. this) is not bound to railway, and the trainType
+     * is not valid.
+     */
+    void autoBusinessWithoutBound(const Railway& rail, bool isPassenger);
+
+    /**
      * 2022.01.23
      * 本车次时刻表与cat所示线路表的车站是否有交集。
      * 这里不考虑跨越站数，直接比对时刻表站名。

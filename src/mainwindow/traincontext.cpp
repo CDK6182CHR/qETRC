@@ -15,6 +15,8 @@
 #include "viewers/traininfowidget.h"
 #include "editors/trainlistwidget.h"
 #include "model/train/trainlistmodel.h"
+#include "data/common/qesystem.h"
+
 #include <DockManager.h>
 
 #include <QApplication>
@@ -1281,6 +1283,10 @@ void TrainContext::setTrain(std::shared_ptr<Train> train_)
 {
 	train = train_;
 	refreshData();
+
+	// 2023.01.24: also show train line  
+	if (SystemJson::instance.auto_highlight_on_selected)
+		actShowTrainLine();
 }
 
 void TrainContext::showTrainEvents()

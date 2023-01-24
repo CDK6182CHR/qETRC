@@ -123,6 +123,7 @@ void RulerPaintWizard::initUI()
 void RulerPaintWizard::resetTmpTrain()
 {
     trainTmp = std::make_shared<Train>(*trainRef);    //copy construct
+    trainTmp->setType(diagram.trainCollection().typeManager().fromRegex(trainTmp->trainName()));
     if (pgStart->getMode() == RulerPaintPageStart::Modify) {
         itrStart = trainTmp->timetable().begin();
         std::advance(itrStart, pgStart->startRow());
@@ -139,6 +140,8 @@ void RulerPaintWizard::updateTrainLine(std::shared_ptr<Train> table)
     if (trainTmp)
         emit removeTmpTrainLine(*trainTmp);
     resetTmpTrain();
+    table->autoBusinessWithoutBound(*pgStation->railway(), trainTmp->getIsPassenger());
+
     //下面：整合算法
     auto m = pgStart->getMode();
     if (m == RulerPaintPageStart::NewTrain) {

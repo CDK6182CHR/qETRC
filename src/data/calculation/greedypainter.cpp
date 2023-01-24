@@ -41,6 +41,8 @@ bool GreedyPainter::paint(const TrainName& trainName)
 
 	// 此变量表示anchor这个站是否有实际的停车 （不管始发终到的事情）
 	bool anchor_stop = (tm_dep != tm_arr);
+	bool anchor_business = anchor_stop || (_anchor == _start && _localStarting)
+		|| (_anchor == _end && _localTerminal);
 
 	bool flag = false, flag2 = false;
 	
@@ -49,7 +51,7 @@ bool GreedyPainter::paint(const TrainName& trainName)
 	// loop invariant: 要求anchor站永远在时刻表里面。
 	for (int _ = 0; _ < 2; _++) {
 		_train->clear();
-		_train->appendStation(_anchor->name, tm_arr, tm_dep);
+		_train->appendStation(_anchor->name, tm_arr, tm_dep, anchor_business);
 
 		// 正向推线
 		auto railint = _anchor->dirNextInterval(_dir);
