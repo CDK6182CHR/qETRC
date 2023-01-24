@@ -44,6 +44,11 @@ public:
     GraphInterval()=default;
     GraphInterval(const QString& name, const RailInterval& interval);
 
+    /**
+     * 2023.01.24 This overload is for TrainLineNet.
+     */
+    GraphInterval(const QString& name, Direction dir, double mile);
+
     static double getMile(const GraphInterval& inter);
 };
 

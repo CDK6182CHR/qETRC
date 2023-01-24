@@ -42,6 +42,11 @@ GraphInterval::GraphInterval(const QString &name, const RailInterval &interval):
     }
 }
 
+GraphInterval::GraphInterval(const QString& name, Direction dir, double mile):
+    railName(name),dir(dir),mile(mile)
+{
+}
+
 double GraphInterval::getMile(const GraphInterval &inter)
 {
     return inter.mile;

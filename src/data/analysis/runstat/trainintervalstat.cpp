@@ -29,8 +29,8 @@ TrainIntervalStatResult TrainIntervalStat::compute()
 
 void TrainIntervalStat::updateDigraph()
 {
-    railnet.clear();
-    railnet.fromRailCategory(&railcat);
+    net.clear();
+    net.fromBoundTrain(*train);
 }
 
 void TrainIntervalStat::computeTrainPart(TrainIntervalStatResult &res)
@@ -71,25 +71,11 @@ void TrainIntervalStat::computeTrainPart(TrainIntervalStatResult &res)
 
 void TrainIntervalStat::computeRailPart(TrainIntervalStatResult &res)
 {
-    auto v_start=railnet.stationByGeneralName(_startIter->name);
-    auto v_end=railnet.stationByGeneralName(_endIter->name);
-    if (!v_start || !v_end){
-        res.railResults.isValid=false;
-        res.railResults.path_s=QObject::tr("起始站或结束站未铺画");
-        return;
-    }
-
-    QString report;
-    auto t=railnet.shortestPath(v_start,v_end,&report);
-    if (t.empty()){
-        // fail
-        res.railResults.isValid=false;
-        res.railResults.path_s=report;
-    }else{
-        // success
-        res.railResults.isValid=true;
-        res.railResults.totalMiles = railnet.pathMile(t);
-        res.railResults.path_s = railnet.pathToString(t);
+    auto net_res = net.pathBetween(&*_startIter, &*_endIter);
+    res.railResults.isValid = net_res.exists;
+    res.railResults.path_s = net_res.path_s;
+    if (net_res.exists) {
+        res.railResults.totalMiles = net_res.mile;
         res.railResults.travelSpeed = res.railResults.totalMiles / res.totalSecs * 3600;
         res.railResults.techSpeed = res.railResults.totalMiles / res.runSecs * 3600;
     }

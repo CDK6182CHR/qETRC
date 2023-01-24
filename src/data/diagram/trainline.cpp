@@ -1344,6 +1344,32 @@ bool TrainLine::autoBusiness()
     return flag;
 }
 
+double TrainLine::previousBoundIntervalMile(ConstAdaPtr st) const
+{
+    double res=0.;
+    auto prev_ada=std::prev(st);
+    auto railst=prev_ada->railStation.lock();
+    auto railst_end=st->railStation.lock();
+
+    bool foundEnd=false;
+
+    for (auto interv=railst->dirNextInterval(dir()); interv;
+         interv=interv->nextInterval()){
+        res += interv->mile();
+        if (interv->toStation() == railst_end){
+            foundEnd=true;
+            break;
+        }
+    }
+
+    if (!foundEnd){
+        qDebug()<<"TrainLine::prevousBoundIntervalMile: Invalid data: "
+                  "the inverval loop passes the end. " << railst->name.toSingleLiteral() << Qt::endl;
+        res=-1;
+    }
+    return res;
+}
+
 RailStationEvent::Position TrainLine::passStationPos(ConstAdaPtr st) const
 {
     if (st == _stations.begin()) {

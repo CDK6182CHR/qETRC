@@ -35,6 +35,7 @@ SOURCES += \
     src/data/analysis/inttrains/intervaltraininfo.cpp \
     src/data/analysis/runstat/trainintervalstat.cpp \
     src/data/analysis/runstat/trainintervalstatresult.cpp \
+    src/data/analysis/runstat/trainlinenet.cpp \
     src/data/analysis/traingap/traingapana.cpp \
     src/data/train/itrainfilter.cpp \
     src/data/train/predeftrainfiltercore.cpp \
@@ -259,6 +260,7 @@ HEADERS += \
     src/data/analysis/inttrains/intervaltraininfo.h \
     src/data/analysis/runstat/trainintervalstat.h \
     src/data/analysis/runstat/trainintervalstatresult.h \
+    src/data/analysis/runstat/trainlinenet.h \
     src/data/analysis/traingap/traingapana.h \
     src/data/train/itrainfilter.h \
     src/data/train/predeftrainfiltercore.h \
@@ -279,6 +281,7 @@ HEADERS += \
     src/editors/train/traingroupwidget.h \
     src/editors/train/trainnameregextable.h \
     src/mainwindow/startuppage.h \
+    src/railnet/graph/railnetutil.hpp \
     src/util/combos/railstationcombo.h \
     src/util/helper_templates.hpp \
     src/util/qefoldwidget.h \

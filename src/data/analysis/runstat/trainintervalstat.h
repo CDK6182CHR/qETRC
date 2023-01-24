@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <list>
-#include "railnet/graph/railnet.h"
+#include "trainlinenet.h"
 #include "trainintervalstatresult.h"
 
 class RailCategory;
@@ -19,7 +19,7 @@ class TrainStation;
 class TrainIntervalStat
 {
     RailCategory& railcat;
-    RailNet railnet;
+    TrainLineNet net;
 
     std::shared_ptr<const Train> train;
     // for computation temporary:

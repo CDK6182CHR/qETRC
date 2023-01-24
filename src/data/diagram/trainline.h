@@ -279,6 +279,16 @@ public:
      */
     bool autoBusiness();
 
+    /**
+     * @brief previousBoundIntervalMile
+     * 2023.01.24 Compute the mile between the previous station and the givene station.
+     * Here, `previous' means the last BOUND station (i.e. in this->_stations).
+     * It is in princple safe to loop with the RailInterval, since the TrainLine should
+     * belong to a single direction (up/down).
+     * However, in case it fails, return a negative value.
+     */
+    double previousBoundIntervalMile(ConstAdaPtr st)const;
+
 private:
 
     /**
