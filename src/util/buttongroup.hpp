@@ -122,7 +122,7 @@ inline void ButtonGroup<_Num, _Layout, _Button>::connectFront_impl(int start, Ty
     TyObj* obj, TySlot&& slot, Args && ...args)
 {
     QObject::connect(buttons[start], std::forward<TySignal>(signal), obj, std::forward<TySlot>(slot));
-    if constexpr (sizeof...(args)) {
+    if constexpr (sizeof...(args) > 0) {
         connectFront_impl(start + 1, std::forward<TySignal>(signal), obj, std::forward<Args>(args)...);
     }
 }

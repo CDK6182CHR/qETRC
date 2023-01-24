@@ -30,12 +30,13 @@ void PredefTrainFilterManager::initUI()
         this, &PredefTrainFilterManager::updateFilter);
 }
 
-void PredefTrainFilterManager::commitAddFilter(int place, const PredefTrainFilterCore *filter)
+void PredefTrainFilterManager::commitAddFilter([[maybe_unused]]int place,
+    [[maybe_unused]] const PredefTrainFilterCore *filter)
 {
     lstWidget->refreshList();
 }
 
-void PredefTrainFilterManager::commitRemoveFilter(int place, const PredefTrainFilterCore *filter)
+void PredefTrainFilterManager::commitRemoveFilter([[maybe_unused]]int place, const PredefTrainFilterCore *filter)
 {
     lstWidget->refreshList();
     if (editWidget->getCore()==filter){

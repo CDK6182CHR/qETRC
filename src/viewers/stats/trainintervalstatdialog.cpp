@@ -128,7 +128,7 @@ void TrainIntervalStatDialog::onStartIndexChanged(int i)
     }
 }
 
-void TrainIntervalStatDialog::onEndIndexChanged(int i)
+void TrainIntervalStatDialog::onEndIndexChanged([[maybe_unused]]int i)
 {
     refreshData();
 }

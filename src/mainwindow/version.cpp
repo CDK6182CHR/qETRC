@@ -2,14 +2,14 @@
 
 namespace qespec {
 
-const std::string_view VERSION = "V1.3.0-dev";
+const std::string_view VERSION = "V1.3.0";
 const std::string_view LAST_VERSION = "V1.2.6";
-const std::string_view DATE = "20230122";
-const int RELEASE_CODE = 33;
+const std::string_view DATE = "20230124";
+const int RELEASE_CODE = 34;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 
-const std::string_view UPDATE_LOG = R"(1. 新增部分列车批量操作功能；
-2. 修复线路里程表编辑相关问题；
-3. 优化保存运行图文件的体积。)";
+const std::string_view UPDATE_LOG = R"(1. 重新设计列车筛选器相关功能；
+2. 新增列车运行统计功能；
+3. 明确标尺排图/贪心推线中的营业站设置规则。)";
 }

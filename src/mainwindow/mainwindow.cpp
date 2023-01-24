@@ -156,7 +156,7 @@ void MainWindow::undoRemoveTrain(std::shared_ptr<Train> train)
 	addTrainLine(*train);
 }
 
-void MainWindow::onStationTableChanged(std::shared_ptr<Railway> rail, bool equiv)
+void MainWindow::onStationTableChanged(std::shared_ptr<Railway> rail, [[maybe_unused]] bool equiv)
 {
 	_diagram.updateRailway(rail);
 	trainListWidget->getModel()->updateAllMileSpeed();

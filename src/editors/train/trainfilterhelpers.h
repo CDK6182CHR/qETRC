@@ -1,5 +1,6 @@
 #pragma once
 
+#if 0
 #include <QDialog>
 #include <QSet>
 #include <memory>
@@ -88,4 +89,5 @@ public slots:
     void showDialog();
     void clearSelection();
 };
+#endif
 

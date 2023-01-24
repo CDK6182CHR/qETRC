@@ -1,3 +1,5 @@
+#if 0
+
 #include "trainfilterhelpers.h"
 
 #include <QListView>
@@ -200,3 +202,5 @@ void SelectRoutingDialog::clearSelection()
     _containsNull=false;
     _selected.clear();
 }
+
+#endif

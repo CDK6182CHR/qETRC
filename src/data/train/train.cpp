@@ -964,14 +964,13 @@ bool Train::autoBusiness()
 void Train::autoBusinessWithoutBound(const Railway& rail, bool isPassenger)
 {
     for (auto& st : _timetable) {
-        auto railst=rail.stationByName(st.name);
+        auto railst = rail.stationByName(st.name);
         assert(railst);   // this MUST be valid in case of rulerpaint
         bool business = false;
-        if (st.name == starting() || st.name == terminal()) {
-            business = true;
-        }
-        else if ((isPassenger && railst->passenger) || (!isPassenger && railst->freight)) {
-            business = true;
+        if (st.name == starting() || st.name == terminal() || st.isStopped()) {
+            if ((isPassenger && railst->passenger) || (!isPassenger && railst->freight)) {
+                business = true;
+            }
         }
         st.business = business;
     }
