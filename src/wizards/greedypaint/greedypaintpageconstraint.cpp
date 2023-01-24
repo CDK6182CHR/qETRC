@@ -15,17 +15,20 @@
 #include <QListView>
 #include <QLabel>
 #include <QGroupBox>
+#include <QToolButton>
+#include <QApplication>
+#include <QStyle>
 #include <util/railrulercombo.h>
 #include <data/diagram/diagram.h>
 #include <data/common/qesystem.h>
 #include <model/delegate/generalspindelegate.h>
 #include <data/calculation/greedypainter.h>
-#include <dialogs/trainfilter.h>
+#include <editors/train/trainfilterselector.h>
 #include <data/analysis/traingap/traingapana.h>
 
 
 GreedyPaintPageConstraint::GreedyPaintPageConstraint(Diagram& diagram_, GreedyPainter &_painter,
-    TrainFilter* filter_, QWidget *parent):
+    TrainFilterSelector* filter_, QWidget *parent):
     QWidget(parent), diagram(diagram_), painter(_painter), filter(filter_),
     _model(new GapConstraintModel(this)),
     _mdForbid(new SelectForbidModel(this))
@@ -60,6 +63,13 @@ void GreedyPaintPageConstraint::initUI()
     flay->addRow(tr("间隔控制方案"),gpGapSet);
     connect(gpGapSet->group(),&QButtonGroup::idToggled,
             this,&GreedyPaintPageConstraint::onGapSetToggled);
+    hlay = new QHBoxLayout;
+    hlay->addWidget(filter);
+    auto* tb = new QToolButton;
+    tb->setIcon(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation));
+    connect(tb, &QToolButton::clicked, this, &GreedyPaintPageConstraint::informFilter);
+    hlay->addWidget(tb);
+    flay->addRow(tr("列车筛选器"), hlay);
 
     vlay->addWidget(new QLabel(tr("考虑以下天窗: ")));
     lstForbid=new QListView;
@@ -99,12 +109,7 @@ void GreedyPaintPageConstraint::initUI()
 
     hlay->addStretch(1);
 
-    auto* btn = new QPushButton(tr("车次筛选器"));
-    hlay->addWidget(btn);
-    connect(btn, &QPushButton::clicked, this, &GreedyPaintPageConstraint::showTrainFilter);
-    hlay->addStretch(3);
-
-    btn = new QPushButton(tr("提取"));
+    auto* btn = new QPushButton(tr("提取"));
     connect(btn, &QPushButton::clicked, this, &GreedyPaintPageConstraint::onGetGapFromCurrent);
     hlay->addWidget(btn);
     gp->setLayout(hlay);
@@ -187,7 +192,7 @@ void GreedyPaintPageConstraint::onGapSetToggled(int id, bool on)
 
 void GreedyPaintPageConstraint::onGetGapFromCurrent()
 {
-    TrainGapAna gapana(diagram, filter->getCore());
+    TrainGapAna gapana(diagram, filter->filter());
     //gapana.setSingleLine(ckSingle->isChecked());
     gapana.setCutSecs(spMinGap->value());
 
@@ -196,15 +201,8 @@ void GreedyPaintPageConstraint::onGetGapFromCurrent()
     _model->setConstrainFromCurrent(res, spMinGap->value(), spMaxGap->value());
 }
 
-void GreedyPaintPageConstraint::showTrainFilter()
+void GreedyPaintPageConstraint::informFilter()
 {
-    if (!filterInformed) {
-        QMessageBox::information(this, tr("提示"),
-            tr("自1.2.4版本起，此处列车筛选器不但决定自动提取的最小间隔，"
-                "同时将决定贪心推线过程中被考虑的车次。未被筛选器选中的车次，"
-                "在贪心推线算法运行中将被直接忽略。"
-                "\n本提示在贪心推线模式本次运行期间仅展示一次。"));
-        filterInformed = true;
-    }
-    filter->show();
+    QMessageBox::information(this,tr("提示"),tr("列车筛选器决定排图过程中需要考虑冲突的列车，" 
+        "和自动提取最小间隔时考虑的列车。未被筛选器选中的车次，在贪心推线算法运行过程中将被直接忽略。"));
 }

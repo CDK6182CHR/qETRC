@@ -9,12 +9,12 @@ class QLineEdit;
 class IntervalTrainTable;
 class Diagram;
 
-class TrainFilter;
+class TrainFilterSelector;
 class IntervalTrainDialog : public QDialog
 {
     Q_OBJECT
     Diagram& diagram;
-    TrainFilter* const filter;
+    TrainFilterSelector* const filter;
     IntervalCounter counter;  // 注意初始化顺序！
     IntervalTrainTable*const table;
 

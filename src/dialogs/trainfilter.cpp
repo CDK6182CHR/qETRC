@@ -1,4 +1,5 @@
-﻿#include "trainfilter.h"
+﻿#if 0
+#include "trainfilter.h"
 
 #include <QCheckBox>
 #include <QFormLayout>
@@ -153,3 +154,4 @@ void TrainFilter::clearFilter()
     ckInverse->setChecked(false);
     gpPassen->get(2)->setChecked(true);
 }
+#endif

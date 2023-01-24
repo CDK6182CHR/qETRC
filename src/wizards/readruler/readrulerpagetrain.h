@@ -8,7 +8,7 @@ class TrainListReadModel;
 
 class TrainCollection;
 class QTableView;
-class TrainFilter;
+class TrainFilterSelector;
 class Diagram;
 class Railway;
 
@@ -19,7 +19,7 @@ class ReadRulerPageTrain : public QWizardPage
     TrainCollection& coll;
     TrainListReadModel *mdUnsel, *mdSel;
     QTableView *tbUnsel,*tbSel;
-    TrainFilter* filter;
+    TrainFilterSelector* filter;
 
     /**
      * 2022.05.06增加

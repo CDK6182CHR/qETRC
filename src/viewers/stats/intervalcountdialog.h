@@ -8,7 +8,7 @@
 class IntervalTrainTable;
 class QTableView;
 class Diagram;
-class TrainFilter;
+class TrainFilterSelector;
 class QCheckBox;
 
 /**
@@ -54,7 +54,7 @@ class IntervalCountDialog : public QDialog
     RadioButtonGroup<2>* rdStart;
     QCheckBox* ckPassenger,*ckFreight;
     QCheckBox* ckBusiness,*ckStop;
-    TrainFilter* const filter;
+    TrainFilterSelector* const filter;
 
     QTableView* table;
     IntervalTrainTable* detailTable=nullptr;

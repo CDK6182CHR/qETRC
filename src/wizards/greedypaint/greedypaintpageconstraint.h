@@ -12,7 +12,7 @@ class QTableView;
 class GreedyPainter;
 class QCheckBox;
 class QSpinBox;
-class TrainFilter;
+class TrainFilterSelector;
 class RailRulerCombo;
 /**
  * @brief The GreedyPaintPageConstraint class
@@ -35,7 +35,7 @@ class GreedyPaintPageConstraint : public QWidget
     RadioButtonGroup<GAP_SET_COUNT>* gpGapSet;
     std::array<std::unique_ptr<gapset::GapSetAbstract>,GAP_SET_COUNT> _availableGapSets;
 
-    TrainFilter* const filter;
+    TrainFilterSelector* const filter;
     QSpinBox* spMinGap, * spMaxGap;
 
     bool filterInformed = false;
@@ -43,7 +43,7 @@ public:
     explicit GreedyPaintPageConstraint(
             Diagram& _diagram,
             GreedyPainter& _painter,
-            TrainFilter* filter_,
+            TrainFilterSelector* filter_,
             QWidget *parent = nullptr);
 private:
     void initUI();
@@ -65,6 +65,6 @@ private slots:
     void onGapSetToggled(int id, bool on);
     void onGetGapFromCurrent();
 
-    void showTrainFilter();
+    void informFilter();
 };
 

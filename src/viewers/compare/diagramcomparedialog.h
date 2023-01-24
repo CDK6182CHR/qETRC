@@ -36,7 +36,7 @@ private:
 
 class QLineEdit;
 class QCheckBox;
-class TrainFilter;
+class TrainFilterSelector;
 class QTableView;
 class TrainCompareDialog;
 
@@ -47,7 +47,7 @@ class DiagramCompareDialog : public QDialog
     DiagramCompareModel* const model;
     QLineEdit* edFile;
     QCheckBox* ckLocal,*ckChanged;
-    TrainFilter* filter;
+    TrainFilterSelector* filter;
 
     QTableView* table;
 public:

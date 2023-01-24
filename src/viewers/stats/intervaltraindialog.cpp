@@ -1,6 +1,6 @@
 ﻿#include "intervaltraindialog.h"
 
-#include <dialogs/trainfilter.h>
+#include <editors/train/trainfilterselector.h>
 #include <data/diagram/diagram.h>
 #include <QCheckBox>
 #include <QFormLayout>
@@ -19,8 +19,8 @@
 
 IntervalTrainDialog::IntervalTrainDialog(Diagram &diagram, QWidget *parent):
     QDialog(parent),
-    diagram(diagram),filter(new TrainFilter(diagram,this)),
-    counter(diagram.trainCollection(),filter->getCore()),
+    diagram(diagram),filter(new TrainFilterSelector(diagram.trainCollection(),this)),
+    counter(diagram.trainCollection()),
     table(new IntervalTrainTable(this))
 {
     setAttribute(Qt::WA_DeleteOnClose);
@@ -67,9 +67,7 @@ void IntervalTrainDialog::initUI()
     hlay->addWidget(ckBusiness);
     hlay->addWidget(ckStop);
 
-    auto* btn=new QPushButton(tr("车次筛选器"));
-    hlay->addWidget(btn);
-    connect(btn,&QPushButton::clicked,filter,&TrainFilter::show);
+    hlay->addWidget(filter);
 
     flay->addRow(tr("筛选"),hlay);
     vlay->addLayout(flay);
@@ -92,6 +90,7 @@ void IntervalTrainDialog::updateData()
         QMessageBox::warning(this,tr("错误"),tr("请输入非空车站名！"));
         return;
     }
+    counter.setFilter(filter->filter());
     counter.setBusinessOnly(ckBusiness->isChecked());
     counter.setStopOnly(ckStop->isChecked());
     counter.setMultiStart(ckMultiStart->isChecked());

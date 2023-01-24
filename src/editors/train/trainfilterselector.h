@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include "data/train/trainfilterselectorcore.h"
 
 class PredefTrainFilterCore;
 class TrainFilterCore;
@@ -14,7 +15,7 @@ class TrainFilterSelector : public QWidget
     TrainCollection& coll;
     TrainFilterDialog* dlg;
     TrainFilterCombo* combo;
-    const TrainFilterCore* _current;
+    TrainFilterSelectorCore selector;
 public:
     explicit TrainFilterSelector(TrainCollection& coll, QWidget *parent = nullptr);
 
@@ -22,7 +23,8 @@ public:
     * This version also initializes dialog->core with given data
     */
     explicit TrainFilterSelector(TrainCollection& coll, const TrainFilterCore& initData, QWidget *parent = nullptr);
-    const TrainFilterCore* filter(){return _current;}
+    const TrainFilterCore* filter(){return selector.filter();}
+    const TrainFilterSelectorCore& core(){return selector;}
     auto* dialog(){return dlg;}
 private:
     void initUI();

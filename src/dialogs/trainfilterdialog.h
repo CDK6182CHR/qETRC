@@ -40,5 +40,6 @@ public slots:
 private slots:
     void onComboChanged(const PredefTrainFilterCore* data);
     void actApply();
+    void informPredef();
 };
 

@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#if 0
 #include <QDialog>
 #include "util/buttongroup.hpp"
 #include "data/train/trainfiltercore.h"
@@ -13,7 +14,7 @@ class Diagram;
  * @brief The TrainFilter class
  * pyETRC.TrainFilter  功能类似，逻辑基本照搬，但直接继承QDialog
  */
-class TrainFilter : public QDialog
+class Q_DECL_DEPRECATED TrainFilter : public QDialog
 {
     Q_OBJECT;
     Diagram& diagram;
@@ -52,3 +53,4 @@ public slots:
     void clearFilter();
 };
 
+#endif

@@ -1,13 +1,14 @@
 ﻿#include "greedypaintpageconstraint.h"
 #include "greedypaintpagepaint.h"
 #include "greedypaintwizard.h"
-#include <dialogs/trainfilter.h>
+#include <editors/train/trainfilterselector.h>
+#include <data/diagram/diagram.h>
 #include <QMessageBox>
 
 GreedyPaintWizard::GreedyPaintWizard(Diagram& diagram_, QWidget *parent):
     QTabWidget(parent),diagram(diagram_),
-    filter(new TrainFilter(diagram_, this)),
-    painter(diagram_, filter->getCore())
+    filter(new TrainFilterSelector(diagram_.trainCollection())),
+    painter(diagram_, filter->core())
 {
     setWindowTitle(tr("贪心推线系统"));
     initUI();

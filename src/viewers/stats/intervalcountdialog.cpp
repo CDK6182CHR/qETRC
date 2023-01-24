@@ -1,7 +1,5 @@
 ﻿#include "intervalcountdialog.h"
 
-#include <dialogs/trainfilter.h>
-
 #include <util/combos/railstationcombo.h>
 #include <data/diagram/diagram.h>
 #include <QCheckBox>
@@ -12,7 +10,7 @@
 #include <data/common/qesystem.h>
 #include <model/delegate/qedelegate.h>
 #include <util/utilfunc.h>
-
+#include <editors/train/trainfilterselector.h>
 #include "intervaltraintable.h"
 
 IntervalCountModel::IntervalCountModel(IntervalCounter& counter, QObject *parent):
@@ -97,8 +95,8 @@ void IntervalCountModel::setupModel()
 
 IntervalCountDialog::IntervalCountDialog(Diagram &diagram, QWidget *parent):
     QDialog(parent), diagram(diagram),
-    filter(new TrainFilter(diagram,this)),
-    counter(diagram.trainCollection(),filter->getCore()),
+    filter(new TrainFilterSelector(diagram.trainCollection(),this)),
+    counter(diagram.trainCollection()),
     model(new IntervalCountModel(counter, this))
 {
     setAttribute(Qt::WA_DeleteOnClose);
@@ -145,18 +143,15 @@ void IntervalCountDialog::initUI()
     hlay=new QHBoxLayout;
     ckBusiness=new QCheckBox(tr("仅营业车次"));
     ckStop=new QCheckBox(tr("仅停车车次"));
-    auto* btn=new QPushButton(tr("车次筛选器"));
     hlay->addWidget(ckBusiness);
     hlay->addWidget(ckStop);
-    hlay->addWidget(btn);
+    hlay->addWidget(filter);
     connect(ckBusiness,&QCheckBox::toggled,
             this,&IntervalCountDialog::refreshData);
     connect(ckStop,&QCheckBox::toggled,
             this,&IntervalCountDialog::refreshData);
-    connect(filter,&TrainFilter::filterApplied,
+    connect(filter,&TrainFilterSelector::filterChanged,
             this,&IntervalCountDialog::refreshData);
-    connect(btn,&QPushButton::clicked,
-            filter,&TrainFilter::show);
     flay->addRow(tr("车次筛选"),hlay);
 
     vlay->addLayout(flay);
@@ -190,6 +185,7 @@ void IntervalCountDialog::refreshData()
     counter.setStopOnly(ckStop->isChecked());
     counter.setPassengerOnly(ckPassenger->isChecked());
     counter.setFreightOnly(ckFreight->isChecked());
+    counter.setFilter(filter->filter());
 
     RailIntervalCount data;
     if (rdStart->get(0)->isChecked()){

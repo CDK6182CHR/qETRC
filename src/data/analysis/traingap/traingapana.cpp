@@ -104,10 +104,15 @@ namespace _gapdetail {
 
 }
 
-TrainGapAna::TrainGapAna(Diagram &diagram, const TrainFilterCore &filter):
+TrainGapAna::TrainGapAna(Diagram &diagram, const TrainFilterCore *filter):
     diagram(diagram), filter(filter)
 {
 
+}
+
+TrainGapAna::TrainGapAna(Diagram& diagram):
+    diagram(diagram)
+{
 }
 
 std::map<TrainGapTypePair, int> TrainGapAna::globalMinimal(
@@ -117,7 +122,7 @@ std::map<TrainGapTypePair, int> TrainGapAna::globalMinimal(
     auto events=diagram.stationEventsForRail(rail);
     for(auto _p=events.begin();_p!=events.end();++_p){
         const RailStationEventList& lst=_p->second;
-        auto gaps=calTrainGaps(lst, filter,_p->first);
+        auto gaps=calTrainGaps(lst, *filter,_p->first);
         TrainGapStatistics stat=countTrainGaps(gaps, _cutSecs);
 
         for (auto q = stat.begin(); q != stat.end(); ++q) {

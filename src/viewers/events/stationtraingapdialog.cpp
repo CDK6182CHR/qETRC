@@ -45,7 +45,7 @@ void StationTrainGapModel::refreshData(const TrainFilterCore* filter)
 {
     this->filter = filter;
     //data = diagram.getTrainGaps(events, filter, station, singleLine);
-    TrainGapAna ana(diagram, *filter);
+    TrainGapAna ana(diagram, filter);
     data = ana.calTrainGaps(events, *filter, station);
     stat = ana.countTrainGaps(data, _cutSecs);
     setupModel();

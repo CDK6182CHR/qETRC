@@ -36,6 +36,7 @@ SOURCES += \
     src/data/analysis/traingap/traingapana.cpp \
     src/data/train/itrainfilter.cpp \
     src/data/train/predeftrainfiltercore.cpp \
+    src/data/train/trainfilterselectorcore.cpp \
     src/data/train/traingroup.cpp \
     src/dialogs/jointrailwaydialog.cpp \
     src/dialogs/selecttrainstationdialog.cpp \
@@ -256,6 +257,7 @@ HEADERS += \
     src/data/analysis/traingap/traingapana.h \
     src/data/train/itrainfilter.h \
     src/data/train/predeftrainfiltercore.h \
+    src/data/train/trainfilterselectorcore.h \
     src/data/train/traingroup.h \
     src/dialogs/jointrailwaydialog.h \
     src/dialogs/selecttrainstationdialog.h \

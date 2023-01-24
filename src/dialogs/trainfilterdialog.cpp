@@ -5,7 +5,10 @@
 #include "data/train/predeftrainfiltercore.h"
 
 #include <QFormLayout>
+#include <QMessageBox>
+#include <QToolButton>
 #include <QVBoxLayout>
+#include <QApplication>
 
 TrainFilterDialog::TrainFilterDialog(TrainCollection &coll, QWidget *parent):
     QDialog(parent), coll(coll)
@@ -34,10 +37,17 @@ void TrainFilterDialog::initUI()
 {
     auto* vlay=new QVBoxLayout(this);
     auto* flay=new QFormLayout;
+    auto* hlay=new QHBoxLayout;
     combo=new TrainFilterCombo(coll);
     connect(combo,&TrainFilterCombo::filterChanged,
             this,&TrainFilterDialog::onComboChanged);
-    flay->addRow(tr("预设"), combo);
+    hlay->addWidget(combo);
+    auto* btn=new QToolButton;
+    btn->setIcon(qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation));
+    connect(btn,&QPushButton::clicked,this,&TrainFilterDialog::informPredef);
+    hlay->addWidget(btn);
+
+    flay->addRow(tr("预设"), hlay);
     vlay->addLayout(flay);
 
     basic=new TrainFilterBasicWidget(coll,&core);
@@ -68,4 +78,12 @@ void TrainFilterDialog::actApply()
     basic->actApply();
     emit filterApplied(this);
     done(Accepted);
+}
+
+void TrainFilterDialog::informPredef()
+{
+    QMessageBox::information(this,tr("提示"),
+                             tr("自1.3.0版本起，列车筛选器支持定义预设，并提供数个系统自定义预设。"
+                                "此处可使用预设的筛选器，然后进一步修改筛选器。\n"
+                                "如需修改预设的筛选器，请前往工具栏[列车]->[预设筛选]。"));
 }

@@ -46,4 +46,7 @@ public slots:
 signals:
     void changeApplied(PredefTrainFilterCore* filter,
         std::unique_ptr<PredefTrainFilterCore>& data);
+
+private slots:
+    void informPredef();
 };

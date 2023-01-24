@@ -2,19 +2,23 @@
 
 #ifndef QETRC_MOBILE_2
 
+#include <QMessageBox>
+#include <QTableView>
+#include <QHeaderView>
+
 #include "data/diagram/diagram.h"
 #include "util/buttongroup.hpp"
-#include "dialogs/trainfilter.h"
 #include "data/common/qesystem.h"
+#include "data/diagram/diagram.h"
 #include "model/train/trainlistreadmodel.h"
-#include <QtWidgets>
+#include "editors/train/trainfilterselector.h"
 #include <algorithm>
 
 ReadRulerPageTrain::ReadRulerPageTrain(Diagram& diagram_, QWidget *parent):
     QWizardPage(parent),diagram(diagram_),  coll(diagram_.trainCollection())
 {
-    filter = new TrainFilter(diagram, this);
-    connect(filter, &TrainFilter::filterApplied,
+    filter = new TrainFilterSelector(diagram.trainCollection(), this);
+    connect(filter, &TrainFilterSelector::filterChanged,
         this, &ReadRulerPageTrain::filtTrainApplied);
     initUI();
 }
@@ -112,7 +116,7 @@ void ReadRulerPageTrain::filtTrainApplied()
 {
     for (int i = 0; i < mdUnsel->rowCount({}); i++) {
         auto train = mdUnsel->trains().at(i);
-        tbUnsel->setRowHidden(i, !filter->check(train));
+        tbUnsel->setRowHidden(i, !filter->filter()->check(train));
     }
 }
 

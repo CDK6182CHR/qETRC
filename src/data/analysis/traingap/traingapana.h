@@ -21,11 +21,14 @@ class Diagram;
 class TrainGapAna
 {
     Diagram& diagram;
-    const TrainFilterCore& filter;
+    const TrainFilterCore* filter=nullptr;
 //    bool _singleLine=false;
     int _cutSecs;
 public:
-    TrainGapAna(Diagram& diagram, const TrainFilterCore& filter);
+    TrainGapAna(Diagram& diagram);
+    TrainGapAna(Diagram& diagram, const TrainFilterCore* filter);
+
+    void setFilter(const TrainFilterCore* filter) { this->filter = filter; }
 
 //    void setSingleLine(bool on){_singleLine=on;}
     void setCutSecs(int secs){_cutSecs=secs;}

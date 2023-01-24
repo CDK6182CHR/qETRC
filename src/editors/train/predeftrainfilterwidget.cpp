@@ -7,6 +7,9 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QToolButton>
+#include <QApplication>
+#include <QStyle>
 
 #include "data/train/predeftrainfiltercore.h"
 #include "util/buttongroup.hpp"
@@ -29,10 +32,17 @@ void PredefTrainFilterWidget::initUI()
 {
     auto* vlay=new QVBoxLayout(this);
     auto* flay=new QFormLayout;
+    auto* hlay=new QHBoxLayout;
 
     edName=new QLineEdit;
+    hlay->addWidget(edName);
+    auto* btn=new QToolButton;
+    btn->setIcon(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation));
+    hlay->addWidget(btn);
+    connect(btn,&QToolButton::clicked,this,
+            &PredefTrainFilterWidget::informPredef);
 
-    flay->addRow(tr("预设名称"), edName);
+    flay->addRow(tr("预设名称"), hlay);
     vlay->addLayout(flay);
 
     basic=new TrainFilterBasicWidget(coll,core);
@@ -89,4 +99,13 @@ void PredefTrainFilterWidget::clearNotChecked()
     basic->clearNotChecked();
     edName->clear();
     edNote->clear();
+}
+
+void PredefTrainFilterWidget::informPredef()
+{
+    QMessageBox::information(this,tr("提示"),
+                             tr("自1.3.0版本起，本系统支持保存列车筛选器预设。在需要使用列车筛选器"
+                                "的功能场景，可以直接使用预设，或者从已有预设编辑。"
+                                "此处编辑的预设将保存到当前运行图文件。"));
+
 }

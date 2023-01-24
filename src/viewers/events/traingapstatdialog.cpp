@@ -140,7 +140,7 @@ void TrainGapSummaryModel::setupHeader()
     globalMin.clear();
     localMin.clear();
     typeCols.clear();
-    TrainGapAna ana(diagram, *filter);
+    TrainGapAna ana(diagram, filter);
     for (auto _p = events.begin(); _p != events.end(); ++_p) {
         const RailStationEventList& lst = _p->second;
         auto gaps = ana.calTrainGaps(lst, *filter, _p->first);

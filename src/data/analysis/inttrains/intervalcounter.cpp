@@ -8,9 +8,8 @@
 #include <data/diagram/trainline.h>
 #include <data/rail/railstation.h>
 
-IntervalCounter::IntervalCounter(const TrainCollection &coll,
-                                 const TrainFilterCore& filter):
-    coll(coll), _filter(filter)
+IntervalCounter::IntervalCounter(const TrainCollection &coll):
+    coll(coll)
 {
 
 }
@@ -22,7 +21,7 @@ IntervalTrainList IntervalCounter::getIntervalTrains(
 {
     IntervalTrainList res{};
     foreach(auto train, coll.trains()){
-        if (! _filter.check(train)){
+        if (! _filter->check(train)){
             continue;
         }
         auto adp=train->adapterFor(*rail);
@@ -58,7 +57,7 @@ IntervalTrainList IntervalCounter::getIntervalTrains(
     auto search_start = transSearchStation(from, _multiStart), search_end = transSearchStation(to, _multiEnd);
     IntervalTrainList res{};
     foreach(auto train,coll.trains()){
-        if (!_filter.check(train))
+        if (!_filter->check(train))
             continue;
         const TrainStation* start_station=nullptr;
         bool start_is_starting=false;
@@ -101,7 +100,7 @@ RailIntervalCount IntervalCounter::getIntervalCountSource(
         const TrainStation* center_station=nullptr;
         bool center_is_start_or_end=false;
         foreach(auto line,adp->lines()){
-            if (!_filter.check(train))
+            if (!_filter->check(train))
                 continue;
             // 注意循环到的车站其实都是本线的，和PyETRC不一样。
             // 只要分清楚前后站即可，由center_station控制。
@@ -142,7 +141,7 @@ RailIntervalCount IntervalCounter::getIntervalCountDrain(std::shared_ptr<const R
 
         for (auto lineit=adp->lines().rbegin();
              lineit!=adp->lines().rend();++lineit){
-            if (!_filter.check(train))
+            if (!_filter->check(train))
                 continue;
             auto line=*lineit;
             for(auto itr=line->stations().rbegin();

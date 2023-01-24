@@ -14,7 +14,8 @@ class Railway;
 class Ruler;
 class RulerNode;
 class Forbid;
-class ITrainFilter;
+class TrainFilterSelectorCore;
+
 /**
  * @brief The GreedyPainter class
  * 贪心算法全自动铺画运行线。
@@ -24,7 +25,7 @@ class ITrainFilter;
 class GreedyPainter
 {
 	Diagram& diagram;
-	const ITrainFilter& filter;
+	const TrainFilterSelectorCore& filter;
 	std::shared_ptr<Railway> _railway;
 	std::shared_ptr<Ruler> _ruler;
 	std::shared_ptr<const RailStation> _anchor, _start, _end;
@@ -50,7 +51,7 @@ class GreedyPainter
 	int backoffCount = 0;
 
 public:
-	GreedyPainter(Diagram& diagram, const ITrainFilter& filter);
+	GreedyPainter(Diagram& diagram, const TrainFilterSelectorCore& filter);
 	auto railway() { return _railway; }
 	auto ruler() { return _ruler; }
 	auto anchor() { return _anchor; }

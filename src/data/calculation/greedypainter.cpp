@@ -5,6 +5,7 @@
 #include <data/rail/rulernode.h>
 #include <util/utilfunc.h>
 #include <data/rail/forbid.h>
+#include <data/train/trainfilterselectorcore.h>
 #include <exception>
 
 
@@ -14,15 +15,15 @@ class BackoffExeed : public std::exception
 };
 
 
-GreedyPainter::GreedyPainter(Diagram& diagram, const ITrainFilter& filter_) :
-	diagram(diagram), filter(filter_)
+GreedyPainter::GreedyPainter(Diagram& diagram, const TrainFilterSelectorCore& core) :
+	diagram(diagram), filter(core)
 {
 
 }
 
 bool GreedyPainter::paint(const TrainName& trainName)
 {
-	_railAxis = diagram.stationEventAxisForRail(_railway, filter);
+	_railAxis = diagram.stationEventAxisForRail(_railway, *filter.filter());
 	_train = std::make_shared<Train>(trainName);
 	_logs.clear();
 	backoffCount = 0;

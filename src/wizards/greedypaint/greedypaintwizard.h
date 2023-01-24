@@ -6,7 +6,7 @@
 
 class GreedyPaintPagePaint;
 class GreedyPaintPageConstraint;
-class TrainFilter;
+class TrainFilterSelector;
 
 /**
  * @brief The GreedyPaintWizard class
@@ -19,7 +19,7 @@ class GreedyPaintWizard : public QTabWidget
 {
     Q_OBJECT
     Diagram& diagram;
-    TrainFilter* const filter;
+    TrainFilterSelector* const filter;   // mind, the actually object belongs to PageConstraint
     GreedyPainter painter;
     GreedyPaintPageConstraint* pgConst;
     GreedyPaintPagePaint* pgPaint;

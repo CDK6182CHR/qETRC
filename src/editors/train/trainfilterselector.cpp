@@ -24,12 +24,14 @@ void TrainFilterSelector::initUI()
 {
     auto* hlay=new QHBoxLayout(this);
     combo=new TrainFilterCombo(coll);
+    combo->setToolTip(tr("选择预设以直接应用预设筛选器，或者编辑临时使用的筛选器。"));
     hlay->addWidget(combo);
     auto* btn=new QPushButton(tr("编辑筛选器"));
+    btn->setToolTip(tr("编辑此处临时使用的列车筛选器，编辑的内容不会保存为预设。"));
     hlay->addWidget(btn);
 
     dlg=new TrainFilterDialog(coll,this);
-    _current = &dlg->getCore();
+    selector._core = &dlg->getCore();
     connect(btn,&QPushButton::clicked,dlg,
             &TrainFilterDialog::show);
     connect(dlg,&TrainFilterDialog::filterApplied,
@@ -42,11 +44,11 @@ void TrainFilterSelector::initUI()
 void TrainFilterSelector::onComboChanged(const PredefTrainFilterCore *core)
 {
     if (core){
-        _current=core;
+        selector._core=core;
     }else{
-        _current=&dlg->getCore();
+        selector._core=&dlg->getCore();
     }
-    emit filterChanged(_current);
+    emit filterChanged(selector._core);
 }
 
 void TrainFilterSelector::onDialogApplied()

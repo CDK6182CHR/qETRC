@@ -13,7 +13,7 @@
 #include <QMessageBox>
 #include <data/diagram/diadiff.h>
 #include <data/train/train.h>
-#include <dialogs/trainfilter.h>
+#include <editors/train/trainfilterselector.h>
 #include <data/common/qesystem.h>
 #include <data/diagram/diagram.h>
 #include <viewers/traintimetableplane.h>
@@ -112,7 +112,7 @@ void DiagramCompareDialog::initUI()
     connect(btn,&QPushButton::clicked,this,&DiagramCompareDialog::viewFile);
     vlay->addLayout(hlay);
 
-    filter=new TrainFilter(diagram,this);
+    filter=new TrainFilterSelector(diagram.trainCollection(),this);
 
     hlay=new QHBoxLayout;
     ckLocal=new QCheckBox(tr("仅对比铺画车次"));
@@ -121,10 +121,8 @@ void DiagramCompareDialog::initUI()
     ckChanged=new QCheckBox(tr("仅显示变化车次"));
     hlay->addWidget(ckChanged);
     connect(ckChanged,&QCheckBox::toggled,this,&DiagramCompareDialog::onChangeToggled);
-    btn=new QPushButton(tr("本运行图车次筛选器"));
-    hlay->addWidget(btn);
-    connect(btn,&QPushButton::clicked,filter,&TrainFilter::show);
-    connect(filter,&TrainFilter::filterApplied,
+    hlay->addWidget(filter);
+    connect(filter,&TrainFilterSelector::filterChanged,
             this,&DiagramCompareDialog::onFilterApplied);
     vlay->addLayout(hlay);
 
@@ -264,7 +262,7 @@ void DiagramCompareDialog::resetRowShow()
             if (ckChanged->isChecked() && t->type == TrainDifference::Unchanged)
                 break;
             // 列车筛选器
-            if (t->train1 && !filter->check(t->train1))
+            if (t->train1 && !filter->filter()->check(t->train1))
                 break;
             flag = true;
         } while (false);

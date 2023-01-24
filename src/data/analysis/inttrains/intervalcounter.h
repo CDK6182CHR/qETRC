@@ -27,13 +27,13 @@ class IntervalCounter
     bool _businessOnly=false,_stopOnly=false;
     // 这两个仅用来处理区间对数表
     bool _passenterOnly=false,_freightOnly=false;
-    const TrainFilterCore& _filter;
+    const TrainFilterCore* _filter=nullptr;
     // 区间车次表多选车站
     bool _multiStart=false, _multiEnd=false;
     bool _regexStart = false, _regexEnd = false;
 public:
-    IntervalCounter(const TrainCollection& coll, const TrainFilterCore& filter);
-    const auto& filter()const{return _filter;}
+    IntervalCounter(const TrainCollection& coll);
+    const auto* filter()const{return _filter;}
     bool businessOnly()const{return _businessOnly;}
     bool stopOnly()const{return _stopOnly;}
     void setBusinessOnly(bool on){_businessOnly=on;}
@@ -44,6 +44,8 @@ public:
     void setMultiEnd(bool on) { _multiEnd = on; }
     void setRegexStart(bool on) { _regexStart = on; }
     void setRegexEnd(bool on) { _regexEnd = on; }
+
+    void setFilter(const TrainFilterCore* core) { _filter = core; }
 
     /**
      * @brief getIntervalTrains
