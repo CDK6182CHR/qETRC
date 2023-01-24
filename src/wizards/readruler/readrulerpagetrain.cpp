@@ -53,8 +53,9 @@ void ReadRulerPageTrain::initUI()
     setSubTitle(tr("请选择一组用于读取标尺的车次（通过添加到右边表格）\n"
                        "本系统将认为所选车次属于同一标尺。如果不是，计算准确性受到影响。"));
     auto* vlay=new QVBoxLayout(this);
-    auto* g=new ButtonGroup<3>({"车次筛选器","全选显示车次","清空选择"});
-    g->connectAll(SIGNAL(clicked()),this,{SLOT(filtTrain()),SLOT(selectAll()),
+    auto* g=new ButtonGroup<2>({"全选显示车次","清空选择"});
+    g->insertWidget(0, filter);
+    g->connectAll(SIGNAL(clicked()),this,{SLOT(selectAll()),
                                           SLOT(deselectAll())});
     vlay->addLayout(g);
     auto* hlay=new QHBoxLayout;
@@ -109,7 +110,7 @@ QVector<int> ReadRulerPageTrain::inversedSelectedRows(QTableView *table)
 
 void ReadRulerPageTrain::filtTrain()
 {
-    filter->show();
+    
 }
 
 void ReadRulerPageTrain::filtTrainApplied()
