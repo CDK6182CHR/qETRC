@@ -124,8 +124,9 @@ std::shared_ptr<RailInterval> RailInterval::inverseInterval()
 
 bool RailInterval::isSymmetryInterval() const
 {
-    return fromStation()->direction == PassedDirection::BothVia &&
-        toStation()->direction == PassedDirection::BothVia;
+    // 2023.01.25 new implementation based on interval
+    auto inv = toStation()->dirNextInterval(DirFunc::reverse(_dir));
+    return inv && inv->toStation() == fromStation();
 }
 
 bool RailInterval::isSingleRail() const

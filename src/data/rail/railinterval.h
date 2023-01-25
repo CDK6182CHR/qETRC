@@ -118,6 +118,7 @@ public:
      * 2022.09.10
      * 是否是对称区间，等价于前后站是否都为双向站。
      * see also: inverseInterval
+     * 2023.01.25: 上述条件是不够的；因为可能对面存在一个多余的站。
      */
     bool isSymmetryInterval()const;
 
