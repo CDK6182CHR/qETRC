@@ -33,7 +33,7 @@ void TrainFilterSelector::initUI()
     dlg=new TrainFilterDialog(coll,this);
     selector._core = &dlg->getCore();
     connect(btn,&QPushButton::clicked,dlg,
-            &TrainFilterDialog::show);
+            &TrainFilterDialog::showDialog);
     connect(dlg,&TrainFilterDialog::filterApplied,
             this,&TrainFilterSelector::onDialogApplied);
     connect(combo,&TrainFilterCombo::filterChanged,

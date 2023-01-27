@@ -63,8 +63,10 @@ void PredefTrainFilterWidget::refreshData()
 {
     if (!core){
         clearNotChecked();
+        setEnabled(false);
         return;
     }
+    setEnabled(true);
     basic->refreshData();
     edName->setText(core->name());
     edNote->setText(core->note());

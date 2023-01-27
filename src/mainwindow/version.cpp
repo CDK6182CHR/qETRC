@@ -2,8 +2,8 @@
 
 namespace qespec {
 
-const std::string_view VERSION = "V1.3.0";
-const std::string_view LAST_VERSION = "V1.2.6";
+const std::string_view VERSION = "V1.3.1";
+const std::string_view LAST_VERSION = "V1.3.0";
 const std::string_view DATE = "20230124";
 const int RELEASE_CODE = 34;
 

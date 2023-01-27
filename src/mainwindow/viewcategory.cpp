@@ -146,7 +146,7 @@ void ViewCategory::initUI()
     meFilters = new SARibbonMenu(mw);
     act->setMenu(meFilters);
     mw->addAction(act);
-    connect(act, &QAction::triggered, filter, &TrainFilterDialog::show);
+    connect(act, &QAction::triggered, filter, &TrainFilterDialog::showDialog);
     panel->addLargeAction(act);
 
 

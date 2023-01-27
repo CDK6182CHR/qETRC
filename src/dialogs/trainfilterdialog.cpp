@@ -73,6 +73,17 @@ void TrainFilterDialog::onComboChanged(const PredefTrainFilterCore *data)
     }
 }
 
+void TrainFilterDialog::refreshData()
+{
+    basic->refreshData();
+}
+
+void TrainFilterDialog::showDialog()
+{
+    refreshData();
+    show();
+}
+
 void TrainFilterDialog::actApply()
 {
     basic->actApply();

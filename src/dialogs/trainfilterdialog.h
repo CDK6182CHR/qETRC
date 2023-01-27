@@ -33,10 +33,13 @@ public:
 
 private:
     void initUI();
+    using QDialog::show;
 signals:
     void filterApplied(TrainFilterDialog* s);
 public slots:
     void clearFilter();
+    void refreshData();
+    void showDialog();
 private slots:
     void onComboChanged(const PredefTrainFilterCore* data);
     void actApply();

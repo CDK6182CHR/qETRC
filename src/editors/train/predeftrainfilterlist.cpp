@@ -64,4 +64,7 @@ void PredefTrainFilterList::refreshList()
         it->setData(QVariant::fromValue(f), qeutil::PredefTrainFilterPointerRole);
         model->setItem(i,it);
     }
+    if (model->rowCount() > 0 && !view->currentIndex().isValid()) {
+        view->setCurrentIndex(model->index(0, 0));
+    }
 }
