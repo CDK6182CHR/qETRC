@@ -7,8 +7,11 @@
 #include <SARibbonContextCategory.h>
 #include <QLineEdit>
 
-#include "data/rail/rail.h"
-#include "data/diagram/diagram.h"
+class Railway;
+class Diagram;
+class Ruler;
+//#include "data/rail/rail.h"
+//#include "data/diagram/diagram.h"
 
 class MainWindow;
 
@@ -124,9 +127,7 @@ namespace qecmd {
         RulerContext* cont;
     public:
         UpdateRuler(std::shared_ptr<Ruler> ruler_,std::shared_ptr<Railway> nr_,
-            RulerContext* context, QUndoCommand* parent=nullptr):
-            QUndoCommand(QObject::tr("更新标尺数据: ")+ruler_->name(),parent),
-            ruler(ruler_),nr(nr_), cont(context){}
+            RulerContext* context, QUndoCommand* parent=nullptr);
         virtual void undo()override;
         virtual void redo()override;
     };
@@ -152,9 +153,7 @@ namespace qecmd {
     public:
         RemoveRuler(std::shared_ptr<Ruler> ruler_,
             std::shared_ptr<Railway> data_,
-            bool ordinate, RulerContext* context,QUndoCommand* parent=nullptr):
-            QUndoCommand(QObject::tr("删除标尺: ")+ruler_->name(),parent),
-            ruler(ruler_),data(data_),isOrd(ordinate),cont(context){}
+            bool ordinate, RulerContext* context,QUndoCommand* parent=nullptr);
         virtual void undo()override;
         virtual void redo()override;
 

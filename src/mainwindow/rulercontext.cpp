@@ -1,4 +1,6 @@
 ﻿#ifndef QETRC_MOBILE_2
+#include "data/rail/rulernode.h"
+#include "data/rail/ruler.h"
 #include "rulercontext.h"
 #include "mainwindow.h"
 #include "railcontext.h"
@@ -290,6 +292,14 @@ void RulerContext::actShowEditWidget()
     mw->getRailContext()->openRulerWidget(ruler);
 }
 
+qecmd::UpdateRuler::UpdateRuler(std::shared_ptr<Ruler> ruler_, std::shared_ptr<Railway> nr_,
+                               RulerContext *context, QUndoCommand *parent):
+    QUndoCommand(QObject::tr("更新标尺数据: ")+ruler_->name(),parent),
+    ruler(ruler_),nr(nr_), cont(context)
+{
+
+}
+
 void qecmd::UpdateRuler::undo()
 {
     ruler->swap(*(nr->getRuler(0)));
@@ -313,6 +323,11 @@ void qecmd::ChangeRulerName::redo()
     std::swap(ruler->nameRef(), name);
     cont->commitChangeRulerName(ruler);
 }
+
+qecmd::RemoveRuler::RemoveRuler(std::shared_ptr<Ruler> ruler_, std::shared_ptr<Railway> data_,
+                      bool ordinate, RulerContext *context, QUndoCommand *parent):
+    QUndoCommand(QObject::tr("删除标尺: ")+ruler_->name(),parent),
+    ruler(ruler_),data(data_),isOrd(ordinate),cont(context){}
 
 void qecmd::RemoveRuler::undo()
 {

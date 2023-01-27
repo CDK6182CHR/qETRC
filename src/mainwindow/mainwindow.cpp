@@ -1,4 +1,6 @@
 ﻿#include "mainwindow.h"
+#include "data/rail/railway.h"
+#include "data/rail/ruler.h"
 
 #ifndef QETRC_MOBILE_2
 #include <QMessageBox>

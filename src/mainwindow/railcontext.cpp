@@ -1,4 +1,6 @@
 ﻿#ifndef QETRC_MOBILE_2
+#include "data/rail/forbid.h"
+#include "data/rail/ruler.h"
 #include "railcontext.h"
 #include "mainwindow.h"
 #include "rulercontext.h"
