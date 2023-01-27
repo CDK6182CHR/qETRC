@@ -4,6 +4,7 @@
 #include "data/diagram/diagram.h"
 #include "data/train/train.h"
 #include "data/train/traintype.h"
+#include "data/rail/ruler.h"
 
 #include <QTableView>
 #include <QHeaderView>

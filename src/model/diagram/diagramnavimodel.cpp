@@ -1,6 +1,8 @@
 ﻿#include "diagramnavimodel.h"
 
 #include "data/diagram/diagram.h"
+#include "data/rail/railway.h"
+#include "data/rail/ruler.h"
 
 DiagramNaviModel::DiagramNaviModel(Diagram& diagram, QObject* parent):
     QAbstractItemModel(parent),_diagram(diagram),

@@ -5,6 +5,7 @@
 #include <QHeaderView>
 #include <QScroller>
 
+#include "data/rail/railway.h"
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"
 #include "data/diagram/diagram.h"

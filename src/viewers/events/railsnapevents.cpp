@@ -1,6 +1,7 @@
 ﻿#include "railsnapevents.h"
 
-#include <QtWidgets>
+#include "data/rail/railstation.h"
+#include "data/rail/railway.h"
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"
 #include "data/train/routing.h"
@@ -10,6 +11,13 @@
 #include "data/train/train.h"
 #include "data/train/traintype.h"
 #include "data/diagram/diagram.h"
+
+#include <QLabel>
+#include <QTableView>
+#include <QTimeEdit>
+#include <QHeaderView>
+#include <QAction>
+#include <QScroller>
 
 RailSnapEventsModel::RailSnapEventsModel(Diagram &diagram_,
                                          std::shared_ptr<Railway> railway_,

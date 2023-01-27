@@ -2,6 +2,7 @@
 #include "data/diagram/diagram.h"
 #include "data/common/qesystem.h"
 
+#include "data/rail/railway.h"
 #include "util/buttongroup.hpp"
 #include "util/selecttraincombo.h"
 #include "data/train/train.h"

@@ -1,8 +1,9 @@
 ﻿#include "trainitem.h"
-#include "data/diagram/trainadapter.h"
+//#include "data/diagram/trainadapter.h"
 #include "data/diagram/trainline.h"
 #include "data/train/routing.h"
 #include "data/diagram/diagram.h"
+#include "data/rail/railway.h"
 
 #include <QPainterPath>
 #include <QPointF>

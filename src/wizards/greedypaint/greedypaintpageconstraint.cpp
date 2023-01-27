@@ -1,4 +1,5 @@
 ﻿#include "greedypaintpageconstraint.h"
+#include "data/rail/railway.h"
 
 #include <model/rail/forbidlistmodel.h>
 #include <model/rail/gapconstraintmodel.h>

@@ -1,10 +1,12 @@
 ﻿#include "trainadapter.h"
 #include <cassert>
 
-#include "kernel/trainitem.h"
+//#include "kernel/trainitem.h"
 #include "util/utilfunc.h"
 #include "config.h"
 #include "data/rail/rulernode.h"
+#include "data/rail/ruler.h"
+#include "data/train/train.h"
 
 
 TrainAdapter::TrainAdapter(std::weak_ptr<Train> train,

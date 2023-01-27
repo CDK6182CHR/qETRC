@@ -2,7 +2,7 @@
 
 #include <data/diagram/diagram.h>
 #include <data/train/trainfiltercore.h>
-
+#include <data/rail/railstation.h>
 
 namespace _gapdetail {
 

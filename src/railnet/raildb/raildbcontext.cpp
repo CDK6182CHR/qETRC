@@ -1,4 +1,5 @@
-﻿#ifndef QETRC_MOBILE_2
+﻿#include "data/rail/railway.h"
+#ifndef QETRC_MOBILE_2
 #include "raildbcontext.h"
 #include "raildbnavi.h"
 #include "raildbwindow.h"

@@ -7,7 +7,7 @@
 #include <QSet>
 #include <QJsonObject>
 #include <memory>
-#include "data/rail/ruler.h"
+//#include "data/rail/ruler.h"
 
 
 struct MarginConfig {

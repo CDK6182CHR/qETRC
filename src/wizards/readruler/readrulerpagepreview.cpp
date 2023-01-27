@@ -1,4 +1,5 @@
 ﻿#include "readrulerpagepreview.h"
+#include "data/rail/railinterval.h"
 
 #ifndef QETRC_MOBILE_2
 
@@ -107,8 +108,8 @@ void ReadRulerPagePreview::initUI()
     dlgDetail = new DialogAdapter(tbDetail, this);
     dlgDetail->setAttribute(Qt::WA_DeleteOnClose, false);
     tbDetail->horizontalHeader()->setSortIndicatorShown(true);
-    connect(tbDetail->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
-        tbDetail, SLOT(sortByColumn(int, Qt::SortOrder)));
+    connect(tbDetail->horizontalHeader(), &QHeaderView::sortIndicatorChanged,
+            tbDetail, &QTableView::sortByColumn);
 
     //summary
     mdSummary = new ReadRulerSummaryModel(this);

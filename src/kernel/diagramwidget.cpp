@@ -1,5 +1,6 @@
 ﻿#include "diagramwidget.h"
 #include "data/diagram/trainadapter.h"
+#include "data/rail/ruler.h"
 #include "data/train/routing.h"
 #include "trainitem.h"
 #include "util/utilfunc.h"

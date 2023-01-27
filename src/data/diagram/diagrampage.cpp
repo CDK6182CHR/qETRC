@@ -2,7 +2,7 @@
 #include "diagram.h"
 #include "trainadapter.h"
 #include "kernel/trainitem.h"
-
+#include "data/rail/railway.h"
 
 DiagramPage::DiagramPage(const Config& config, const QList<std::shared_ptr<Railway> > &railways,
     const QString& name,const QString& note): _config(config),

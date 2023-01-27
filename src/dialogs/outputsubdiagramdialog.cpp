@@ -1,8 +1,14 @@
 ﻿#include "outputsubdiagramdialog.h"
 
-#include <QtWidgets>
+#include "data/rail/railway.h"
 #include "util/buttongroup.hpp"
 #include "data/diagram/diagram.h"
+
+#include <QCheckBox>
+#include <QFileDialog>
+#include <QFormLayout>
+#include <QLabel>
+#include <QMessageBox>
 
 OutputSubDiagramDialog::OutputSubDiagramDialog(Diagram &diagram_, QWidget *parent):
     QDialog(parent),diagram(diagram_)

@@ -3,7 +3,6 @@
 #include "trainadapter.h"
 #include "util/utilfunc.h"
 #include "data/train/routing.h"
-#include "data/diagram/traingap.h"
 #include "data/train/trainfiltercore.h"
 #include "data/diagram/diagrampage.h"
 #include "data/rail/forbid.h"

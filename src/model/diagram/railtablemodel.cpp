@@ -1,5 +1,6 @@
 ﻿#include "railtablemodel.h"
 #include "data/diagram/diagram.h"
+#include "data/rail/railway.h"
 
 RailTableModel::RailTableModel(Diagram& diagram_, QObject* parent):
 	QAbstractTableModel(parent),diagram(diagram_)

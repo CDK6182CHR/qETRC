@@ -5,6 +5,7 @@
 #include "rulerpaintpagestart.h"
 #include "rulerpaintpagestation.h"
 #include "rulerpaintpagetable.h"
+#include "data/rail/railway.h"
 
 #include <QMessageBox>
 

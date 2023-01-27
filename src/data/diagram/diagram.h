@@ -5,7 +5,6 @@
 #include <QString>
 #include "config.h"
 #include "data/train/traincollection.h"
-#include "traingap.h"
 #include "data/diagram/trainline.h"    // for: alias
 #include "data/rail/railcategory.h"
 #include "data/calculation/railwaystationeventaxis.h"

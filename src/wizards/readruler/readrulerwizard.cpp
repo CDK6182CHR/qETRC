@@ -1,4 +1,5 @@
 ﻿#include "readrulerwizard.h"
+#include "data/rail/ruler.h"
 
 #ifndef QETRC_MOBILE_2
 

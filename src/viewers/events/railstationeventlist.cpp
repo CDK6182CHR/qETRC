@@ -1,5 +1,6 @@
 ﻿#include "railstationeventlist.h"
 
+#include "data/rail/railway.h"
 #include "data/train/traintype.h"
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"

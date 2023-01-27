@@ -11,6 +11,7 @@
 #include <QScroller>
 #include <data/common/qesystem.h>
 #include <data/analysis/traingap/traingapana.h>
+#include "data/rail/railway.h"
 #include "model/delegate/timeintervaldelegate.h"
 #include "data/diagram/diagram.h"
 #include "editors/train/trainfilterselector.h"

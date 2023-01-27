@@ -2,6 +2,7 @@
 #include "data/diagram/traingap.h"
 #include "data/diagram/trainline.h"
 #include "data/diagram/diagram.h"
+#include "data/rail/railway.h"
 #include "model/delegate/qedelegate.h"
 #include "data/train/train.h"
 
@@ -20,7 +21,6 @@
 #include "util/utilfunc.h"
 #include "model/delegate/timeintervaldelegate.h"
 #include "traingapstatdialog.h"
-//#include "dialogs/trainfilterdialog.h"
 #include "editors/train/trainfilterselector.h"
 #include "util/pagecomboforrail.h"
 

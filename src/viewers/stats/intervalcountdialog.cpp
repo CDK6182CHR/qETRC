@@ -11,6 +11,7 @@
 #include <model/delegate/qedelegate.h>
 #include <util/utilfunc.h>
 #include <editors/train/trainfilterselector.h>
+#include "data/rail/railway.h"
 #include "intervaltraintable.h"
 
 IntervalCountModel::IntervalCountModel(IntervalCounter& counter, QObject *parent):

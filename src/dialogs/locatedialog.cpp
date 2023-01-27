@@ -15,7 +15,7 @@
 
 #include <util/pagecomboforrail.h>
 #include "data/diagram/stationbinding.h"
-
+#include "data/rail/railway.h"
 
 LocateDialog::LocateDialog(Diagram &diagram, QWidget *parent):
     QDialog(parent),diagram(diagram)

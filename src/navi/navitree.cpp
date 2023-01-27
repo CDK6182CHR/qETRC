@@ -1,4 +1,5 @@
 ﻿#include "navitree.h"
+#include "data/rail/railway.h"
 
 #ifndef QETRC_MOBILE_2
 

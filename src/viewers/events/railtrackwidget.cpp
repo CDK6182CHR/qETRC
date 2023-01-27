@@ -11,6 +11,7 @@
 #include <kernel/trackdiagram.h>
 #include "data/rail/railstation.h"
 #include "data/diagram/diagram.h"
+#include "data/rail/railway.h"
 #include "data/train/trainstation.h"
 #include <util/qecontrolledtable.h>
 
