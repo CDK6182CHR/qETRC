@@ -5,9 +5,11 @@
 #include <QSet>
 #include <QJsonObject>
 
-#include "train.h"
+#include "trainpassenger.h"
 #include "itrainfilter.h"
 
+class Routing;
+class TrainType;
 
 class TrainFilter;
 class Diagram;

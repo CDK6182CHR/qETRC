@@ -1,5 +1,6 @@
 ﻿#include "railstationeventlist.h"
 
+#include "data/train/traintype.h"
 #include "util/buttongroup.hpp"
 #include "util/utilfunc.h"
 
@@ -11,7 +12,7 @@
 #include "model/delegate/qedelegate.h"
 #include "data/common/qeglobal.h"
 #include "util/pagecomboforrail.h"
-#include "data/train/traintype.h"
+#include "data/train/train.h"
 
 #include <QFormLayout>
 #include <QTableView>
@@ -91,8 +92,7 @@ station(station),
 model(new RailStationEventListModel(diagram, rail, station)),
 filter(new TrainFilterSelector(diagram.trainCollection(),this))
 {
-	setWindowTitle(tr("车站事件表 - %1 @ %2").arg(station->name.toSingleLiteral())
-		.arg(rail->name()));
+    setWindowTitle(tr("车站事件表 - %1 @ %2").arg(station->name.toSingleLiteral(),rail->name()));
 	resize(800, 800);
 	setAttribute(Qt::WA_DeleteOnClose);
 	initUI();

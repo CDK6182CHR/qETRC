@@ -7,11 +7,12 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QVariant>
+#include <QTableView>
 #include <QHeaderView>
 #include "util/railrulercombo.h"
 #include "data/common/qesystem.h"
 
-#include "rulerpaintwizard.h"
+//#include "rulerpaintwizard.h"
 #include "data/rail/railcategory.h"
 #include "model/delegate/qedelegate.h"
 

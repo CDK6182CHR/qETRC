@@ -3,6 +3,7 @@
 #include "data/common/qesystem.h"
 #include "util/buttongroup.hpp"
 #include "model/delegate/qetimedelegate.h"
+#include "data/common/qeglobal.h"
 
 #include "model/train/timetablestdmodel.h"
 #include "util/qecontrolledtable.h"

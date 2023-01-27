@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <cstdint>
 #include <QVector>
 #include <QPen>
 #include <list>
@@ -8,6 +7,7 @@
 #include "trainname.h"
 #include "trainstation.h"
 #include "data/common/qeglobal.h"
+#include "trainpassenger.h"
 
 class RailStation;
 class Railway;
@@ -15,12 +15,7 @@ class QJsonObject;
 struct Config;
 class RailCategory;
 
-enum class TrainPassenger:
-        std::int8_t{
-    False=0,
-    Auto=1,
-    True=2
-};
+
 
 class TrainAdapter;
 

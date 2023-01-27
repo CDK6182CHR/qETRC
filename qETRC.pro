@@ -266,6 +266,7 @@ HEADERS += \
     src/data/train/predeftrainfiltercore.h \
     src/data/train/trainfilterselectorcore.h \
     src/data/train/traingroup.h \
+    src/data/train/trainpassenger.h \
     src/dialogs/jointrailwaydialog.h \
     src/dialogs/selecttrainstationdialog.h \
     src/dialogs/trainfilterdialog.h \

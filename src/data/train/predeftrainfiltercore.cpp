@@ -2,8 +2,9 @@
 
 #include "traintype.h"
 #include "routing.h"
-#include "data/diagram/diagram.h"
 #include "data/train/traincollection.h"
+
+#include <QJsonArray>
 
 #define LOAD_BOOL(_Key) this->_Key=obj.value(#_Key).toBool()
 

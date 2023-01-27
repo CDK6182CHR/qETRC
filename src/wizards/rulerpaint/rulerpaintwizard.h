@@ -1,12 +1,18 @@
 ﻿#pragma once
 #include <QWizard>
+#include <list>
 
-#include "rulerpaintpagestart.h"
-#include "rulerpaintpagestation.h"
-#include "rulerpaintpagetable.h"
+class TrainStation;
+class Train;
+//#include "rulerpaintpagestart.h"
+//#include "rulerpaintpagestation.h"
+//#include "rulerpaintpagetable.h"
 
 class Diagram;
 class MainWindow;
+class RulerPaintPageStart;
+class RulerPaintPageStation;
+class RulerPaintPageTable;
 
 /**
  * @brief The RulerPaintWizard class
@@ -23,7 +29,7 @@ class RulerPaintWizard : public QWizard
 
     std::shared_ptr<const Train> trainRef;   // 起始页选择的车次  作为参考，不可修改
     std::shared_ptr<Train> trainTmp;         // 整合出来的临时车次
-    Train::StationPtr itrStart, itrEnd;      // 注意这是tmp里面的迭代器，只有调整排图启用
+    std::list<TrainStation>::iterator itrStart, itrEnd;      // 注意这是tmp里面的迭代器，只有调整排图启用
 
 public:
     /**

@@ -2,6 +2,7 @@
 #include "data/diagram/diagram.h"
 #include "util/selecttraincombo.h"
 #include "util/utilfunc.h"
+#include "data/train/train.h"
 
 #include <QComboBox>
 #include <QFormLayout>

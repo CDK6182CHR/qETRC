@@ -1,8 +1,12 @@
 ﻿#include "rulerpaintwizard.h"
 
-#include <QtWidgets>
 #include "data/diagram/diagram.h"
 #include "data/diagram/trainadapter.h"
+#include "rulerpaintpagestart.h"
+#include "rulerpaintpagestation.h"
+#include "rulerpaintpagetable.h"
+
+#include <QMessageBox>
 
 RulerPaintWizard::RulerPaintWizard(Diagram &diagram_, QWidget *parent):
     QWizard(parent), diagram(diagram_)

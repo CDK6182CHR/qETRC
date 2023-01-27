@@ -3,6 +3,7 @@
 #include "data/diagram/trainline.h"
 #include "data/diagram/diagram.h"
 #include "model/delegate/qedelegate.h"
+#include "data/train/train.h"
 
 #include <QCheckBox>
 #include <QFormLayout>

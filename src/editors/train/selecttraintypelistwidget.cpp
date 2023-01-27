@@ -6,6 +6,7 @@
 #include "data/train/traincollection.h"
 #include "data/train/traintype.h"
 #include "model/delegate/qedelegate.h"
+#include "data/common/qeglobal.h"   // for qHash
 
 SelectTrainTypeListWidget::SelectTrainTypeListWidget(TrainCollection &coll_, QWidget *parent):
     QListView(parent), coll(coll_), model(new QStandardItemModel(this))
