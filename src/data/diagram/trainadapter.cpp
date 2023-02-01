@@ -196,6 +196,15 @@ double TrainAdapter::relativeError(std::shared_ptr<const Ruler> ruler) const
 	return static_cast<double>(error_time) / this_time;
 }
 
+int TrainAdapter::timetableInterpolationSimple()
+{
+	int cnt = 0;
+	foreach(const auto & line, _lines) {
+		cnt += line->timetableInterpolationSimple();
+	}
+	return cnt;
+}
+
 //#define LINE_DBG_PRINT_COND train()->trainName().full() == "1001"
 
 void TrainAdapter::autoLines(const Config& config)

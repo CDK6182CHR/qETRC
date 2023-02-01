@@ -413,7 +413,7 @@ void TrainLine::diagnoForbid(DiagnosisList& res, std::shared_ptr<const RailInter
 
 void TrainLine::detectPassStations(LineEventList& res, int index, ConstAdaPtr itr) const
 {
-    ConstAdaPtr right = itr; ++right; 
+    ConstAdaPtr right = std::next(itr);
     if (right == _stations.end())return;
     auto rs0 = itr->railStation.lock(), rsn = right->railStation.lock();
     auto ts0 = itr->trainStation, tsn = right->trainStation;
@@ -443,6 +443,40 @@ void TrainLine::detectPassStations(LineEventList& res, int index, ConstAdaPtr it
             rsi, std::nullopt, QObject::tr("推算")
         ));
     }
+}
+
+std::list<TrainStation> TrainLine::detectPassStationTimes(ConstAdaPtr itr) const
+{
+    std::list<TrainStation> res;
+    ConstAdaPtr right = std::next(itr); 
+    if (right == _stations.end())return res;
+    auto rs0 = itr->railStation.lock(), rsn = right->railStation.lock();
+    auto ts0 = itr->trainStation, tsn = right->trainStation;
+    if (rs0->isAdjacentWith(rsn)) {
+        //区间没有跨过车站，啥都不用干
+        return res;
+    }
+    //以下依赖于纵坐标！
+    double y0 = rs0->y_coeff.value(), yn = rsn->y_coeff.value();
+    double dy = yn - y0;
+    int ds = ts0->depart.secsTo(tsn->arrive);   //区间时间，秒数
+    if (ds <= 0)ds += 24 * 3600;
+    if (y0 == yn) {
+        //这个情况很吊诡，应该不会存在。安全起见，特殊处理
+        return res;
+    }
+
+    for (auto p = rs0->dirNextInterval(dir());
+        p && p->toStation() != rsn; p = p->nextInterval()) {
+        auto rsi = p->toStation();
+        double yi = rsi->y_coeff.value();
+        double rate = (yi - y0) / dy;
+        double dsif = ds * rate;
+        int dsi = int(std::round(dsif));
+        const auto& tm = ts0->depart.addSecs(dsi);
+        res.emplace_back(rsi->name, tm, tm, false, "", QObject::tr("推定"));
+    }
+    return res;
 }
 
 void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another, 
@@ -1648,6 +1682,30 @@ void TrainLine::timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool t
             else to_deter = to_deter->dirAdjacent(dir());
         }
     }
+}
+
+int TrainLine::timetableInterpolationSimple()
+{
+    int count;
+    for (auto itr = _stations.begin(); itr != _stations.end(); ++itr) {
+        auto stations = detectPassStationTimes(itr);
+        if (stations.empty())continue;
+        // 现在std::next(itr)肯定存在
+        auto itr_next = std::next(itr);
+        auto tcur = itr->trainStation, tnext = itr_next->trainStation;
+        // now, do a manual two-way merge
+        auto p0 = std::next(tcur);
+        while (p0 != tnext && !stations.empty()) {
+            if (qeutil::timeCompare(stations.front().depart, p0->arrive)) {
+                train()->timetable().splice(p0, stations, stations.begin(), std::next(stations.begin()));
+            }
+        }
+        if (!stations.empty()) {
+            train()->timetable().splice(tnext, std::move(stations));
+        }
+        count += stations.size();
+    }
+    return count;
 }
 
 

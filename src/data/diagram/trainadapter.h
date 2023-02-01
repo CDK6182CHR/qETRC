@@ -139,6 +139,13 @@ public:
      */
     double relativeError(std::shared_ptr<const Ruler> ruler)const;
 
+    /**
+     * 推定通过站时刻 但使用事件表算法
+     * 同样要求已绑定到线路，且直接修改this指向对象。
+     * @return 新插入车站个数
+     */
+    int timetableInterpolationSimple();
+
 private:
 
     /**

@@ -306,6 +306,12 @@ private:
     void detectPassStations(LineEventList& res, int index, ConstAdaPtr itr)const;
 
     /**
+     * 2023.02.01  see also detestPassStations
+     * For generating new timetable for the passed stations.
+     */
+    std::list<TrainStation> detectPassStationTimes(ConstAdaPtr itr)const;
+
+    /**
      * @brief eventsWithSameDir  同向列车事件表：越行、待避、共线
      * @param another  已知同向的另一段列车运行线
      */
@@ -492,6 +498,8 @@ private:
      */
     void timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool toBegin,
         bool toEnd, int precision);
+
+    int timetableInterpolationSimple();
 
 };
 
