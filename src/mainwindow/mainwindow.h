@@ -6,6 +6,7 @@
 #include "kernel/diagramwidget.h"
 #include "SARibbonMainWindow.h"
 #include "data/diagram/diagram.h"
+#include "data/common/qeglobal.h"  // for shared_ptr<Railway> meta-decl
 
 class SARibbonMenu;
 class RoutingContext;

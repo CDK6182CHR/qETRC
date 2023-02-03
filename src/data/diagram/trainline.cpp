@@ -1690,6 +1690,7 @@ int TrainLine::timetableInterpolationSimple()
     for (auto itr = _stations.begin(); itr != _stations.end(); ++itr) {
         auto stations = detectPassStationTimes(itr);
         if (stations.empty())continue;
+        count += stations.size();
         // 现在std::next(itr)肯定存在
         auto itr_next = std::next(itr);
         auto tcur = itr->trainStation, tnext = itr_next->trainStation;
@@ -1703,7 +1704,6 @@ int TrainLine::timetableInterpolationSimple()
         if (!stations.empty()) {
             train()->timetable().splice(tnext, std::move(stations));
         }
-        count += stations.size();
     }
     return count;
 }

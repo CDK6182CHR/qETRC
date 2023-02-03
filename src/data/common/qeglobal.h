@@ -4,12 +4,15 @@
 
 class Routing;
 class Train;
+class Railway;
 
 Q_DECLARE_METATYPE(std::shared_ptr<Routing>)
 
 Q_DECLARE_METATYPE(std::shared_ptr<Train>)
 
 Q_DECLARE_METATYPE(std::shared_ptr<const Train>)
+
+Q_DECLARE_METATYPE(std::shared_ptr<Railway>)
 
 template <typename _Ty>
 uint qHash(const std::shared_ptr<_Ty>& key, uint seed)

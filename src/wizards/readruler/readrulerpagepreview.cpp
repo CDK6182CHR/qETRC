@@ -109,7 +109,7 @@ void ReadRulerPagePreview::initUI()
     dlgDetail->setAttribute(Qt::WA_DeleteOnClose, false);
     tbDetail->horizontalHeader()->setSortIndicatorShown(true);
     connect(tbDetail->horizontalHeader(), &QHeaderView::sortIndicatorChanged,
-            tbDetail, &QTableView::sortByColumn);
+            tbDetail, qOverload<int,Qt::SortOrder>(&QTableView::sortByColumn));
 
     //summary
     mdSummary = new ReadRulerSummaryModel(this);

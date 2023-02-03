@@ -2,6 +2,8 @@
 #include <QWizard>
 #include <list>
 
+#include "data/common/qeglobal.h"   // for meta-type decl
+
 class TrainStation;
 class Train;
 //#include "rulerpaintpagestart.h"
@@ -88,6 +90,6 @@ private slots:
      * pgStation的当前线路变化触发
      * 设置默认的Anchor信息，根据已有的车次信息。
      */
-    void setDefaultAnchorStation();
+    void setDefaultAnchorStation(); 
 };
 

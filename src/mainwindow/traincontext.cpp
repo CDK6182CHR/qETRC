@@ -16,6 +16,9 @@
 #include "editors/trainlistwidget.h"
 #include "model/train/trainlistmodel.h"
 #include "data/common/qesystem.h"
+#include "data/rail/railway.h"
+#include "railcontext.h"
+#include "data/diagram/trainadapter.h"
 
 #include <DockManager.h>
 
@@ -262,6 +265,12 @@ void TrainContext::initUI()
 		connect(act, &QAction::triggered, this, &TrainContext::actCorrection);
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(70);
+
+		act = new QAction(QIcon(":/icons/add.png"), tr("快速推定"), this);
+		act->setToolTip(tr("快速推定通过站时刻\n根据里程信息，快速推定本次列车在当前线路的通过站时刻，"
+			"不做外插且不考虑起停附加时分。"));
+		connect(act, &QAction::triggered, this, &TrainContext::actSimpleInterpolation);
+		panel->addLargeAction(act);
 
 		panel = page->addPannel(tr(""));
 
@@ -950,6 +959,41 @@ void TrainContext::batchExportTrainEvents(const QList<std::shared_ptr<Train>>& t
 	mw->showStatus(tr("批量导出事件表 用时 %1 ms").arg((clk_e - clk_s) / 1ms));
 }
 
+void TrainContext::actSimpleInterpolation()
+{
+	if (!train) {
+		QMessageBox::warning(mw, tr("快速推定"), tr("错误：当前没有选中车次！"));
+		return;
+	}
+	auto rail = mw->getRailContext()->getRailway();
+	if (!rail) {
+		QMessageBox::warning(mw, tr("快速推定"), tr("错误：当前没有选中线路！"));
+	}
+
+	auto adp = train->adapterFor(*rail);
+	if (adp) {
+		auto tab = std::make_shared<Train>(*train);
+		diagram.updateTrain(tab);
+		auto nadp = tab->adapterFor(*rail);
+
+		int cnt = nadp->timetableInterpolationSimple();
+		if (cnt) {
+			mw->getUndoStack()->push(new qecmd::TimetableInterpolationSimple(train, tab, this,
+				rail.get()));
+			mw->showStatus(tr("快速推定列车[%1]在线路[%2]上的通过站时刻 添加%3个时刻信息").arg(train->trainName().full(),
+				rail->name(), QString::number(cnt)));
+		}
+		else {
+			mw->showStatus(tr("快速推定: 列车[%1]在线路[%2]上没有需要推定的车站").arg(train->trainName().full(),
+				rail->name()));
+		}
+	}
+	else {
+		mw->showStatus(tr("当前车次[%1]在线路[%2]上没有运行线，无法推定时刻").arg(train->trainName().full(),
+			rail->name()));
+	}
+}
+
 void TrainContext::actShowTrainLine()
 {
 	//强制显示列车运行线。如果已经全部显示了也没关系，没有任何效果
@@ -1432,4 +1476,11 @@ void qecmd::BatchAutoCorrection::commit()
 	//	train->swapTimetableWithAdapters(*d);
 	//}
 	//cont->commitAutoCorrection(trains);
+}
+
+qecmd::TimetableInterpolationSimple::TimetableInterpolationSimple(std::shared_ptr<Train> train,
+	std::shared_ptr<Train> newtable, TrainContext* context, const Railway* rail, QUndoCommand* parent):
+	ChangeTimetable(train,newtable,context,parent)
+{
+	setText(QObject::tr("快速推定: %1 @ %2").arg(train->trainName().full(), rail->name()));
 }

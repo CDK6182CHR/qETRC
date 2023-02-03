@@ -304,6 +304,12 @@ public slots:
      */
     void batchExportTrainEvents(const QList<std::shared_ptr<Train>>& trains);
 
+    /**
+     * 2023.02.03  使用事件表那套算法，简单推定通过站时刻。
+     * 默认在当前列车+当前线路执行，不提供选项。
+     */
+    void actSimpleInterpolation();
+
 private slots:
     void showTrainEvents();
 
@@ -497,6 +503,16 @@ namespace qecmd {
         void redo()override;
     private:
         void commit();
+    };
+
+    /**
+     * 2023.02.03  快速推定，和ChangeTimetable唯一的区别是text()不一样
+     * 构造函数多一个railway，仅仅用来生成text()。
+     */
+    class TimetableInterpolationSimple : public ChangeTimetable {
+    public:
+        TimetableInterpolationSimple(std::shared_ptr<Train> train, std::shared_ptr<Train> newtable,
+            TrainContext* context, const Railway* rail, QUndoCommand* parent = nullptr);
     };
 }
 
