@@ -1700,6 +1700,9 @@ int TrainLine::timetableInterpolationSimple()
             if (qeutil::timeCompare(stations.front().depart, p0->arrive)) {
                 train()->timetable().splice(p0, stations, stations.begin(), std::next(stations.begin()));
             }
+            else {
+                ++p0;
+            }
         }
         if (!stations.empty()) {
             train()->timetable().splice(tnext, std::move(stations));

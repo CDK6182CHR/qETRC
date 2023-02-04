@@ -271,6 +271,7 @@ void TrainContext::initUI()
 			"不做外插且不考虑起停附加时分。"));
 		connect(act, &QAction::triggered, this, &TrainContext::actSimpleInterpolation);
 		panel->addLargeAction(act);
+		mw->diaActions.simpleInterp = act;
 
 		panel = page->addPannel(tr(""));
 
