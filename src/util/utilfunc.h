@@ -28,6 +28,11 @@ inline int secsTo(const QTime& tm1, const QTime& tm2) {
 }
 
 /**
+ * 2023.02.12  此版本准确考虑跨日问题。
+ */
+int secsToStrict(const QTime& tm1, const QTime& tm2, int addDays);
+
+/**
  * 返回时间的中文字符串表示：xx分 或者 xx分xx秒
  */
 QString secsToString(int secs);

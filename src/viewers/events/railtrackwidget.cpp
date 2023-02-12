@@ -214,7 +214,7 @@ void RailTrackWidget::initUI()
 
     hlay=new QHBoxLayout;
     auto* btn=new QPushButton(tr("保存股道分析结果至时刻表"));
-    btn->setMaximumWidth(200);
+    btn->setMaximumWidth(400);
     connect(btn,&QPushButton::clicked,this,
             &RailTrackWidget::actSaveTracks);
     hlay->addWidget(btn);

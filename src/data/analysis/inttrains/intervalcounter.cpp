@@ -29,22 +29,30 @@ IntervalTrainList IntervalCounter::getIntervalTrains(
         std::optional<std::deque<AdapterStation>::iterator> start_itr=std::nullopt;
         bool start_is_starting=false;
         foreach(auto line, adp->lines()){
-            for(auto itr=line->stations().begin();
-                itr!=line->stations().end();++itr){
-                if (itr->railStation.lock() == from){
-                    start_itr=itr;
-                    start_is_starting=line->isStartingStation(itr);
-                }else if(start_itr.has_value() &&
-                         itr->railStation.lock() == to){
+            decltype(line->stations().begin()) last;
+            int add_days = 0;
+            for (auto itr = line->stations().begin();
+                itr != line->stations().end(); ++itr) {
+                if (start_itr.has_value()) {
+                    if (itr->trainStation->arrive < last->trainStation->depart)
+                        add_days++;
+                }
+                if (itr->railStation.lock() == from) {
+                    start_itr = itr;
+                    start_is_starting = line->isStartingStation(itr);
+                }
+                else if (start_itr.has_value() &&
+                    itr->railStation.lock() == to) {
                     // 结束
                     IntervalTrainInfo info(train, &*(start_itr.value()->trainStation),
-                                           &*(itr->trainStation),start_is_starting,
-                                           line->isTerminalStation(itr));
-                    if (checkStopBusiness(info)){
+                        &*(itr->trainStation), start_is_starting,
+                        line->isTerminalStation(itr), add_days);
+                    if (checkStopBusiness(info)) {
                         res.emplace_back(std::move(info));
-                        start_itr=std::nullopt;
+                        start_itr = std::nullopt;
                     }
                 }
+                last = itr;
             }
         }
     }
@@ -61,9 +69,15 @@ IntervalTrainList IntervalCounter::getIntervalTrains(
             continue;
         const TrainStation* start_station=nullptr;
         bool start_is_starting=false;
+        int add_days = 0;
+        Train::StationPtr last;
         for(auto itr=train->timetable().begin();
             itr!=train->timetable().end();++itr){
-            //if (itr->name.equalOrBelongsTo(from)){
+            if (start_station) {  // count days. `last` must be valid, obviously.
+                if (itr->arrive < last->depart) {
+                    add_days++;
+                }
+            }
             if (checkStationName(itr->name, search_start, _regexStart)){
                 // 2022.04.24：允许多车站后，替代需要条件
                 // 如果上一站满足停车和营业条件但本站不满足，不替换；否则替换
@@ -73,17 +87,19 @@ IntervalTrainList IntervalCounter::getIntervalTrains(
                     checkStationStopBusiness(*this_station, this_is_starting)) {
                     start_station = this_station;
                     start_is_starting = this_is_starting;
+                    add_days = 0;
                 }
             }else if(start_station &&
                     checkStationName(itr->name, search_end, _regexEnd)){    
                 IntervalTrainInfo info(
                             train, start_station, &*itr, start_is_starting,
-                            train->isTerminalStation(itr->name));
+                            train->isTerminalStation(itr->name), add_days);
                 if (checkStopBusiness(info)){
                     res.emplace_back(std::move(info));
                     start_station=nullptr;
                 }
             }
+            last = itr;
         }
     }
     return res;
@@ -102,10 +118,17 @@ RailIntervalCount IntervalCounter::getIntervalCountSource(
         foreach(auto line,adp->lines()){
             if (!_filter->check(train))
                 continue;
+
+            int add_days = 0;
+            auto last = line->stations().begin();
             // 注意循环到的车站其实都是本线的，和PyETRC不一样。
             // 只要分清楚前后站即可，由center_station控制。
             for(auto itr=line->stations().begin();
                 itr!=line->stations().end();++itr){
+                if (center_station) {
+                    if (itr->trainStation->arrive < last->trainStation->depart)
+                        ++add_days;
+                }
                 if (itr->railStation.lock()==center){
                     center_station=&*(itr->trainStation);
                     center_is_start_or_end=line->isStartingStation(itr);
@@ -118,12 +141,13 @@ RailIntervalCount IntervalCounter::getIntervalCountSource(
                         IntervalTrainInfo info(train,center_station,
                                                &*(itr->trainStation),
                                                center_is_start_or_end,
-                                               line->isTerminalStation(itr));
+                                               line->isTerminalStation(itr), add_days);
                         if(checkStopBusiness(info)){
                             res[itr->railStation.lock()].add(std::move(info));
                         }
                     }
                 }
+                last = itr;
             }
         }
     }
@@ -144,27 +168,35 @@ RailIntervalCount IntervalCounter::getIntervalCountDrain(std::shared_ptr<const R
             if (!_filter->check(train))
                 continue;
             auto line=*lineit;
-            for(auto itr=line->stations().rbegin();
-                itr!=line->stations().rend();++itr){
 
-                if (itr->railStation.lock()==drain){
-                    center_station=&*(itr->trainStation);
-                    center_is_start_or_end=line->isTerminalStation(&*itr);
-                }else{
+            int add_days = 0;
+            auto last = line->stations().rbegin();
+            for (auto itr = line->stations().rbegin();
+                itr != line->stations().rend(); ++itr) {
+                if (center_station) {
+                    if (last->trainStation->depart < itr->trainStation->arrive)
+                        ++add_days;
+                }
+                if (itr->railStation.lock() == drain) {
+                    center_station = &*(itr->trainStation);
+                    center_is_start_or_end = line->isTerminalStation(&*itr);
+                }
+                else {
                     // 非中心站
                     if (center_station
-                            && checkStation(itr->railStation.lock())){
+                        && checkStation(itr->railStation.lock())) {
                         // 找到start->end的对
                         IntervalTrainInfo info(train,
-                                               &*(itr->trainStation),
-                                               center_station,
-                                               line->isStartingStation(&*itr),
-                                               center_is_start_or_end);
-                        if(checkStopBusiness(info)){
+                            &*(itr->trainStation),
+                            center_station,
+                            line->isStartingStation(&*itr),
+                            center_is_start_or_end, add_days);
+                        if (checkStopBusiness(info)) {
                             res[itr->railStation.lock()].add(std::move(info));
                         }
                     }
                 }
+                last = itr;
             }
         }
     }

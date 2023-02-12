@@ -18,6 +18,7 @@ class TrainLine;
  * 因为AdapterStation只要发生重新绑定就会失效，而TrainStation相对稳定一点。
  * 但如果本类存续期间发生列车信息更新，仍可能造成悬空指针。
  * 暂时应该用不到RailStation，所以暂时不给
+ * 2023.02.12 增加 addDays属性，即从发站至到站是否有跨日。
  */
 struct IntervalTrainInfo
 {
@@ -25,14 +26,17 @@ struct IntervalTrainInfo
     const TrainStation* from;
     const TrainStation* to;
     bool isStarting, isTerminal;
+    int addDays;
 public:
     IntervalTrainInfo(std::shared_ptr<const Train> train,
                       const TrainStation* from,
                       const TrainStation* to,
                       bool isStarting,
-                      bool isTerminal):
+                      bool isTerminal,
+                      int addDays
+        ):
         train(train), from(from), to(to), isStarting(isStarting),
-        isTerminal(isTerminal)
+        isTerminal(isTerminal), addDays(addDays)
     {}
 };
 

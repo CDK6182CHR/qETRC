@@ -5,6 +5,8 @@
 #include <util/utilfunc.h>
 #include <data/train/train.h>
 #include <data/train/traintype.h>
+#include <model/delegate/timeintervaldelegate.h>
+#include <model/delegate/qetimedelegate.h>
 
 IntervalTrainModel::IntervalTrainModel(QWidget *parent):
     QStandardItemModel(parent)
@@ -33,12 +35,20 @@ void IntervalTrainModel::setupModel()
 
         setItem(i,ColType,new SI(info.train->type()->name()));
         setItem(i,ColFromStation,new SI(info.from->name.toSingleLiteral()));
-        setItem(i,ColFromTime,new SI(info.from->depart.toString("hh:mm:ss")));
-        setItem(i,ColToStation,new SI(info.to->name.toSingleLiteral()));
-        setItem(i,ColToTime,new SI(info.to->arrive.toString("hh:mm:ss")));
+        setItem(i, ColToStation, new SI(info.to->name.toSingleLiteral()));
 
-        int secs=qeutil::secsTo(info.from->depart,info.to->arrive);
-        setItem(i,ColTime,new SI(qeutil::secsToStringHour(secs)));
+        it = new SI;
+        it->setData(info.from->depart, Qt::EditRole);
+        setItem(i,ColFromTime,it);
+        
+        it = new SI;
+        it->setData(info.to->arrive, Qt::EditRole);
+        setItem(i,ColToTime,it);
+
+        int secs=qeutil::secsToStrict(info.from->depart,info.to->arrive,info.addDays);
+        it = new SI;
+        it->setData(secs, Qt::EditRole);
+        setItem(i, ColTime, it);
         setItem(i,ColStarting,new SI(info.train->starting().toSingleLiteral()));
         setItem(i,ColTerminal,new SI(info.train->terminal().toSingleLiteral()));
     }
@@ -78,4 +88,9 @@ void IntervalTrainTable::initUI()
             setColumnWidth(c++,w);
         }
     }
+    
+    auto* time_del = new QETimeDelegate(this);
+    setItemDelegateForColumn(IntervalTrainModel::ColFromTime, time_del);
+    setItemDelegateForColumn(IntervalTrainModel::ColToTime, time_del);
+    setItemDelegateForColumn(IntervalTrainModel::ColTime, new TimeIntervalDelegateHour(this));
 }

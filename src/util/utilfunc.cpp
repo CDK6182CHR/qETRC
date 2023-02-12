@@ -36,6 +36,13 @@ QTime qeutil::parseTime(const QString& tm)
 	return QTime();
 }
 
+int qeutil::secsToStrict(const QTime& tm1, const QTime& tm2, int addDays)
+{
+	int secs = tm1.secsTo(tm2);
+	secs += addDays * 3600 * 24;
+	return secs;
+}
+
 QString qeutil::secsToString(int secs)
 {
 	if (secs % 60 == 0)

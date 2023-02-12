@@ -15,3 +15,11 @@ public:
     //explicit TimeIntervalDelegate(QObject *parent = nullptr);
     virtual QString displayText(const QVariant &value, const QLocale &locale) const override;
 };
+
+class TimeIntervalDelegateHour :public QStyledItemDelegate
+{
+    Q_OBJECT 
+public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+    virtual QString displayText(const QVariant& value, const QLocale& locale)const override;
+};
