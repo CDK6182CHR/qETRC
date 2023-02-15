@@ -1,13 +1,11 @@
 #include "trainintervalstat.h"
-#include "data/rail/railcategory.h"
 #include "data/train/train.h"
 #include "util/utilfunc.h"
 
 #include <QObject>
 
-TrainIntervalStat::TrainIntervalStat(RailCategory &railcat,
-                                     const std::shared_ptr<const Train>& train):
-    railcat(railcat),train(train)
+TrainIntervalStat::TrainIntervalStat(const std::shared_ptr<const Train>& train):
+    train(train)
 {
 
 }

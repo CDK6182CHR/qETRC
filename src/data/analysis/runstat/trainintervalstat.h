@@ -18,7 +18,6 @@ class TrainStation;
  */
 class TrainIntervalStat
 {
-    RailCategory& railcat;
     TrainLineNet net;
 
     std::shared_ptr<const Train> train;
@@ -26,8 +25,7 @@ class TrainIntervalStat
     int _startIndex,_endIndex;
     std::list<TrainStation>::const_iterator _startIter,_endIter;
 public:
-    TrainIntervalStat(RailCategory& railcat,
-                      const std::shared_ptr<const Train>& train=nullptr);
+    TrainIntervalStat(const std::shared_ptr<const Train>& train=nullptr);
     void setTrain(std::shared_ptr<const Train> train){this->train=train;}
     void setRange(int start, int end);
 

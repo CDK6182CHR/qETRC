@@ -14,6 +14,7 @@
 
 #include "data/train/train.h"
 #include "data/train/routing.h"
+#include "data/analysis/runstat/trainintervalstat.h"
 #include "data/train/traintype.h"
 #include "util/utilfunc.h"
 #include "util/dialogadapter.h"
@@ -40,11 +41,19 @@ void TrainInfoWidget::initUI()
     edPassen=makeLineEdit(tr("旅客列车"));
     edStations=makeLineEdit(tr("总/铺画站数"));
     edLines=makeLineEdit(tr("运行线情况"));
+
+    edTotTime = makeLineEdit(tr("总历时"));
+    edTotRun = makeLineEdit(tr("总运行时间"));
+    edTotStay = makeLineEdit(tr("总停站时间"));
+    edTotMile = makeLineEdit(tr("总里程"));
+    edTotSpeed = makeLineEdit(tr("总旅行速度"));
+    edTotTechSpeed = makeLineEdit(tr("总技术速度"));
+
     edMile=makeLineEdit(tr("铺画里程"));
     edTime=makeLineEdit(tr("铺画总时间"));
     edTime->setToolTip(tr("本次列车在本运行图所有线路中的所有运行线的总时长"));
-    edRun=makeLineEdit(tr("铺画运行时间"));
-    edStay=makeLineEdit(tr("图定停站时间"));
+    //edRun=makeLineEdit(tr("铺画运行时间"));
+    //edStay=makeLineEdit(tr("铺画停站时间"));
     edSpeed=makeLineEdit(tr("铺画旅行速度"));
     edTechSpeed=makeLineEdit(tr("铺画技术速度"));
 
@@ -133,13 +142,38 @@ void TrainInfoWidget::refreshData()
     edLines->setText(tr("%1线路 | %2运行线").arg(train->adapters().size())
                      .arg(train->lineCount()));
 
+    // for global information
+    TrainIntervalStatResult res{};
+    
+    if (train->empty()) {
+        // use zero-initialized res    
+    }
+    else {
+        TrainIntervalStat stat{ train };
+        stat.setRange(0, train->stationCount() - 1);
+        res = stat.compute();
+    }
+    edTotTime->setText(qeutil::secsToStringHour(res.totalSecs));
+    edTotRun->setText(qeutil::secsToStringHour(res.runSecs));
+    edTotStay->setText(qeutil::secsToStringHour(res.stopSecs));
+    if (res.railResults.isValid) {
+        edTotMile->setText(tr("%1 km").arg(QString::number(res.railResults.totalMiles, 'f', 3)));
+        edTotSpeed->setText(tr("%1 km/h").arg(QString::number(res.railResults.travelSpeed, 'f', 3)));
+        edTotTechSpeed->setText(tr("%1 km/h").arg(QString::number(res.railResults.techSpeed, 'f', 3)));
+    }
+    else {
+        edTotMile->setText("NA");
+        edTotSpeed->setText("NA");
+        edTotTechSpeed->setText("NA");
+    }
+
     double mile=train->localMile();
     auto [run,stay]=train->localRunStaySecs();
 
     edMile->setText(tr("%1 km").arg(QString::number(mile,'f',3)));
     edTime->setText(qeutil::secsToStringHour(run+stay));
-    edRun->setText(qeutil::secsToStringHour(run));
-    edStay->setText(qeutil::secsToStringHour(stay));
+    //edRun->setText(qeutil::secsToStringHour(run));
+    //edStay->setText(qeutil::secsToStringHour(stay));
 
     double spd = mile / (run + stay) * 3600;
     double techspd = mile / run * 3600;
@@ -187,6 +221,12 @@ void TrainInfoWidget::toText()
                         .arg(train->adapterStationCount()));
     text.append(tr("运行线信息：%1线路 | %2运行线\n").arg(train->adapters().size())
                      .arg(train->lineCount()));
+
+    // global information, just use that in the editors to avoid overhead
+    text.append(tr("总时间：%1\n").arg(edTotTime->text()));
+    text.append(tr("总运行时间：%1\n总停站时间：%2\n").arg(edTotRun->text(), edTotStay->text()));
+    text.append(tr("总里程：%1\n总旅行速度：%2\n总技术速度：%3\n").arg(edTotMile->text(),
+        edTotSpeed->text(), edTotTechSpeed->text()));
 
     double mile=train->localMile();
     auto [run,stay]=train->localRunStaySecs();

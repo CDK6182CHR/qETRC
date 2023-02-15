@@ -21,8 +21,11 @@ class TrainInfoWidget : public QScrollArea
 
     QLineEdit* edName,*edNameDir,*edStartEnd,*edType,*edPassen;
     QLineEdit* edStations, *edLines,*edMile,*edTime,*edSpeed;
-    QLineEdit* edRun,*edStay,*edTechSpeed;
+    QLineEdit* edTechSpeed;
     QLineEdit* edRouting,*edModel,*edOwner,*edPre,*edPost;
+
+    // 2023.02.14: add the following corresponding to total information
+    QLineEdit* edTotTime, * edTotRun, * edTotStay, * edTotMile, * edTotSpeed, * edTotTechSpeed;
     QTextBrowser* edOrder;
 
     QFormLayout* flay;
