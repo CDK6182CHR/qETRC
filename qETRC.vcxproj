@@ -468,6 +468,7 @@
     <QtMoc Include="src\dialogs\trainfilterdialog.h" />
     <QtMoc Include="src\editors\train\trainfilterselector.h" />
     <QtMoc Include="src\editors\train\trainfiltercombo.h" />
+    <ClInclude Include="src\data\train\trainpassenger.h" />
     <ClInclude Include="src\model\rail\gapconstraintmodel.h" />
     <ClInclude Include="src\railnet\graph\railnetutil.hpp" />
     <ClInclude Include="src\util\buttongroup.hpp" />

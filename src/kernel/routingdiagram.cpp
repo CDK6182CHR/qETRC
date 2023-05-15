@@ -72,19 +72,27 @@ bool RoutingDiagram::transData()
             continue;
         }
         auto train=p->train();
-        auto starting=train->boundStarting(),terminal=train->boundTerminal();
-        if(!starting || !terminal){
-            qDebug()<<"RoutingDiagram::transData: WARNING: invalid null starting or terminal: "<<
-                      train->trainName().full()<<Qt::endl;
+        if (train->empty()) {
+            qDebug() << "RoutingDiagram::transData: ERROR: unexpected empty train " <<
+                train->trainName().full() << Qt::endl;
             continue;
         }
-        if(starting->trainStation->arrive < last_time){
+        //2023.05.15: use first/last station in timetable is enough.
+        //auto starting=train->boundStarting(),terminal=train->boundTerminal();
+        auto& starting = train->timetable().front();
+        auto& terminal = train->timetable().back();
+        //if(!starting || !terminal){
+        //    qDebug()<<"RoutingDiagram::transData: WARNING: invalid null starting or terminal: "<<
+        //              train->trainName().full()<<Qt::endl;
+        //    continue;
+        //}
+        if(starting.arrive < last_time){
             currentDay++;
         }
         int start_day=currentDay;
         currentDay += train->deltaDays(_multiDayByTimetable);
         int end_day=currentDay;
-        last_time=terminal->trainStation->depart;
+        last_time=terminal.depart;
         data.push_back(RoutingLine{p,start_day,end_day});
     }
     maxDay=currentDay;

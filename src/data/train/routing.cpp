@@ -80,6 +80,8 @@ void Routing::swapBase(Routing& other)
     //ATTR_SWAP(_highlighted);
 }
 
+#undef ATTR_SWAP
+
 bool Routing::baseEqual(const Routing& other) const
 {
     return _name == other._name &&
@@ -313,16 +315,17 @@ bool Routing::checkForDiagram(QString &report) const
                               .arg(train->trainName().full()));
                 continue;
             }
-            auto* s=train->boundStarting();
-            if (!s){
+            //auto* s=train->boundStarting();
+            //2023.05.15: change the criterion from boundStarting() to "starting station is the first station in timetable"
+            if (!train->timetable().front().name.equalOrBelongsTo(train->starting())) {
                 flag=false;
                 report.append(QObject::tr("交路车次[%1]缺失始发站[%2]的时刻信息；时刻表首站为[%3]\n")
                     .arg(train->trainName().full(),
                         train->starting().toSingleLiteral(),
                         train->timetable().front().name.toSingleLiteral()));
             }
-            auto* t=train->boundTerminal();
-            if(!t){
+            //auto* t=train->boundTerminal();
+            if(!train->timetable().back().name.equalOrBelongsTo(train->terminal())){
                 flag=false;
                 report.append(QObject::tr("交路车次[%1]缺失终到站[%2]的时刻信息；时刻表末站为[%3]\n")
                     .arg(train->trainName().full(),
@@ -333,8 +336,6 @@ bool Routing::checkForDiagram(QString &report) const
     }
     return flag;
 }
-
-#undef ATTR_SWAP
 
 RoutingNode::RoutingNode(const QString &name, bool link):
     _name(name),_virtual(true),_link(link)
