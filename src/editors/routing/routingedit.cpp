@@ -65,8 +65,8 @@ void RoutingEdit::initUI()
     g->connectAll(SIGNAL(clicked()),this,{SLOT(actAddBefore()),SLOT(actAddAfter()),
       SLOT(actRemove()),SLOT(actMoveUp()),SLOT(actMoveDown()) });
     g->setMinimumWidth(80);
-    auto* g1 = new ButtonGroup<2>({ "解析文本","识别车次" });
-    g1->connectAll(SIGNAL(clicked()), this, { SLOT(actParse()),SLOT(actDetect()) });
+    auto* g1 = new ButtonGroup<3>({ "解析文本","识别车次", "刷新"});
+    g1->connectAll(SIGNAL(clicked()), this, { SLOT(actParse()),SLOT(actDetect()),SLOT(refreshData()) });
     vlay->addLayout(g1);
 
     table=new QTableView;

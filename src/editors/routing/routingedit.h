@@ -33,8 +33,6 @@ public:
     explicit RoutingEdit(TrainCollection& coll_, std::shared_ptr<Routing> routing_, QWidget *parent = nullptr);
     auto getRouting(){return routing;}
     auto* getModel(){return model;}
-    void refreshData();
-    void refreshBasicData();
     virtual bool event(QEvent* e)override;
 private:
     void initUI();
@@ -49,6 +47,10 @@ signals:
     void routingOrderChanged(std::shared_ptr<Routing> routing, std::shared_ptr<Routing> info);
 
     void focusInRouting(std::shared_ptr<Routing>);
+
+public slots:
+    void refreshData();
+    void refreshBasicData();
 
 private slots:
     void actAddBefore();
