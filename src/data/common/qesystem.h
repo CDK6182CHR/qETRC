@@ -31,6 +31,10 @@ public:
 
     bool show_start_page = true;
 
+    // 2023.05.28  experimental: drag to adjust time. 
+    // I/O and GUI setting reserved for later.
+    bool drag_time = true;
+
     //todo: dock show..
 
     /**

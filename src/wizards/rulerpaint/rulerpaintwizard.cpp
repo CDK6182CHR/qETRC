@@ -44,6 +44,7 @@ void RulerPaintWizard::accept()
     }
     auto m = pgStart->getMode();
     if (m == RulerPaintPageStart::NewTrain) {
+        trainTmp->setOnPainting(false);
         emit trainAdded(trainTmp);
     }
     else {
@@ -128,6 +129,7 @@ void RulerPaintWizard::initUI()
 void RulerPaintWizard::resetTmpTrain()
 {
     trainTmp = std::make_shared<Train>(*trainRef);    //copy construct
+    trainTmp->setOnPainting(true);
     trainTmp->setType(diagram.trainCollection().typeManager().fromRegex(trainTmp->trainName()));
     if (pgStart->getMode() == RulerPaintPageStart::Modify) {
         itrStart = trainTmp->timetable().begin();

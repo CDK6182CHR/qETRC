@@ -25,6 +25,7 @@ bool GreedyPainter::paint(const TrainName& trainName)
 {
 	_railAxis = diagram.stationEventAxisForRail(_railway, *filter.filter());
 	_train = std::make_shared<Train>(trainName);
+	_train->setOnPainting(true);
 	_logs.clear();
 	backoffCount = 0;
 

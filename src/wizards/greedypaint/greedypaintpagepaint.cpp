@@ -599,6 +599,7 @@ void GreedyPaintPagePaint::resetTmpTrain()
         trainTmp = std::make_shared<Train>(painter.train()->trainName());
         trainTmp->setType(diagram.trainCollection().typeManager().fromRegex(trainTmp->trainName()));
     }
+    trainTmp->setOnPainting(true);
 }
 
 void GreedyPaintPagePaint::mergeTmpTrain()
@@ -679,6 +680,7 @@ void GreedyPaintPagePaint::onApply()
     trainTmp.reset();
 
     diagram.updateTrain(newtrain);
+    newtrain->setOnPainting(false);
     emit trainAdded(newtrain);
 
 }

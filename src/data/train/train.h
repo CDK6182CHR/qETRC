@@ -80,6 +80,12 @@ class Train:
     std::optional<double> _locMile;
     std::optional<int> _locRunSecs, _locStaySecs;
 
+    /**
+     * 2023.05.28  experimental: on painting flag.
+     * 用于标识正在进行标尺排图/贪心推线的车次。正常情况都是false。
+     */
+    bool _onPainting=false;
+
 public:
     using StationPtr=std::list<TrainStation>::iterator;
     using ConstStationPtr=std::list<TrainStation>::const_iterator;
@@ -114,6 +120,7 @@ public:
     inline auto type()const{return _type;}
     inline TrainPassenger passenger()const{return _passenger;}
     inline bool isShow()const { return _show; }
+    inline bool isOnPainting()const { return _onPainting; }
 
     inline void setTrainName(const TrainName& n){_trainName=n;}
     inline void setStarting(const StationName& s){_starting=s;}
@@ -121,6 +128,7 @@ public:
     inline void setType(std::shared_ptr<TrainType> t){_type=t;}
     inline void setPassenger(TrainPassenger t){_passenger=t;}
     inline void setIsShow(bool  s) { _show = s; }
+    inline void setOnPainting(bool s) { _onPainting = s; }
 
     /**
      * 强制判断是否为客车；如果设置为自动，根据类型

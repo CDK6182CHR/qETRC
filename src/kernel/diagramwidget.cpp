@@ -1094,6 +1094,10 @@ void DiagramWidget::selectTrain(TrainItem* item)
     _selectedTrain = item->train();
     _page->highlightTrainItems(*_selectedTrain);
 
+    // debug check
+    //qDebug() << "selectTrain " << _selectedTrain->trainName().full() << ", onPainting flag: " 
+    //    << _selectedTrain->isOnPainting() << Qt::endl;
+
     nowItem->setText(_selectedTrain->trainName().full());
 
     showWeakenItem();
