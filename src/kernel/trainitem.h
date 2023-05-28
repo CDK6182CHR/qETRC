@@ -10,6 +10,13 @@ class Diagram;
 class TrainAdapter;
 class TrainLine;
 class Railway;
+class QPointF;
+
+enum class StationPoint {
+    NotValid,
+    Arrive,
+    Depart
+};
 
 /**
  * @brief The TrainItem class  列车运行线类
@@ -78,6 +85,10 @@ class TrainItem : public QGraphicsItem
      */
     static constexpr double MAX_COVER_WIDTH = 200;
 
+    bool _onDragging=false;
+    const AdapterStation* _draggedStation=nullptr;
+    StationPoint _dragPoint = StationPoint::NotValid;
+
 public:
     enum { Type = UserType + 1 };
     TrainItem(Diagram& diagram, std::shared_ptr<TrainLine> line, Railway& railway, DiagramPage& page, double startY,
@@ -123,6 +134,12 @@ public:
     void clearLabelInfo();
 
     Direction dir()const;
+
+    /**
+     * 2023.05.28  Begin of dragging, called by MousePressEvent.
+     * Find and store the station under drag.
+     */
+    bool dragBegin(const QPointF& pos);
 
 private:
     
@@ -206,6 +223,14 @@ private:
      * 添加与交路前序车次之间的连线
      */
     void addLinkLine();
+
+    /**
+     * Compute the distance between the time `tm` and the coord `x` along time axis.
+     * PBC is considered. The returned value should be the minimum (in abs. value) under PBC.
+     * The sign is reserved, which is defined as:  x - tm 
+     * MIND: if the distance is quite large, then the result may be not reliable.
+     */
+    double timeDistancePbc(double x, const QTime& tm)const;
 
 };
 

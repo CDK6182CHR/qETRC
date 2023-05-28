@@ -259,6 +259,13 @@ void DiagramWidget::showPosTip(const QPoint& pos, const QString& msg, const QStr
     posTip->balloon(pos, 10000, true);
 }
 
+void DiagramWidget::dragTimeBegin(const QPointF& pos, TrainItem* item)
+{
+    if ((_onDragging = item->dragBegin(pos))) {
+        _draggedItem = item;
+    }
+}
+
 bool DiagramWidget::toPng(const QString& filename, const QString& title, const QString& note)
 {
     using namespace std::chrono_literals;
@@ -412,6 +419,7 @@ void DiagramWidget::setupMenu(const SharedActions& actions)
     }
 }
 
+#if 0
 void DiagramWidget::mousePressEvent(QMouseEvent* e)
 {
     QGraphicsView::mousePressEvent(e);
@@ -427,6 +435,32 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
         }
     }
 }
+#else 
+
+// 2023.05.28  new for drag support
+void DiagramWidget::mousePressEvent(QMouseEvent* e)
+{
+    QGraphicsView::mousePressEvent(e);
+    if (updating)
+        return;
+    if (e->button() == Qt::LeftButton) {
+        auto pos = mapToScene(e->pos());
+        auto* item = posTrainItem(pos);
+
+        if (item && item->train() == selectedTrain()) {
+            // for drag here
+            dragTimeBegin(pos, item);
+        }
+        else {
+            unselectTrain();
+            if (item) {
+                selectTrain(item);
+            }
+        }
+    }
+}
+
+#endif
 
 void DiagramWidget::mouseMoveEvent(QMouseEvent* e)
 {

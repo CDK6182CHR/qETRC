@@ -1425,6 +1425,19 @@ std::deque<AdapterStation>::const_iterator TrainLine::stationFromYCoeff(double y
     }
 }
 
+std::deque<AdapterStation>::const_iterator TrainLine::stationFromYCoeffClosest(double y) const
+{
+    auto itr = stationFromYCoeff(y);
+
+    if (itr == _stations.begin()) {
+        auto itprev = std::prev(itr);
+        if (std::abs(itprev->yCoeff() - y) < std::abs(itr->yCoeff())) {
+            return itprev;
+        }
+    }
+    return itr;
+}
+
 const AdapterStation* TrainLine::stationFromRail(std::shared_ptr<RailStation> rail) const
 {
     // 2021.09.22：不能直接lower_bound，要考虑上下行

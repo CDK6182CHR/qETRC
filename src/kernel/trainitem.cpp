@@ -252,6 +252,41 @@ Direction TrainItem::dir() const
     return _line->dir();
 }
 
+bool TrainItem::dragBegin(const QPointF& pos)
+{
+    _onDragging = false;
+    _draggedStation = nullptr;
+    double ycoef = _railway.yCoeffFromAbsValue(pos.y()-start_y, config());
+    auto itr = _line->stationFromYCoeffClosest(ycoef);
+    if (itr == _line->stations().end())
+        return false;
+
+    constexpr const int MAX_DIFF = 50;
+    if (std::abs(ycoef - itr->yCoeff()) > MAX_DIFF)
+        return false;
+    
+    double dis_arr = std::abs(timeDistancePbc(pos.x(), itr->trainStation->arrive));
+    double dis_dep = std::abs(timeDistancePbc(pos.x(), itr->trainStation->depart));
+
+    double dis_min = std::min(dis_arr, dis_dep);
+    if (dis_min > MAX_DIFF)
+        return false;
+    if (dis_dep < dis_arr) {
+        // is depart time
+        _dragPoint = StationPoint::Depart;
+    }
+    else {
+        _dragPoint = StationPoint::Arrive;
+    }
+
+    _draggedStation = &*itr;
+    _onDragging = true;
+
+    qDebug() << "dragBegin: on station " << _draggedStation->trainStation->name.toSingleLiteral() << Qt::endl;
+
+    return true;
+}
+
 const Config &TrainItem::config() const
 {
     return _page.config();
@@ -817,4 +852,18 @@ void TrainItem::addLinkLine()
             linkItem2->setPen(pen);
         }
     }
+}
+
+double TrainItem::timeDistancePbc(double x, const QTime& tm) const
+{
+    double tm_x = calXFromStart(tm) + start_x;
+    double width = config().diagramWidth();
+    while (tm_x - x > width) {
+        x += width;
+    }
+    while (x - tm_x > width) {
+        tm_x += width;
+    }
+    // now tm_x and x should be in the same image under PBC
+    return x - tm_x;
 }

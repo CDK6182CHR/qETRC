@@ -73,6 +73,10 @@ class DiagramWidget : public QGraphicsView
 
     QMenu* contextMenu = nullptr;
 
+    // 2023.05.28  status for dragging time
+    bool _onDragging = false;
+    TrainItem* _draggedItem = nullptr;
+
 public:
     struct SharedActions {
         QAction* refreshAll;
@@ -300,6 +304,12 @@ private:
 
     void showPosTip(const QPoint& pos, const QString& msg, 
         const QString& title = tr("运行图定位"));
+
+    void dragTimeBegin(const QPointF& pos, TrainItem* item);
+
+    void dragTimeMove();
+
+    void dragTimeFinish();
 
 signals:
     void showNewStatus(QString);

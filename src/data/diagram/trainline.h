@@ -200,6 +200,14 @@ public:
         stationFromYCoeff(double y)const;
 
     /**
+     * 2023.05.28  Find the station from YCoeff, but returns the one that is closest to 
+     * the given y (instead of that consistents with std::lower_bound)
+     * Used for drag.
+     */
+    std::deque<AdapterStation>::const_iterator
+        stationFromYCoeffClosest(double y)const;
+
+    /**
      * 注意  不标注起点标签的线，首站不返回。
      * 2021.08.01  改为二分查找
      */
