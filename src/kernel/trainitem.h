@@ -141,6 +141,12 @@ public:
      */
     bool dragBegin(const QPointF& pos);
 
+    /**
+     * 2023.05.30  for drag move event: return the time corresponding to the pos by simply calculation.
+     * PBC is implicitly considered.
+     */
+    QTime posToTime(const QPointF& pos)const;
+
 private:
     
     const Config& config()const;
@@ -166,6 +172,12 @@ private:
      * 注意：规定返回总是正值。
      */
     double calXFromStart(const QTime& time)const;
+
+    /**
+     * 2023.05.30  the inverse operation of calXFromStart: 
+     * Compute the time corresponding to the given x (with start_x extracted)
+     */
+    QTime calTimeByXFromStart(double x_from_start)const;
 
     /**
      * @brief 出图操作  运行线右越界

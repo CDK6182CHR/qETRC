@@ -256,12 +256,18 @@ bool TrainItem::dragBegin(const QPointF& pos)
 {
     _onDragging = false;
     _draggedStation = nullptr;
+
+    if (train()->isOnPainting()) {
+        // not process for paiting trains for now
+        return false;
+    }
+
     double ycoef = _railway.yCoeffFromAbsValue(pos.y()-start_y, config());
     auto itr = _line->stationFromYCoeffClosest(ycoef);
     if (itr == _line->stations().end())
         return false;
 
-    constexpr const int MAX_DIFF = 50;
+    constexpr const int MAX_DIFF = 10;
     if (std::abs(ycoef - itr->yCoeff()) > MAX_DIFF)
         return false;
     
@@ -285,6 +291,11 @@ bool TrainItem::dragBegin(const QPointF& pos)
     qDebug() << "dragBegin: on station " << _draggedStation->trainStation->name.toSingleLiteral() << Qt::endl;
 
     return true;
+}
+
+QTime TrainItem::posToTime(const QPointF& pos) const
+{
+    return calTimeByXFromStart(pos.x() - start_x);
 }
 
 const Config &TrainItem::config() const
@@ -614,6 +625,12 @@ double TrainItem::calXFromStart(const QTime& time) const
     if (sec < 0) 
         sec += 24 * 3600;
     return sec / config().seconds_per_pix;
+}
+
+QTime TrainItem::calTimeByXFromStart(double x_from_start) const
+{
+    int sec = (int)std::round(x_from_start * config().seconds_per_pix);
+    return startTime.addSecs(sec);
 }
 
 double TrainItem::getOutGraph(double xin, double yin, double xout, double yout, 

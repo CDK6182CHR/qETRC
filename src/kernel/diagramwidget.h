@@ -172,6 +172,8 @@ protected:
 
     virtual void mouseMoveEvent(QMouseEvent* e)override;
 
+    virtual void mouseReleaseEvent(QMouseEvent* e)override;
+
     virtual void mouseDoubleClickEvent(QMouseEvent* e)override;
 
     virtual void resizeEvent(QResizeEvent* e)override;
@@ -305,11 +307,17 @@ private:
     void showPosTip(const QPoint& pos, const QString& msg, 
         const QString& title = tr("运行图定位"));
 
+    /**
+     * 2023.05.30  moved from MouseMoveEvent()
+     * The process about mouse-over information
+     */
+    void showTimeTooltip(const QPoint& pos_glb);
+
     void dragTimeBegin(const QPointF& pos, TrainItem* item);
 
-    void dragTimeMove();
+    void dragTimeMove(const QPointF& pos);
 
-    void dragTimeFinish();
+    void dragTimeFinish(const QPointF& pos);
 
 signals:
     void showNewStatus(QString);

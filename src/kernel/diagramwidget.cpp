@@ -259,11 +259,67 @@ void DiagramWidget::showPosTip(const QPoint& pos, const QString& msg, const QStr
     posTip->balloon(pos, 10000, true);
 }
 
+void DiagramWidget::showTimeTooltip(const QPoint& pos_glb)
+{
+    if (!SystemJson::instance.show_train_tooltip)
+        return;
+    auto pos = mapToScene(pos_glb);
+    TrainItem* item = posTrainItem(pos);
+    if (!item || item->train() != _selectedTrain) {
+        setToolTip("");
+        return;
+    }
+
+    auto line = item->trainLine();
+    auto rail = line->railway();
+
+    double y = pos.y() - item->getStartY();  // 绝对坐标
+    auto itr = line->stationFromYCoeff(line->railway()->yCoeffFromAbsValue(y, config()));
+    const auto& dq = line->stations();
+    if (itr == dq.end())
+        return;
+    static constexpr double STATION_SPAN = 5;
+    //第一种情况：属于站内
+    if (std::abs(rail->yValueFromCoeff(itr->yCoeff(), config()) - y) <= STATION_SPAN) {
+        stationToolTip(itr, *line);
+        return;
+    }
+    //否则：找区间的另一个站
+    if (itr == dq.begin())
+        return;
+    auto prev = itr; --prev;    //区间前一个站
+    if (std::abs(rail->yValueFromCoeff(prev->yCoeff(), config()) - y) <= STATION_SPAN) {
+        stationToolTip(prev, *line);
+        return;
+    }
+    //到现在：只能是区间了
+    intervalToolTip(prev, itr, *line);
+}
+
 void DiagramWidget::dragTimeBegin(const QPointF& pos, TrainItem* item)
 {
     if ((_onDragging = item->dragBegin(pos))) {
         _draggedItem = item;
     }
+}
+
+void DiagramWidget::dragTimeMove(const QPointF& pos)
+{
+    if (_draggedItem) {
+        auto tm = _draggedItem->posToTime(pos);
+        qDebug() << "dragTimeMove: " << tm << Qt::endl;
+    }
+    else [[unlikely]] {
+        qDebug() << "DiagramWidget::dragTimeMove: unexpected nullptr!!" << Qt::endl;
+    }
+}
+
+void DiagramWidget::dragTimeFinish(const QPointF& pos)
+{
+    // TODO: add time process; 
+    // MIND: finishing in TrainItem
+    _onDragging = false;
+    _draggedItem = nullptr;
 }
 
 bool DiagramWidget::toPng(const QString& filename, const QString& title, const QString& note)
@@ -467,39 +523,21 @@ void DiagramWidget::mouseMoveEvent(QMouseEvent* e)
     QGraphicsView::mouseMoveEvent(e);
     if (updating)
         return;
-    if (!SystemJson::instance.show_train_tooltip)
-        return;
-    auto pos = mapToScene(e->pos());
-    TrainItem* item = posTrainItem(pos);
-    if (!item || item->train() != _selectedTrain) {
-        setToolTip("");
-        return;
-    }
 
-    auto line = item->trainLine();
-    auto rail = line->railway();
+    if (_onDragging) {
+        dragTimeMove(mapToScene(e->pos()));
+    }
+    else {
+        showTimeTooltip(e->pos());
+    }
+    
+}
 
-    double y = pos.y() - item->getStartY();  // 绝对坐标
-    auto itr = line->stationFromYCoeff(line->railway()->yCoeffFromAbsValue(y, config()));
-    const auto& dq = line->stations();
-    if (itr == dq.end())
-        return;
-    static constexpr double STATION_SPAN = 5;
-    //第一种情况：属于站内
-    if (std::abs(rail->yValueFromCoeff(itr->yCoeff(), config()) - y) <= STATION_SPAN) {
-        stationToolTip(itr, *line);
-        return;
+void DiagramWidget::mouseReleaseEvent(QMouseEvent* e)
+{
+    if (_onDragging) {
+        dragTimeFinish(mapToScene(e->pos()));
     }
-    //否则：找区间的另一个站
-    if (itr == dq.begin())
-        return;
-    auto prev = itr; --prev;    //区间前一个站
-    if (std::abs(rail->yValueFromCoeff(prev->yCoeff(), config()) - y) <= STATION_SPAN) {
-        stationToolTip(prev, *line);
-        return;
-    }
-    //到现在：只能是区间了
-    intervalToolTip(prev, itr, *line);
 }
 
 
