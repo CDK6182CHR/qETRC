@@ -15,7 +15,8 @@ class QPointF;
 enum class StationPoint {
     NotValid,
     Arrive,
-    Depart
+    Depart,
+    Pass
 };
 
 /**
@@ -146,6 +147,14 @@ public:
      * PBC is implicitly considered.
      */
     QTime posToTime(const QPointF& pos)const;
+
+    const QString& dragPointString()const;
+
+    auto* draggedStation()const { return _draggedStation; }
+
+    bool isOnDragging()const { return _onDragging; }
+
+    const QTime& draggedOldTime()const;
 
 private:
     

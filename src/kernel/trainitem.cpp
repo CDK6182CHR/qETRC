@@ -277,12 +277,17 @@ bool TrainItem::dragBegin(const QPointF& pos)
     double dis_min = std::min(dis_arr, dis_dep);
     if (dis_min > MAX_DIFF)
         return false;
-    if (dis_dep < dis_arr) {
-        // is depart time
-        _dragPoint = StationPoint::Depart;
+    if (itr->trainStation->isStopped()) {
+        if (dis_dep < dis_arr) {
+            // is depart time
+            _dragPoint = StationPoint::Depart;
+        }
+        else {
+            _dragPoint = StationPoint::Arrive;
+        }
     }
     else {
-        _dragPoint = StationPoint::Arrive;
+        _dragPoint = StationPoint::Pass;
     }
 
     _draggedStation = &*itr;
@@ -296,6 +301,39 @@ bool TrainItem::dragBegin(const QPointF& pos)
 QTime TrainItem::posToTime(const QPointF& pos) const
 {
     return calTimeByXFromStart(pos.x() - start_x);
+}
+
+const QString& TrainItem::dragPointString() const
+{
+    static const QString
+        _arrive = QObject::tr("到达"),
+        _depart = QObject::tr("出发"),
+        _pass = QObject::tr("通过"),
+        _invalid = QObject::tr("!INVALID!");
+    switch (_dragPoint) {
+    case StationPoint::Arrive: return _arrive;
+    case StationPoint::Depart: return _depart;
+    case StationPoint::Pass: return _pass;
+    default: return _invalid;
+    }
+}
+
+const QTime& TrainItem::draggedOldTime() const
+{
+    switch (_dragPoint)
+    {
+    case StationPoint::Arrive:
+    case StationPoint::Pass:
+        return _draggedStation->trainStation->arrive;
+        break;
+    case StationPoint::Depart:
+        return _draggedStation->trainStation->depart;
+        break;
+    default:
+        // INVALID !!
+        return {};
+        break;
+    }
 }
 
 const Config &TrainItem::config() const

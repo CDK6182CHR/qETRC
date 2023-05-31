@@ -29,6 +29,7 @@
 #include "util/qeballoomtip.h"
 #include "data/rail/rulernode.h"
 #include "data/rail/forbid.h"
+#include "dragtimeinfowidget.h"
 
 DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page, QWidget* parent):
     QGraphicsView(parent), _page(page),_diagram(diagram),startTime(page->config().start_hour,0,0)
@@ -300,14 +301,48 @@ void DiagramWidget::dragTimeBegin(const QPointF& pos, TrainItem* item)
 {
     if ((_onDragging = item->dragBegin(pos))) {
         _draggedItem = item;
+
+        if (_dragInfoWidget == nullptr) {
+            _dragInfoWidget = new DragTimeInfoWidget;
+            _dragInfoProxy = scene()->addWidget(_dragInfoWidget);
+            _dragInfoProxy->setZValue(18);
+            _dragInfoProxy->hide();
+        }
+
+        QPointF infoPos{ pos };   // copy construct
+        constexpr double X_SPLIT = 20, Y_SPLIT = 20;
+        const auto& wd_rect = _dragInfoWidget->rect();
+        QPointF corner = mapToScene(width(), height());
+        if (infoPos.x() > corner.x() - X_SPLIT - wd_rect.width()) {
+            // right-aligned
+            infoPos.setX(pos.x() - _dragInfoWidget->rect().width() - X_SPLIT);
+        }
+        else {
+            infoPos.setX(pos.x() + X_SPLIT);
+        }
+
+        if (infoPos.y() > corner.y() - Y_SPLIT - wd_rect.height()) {
+            // lower-aligned
+            infoPos.setY(pos.y() - wd_rect.height() - Y_SPLIT);
+        }
+        else {
+            infoPos.setY(pos.y() + Y_SPLIT);
+        }
+
+        _dragInfoProxy->setPos(infoPos);
     }
 }
 
 void DiagramWidget::dragTimeMove(const QPointF& pos)
 {
-    if (_draggedItem) {
+    if (_draggedItem && _draggedItem->isOnDragging()) {
         auto tm = _draggedItem->posToTime(pos);
-        qDebug() << "dragTimeMove: " << tm << Qt::endl;
+        
+        auto* st = _draggedItem->draggedStation();
+        _dragInfoWidget->showInfo(_draggedItem->train()->trainName().full(),
+            st->trainStation->name.toSingleLiteral(), _draggedItem->dragPointString(),
+            _draggedItem->draggedOldTime(), tm);
+
     }
     else [[unlikely]] {
         qDebug() << "DiagramWidget::dragTimeMove: unexpected nullptr!!" << Qt::endl;
@@ -320,6 +355,9 @@ void DiagramWidget::dragTimeFinish(const QPointF& pos)
     // MIND: finishing in TrainItem
     _onDragging = false;
     _draggedItem = nullptr;
+    if (_dragInfoProxy) {
+        _dragInfoProxy->hide();
+    }
 }
 
 bool DiagramWidget::toPng(const QString& filename, const QString& title, const QString& note)

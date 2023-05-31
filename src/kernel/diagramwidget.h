@@ -23,6 +23,7 @@ struct Config;
 class Forbid;
 class ForbidNode;
 class Routing;
+class DragTimeInfoWidget;
 namespace qeutil {
     class QEBalloonTip;
 }
@@ -76,6 +77,9 @@ class DiagramWidget : public QGraphicsView
     // 2023.05.28  status for dragging time
     bool _onDragging = false;
     TrainItem* _draggedItem = nullptr;
+
+    DragTimeInfoWidget* _dragInfoWidget = nullptr;
+    QGraphicsProxyWidget* _dragInfoProxy = nullptr;
 
 public:
     struct SharedActions {

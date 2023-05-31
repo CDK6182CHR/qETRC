@@ -236,6 +236,7 @@
     <ClCompile Include="src\editors\train\trainfilterhelpers.cpp" />
     <ClCompile Include="src\editors\train\trainfilterselector.cpp" />
     <ClCompile Include="src\editors\train\trainnameregextable.cpp" />
+    <ClCompile Include="src\kernel\dragtimeinfowidget.cpp" />
     <ClCompile Include="src\mainwindow\startuppage.cpp" />
     <ClCompile Include="src\mainwindow\version.cpp" />
     <ClCompile Include="src\model\rail\forbidlistmodel.cpp" />
@@ -469,6 +470,7 @@
     <QtMoc Include="src\editors\train\trainfilterselector.h" />
     <QtMoc Include="src\editors\train\trainfiltercombo.h" />
     <ClInclude Include="src\data\train\trainpassenger.h" />
+    <QtMoc Include="src\kernel\dragtimeinfowidget.h" />
     <ClInclude Include="src\model\rail\gapconstraintmodel.h" />
     <ClInclude Include="src\railnet\graph\railnetutil.hpp" />
     <ClInclude Include="src\util\buttongroup.hpp" />

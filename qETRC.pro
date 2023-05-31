@@ -55,6 +55,7 @@ SOURCES += \
     src/editors/train/trainfilterselector.cpp \
     src/editors/train/traingroupwidget.cpp \
     src/editors/train/trainnameregextable.cpp \
+    src/kernel/dragtimeinfowidget.cpp \
     src/mainwindow/startuppage.cpp \
     src/mainwindow/version.cpp \
     src/util/combos/railstationcombo.cpp \
@@ -281,6 +282,7 @@ HEADERS += \
     src/editors/train/trainfilterselector.h \
     src/editors/train/traingroupwidget.h \
     src/editors/train/trainnameregextable.h \
+    src/kernel/dragtimeinfowidget.h \
     src/mainwindow/startuppage.h \
     src/railnet/graph/railnetutil.hpp \
     src/util/combos/railstationcombo.h \
