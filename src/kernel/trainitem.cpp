@@ -267,7 +267,7 @@ bool TrainItem::dragBegin(const QPointF& pos)
     if (itr == _line->stations().end())
         return false;
 
-    constexpr const int MAX_DIFF = 10;
+    constexpr const int MAX_DIFF = 20;
     if (std::abs(ycoef - itr->yCoeff()) > MAX_DIFF)
         return false;
     
@@ -334,6 +334,35 @@ const QTime& TrainItem::draggedOldTime() const
         return {};
         break;
     }
+}
+
+void TrainItem::doDrag(const QTime& tm)
+{
+    if (!_onDragging) {
+        qDebug() << "TrainItem::doDrag: ERROR: unexpected status" << Qt::endl;
+        return;
+    }
+    switch (_dragPoint)
+    {
+    case StationPoint::Arrive:
+        _draggedStation->trainStation->arrive = tm;
+        break;
+    case StationPoint::Depart:
+        _draggedStation->trainStation->depart = tm;
+        break;
+    case StationPoint::Pass:
+        _draggedStation->trainStation->arrive = tm;
+        _draggedStation->trainStation->depart = tm;
+        break;
+    default:
+        qDebug() << "TrainItem::doDrag: INVALID _dragPoint" << Qt::endl;
+        break;
+    }
+
+    // finalize
+    _onDragging = false;
+    _draggedStation = nullptr;
+    _dragPoint = StationPoint::NotValid;
 }
 
 const Config &TrainItem::config() const

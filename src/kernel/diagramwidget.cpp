@@ -301,6 +301,7 @@ void DiagramWidget::dragTimeBegin(const QPointF& pos, TrainItem* item)
 {
     if ((_onDragging = item->dragBegin(pos))) {
         _draggedItem = item;
+        _dragStartPoint = pos;
 
         if (_dragInfoWidget == nullptr) {
             _dragInfoWidget = new DragTimeInfoWidget;
@@ -351,13 +352,31 @@ void DiagramWidget::dragTimeMove(const QPointF& pos)
 
 void DiagramWidget::dragTimeFinish(const QPointF& pos)
 {
-    // TODO: add time process; 
-    // MIND: finishing in TrainItem
+    if (!_onDragging || !_draggedItem)
+        return;
+
+    if (pos.x() != _dragStartPoint.x()) {
+        auto tm = _draggedItem->posToTime(pos);
+
+        auto* st = _draggedItem->draggedStation();
+        const auto& train = _draggedItem->train();
+        int station_id = std::distance(train->timetable().begin(), st->trainStation);
+        TrainStation data = *(st->trainStation);   // copy construct
+
+        // this option commits the drag directly, 
+        // and the status in TrainItem is updated
+        _draggedItem->doDrag(tm);
+
+        emit timeDragged(train, station_id, data);
+    }
+
     _onDragging = false;
     _draggedItem = nullptr;
     if (_dragInfoProxy) {
         _dragInfoProxy->hide();
     }
+
+    
 }
 
 bool DiagramWidget::toPng(const QString& filename, const QString& title, const QString& note)

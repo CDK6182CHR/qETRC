@@ -1429,6 +1429,9 @@ std::deque<AdapterStation>::const_iterator TrainLine::stationFromYCoeffClosest(d
 {
     auto itr = stationFromYCoeff(y);
 
+    if (itr == _stations.end()) {
+        return std::prev(itr);   // assume TrainLine is never empty
+    }
     if (itr != _stations.begin()) {
         auto itprev = std::prev(itr);
         if (std::abs(itprev->yCoeff() - y) < std::abs(itr->yCoeff())) {

@@ -126,7 +126,7 @@ namespace qecmd {
      * 实质性操作都一样，只是增加操作合并
      */
     class ChangePageScale : public ChangePageConfig {
-        static constexpr int ID = 101;
+        static constexpr int ID = 102;
     public:
         ChangePageScale(Config& cfg_, const Config& newcfg_, bool repaint_,
             std::shared_ptr<DiagramPage> page, ViewCategory* cat_,

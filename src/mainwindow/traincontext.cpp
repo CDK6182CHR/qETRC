@@ -995,6 +995,11 @@ void TrainContext::actSimpleInterpolation()
 	}
 }
 
+void TrainContext::actDragTime(std::shared_ptr<Train> train, int station_id, const TrainStation& data)
+{
+	mw->getUndoStack()->push(new qecmd::DragTrainStationTime(train, station_id, data, this));
+}
+
 void TrainContext::actShowTrainLine()
 {
 	//强制显示列车运行线。如果已经全部显示了也没关系，没有任何效果
@@ -1484,4 +1489,45 @@ qecmd::TimetableInterpolationSimple::TimetableInterpolationSimple(std::shared_pt
 	ChangeTimetable(train,newtable,context,parent)
 {
 	setText(QObject::tr("快速推定: %1 @ %2").arg(train->trainName().full(), rail->name()));
+}
+
+qecmd::DragTrainStationTime::DragTrainStationTime(std::shared_ptr<Train> train, int station_id,
+	const TrainStation& data, TrainContext* cont, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("拖动时刻: %1 @ %2").arg(data.name.toSingleLiteral(), train->trainName().full()),parent),
+	train(train),station_id(station_id),data(data),cont(cont)
+{
+}
+
+void qecmd::DragTrainStationTime::undo()
+{
+	commit();
+}
+
+void qecmd::DragTrainStationTime::redo()
+{
+	if (first) {
+		first = false;
+		cont->onTrainStationTimeChanged(train, true);
+		return;
+	}
+	commit();
+}
+
+bool qecmd::DragTrainStationTime::mergeWith(const QUndoCommand* other)
+{
+	if (id() != other->id())return false;
+	auto cmd = static_cast<const DragTrainStationTime*>(other);
+	if (train == cmd->train && station_id == cmd->station_id) {
+		// 抛弃中间状态即可
+		return true;
+	}
+	else return false;
+}
+
+void qecmd::DragTrainStationTime::commit()
+{
+	auto itr = train->timetable().begin();
+	std::advance(itr, station_id);
+	std::swap(*itr, data);
+	cont->onTrainStationTimeChanged(train, true);
 }

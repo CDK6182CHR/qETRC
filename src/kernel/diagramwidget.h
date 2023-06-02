@@ -77,6 +77,7 @@ class DiagramWidget : public QGraphicsView
     // 2023.05.28  status for dragging time
     bool _onDragging = false;
     TrainItem* _draggedItem = nullptr;
+    QPointF _dragStartPoint;
 
     DragTimeInfoWidget* _dragInfoWidget = nullptr;
     QGraphicsProxyWidget* _dragInfoProxy = nullptr;
@@ -328,6 +329,8 @@ signals:
     void trainSelected(std::shared_ptr<Train> train);
     void pageFocussedIn(std::shared_ptr<DiagramPage> page);
     void railFocussedIn(std::shared_ptr<Railway> railway);
+
+    void timeDragged(std::shared_ptr<Train> train, int station_id, const TrainStation& data);
 
 private slots:
     void updateTimeAxis();

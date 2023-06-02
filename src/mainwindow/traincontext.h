@@ -310,6 +310,8 @@ public slots:
      */
     void actSimpleInterpolation();
 
+    void actDragTime(std::shared_ptr<Train> train, int station_id, const TrainStation& data);
+
 private slots:
     void showTrainEvents();
 
@@ -513,6 +515,33 @@ namespace qecmd {
     public:
         TimetableInterpolationSimple(std::shared_ptr<Train> train, std::shared_ptr<Train> newtable,
             TrainContext* context, const Railway* rail, QUndoCommand* parent = nullptr);
+    };
+
+    /**
+    * 2023.06.02  for dragging
+    * like: AdjustTrainStationTime (defined in timetablequickmodel.h)
+    * but called by dragging. 
+    * The actual operation should be done inside this class.
+     */
+    class DragTrainStationTime : public QUndoCommand
+    {
+        std::shared_ptr<Train> train;
+        int station_id;
+        TrainStation data;
+        TrainContext* const cont;
+
+        static constexpr const int ID = 103;
+        bool first = true;
+    public:
+        DragTrainStationTime(std::shared_ptr<Train> train, int station_id, const TrainStation& data,
+            TrainContext* cont, QUndoCommand* parent = nullptr);
+
+        virtual void undo()override;
+        virtual void redo()override;
+        virtual int id()const override { return ID; }
+        virtual bool mergeWith(const QUndoCommand* other)override;
+    private:
+        void commit();
     };
 }
 

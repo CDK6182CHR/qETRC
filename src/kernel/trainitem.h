@@ -156,6 +156,11 @@ public:
 
     const QTime& draggedOldTime()const;
 
+    /**
+     * Commit the drag, then set to non-dragging mode.
+     */
+    void doDrag(const QTime& tm);
+
 private:
     
     const Config& config()const;
