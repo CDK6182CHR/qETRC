@@ -24,6 +24,7 @@ class Forbid;
 class ForbidNode;
 class Routing;
 class DragTimeInfoWidget;
+class PaintStationPointItem;
 namespace qeutil {
     class QEBalloonTip;
 }
@@ -36,10 +37,12 @@ namespace qeutil {
  * 0：基本层。包含底图框线。
  * [1,5) 区间安排底图上的修饰内容。目前仅有天窗。天窗为1.
  * [5,10)区间安排列车运行线。目前统一安排为5.
+ * （2023.06.04增加）6：PaintStationPointItem  铺画点标记/拖动点
  * （2021.08.29增加）9：weakItem  用于遮蔽其他运行线的。
  * 10：选中车次运行线层。
  * [10,15)预留。
  * [15,20)软件悬浮层。目前安排距离轴、时间轴15，选中车次名称16.
+ * （2023.06.01增加）18：DragTimeInfoWidget   拖动时刻的信息窗口
  */
 class DiagramWidget : public QGraphicsView
 {
@@ -318,7 +321,8 @@ private:
      */
     void showTimeTooltip(const QPoint& pos_glb);
 
-    void dragTimeBegin(const QPointF& pos, TrainItem* item, bool ctrl_pressed, bool alt_pressed);
+    void dragTimeBegin(const QPointF& pos, TrainItem* item, PaintStationPointItem* point,
+        bool ctrl_pressed, bool alt_pressed);
 
     void dragTimeMove(const QPointF& pos);
 

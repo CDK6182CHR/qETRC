@@ -4,6 +4,7 @@
 #include "data/train/routing.h"
 #include "data/diagram/diagram.h"
 #include "data/rail/railway.h"
+#include "paintstationpointitem.h"
 
 #include <QPainterPath>
 #include <QPointF>
@@ -110,6 +111,19 @@ void TrainItem::highlight()
         else
             addTimeMarks();
     }
+
+    //显示铺画点
+    if (true) {
+        if (!stationMarks.empty()) {
+            for (auto p : stationMarks) {
+                p->setVisible(true);
+            }
+        }
+        else {
+            addStationPoints();
+        }
+    }
+
     setZValue(10);
     _isHighlighted = true;
 }
@@ -160,6 +174,8 @@ void TrainItem::unhighlight()
 
     if (config().show_time_mark == 1)
         hideTimeMarks();
+
+    hideStationPoints();
 
     _isHighlighted = false;
 }
@@ -252,7 +268,8 @@ Direction TrainItem::dir() const
     return _line->dir();
 }
 
-bool TrainItem::dragBegin(const QPointF& pos, bool ctrl, bool alt)
+#if 0
+bool TrainItem::dragBegin(const QPointF& pos, PaintStationPointItem* point, bool ctrl, bool alt)
 {
     _onDragging = false;
     _draggedStation = nullptr;
@@ -305,6 +322,42 @@ bool TrainItem::dragBegin(const QPointF& pos, bool ctrl, bool alt)
 
     return true;
 }
+#else 
+
+// 2023.06.04  new version using PaintStationPointItem
+bool TrainItem::dragBegin(const QPointF& pos, PaintStationPointItem* point, bool ctrl, bool alt)
+{
+    Q_UNUSED(pos);
+    _onDragging = false;
+    _draggedStation = nullptr;
+
+    if (train()->isOnPainting()) {
+        // not process for paiting trains for now
+        return false;
+    }
+
+    _dragPoint = point->point();
+    
+    if (_dragPoint == StationPoint::Pass) {
+        if (ctrl) {
+            _dragPoint = StationPoint::Arrive;
+        }
+        else if (alt) {
+            _dragPoint = StationPoint::Depart;
+        }
+    }
+
+    _draggedStation = point->station();
+    _onDragging = true;
+
+    //qDebug() << "station: " << point->station() << Qt::endl;
+
+    qDebug() << "dragBegin: on station " << _draggedStation->trainStation->name.toSingleLiteral() << Qt::endl;
+
+    return true;
+}
+
+#endif
 
 QTime TrainItem::posToTime(const QPointF& pos) const
 {
@@ -850,6 +903,43 @@ void TrainItem::hideTimeMarks()
 {
     for (auto p : markLabels) {
         p->setVisible(false);
+    }
+}
+
+void TrainItem::addStationPoints()
+{
+    for (auto p = _line->stations().begin(); p != _line->stations().end(); ++p) {
+        auto ts = p->trainStation;
+        auto rs = p->railStation.lock();
+        double ycur = _railway.yValueFromCoeff(rs->y_coeff.value(), config());
+        double xarr = calXFromStart(ts->arrive), xdep = calXFromStart(ts->depart);
+
+        //qDebug() << "addStationPoints: station, id " << p->trainStation->name.toSingleLiteral() << ", "
+        //    << &*p << Qt::endl;
+
+        // arrive point
+        auto arr_point_type = (ts->isStopped() ? StationPoint::Arrive : StationPoint::Pass);
+        auto* itarr = new PaintStationPointItem(arr_point_type, &*p, xarr + start_x, ycur + start_y, this);
+        itarr->setZValue(6);
+        itarr->setBrush(pen.color());
+        itarr->setPen(pen);
+        stationMarks.push_back(itarr);
+
+        // depart point
+        if (ts->isStopped()) {
+            auto* itdep = new PaintStationPointItem(StationPoint::Depart, &*p, xdep + start_x, ycur + start_y, this);
+            itdep->setBrush(pen.color());
+            itdep->setPen(pen);
+            itdep->setZValue(6);
+            stationMarks.push_back(itdep);
+        }
+    }
+}
+
+void TrainItem::hideStationPoints()
+{
+    for (auto p : stationMarks) {
+        p->hide();
     }
 }
 

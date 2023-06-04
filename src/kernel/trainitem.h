@@ -4,6 +4,7 @@
 #include <QTime>
 
 #include "data/diagram/diagrampage.h"
+#include "data/train/stationpoint.h"
 
 class DiagramPage;
 class Diagram;
@@ -11,13 +12,8 @@ class TrainAdapter;
 class TrainLine;
 class Railway;
 class QPointF;
+class PaintStationPointItem;
 
-enum class StationPoint {
-    NotValid,
-    Arrive,
-    Depart,
-    Pass
-};
 
 /**
  * @brief The TrainItem class  列车运行线类
@@ -66,6 +62,11 @@ class TrainItem : public QGraphicsItem
      * 标注通过站时刻的标签
      */
     QList<QGraphicsSimpleTextItem*> markLabels;
+
+    /**
+     * 2023.06.04  图定铺画点标记/拖动点
+     */
+    QVector<PaintStationPointItem*> stationMarks;
 
     std::multimap<double, LabelPositionInfo>::iterator startLabelInfo, endLabelInfo;
 
@@ -140,7 +141,7 @@ public:
      * 2023.05.28  Begin of dragging, called by MousePressEvent.
      * Find and store the station under drag.
      */
-    bool dragBegin(const QPointF& pos, bool ctrl, bool alt);
+    bool dragBegin(const QPointF& pos, PaintStationPointItem* point, bool ctrl, bool alt);
 
     /**
      * 2023.05.30  for drag move event: return the time corresponding to the pos by simply calculation.
@@ -234,6 +235,13 @@ private:
     void addTimeMarks();
 
     void hideTimeMarks();
+
+    /**
+     * 2023.06.04  添加图定点标记
+     */
+    void addStationPoints();
+
+    void hideStationPoints();
 
     /**
      * 详细停点的标记，分为到、开两种情况，一共四个位置，由行别进一步细分

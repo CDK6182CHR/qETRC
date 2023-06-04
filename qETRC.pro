@@ -56,6 +56,7 @@ SOURCES += \
     src/editors/train/traingroupwidget.cpp \
     src/editors/train/trainnameregextable.cpp \
     src/kernel/dragtimeinfowidget.cpp \
+    src/kernel/paintstationpointitem.cpp \
     src/mainwindow/startuppage.cpp \
     src/mainwindow/version.cpp \
     src/util/combos/railstationcombo.cpp \
@@ -265,6 +266,7 @@ HEADERS += \
     src/data/analysis/traingap/traingapana.h \
     src/data/train/itrainfilter.h \
     src/data/train/predeftrainfiltercore.h \
+    src/data/train/stationpoint.h \
     src/data/train/trainfilterselectorcore.h \
     src/data/train/traingroup.h \
     src/data/train/trainpassenger.h \
@@ -283,6 +285,7 @@ HEADERS += \
     src/editors/train/traingroupwidget.h \
     src/editors/train/trainnameregextable.h \
     src/kernel/dragtimeinfowidget.h \
+    src/kernel/paintstationpointitem.h \
     src/mainwindow/startuppage.h \
     src/railnet/graph/railnetutil.hpp \
     src/util/combos/railstationcombo.h \

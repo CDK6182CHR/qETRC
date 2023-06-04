@@ -42,6 +42,9 @@ public:
      */
     QList<QString> history;
 
+    // below: data not yet written to file
+    double station_mark_radius=3.0;
+
     void saveFile();
 
     /**

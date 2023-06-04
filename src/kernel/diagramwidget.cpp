@@ -30,6 +30,7 @@
 #include "data/rail/rulernode.h"
 #include "data/rail/forbid.h"
 #include "dragtimeinfowidget.h"
+#include "paintstationpointitem.h"
 
 DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page, QWidget* parent):
     QGraphicsView(parent), _page(page),_diagram(diagram),startTime(page->config().start_hour,0,0)
@@ -297,9 +298,9 @@ void DiagramWidget::showTimeTooltip(const QPoint& pos_glb)
     intervalToolTip(prev, itr, *line);
 }
 
-void DiagramWidget::dragTimeBegin(const QPointF& pos, TrainItem* item, bool ctrl, bool alt)
+void DiagramWidget::dragTimeBegin(const QPointF& pos, TrainItem* item, PaintStationPointItem* point, bool ctrl, bool alt)
 {
-    if ((_onDragging = item->dragBegin(pos, ctrl, alt))) {
+    if ((_onDragging = item->dragBegin(pos, point, ctrl, alt))) {
         _draggedItem = item;
         _dragStartPoint = pos;
 
@@ -567,18 +568,38 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
         }
         
         auto pos = mapToScene(e->pos());
-        auto* item = posTrainItem(pos);
+        //auto* item = posTrainItem(pos);
 
-        if (item && item->train() == selectedTrain()) {
+        // 2023.06.04: extract the item manually here
+        TrainItem* trainItem=nullptr;
+        PaintStationPointItem* pointItem=nullptr;
+
+        if constexpr (true) {
+            auto* item = scene()->itemAt(pos, transform());
+            while (item) {
+                switch (item->type()) {
+                case PaintStationPointItem::Type:
+                    pointItem = qgraphicsitem_cast<PaintStationPointItem*>(item);
+                    break;
+                case TrainItem::Type:
+                    trainItem = qgraphicsitem_cast<TrainItem*>(item);
+                    break;
+                }
+                item = item->parentItem();
+            }
+        }
+
+
+        if (trainItem && pointItem && trainItem->train() == selectedTrain()) {
             // for drag here
             if (SystemJson::instance.drag_time) {
-                dragTimeBegin(pos, item, ctrl, alt);
+                dragTimeBegin(pos, trainItem, pointItem, ctrl, alt);
             }
         }
         else {
             unselectTrain();
-            if (item) {
-                selectTrain(item);
+            if (trainItem) {
+                selectTrain(trainItem);
             }
         }
     }
