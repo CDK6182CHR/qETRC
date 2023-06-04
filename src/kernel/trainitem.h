@@ -140,7 +140,7 @@ public:
      * 2023.05.28  Begin of dragging, called by MousePressEvent.
      * Find and store the station under drag.
      */
-    bool dragBegin(const QPointF& pos);
+    bool dragBegin(const QPointF& pos, bool ctrl, bool alt);
 
     /**
      * 2023.05.30  for drag move event: return the time corresponding to the pos by simply calculation.
@@ -154,7 +154,7 @@ public:
 
     bool isOnDragging()const { return _onDragging; }
 
-    const QTime& draggedOldTime()const;
+    QTime draggedOldTime()const;
 
     /**
      * Commit the drag, then set to non-dragging mode.

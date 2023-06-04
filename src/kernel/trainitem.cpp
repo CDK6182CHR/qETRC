@@ -252,7 +252,7 @@ Direction TrainItem::dir() const
     return _line->dir();
 }
 
-bool TrainItem::dragBegin(const QPointF& pos)
+bool TrainItem::dragBegin(const QPointF& pos, bool ctrl, bool alt)
 {
     _onDragging = false;
     _draggedStation = nullptr;
@@ -266,7 +266,7 @@ bool TrainItem::dragBegin(const QPointF& pos)
     auto itr = _line->stationFromYCoeffClosest(ycoef);
     if (itr == _line->stations().end())
         return false;
-
+     
     constexpr const int MAX_DIFF = 20;
     if (std::abs(ycoef - itr->yCoeff()) > MAX_DIFF)
         return false;
@@ -287,7 +287,15 @@ bool TrainItem::dragBegin(const QPointF& pos)
         }
     }
     else {
-        _dragPoint = StationPoint::Pass;
+        if (ctrl) {
+            _dragPoint = StationPoint::Arrive;
+        }
+        else if (alt) {
+            _dragPoint = StationPoint::Depart;
+        }
+        else {
+            _dragPoint = StationPoint::Pass;
+        }
     }
 
     _draggedStation = &*itr;
@@ -318,7 +326,7 @@ const QString& TrainItem::dragPointString() const
     }
 }
 
-const QTime& TrainItem::draggedOldTime() const
+QTime TrainItem::draggedOldTime() const
 {
     switch (_dragPoint)
     {

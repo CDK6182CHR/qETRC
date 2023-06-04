@@ -83,6 +83,10 @@ void SystemJsonDialog::initUI()
     ckStartup->setToolTip(tr("启动程序时显示提示页面"));
     flay->addRow(tr("启动提示页"), ckStartup);
 
+    ckDrag = new QCheckBox(tr("启用"));
+    ckDrag->setToolTip(tr("拖动运行线上停点调整时刻。对于通过站，按住Ctrl调整到达时刻，Alt调整出发时刻，否则同时调整。"));
+    flay->addRow(tr("拖动调整时刻"), ckDrag);
+
     vlay->addLayout(flay);
 
     auto* g=new ButtonGroup<3>({"确定","还原", "关闭"});
@@ -106,6 +110,7 @@ void SystemJsonDialog::setData()
     ckAutoHighlight->setChecked(t.auto_highlight_on_selected);
     ckStartup->setChecked(t.show_start_page);
     cbSysStyle->setCurrentText(t.app_style);
+    ckDrag->setChecked(t.drag_time);
 }
 
 void SystemJsonDialog::actApply()
@@ -128,6 +133,7 @@ void SystemJsonDialog::actApply()
     t.use_central_widget = ckCentral->isChecked();
     t.auto_highlight_on_selected = ckAutoHighlight->isChecked();
     t.show_start_page = ckStartup->isChecked();
+    t.drag_time = ckDrag->isChecked();
 }
 
 #endif

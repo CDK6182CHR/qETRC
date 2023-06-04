@@ -270,7 +270,7 @@ void DiagramWidget::showTimeTooltip(const QPoint& pos_glb)
         setToolTip("");
         return;
     }
-
+    
     auto line = item->trainLine();
     auto rail = line->railway();
 
@@ -297,9 +297,9 @@ void DiagramWidget::showTimeTooltip(const QPoint& pos_glb)
     intervalToolTip(prev, itr, *line);
 }
 
-void DiagramWidget::dragTimeBegin(const QPointF& pos, TrainItem* item)
+void DiagramWidget::dragTimeBegin(const QPointF& pos, TrainItem* item, bool ctrl, bool alt)
 {
-    if ((_onDragging = item->dragBegin(pos))) {
+    if ((_onDragging = item->dragBegin(pos, ctrl, alt))) {
         _draggedItem = item;
         _dragStartPoint = pos;
 
@@ -557,12 +557,23 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
     if (updating)
         return;
     if (e->button() == Qt::LeftButton) {
+
+        bool ctrl=false, alt=false;
+        if (e->modifiers() == Qt::CTRL) {
+            ctrl = true;
+        }
+        else if (e->modifiers() == Qt::ALT){
+            alt = true;
+        }
+        
         auto pos = mapToScene(e->pos());
         auto* item = posTrainItem(pos);
 
         if (item && item->train() == selectedTrain()) {
             // for drag here
-            dragTimeBegin(pos, item);
+            if (SystemJson::instance.drag_time) {
+                dragTimeBegin(pos, item, ctrl, alt);
+            }
         }
         else {
             unselectTrain();

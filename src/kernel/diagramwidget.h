@@ -318,7 +318,7 @@ private:
      */
     void showTimeTooltip(const QPoint& pos_glb);
 
-    void dragTimeBegin(const QPointF& pos, TrainItem* item);
+    void dragTimeBegin(const QPointF& pos, TrainItem* item, bool ctrl_pressed, bool alt_pressed);
 
     void dragTimeMove(const QPointF& pos);
 
