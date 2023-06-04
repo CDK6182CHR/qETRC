@@ -15,7 +15,8 @@
 
 #include "intervaltraintable.h"
 
-
+bool IntervalTrainDialog::informMultiCheck = true;
+bool IntervalTrainDialog::informRegexCheck = true;
 
 IntervalTrainDialog::IntervalTrainDialog(Diagram &diagram, QWidget *parent):
     QDialog(parent),
@@ -118,7 +119,7 @@ void IntervalTrainDialog::onMultiChecked(bool on)
             "空格等其他任何符号。"
             "启用本功能时，如果车站站名内存在此符号，则会被当做两个站处理。\n"
             "输入的多个车站为“或”的关系，只要列车时刻表内存在一个车站，就能匹配。\n"
-            "此提示在本窗口运行期间仅展示一次。"));
+            "此提示在本程序运行期间仅展示一次。"));
         informMultiCheck = false;
     }
 }
@@ -133,7 +134,7 @@ void IntervalTrainDialog::onRegexChecked(bool on)
             "（2）若正则表达式和多车站查询同时开启，则首先按照垂直线|（U+007C）划分，再将每一部分"
             "按正则表达式解析。"
             "（3）友情提示：如果要匹配完整的站名，可以使用正则表达式的行首、行尾表达，例如 ^成都$ \n" 
-            "此提示在本窗口运行期间仅展示一次。"));
+            "此提示在本程序运行期间仅展示一次。"));
         informRegexCheck = false;
     }
 }

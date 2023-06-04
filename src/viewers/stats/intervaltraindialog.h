@@ -23,7 +23,8 @@ class IntervalTrainDialog : public QDialog
     QCheckBox* ckMultiStart, * ckMultiEnd;
     QCheckBox* ckRegexStart, * ckRegexEnd;
 
-    bool informMultiCheck = true, informRegexCheck = true;
+    // 2023.06.04  change to static
+    static bool informMultiCheck, informRegexCheck;
 public:
     IntervalTrainDialog(Diagram& diagram, QWidget* parent=nullptr);
 private:

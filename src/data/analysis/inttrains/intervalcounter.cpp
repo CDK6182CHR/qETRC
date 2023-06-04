@@ -99,6 +99,12 @@ IntervalTrainList IntervalCounter::getIntervalTrains(
                     start_station=nullptr;
                 }
             }
+            // 2023.06.04: add days count for in-station-pass of a day. Only needed for station that is NOT the end one.
+            if (start_station && start_station != &*itr) {
+                if (itr->depart < itr->arrive) {
+                    add_days++;
+                }
+            }
             last = itr;
         }
     }
