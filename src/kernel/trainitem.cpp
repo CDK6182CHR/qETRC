@@ -5,6 +5,7 @@
 #include "data/diagram/diagram.h"
 #include "data/rail/railway.h"
 #include "paintstationpointitem.h"
+#include "data/common/qesystem.h"
 
 #include <QPainterPath>
 #include <QPointF>
@@ -113,7 +114,7 @@ void TrainItem::highlight()
     }
 
     //显示铺画点
-    if (true) {
+    if (SystemJson::instance.drag_time && !train()->isOnPainting()) {
         if (!stationMarks.empty()) {
             for (auto p : stationMarks) {
                 p->setVisible(true);
