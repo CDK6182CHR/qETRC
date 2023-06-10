@@ -75,3 +75,5 @@ customize.xml
 
 # CMake
 build
+out
+CMakeSettings.json
