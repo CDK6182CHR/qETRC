@@ -9,8 +9,9 @@ set(CMAKE_PROJECT_VERSION_PATCH 5)
 ################# Qt basic ################
 list(PREPEND CMAKE_PREFIX_PATH $ENV{QTDIR}/lib/cmake)
 message(STATUS "set QTDIR $ENV{QTDIR}")
-find_package(Qt5 REQUIRED COMPONENTS Widgets Core Gui)
-find_package(Qt5 COMPONENTS PrintSupport)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS PrintSupport)
 
 ################# External ################
 
@@ -32,21 +33,25 @@ target_link_libraries(qETRC Qt5::Widgets)
 
 if (Qt5PrintSupport_FOUND)
     message(STATUS "QtPrintSupport is found")
-    target_link_libraries(qETRC Qt5::PrintSupport)
+    target_link_libraries(qETRC Qt${QT_VERSION_MAJOR}::PrintSupport)
 else()
     message(WARNING "QtPrintSupport not found")
 endif()
 
 ################# external libraries ##################
-if (NOT ANDROID)
-    add_subdirectory(external/Qt-Advanced-Docking-System)
+include(FetchContent)
 
+if (NOT ANDROID)
     # disable example building in SARibbon, since some of them requires Qt6 ..
     set(BUILD_EXAMPLES OFF)
+
     add_subdirectory(external/SARibbon)
+    
+    list(APPEND CMAKE_PREFIX_PATH "D:/codes/QtProjects/site-packages/Qt-Advanced-Docking-System/out/install/lib/cmake/qt5advanceddocking")
+    find_package(qt${QT_VERSION_MAJOR}advanceddocking CONFIG REQUIRED)
 
     target_link_libraries(qETRC SARibbonBar)
-    target_link_libraries(qETRC qtadvanceddocking)
+    target_link_libraries(qETRC ads::qt${QT_VERSION_MAJOR}advanceddocking)
 endif()
 
 
@@ -63,7 +68,7 @@ if (MSVC)
 endif()
 
 install(TARGETS qETRC)
-
+#install(IMPORTED_RUNTIME_ARTIFACTS ads::qt${QT_VERSION_MAJOR}advanceddocking)
 
 
 
