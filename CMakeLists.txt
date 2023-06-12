@@ -1,21 +1,23 @@
-cmake_minimum_required(VERSION 3.10)
-project(qETRC LANGUAGES CXX)
-set(CMAKE_PROJECT_VERSION_MAJOR 1)
-set(CMAKE_PROJECT_VERSION_MINOR 3)
-set(CMAKE_PROJECT_VERSION_PATCH 5)
+cmake_minimum_required(VERSION 3.14)
 
-# Test versoin on SARibbon  1e76ee5
+set(qETRC_VERSION_MAJOR 1)
+set(qETRC_VERSION_MINOR 3)
+set(qETRC_VERSION_PATCH 5)
+set(qETRC_RELEASE_CODE 40)
+
+set(qETRC_VERSION "${qETRC_VERSION_MAJOR}.${qETRC_VERSION_MINOR}.${qETRC_VERSION_PATCH}")
+
+message(STATUS "qETRC version ${qETRC_VERSION}")
+
+project(qETRC LANGUAGES CXX VERSION ${qETRC_VERSION})
+
 
 ################# Qt basic ################
 list(PREPEND CMAKE_PREFIX_PATH $ENV{QTDIR}/lib/cmake)
-message(STATUS "set QTDIR $ENV{QTDIR}")
+message(STATUS "env QTDIR $ENV{QTDIR}")
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS Core Gui Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS PrintSupport)
-
-################# External ################
-
-
 
 ################## main ##################
 set(CMAKE_CXX_STANDARD 17)
@@ -47,8 +49,18 @@ if (NOT ANDROID)
 
     add_subdirectory(external/SARibbon)
     
-    list(APPEND CMAKE_PREFIX_PATH "D:/codes/QtProjects/site-packages/Qt-Advanced-Docking-System/out/install/lib/cmake/qt5advanceddocking")
-    find_package(qt${QT_VERSION_MAJOR}advanceddocking CONFIG REQUIRED)
+    # list(APPEND CMAKE_PREFIX_PATH "D:/codes/QtProjects/site-packages/Qt-Advanced-Docking-System/out/install/lib/cmake/qt5advanceddocking")
+    # find_package(qt${QT_VERSION_MAJOR}advanceddocking CONFIG REQUIRED)
+
+    # try: using FetchContent
+    FetchContent_Declare(
+        ads
+        # GIT_REPOSITORY ${CMAKE_SOURCE_DIR}/external/Qt-Advanced-Docking-System
+        GIT_REPOSITORY https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System.git
+        GIT_TAG 4.0.3
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/external/ads
+    )
+    FetchContent_MakeAvailable(ads)
 
     target_link_libraries(qETRC SARibbonBar)
     target_link_libraries(qETRC ads::qt${QT_VERSION_MAJOR}advanceddocking)

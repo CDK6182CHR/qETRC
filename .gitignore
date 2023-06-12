@@ -73,6 +73,10 @@ customize.xml
 
 !archive-script/*
 
+# submodule / fetch content
+external/ads
+
+
 # CMake
 build
 out

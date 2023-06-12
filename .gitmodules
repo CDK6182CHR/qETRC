@@ -1,6 +1,3 @@
-[submodule "external/Qt-Advanced-Docking-System"]
-	path = external/Qt-Advanced-Docking-System
-	url = https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System
 [submodule "external/SARibbon"]
 	path = external/SARibbon
 	url = https://github.com/czyt1988/SARibbon
