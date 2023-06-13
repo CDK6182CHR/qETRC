@@ -11,7 +11,7 @@ SUFFIX =
 QETRC_ROOT = D:\codes\QtProjects\qETRC\qETRC
 
 # use MSVC build 
-BUILD_DIR = ..\release
+BUILD_DIR = ..\out\install\x64-Release\bin
 BIN_FILE = qETRC.exe
 QT_PROMPT_SCRIPT = C:\Qt\5.15.2\msvc2019_64\bin\qtenv2.bat
 
@@ -27,8 +27,8 @@ PATCH_ARCHIVE = qETRC-win64-patch$(SUFFIX).7z
 ARC_NAME = Qt5.15.2-win32-msvc
 LIB_ROOT = ..\lib
 
-SARIBBON_LIB = $(LIB_ROOT)\SARibbon\$(ARC_NAME)\SARibbonBar.dll
-ADS_LIB = $(LIB_ROOT)\ads\$(ARC_NAME)\qtadvanceddocking.dll
+SARIBBON_LIB = $(BUILD_DIR)\SARibbonBar.dll
+ADS_LIB = $(BUILD_DIR)\qt5advanceddocking.dll
 
 # Other files
 NOTE_FILE = ..\ReleaseNote.pdf

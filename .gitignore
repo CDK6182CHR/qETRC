@@ -81,3 +81,4 @@ external/ads
 build
 out
 CMakeSettings.json
+RC*

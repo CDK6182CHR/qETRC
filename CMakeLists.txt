@@ -27,7 +27,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 file(GLOB_RECURSE qETRC_SOURCES "src/*.cpp")
 
-add_executable(qETRC ${qETRC_SOURCES} rsc/resource.qrc)
+if (NOT ANDROID)
+    set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/qETRC_resource.rc")
+endif()
+
+add_executable(qETRC ${qETRC_SOURCES} rsc/resource.qrc ${app_icon_resource_windows})
 
 target_include_directories(qETRC PRIVATE src/)
 
@@ -39,6 +43,7 @@ if (Qt5PrintSupport_FOUND)
 else()
     message(WARNING "QtPrintSupport not found")
 endif()
+
 
 ################# external libraries ##################
 include(FetchContent)
@@ -58,7 +63,7 @@ if (NOT ANDROID)
         # GIT_REPOSITORY ${CMAKE_SOURCE_DIR}/external/Qt-Advanced-Docking-System
         GIT_REPOSITORY https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System.git
         GIT_TAG 4.0.3
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/external/ads
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/ads
     )
     FetchContent_MakeAvailable(ads)
 
@@ -71,8 +76,6 @@ endif()
 
 if (ANDROID)
     target_compile_definitions(qETRC PUBLIC QETRC_MOBILE QETRC_MOBILE_2)
-else()
-    set(RC_ICONS rsc/icons/desktop-icon.ico)
 endif()
 
 if (MSVC)
