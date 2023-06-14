@@ -544,7 +544,6 @@ void qecmd::ChangePageConfig::redo()
     std::swap(cfg, newcfg);
     cat->commitPageConfigChange(page, repaint);
 }
-#endif
 
 qecmd::ChangePageScale::ChangePageScale(Config& cfg_, const Config& newcfg_,
     bool repaint_, std::shared_ptr<DiagramPage> page, ViewCategory* cat_, QUndoCommand* parent):
@@ -561,3 +560,4 @@ bool qecmd::ChangePageScale::mergeWith(const QUndoCommand* cmd)
     auto* another = static_cast<const qecmd::ChangePageScale*>(cmd);
     return page == another->page;
 }
+#endif

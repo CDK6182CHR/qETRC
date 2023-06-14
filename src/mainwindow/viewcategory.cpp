@@ -802,8 +802,6 @@ qecmd::ApplyConfigToPages::ApplyConfigToPages(QUndoCommand* parent):
     setText(QObject::tr("应用显示设置至运行图页面"));
 }
 
-#endif
-
 qecmd::AddTrainFilter::AddTrainFilter(TrainCollection& coll, ViewCategory* cat, QUndoCommand* parent):
     QUndoCommand(parent), coll(coll), data(), cat(cat)
 {
@@ -865,3 +863,5 @@ void qecmd::UpdateTrainFilter::redo()
     core->swapWith(*data);
     cat->commitUpdateFilter(core);
 }
+
+#endif

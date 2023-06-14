@@ -1460,9 +1460,6 @@ void qecmd::AutoBusiness::commit()
 	cont->commitInterpolation(trains, data);
 }
 
-
-#endif
-
 void qecmd::BatchAutoCorrection::undo()
 {
 	commit();
@@ -1531,3 +1528,5 @@ void qecmd::DragTrainStationTime::commit()
 	std::swap(*itr, data);
 	cont->onTrainStationTimeChanged(train, true);
 }
+
+#endif

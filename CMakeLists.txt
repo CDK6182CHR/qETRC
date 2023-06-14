@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 set(qETRC_VERSION_MAJOR 1)
 set(qETRC_VERSION_MINOR 3)
-set(qETRC_VERSION_PATCH 5)
+set(qETRC_VERSION_PATCH 6)
 set(qETRC_RELEASE_CODE 40)
 
 set(qETRC_VERSION "${qETRC_VERSION_MAJOR}.${qETRC_VERSION_MINOR}.${qETRC_VERSION_PATCH}")
@@ -31,13 +31,40 @@ if (NOT ANDROID)
     set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/qETRC_resource.rc")
 endif()
 
-add_executable(qETRC ${qETRC_SOURCES} rsc/resource.qrc ${app_icon_resource_windows})
+# add_executable(qETRC
+#     ${qETRC_SOURCES}
+#     rsc/resource.qrc
+#     ${app_icon_resource_windows}
+# )
+set(PROJECT_SOURCES ${qETRC_SOURCES} rsc/resource.qrc ${app_icon_resource_windows})
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    qt_add_executable(qETRC
+        MANUAL_FINALIZATION
+        ${PROJECT_SOURCES}
+    )
+# Define target properties for Android with Qt 6 as:
+#    set_property(TARGET QtAndroidCMakeTest APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
+# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
+else()
+    if(ANDROID)
+        add_library(qETRC SHARED
+            ${PROJECT_SOURCES}
+        )
+# Define properties for Android with Qt 5 after find_package() calls as:
+   set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Android_source")
+    else()
+        add_executable(qETRC
+            ${PROJECT_SOURCES}
+        )
+    endif()
+endif()
 
 target_include_directories(qETRC PRIVATE src/)
 
 target_link_libraries(qETRC Qt5::Widgets)
 
-if (Qt5PrintSupport_FOUND)
+if (Qt${QT_VERSION_MAJOR}PrintSupport_FOUND)
     message(STATUS "QtPrintSupport is found")
     target_link_libraries(qETRC Qt${QT_VERSION_MAJOR}::PrintSupport)
 else()
@@ -82,8 +109,19 @@ if (MSVC)
     target_compile_options(qETRC PRIVATE /utf-8 /wd4267 ) 
 endif()
 
-install(TARGETS qETRC)
-#install(IMPORTED_RUNTIME_ARTIFACTS ads::qt${QT_VERSION_MAJOR}advanceddocking)
+if (WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Release")
+    message("disable console for Release buildings.")
+    # disable console for release version
+    set_property(TARGET qETRC PROPERTY WIN32_EXECUTABLE true)
+endif()
+
+install(TARGETS qETRC
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(QtAndroidCMakeTest)
+endif()
 
 
 
