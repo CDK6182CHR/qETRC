@@ -132,10 +132,10 @@ TrainGapAna::TrainGapAna(Diagram& diagram):
 {
 }
 
-std::map<TrainGapTypePair, int> TrainGapAna::globalMinimal(
+std::map<TrainGap::GapTypesV2, int> TrainGapAna::globalMinimal(
         std::shared_ptr<Railway> rail) const
 {
-    std::map<TrainGapTypePair,int> res{};
+    std::map<TrainGap::GapTypesV2,int> res{};
     auto events=diagram.stationEventsForRail(rail);
     for(auto _p=events.begin();_p!=events.end();++_p){
         const RailStationEventList& lst=_p->second;
@@ -143,7 +143,7 @@ std::map<TrainGapTypePair, int> TrainGapAna::globalMinimal(
         TrainGapStatistics stat=countTrainGaps(gaps, _cutSecs);
 
         for (auto q = stat.begin(); q != stat.end(); ++q) {
-            const TrainGapTypePair& tp = q->first;
+            const auto& tp = q->first;
             std::shared_ptr<TrainGap> gap = q->second.begin().operator*();
 
             // 统计全局最小
@@ -204,7 +204,6 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, const
              p->type == TrainEventType::SettledPass) {
              if (p->pos == RailStationEvent::Both) {
                  // 站内所有车被踩一次
-                 // todo: 这个要想清楚，单双线边界情况下什么时候算踩？
                  for (auto& q : down_in) {
                      if (stk.hasAvoidEvent(q.first.get(), p.get()))
                          q.second++;
@@ -226,10 +225,10 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, const
              res.emplace_back(std::make_shared<TrainGap>(lastRelated, p));
              // 2023.06.14: for counter ??
              // 暂时是不行的。因为目前的事件/间隔分析里强烈依赖了站前/站后的标记。
-             //auto lastCounter = stk.preCounterEvent(*p);
-             //if (lastCounter && lastCounter != lastRelated) {
-             //    res.emplace_back(std::make_shared<TrainGap>(lastCounter, p));
-             //}
+             auto lastCounter = stk.preCounterEvent(*p);
+             if (lastCounter && lastCounter != lastRelated) {
+                 res.emplace_back(std::make_shared<TrainGap>(lastCounter, p));
+             }
          }
          if (p->pos & RailStationEvent::Post) {
              // 与站后有交集
@@ -238,10 +237,10 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, const
                  auto lastRelated = stk.postRelatedEvent(*p);
                  res.emplace_back(std::make_shared<TrainGap>(lastRelated, p));
                  // 2023.06.14: for counter ??
-                 //auto lastCounter = stk.postCounterEvent(*p);
-                 //if (lastCounter &&lastCounter != lastRelated) {
-                 //    res.emplace_back(std::make_shared<TrainGap>(lastCounter, p));
-                 //}
+                 auto lastCounter = stk.postCounterEvent(*p);
+                 if (lastCounter &&lastCounter != lastRelated) {
+                     res.emplace_back(std::make_shared<TrainGap>(lastCounter, p));
+                 }
              }
          }
 
@@ -297,17 +296,8 @@ TrainGapStatistics TrainGapAna::countTrainGaps(const TrainGapList &gaps, int cut
     for (const auto& p: gaps) {
         if (p->secs() < cutSecs)
             continue;
-        if (p->position() == RailStationEvent::NoPos) {
-            res.operator[](std::make_pair(p->position(), p->type)).emplace(p);
-        }
-        else {
-            if (p->position() & RailStationEvent::Pre) {
-                res.operator[](std::make_pair(RailStationEvent::Pre, p->type)).emplace(p);
-            }
-            if (p->position() & RailStationEvent::Post) {
-                res.operator[](std::make_pair(RailStationEvent::Post, p->type)).emplace(p);
-            }
-        }
+        // 2023.06.15: for API v2, simply emplace each one.
+        res.operator[](p->type).emplace(p);
     }
     return res;
 }

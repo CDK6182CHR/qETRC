@@ -33,7 +33,7 @@ public:
 //    void setSingleLine(bool on){_singleLine=on;}
     void setCutSecs(int secs){_cutSecs=secs;}
 
-    std::map<TrainGapTypePair,int>
+    std::map<TrainGap::GapTypesV2,int>
         globalMinimal(std::shared_ptr<Railway> rail)const;
 
     /**

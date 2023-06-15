@@ -7,6 +7,8 @@ namespace gapset{
  * 2022.03.12
  * 一组具有特定意义的列车间隔类型分组。
  * 各子类型由其判定函数来定义。
+ * ---------------
+ * 2023.06.15  API V2  (todo)
  */
 class GapGroupAbstract:
         public std::vector<TrainGapTypePair>

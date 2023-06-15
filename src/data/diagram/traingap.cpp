@@ -16,6 +16,8 @@ TrainGap::TrainGap(std::shared_ptr<const RailStationEvent> left_,
         type |= LeftDown;
     if (right->line->dir() == Direction::Down)
         type |= RightDown;
+    type |= posToGapPosLeft(left->pos);
+    type |= posToGapPosRight(right->pos);
 }
 
 RailStationEvent::Positions TrainGap::position() const
@@ -91,9 +93,94 @@ QString TrainGap::typeString() const
 
 QString TrainGap::typeString() const
 {
-    return typeToString(type, position());
+    return typeToString(type);
 }
 
+TrainGap::GapTypesV2 TrainGap::posToGapPosLeft(RailStationEvent::Positions pos)
+{
+    return pos << 8;
+}
+
+TrainGap::GapTypesV2 TrainGap::posToGapPosRight(RailStationEvent::Positions pos)
+{
+    return pos << 10;
+}
+
+RailStationEvent::Positions TrainGap::gapTypeToPosLeft(GapTypesV2 type)
+{
+    return (0b11 & (type >> 8));
+}
+
+RailStationEvent::Positions TrainGap::gapTypeToPosRight(GapTypesV2 type)
+{
+    return (0b11 & (type >> 10));
+}
+
+QString TrainGap::typeToString(const GapTypesV2& type)
+{
+    if (type == Avoid)
+        return QObject::tr("待避");
+    QString text;
+    // 方向描述
+    if (bool(type & LeftDown) != bool(type & RightDown)) {
+        //text = QObject::tr("对向");
+        if (type & LeftDown) {
+            text = QObject::tr("下上");
+        }
+        else {
+            text = QObject::tr("上下");
+        }
+    }
+    else if (type & LeftDown) {
+        text = QObject::tr("下行");
+    }
+    else {
+        text = QObject::tr("上行");
+    }
+
+
+    if (!(type & LeftAppend) && !(type & RightAppend)) {
+        // 两事件都是站前站后贯通，只能是通通
+        return text + QObject::tr("通通");
+    }
+
+
+    // 左车次描述
+    if (type & LeftAppend) {
+        if (isTypeLeftFormer(type))
+            text.append(QObject::tr("到"));
+        else
+            text.append(QObject::tr("发"));
+    }
+    else {
+        text.append(QObject::tr("通"));
+    }
+    //右车次描述
+    if (type & RightAppend) {
+        if (isTypeRightFormer(type))
+            text.append(QObject::tr("到"));
+        else
+            text.append(QObject::tr("发"));
+    }
+    else {
+        text.append(QObject::tr("通"));
+    }
+    return text;
+}
+
+QString TrainGap::prefixPosToString(const GapTypesV2& type)
+{
+    auto pos = (gapTypeToPosLeft(type) & gapTypeToPosRight(type));
+    switch (pos) {
+    case RailStationEvent::Pre:return QObject::tr("站前");
+    case RailStationEvent::Post:return QObject::tr("站后");
+    case RailStationEvent::Both:return QObject::tr("前后");
+    case RailStationEvent::NoPos:return QObject::tr("对侧");
+    default:return "";
+    }
+}
+
+#if 0
 QString TrainGap::typeToString(const GapTypes& type, const RailStationEvent::Positions& pos)
 {
     // 特殊规则
@@ -147,12 +234,13 @@ QString TrainGap::typeToString(const GapTypes& type, const RailStationEvent::Pos
     }
     return text;
 }
+#endif
 
-QString TrainGap::posTypeToString(const GapTypes& type, const RailStationEvent::Positions& pos)
+QString TrainGap::posTypeToString(const GapTypesV2& type)
 {
-    QString text = RailStationEvent::posToString(pos);
+    QString text = prefixPosToString(type);
     if (!text.isEmpty())text.append('\n');
-    text.append(typeToString(type, pos));
+    text.append(typeToString(type));
     return text;
 }
 
@@ -168,16 +256,16 @@ bool TrainGap::isRightFormer() const
         (rightDir() == Direction::Up && (right->pos & RailStationEvent::Post));
 }
 
-bool TrainGap::isTypeLeftFormer(const GapTypes& type, const RailStationEvent::Positions& pos)
+bool TrainGap::isTypeLeftFormer(const GapTypesV2& type)
 {
-    return  ((type & LeftDown) && (pos & RailStationEvent::Pre)) ||
-        ( !(type & LeftDown) && (pos & RailStationEvent::Post));
+    return  ((type & LeftDown) && (type & LeftPre)) ||
+        ( !(type & LeftDown) && (type & LeftPost));
 }
 
-bool TrainGap::isTypeRightFormer(const GapTypes& type, const RailStationEvent::Positions& pos)
+bool TrainGap::isTypeRightFormer(const GapTypesV2& type)
 {
-    return  ((type & RightDown) && (pos & RailStationEvent::Pre)) ||
-        (!(type & RightDown) && (pos & RailStationEvent::Post));
+    return  ((type & RightDown) && (type & RightPre)) ||
+        (!(type & RightDown) && (type & RightPost));
 }
 
 
@@ -192,7 +280,7 @@ bool TrainGap::ltSecs(const std::shared_ptr<TrainGap>& gap1,
     return gap1->secs() < gap2->secs();
 }
 
-std::optional<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>> 
+std::optional<TrainGap::GapTypesV2> 
     TrainGap::gapTypeBetween(const RailStationEventBase& left, 
         const RailStationEventBase& right, bool singleLine)
 {
@@ -202,12 +290,13 @@ std::optional<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>>
         // 双线反向两车次不构成间隔
         return std::nullopt;
     }
-    else if (pos == RailStationEvent::NoPos) {
-        // 空间不相干事件不构成间隔
-        return std::nullopt;
-    }
+    //2023.06.15: for gap type V2, no this condition
+    //else if (pos == RailStationEvent::NoPos) {
+    //    // 空间不相干事件不构成间隔
+    //    return std::nullopt;
+    //}
 
-    GapTypes type = NoAppend;
+    GapTypesV2 type = NoAppend;
     if (left.hasAppend())
         type |= LeftAppend;
     if (right.hasAppend())
@@ -216,13 +305,16 @@ std::optional<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>>
         type |= LeftDown;
     if (right.dir == Direction::Down)
         type |= RightDown;
-    return std::make_pair(pos, type);
+    type |= posToGapPosLeft(left.pos);
+    type |= posToGapPosRight(right.pos);
+    return type;
 }
 
-typename TrainGap::GapTypes 
+typename TrainGap::GapTypesV2 
     TrainGap::generateType(Direction left_dir, Direction right_dir, bool left_append, bool right_append)
 {
-    GapTypes res = NoAppend;
+    // MIND: not modified for V2!!!
+    GapTypesV2 res = NoAppend;
     if (left_dir == Direction::Down)
         res |= LeftDown;
     if (right_dir == Direction::Down)
@@ -235,8 +327,8 @@ typename TrainGap::GapTypes
     return res;
 }
 
-typename TrainGap::GapTypes 
-TrainGap::genDirGapType(Direction left_dir, Direction right_dir, GapTypes base)
+typename TrainGap::GapTypesV2
+TrainGap::genDirGapType(Direction left_dir, Direction right_dir, GapTypesV2 base)
 {
     if (left_dir == Direction::Down)
         base |= LeftDown;
@@ -245,10 +337,10 @@ TrainGap::genDirGapType(Direction left_dir, Direction right_dir, GapTypes base)
     return base;
 }
 
-std::vector<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>> 
+std::vector<TrainGap::GapTypesV2> 
     TrainGap::allPossibleGaps(bool singleLine)
 {
-    std::vector<GapTypes> baseTypes;
+    std::vector<GapTypesV2> baseTypes;
     auto appendTypes = { NoAppend,LeftAppend,RightAppend,BothAppend };
     if (singleLine) {
         for (auto tp : appendTypes) {
@@ -267,10 +359,15 @@ std::vector<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>>
         }
     }
 
-    std::vector<std::pair<RailStationEvent::Positions, TrainGap::GapTypes>> res;
-    for (auto t : { RailStationEventBase::Pre,RailStationEventBase::Post }) {
-        for (auto s : baseTypes) {
-            res.emplace_back(t, s);
+    // 2023.06.15  API V2
+    // 产生所有可能的间隔类型时，并不考虑Pre|Post这种，通过类型。
+    // 但分析/匹配的时候，需要特别注意。
+    std::vector<TrainGap::GapTypesV2> res;
+    for (auto a : { TrainGap::LeftPre, TrainGap::LeftPost }) {
+        for (auto b : { TrainGap::RightPre,TrainGap::RightPost }) {
+            for (auto s : baseTypes) {
+                res.emplace_back(a | b | s);
+            }
         }
     }
     return res;
