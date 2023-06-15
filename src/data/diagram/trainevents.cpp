@@ -158,6 +158,7 @@ QString RailStationEventBase::posToString(const Positions& pos)
 	case Pre:return QObject::tr("站前");
 	case Post:return QObject::tr("站后");
 	case Both:return QObject::tr("前后");
+	//case NoPos:return QObject::tr("对向");
 	default:return "";
 	}
 }

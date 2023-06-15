@@ -25,7 +25,14 @@ namespace _gapdetail {
          * @brief 站前事件中，与所给事件有关的上一个事件。
          */
         std::shared_ptr<const RailStationEvent> preRelatedEvent(const RailStationEvent& ev)const;
-        std::shared_ptr<const RailStationEvent> postRelatedEvent(const RailStationEvent& ev);
+        std::shared_ptr<const RailStationEvent> postRelatedEvent(const RailStationEvent& ev)const;
+
+        /**
+         * 2023.06.14 Experimental: the COUNTER-place event related to the pre-station event, i.e. the post-station event.
+         * The difference from preRelatedEvent is that, here the preSingle is not ensured to be valid.
+         */
+        std::shared_ptr<const RailStationEvent> preCounterEvent(const RailStationEvent& ev)const;
+        std::shared_ptr<const RailStationEvent> postCounterEvent(const RailStationEvent& ev)const;
 
         /**
          * 判断两事件之间是否存在待避。对向判断的标准是：
@@ -72,7 +79,7 @@ namespace _gapdetail {
         }
     }
 
-    std::shared_ptr<const RailStationEvent> EventStackTop::postRelatedEvent(const RailStationEvent& ev)
+    std::shared_ptr<const RailStationEvent> EventStackTop::postRelatedEvent(const RailStationEvent& ev)const
     {
         if (*postSingle) {
             int secs1 = downLatterLast->secsTo(ev),
@@ -90,6 +97,16 @@ namespace _gapdetail {
         else {
             return ev.line->dir() == Direction::Down ? downLatterLast : upFormerLast;
         }
+    }
+
+    std::shared_ptr<const RailStationEvent> EventStackTop::preCounterEvent(const RailStationEvent& ev) const
+    {
+        return postSingle.has_value() ? postRelatedEvent(ev) : nullptr;
+    }
+
+    std::shared_ptr<const RailStationEvent> EventStackTop::postCounterEvent(const RailStationEvent& ev) const
+    {
+        return preSingle.has_value() ? preRelatedEvent(ev) : nullptr;
     }
 
     bool EventStackTop::hasAvoidEvent(const RailStationEvent* stay, const RailStationEvent* leave)
@@ -143,7 +160,7 @@ std::map<TrainGapTypePair, int> TrainGapAna::globalMinimal(
 
 TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, const TrainFilterCore &filter, std::shared_ptr<const RailStation> st) const
 {
-    // 此版本尝试使用内建的单双线数据。
+     // 此版本尝试使用内建的单双线数据。
      // 目前的思路是，考虑在单线基础上，筛选一下事件的相关性。
      TrainGapList res;
 
@@ -207,6 +224,12 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, const
              // 2022.09.10: 如果出现Pre，那么pre应该是存在的，这么直接*应该不会遭起
              auto lastRelated = stk.preRelatedEvent(*p);
              res.emplace_back(std::make_shared<TrainGap>(lastRelated, p));
+             // 2023.06.14: for counter ??
+             // 暂时是不行的。因为目前的事件/间隔分析里强烈依赖了站前/站后的标记。
+             //auto lastCounter = stk.preCounterEvent(*p);
+             //if (lastCounter && lastCounter != lastRelated) {
+             //    res.emplace_back(std::make_shared<TrainGap>(lastCounter, p));
+             //}
          }
          if (p->pos & RailStationEvent::Post) {
              // 与站后有交集
@@ -214,6 +237,11 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, const
                  // 这个条件是针对通通的情况，防止重复
                  auto lastRelated = stk.postRelatedEvent(*p);
                  res.emplace_back(std::make_shared<TrainGap>(lastRelated, p));
+                 // 2023.06.14: for counter ??
+                 //auto lastCounter = stk.postCounterEvent(*p);
+                 //if (lastCounter &&lastCounter != lastRelated) {
+                 //    res.emplace_back(std::make_shared<TrainGap>(lastCounter, p));
+                 //}
              }
          }
 
