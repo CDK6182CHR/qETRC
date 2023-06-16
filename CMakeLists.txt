@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.14)
 
 set(qETRC_VERSION_MAJOR 1)
 set(qETRC_VERSION_MINOR 3)
-set(qETRC_VERSION_PATCH 6)
-set(qETRC_RELEASE_CODE 40)
+set(qETRC_VERSION_PATCH 7)
+#set(qETRC_RELEASE_CODE 40)
 
 set(qETRC_VERSION "${qETRC_VERSION_MAJOR}.${qETRC_VERSION_MINOR}.${qETRC_VERSION_PATCH}")
 
@@ -13,8 +13,8 @@ project(qETRC LANGUAGES CXX VERSION ${qETRC_VERSION})
 
 
 ################# Qt basic ################
-list(PREPEND CMAKE_PREFIX_PATH $ENV{QTDIR}/lib/cmake)
-message(STATUS "env QTDIR $ENV{QTDIR}")
+#list(PREPEND CMAKE_PREFIX_PATH $ENV{QTDIR}/lib/cmake)
+#message(STATUS "env QTDIR $ENV{QTDIR}")
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS Core Gui Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS PrintSupport)

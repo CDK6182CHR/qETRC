@@ -2,6 +2,8 @@
 
 Electronic Train Running Chart implemented with Qt
 
+> To build this project from source code, see [build](doc/build.md)
+
 本项目是对此前的[pyETRC](https://github.com/CDK6182CHR/train_graph)项目的C++重构版本，工程名暂定为qETRC。本项目基于GPLv3协议开放源代码，在协议允许范围内，作者保留一切权利和最终解释权。
 
 联系方式：mxy0268@qq.com
@@ -12,15 +14,7 @@ Electronic Train Running Chart implemented with Qt
 
 ## 环境
 
-本项目的开发环境：
-
-- Windows 10 x64
-- Qt 5.15.2  MSVC 2019 x64
-
-对环境的已知要求：
-
-- Qt5
-- **支持C++17标准**。已知的使用的C++17的特性包括`std::optional` `std::string_view`以及`if constexpr`等。
+自2023年6月16日起，改为使用CMake构建，原基于qmake的构建流程作废。详见[build](doc/build.md)
 
 
 
