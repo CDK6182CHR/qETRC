@@ -87,12 +87,12 @@ public:
 
 
 class CalculationLogGap: public CalculationLogStation {
-    TrainGapTypePair _gapType;
+    typename TrainGap::GapTypesV2 _gapType;
     std::shared_ptr<RailStation> _conflictStation;
     std::shared_ptr<RailStationEvent> _event;
 public:
     CalculationLogGap(Reason reason, std::shared_ptr<RailStation> station,
-        const QTime time, ModifiedField field, TrainGapTypePair gapType,
+        const QTime time, ModifiedField field, typename TrainGap::GapTypesV2 gapType,
         std::shared_ptr<RailStation> conflictStation,
         std::shared_ptr<RailStationEvent> event_);
     virtual QString reasonString()const override;

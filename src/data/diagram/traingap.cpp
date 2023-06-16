@@ -116,6 +116,25 @@ RailStationEvent::Positions TrainGap::gapTypeToPosRight(GapTypesV2 type)
     return (0b11 & (type >> 10));
 }
 
+typename TrainGap::GapTypesV2 TrainGap::setLeftPos(GapTypesV2 type, RailStationEvent::Positions pos)
+{
+    type &= ~LeftPositionMask;
+    type |= posToGapPosLeft(pos);
+    return type;
+}
+
+typename TrainGap::GapTypesV2 TrainGap::setRightPos(GapTypesV2 type, RailStationEvent::Positions pos)
+{
+    type &= ~RightPositionMask;
+    type |= posToGapPosRight(pos);
+    return type;
+}
+
+bool TrainGap::isSamePositionType(GapTypesV2 type)
+{
+    return gapTypeToPosLeft(type) & gapTypeToPosRight(type);
+}
+
 QString TrainGap::typeToString(const GapTypesV2& type)
 {
     if (type == Avoid)
@@ -238,6 +257,11 @@ QString TrainGap::typeToString(const GapTypes& type, const RailStationEvent::Pos
 
 QString TrainGap::posTypeToString(const GapTypesV2& type)
 {
+    // special cases
+    switch (type) {
+    case Avoid: return QObject::tr("待避");
+    }
+
     QString text = prefixPosToString(type);
     if (!text.isEmpty())text.append('\n');
     text.append(typeToString(type));

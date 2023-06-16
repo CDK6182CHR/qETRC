@@ -296,8 +296,30 @@ TrainGapStatistics TrainGapAna::countTrainGaps(const TrainGapList &gaps, int cut
     for (const auto& p: gaps) {
         if (p->secs() < cutSecs)
             continue;
-        // 2023.06.15: for API v2, simply emplace each one.
-        res.operator[](p->type).emplace(p);
+        // 2023.06.15: for API v2
+        // 此处对于站前站后都存在的间隔，应当手动分开。注意如果存在这种情况，只考虑同侧间隔。
+        auto posLeft = p->gapTypeToPosLeft(p->type);
+        auto posRight = p->gapTypeToPosRight(p->type);
+        auto posCross = (posLeft & posRight);
+        if (posCross == RailStationEvent::Both) {
+            // 拆解事件为一个站前一个站后
+            auto p_post = std::make_shared<TrainGap>(*p);   // copy construct
+            p_post->type &= ~TrainGap::PreMask;
+            auto p_pre = std::make_shared<TrainGap>(*p);
+            p_pre->type &= ~TrainGap::PostMask;
+            res.operator[](p_pre->type).emplace(p_pre);
+            res.operator[](p_post->type).emplace(p_post);
+            //qDebug() << "Splitted type: " << p_pre->type << ", " << p_post->type << Qt::endl;
+        }
+        else if (posLeft==RailStationEvent::Both || posRight==RailStationEvent::Both) {
+            // 对于一个到一个通这种情况也需要特别对待，否则他们type的hash是不同的。
+            auto p_copy = std::make_shared<TrainGap>(*p);
+            p_copy->type = TrainGap::setLeftPos(p_copy->type, posCross);
+            p_copy->type = TrainGap::setRightPos(p_copy->type, posCross);
+        }
+        else {
+            res.operator[](p->type).emplace(p);
+        }
     }
     return res;
 }

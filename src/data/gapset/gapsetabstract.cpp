@@ -13,7 +13,7 @@ void gapset::GapSetAbstract::setSingleLineAndBuild(bool on)
 
 std::map<const gapset::GapGroupAbstract *, int>
     gapset::GapSetAbstract::minimalGapByGroup(
-        const std::map<TrainGapTypePair, int> &mingap, int minSecs, int maxSecs) const
+        const std::map<TrainGapType, int> &mingap, int minSecs, int maxSecs) const
 {
     std::map<const GapGroupAbstract*,int> res{};
     for(auto p=mingap.begin();p!=mingap.end();++p){
@@ -46,7 +46,7 @@ std::map<const gapset::GapGroupAbstract *, int>
 }
 
 void gapset::GapSetAbstract::setConstraintFromMinimal(
-        const std::map<TrainGapTypePair, int> &mingap,
+        const std::map<TrainGapType, int> &mingap,
         int minSecs, int maxSecs)
 {
     auto data=minimalGapByGroup(mingap,minSecs,maxSecs);

@@ -122,7 +122,11 @@ bool StationEventAxis::isConflict(const RailStationEventBase& left,
 		// 构成相干事件，检查间隔是否符合要求。
 		// 注意约定正好相等的情况是符合要求（不冲突）的
 		int secs = qeutil::secsTo(left.time, right.time);
-		if (secs < constraint.at(*gap_type)) {
+		//if (secs < constraint.at(*gap_type)) {
+		//	return true;
+		//}
+		// API V2
+		if (constraint.checkConflict(*gap_type, secs)) {
 			return true;
 		}
 	}

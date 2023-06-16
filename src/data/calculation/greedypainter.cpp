@@ -235,7 +235,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 					// 左冲突事件，将时刻弄到与当前不冲突的地方
 					auto type = TrainGap::gapTypeBetween(*ev_conf, ev_start, railint->isSingleRail());
 					qDebug() << "左冲突：" << ev_conf->toString() << Qt::endl;
-					int gap_min = _constraints.at(*type);
+					int gap_min = _constraints.maxConstraint(*type);   
 					auto trial_tm = ev_conf->time.addSecs(gap_min);
 					tot_delay += qeutil::secsTo(ev_start.time, trial_tm);
 					ev_start.time = trial_tm;
@@ -388,7 +388,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 			}
 
 			int_secs -= node->stop;
-			TrainGapTypePair type;
+			TrainGap::GapTypesV2 type;
 			if (qeutil::timeCompare(tm_to, to_conf->time)) {
 				// 右冲突事件，设置出发时间使得到达时间为冲突时刻的时间
 				auto trial_tm = to_conf->time.addSecs(-int_secs);
@@ -399,7 +399,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 			else {
 				// 左冲突事件，将时刻弄到与当前不冲突的地方
 				type = *TrainGap::gapTypeBetween(*to_conf, ev_stop, railint->isSingleRail());
-				int gap_min = _constraints.at(type);
+				int gap_min = _constraints.maxConstraint(type);   
 
 				QTime trial_arr = to_conf->time.addSecs(gap_min);
 				QTime trial_dep = trial_arr.addSecs(-int_secs);
@@ -509,7 +509,7 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 				else {
 					// 反向右冲突事件，将时刻弄到与当前不冲突的地方
 					auto type = TrainGap::gapTypeBetween(ev_arrive, *ev_conf, railint->isSingleRail());
-					int gap_min = _constraints.at(*type);
+					int gap_min = _constraints.maxConstraint(*type);   
 					auto trial_tm = ev_conf->time.addSecs(-gap_min);
 					tot_delay += qeutil::secsTo(trial_tm, ev_arrive.time);
 					ev_arrive.time = trial_tm;
@@ -663,7 +663,7 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 			}
 
 			int_secs -= node->start;
-			TrainGapTypePair type;
+			TrainGap::GapTypesV2 type;
 			if (qeutil::timeCompare(to_conf->time, tm_dep)) {
 				// 反向左冲突事件，设置出发时间使得到达时间为冲突时刻的时间
 				auto tm_trial = to_conf->time.addSecs(int_secs);
@@ -674,7 +674,7 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 			else {
 				// 反向右冲突事件，将时刻弄到与当前不冲突的地方
 				type = *TrainGap::gapTypeBetween(ev_depart, *to_conf, railint->isSingleRail());
-				int gap_min = _constraints.at(type);
+				int gap_min = _constraints.maxConstraint(type);  
 				QTime trial_dep = to_conf->time.addSecs(-gap_min);
 				QTime trial_arr = trial_dep.addSecs(int_secs);
 				tot_delay += qeutil::secsTo(trial_arr, ev_arrive.time);

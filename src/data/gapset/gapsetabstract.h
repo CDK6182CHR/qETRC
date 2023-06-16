@@ -15,8 +15,9 @@ class GapSetAbstract:
         public std::vector<std::unique_ptr<GapGroupAbstract>>
 {
 protected:
+    using TrainGapType = TrainGap::GapTypesV2;
     //bool _singleLine=false;
-    std::vector<TrainGapTypePair> _remainTypes;
+    std::vector<TrainGapType> _remainTypes;
 
 public:
     GapSetAbstract()=default;
@@ -27,7 +28,7 @@ public:
     /**
      * 设置是否单线；如果改变了，则重新构建set。
      */
-    void setSingleLineAndBuild(bool on);
+    //void setSingleLineAndBuild(bool on);
 
 
     /**
@@ -53,10 +54,10 @@ public:
      * 无数据的实现为minSecs
      */
     std::map<const GapGroupAbstract*, int>
-        minimalGapByGroup(const std::map<TrainGapTypePair,int>& mingap,
+        minimalGapByGroup(const std::map<TrainGapType,int>& mingap,
                           int minSecs, int maxSecs)const;
 
-    void setConstraintFromMinimal(const std::map<TrainGapTypePair,int>& mingap,
+    void setConstraintFromMinimal(const std::map<TrainGapType,int>& mingap,
                                   int minSecs, int maxSecs);
 
     virtual ~GapSetAbstract()=default;

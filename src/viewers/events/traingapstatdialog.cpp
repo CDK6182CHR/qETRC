@@ -42,8 +42,8 @@ void TrainGapStatModel::setupModel()
     setRowCount(stat.size());
     int row=0;
     for (auto p=stat.begin();p!=stat.end();++p){
-        setItem(row,ColPos,new SI(RailStationEvent::posToString(p->first.first)));
-        setItem(row,ColType,new SI(TrainGap::typeToString(p->first.second,p->first.first)));
+        setItem(row,ColPos,new SI(TrainGap::posTypeToString(p->first)));
+        setItem(row,ColType,new SI(TrainGap::typeToString(p->first)));
         auto * it=new SI;
         it->setData(p->second.begin()->operator*().secs(),Qt::EditRole);
         setItem(row,ColValue,it);
@@ -147,7 +147,7 @@ void TrainGapSummaryModel::setupHeader()
         auto gaps = ana.calTrainGaps(lst, *filter, _p->first);
         TrainGapStatistics stat = ana.countTrainGaps(gaps, cutSecs);
         for (auto q = stat.begin(); q != stat.end(); ++q) {
-            const TrainGapTypePair& tp = q->first;
+            const typename TrainGap::GapTypesV2& tp = q->first;
             std::shared_ptr<TrainGap> gap = q->second.begin().operator*();
 
             // 统计全局最小
@@ -175,13 +175,13 @@ void TrainGapSummaryModel::setupHeader()
     for (int i = ColOTHERS; i < nextCol; i++)
         labels.append("");
     for (auto p = typeCols.begin(); p != typeCols.end(); ++p) {
-        labels[p->second] = TrainGap::posTypeToString(p->first.second, p->first.first);
+        labels[p->second] = TrainGap::posTypeToString(p->first);
     }
     setHorizontalHeaderLabels(labels);
 }
 
 void TrainGapSummaryModel::setupRow(int row, const QString& text, 
-    const std::map<TrainGapTypePair, int>& val)
+    const std::map<TrainGap::GapTypesV2, int>& val)
 {
     using SI = QStandardItem;
     setItem(row, ColStation, new SI(text));

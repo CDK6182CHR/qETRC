@@ -9,10 +9,10 @@ namespace gapset {
 class TransparentGroup:
         public GapGroupAbstract
 {
-    TrainGapTypePair _type;
+    typename TrainGap::GapTypesV2 _type;
 public:
-    TransparentGroup(const TrainGapTypePair& type);
-    bool matches(const TrainGapTypePair &type) const override;
+    TransparentGroup(const TrainGapType& type);
+    bool matches(const TrainGapType &type) const override;
 };
 
 class TransparentSet:

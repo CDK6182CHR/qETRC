@@ -11,11 +11,13 @@ namespace gapset{
  * 2023.06.15  API V2  (todo)
  */
 class GapGroupAbstract:
-        public std::vector<TrainGapTypePair>
+    public std::vector<TrainGap::GapTypesV2>
 {
     QString _name;
     int _limit=6*60;
     QString _description;
+protected:
+    using TrainGapType = typename TrainGap::GapTypesV2;
 public:
     GapGroupAbstract(const QString& name, const QString& description=""):
         _name(name),_description(description){}
@@ -27,7 +29,7 @@ public:
     const auto& description()const{return _description;}
     void setDescription(const QString& d){_description=d;}
 
-    virtual bool matches(const TrainGapTypePair& type)const=0;
+    virtual bool matches(const typename TrainGap::GapTypesV2& type)const=0;
 
     virtual ~GapGroupAbstract()=default;
 };
@@ -39,7 +41,7 @@ public:
 class GapGroupBasic: public GapGroupAbstract{
 public:
     using GapGroupAbstract::GapGroupAbstract;
-    virtual bool matches(const TrainGapTypePair&)const override{return true;}
+    virtual bool matches(const typename TrainGap::GapTypesV2&)const override{return true;}
 };
 
 }

@@ -61,9 +61,9 @@ class TrainGapSummaryModel :
     const std::map<std::shared_ptr<RailStation>, RailStationEventList> events;
     const TrainFilterCore* filter;
 
-    std::map<TrainGapTypePair, int> globalMin;
-    std::map<TrainGapTypePair, int> typeCols;
-    std::map<std::shared_ptr<RailStation>, std::map<TrainGapTypePair, int>> localMin;
+    std::map<TrainGap::GapTypesV2, int> globalMin;
+    std::map<TrainGap::GapTypesV2, int> typeCols;
+    std::map<std::shared_ptr<RailStation>, std::map<TrainGap::GapTypesV2, int>> localMin;
     int nextCol;
 
     //bool useSingle = false;
@@ -91,7 +91,7 @@ private:
     void setupHeader();
 
     void setupRow(int row, const QString& text,
-        const std::map<TrainGapTypePair, int>& val);
+        const std::map<TrainGap::GapTypesV2, int>& val);
 };
 
 class TimeIntervalDelegate;

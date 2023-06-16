@@ -15,6 +15,9 @@ void CRSet::buildSet()
     emplace_back(std::make_unique<GroupTrack>());
     emplace_back(std::make_unique<GroupMeet>());
     emplace_back(std::make_unique<GroupArrive>());
+    emplace_back(std::make_unique<GroupDepart>());
+    emplace_back(std::make_unique<GroupArrDep>());
+    emplace_back(std::make_unique<GroupDepArr>());
 
     // 2022.09.11: 暂定一律单线
     auto alltypes=TrainGap::allPossibleGaps(true);

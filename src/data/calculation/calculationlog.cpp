@@ -58,7 +58,7 @@ QString CalculationLogBasic::reasonString() const
 }
 
 CalculationLogGap::CalculationLogGap(Reason reason, std::shared_ptr<RailStation> station, const QTime time,
-    ModifiedField field, TrainGapTypePair gapType, std::shared_ptr<RailStation> conflictStation,
+    ModifiedField field, TrainGap::GapTypesV2 gapType, std::shared_ptr<RailStation> conflictStation,
     std::shared_ptr<RailStationEvent> event_) :
     CalculationLogStation(reason, station, time, field), _gapType(gapType), _conflictStation(conflictStation),
     _event(event_)
@@ -69,7 +69,7 @@ QString CalculationLogGap::reasonString() const
 {
     if (_reason == GapConflict) {
         return QObject::tr("%1站%2间隔冲突").arg(_conflictStation->name.toSingleLiteral(),
-            TrainGap::typeToString(_gapType.second, _gapType.first));
+            TrainGap::typeToString(_gapType));
     }
     else {
         return QObject::tr("ERROR: Non-gap type");

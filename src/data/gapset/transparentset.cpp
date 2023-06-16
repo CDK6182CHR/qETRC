@@ -1,16 +1,22 @@
 ﻿#include "transparentset.h"
 
 
-gapset::TransparentGroup::TransparentGroup(const TrainGapTypePair &type):
-    GapGroupAbstract(TrainGap::posTypeToString(type.second,type.first).replace("\n"," ")),
+gapset::TransparentGroup::TransparentGroup(const TrainGapType &type):
+    GapGroupAbstract(TrainGap::posTypeToString(type).replace("\n"," ")),
     _type(type)
 {
 
 }
 
-bool gapset::TransparentGroup::matches(const TrainGapTypePair &type) const
+bool gapset::TransparentGroup::matches(const TrainGapType &type) const
 {
-    return type==this->_type;
+    // 2023.06.16  for API V2: 
+    // 匹配分为两部分。低位部分（API V1部分）需要完全相等；
+    // 高位部分（Position部分）只要两段皆有非零交集即可。
+    auto cross = type & _type;
+    return (_type & TrainGap::BasicMask) == (type & TrainGap::BasicMask) &&
+        bool(cross & TrainGap::LeftPositionMask) &&
+        bool(cross & TrainGap::RightPositionMask);
 }
 
 void gapset::TransparentSet::buildSet()

@@ -34,10 +34,17 @@ struct TrainGap{
         RightAppend = 0b00010,
         BothAppend = LeftAppend | RightAppend,
         Avoid = 0b10000,
-        LeftPre=0x0100,
-        LeftPost=0x0200,
-        RightPre=0x0400,
-        RightPost=0x0800,
+        LeftPre = 0x0100,
+        LeftPost = 0x0200,
+        RightPre = 0x0400,
+        RightPost = 0x0800,
+
+        // masks for part comparison
+        BasicMask = 0x00FF,
+        LeftPositionMask = 0x0300,
+        RightPositionMask = 0x0C00,
+        PreMask = LeftPre | RightPre,
+        PostMask = LeftPost | RightPost,
     };
     Q_DECLARE_FLAGS(GapTypesV2, GapType)
 
@@ -86,6 +93,15 @@ struct TrainGap{
     
     static RailStationEvent::Positions gapTypeToPosLeft(GapTypesV2 type);
     static RailStationEvent::Positions gapTypeToPosRight(GapTypesV2 type);
+
+    static GapTypesV2 setLeftPos(GapTypesV2 type, RailStationEvent::Positions pos);
+    static GapTypesV2 setRightPos(GapTypesV2 type, RailStationEvent::Positions pos);
+
+    /**
+     * 2023.06.16  判断是否为同侧间隔（站前站后）。
+     * 如果两边的位置有交集，一律优先判为同侧。（即：通发可算作同侧）
+     */
+    static bool isSamePositionType(GapTypesV2 type);
 
     //static QString typeToString(const GapTypes& type, const RailStationEvent::Positions& pos);
 

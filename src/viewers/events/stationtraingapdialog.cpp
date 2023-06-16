@@ -72,7 +72,7 @@ void StationTrainGapModel::setupModel()
         it = new SI;
         it->setData(ev.secs(), Qt::EditRole);
         setItem(i, ColPeriod, it);
-        setItem(i, ColPos, new SI(RailStationEvent::posToString(ev.position())));
+        setItem(i, ColPos, new SI(TrainGap::prefixPosToString(ev.type)));
         setItem(i, ColLeftTrain, new SI(ev.left->line->train()->trainName().full()));
         setItem(i, ColLeftTime, new SI(ev.left->time.toString("hh:mm:ss")));
         setItem(i, ColRightTrain, new SI(ev.right->line->train()->trainName().full()));
@@ -93,20 +93,20 @@ bool StationTrainGapModel::isMinimumGap(const TrainGap& gap) const
     if (gap.position() == RailStationEvent::NoPos) {
         // 注意由于存在截断秒数，这样去查找可能查出来是空的
         // 但找出来的，value一定不是空的
-        if (auto p = stat.find(std::make_pair(gap.position(), gap.type)); p != stat.end()) {
+        if (auto p = stat.find(gap.type); p != stat.end()) {
             return gap.secs() == p->second.begin()->operator*().secs();
         }
         else return false;
     }
     // 不是NoPos的：按两个边界分别找
     if (gap.position() & RailStationEvent::Pre){
-        if (auto p = stat.find(std::make_pair(RailStationEvent::Pre, gap.type)); p != stat.end()) {
+        if (auto p = stat.find(gap.type); p != stat.end()) {
             if (p->second.begin()->operator*().secs() == gap.secs())
                 return true;
         }
     }
     if (gap.position() & RailStationEvent::Post) {
-        if (auto p = stat.find(std::make_pair(RailStationEvent::Post, gap.type)); p != stat.end()) {
+        if (auto p = stat.find(gap.type); p != stat.end()) {
             if (p->second.begin()->operator*().secs() == gap.secs())
                 return true;
         }
