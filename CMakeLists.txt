@@ -20,7 +20,7 @@ find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS Core Gui Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS PrintSupport)
 
 ################## main ##################
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

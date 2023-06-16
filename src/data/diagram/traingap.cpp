@@ -98,22 +98,22 @@ QString TrainGap::typeString() const
 
 TrainGap::GapTypesV2 TrainGap::posToGapPosLeft(RailStationEvent::Positions pos)
 {
-    return pos << 8;
+    return (TrainGap::GapTypesV2) (pos << 8);
 }
 
 TrainGap::GapTypesV2 TrainGap::posToGapPosRight(RailStationEvent::Positions pos)
 {
-    return pos << 10;
+    return TrainGap::GapTypesV2(pos << 10);
 }
 
 RailStationEvent::Positions TrainGap::gapTypeToPosLeft(GapTypesV2 type)
 {
-    return (0b11 & (type >> 8));
+    return RailStationEvent::Positions(0b11 & (type >> 8));
 }
 
 RailStationEvent::Positions TrainGap::gapTypeToPosRight(GapTypesV2 type)
 {
-    return (0b11 & (type >> 10));
+    return RailStationEvent::Positions(0b11 & (type >> 10));
 }
 
 typename TrainGap::GapTypesV2 TrainGap::setLeftPos(GapTypesV2 type, RailStationEvent::Positions pos)

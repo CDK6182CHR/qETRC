@@ -58,6 +58,7 @@
 
 #include "DockAreaWidget.h"
 #include <DockManager.h>
+#include <AutoHideDockContainer.h>
 
 #include "editors/railstationwidget.h"
 #include "editors/routing/routingwidget.h"
@@ -88,6 +89,7 @@ MainWindow::MainWindow(QWidget* parent)
 	ads::CDockManager::setConfigFlag(ads::CDockManager::OpaqueSplitterResize, true);
 	ads::CDockManager::setConfigFlag(ads::CDockManager::XmlCompressionEnabled, false);
 	ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
+	ads::CDockManager::setAutoHideConfigFlags(ads::CDockManager::DefaultAutoHideConfig);
 	manager = new ads::CDockManager(this);
 	_diagram.readDefaultConfigs();
 	undoStack->setUndoLimit(200);
@@ -552,6 +554,7 @@ void MainWindow::initDockWidgets()
 			this, &MainWindow::activatePageWidget);
 	}
 	auto* area = manager->addDockWidget(ads::LeftDockWidgetArea, dock);
+	//auto autoHideArea = manager->addAutoHideDockWidget(ads::SideBarLeft, dock);
 
 	// 历史记录
 	if constexpr (true) {
@@ -562,6 +565,7 @@ void MainWindow::initDockWidgets()
 		dock->setWidget(view);
 		undoDock = dock;
 		area = manager->addDockWidget(ads::BottomDockWidgetArea, dock, area);
+		//manager->addAutoHideDockWidget(ads::SideBarLeft, dock);
 }
 
 #ifdef Q_OS_ANDROID
@@ -640,7 +644,9 @@ void MainWindow::initDockWidgets()
 		connect(w, &TrainInfoWidget::switchToRouting,
 			this, &MainWindow::focusInRouting);
 	}
-	area = manager->addDockWidget(ads::RightDockWidgetArea, dock);
+	//area = manager->addDockWidget(ads::RightDockWidgetArea, dock);
+	auto* container=manager->addAutoHideDockWidget(ads::SideBarRight, dock);
+	container->setSize(320);
 
 	// 速览时刻
 	if constexpr (true) {
@@ -649,7 +655,9 @@ void MainWindow::initDockWidgets()
 		dock->setWidget(w);
 		timetableQuickWidget = w;
 		timetableQuickDock = dock;
-		manager->addDockWidgetTabToArea(dock, area);
+		//manager->addDockWidgetTabToArea(dock, area);
+		container = manager->addAutoHideDockWidget(ads::SideBarRight, dock);
+		container->setSize(320);
 	}
 }
 
