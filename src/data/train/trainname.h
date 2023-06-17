@@ -83,11 +83,21 @@ private:
     }
 };
 
+#if QT_VERSION_MAJOR >= 6
+
+inline size_t qHash(const TrainName& tn, size_t seed)
+{
+    return qHash(tn.full(), seed) ^ qHash(tn.down(), seed) ^
+        qHash(tn.up(), seed);
+}
+
+#else
+
 inline uint qHash(const TrainName& tn, uint seed)
 {
-    uint qHash(const QString&, uint)noexcept;
     return qHash(tn.full(),seed) ^ qHash(tn.down(),seed) ^
             qHash(tn.up(),seed);
 }
+#endif
 
 

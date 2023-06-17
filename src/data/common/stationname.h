@@ -100,12 +100,17 @@ public:
 
 };
 
-inline uint qHash(const StationName& sn, uint seed)
+#if QT_VERSION_MAJOR >= 6
+inline size_t qHash(const StationName& sn, size_t seed)
 {
-    // declare explicitly to avoid overload decision ambiguity
-    uint qHash(const QString&, uint)noexcept;
     return qHash(sn.station(),seed) ^ qHash(sn.field(),seed);
 }
+#else 
+inline uint qHash(const StationName& sn, uint seed)
+{
+    return qHash(sn.station(), seed) ^ qHash(sn.field(), seed);
+}
+#endif
 
 inline QDebug operator<<(QDebug debug, const StationName& s){
     QDebugStateSaver saver(debug);

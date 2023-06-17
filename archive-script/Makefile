@@ -13,11 +13,11 @@ QETRC_ROOT = D:\codes\QtProjects\qETRC\qETRC
 # use MSVC build 
 BUILD_DIR = ..\out\install\x64-Release\bin
 BIN_FILE = qETRC.exe
-QT_PROMPT_SCRIPT = C:\Qt\5.15.2\msvc2019_64\bin\qtenv2.bat
+QT_PROMPT_SCRIPT = D:\programs\Qt\6.5.1\msvc2019_64\bin\qtenv2.bat
 
 # specify output dir
 OUTPUT_ROOT = $(QETRC_ROOT)\..\archive
-WIN64_DIR = $(OUTPUT_ROOT)\win64
+WIN64_DIR = $(OUTPUT_ROOT)\win64-Qt6
 PATCH_DIR = $(OUTPUT_ROOT)\patch
 
 WIN64_ARCHIVE = qETRC-win64$(SUFFIX).7z

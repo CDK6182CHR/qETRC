@@ -17,8 +17,17 @@ Q_DECLARE_METATYPE(std::shared_ptr<const Train>)
 
 Q_DECLARE_METATYPE(std::shared_ptr<Railway>)
 
+#if QT_VERSION_MAJOR >= 6
+template <typename Ty>
+size_t qHash(const std::shared_ptr<Ty>& key, size_t seed)
+{
+    return qHash(key.get(), seed);
+}
+#else 
 template <typename Ty>
 uint qHash(const std::shared_ptr<Ty>& key, uint seed)
 {
     return qHash(key.get(), seed);
 }
+
+#endif
