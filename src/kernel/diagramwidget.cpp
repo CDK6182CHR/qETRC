@@ -493,21 +493,21 @@ void DiagramWidget::setupMenu(const SharedActions& actions)
         contextMenu = new QMenu(this);
         auto* m = contextMenu;
         auto* act = new QAction(tr("重新铺画当前运行图"));
-        act->setShortcut(Qt::SHIFT + Qt::Key_F5);
+        act->setShortcut(Qt::SHIFT | Qt::Key_F5);
         act->setShortcutContext(Qt::WidgetShortcut);
         connect(act, &QAction::triggered, this, &DiagramWidget::paintGraph);
         addAction(act);
         contextMenu->addAction(act);
 
         act = new QAction(tr("放大视图"));
-        act->setShortcut(Qt::CTRL + Qt::Key_Equal);
+        act->setShortcut(Qt::CTRL | Qt::Key_Equal);
         act->setShortcutContext(Qt::WidgetShortcut);
         addAction(act);
         m->addAction(act);
         connect(act, &QAction::triggered, this, &DiagramWidget::zoomIn);
 
         act = new QAction(tr("缩小视图"));
-        act->setShortcut(Qt::CTRL + Qt::Key_Minus);
+        act->setShortcut(Qt::CTRL | Qt::Key_Minus);
         act->setShortcutContext(Qt::WidgetShortcut);
         addAction(act);
         m->addAction(act);

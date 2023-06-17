@@ -672,18 +672,18 @@ void MainWindow::initToolbar()
 		//撤销重做
 		QAction* act = undoStack->createUndoAction(this, tr("撤销"));
 		act->setIcon(QIcon(":/icons/undo.png"));
-		act->setShortcut(Qt::CTRL + Qt::Key_Z);
+		act->setShortcut(Qt::CTRL | Qt::Key_Z);
 		act->setShortcutContext(Qt::WindowShortcut);
 		ribbon->quickAccessBar()->addAction(act);
 
 		act = undoStack->createRedoAction(this, tr("重做"));
 		act->setIcon(QIcon(":/icons/redo.png"));
-		act->setShortcut(Qt::CTRL + Qt::Key_Y);
+		act->setShortcut(Qt::CTRL | Qt::Key_Y);
 		ribbon->quickAccessBar()->addAction(act);
 
 		act = new QAction(qApp->style()->standardIcon(QStyle::SP_DialogCloseButton),
 			tr("关闭当前面面板 (Ctrl+W)"), this);
-		act->setShortcut(Qt::CTRL + Qt::Key_W);
+		act->setShortcut(Qt::CTRL | Qt::Key_W);
 		connect(act, &QAction::triggered, this, &MainWindow::closeCurrentTab);
 		ribbon->quickAccessBar()->addAction(act);
 
@@ -713,7 +713,7 @@ void MainWindow::initToolbar()
 		QAction* act = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileIcon),
 			QObject::tr("新建"), this);
 		panel->addLargeAction(act);
-		act->setShortcut(Qt::CTRL + Qt::Key_N);
+		act->setShortcut(Qt::CTRL | Qt::Key_N);
 		act->setToolTip(tr("新建 (Ctrl+N)\n关闭当前运行图文件，并新建空白运行图文件。"));
 		addAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actNewGraph()));
@@ -723,7 +723,7 @@ void MainWindow::initToolbar()
 			QObject::tr("打开"), this);
 		addAction(act);
 		act->setToolTip(tr("打开 (Ctrl+O)\n关闭当前运行图文件，并打开新的既有运行图文件。"));
-		act->setShortcut(Qt::CTRL + Qt::Key_O);
+		act->setShortcut(Qt::CTRL | Qt::Key_O);
 		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actOpenGraph()));
 		sharedActions.open = act;
@@ -731,7 +731,7 @@ void MainWindow::initToolbar()
 		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogSaveButton),
 			QObject::tr("保存"), this);
 		act->setToolTip(tr("保存 (Ctrl+S)\n保存当前运行图。如果是新运行图，则需要先选择文件。"));
-		act->setShortcut(Qt::CTRL + Qt::Key_S);
+		act->setShortcut(Qt::CTRL | Qt::Key_S);
 		addAction(act);
 		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actSaveGraph()));
@@ -747,7 +747,7 @@ void MainWindow::initToolbar()
 		act = new QAction(QIcon(":/icons/ETRC-dynamic.png"), tr("导出为.."), this);
 		act->setToolTip(tr("导出为单线路运行图 (Ctrl+M)\n"
 			"导出为单一线路的pyETRC或ETRC运行图文件格式。"));
-		act->setShortcut(Qt::CTRL + Qt::Key_M);
+		act->setShortcut(Qt::CTRL | Qt::Key_M);
 		connect(act, SIGNAL(triggered()), this, SLOT(actToSingleFile()));
 		addAction(act);
 		panel->addMediumAction(act);
@@ -808,7 +808,7 @@ void MainWindow::initToolbar()
 		act->setToolTip(tr("全局站名修改 (Ctrl+U)\n"
 			"在整个运行图的所有线路、所有车次中，将旧站名改为新站名。"));
         //qactChangeStationName = act;
-		act->setShortcut(Qt::CTRL + Qt::Key_U);
+		act->setShortcut(Qt::CTRL | Qt::Key_U);
 		addAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actChangeStationName()));
         auto* btn = panel->addLargeAction(act);
@@ -862,7 +862,7 @@ void MainWindow::initToolbar()
 		act->setToolTip(tr("标尺编辑 (Ctrl+B)\n"
 			"打开全局任意线路中的任意一个标尺的编辑面板。"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actNaviToRuler()));
-		act->setShortcut(Qt::CTRL + Qt::Key_B);
+		act->setShortcut(Qt::CTRL | Qt::Key_B);
 		addAction(act);
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(80);
@@ -898,7 +898,7 @@ void MainWindow::initToolbar()
 			tr("定位"), this);
 		act->setToolTip(tr("运行图定位 (Ctrl+G)\n输入时刻，线路及其里程，"
 			"快速定位到运行图面板上。"));
-		act->setShortcut(Qt::CTRL + Qt::Key_G);
+		act->setShortcut(Qt::CTRL | Qt::Key_G);
 		connect(act, &QAction::triggered, this, &MainWindow::actLocateDiagram);
 		addAction(act);
 		btn = panel->addLargeAction(act);
@@ -910,7 +910,7 @@ void MainWindow::initToolbar()
 		act->setToolTip(tr("线路数据库 (Ctrl+H)\n"
 			"查看、编辑或者导入线路数据库中的基线数据。"));
 		connect(act, &QAction::triggered, this, &MainWindow::actRailDBDock);
-		act->setShortcut(Qt::CTRL + Qt::Key_H);
+		act->setShortcut(Qt::CTRL | Qt::Key_H);
 		addAction(act);
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(80);
@@ -925,7 +925,7 @@ void MainWindow::initToolbar()
 		act = new QAction(QIcon(":/icons/diagram.png"), tr("快速径路"), this);
 		act->setToolTip(tr("快速径路生成 (Ctrl+J)\n"
 			"通过线路数据库中的数据，给出经由的关键点表，利用最短路算法生成新线路数据。"));
-		act->setShortcut(Qt::CTRL + Qt::Key_J);
+		act->setShortcut(Qt::CTRL | Qt::Key_J);
 		addAction(act);
 		panel->addMediumAction(act);
 		actQuickPath = act;
@@ -934,7 +934,7 @@ void MainWindow::initToolbar()
 		act->setToolTip(tr("交互式经由选择 (Ctrl+K)\n"
 			"通过数据库中的数据，手动指定通过邻站、邻线或者区间最短路方式，"
 			"生成径路可精确控制的新线路数据。"));
-		act->setShortcut(Qt::CTRL + Qt::Key_K);
+		act->setShortcut(Qt::CTRL | Qt::Key_K);
 		addAction(act);
 		panel->addMediumAction(act);
 		actSelector = act;
@@ -997,7 +997,7 @@ void MainWindow::initToolbar()
 		
 		act = new QAction(QIcon(":/icons/add_train.png"), tr("导入车次"), this);
 		act->setToolTip(tr("导入车次 (Ctrl+D)\n从既有运行图或者车次数据库文件中导入部分或全部的车次。"));
-		act->setShortcut(Qt::CTRL + Qt::Key_D);
+		act->setShortcut(Qt::CTRL | Qt::Key_D);
 		addAction(act);
 		connect(act, SIGNAL(triggered()), naviView, SLOT(importTrains()));
 
@@ -1011,7 +1011,7 @@ void MainWindow::initToolbar()
 			tr("搜索车次"), this);
 		act->setToolTip(tr("搜索车次 (Ctrl+F)\n搜索车次，将车次设定为当前车次，并高亮运行线。"));
 		connect(act, &QAction::triggered, this, &MainWindow::actSearchTrain);
-		act->setShortcut(Qt::CTRL + Qt::Key_F);
+		act->setShortcut(Qt::CTRL | Qt::Key_F);
 		addAction(act);
 		panel->addMediumAction(act);
 		diaActions.search = act;
@@ -1028,7 +1028,7 @@ void MainWindow::initToolbar()
 
 		act = timetableQuickDock->toggleViewAction();
 		act->setIcon(QIcon(":/icons/clock.png"));
-		act->setShortcut(Qt::CTRL + Qt::Key_I);
+		act->setShortcut(Qt::CTRL | Qt::Key_I);
 		addAction(act);
 		act->setToolTip(tr("速览时刻 (Ctrl+I)\n"
 			"显示或隐藏pyETRC风格的双行只读时刻表。"));
@@ -1037,7 +1037,7 @@ void MainWindow::initToolbar()
 
 		act = trainInfoDock->toggleViewAction();
 		act->setIcon(QIcon(":/icons/info.png"));
-		act->setShortcut(Qt::CTRL + Qt::Key_Q);
+		act->setShortcut(Qt::CTRL | Qt::Key_Q);
 		addAction(act);
 		act->setToolTip(tr("速览信息 (Ctrl+Q)\n"
 			"显示或隐藏pyETRC风格的列车信息栏。"));
@@ -1141,7 +1141,7 @@ void MainWindow::initToolbar()
 
 		act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("标尺排图"), this);
 		addAction(act);
-		act->setShortcut(Qt::CTRL + Qt::Key_R);
+		act->setShortcut(Qt::CTRL | Qt::Key_R);
 		act->setToolTip(tr("标尺排图向导 (Ctrl+R)\n使用指定线路的指定标尺，"
 			"铺画新的列车运行线，或者重新铺画既有列车运行线的一部分。"));
 		btn = panel->addLargeAction(act);
@@ -1169,7 +1169,7 @@ void MainWindow::initToolbar()
 
 		act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("贪心排图"), this);
 		addAction(act);
-		act->setShortcut(Qt::CTRL + Qt::Key_T);
+		act->setShortcut(Qt::CTRL | Qt::Key_T);
 		act->setToolTip(tr("自动贪心排图向导 (Ctrl+T)\n使用指定线路的指定标尺，"
 			"采用贪心算法自动计算运行线。"));
 		diaActions.greedyPaint = act;

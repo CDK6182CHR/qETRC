@@ -637,12 +637,12 @@ void RulerPaintPageTable::initUI()
     table->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     auto* act = new QAction(tr("冲突检查"), table);
-    act->setShortcut(Qt::ALT + Qt::Key_X);
+    act->setShortcut(Qt::ALT | Qt::Key_X);
     table->addAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(showConflict()));
 
     act = new QAction(tr("查看参考时刻表"), table);
-    act->setShortcut(Qt::ALT + Qt::Key_Y);
+    act->setShortcut(Qt::ALT | Qt::Key_Y);
     table->addAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(showTimetable()));
 
