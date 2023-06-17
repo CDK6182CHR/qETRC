@@ -32,7 +32,7 @@ protected:
     TrainPassenger passengerType = TrainPassenger::Auto;
 
     QSet<std::shared_ptr<const TrainType>> types;
-    QVector<QRegExp> includes, excludes;
+    QVector<QRegularExpression> includes, excludes;
     QSet<std::shared_ptr<const Routing>> routings;
     bool selNullRouting=false;
 

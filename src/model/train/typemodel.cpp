@@ -6,6 +6,7 @@
 
 #include <QWidget>
 #include <QMessageBox>
+#include <QRegularExpression>
 #include <type_traits>
 
 TypeConfigModel::TypeConfigModel(TypeManager &manager_, QObject *parent):
@@ -128,7 +129,7 @@ bool TypeRegexModel::appliedData(TypeManager& data)
     std::decay_t<decltype(manager.regex())> reges;
     for(int i=0;i<rowCount();i++){
         const QString& reg_s = item(i,ColRegex)->text();
-        QRegExp reg(reg_s);
+        QRegularExpression reg(reg_s);
         if(!reg.isValid()){
             QMessageBox::warning(par,tr("错误"),tr("第%1行的正则表达式[%2]非法，更改未提交。"
             "\n有关正则表达式语法，可以参阅：https://doc.qt.io/qt-5/qregexp.html#details")

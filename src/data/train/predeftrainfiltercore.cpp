@@ -37,12 +37,12 @@ void PredefTrainFilterCore::fromJson(const QJsonObject &obj, const TrainCollecti
 
     const auto& arInc=obj.value("includes").toArray();
     foreach(const auto& t,arInc){
-        includes.push_back(QRegExp(t.toString()));
+        includes.push_back(QRegularExpression(t.toString()));
     }
 
     const auto& arExc=obj.value("excludes").toArray();
     foreach(const auto& t,arExc){
-        excludes.push_back(QRegExp(t.toString()));
+        excludes.push_back(QRegularExpression(t.toString()));
     }
 
     const auto& arRout=obj.value("routings").toArray();

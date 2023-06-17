@@ -85,6 +85,7 @@ private:
 
 inline uint qHash(const TrainName& tn, uint seed)
 {
+    uint qHash(const QString&, uint)noexcept;
     return qHash(tn.full(),seed) ^ qHash(tn.down(),seed) ^
             qHash(tn.up(),seed);
 }

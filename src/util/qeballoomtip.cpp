@@ -8,7 +8,7 @@
 #include <QPushButton>
 #include <QStyle>
 #include <QGridLayout>
-#include <QDesktopWidget>
+//#include <QDesktopWidget>
 #include <QApplication>
 #include <QScreen>
 #include <QPainterPath>

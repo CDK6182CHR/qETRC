@@ -56,12 +56,12 @@ std::shared_ptr<TrainType> TypeManager::addType(const QString& name, const QPen&
     return t;
 }
 
-void TypeManager::appendRegex(const QRegExp& reg, const QString& name)
+void TypeManager::appendRegex(const QRegularExpression& reg, const QString& name)
 {
     _regs.append(qMakePair(reg, findOrCreate(name)));
 }
 
-std::shared_ptr<TrainType> TypeManager::appendRegex(const QRegExp& reg, const QString& name, bool passenger)
+std::shared_ptr<TrainType> TypeManager::appendRegex(const QRegularExpression& reg, const QString& name, bool passenger)
 {
     auto t = findOrCreate(name, passenger);
     _regs.append(qMakePair(reg, t));
@@ -71,7 +71,8 @@ std::shared_ptr<TrainType> TypeManager::appendRegex(const QRegExp& reg, const QS
 std::shared_ptr<TrainType> TypeManager::fromRegex(const TrainName& name) const
 {
     for (const auto& p : _regs) {
-        if (p.first.indexIn(name.full()) == 0)
+        //if (p.first.indexIn(name.full()) == 0)
+        if (p.first.match(name.full()).hasMatch())
             return p.second;
     }
     return defaultType;
@@ -137,7 +138,7 @@ bool TypeManager::fromJson(const QJsonObject& obj)
         fw = obj.value("default_huoche_width").toDouble(0.75);
     for (const auto& p:arreg) {
         const QJsonArray tp = p.toArray();
-        auto t = appendRegex(QRegExp(tp.at(1).toString()), tp.at(0).toString(), tp.at(2).toBool());
+        auto t = appendRegex(QRegularExpression(tp.at(1).toString()), tp.at(0).toString(), tp.at(2).toBool());
         if (t->isPassenger())
             t->pen().setWidthF(pw);
         else
@@ -189,40 +190,40 @@ void TypeManager::initDefaultTypes()
     addType(QObject::tr("高速"), QPen(QColor(255, 0, 190), 1.5));
     addType(QObject::tr("城际"), QPen(QColor(255, 51, 204), 1.5));
 
-    appendRegex(QRegExp(R"(G\d+)"), QObject::tr("高速"), true);
-    appendRegex(QRegExp(R"(D\d+)"), QObject::tr("动车组"), true);
-    appendRegex(QRegExp(R"(C\d+)"), QObject::tr("城际"), true);
-    appendRegex(QRegExp(R"(Z\d+)"), QObject::tr("直达特快"), true);
-    appendRegex(QRegExp(R"(T\d+)"), QObject::tr("特快"), true);
-    appendRegex(QRegExp(R"(K\d+)"), QObject::tr("快速"), true);
-    appendRegex(QRegExp(R"([1-5]\d{3}$)"), QObject::tr("普快"), true);
-    appendRegex(QRegExp(R"([1-5]\d{3}\D)"), QObject::tr("普快"), true);
-    appendRegex(QRegExp(R"(6\d{3}$)"), QObject::tr("普客"), true);
-    appendRegex(QRegExp(R"(6\d{3}\D)"), QObject::tr("普客"), true);
-    appendRegex(QRegExp(R"(7[0-5]\d{2}$)"), QObject::tr("普客"), true);
-    appendRegex(QRegExp(R"(7[0-5]\d{2}\D)"), QObject::tr("普客"), true);
-    appendRegex(QRegExp(R"(7\d{3}$)"), QObject::tr("通勤"), true);
-    appendRegex(QRegExp(R"(7\d{3}\D)"), QObject::tr("通勤"), true);
-    appendRegex(QRegExp(R"(8\d{3}$)"), QObject::tr("通勤"), true);
-    appendRegex(QRegExp(R"(8\d{3}\D)"), QObject::tr("通勤"), true);
-    appendRegex(QRegExp(R"(Y\d+)"), QObject::tr("旅游"), true);
-    appendRegex(QRegExp(R"(57\d+)"), QObject::tr("路用"), true);
-    appendRegex(QRegExp(R"(X1\d{2})"), QObject::tr("特快行包"), true);
-    appendRegex(QRegExp(R"(DJ\d+)"), QObject::tr("动检"), true);
-    appendRegex(QRegExp(R"(0[GDCZTKY]\d+)"), QObject::tr("客车底"), true);
-    appendRegex(QRegExp(R"(L\d+)"), QObject::tr("临客"), true);
-    appendRegex(QRegExp(R"(0\d{4})"), QObject::tr("客车底"), true);
-    appendRegex(QRegExp(R"(X\d{3}\D)"), QObject::tr("行包"), false);
-    appendRegex(QRegExp(R"(X\d{3}$)"), QObject::tr("行包"), false);
-    appendRegex(QRegExp(R"(X\d{4})"), QObject::tr("班列"), false);
-    appendRegex(QRegExp(R"(1\d{4})"), QObject::tr("直达"), false);
-    appendRegex(QRegExp(R"(2\d{4})"), QObject::tr("直货"), false);
-    appendRegex(QRegExp(R"(3\d{4})"), QObject::tr("区段"), false);
-    appendRegex(QRegExp(R"(4[0-4]\d{3})"), QObject::tr("摘挂"), false);
-    appendRegex(QRegExp(R"(4[5-9]\d{3})"), QObject::tr("小运转"), false);
-    appendRegex(QRegExp(R"(5[0-2]\d{3})"), QObject::tr("单机"), false);
-    appendRegex(QRegExp(R"(5[3-4]\d{3})"), QObject::tr("补机"), false);
-    appendRegex(QRegExp(R"(55\d{3})"), QObject::tr("试运转"), false);
+    appendRegex(QRegularExpression(R"(^G\d+)"), QObject::tr("高速"), true);
+    appendRegex(QRegularExpression(R"(^D\d+)"), QObject::tr("动车组"), true);
+    appendRegex(QRegularExpression(R"(^C\d+)"), QObject::tr("城际"), true);
+    appendRegex(QRegularExpression(R"(^Z\d+)"), QObject::tr("直达特快"), true);
+    appendRegex(QRegularExpression(R"(^T\d+)"), QObject::tr("特快"), true);
+    appendRegex(QRegularExpression(R"(^K\d+)"), QObject::tr("快速"), true);
+    appendRegex(QRegularExpression(R"(^[1-5]\d{3}$)"), QObject::tr("普快"), true);
+    appendRegex(QRegularExpression(R"(^[1-5]\d{3}\D)"), QObject::tr("普快"), true);
+    appendRegex(QRegularExpression(R"(^6\d{3}$)"), QObject::tr("普客"), true);
+    appendRegex(QRegularExpression(R"(^6\d{3}\D)"), QObject::tr("普客"), true);
+    appendRegex(QRegularExpression(R"(^7[0-5]\d{2}$)"), QObject::tr("普客"), true);
+    appendRegex(QRegularExpression(R"(^7[0-5]\d{2}\D)"), QObject::tr("普客"), true);
+    appendRegex(QRegularExpression(R"(^7\d{3}$)"), QObject::tr("通勤"), true);
+    appendRegex(QRegularExpression(R"(^7\d{3}\D)"), QObject::tr("通勤"), true);
+    appendRegex(QRegularExpression(R"(^8\d{3}$)"), QObject::tr("通勤"), true);
+    appendRegex(QRegularExpression(R"(^8\d{3}\D)"), QObject::tr("通勤"), true);
+    appendRegex(QRegularExpression(R"(^Y\d+)"), QObject::tr("旅游"), true);
+    appendRegex(QRegularExpression(R"(^57\d+)"), QObject::tr("路用"), true);
+    appendRegex(QRegularExpression(R"(^X1\d{2})"), QObject::tr("特快行包"), true);
+    appendRegex(QRegularExpression(R"(^DJ\d+)"), QObject::tr("动检"), true);
+    appendRegex(QRegularExpression(R"(^0[GDCZTKY]\d+)"), QObject::tr("客车底"), true);
+    appendRegex(QRegularExpression(R"(^L\d+)"), QObject::tr("临客"), true);
+    appendRegex(QRegularExpression(R"(^0\d{4})"), QObject::tr("客车底"), true);
+    appendRegex(QRegularExpression(R"(^X\d{3}\D)"), QObject::tr("行包"), false);
+    appendRegex(QRegularExpression(R"(^X\d{3}$)"), QObject::tr("行包"), false);
+    appendRegex(QRegularExpression(R"(^X\d{4})"), QObject::tr("班列"), false);
+    appendRegex(QRegularExpression(R"(^1\d{4})"), QObject::tr("直达"), false);
+    appendRegex(QRegularExpression(R"(^2\d{4})"), QObject::tr("直货"), false);
+    appendRegex(QRegularExpression(R"(^3\d{4})"), QObject::tr("区段"), false);
+    appendRegex(QRegularExpression(R"(^4[0-4]\d{3})"), QObject::tr("摘挂"), false);
+    appendRegex(QRegularExpression(R"(^4[5-9]\d{3})"), QObject::tr("小运转"), false);
+    appendRegex(QRegularExpression(R"(^5[0-2]\d{3})"), QObject::tr("单机"), false);
+    appendRegex(QRegularExpression(R"(^5[3-4]\d{3})"), QObject::tr("补机"), false);
+    appendRegex(QRegularExpression(R"(^55\d{3})"), QObject::tr("试运转"), false);
 }
 
 void TypeManager::toJson(QJsonObject& obj) const

@@ -89,18 +89,18 @@ void ForbidWidget::initContextMenu()
 
     context = new QMenu(this);
 
-    using key_t = decltype(Qt::CTRL + Qt::Key_K);
+    using key_t = decltype(Qt::CTRL | Qt::Key_K);
     using slot_t = std::decay< decltype(SLOT(calculateBegin()))>::type;
 
     std::initializer_list<std::tuple<QString, key_t, QObject*, slot_t>> acts = {
-        {tr("复制当前数据到下一行"),(Qt::ALT + Qt::Key_C),this,SLOT(copyToNextRow())},
-        {tr("复制当前数据到本方向所有行"),(Qt::ALT + Qt::SHIFT + Qt::Key_C),this,SLOT(copyToAllRows())},
-        {tr("计算结束时间"),(Qt::ALT + Qt::Key_E),this,SLOT(calculateEnd())},
-        {tr("计算开始时间"),(Qt::ALT + Qt::Key_R),this,SLOT(calculateBegin())},
-        {tr("计算所有结束时间"),(Qt::ALT + Qt::SHIFT + Qt::Key_E),this,SLOT(calculateAllEnd())},
-        {tr("计算所有开始时间"),(Qt::ALT + Qt::SHIFT + Qt::Key_R),this,SLOT(calculateAllBegin())},
-        {tr("复制下行数据到上行"),(Qt::ALT + Qt::Key_U),model,SLOT(copyFromDownToUp())},
-        {tr("复制上行数据到下行"),(Qt::ALT + Qt::Key_D),model,SLOT(copyFromUpToDown())}
+        {tr("复制当前数据到下一行"),(Qt::ALT | Qt::Key_C),this,SLOT(copyToNextRow())},
+        {tr("复制当前数据到本方向所有行"),(Qt::ALT | Qt::SHIFT | Qt::Key_C),this,SLOT(copyToAllRows())},
+        {tr("计算结束时间"),(Qt::ALT | Qt::Key_E),this,SLOT(calculateEnd())},
+        {tr("计算开始时间"),(Qt::ALT | Qt::Key_R),this,SLOT(calculateBegin())},
+        {tr("计算所有结束时间"),(Qt::ALT | Qt::SHIFT | Qt::Key_E),this,SLOT(calculateAllEnd())},
+        {tr("计算所有开始时间"),(Qt::ALT | Qt::SHIFT | Qt::Key_R),this,SLOT(calculateAllBegin())},
+        {tr("复制下行数据到上行"),(Qt::ALT | Qt::Key_U),model,SLOT(copyFromDownToUp())},
+        {tr("复制上行数据到下行"),(Qt::ALT | Qt::Key_D),model,SLOT(copyFromUpToDown())}
     };
 
     enum { IdxText, IdxShortcut, IdxTarget, IdxSlot };

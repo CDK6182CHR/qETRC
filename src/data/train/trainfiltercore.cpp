@@ -16,7 +16,7 @@ bool TrainFilterCore::checkInclude(std::shared_ptr<const Train> train) const
     if (!useInclude) return false;   // 这个特殊
     foreach (auto& p, includes){
         const auto& n=train->trainName();
-        if (p.indexIn(n.full())==0 || p.indexIn(n.down())==0 || p.indexIn(n.up())==0){
+        if (p.match(n.full()).hasMatch() || p.match(n.down()).hasMatch() || p.match(n.up()).hasMatch()){
             return true;
         }
     }
@@ -28,7 +28,7 @@ bool TrainFilterCore::checkExclude(std::shared_ptr<const Train> train) const
     if(!useExclude) return false;
     foreach (auto& p, excludes){
         const auto& n=train->trainName();
-        if (p.indexIn(n.full())==0 || p.indexIn(n.down())==0 || p.indexIn(n.up())==0){
+        if (p.match(n.full()).hasMatch() || p.match(n.down()).hasMatch() || p.match(n.up()).hasMatch()) {
             return true;
         }
     }

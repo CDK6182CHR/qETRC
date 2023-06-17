@@ -26,6 +26,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 file(GLOB_RECURSE qETRC_SOURCES "src/*.cpp")
+file(GLOB_RECURSE qETRC_HEADERS "src/*.h")
+file(GLOB_RECURSE qETRC_HEADERS_PP "src/*.hpp")
 
 if (NOT ANDROID)
     set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/qETRC_resource.rc")
@@ -36,7 +38,8 @@ endif()
 #     rsc/resource.qrc
 #     ${app_icon_resource_windows}
 # )
-set(PROJECT_SOURCES ${qETRC_SOURCES} rsc/resource.qrc ${app_icon_resource_windows})
+set(PROJECT_SOURCES ${qETRC_SOURCES} ${qETRC_HEADERS} ${qETRC_HEADERS_PP}
+    rsc/resource.qrc ${app_icon_resource_windows})
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(qETRC
         MANUAL_FINALIZATION
@@ -62,11 +65,11 @@ endif()
 
 target_include_directories(qETRC PRIVATE src/)
 
-target_link_libraries(qETRC Qt5::Widgets)
+target_link_libraries(qETRC PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
 if (Qt${QT_VERSION_MAJOR}PrintSupport_FOUND)
     message(STATUS "QtPrintSupport is found")
-    target_link_libraries(qETRC Qt${QT_VERSION_MAJOR}::PrintSupport)
+    target_link_libraries(qETRC PRIVATE Qt${QT_VERSION_MAJOR}::PrintSupport)
 else()
     message(WARNING "QtPrintSupport not found")
 endif()
@@ -94,8 +97,8 @@ if (NOT ANDROID)
     )
     FetchContent_MakeAvailable(ads)
 
-    target_link_libraries(qETRC SARibbonBar)
-    target_link_libraries(qETRC ads::qt${QT_VERSION_MAJOR}advanceddocking)
+    target_link_libraries(qETRC PRIVATE SARibbonBar)
+    target_link_libraries(qETRC PRIVATE ads::qt${QT_VERSION_MAJOR}advanceddocking)
 endif()
 
 
@@ -106,7 +109,7 @@ if (ANDROID)
 endif()
 
 if (MSVC)
-    target_compile_options(qETRC PRIVATE /utf-8 /wd4267 ) 
+    target_compile_options(qETRC PRIVATE /utf-8 /wd4267 /Zc:__cplusplus ) 
 endif()
 
 if (WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -120,7 +123,7 @@ install(TARGETS qETRC
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(QtAndroidCMakeTest)
+    qt_finalize_executable(qETRC)
 endif()
 
 

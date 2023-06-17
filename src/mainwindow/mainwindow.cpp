@@ -885,7 +885,7 @@ void MainWindow::initToolbar()
 		btn->setMinimumWidth(80);
 
 		act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("标尺综合"), this);
-		act->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_B);
+		act->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_B);
 		addAction(act);
 		act->setToolTip(tr("标尺综合 (Ctrl+Shift+B)\n"
 			"从一组选定的车次中，读取一套标尺数据，用于建立新标尺，或更新既有标尺。"));
@@ -1018,7 +1018,7 @@ void MainWindow::initToolbar()
 
 		act = new QAction(QIcon(":/icons/add.png"), tr("新建车次"), this);
 		act->setToolTip(tr("新建车次 (Ctrl+Shift+C)\n新建空白车次"));
-		act->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_C);
+		act->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_C);
 		addAction(act);
 		diaActions.addTrain = act;
 		btn = panel->addMediumAction(act);

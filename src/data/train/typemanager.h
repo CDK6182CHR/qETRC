@@ -25,8 +25,9 @@ class TypeManager{
     /**
      * @brief _regs
      * 按顺序进行正则匹配
+     * 2023.06.17: change to QRegularExpression for Qt6
      */
-    QVector<QPair<QRegExp, std::shared_ptr<TrainType>>> _regs;
+    QVector<QPair<QRegularExpression, std::shared_ptr<TrainType>>> _regs;
 
     /**
      * 默认的版本。注意这个不应该是static，因为系统Config和默认Config指定的默认颜色可能不同。
@@ -74,12 +75,12 @@ public:
     std::shared_ptr<TrainType> addType(const QString& name,
                                            const QPen& pen);
 
-    void appendRegex(const QRegExp& reg, const QString& name);
+    void appendRegex(const QRegularExpression& reg, const QString& name);
 
     /**
      * 用来读pyETRC的配置数据，同时写进是否客车的数据
      */
-    std::shared_ptr<TrainType> appendRegex(const QRegExp& reg, const QString& name, bool passenger);
+    std::shared_ptr<TrainType> appendRegex(const QRegularExpression& reg, const QString& name, bool passenger);
 
     std::shared_ptr<TrainType> fromRegex(const TrainName& name)const;
 

@@ -812,7 +812,7 @@ void TrainContext::actImportTrainFromCsv()
 		return;
 	}
 	QTextStream ts(&file);
-	ts.setCodec("utf-8");
+	//ts.setCodec("utf-8");
 
 	QVector<std::shared_ptr<Train>> newTrains, modifiedTrains, modifiedData;
 	QMap<QString, std::shared_ptr<Train>> trainMap;   // 这里存的是要更新的对象，副本或新增的

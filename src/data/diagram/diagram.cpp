@@ -834,7 +834,7 @@ namespace etrc_consts {
 bool Diagram::fromTrc(QTextStream& fin)
 {
     QString line;
-    fin.setCodec("utf-8");
+    //fin.setCodec("utf-8");
 
     clear();
     trainCollection().typeManager().operator=(_defaultManager);
@@ -1449,7 +1449,7 @@ bool Diagram::toTrc(const QString& filename, std::shared_ptr<Railway> rail, bool
         return false;
     }
     QTextStream fout(&file);
-    fout.setCodec("utf-8");
+    //fout.setCodec("utf-8");
     using namespace etrc_consts;
     //线路
     fout << SPLIT_CIRCUIT << Qt::endl;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include "util/qecontrolledtable.h"
 
 class QEMoveableModel;
@@ -10,16 +10,16 @@ class TrainNameRegexTable : public QEControlledTable
     Q_OBJECT
     TrainCollection& coll;
     QEMoveableModel* model;
-    QVector<QRegExp> _names;
+    QVector<QRegularExpression> _names;
 public:
     TrainNameRegexTable(TrainCollection& coll_, QWidget* parent=nullptr);
-    QVector<QRegExp> names()const;
+    QVector<QRegularExpression> names()const;
 private:
     void initUI();
 private slots:
 
 public slots:
-    void refreshData(const QVector<QRegExp>& _names);
+    void refreshData(const QVector<QRegularExpression>& _names);
     void clearNames();
 };
 

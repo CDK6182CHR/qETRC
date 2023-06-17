@@ -1113,7 +1113,7 @@ std::shared_ptr<Train> Train::fromTrf(const QString& filename)
         return {};
     }
     QTextStream fin(&file);
-    fin.setCodec("utf-8");
+    //fin.setCodec("utf-8");
     QString line;
 
     // 标题行

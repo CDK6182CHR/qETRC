@@ -25,7 +25,7 @@ void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaul
 
 	//Train类型的正确设置依赖于TypeManager的正确初始化
 	const QJsonArray& artrains = obj.value("trains").toArray();
-	foreach (const auto& p , artrains) {
+	for (const auto& p : artrains) {
 		_trains.append(std::make_shared<Train>(p.toObject(), _manager));
 	}
 	
@@ -48,7 +48,7 @@ void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaul
 
     //注意TrainFilter的读取依赖车次查找和Routing查找
     const auto& arfilt=obj.value("filters").toArray();
-	foreach(const auto& f, arfilt) {
+	for (const auto& f: arfilt) {
 		auto fil = std::make_unique<PredefTrainFilterCore>();
 		fil->fromJson(f.toObject(), *this);
 		_filters.emplace_back(std::move(fil));

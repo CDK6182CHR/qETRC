@@ -142,7 +142,7 @@ void ViewCategory::initUI()
     act = new QAction(QIcon(":/icons/filter.png"), tr("高级"), this);
     act->setToolTip(tr("高级显示类型筛选 (Ctrl+Shift+L)\n"
         "使用（与pyETRC一致的）车次筛选器来决定显示车次的集合。"));
-    act->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_L);
+    act->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_L);
     meFilters = new SARibbonMenu(mw);
     act->setMenu(meFilters);
     mw->addAction(act);

@@ -80,9 +80,9 @@ void BatchParseRoutingDialog::actParse()
     QSet<QString> names;   //用来避免现在添加的这一批名称重复
 
     QList<std::shared_ptr<Routing>> routings;
-    auto s = text.splitRef("\n");
+    auto s = text.split("\n");
     foreach(const auto & _line, s) {
-        QString line = _line.toString().simplified();
+        QString line = _line.simplified();
         if (line.isEmpty())continue;
         auto r = std::make_shared<Routing>();
         r->parse(coll, line, sp, ckFull->isChecked(), report, nullptr);

@@ -102,6 +102,8 @@ public:
 
 inline uint qHash(const StationName& sn, uint seed)
 {
+    // declare explicitly to avoid overload decision ambiguity
+    uint qHash(const QString&, uint)noexcept;
     return qHash(sn.station(),seed) ^ qHash(sn.field(),seed);
 }
 

@@ -19,7 +19,7 @@ TrainFilterCombo::~TrainFilterCombo()
 void TrainFilterCombo::onIndexChanged(int id)
 {
     const auto& it=itemData(id);
-    if (it.type() == QVariant::Int){
+    if (it.type() == QMetaType::Int){
         // for Sys filters
         auto t=static_cast<PredefTrainFilterCore::SysFilterId>(it.toInt());
         auto* f=PredefTrainFilterCore::getSysFilter(t);

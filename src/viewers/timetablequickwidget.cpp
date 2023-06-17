@@ -63,10 +63,10 @@ void TimetableQuickWidget::initUI()
 
     meContext = new QMenu(this);
     auto* act = meContext->addAction(tr("定位到到达点"), this,
-        &TimetableQuickWidget::locateArrive, Qt::ALT + Qt::Key_G);
+        &TimetableQuickWidget::locateArrive, Qt::ALT | Qt::Key_G);
     table->addAction(act);
     act = meContext->addAction(tr("定位到出发点"), this,
-        &TimetableQuickWidget::locateDepart, Qt::ALT + Qt::SHIFT + Qt::Key_G);
+        &TimetableQuickWidget::locateDepart, Qt::ALT | Qt::SHIFT | Qt::Key_G);
     table->addAction(act);
 
     vlay->addWidget(table);

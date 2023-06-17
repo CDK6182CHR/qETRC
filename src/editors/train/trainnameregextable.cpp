@@ -11,13 +11,13 @@ TrainNameRegexTable::TrainNameRegexTable(TrainCollection &coll_, QWidget *parent
     initUI();
 }
 
-QVector<QRegExp> TrainNameRegexTable::names() const
+QVector<QRegularExpression> TrainNameRegexTable::names() const
 {
-    QVector<QRegExp> res;
+    QVector<QRegularExpression> res;
     for(int i=0;i<model->rowCount();i++){
         if(auto* it=model->item(i,0)){
             if(!it->text().isEmpty()){
-                QRegExp re(it->text());
+                QRegularExpression re(it->text());
                 res.push_back(re);
             }
         }
@@ -35,7 +35,7 @@ void TrainNameRegexTable::initUI()
     table()->setModel(model);
 }
 
-void TrainNameRegexTable::refreshData(const QVector<QRegExp> &_names)
+void TrainNameRegexTable::refreshData(const QVector<QRegularExpression> &_names)
 {
     model->setRowCount(_names.size());
     for(int i=0;i<model->rowCount();i++){

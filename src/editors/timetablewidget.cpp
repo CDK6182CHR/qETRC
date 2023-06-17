@@ -34,12 +34,12 @@ void TimetableWidget::initUI()
     }
 
     auto* act=new QAction(tr("复制到达时刻为出发时刻"), this);
-    act->setShortcut(Qt::ALT+Qt::Key_D);
+    act->setShortcut(Qt::ALT | Qt::Key_D);
     connect(act,&QAction::triggered,this,&TimetableWidget::copyToDepart);
     addAction(act);
 
     act=new QAction(tr("复制出发时刻为到达时刻"), this);
-    act->setShortcut(Qt::ALT+Qt::SHIFT+Qt::Key_D);
+    act->setShortcut(Qt::ALT | Qt::SHIFT | Qt::Key_D);
     connect(act,&QAction::triggered,this,&TimetableWidget::copyToArrive);
     addAction(act);
 
