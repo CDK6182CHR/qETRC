@@ -53,7 +53,8 @@ QString pathToString(
         mile += ed->data.mile;
     }
 
-    if (lastVert != path.back()->to.lock()) {
+    // 2023.06.17 FIX: lastVert may be empty
+    if (lastVert && lastVert != path.back()->to.lock()) {
         // 最后一段的处理
         res.append(intervalPathToString(lastVert, path.back()->to.lock(),
             lastRailName, mile - lastMile));

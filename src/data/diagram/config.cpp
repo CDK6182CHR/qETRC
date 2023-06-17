@@ -70,6 +70,7 @@ bool Config::fromJson(const QJsonObject& obj)
     FROM_OBJ(minute_mark_gap_pix, Double);
     
     FROM_OBJ(bold_line_level, Int);
+    FROM_OBJ(show_station_level, Int);
     FROM_OBJ(show_line_in_station, Bool);
     FROM_OBJ(start_label_height, Int);
     FROM_OBJ(end_label_height, Int);
@@ -123,6 +124,7 @@ QJsonObject Config::toJson() const
         TO_OBJ(minutes_per_vertical_line)
         TO_OBJ(minute_mark_gap_pix)
         TO_OBJ(bold_line_level)
+        TO_OBJ(show_station_level)
         TO_OBJ(show_line_in_station)
         TO_OBJ(start_label_height)
         TO_OBJ(end_label_height)

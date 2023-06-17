@@ -843,7 +843,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
 
     //铺画车站。以前已经完成了绑定，这里只需要简单地把所有有y坐标的全画出来就好
     for (auto p : rail->stations()) {
-        if (p->y_coeff.has_value() && p->_show) {
+        if (p->y_coeff.has_value() && p->_show && p->level <= cfg.show_station_level) {
             const auto& pen = p->level <= cfg.bold_line_level ?
                 boldPen : defaultPen;
             double h = start_y + rail->yValueFromCoeff(p->y_coeff.value(), cfg);

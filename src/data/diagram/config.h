@@ -73,6 +73,7 @@ struct Config
         minutes_per_vertical_line = 10.0,
         minute_mark_gap_pix = 200;
     int bold_line_level = 2;
+    int show_station_level = 5;   // 2023.06.17
     bool show_line_in_station = true;
     int start_label_height = 30;
     int end_label_height = 15;

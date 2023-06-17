@@ -38,6 +38,7 @@ class ConfigDialog : public QDialog
             *spBaseHeight,*spStepHeight;
     QDoubleSpinBox* sdScaleX, * sdSlimWidth, * sdBoldWidth, *sdScaleYdist,
             *sdScaleYsec;
+    QSpinBox* spBoldLevel, * spShowLevel;
     QComboBox* cbShowTimeMark;
     QCheckBox *ckFullName,*ckEndLabel,*ckAvoidCollid;
     QCheckBox* ckShowRuler, * ckShowMile, * ckShowCount;

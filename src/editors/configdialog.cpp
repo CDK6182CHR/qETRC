@@ -208,6 +208,18 @@ void ConfigDialog::initUI()
         form->addRow(tr("纵轴每秒像素数"),sd);
         sdScaleYsec=sd;
 
+        sp = new QSpinBox;
+        sp->setRange(0, 100);
+        sp->setToolTip(tr("最低显示车站等级，低于此等级（数值更大）的车站水平线将不显示。"));
+        form->addRow(tr("最低显示等级"), sp);
+        spShowLevel = sp;
+
+        sp = new QSpinBox;
+        sp->setRange(0, 100);
+        sp->setToolTip(tr("最低粗线显示等级，高于（数值小于，包含）此等级的车站将显示为粗线。"));
+        form->addRow(tr("最低粗线等级"), sp);
+        spBoldLevel = sp;
+
         auto* ck = new QCheckBox(tr("显示"));
         ckShowRuler = ck;
         ck->setToolTip(tr("控制运行图左侧的[排图标尺]或者[区间距离]栏是否显示"));
@@ -350,6 +362,8 @@ void ConfigDialog::refreshData()
     //空间轴
     _SET_VALUE(sdScaleYdist, pixels_per_km);
     _SET_VALUE(sdScaleYsec, seconds_per_pix_y);
+    _SET_VALUE(spShowLevel, show_station_level);
+    _SET_VALUE(spBoldLevel, bold_line_level);
     _SET_CHECK(ckShowRuler, show_ruler_bar);
     _SET_CHECK(ckShowMile, show_mile_bar);
     _SET_CHECK(ckShowCount, show_count_bar);
@@ -419,6 +433,8 @@ void ConfigDialog::actApply()
     //空间轴
     _GET_VALUE(sdScaleYdist, pixels_per_km);
     _GET_VALUE(sdScaleYsec, seconds_per_pix_y);
+    _GET_VALUE(spShowLevel, show_station_level);
+    _GET_VALUE(spBoldLevel, bold_line_level);
     _GET_CHECK(ckShowRuler, show_ruler_bar);
     _GET_CHECK(ckShowMile, show_mile_bar);
     _GET_CHECK(ckShowCount, show_count_bar);
