@@ -63,7 +63,7 @@ void PageContext::initUI()
         edName = ed;
         ed->setFocusPolicy(Qt::NoFocus);
         ed->setAlignment(Qt::AlignCenter);
-        ed->setFixedWidth(150);
+        ed->setFixedWidth(120);
 
         auto* w = new QWidget;
         auto* vlay = new QVBoxLayout;

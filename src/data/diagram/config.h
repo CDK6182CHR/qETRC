@@ -16,9 +16,9 @@ struct MarginConfig {
         right_white = 10,
         up = 90,
         down = 90,
-        label_width = 80,
-        mile_label_width = 40,
-        ruler_label_width = 80,
+        label_width = 60,
+        mile_label_width = 35,
+        ruler_label_width = 70,
         count_label_width = 60;
 private:
     int left = 275,
@@ -54,8 +54,8 @@ struct Config
      * 绘图比例
      */
     double
-        seconds_per_pix=15.0,
-        seconds_per_pix_y=8.0,
+        seconds_per_pix=25.0,
+        seconds_per_pix_y=12.0,
         pixels_per_km=4.0;
     QColor
         grid_color=QColor(170,170,127),  // #AAAA7F
@@ -77,7 +77,7 @@ struct Config
     bool show_line_in_station = true;
     int start_label_height = 30;
     int end_label_height = 15;
-    int table_row_height = 30;
+    int table_row_height = 20;
     int link_line_height = 10;
 
     bool auto_paint = true;
@@ -96,7 +96,7 @@ struct Config
 
     bool avoid_cover = true;
     int base_label_height = 15;
-    int step_label_height = 20;
+    int step_label_height = 15;
 
     double default_grid_width = 1.0;
     double bold_grid_width = 2.5;

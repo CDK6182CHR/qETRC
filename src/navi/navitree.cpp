@@ -45,8 +45,8 @@ void NaviTree::initUI()
 
     connect(tree, &QAbstractItemView::doubleClicked, this, &NaviTree::onDoubleClicked);
     tree->setModel(_model);
-    tree->setColumnWidth(0, 200);
-    tree->setColumnWidth(1, 50);
+    tree->setColumnWidth(0, 150);
+    tree->setColumnWidth(1, 40);
     connect(tree->selectionModel(), &QItemSelectionModel::currentChanged,
         this, &NaviTree::onCurrentChanged);
     connect(g->get(0), SIGNAL(clicked()), tree, SLOT(expandAll()));

@@ -17,7 +17,7 @@ ReadRulerWizard::ReadRulerWizard(Diagram& diagram_, QWidget* parent) :
 {
     setWindowTitle(tr("标尺综合"));
     setAttribute(Qt::WA_DeleteOnClose);
-    resize(900, 800);
+    resize(800, 700);
     initUI();
 }
 

@@ -14,7 +14,7 @@ RulerPaintWizard::RulerPaintWizard(Diagram &diagram_, QWidget *parent):
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("标尺排图向导"));
-    resize(800,800);
+    resize(600,600);
     initUI();
 }
 

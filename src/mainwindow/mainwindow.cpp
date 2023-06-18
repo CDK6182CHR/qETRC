@@ -445,7 +445,7 @@ void MainWindow::actGreedyPaint()
 	if (greedyWidget == nullptr) {
 		greedyWidget = new GreedyPaintWizard(_diagram, this);
 		greedyWidget->setWindowFlag(Qt::Dialog);
-		greedyWidget->resize(800,800);
+		greedyWidget->resize(600,600);
 		connect(greedyWidget, &GreedyPaintWizard::removeTmpTrainLine,
 			this, &MainWindow::removeTrainLine);
 		connect(greedyWidget, &GreedyPaintWizard::paintTmpTrainLine,
@@ -646,7 +646,7 @@ void MainWindow::initDockWidgets()
 	}
 	//area = manager->addDockWidget(ads::RightDockWidgetArea, dock);
 	auto* container=manager->addAutoHideDockWidget(ads::SideBarRight, dock);
-	container->setSize(320);
+	container->setSize(240);
 
 	// 速览时刻
 	if constexpr (true) {
@@ -657,7 +657,7 @@ void MainWindow::initDockWidgets()
 		timetableQuickDock = dock;
 		//manager->addDockWidgetTabToArea(dock, area);
 		container = manager->addAutoHideDockWidget(ads::SideBarRight, dock);
-		container->setSize(320);
+		container->setSize(240);
 	}
 }
 
@@ -846,7 +846,6 @@ void MainWindow::initToolbar()
 		connect(act, SIGNAL(triggered()), naviView, SLOT(importRailways()));
 		act->setToolTip(tr("导入线路\n从既有运行图文件中导入（其中全部的）线路数据"));
 		auto* btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
 
 		act = new QAction(QIcon(":/icons/rail.png"), tr("基线编辑"), this);
 		act->setToolTip(tr("基线编辑\n导航到、新建、打开或者关闭（pyETRC风格的）基线编辑面板。"));
@@ -856,7 +855,6 @@ void MainWindow::initToolbar()
 		act->setMenu(menu);
 		menu->setTitle(tr("线路编辑"));
 		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
 
 		act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺编辑"), this);
 		act->setToolTip(tr("标尺编辑 (Ctrl+B)\n"
@@ -865,7 +863,6 @@ void MainWindow::initToolbar()
 		act->setShortcut(Qt::CTRL | Qt::Key_B);
 		addAction(act);
 		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
 
 		act = new QAction(QIcon(":/icons/forbid.png"), tr("天窗编辑"), this);
 		act->setToolTip(tr("天窗编辑\n打开或导航到任意一基线的天窗编辑面板。"));
@@ -873,16 +870,13 @@ void MainWindow::initToolbar()
 		forbidMenu = new SARibbonMenu(this);
 		act->setMenu(forbidMenu);
 		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
 
 		act = new QAction(QIcon(":/icons/new-file.png"), tr("新建线路"), this);
 		connect(act, SIGNAL(triggered()), naviView, SLOT(actAddRailway()));
 		act->setToolTip(tr("新建线路\n新建空白的铁路线路"));
 		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
 
 		panel = cat->addPannel(tr("调整"));
-		btn->setMinimumWidth(80);
 
 		act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("标尺综合"), this);
 		act->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_B);
@@ -891,7 +885,6 @@ void MainWindow::initToolbar()
 			"从一组选定的车次中，读取一套标尺数据，用于建立新标尺，或更新既有标尺。"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actReadRulerWizard()));
 		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
 
 		panel->addSeparator();
 		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileDialogContentsView),
@@ -902,7 +895,6 @@ void MainWindow::initToolbar()
 		connect(act, &QAction::triggered, this, &MainWindow::actLocateDiagram);
 		addAction(act);
 		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
 
 		panel = cat->addPannel(tr("路网管理"));
 
@@ -913,7 +905,6 @@ void MainWindow::initToolbar()
 		act->setShortcut(Qt::CTRL | Qt::Key_H);
 		addAction(act);
 		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
 
 		//menu = new SARibbonMenu(this);
 		//auto actsub = menu->addAction(tr("线路数据库 (pyETRC风格)"));
@@ -1092,7 +1083,6 @@ void MainWindow::initToolbar()
 		act->setMenu(routingMenu);
 
 		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
 
 		act = new QAction(QIcon(":/icons/text.png"), tr("批量解析"), this);
 		connect(act, &QAction::triggered, this, &MainWindow::actBatchParseRouting);
@@ -1625,7 +1615,7 @@ void MainWindow::actDiagramCompare()
 {
 	auto* dialog = new DiagramCompareDialog(_diagram, this);
 	connect(dialog, &DiagramCompareDialog::showStatus, this, &MainWindow::showStatus);
-	dialog->resize(800, 800);
+	dialog->resize(600, 600);
 	dialog->open();
 }
 

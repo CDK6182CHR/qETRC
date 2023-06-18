@@ -17,7 +17,7 @@ public:
     QString default_file = "sample.pyetgr";
     QString default_raildb_file = "CRPassengerMileage.pyetlib";
     QString app_style = "windowsvista";
-    int table_row_height = 25;
+    int table_row_height = 20;
 
     bool show_train_tooltip = true;
 

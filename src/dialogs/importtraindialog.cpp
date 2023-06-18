@@ -23,7 +23,7 @@ ImportTrainDialog::ImportTrainDialog(Diagram& diagram_, QWidget* parent):
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	initUI();
-	resize(1200, 800);
+	resize(1000, 700);
 	setWindowTitle(tr("导入车次"));
 }
 

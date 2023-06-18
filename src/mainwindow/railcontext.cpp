@@ -105,7 +105,7 @@ void RailContext::initUI()
 
 		ed->setFocusPolicy(Qt::NoFocus);
 		ed->setAlignment(Qt::AlignCenter);
-		ed->setFixedWidth(120);
+		ed->setFixedWidth(100);
 
 		vlay->addWidget(ed);
 		w->setLayout(vlay);
@@ -142,7 +142,6 @@ void RailContext::initUI()
 	QAction* act;
 	act = new QAction(QIcon(":/icons/rail.png"), tr("基线编辑"), this);
 	auto* btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(70);
 	connect(act, SIGNAL(triggered()), this, SLOT(actOpenStationWidget()));
 
 	act = new QAction(QIcon(":/icons/forbid.png"), tr("天窗编辑"), this);
@@ -150,7 +149,6 @@ void RailContext::initUI()
 	connect(act, SIGNAL(triggered()), this, SLOT(actOpenForbidWidget()));
 	act->setMenu(mw->forbidMenu);
 	btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(80);
 
 	panel = page->addPannel(tr("标尺"));
 	act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺"), this);
@@ -160,13 +158,11 @@ void RailContext::initUI()
 	act->setMenu(me);
 	connect(act, SIGNAL(triggered()), this, SLOT(actSelectRuler()));
 	btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(70);
 
 	act = new QAction(QIcon(":/icons/add.png"), tr("新建标尺"), this);
 	act->setToolTip(tr("新建标尺\n新建本线的空白标尺"));
 	connect(act, SIGNAL(triggered()), this, SLOT(actAddNewRuler()));
 	btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(70);
 
 	panel = page->addPannel(tr("调整"));
 	act = new QAction(QIcon(":/icons/exchange1.png"), tr("线路反排"), this);
@@ -182,7 +178,6 @@ void RailContext::initUI()
 	act = new QAction(QIcon(":/icons/counter.png"), tr("断面对数"), this);
 	connect(act, SIGNAL(triggered()), this, SLOT(showSectionCount()));
 	btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(70);
 	panel->addSeparator();
 
 	act = new QAction(QIcon(":/icons/timetable.png"), tr("车站车次"), this);
@@ -213,7 +208,6 @@ void RailContext::initUI()
 	act->setToolTip(tr("股道分析\n根据手动给出的股道表，或本系统的内置算法，"
 		"绘出可能的股道分布情况。"));
 	btn=panel->addLargeAction(act);
-	btn->setMinimumWidth(70);
 
 	act = new QAction(QIcon(":/icons/diagram.png"), tr("线路拓扑"), this);
 	connect(act, &QAction::triggered, this, &RailContext::actRailTopo);
@@ -237,7 +231,6 @@ void RailContext::initUI()
 	act->setToolTip(tr("快速创建单线路运行图\n一键创建新的运行图页面，新运行图页面\n"
 		"仅包含当前线路，以当前线路命名。"));
 	btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(80);
 
 	panel = page->addPannel("");
 	act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
@@ -245,13 +238,11 @@ void RailContext::initUI()
 	act->setToolTip(tr("删除基线\n删除当前基线，并且从所有运行图中移除（空白运行图将被删除）。"
 		"\n自V1.0.1版本起，此操作支持撤销/重做。"));
 	btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(70);
 	connect(act, &QAction::triggered, this, &RailContext::actRemoveRailwayU);
 
 	act = new QAction(QIcon(":/icons/copy.png"), tr("副本"), this);
 	act->setToolTip(tr("创建基线副本\n以输入的名称，创建于当前基线数据一致的副本。"));
 	btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(70);
 	connect(act, &QAction::triggered, this, &RailContext::actDulplicateRailway);
 
 	act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
@@ -259,7 +250,6 @@ void RailContext::initUI()
 	connect(act, &QAction::triggered, mw, &MainWindow::focusOutRailway);
 	act->setToolTip(tr("关闭面板\n关闭当前的基线上下文工具栏页面。"));
 	btn = panel->addLargeAction(act);
-	btn->setMinimumWidth(70);
 }
 
 void RailContext::updateRailWidget(std::shared_ptr<Railway> rail)
