@@ -32,14 +32,14 @@ std::pair<QMap<QString, std::shared_ptr<TrainType> >,
     for(int i=0;i<rowCount();i++){
         auto ptr=qvariant_cast<std::shared_ptr<TrainType>>(
                          item(i,ColName)->data(qeutil::TrainTypeRole));
-        if(ptr){
+        if(ptr||true){  // 2023.06.18  not sure here
             QPen pen(item(i,ColColor)->background(),
                      item(i,ColWidth)->data(Qt::EditRole).toDouble(),
                      static_cast<Qt::PenStyle>(item(i,ColLineStyle)->data(Qt::EditRole).toInt()));
             auto np=std::make_shared<TrainType>(item(i,ColName)->text(),pen,
                     item(i,ColPassenger)->checkState()==Qt::Checked );
-            data.insert(np->name(), ptr);
-            if(ptr->operator!=(*np)){
+            data.insert(np->name(), ptr?ptr:np);
+            if(ptr && ptr->operator!=(*np)){
                 // 对象发生调整
                 modified.append(qMakePair(ptr,np));
             }

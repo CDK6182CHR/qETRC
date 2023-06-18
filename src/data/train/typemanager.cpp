@@ -5,7 +5,7 @@
 #include <QJsonObject>
 
 TypeManager::TypeManager():
-    defaultPen(QColor(0,128,0)),defaultPenPassenger(QColor(0,128,0),1.5),
+    defaultPen(QColor(0,128,0),0.5),defaultPenPassenger(QColor(0,128,0),1.0),
     defaultType(std::make_shared<TrainType>(QObject::tr("其他_"),defaultPen))
 {
 }
@@ -134,8 +134,8 @@ bool TypeManager::fromJson(const QJsonObject& obj)
 
     //先读取正则
     const QJsonArray& arreg = obj.value("type_regex").toArray();
-    double pw = obj.value("default_keche_width").toDouble(1.5),
-        fw = obj.value("default_huoche_width").toDouble(0.75);
+    double pw = obj.value("default_keche_width").toDouble(1.0),
+        fw = obj.value("default_huoche_width").toDouble(0.5);
     for (const auto& p:arreg) {
         const QJsonArray tp = p.toArray();
         auto t = appendRegex(QRegularExpression(tp.at(1).toString()), tp.at(0).toString(), tp.at(2).toBool());
@@ -182,13 +182,13 @@ bool TypeManager::fromJson(const QJsonObject& obj)
 void TypeManager::initDefaultTypes()
 {
     _types.insert(QObject::tr("其他"), defaultType);
-    addType(QObject::tr("快速"), QPen(QColor(255, 0, 0), 1.5));
-    addType(QObject::tr("特快"), QPen(QColor(0, 0, 255), 1.5));
-    addType(QObject::tr("直达特快"), QPen(QColor(255, 0, 255), 1.5));
-    addType(QObject::tr("动车组"), QPen(QColor(128, 64, 0), 1.5));
-    addType(QObject::tr("动车"), QPen(QColor(128, 64, 0), 1.5));
-    addType(QObject::tr("高速"), QPen(QColor(255, 0, 190), 1.5));
-    addType(QObject::tr("城际"), QPen(QColor(255, 51, 204), 1.5));
+    addType(QObject::tr("快速"), QPen(QColor(255, 0, 0), 1.0));
+    addType(QObject::tr("特快"), QPen(QColor(0, 0, 255), 1.0));
+    addType(QObject::tr("直达特快"), QPen(QColor(255, 0, 255), 1.0));
+    addType(QObject::tr("动车组"), QPen(QColor(128, 64, 0), 1.0));
+    addType(QObject::tr("动车"), QPen(QColor(128, 64, 0), 1.0));
+    addType(QObject::tr("高速"), QPen(QColor(255, 0, 190), 1.0));
+    addType(QObject::tr("城际"), QPen(QColor(255, 51, 204), 1.0));
 
     appendRegex(QRegularExpression(R"(^G\d+)"), QObject::tr("高速"), true);
     appendRegex(QRegularExpression(R"(^D\d+)"), QObject::tr("动车组"), true);

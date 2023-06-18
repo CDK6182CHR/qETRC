@@ -133,7 +133,7 @@ void ViewCategory::initUI()
     //group->setSelectionBehavior(QAbstractItemView::SelectItems);
     gall->currentViewGroup()->setSelectionMode(QAbstractItemView::MultiSelection);
     gall->currentViewGroup()->setSelectionModel(group->selectionModel());
-    group->setStyleSheet("QListView::item{height:30px;}");
+    group->setStyleSheet("QListView::item{height:15px;}");
     group->setGridSize(QSize(group->gridSize().width(), SystemJson::instance.table_row_height));
     gall->currentViewGroup()->setGridSize(QSize(group->gridSize().width(),
         SystemJson::instance.table_row_height));
@@ -173,7 +173,6 @@ void ViewCategory::initUI()
     act->setMenu(m);
 
     btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
     
 
     act = new QAction(QIcon(":/icons/settings.png"), tr("类型管理"), this);
@@ -635,6 +634,14 @@ void ViewCategory::actDefaultTypeSetChanged(TypeManager& manager,
     mw->getUndoStack()->push(new qecmd::ChangeTypeSet(manager, types, modified, this, true));
 }
 
+void ViewCategory::actApplyDefaultTypeSetToColl()
+{
+}
+
+
+void ViewCategory::actApplyCollTypeSetToDefault()
+{
+}
 
 void ViewCategory::actCollTypeRegexChanged(TypeManager& manager,
     std::shared_ptr<TypeManager> data)

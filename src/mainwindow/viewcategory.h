@@ -212,6 +212,18 @@ public slots:
         const QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>>& modified);
 
     /**
+     * 2023.06.18  prepared
+     * 将默认设置应用到当前运行图。
+     */
+    void actApplyDefaultTypeSetToColl();
+
+    /**
+     * 2023.06.18  prepared
+     * 将当前运行图设置保存为默认。与上一个slot应当是很类似的。
+     */
+    void actApplyCollTypeSetToDefault();
+
+    /**
      * 类型正则表达式变更
      */
     void actCollTypeRegexChanged(TypeManager& manager,

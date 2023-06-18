@@ -1,6 +1,7 @@
 ﻿#include <QMap>
 #include <QPen>
 #include <QString>
+#include <QVector>
 
 class TrainName;
 class TrainType;
@@ -124,6 +125,16 @@ public:
     void swapForRegex(TypeManager& other);
 
     // ~TypeManager()noexcept;
+
+
+    /**
+     * 2023.06.18 prepared
+     * see also TypeConfigModel::appliedData()  (typemodel.cpp)
+     * Returns the data CHANGE that has to made in order to change *this to other.
+     */
+    std::pair<QMap<QString, std::shared_ptr<TrainType>>,
+        QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>>>
+        updateTypeSetTo(const TypeManager& other);
 
 private:
     /**
