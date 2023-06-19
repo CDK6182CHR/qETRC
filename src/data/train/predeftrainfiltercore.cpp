@@ -29,7 +29,7 @@ void PredefTrainFilterCore::fromJson(const QJsonObject &obj, const TrainCollecti
     passengerType=static_cast<TrainPassenger>(obj.value("passengerType").toInt(1));
 
     const auto& tps=obj.value("types").toArray();
-    foreach(const auto& t,tps){
+    for (const auto& t:tps){
         auto tp=coll.typeManager().find(t.toString());
         assert(tp);
         types.insert(tp);

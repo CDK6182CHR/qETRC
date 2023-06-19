@@ -17,7 +17,7 @@ QT_PROMPT_SCRIPT = D:\programs\Qt\6.5.1\msvc2019_64\bin\qtenv2.bat
 
 # specify output dir
 OUTPUT_ROOT = $(QETRC_ROOT)\..\archive
-WIN64_DIR = $(OUTPUT_ROOT)\win64-Qt6
+WIN64_DIR = $(OUTPUT_ROOT)\win64
 PATCH_DIR = $(OUTPUT_ROOT)\patch
 
 WIN64_ARCHIVE = qETRC-win64$(SUFFIX).7z
@@ -51,7 +51,6 @@ win64: win64_dir
 	$(COPY) $(SAMPLE_FILE) $(WIN64_DIR)
 	$(COPY) $(RAIL_LIB_FILE) $(WIN64_DIR)
 	$(COPY) $(SARIBBON_LIB) $(WIN64_DIR)
-	$(COPY) $(ADS_LIB) $(WIN64_DIR)
 	$(QT_PROMPT_SCRIPT) && cd /d $(WIN64_DIR) && cd && windeployqt $(BIN_FILE)
 	cd $(OUTPUT_ROOT) && $(ZIP) $(WIN64_ARCHIVE) $(WIN64_DIR)
 
@@ -70,7 +69,6 @@ LOCAL_DIR = $(QETRC_ROOT)\..\local
 local:
 	$(COPY) $(BUILD_DIR)\$(BIN_FILE) $(LOCAL_DIR)
 	$(COPY) $(SARIBBON_LIB) $(LOCAL_DIR)
-	$(COPY) $(ADS_LIB) $(LOCAL_DIR)
 
 win64_dir:
 	-mkdir $(WIN64_DIR)

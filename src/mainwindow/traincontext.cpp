@@ -271,7 +271,6 @@ void TrainContext::initUI()
 		act = new QAction(QIcon(":/icons/timetable.png"), tr("时刻表"), this);
 		act->setToolTip(tr("时刻表编辑\n显示简洁的、仅包含时刻表的编辑页面"));
 		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
 		connect(act, SIGNAL(triggered()), this, SLOT(actShowBasicWidget()));
 
 		act = new QAction(QIcon(":/icons/edit.png"), tr("编辑"), this);

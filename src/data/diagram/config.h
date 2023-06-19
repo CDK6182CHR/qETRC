@@ -21,8 +21,8 @@ struct MarginConfig {
         ruler_label_width = 70,
         count_label_width = 60;
 private:
-    int left = 275,
-        right = 230;
+    int left = 220,
+        right = 170;
 
     friend struct Config;
     friend class ConfigDialog;
