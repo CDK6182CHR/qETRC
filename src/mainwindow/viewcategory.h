@@ -232,6 +232,10 @@ public slots:
     void actDefaultTypeRegexChanged(TypeManager& manager,
         std::shared_ptr<TypeManager> data);
 
+    void actApplyDefaultTypeRegexToColl();
+
+    void actApplyCollTypeRegexToDefault();
+
     void saveDefaultConfigs();
 
     void actAddFilter(TrainCollection& coll);

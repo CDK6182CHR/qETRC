@@ -21,7 +21,7 @@ public:
     TrainType(const QString& name, const QPen& pen, bool passenger=false);
 
     // for test...
-    // TrainType(const TrainType& other);
+    TrainType(const TrainType& other) = default;
 
     const QPen& pen()const{return _pen;}
     QPen& pen() { return _pen; }

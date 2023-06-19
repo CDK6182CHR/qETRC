@@ -178,26 +178,33 @@ void ViewCategory::initUI()
     act = new QAction(QIcon(":/icons/settings.png"), tr("类型管理"), this);
     connect(act, &QAction::triggered, this, &ViewCategory::actTypeConfig);
     act->setToolTip(tr("类型管理\n管理[当前运行图文件]的列车类型，及各种类型的颜色、线形等。"));
-    panel->addMediumAction(act);
+    
 
     m = new SARibbonMenu(cat);
     ma = m->addAction(tr("默认类型管理"));
     connect(ma, &QAction::triggered, this, &ViewCategory::actTypeConfigDefault);
     ma->setToolTip(tr("默认类型管理\n配置[系统默认设置]的类型管理部分，"
         "将用于缺省的新运行图。"));
+    m->addSeparator();
+    m->addAction(tr("应用默认类型管理到当前运行图"), this, &ViewCategory::actApplyDefaultTypeSetToColl);
+    m->addAction(tr("保存当前运行图类型管理为默认"), this, &ViewCategory::actApplyCollTypeSetToDefault);
     act->setMenu(m);
+    panel->addMediumAction(act);
 
     act = new QAction(QIcon(":/icons/filter.png"), tr("类型规则"), this);
     connect(act, &QAction::triggered, this, &ViewCategory::actTypeRegex);
     act->setToolTip(tr("类型判定规则\n编辑[当前运行图文件]的由正则表达式判定车次所属类型的规则。"));
-    panel->addMediumAction(act);
 
     m = new SARibbonMenu(cat);
     ma = m->addAction(tr("默认类型规则"));
     connect(ma, &QAction::triggered, this, &ViewCategory::actTypeRegexDefault);
     ma->setToolTip(tr("默认类型规则\n配置[系统默认设置]的正则表达式判定车次所述类型规则，"
         "将用于缺省的新运行图。"));
+    m->addSeparator();
+    m->addAction(tr("应用默认类型规则到当前运行图"), this, &ViewCategory::actApplyDefaultTypeRegexToColl);
+    m->addAction(tr("保存当前运行图类型规则为默认"), this, &ViewCategory::actApplyCollTypeRegexToDefault);
     act->setMenu(m);
+    panel->addMediumAction(act);
 }
 
 void ViewCategory::setupTrainFilterMenu()
@@ -636,11 +643,15 @@ void ViewCategory::actDefaultTypeSetChanged(TypeManager& manager,
 
 void ViewCategory::actApplyDefaultTypeSetToColl()
 {
+    auto [data, modified] = diagram.trainCollection().typeManager().updateTypeSetTo(diagram.defaultTypeManager());
+    actCollTypeSetChanged(diagram.trainCollection().typeManager(), data, modified);
 }
 
 
 void ViewCategory::actApplyCollTypeSetToDefault()
 {
+    auto [data, modified] = diagram.defaultTypeManager().updateTypeSetTo(diagram.trainCollection().typeManager());
+    actDefaultTypeSetChanged(diagram.defaultTypeManager(), data, modified);
 }
 
 void ViewCategory::actCollTypeRegexChanged(TypeManager& manager,
@@ -652,6 +663,20 @@ void ViewCategory::actCollTypeRegexChanged(TypeManager& manager,
 void ViewCategory::actDefaultTypeRegexChanged(TypeManager& manager, std::shared_ptr<TypeManager> data)
 {
     mw->getUndoStack()->push(new qecmd::ChangeTypeRegex(manager, data,this,true));
+}
+
+void ViewCategory::actApplyDefaultTypeRegexToColl()
+{
+    auto data = std::make_shared<TypeManager>();
+    data->regexRef() = diagram.defaultTypeManager().regex();    // copy assign
+    actCollTypeRegexChanged(diagram.trainCollection().typeManager(), std::move(data));
+}
+
+void ViewCategory::actApplyCollTypeRegexToDefault()
+{
+    auto data = std::make_shared<TypeManager>();
+    data->regexRef() = diagram.trainCollection().typeManager().regex();    // copy assign
+    actDefaultTypeRegexChanged(diagram.defaultTypeManager(), std::move(data));
 }
 
 void ViewCategory::saveDefaultConfigs()

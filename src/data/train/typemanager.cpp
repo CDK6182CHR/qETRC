@@ -127,6 +127,32 @@ void TypeManager::swapForRegex(TypeManager& other)
 //    qDebug()<<"typeManager delete"<<Qt::endl;
 //}
 
+std::pair<QMap<QString, std::shared_ptr<TrainType>>, QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>>> 
+TypeManager::updateTypeSetTo(const TypeManager& other)
+{
+    QMap<QString, std::shared_ptr<TrainType>> data;
+    QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>> modified;
+    for (auto itr=other.types().cbegin();itr!=other.types().cend();++itr) {
+        if (auto p = _types.find(itr.key()); p != _types.end()) {
+            // in this case, the required type exists in current object. 
+            data.insert(itr.key(), p.value());
+            // check whether modified
+            if (itr.value()->operator!=(*p.value())) {
+                // data is modified. However, we cannot put the object in `itr` directly in `modified`; 
+                // instead, create a new object.
+                auto ntype = std::make_shared<TrainType>(*itr.value());   // copy construct
+                modified.emplace_back(p.value(), ntype);
+            }
+        }
+        else {
+            // the required type does not exist; create a new type
+            auto ntype = std::make_shared<TrainType>(*itr.value());   // copy construct
+            data.insert(itr.key(), ntype);
+        }
+    }
+    return std::make_pair(data, modified);
+}
+
 bool TypeManager::fromJson(const QJsonObject& obj)
 {
     if (obj.isEmpty())
