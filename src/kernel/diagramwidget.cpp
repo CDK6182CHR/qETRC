@@ -990,10 +990,15 @@ void DiagramWidget::setVLines(double width, int hour_count,
     int vlines = 60 / gap;   //每小时纵线数量+1
     int centerj = vlines / 2;   //中心那条线的j下标。与它除minute_marks_gap同余的是要标注的
 
+    int solid_line_factor = static_cast<int>(std::round(
+        config().minutes_per_vertical_solid / config().minutes_per_vertical_line));
+    int bold_line_factor = static_cast<int>(std::round(
+        config().minutes_per_vertical_bold / config().minutes_per_vertical_line));
+
     QPen
-        pen_hour(config().grid_color, config().bold_grid_width),
-        pen_half(config().grid_color, config().default_grid_width, Qt::DashLine),
-        pen_other(config().grid_color, config().default_grid_width);
+        pen_bold(config().grid_color, config().bold_grid_width),
+        pen_dash(config().grid_color, config().default_grid_width, Qt::DashLine),
+        pen_solid(config().grid_color, config().default_grid_width);
 
     QList<QGraphicsItem*> topItems, bottomItems;
 
@@ -1044,7 +1049,7 @@ void DiagramWidget::setVLines(double width, int hour_count,
         //小时线
         if (i) {
             for (const auto& t : railYRanges) {
-                scene()->addLine(x, t.first, x, t.second, pen_hour);
+                scene()->addLine(x, t.first, x, t.second, pen_bold);
             }
         }
         //分钟线
@@ -1053,10 +1058,15 @@ void DiagramWidget::setVLines(double width, int hour_count,
             double minu = j * gap;
             for (const auto& t : railYRanges) {
                 auto* line = scene()->addLine(x, t.first, x, t.second);
-                if (minu == 30)
-                    line->setPen(pen_half);
-                else
-                    line->setPen(pen_other);
+                if (j % bold_line_factor == 0) {
+                    line->setPen(pen_bold);
+                }
+                else if (j % solid_line_factor == 0) {
+                    line->setPen(pen_solid);
+                }
+                else {
+                    line->setPen(pen_dash);
+                }
             }
             if (j % minute_marks_gap == centerj % minute_marks_gap) {
                 //标记分钟数
