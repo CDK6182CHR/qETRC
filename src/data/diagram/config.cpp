@@ -69,8 +69,9 @@ bool Config::fromJson(const QJsonObject& obj)
     FROM_OBJ(minutes_per_vertical_line, Double);
     FROM_OBJ(minute_mark_gap_pix, Double);
 
-    FROM_OBJ(minutes_per_vertical_solid, Double);
+    FROM_OBJ(minutes_per_vertical_second, Double);
     FROM_OBJ(minutes_per_vertical_bold, Double);
+    FROM_OBJ(dash_as_second_level_vline, Bool);
     
     FROM_OBJ(bold_line_level, Int);
     FROM_OBJ(show_station_level, Int);
@@ -126,7 +127,8 @@ QJsonObject Config::toJson() const
         TO_OBJ(end_hour)
         TO_OBJ(minutes_per_vertical_line)
         TO_OBJ(minutes_per_vertical_bold)
-        TO_OBJ(minutes_per_vertical_solid)
+        TO_OBJ(minutes_per_vertical_second)
+        TO_OBJ(dash_as_second_level_vline)
         TO_OBJ(minute_mark_gap_pix)
         TO_OBJ(bold_line_level)
         TO_OBJ(show_station_level)

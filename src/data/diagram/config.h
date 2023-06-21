@@ -74,8 +74,9 @@ struct Config
         minute_mark_gap_pix = 200;
     // 2023.06.20 add: new control for bold lines and dash lines
     double
-        minutes_per_vertical_solid = 30.0,
+        minutes_per_vertical_second = 30.0,
         minutes_per_vertical_bold = 60.0;
+    bool dash_as_second_level_vline = false;
     int bold_line_level = 2;
     int show_station_level = 5;   // 2023.06.17
     bool show_line_in_station = true;

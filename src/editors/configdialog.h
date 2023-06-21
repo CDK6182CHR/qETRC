@@ -31,7 +31,8 @@ class ConfigDialog : public QDialog
     bool repaint=false;
     const std::shared_ptr<DiagramPage> page;
 
-    QSpinBox* spStartHour, * spEndHour, * spVLines, * spMinMarkInter;
+    QSpinBox* spStartHour, * spEndHour, * spMinMarkInter;
+    QDoubleSpinBox* sdVLineBold, * sdVLineSecond, * sdVLineThird;
     QSpinBox* spMarginUp, * spMarginDown, * spRulerWidth,
         * spMileWidth, * spHWhite, * spStationWidth, * spInterval, * spCountWidth;
     QSpinBox *spValidWidth,*spStartLabelHeight,*spEndLabelHeight,
@@ -39,7 +40,7 @@ class ConfigDialog : public QDialog
     QDoubleSpinBox* sdScaleX, * sdSlimWidth, * sdBoldWidth, *sdScaleYdist,
             *sdScaleYsec;
     QSpinBox* spBoldLevel, * spShowLevel;
-    QComboBox* cbShowTimeMark;
+    QComboBox* cbShowTimeMark, * cbVLineStyle;
     QCheckBox *ckFullName,*ckEndLabel,*ckAvoidCollid;
     QCheckBox* ckShowRuler, * ckShowMile, * ckShowCount;
     QPushButton* btnGridColor, * btnTextColor;

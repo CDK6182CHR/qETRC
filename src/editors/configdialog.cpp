@@ -12,6 +12,7 @@
 #include <QDoubleSpinBox>
 #include <QFormLayout>
 #include <QGroupBox>
+#include <QMessageBox>
 
 
 ConfigDialog::ConfigDialog(Config &cfg,bool forDefault_, QWidget *parent):
@@ -32,7 +33,7 @@ ConfigDialog::ConfigDialog(Config& cfg, const std::shared_ptr<DiagramPage>& page
     QDialog(parent),_cfg(cfg),forDefault(false),page(page)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    resize(600, 600);
+    resize(600, 700);
     setWindowTitle(tr("运行图显示设置 - %1").arg(page->name()));
     initUI();
     refreshData();
@@ -72,11 +73,37 @@ void ConfigDialog::initUI()
         form->addRow(tr("横轴每像素秒数"),sd);
         sdScaleX=sd;
 
-        sp=new QSpinBox;
-        sp->setRange(0,59);
-        sp->setToolTip(tr("每小时的时长范围内纵线的数目，不包括整点线"));
-        form->addRow(tr("每小时纵线数"),sp);
-        spVLines=sp;
+        //sp=new QSpinBox;
+        //sp->setRange(0,59);
+        //sp->setToolTip(tr("每小时的时长范围内纵线的数目，不包括整点线"));
+        //form->addRow(tr("每小时纵线数"),sp);
+        //spVLines=sp;
+
+        cbVLineStyle = new QComboBox;
+        cbVLineStyle->addItem(tr("第二级细实线，第三级细虚线"));
+        cbVLineStyle->addItem(tr("第二级细虚线，第三级细实线"));
+        form->addRow(tr("纵线形式"), cbVLineStyle);
+
+        sd = new QDoubleSpinBox;
+        sd->setRange(0, 60);
+        sd->setToolTip(tr("小时线以下第一级纵线（粗实线）的间隔分钟数"));
+        sd->setSuffix(tr(" 分钟 (min)"));
+        form->addRow(tr("一级纵线间隔"), sd);
+        sdVLineBold = sd;
+
+        sd = new QDoubleSpinBox;
+        sd->setRange(0, 60);
+        sd->setToolTip(tr("小时线以下第二级纵线（细实线或细虚线）的间隔分钟数"));
+        sd->setSuffix(tr(" 分钟 (min)"));
+        form->addRow(tr("二级纵线间隔"), sd);
+        sdVLineSecond = sd;
+
+        sd = new QDoubleSpinBox;
+        sd->setRange(0, 60);
+        sd->setToolTip(tr("小时线以下第三级纵线（细虚线或细实线）的间隔分钟数"));
+        sd->setSuffix(tr(" 分钟 (min)"));
+        form->addRow(tr("三级纵线间隔"), sd);
+        sdVLineThird = sd;
 
         sp=new QSpinBox;
         sp->setRange(0,10000000);
@@ -331,55 +358,58 @@ void ConfigDialog::initUI()
 
 }
 
-#define _SET_VALUE(_spin,_key) _spin->setValue(_cfg._key)
-#define _SET_MARGIN(_spin,_key) _spin->setValue(_cfg.margins._key)
-#define _SET_CHECK(_check,_key) _check->setChecked(_cfg._key)
+#define SET_VALUE(_spin,_key) _spin->setValue(_cfg._key)
+#define SET_MARGIN(_spin,_key) _spin->setValue(_cfg.margins._key)
+#define SET_CHECK(_check,_key) _check->setChecked(_cfg._key)
 
 void ConfigDialog::refreshData()
 {
     //时间轴
-    _SET_VALUE(spStartHour, start_hour);
-    _SET_VALUE(spEndHour, end_hour);
-    _SET_VALUE(sdScaleX, seconds_per_pix);
-    spVLines->setValue(int(60 / (_cfg.minutes_per_vertical_line) - 1));
-    _SET_VALUE(spMinMarkInter, minute_mark_gap_pix);
+    SET_VALUE(spStartHour, start_hour);
+    SET_VALUE(spEndHour, end_hour);
+    SET_VALUE(sdScaleX, seconds_per_pix);
+    SET_VALUE(sdVLineBold, minutes_per_vertical_bold);
+    SET_VALUE(sdVLineSecond, minutes_per_vertical_second);
+    SET_VALUE(sdVLineThird, minutes_per_vertical_line);
+    SET_VALUE(spMinMarkInter, minute_mark_gap_pix);
+    cbVLineStyle->setCurrentIndex(_cfg.dash_as_second_level_vline ? 1 : 0);
 
     //运行图边距
-    _SET_MARGIN(spMarginUp, up);
-    _SET_MARGIN(spMarginDown, down);
-    _SET_MARGIN(spRulerWidth,ruler_label_width);
-    _SET_MARGIN(spMileWidth, mile_label_width);
-    _SET_MARGIN(spStationWidth, label_width);
-    _SET_MARGIN(spCountWidth, count_label_width);
+    SET_MARGIN(spMarginUp, up);
+    SET_MARGIN(spMarginDown, down);
+    SET_MARGIN(spRulerWidth,ruler_label_width);
+    SET_MARGIN(spMileWidth, mile_label_width);
+    SET_MARGIN(spStationWidth, label_width);
+    SET_MARGIN(spCountWidth, count_label_width);
     spHWhite->setValue(_cfg.margins.right - _cfg.margins.right_white - _cfg.margins.label_width
         - _cfg.margins.count_label_width);
-    _SET_MARGIN(spInterval, gap_between_railways);
+    SET_MARGIN(spInterval, gap_between_railways);
 
     //格线控制
-    _SET_VALUE(sdSlimWidth, default_grid_width);
-    _SET_VALUE(sdBoldWidth, bold_grid_width);
+    SET_VALUE(sdSlimWidth, default_grid_width);
+    SET_VALUE(sdBoldWidth, bold_grid_width);
 
     //空间轴
-    _SET_VALUE(sdScaleYdist, pixels_per_km);
-    _SET_VALUE(sdScaleYsec, seconds_per_pix_y);
-    _SET_VALUE(spShowLevel, show_station_level);
-    _SET_VALUE(spBoldLevel, bold_line_level);
-    _SET_CHECK(ckShowRuler, show_ruler_bar);
-    _SET_CHECK(ckShowMile, show_mile_bar);
-    _SET_CHECK(ckShowCount, show_count_bar);
+    SET_VALUE(sdScaleYdist, pixels_per_km);
+    SET_VALUE(sdScaleYsec, seconds_per_pix_y);
+    SET_VALUE(spShowLevel, show_station_level);
+    SET_VALUE(spBoldLevel, bold_line_level);
+    SET_CHECK(ckShowRuler, show_ruler_bar);
+    SET_CHECK(ckShowMile, show_mile_bar);
+    SET_CHECK(ckShowCount, show_count_bar);
 
     //运行线控制
-    _SET_VALUE(spValidWidth, valid_width);
+    SET_VALUE(spValidWidth, valid_width);
     cbShowTimeMark->setCurrentIndex(_cfg.show_time_mark);
     ckEndLabel->setChecked(_cfg.end_label_name);
     ckFullName->setChecked(_cfg.show_full_train_name);
 
     //标签高度
     ckAvoidCollid->setChecked(_cfg.avoid_cover);
-    _SET_VALUE(spStartLabelHeight, start_label_height);
-    _SET_VALUE(spEndLabelHeight, end_label_height);
-    _SET_VALUE(spBaseHeight, base_label_height);
-    _SET_VALUE(spStepHeight, step_label_height);
+    SET_VALUE(spStartLabelHeight, start_label_height);
+    SET_VALUE(spEndLabelHeight, end_label_height);
+    SET_VALUE(spBaseHeight, base_label_height);
+    SET_VALUE(spStepHeight, step_label_height);
 
     gridColor = _cfg.grid_color;
     textColor = _cfg.text_color;
@@ -393,12 +423,12 @@ void ConfigDialog::refreshData()
         .arg(textColor.green()).arg(textColor.blue()));
 }
 
-#undef _SET_VALUE
-#undef _SET_MARGIN
+#undef SET_VALUE
+#undef SET_MARGIN
 
-#define _GET_VALUE(_spin,_key) cnew._key=_spin->value()
-#define _GET_MARGIN(_spin,_key) cnew.margins._key=_spin->value()
-#define _GET_CHECK(_check,_key) cnew._key=_check->isChecked()
+#define GET_VALUE(_spin,_key) cnew._key=_spin->value()
+#define GET_MARGIN(_spin,_key) cnew.margins._key=_spin->value()
+#define GET_CHECK(_check,_key) cnew._key=_check->isChecked()
 
 void ConfigDialog::actApply()
 {
@@ -407,53 +437,74 @@ void ConfigDialog::actApply()
     bool repaint = false;
 
     //时间轴
-    _GET_VALUE(spStartHour, start_hour);
-    _GET_VALUE(spEndHour, end_hour);
-    _GET_VALUE(sdScaleX, seconds_per_pix);
-    cnew.minutes_per_vertical_line = 60 / (spVLines->value() + 1);
-    _GET_VALUE(spMinMarkInter, minute_mark_gap_pix);
+    GET_VALUE(spStartHour, start_hour);
+    GET_VALUE(spEndHour, end_hour);
+    GET_VALUE(sdScaleX, seconds_per_pix);
+    GET_VALUE(sdVLineBold, minutes_per_vertical_bold);
+    GET_VALUE(sdVLineSecond, minutes_per_vertical_second);
+    GET_VALUE(sdVLineThird, minutes_per_vertical_line);
+    GET_VALUE(spMinMarkInter, minute_mark_gap_pix);
+    cnew.dash_as_second_level_vline = bool(cbVLineStyle->currentIndex());
 
     //运行图边距
-    _GET_MARGIN(spMarginUp, up);
-    _GET_MARGIN(spMarginDown, down);
-    _GET_MARGIN(spRulerWidth, ruler_label_width);
-    _GET_MARGIN(spMileWidth, mile_label_width);
-    _GET_MARGIN(spStationWidth, label_width);
-    _GET_MARGIN(spCountWidth, count_label_width);
+    GET_MARGIN(spMarginUp, up);
+    GET_MARGIN(spMarginDown, down);
+    GET_MARGIN(spRulerWidth, ruler_label_width);
+    GET_MARGIN(spMileWidth, mile_label_width);
+    GET_MARGIN(spStationWidth, label_width);
+    GET_MARGIN(spCountWidth, count_label_width);
     cnew.margins.left = spHWhite->value() + cnew.margins.ruler_label_width +
         cnew.margins.mile_label_width + cnew.margins.label_width + cnew.margins.left_white;
     cnew.margins.right = spHWhite->value() + cnew.margins.right_white +
         cnew.margins.label_width + cnew.margins.count_label_width;
-    _GET_MARGIN(spInterval, gap_between_railways);
+    GET_MARGIN(spInterval, gap_between_railways);
 
     //格线控制
-    _GET_VALUE(sdSlimWidth, default_grid_width);
-    _GET_VALUE(sdBoldWidth, bold_grid_width);
+    GET_VALUE(sdSlimWidth, default_grid_width);
+    GET_VALUE(sdBoldWidth, bold_grid_width);
 
     //空间轴
-    _GET_VALUE(sdScaleYdist, pixels_per_km);
-    _GET_VALUE(sdScaleYsec, seconds_per_pix_y);
-    _GET_VALUE(spShowLevel, show_station_level);
-    _GET_VALUE(spBoldLevel, bold_line_level);
-    _GET_CHECK(ckShowRuler, show_ruler_bar);
-    _GET_CHECK(ckShowMile, show_mile_bar);
-    _GET_CHECK(ckShowCount, show_count_bar);
+    GET_VALUE(sdScaleYdist, pixels_per_km);
+    GET_VALUE(sdScaleYsec, seconds_per_pix_y);
+    GET_VALUE(spShowLevel, show_station_level);
+    GET_VALUE(spBoldLevel, bold_line_level);
+    GET_CHECK(ckShowRuler, show_ruler_bar);
+    GET_CHECK(ckShowMile, show_mile_bar);
+    GET_CHECK(ckShowCount, show_count_bar);
 
     //运行线控制
-    _GET_VALUE(spValidWidth, valid_width);
+    GET_VALUE(spValidWidth, valid_width);
     cnew.show_time_mark = cbShowTimeMark->currentIndex();
     cnew.end_label_name = ckEndLabel->isChecked();
     cnew.show_full_train_name = ckFullName->isChecked();
 
     //标签高度
     cnew.avoid_cover = ckAvoidCollid->isChecked();
-    _GET_VALUE(spStartLabelHeight, start_label_height);
-    _GET_VALUE(spEndLabelHeight, end_label_height);
-    _GET_VALUE(spBaseHeight, base_label_height);
-    _GET_VALUE(spStepHeight, step_label_height);
+    GET_VALUE(spStartLabelHeight, start_label_height);
+    GET_VALUE(spEndLabelHeight, end_label_height);
+    GET_VALUE(spBaseHeight, base_label_height);
+    GET_VALUE(spStepHeight, step_label_height);
     
     cnew.grid_color = gridColor;
     cnew.text_color = textColor;
+
+    // check and warnings
+    QString warns{};
+    if (std::fmod(60., cnew.minutes_per_vertical_line) > 1e-6 ||
+        std::fmod(60., cnew.minutes_per_vertical_bold) > 1e-6 ||
+        std::fmod(60., cnew.minutes_per_vertical_second) > 1e-6) {
+        warns.append(tr("[一级|二级|三级]纵线间隔值不是60的因数，可能导致铺画异常\n"));
+    }
+    if (std::fmod(cnew.minutes_per_vertical_bold, cnew.minutes_per_vertical_second) > 1e-6 ||
+        std::fmod(cnew.minutes_per_vertical_second, cnew.minutes_per_vertical_line) > 1e-6) {
+        warns.append(tr("一级纵线间隔不是二级纵线间隔的整数倍，或二级纵线间隔不是三级纵线间隔的整数倍，"
+            "可能导致铺画异常\n"));
+    }
+
+    if (!warns.isEmpty()) {
+        warns.append(tr("以上警告不影响结果提交，但强烈建议修正以避免可能的异常行为！"));
+        QMessageBox::warning(this, tr("警告"), warns);
+    }
 
     if (page) {
         emit onPageConfigApplied(_cfg, cnew, repaint, page);

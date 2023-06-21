@@ -990,8 +990,8 @@ void DiagramWidget::setVLines(double width, int hour_count,
     int vlines = 60 / gap;   //每小时纵线数量+1
     int centerj = vlines / 2;   //中心那条线的j下标。与它除minute_marks_gap同余的是要标注的
 
-    int solid_line_factor = static_cast<int>(std::round(
-        config().minutes_per_vertical_solid / config().minutes_per_vertical_line));
+    int second_line_factor = static_cast<int>(std::round(
+        config().minutes_per_vertical_second / config().minutes_per_vertical_line));
     int bold_line_factor = static_cast<int>(std::round(
         config().minutes_per_vertical_bold / config().minutes_per_vertical_line));
 
@@ -999,6 +999,9 @@ void DiagramWidget::setVLines(double width, int hour_count,
         pen_bold(config().grid_color, config().bold_grid_width),
         pen_dash(config().grid_color, config().default_grid_width, Qt::DashLine),
         pen_solid(config().grid_color, config().default_grid_width);
+    pen_dash.setDashPattern({ 5,5 });
+    const auto& pen_second = config().dash_as_second_level_vline ? pen_dash : pen_solid;
+    const auto& pen_third = config().dash_as_second_level_vline ? pen_solid : pen_dash;
 
     QList<QGraphicsItem*> topItems, bottomItems;
 
@@ -1025,12 +1028,12 @@ void DiagramWidget::setVLines(double width, int hour_count,
     ));
 
     QFont font;
-    font.setPixelSize(25);
-    font.setBold(true);
+    font.setPixelSize(20);
+    //font.setBold(true);
 
     QFont fontmin;
-    fontmin.setPixelSize(15);
-    fontmin.setBold(true);
+    fontmin.setPixelSize(12);
+    //fontmin.setBold(true);
 
     for (int i = 0; i < hour_count + 1; i++) {
         double x = config().totalLeftMargin() + i * 3600 / config().seconds_per_pix;
@@ -1061,11 +1064,11 @@ void DiagramWidget::setVLines(double width, int hour_count,
                 if (j % bold_line_factor == 0) {
                     line->setPen(pen_bold);
                 }
-                else if (j % solid_line_factor == 0) {
-                    line->setPen(pen_solid);
+                else if (j % second_line_factor == 0) {
+                    line->setPen(pen_second);
                 }
                 else {
-                    line->setPen(pen_dash);
+                    line->setPen(pen_third);
                 }
             }
             if (j % minute_marks_gap == centerj % minute_marks_gap) {
