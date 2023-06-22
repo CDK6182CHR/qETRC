@@ -492,7 +492,7 @@ void MainWindow::initDockWidgets()
 	//manager->setConfigFlag(ads::CDockManager::FocusHighlighting, true);
 
 	// Central
-	if (SystemJson::instance.use_central_widget || true) {
+	if (SystemJson::instance.use_central_widget) {
 		dock = new ads::CDockWidget(tr("运行图窗口"));
 		dock->setFeature(ads::CDockWidget::NoTab, true);
 		auto* w = new QWidget;
@@ -501,6 +501,7 @@ void MainWindow::initDockWidgets()
 
 		auto* c = manager->setCentralWidget(dock);
 		centralArea = c;
+		//c->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	}
 
 	//总导航
@@ -553,8 +554,9 @@ void MainWindow::initDockWidgets()
 		connect(naviView, &NaviTree::activatePageAt,
 			this, &MainWindow::activatePageWidget);
 	}
-	auto* area = manager->addDockWidget(ads::LeftDockWidgetArea, dock);
-	//auto autoHideArea = manager->addAutoHideDockWidget(ads::SideBarLeft, dock);
+	//auto* area = manager->addDockWidget(ads::LeftDockWidgetArea, dock);
+	auto autoHideArea = manager->addAutoHideDockWidget(ads::SideBarLeft, dock);
+	autoHideArea->setSize(240);
 
 	// 历史记录
 	if constexpr (true) {
@@ -564,8 +566,9 @@ void MainWindow::initDockWidgets()
 		auto* dock = new ads::CDockWidget(tr("历史记录"));
 		dock->setWidget(view);
 		undoDock = dock;
-		area = manager->addDockWidget(ads::BottomDockWidgetArea, dock, area);
-		//manager->addAutoHideDockWidget(ads::SideBarLeft, dock);
+		//area = manager->addDockWidget(ads::BottomDockWidgetArea, dock, area);
+		autoHideArea = manager->addAutoHideDockWidget(ads::SideBarLeft, dock);
+		autoHideArea->setSize(240);
 }
 
 #ifdef Q_OS_ANDROID
@@ -643,10 +646,13 @@ void MainWindow::initDockWidgets()
 			this, &MainWindow::showQuickTimetable);
 		connect(w, &TrainInfoWidget::switchToRouting,
 			this, &MainWindow::focusInRouting);
+		//dock->setMinimumSize(200, 200);
+		dock->setBaseSize(200, 200);
 	}
-	//area = manager->addDockWidget(ads::RightDockWidgetArea, dock);
-	auto* container=manager->addAutoHideDockWidget(ads::SideBarRight, dock);
-	container->setSize(240);
+	auto* area = manager->addDockWidget(ads::RightDockWidgetArea, dock);
+	//auto* container=manager->addAutoHideDockWidget(ads::SideBarRight, dock);
+	//container->setSize(240);
+	//area->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Minimum);
 
 	// 速览时刻
 	if constexpr (true) {
@@ -655,9 +661,11 @@ void MainWindow::initDockWidgets()
 		dock->setWidget(w);
 		timetableQuickWidget = w;
 		timetableQuickDock = dock;
-		//manager->addDockWidgetTabToArea(dock, area);
-		container = manager->addAutoHideDockWidget(ads::SideBarRight, dock);
-		container->setSize(240);
+		//dock->setMinimumSize(200, 200);
+		dock->setBaseSize(200, 200);
+		manager->addDockWidgetTabToArea(dock, area);
+		//container = manager->addAutoHideDockWidget(ads::SideBarRight, dock);
+		//container->setSize(240);
 	}
 }
 

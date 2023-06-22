@@ -19,7 +19,6 @@ ConfigDialog::ConfigDialog(Config &cfg,bool forDefault_, QWidget *parent):
     QDialog(parent),_cfg(cfg),forDefault(forDefault_),page(nullptr)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    resize(600, 600);
     if (forDefault) {
         setWindowTitle(tr("系统默认显示设置"));
     }
@@ -33,7 +32,6 @@ ConfigDialog::ConfigDialog(Config& cfg, const std::shared_ptr<DiagramPage>& page
     QDialog(parent),_cfg(cfg),forDefault(false),page(page)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    resize(600, 700);
     setWindowTitle(tr("运行图显示设置 - %1").arg(page->name()));
     initUI();
     refreshData();
@@ -41,6 +39,7 @@ ConfigDialog::ConfigDialog(Config& cfg, const std::shared_ptr<DiagramPage>& page
 
 void ConfigDialog::initUI()
 {
+    resize(600, 700);
     auto* hlay=new QHBoxLayout;
     QVBoxLayout* vlay;
     QFormLayout* form;

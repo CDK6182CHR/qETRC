@@ -58,6 +58,12 @@ void TimetableQuickWidget::initUI()
     table->setItemDelegateForColumn(TimetableQuickModel::ColTime,
         new TimeQuickDelegate(this));
     table->setContextMenuPolicy(Qt::CustomContextMenu);
+    {
+        int c = 0;
+        for (int w : {60, 60, 60}) {
+            table->setColumnWidth(c++, w);
+        }
+    }
     connect(table, &QTableView::customContextMenuRequested,
         this, &TimetableQuickWidget::onTableContext);
 
@@ -151,7 +157,7 @@ void TimetableQuickWidget::refreshData()
     for(int i=0;i<train->stationCount();i++){
         table->setSpan(2*i,0,2,1);
     }
-    table->resizeColumnsToContents();
+    //table->resizeColumnsToContents();
 
     onStopOnlyChanged(ckStopOnly->isChecked());
 }

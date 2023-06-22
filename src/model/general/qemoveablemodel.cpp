@@ -10,8 +10,10 @@ bool QEMoveableModel::moveRows(const QModelIndex& sourceParent, int sourceRow, i
 {
 	updating = true;
 	if (sourceParent == destinationParent) {
-		beginMoveRows(sourceParent, sourceRow, sourceRow + count - 1,
-			destinationParent, destinationChild);
+		// 2023.06.22: Do NOT call this low-level APIs, since the
+		// moving is implemented via the APIs of QStandardItemModel. Such APIs should take care of these well.
+		//bool flag = beginMoveRows(sourceParent, sourceRow, sourceRow + count - 1,
+		//	destinationParent, destinationChild);
 		for (int i = 0; i < count; i++) {
 			int src = sourceRow + i, dst = destinationChild + i;
 			if (src != dst) {
@@ -29,7 +31,7 @@ bool QEMoveableModel::moveRows(const QModelIndex& sourceParent, int sourceRow, i
 				//removeRow(nsrc);
 			}
 		}
-		endMoveRows();
+		//endMoveRows();
 	}
 	updating = false;
 	return true;
@@ -50,14 +52,14 @@ void QEMoveableModel::moveUp(int row)
 {
 	if (row > 0 && row < rowCount()) {
         updating=true;
-		beginMoveRows({}, row, row, {}, row - 1);
+		//beginMoveRows({}, row, row, {}, row - 1);
 		for (int c = 0; c < columnCount(); c++) {
 			auto* it1 = takeItem(row - 1, c);
 			auto* it2 = takeItem(row, c);
 			setItem(row - 1, c, it2);
 			setItem(row, c, it1);
 		}
-		endMoveRows();
+		//endMoveRows();
         updating=false;
 	}
 }
