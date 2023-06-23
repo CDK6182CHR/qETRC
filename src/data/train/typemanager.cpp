@@ -158,7 +158,7 @@ bool TypeManager::fromJson(const QJsonObject& obj, bool ignore_transparent)
     if (obj.isEmpty())
         return false;
 
-    transparent_types = obj.value("transparent_types").toBool(true);
+    transparent_types = obj.value("transparent_types").toBool(false);
     if (transparent_types && SystemJson::instance.transparent_config && !ignore_transparent) {
         return false;
     }

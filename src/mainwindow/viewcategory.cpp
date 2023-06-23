@@ -788,6 +788,16 @@ void qecmd::ChangeSingleTrainShow::redo()
     cat->commitSingleTrainShow(lines, show);
 }
 
+qecmd::ChangeTypeSet::ChangeTypeSet(TypeManager& manager_, 
+    const QMap<QString, std::shared_ptr<TrainType>>& types_, 
+    const QVector<QPair<std::shared_ptr<TrainType>, 
+    std::shared_ptr<TrainType>>>& modified_, ViewCategory* cat_, bool forDefault_, QUndoCommand* parent) :
+    QUndoCommand(QObject::tr("更新类型表"), parent), manager(manager_),
+    types(types_), modified(modified_),
+    cat(cat_), forDefault(forDefault_), transparent(manager_.isTransparent()) 
+{
+}
+
 void qecmd::ChangeTypeSet::undo()
 {
     commit();
@@ -807,6 +817,14 @@ void qecmd::ChangeTypeSet::commit()
     }
     std::swap(manager.typesRef(), types);
     if (forDefault) cat->saveDefaultConfigs();
+}
+
+qecmd::ChangeTypeRegex::ChangeTypeRegex(TypeManager& manager_,
+    std::shared_ptr<TypeManager> data_, ViewCategory* cat_,
+    bool forDefault_, QUndoCommand* parent) :
+    QUndoCommand(QObject::tr("更新类型判定规则"), parent),
+    manager(manager_), data(data_), cat(cat_), forDefault(forDefault_), transparent(manager_.isTransparent()) 
+{
 }
 
 void qecmd::ChangeTypeRegex::undo()
