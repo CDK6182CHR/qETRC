@@ -559,6 +559,7 @@ qecmd::ChangeConfig::ChangeConfig(Config& cfg_, const Config& newcfg_,
     repaint(repaint_), forDefault(forDefault_),
     cat(cat_)
 {
+    newcfg.transparent_config = false;
     if (forDefault) {
         setText(QObject::tr("更改系统默认显示设置"));
     }
@@ -597,6 +598,7 @@ qecmd::ChangePageConfig::ChangePageConfig(Config& cfg_, const Config& newcfg_, b
     std::shared_ptr<DiagramPage> page, ViewCategory* cat_, QUndoCommand* parent):
     ChangeConfig(cfg_,newcfg_,repaint_,false,cat_,parent),page(page)
 {
+    newcfg.transparent_config = false;
     setText(QObject::tr("更改运行图页面设置: %1").arg(page->name()));
 }
 

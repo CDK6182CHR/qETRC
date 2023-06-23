@@ -35,6 +35,11 @@ public:
     // I/O and GUI setting reserved for later.
     bool drag_time = true;
 
+    /** 
+     * 2023.06.23 experimental: transparent config; global switch
+     */
+    bool transparent_config = true;
+
     //todo: dock show..
 
     /**

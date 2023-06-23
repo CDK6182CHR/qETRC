@@ -37,6 +37,8 @@ class TypeManager{
     QPen defaultPen, defaultPenPassenger;
     std::shared_ptr<TrainType> defaultType;
 
+    bool transparent_types;
+
 public:
     TypeManager();
     TypeManager(const TypeManager&)=delete;
@@ -51,6 +53,9 @@ public:
 
     const auto& types()const { return _types; }
     auto& typesRef() { return _types; }
+
+    bool isTransparent()const { return transparent_types; }
+    void setTransparent(bool on) { transparent_types = on; }
 
     /**
      * 读取系统默认配置 config.json
@@ -141,7 +146,7 @@ private:
      * 输入格式是pyETRC的config.json或者graph中config对象
      * 返回是否成功
      */
-    bool fromJson(const QJsonObject& obj);
+    bool fromJson(const QJsonObject& obj, bool ignore_transparent);
 
 
 };

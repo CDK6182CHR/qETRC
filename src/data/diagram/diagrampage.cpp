@@ -64,11 +64,11 @@ void DiagramPage::fromJson(const QJsonObject& obj, Diagram& _diagram)
     bool succ_cfg = false;
     const auto& obj_cfg = obj.value("config").toObject();
     if (!obj_cfg.isEmpty()) {
-        succ_cfg = _config.fromJson(obj_cfg);
+        succ_cfg = _config.fromJson(obj_cfg, false);
     }
     if (!succ_cfg) {
-        qDebug() << "DiagramPage::fromJson: WARNING: load config for page " << _name << " failed, "
-            << "use config from diagram." << Qt::endl;
+        //qDebug() << "DiagramPage::fromJson: WARNING: load config for page " << _name << " failed, "
+        //    << "use config from diagram." << Qt::endl;
         _config = _diagram.config();
     }
 

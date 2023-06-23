@@ -1,5 +1,6 @@
 ﻿#include "config.h"
 #include <QJsonArray>
+#include "data/common/qesystem.h"
 
 #define FROM_OBJ(_key,_type) \
 _key = obj.value(#_key).to##_type(_key)
@@ -48,10 +49,14 @@ QJsonObject MarginConfig::toJson() const
 
 
 
-bool Config::fromJson(const QJsonObject& obj)
+bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
 {
     if (obj.empty())
         return false;
+    FROM_OBJ(transparent_config, Bool);
+    if (SystemJson::instance.transparent_config && transparent_config && !ignore_transparent) {
+        return false;
+    }
     FROM_OBJ(seconds_per_pix, Double);
     FROM_OBJ(seconds_per_pix_y, Double);
     FROM_OBJ(pixels_per_km, Double);
@@ -113,6 +118,11 @@ bool Config::fromJson(const QJsonObject& obj)
 
 QJsonObject Config::toJson() const
 {
+    if (SystemJson::instance.transparent_config && transparent_config) {
+        return QJsonObject{
+            TO_OBJ(transparent_config)
+        };
+    }
     //先把能够一行转换的写了，其他的再后面插
     QJsonObject obj{
         TO_OBJ(seconds_per_pix)
@@ -152,6 +162,7 @@ QJsonObject Config::toJson() const
         TO_OBJ(show_mile_bar)
         TO_OBJ(show_ruler_bar)
         TO_OBJ(show_count_bar)
+        TO_OBJ(transparent_config)
     };
     obj.insert("grid_color", grid_color.name());
     obj.insert("text_color", text_color.name());

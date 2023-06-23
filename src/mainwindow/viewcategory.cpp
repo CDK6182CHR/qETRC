@@ -791,11 +791,13 @@ void qecmd::ChangeSingleTrainShow::redo()
 void qecmd::ChangeTypeSet::undo()
 {
     commit();
+    manager.setTransparent(transparent);
 }
 
 void qecmd::ChangeTypeSet::redo()
 {
     commit();
+    manager.setTransparent(false);
 }
 
 void qecmd::ChangeTypeSet::commit()
@@ -810,12 +812,14 @@ void qecmd::ChangeTypeSet::commit()
 void qecmd::ChangeTypeRegex::undo()
 {
     manager.swapForRegex(*data);
+    manager.setTransparent(transparent);
     if (forDefault) cat->saveDefaultConfigs();
 }
 
 void qecmd::ChangeTypeRegex::redo()
 {
     manager.swapForRegex(*data);
+    manager.setTransparent(false);
     if (forDefault) cat->saveDefaultConfigs();
 }
 

@@ -330,6 +330,7 @@ namespace qecmd {
         QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>> modified;
         ViewCategory* const cat;
         const bool forDefault;
+        const bool transparent;
     public:
         ChangeTypeSet(TypeManager& manager_, 
             const QMap<QString, std::shared_ptr<TrainType>>& types_,
@@ -339,7 +340,7 @@ namespace qecmd {
             QUndoCommand* parent=nullptr):
             QUndoCommand(QObject::tr("更新类型表"),parent),manager(manager_),
             types(types_),modified(modified_),
-            cat(cat_),forDefault(forDefault_){}
+            cat(cat_),forDefault(forDefault_), transparent(manager_.isTransparent()){}
         virtual void undo()override;
         virtual void redo()override;
     private:
@@ -351,11 +352,12 @@ namespace qecmd {
         std::shared_ptr<TypeManager> data;
         ViewCategory* const cat;
         const bool forDefault;
+        const bool transparent;
     public:
         ChangeTypeRegex(TypeManager& manager_, std::shared_ptr<TypeManager> data_,
             ViewCategory* cat_,bool forDefault_, QUndoCommand* parent=nullptr):
             QUndoCommand(QObject::tr("更新类型判定规则"),parent),
-            manager(manager_),data(data_),cat(cat_),forDefault(forDefault_){}
+            manager(manager_),data(data_),cat(cat_),forDefault(forDefault_), transparent(manager_.isTransparent()){}
         virtual void undo()override;
         virtual void redo()override;
     };

@@ -1,7 +1,7 @@
 ﻿#include "typemanager.h"
 #include "traintype.h"
 #include "trainname.h"
-
+#include "data/common/qesystem.h"
 #include <QJsonObject>
 
 TypeManager::TypeManager():
@@ -27,7 +27,7 @@ TypeManager& TypeManager::operator=(const TypeManager& another)
 
 void TypeManager::readForDefault(const QJsonObject& obj)
 {
-    bool flag = fromJson(obj);
+    bool flag = fromJson(obj, true);
     if (!flag) {
         initDefaultTypes();
     }
@@ -41,7 +41,7 @@ void TypeManager::readForDiagram(const QJsonObject& obj, const TypeManager& defa
         //没有regex的旧版图，先应用默认的，再在上面修改
         operator=(defaultManager);
     }
-    bool flag = fromJson(obj);
+    bool flag = fromJson(obj, false);
     if (!flag||isNull()) {
         qDebug() << "TypeManager::readForDiagram: WARNING: load type configuration for Diagram failed."
             << " Default TypeManager will be used. " << Qt::endl;
@@ -153,10 +153,15 @@ TypeManager::updateTypeSetTo(const TypeManager& other)
     return std::make_pair(data, modified);
 }
 
-bool TypeManager::fromJson(const QJsonObject& obj)
+bool TypeManager::fromJson(const QJsonObject& obj, bool ignore_transparent)
 {
     if (obj.isEmpty())
         return false;
+
+    transparent_types = obj.value("transparent_types").toBool(true);
+    if (transparent_types && SystemJson::instance.transparent_config && !ignore_transparent) {
+        return false;
+    }
 
     //先读取正则
     const QJsonArray& arreg = obj.value("type_regex").toArray();
@@ -254,6 +259,10 @@ void TypeManager::initDefaultTypes()
 
 void TypeManager::toJson(QJsonObject& obj) const
 {
+    obj.insert("transparent_types", transparent_types);
+    if (SystemJson::instance.transparent_config && transparent_types) {
+        return;
+    }
     //颜色
     QJsonObject objcolor;
     //LineStype二元组：线型，粗细。新增

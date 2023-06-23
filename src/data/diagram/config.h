@@ -51,6 +51,10 @@ public:
 struct Config
 {
     /**
+     * 2023.06.23  whether current object is transparent. If true, the data are not read.
+     */
+    bool transparent_config = false;
+    /**
      * 绘图比例
      */
     double
@@ -127,7 +131,7 @@ struct Config
     //std::weak_ptr<Ruler> ordinate;
     QSet<QString> not_show_types;
 
-    bool fromJson(const QJsonObject& obj);
+    bool fromJson(const QJsonObject& obj, bool ignore_transparent);
     QJsonObject toJson()const;
 
     /**

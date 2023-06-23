@@ -1310,8 +1310,10 @@ bool Diagram::readDefaultConfigs(const QString& filename)
     }
     QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
     const QJsonObject& obj = doc.object();
-    _defaultConfig.fromJson(obj);
+    _defaultConfig.fromJson(obj, true);
+    _defaultConfig.transparent_config = false;
     _defaultManager.readForDefault(obj);
+    _defaultManager.setTransparent(false);
     return true;
 }
 
@@ -1348,7 +1350,7 @@ bool Diagram::fromJson(const QJsonObject& obj)
 
     //车次和Config直接转发即可
     _trainCollection.fromJson(obj, _defaultManager);
-    bool flag = _config.fromJson(obj.value("config").toObject());
+    bool flag = _config.fromJson(obj.value("config").toObject(), false);
     if (!flag) {
         //缺配置信息，使用默认值
         _config = _defaultConfig;
