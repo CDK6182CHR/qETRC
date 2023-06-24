@@ -7,6 +7,7 @@
 #include "data/diagram/diagrampage.h"
 #include "data/rail/forbid.h"
 #include "mainwindow/version.h"
+#include "data/common/qesystem.h"
 
 #include <QFile>
 #include <QJsonObject>
@@ -1563,6 +1564,7 @@ void Diagram::clear()
     _trainCollection.clear(_defaultManager);
     railways().clear();
     _config = _defaultConfig;
+    _config.transparent_config = SystemJson::instance.transparent_config;
     _note = "";
     _version = "";
 }

@@ -3,12 +3,14 @@
 #include "trainadapter.h"
 #include "kernel/trainitem.h"
 #include "data/rail/railway.h"
+#include "data/common/qesystem.h"
+
 
 DiagramPage::DiagramPage(const Config& config, const QList<std::shared_ptr<Railway> > &railways,
     const QString& name,const QString& note): _config(config),
     _railways(railways),_name(name),_note(note)
 {
-
+    _config.transparent_config = SystemJson::instance.transparent_config;
 }
 
 DiagramPage::DiagramPage(const QJsonObject& obj, Diagram& _diagram)

@@ -13,6 +13,9 @@
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QMessageBox>
+#include <QToolButton>
+#include <QApplication>
+#include <QStyle >
 
 
 ConfigDialog::ConfigDialog(Config &cfg,bool forDefault_, QWidget *parent):
@@ -49,6 +52,27 @@ void ConfigDialog::initUI()
     QDoubleSpinBox* sd;
 
     vlay=new QVBoxLayout;
+
+    // 0. 透明模式
+    if (!forDefault) {
+        gb = new QGroupBox(tr("透明模式"));
+        auto* flay = new QFormLayout;
+        auto* chlay = new QHBoxLayout;
+
+        ckTransparent = new QCheckBox(tr("当前设置使用透明模式"));
+        ckTransparent->setEnabled(false);
+        chlay->addWidget(ckTransparent);
+
+        auto* tb = new QToolButton;
+        tb->setIcon(QApplication::style()->standardIcon(QStyle::SP_MessageBoxQuestion));
+        connect(tb, &QToolButton::clicked, this, &ConfigDialog::informTransparent);
+        chlay->addWidget(tb);
+
+        flay->addRow(chlay);
+        gb->setLayout(flay);
+        vlay->addWidget(gb);
+    }
+
     // 1. 时间轴
     if constexpr (true){
         gb=new QGroupBox(tr("时间轴"));
@@ -397,6 +421,11 @@ void ConfigDialog::refreshData()
     SET_CHECK(ckShowMile, show_mile_bar);
     SET_CHECK(ckShowCount, show_count_bar);
 
+    //透明模式
+    if (!forDefault) {
+        SET_CHECK(ckTransparent, transparent_config);
+    }
+
     //运行线控制
     SET_VALUE(spValidWidth, valid_width);
     cbShowTimeMark->setCurrentIndex(_cfg.show_time_mark);
@@ -551,6 +580,16 @@ void ConfigDialog::actTextColor()
             "QPushButton { background-color: rgb(%1, %2, %3); }").arg(textColor.red())
             .arg(textColor.green()).arg(textColor.blue()));
     }
+}
+
+void ConfigDialog::informTransparent()
+{
+    QMessageBox::information(this, tr("透明模式"),
+        tr("自V1.4.0版本起，运行图显示控制默认采用“透明模式”。若运行图显示设置为透明，"
+            "则每次读取运行图文件时，自动调用上级的默认设置。\n"
+            "若修改并应用了当前显示设置，则透明模式关闭，修改的设置将被保存到运行图文件，"
+            "从而不再自动与上级的默认设置同步。\n"
+            "目前透明模式不支持手动设置。"));
 }
 
 qecmd::ChangeConfig::ChangeConfig(Config& cfg_, const Config& newcfg_, 

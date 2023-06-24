@@ -42,7 +42,8 @@ class ConfigDialog : public QDialog
     QSpinBox* spBoldLevel, * spShowLevel;
     QComboBox* cbShowTimeMark, * cbVLineStyle;
     QCheckBox *ckFullName,*ckEndLabel,*ckAvoidCollid;
-    QCheckBox* ckShowRuler, * ckShowMile, * ckShowCount;
+    QCheckBox* ckShowRuler, * ckShowMile, * ckShowCount; 
+    QCheckBox* ckTransparent;
     QPushButton* btnGridColor, * btnTextColor;
 
     QColor gridColor, textColor;
@@ -86,6 +87,8 @@ private slots:
     void actGridColor();
 
     void actTextColor();
+
+    void informTransparent();
 };
 
 class ViewCategory;

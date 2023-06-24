@@ -18,7 +18,7 @@ SystemJsonDialog::SystemJsonDialog(QWidget *parent):
     QDialog(parent)
 {
     setWindowTitle(tr("全局选项"));
-    resize(400,500);
+    //resize(400,500);
     initUI();
     setData();
 }
@@ -87,6 +87,10 @@ void SystemJsonDialog::initUI()
     ckDrag->setToolTip(tr("拖动运行线上停点调整时刻。对于通过站，按住Ctrl调整到达时刻，Alt调整出发时刻，否则同时调整。"));
     flay->addRow(tr("拖动调整时刻"), ckDrag);
 
+    ckTransparentConfig = new QCheckBox(tr("启用"));
+    ckTransparentConfig->setToolTip(tr("对新创建的运行图的显示设置、类型管理默认使用透明模式。"));
+    flay->addRow(tr("透明设置"), ckTransparentConfig);
+
     vlay->addLayout(flay);
 
     auto* g=new ButtonGroup<3>({"确定","还原", "关闭"});
@@ -111,6 +115,7 @@ void SystemJsonDialog::setData()
     ckStartup->setChecked(t.show_start_page);
     cbSysStyle->setCurrentText(t.app_style);
     ckDrag->setChecked(t.drag_time);
+    ckTransparentConfig->setChecked(t.transparent_config);
 }
 
 void SystemJsonDialog::actApply()
@@ -134,6 +139,7 @@ void SystemJsonDialog::actApply()
     t.auto_highlight_on_selected = ckAutoHighlight->isChecked();
     t.show_start_page = ckStartup->isChecked();
     t.drag_time = ckDrag->isChecked();
+    t.transparent_config = ckTransparentConfig->isChecked();
 }
 
 #endif
