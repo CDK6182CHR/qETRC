@@ -8,6 +8,7 @@ class QLabel;
 class TypeManager;
 class TypeConfigModel;
 class TrainType;
+class QCheckBox;
 
 /**
  * @brief The TypeConfigDialog class
@@ -27,6 +28,7 @@ class TypeConfigDialog : public QDialog
 
     QEControlledTable* ctab;
     QTableView* table;
+    QCheckBox* ckTransparent;
 
 public:
     explicit TypeConfigDialog(TypeManager& manager_,bool forDefault_, QWidget *parent = nullptr);
@@ -47,6 +49,7 @@ signals:
 private slots:
     void actApply();
     void onDoubleClicked(const QModelIndex& idx);
+    void informTransparent();
 public slots:
     void refreshData();
 };

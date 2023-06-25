@@ -10,5 +10,6 @@ namespace qespec {
     extern const int RELEASE_CODE;
 
     extern const std::string_view DOC_URL;
+    extern const std::string_view DOC_URL_PREFIX;
     extern const std::string_view UPDATE_LOG;
 }

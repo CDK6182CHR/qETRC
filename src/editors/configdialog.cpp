@@ -15,8 +15,8 @@
 #include <QMessageBox>
 #include <QToolButton>
 #include <QApplication>
-#include <QStyle >
-
+#include <QStyle>
+#include <QDesktopServices>
 
 ConfigDialog::ConfigDialog(Config &cfg,bool forDefault_, QWidget *parent):
     QDialog(parent),_cfg(cfg),forDefault(forDefault_),page(nullptr)
@@ -584,12 +584,14 @@ void ConfigDialog::actTextColor()
 
 void ConfigDialog::informTransparent()
 {
-    QMessageBox::information(this, tr("透明模式"),
-        tr("自V1.4.0版本起，运行图显示控制默认采用“透明模式”。若运行图显示设置为透明，"
-            "则每次读取运行图文件时，自动调用上级的默认设置。\n"
-            "若修改并应用了当前显示设置，则透明模式关闭，修改的设置将被保存到运行图文件，"
-            "从而不再自动与上级的默认设置同步。\n"
-            "目前透明模式不支持手动设置。"));
+    QString doc_url = QString("%1/view/view.html#sec-transparent-config").arg(qespec::DOC_URL_PREFIX.data());
+    QDesktopServices::openUrl(doc_url);
+    //QMessageBox::information(this, tr("透明模式"),
+    //    tr("自V1.4.0版本起，运行图显示控制默认采用“透明模式”。若运行图显示设置为透明，"
+    //        "则每次读取运行图文件时，自动调用上级的默认设置。\n"
+    //        "若修改并应用了当前显示设置，则透明模式关闭，修改的设置将被保存到运行图文件，"
+    //        "从而不再自动与上级的默认设置同步。\n"
+    //        "目前透明模式不支持手动设置。"));
 }
 
 qecmd::ChangeConfig::ChangeConfig(Config& cfg_, const Config& newcfg_, 

@@ -6,6 +6,7 @@
 #include "model/delegate/generaldoublespindelegate.h"
 #include "data/train/traintype.h"
 #include "data/train/typemanager.h"
+#include "mainwindow/version.h"
 #include <model/delegate/linestyledelegate.h>
 
 #include <util/qecontrolledtable.h>
@@ -15,6 +16,11 @@
 #include <QTableView>
 #include <QMessageBox>
 #include <QColorDialog>
+#include <QCheckBox>
+#include <QToolButton>
+#include <QApplication>
+#include <QStyle>
+#include <QDesktopServices>
 
 TypeConfigDialog::TypeConfigDialog(TypeManager &manager_, bool forDefault_, QWidget *parent):
     QDialog(parent), manager(manager_),
@@ -38,6 +44,16 @@ void TypeConfigDialog::initUI()
     else {
         lab->setText(tr("【注意】当前编辑的是运行图类型管理器，编辑结果将直接应用到"
             "当前的运行图中。"));
+        auto* hlay = new QHBoxLayout;
+        ckTransparent = new QCheckBox(tr("当前类型管理器为透明状态"));
+        ckTransparent->setEnabled(false);
+        hlay->addWidget(ckTransparent);
+        auto* tb = new QToolButton;
+        tb->setIcon(QApplication::style()->standardIcon(QStyle::SP_MessageBoxQuestion));
+        hlay->addWidget(tb);
+        connect(tb, &QToolButton::clicked, this, &TypeConfigDialog::informTransparent);
+        vlay->addLayout(hlay);
+
     }
     lab->setWordWrap(true);
     vlay->addWidget(lab);
@@ -105,7 +121,21 @@ void TypeConfigDialog::onDoubleClicked(const QModelIndex &idx)
     }
 }
 
+void TypeConfigDialog::informTransparent()
+{
+    QString doc_url = QString("%1/view/view.html#sec-transparent-config").arg(qespec::DOC_URL_PREFIX.data());
+    QDesktopServices::openUrl(doc_url);
+    //QMessageBox::information(this, tr("透明模式"),
+    //    tr("自V1.4.0起，类型管理器默认采用透明模式。\n在透明模式中，每次读取运行图文件时，"
+    //        "自动读取当前的系统默认类型管理器，并随系统默认管理器设置变化而变化。\n"
+    //        "若用户手动修改类型管理设置并应用，则透明模式关闭。目前透明模式不支持手动设置。\n"
+    //    "详见%1/view/view.html#sec-transparent-config").arg(qespec::DOC_URL_PREFIX.data()));
+}
+
 void TypeConfigDialog::refreshData()
 {
     model->refreshData();
+    if (!forDefault) {
+        ckTransparent->setChecked(manager.isTransparent());
+    }
 }

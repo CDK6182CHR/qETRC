@@ -5,11 +5,17 @@
 #include "util/qecontrolledtable.h"
 #include "data/common/qesystem.h"
 #include "util/buttongroup.hpp"
+#include "mainwindow/version.h"
 
 #include <QLabel>
 #include <QTableView>
 #include <QHeaderView>
-
+#include <QCheckBox>
+#include <QToolButton>
+#include <QApplication>
+#include <QStyle>
+#include <QMessageBox>
+#include <QDesktopServices>
 
 TypeRegexDialog::TypeRegexDialog(TypeManager &manager_,bool forDefault_, QWidget *parent):
     QDialog(parent),manager(manager_),
@@ -31,6 +37,16 @@ void TypeRegexDialog::initUI()
     }
     else {
         lab->setText(tr("【注意】当前编辑的运行图类型管理器，编辑结果将直接应用到当前运行图。"));
+        auto* ckTransparent = new QCheckBox(tr("当前类型管理器为透明状态"));
+        ckTransparent->setEnabled(false);
+        auto* hlay = new QHBoxLayout;
+        hlay->addWidget(ckTransparent);
+        auto* tb = new QToolButton;
+        tb->setIcon(qApp->style()->standardIcon(QStyle::SP_MessageBoxQuestion));
+        hlay->addWidget(tb);
+        connect(tb, &QToolButton::clicked, this, &TypeRegexDialog::informTransparent);
+        vlay->addLayout(hlay);
+
     }
     lab->setWordWrap(true);
     vlay->addWidget(lab);
@@ -67,5 +83,19 @@ void TypeRegexDialog::actApply()
 void TypeRegexDialog::refreshData()
 {
     model->refreshData();
+    if (!forDefault) {
+        ckTransparent->setChecked(manager.isTransparent());
+    }
+}
+
+void TypeRegexDialog::informTransparent()
+{
+    QString doc_url = QString("%1/view/view.html#sec-transparent-config").arg(qespec::DOC_URL_PREFIX.data());
+    QDesktopServices::openUrl(doc_url);
+    //QMessageBox::information(this, tr("透明模式"),
+    //    tr("自V1.4.0起，类型管理器默认采用透明模式。\n在透明模式中，每次读取运行图文件时，"
+    //        "自动读取当前的系统默认类型管理器，并随系统默认管理器设置变化而变化。\n"
+    //        "若用户手动修改类型管理设置并应用，则透明模式关闭。目前透明模式不支持手动设置。\n"
+    //        "详见 <a href=\"%1\"> Doc </a>").arg(doc_url));
 }
 

@@ -7,6 +7,7 @@ class QTableView;
 class QEControlledTable;
 class TypeManager;
 class TypeRegexModel;
+class QCheckBox;
 
 class TypeRegexDialog : public QDialog
 {
@@ -17,6 +18,7 @@ class TypeRegexDialog : public QDialog
 
     QEControlledTable* ctab;
     QTableView* table;
+    QCheckBox* ckTransparent;
 
 public:
     TypeRegexDialog(TypeManager& manager_,bool forDefault, QWidget* parent=nullptr);
@@ -28,5 +30,6 @@ signals:
 private slots:
     void actApply();
     void refreshData();
+    void informTransparent();
 };
 
