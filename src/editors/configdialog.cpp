@@ -5,6 +5,7 @@
 #include "mainwindow/viewcategory.h"
 #include "mainwindow/mainwindow.h"
 #include "data/diagram/diagrampage.h"
+#include "mainwindow/version.h"
 
 #include <QCheckBox>
 #include <QColorDialog>
