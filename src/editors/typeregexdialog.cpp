@@ -39,6 +39,7 @@ void TypeRegexDialog::initUI()
         lab->setText(tr("【注意】当前编辑的运行图类型管理器，编辑结果将直接应用到当前运行图。"));
         auto* ckTransparent = new QCheckBox(tr("当前类型管理器为透明状态"));
         ckTransparent->setEnabled(false);
+        ckTransparent->setChecked(manager.isTransparent());
         auto* hlay = new QHBoxLayout;
         hlay->addWidget(ckTransparent);
         auto* tb = new QToolButton;

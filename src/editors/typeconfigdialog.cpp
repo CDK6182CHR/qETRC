@@ -47,6 +47,7 @@ void TypeConfigDialog::initUI()
         auto* hlay = new QHBoxLayout;
         ckTransparent = new QCheckBox(tr("当前类型管理器为透明状态"));
         ckTransparent->setEnabled(false);
+        ckTransparent->setChecked(manager.isTransparent());
         hlay->addWidget(ckTransparent);
         auto* tb = new QToolButton;
         tb->setIcon(QApplication::style()->standardIcon(QStyle::SP_MessageBoxQuestion));
