@@ -6,6 +6,7 @@
 #include <QJsonObject>
 
 class Railway;
+class TrainPath;
 
 /**
  * @brief The RailCategory class
@@ -23,6 +24,7 @@ class RailCategory: public std::enable_shared_from_this<RailCategory>
     //std::weak_ptr<RailCategory> _parent;
     QList<std::shared_ptr<RailCategory>> _subcats;
     QList<std::shared_ptr<Railway>> _railways;
+    //QList<std::shared_ptr<TrainPath>> _paths;
 
     /**
      * 浅拷贝的构造函数，作为private访问。
@@ -45,6 +47,8 @@ public:
     const auto& name()const { return _name; }
     void setName(const QString& name) { _name = name; }
     auto& nameRef() { return _name; }
+    //auto& paths() { return _paths; }
+    //auto& paths()const { return _paths; }
 
     bool railNameIsValid(const QString& name, std::shared_ptr<const Railway> rail)const;
     bool categoryNameIsValid(const QString& name, std::shared_ptr<const RailCategory> cat)const;
@@ -64,6 +68,11 @@ public:
     int getRailwayIndex(std::shared_ptr<const Railway> rail)const;
 
     int getRailwayIndex(const Railway& rail)const;
+
+    /**
+     * 2023.08.04  linear search
+     */
+    std::shared_ptr<Railway> railwayByName(const QString& name)const;
 
     void fromJson(const QJsonObject& obj);
 

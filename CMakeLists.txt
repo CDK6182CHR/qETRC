@@ -40,6 +40,8 @@ endif()
 # )
 set(PROJECT_SOURCES ${qETRC_SOURCES} ${qETRC_HEADERS} ${qETRC_HEADERS_PP}
     rsc/resource.qrc ${app_icon_resource_windows})
+
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(qETRC
         MANUAL_FINALIZATION

@@ -1,5 +1,6 @@
 ﻿#include "railcategory.h"
 #include "railway.h"
+#include "data/trainpath/trainpath.h"
 
 RailCategory::RailCategory(const QString& name):
 	 _name(name)
@@ -133,6 +134,15 @@ void RailCategory::fromJson(const QJsonObject& obj)
 	}
 }
 
+std::shared_ptr<Railway> RailCategory::railwayByName(const QString& name)const
+{
+	foreach (auto p , _railways) {
+		if (p->name() == name)
+			return p;
+	}
+	return std::shared_ptr<Railway>();
+}
+
 QJsonObject RailCategory::toJson() const
 {
 	QJsonObject obj;
@@ -149,6 +159,7 @@ void RailCategory::clear()
 {
 	_subcats.clear();
 	_railways.clear();
+	_paths.clear();
 }
 
 bool RailCategory::isNull() const

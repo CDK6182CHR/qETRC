@@ -4,6 +4,9 @@
 #include "trainpathseg.h"
 
 
+class RailCategory;
+
+
 /**
  * 2023.8.3
  * The class representing the train path (ÁÐ³µ¾¶Â·).
@@ -30,4 +33,7 @@ public:
 
 	const auto& segments()const { return _segments; }
 	auto& segments() { return _segments; }
+
+	void fromJson(const QJsonObject& obj, const RailCategory& cat);
+	QJsonObject toJson()const;
 };

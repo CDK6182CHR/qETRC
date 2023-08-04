@@ -1,8 +1,10 @@
 #pragma once
 #include <memory>
+#include <QJsonObject>
 #include "data/common/stationname.h"
 
 class Railway;
+class RailCategory;
 
 /**
  * 2023.08.03  A "segment" for train path.
@@ -13,12 +15,27 @@ class Railway;
  * not deleted actually (due to undo system).
  */
 struct TrainPathSeg {
+	QString rail_name;
 	std::weak_ptr<Railway> railway;
 	StationName end_station;
+
+	TrainPathSeg(const QString& rail_name, const StationName& end_station) :
+		rail_name(rail_name), end_station(end_station)
+	{
+
+	}
 
 	TrainPathSeg(const std::weak_ptr<Railway>& railway, const StationName& end_station) :
 		railway(railway), end_station(end_station)
 	{
 
 	}
+
+	TrainPathSeg(const QJsonObject& obj, const RailCategory& cat);
+
+	const QString& railwayName()const;
+
+	void fromJson(const QJsonObject& obj, const RailCategory& cat);
+	
+	QJsonObject toJson()const;
 };
