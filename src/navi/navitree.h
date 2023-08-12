@@ -39,6 +39,7 @@ class NaviTree : public QWidget
 
     QMenu* mePageList, * meRailList, * meTrainList, * mePage, * meTrain, * meRailway;
     QMenu* meRuler, * meForbid, * meRouting, * meRoutingList;
+    QMenu* mePath, * mePathList;
     DiagramNaviModel* _model;
     QUndoStack* const _undo;
     QTreeView* tree;
@@ -98,6 +99,14 @@ signals:
      */
     void dulplicateRuler(std::shared_ptr<Ruler>);
 
+    void actAddPath();
+
+    void editPathNavi(int idx);
+
+    void removePathNavi(int idx);
+
+    void duplicatePathNavi(int idx);
+
 private slots:
     void showContextMenu(const QPoint& pos);
     
@@ -140,6 +149,12 @@ private slots:
     void onCreatePageByRailContext();
 
     void onSwitchToTrainRoutingContext();
+
+    void onEditPathContext();
+
+    void onRemovePathContext();
+
+    void onDuplicatePathContext();
 
     void onCurrentChanged(const QModelIndex& cur, const QModelIndex& prev);
 

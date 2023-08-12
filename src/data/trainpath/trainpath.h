@@ -37,6 +37,9 @@ public:
 		_name(name), _valid(false)
 	{}
 
+	// used for duplicate
+	TrainPath(const TrainPath& other) = default;
+
 	const QString& name()const { return _name; }
 	void setName(const QString& n) { _name = n; }
 	const QString& note()const { return _note; }

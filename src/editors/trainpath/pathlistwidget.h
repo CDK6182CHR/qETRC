@@ -38,6 +38,11 @@ private slots:
 public slots:
 	void actAdd();
 
+	// call from navi
+	void actRemovePath(int idx);
+
+	void actDuplicate(int idx);
+
 public:
 
 	void commitAddPath(std::unique_ptr<TrainPath>&& path);

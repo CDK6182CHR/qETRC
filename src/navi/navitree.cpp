@@ -23,6 +23,7 @@ NaviTree::NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget* parent) 
     meTrainList(new QMenu(this)), mePage(new QMenu(this)), meTrain(new QMenu(this)),
     meRailway(new QMenu(this)), meRuler(new QMenu(this)), meForbid(new QMenu(this)),
     meRouting(new QMenu(this)),meRoutingList(new QMenu(this)),
+    mePath(new QMenu(this)), mePathList(new QMenu(this)),
     _model(model_), _undo(undo)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -137,6 +138,15 @@ void NaviTree::initContextMenus()
     connect(act, &QAction::triggered, this, &NaviTree::actBatchParseRouting);
     act = meRoutingList->addAction(tr("批量识别车次"));
     connect(act, &QAction::triggered, this, &NaviTree::actBatchDetectRouting);
+
+    //PathList
+    mePathList->addActions(common);
+    mePathList->addAction(tr("添加列车径路"), this, &NaviTree::actAddPath);
+    
+    //Path
+    mePath->addAction(tr("编辑列车径路"), this, &NaviTree::onEditPathContext);
+    mePath->addAction(tr("删除列车径路"), this, &NaviTree::onRemovePathContext);
+    mePath->addAction(tr("创建列车径路副本"), this, &NaviTree::onDuplicatePathContext);
 }
 
 NaviTree::ACI* NaviTree::getItem(const QModelIndex& idx)
@@ -353,6 +363,33 @@ void NaviTree::onSwitchToTrainRoutingContext()
             QMessageBox::warning(this, tr("错误"), 
                 tr("当前车次[%1]无交路。").arg(train->trainName().full()));
         }
+    }
+}
+
+void NaviTree::onEditPathContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::PathItem::Type) {
+        emit editPathNavi(item->row());
+    }
+}
+
+void NaviTree::onRemovePathContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::PathItem::Type) {
+        emit removePathNavi(item->row());
+    }
+}
+
+void NaviTree::onDuplicatePathContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::PathItem::Type) {
+        emit duplicatePathNavi(item->row());
     }
 }
 
@@ -623,6 +660,8 @@ void NaviTree::showContextMenu(const QPoint& pos)
     case navi::ForbidItem::Type:meForbid->popup(p); break;
     case navi::RoutingItem::Type:meRouting->popup(p); break;
     case navi::RoutingListItem::Type:meRoutingList->popup(p); break;
+    case navi::PathListItem::Type: mePathList->popup(p); break;
+    case navi::PathItem::Type: mePath->popup(p); break;
     }
     
 }

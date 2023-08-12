@@ -58,12 +58,30 @@ void PathListWidget::actDelete()
     const auto& idx = table->currentIndex();
     int row = idx.row();
     if (0 <= row && row < pathcoll.size()) {
-        if (_undo) {
-            _undo->push(new qecmd::RemoveTrainPath(row, this));
-        }
-        else {
-            commitRemovePath(row);
-        }
+        actRemovePath(row);
+    }
+}
+
+void PathListWidget::actRemovePath(int idx)
+{
+    if (_undo) {
+        _undo->push(new qecmd::RemoveTrainPath(idx, this));
+    }
+    else {
+        commitRemovePath(idx);
+    }
+}
+
+void PathListWidget::actDuplicate(int idx)
+{
+    const auto& path = pathcoll.paths().at(idx);
+    auto npath = std::make_unique<TrainPath>(*path);   // copy construct!
+    npath->setName(pathcoll.validNewPathName(path->name() + QObject::tr("_副本")));
+    if (_undo) {
+        _undo->push(new qecmd::AddTrainPath(std::move(npath), this));
+    }
+    else {
+        commitAddPath(std::move(npath));
     }
 }
 

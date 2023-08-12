@@ -651,6 +651,12 @@ void MainWindow::initDockWidgets()
 			naviModel, &DiagramNaviModel::onPathRemoved);
 		connect(pathListWidget->model(), &PathListModel::dataChanged,
 			naviModel, &DiagramNaviModel::onPathChanged);
+		connect(naviView, &NaviTree::actAddPath,
+			pathListWidget, &PathListWidget::actAdd);
+		connect(naviView, &NaviTree::removePathNavi,
+			pathListWidget, &PathListWidget::actRemovePath);
+		connect(naviView, &NaviTree::duplicatePathNavi,
+			pathListWidget, &PathListWidget::actDuplicate);
 	}
 
 
