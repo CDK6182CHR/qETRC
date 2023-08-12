@@ -8,6 +8,8 @@
 #include "data/diagram/trainline.h"    // for: alias
 #include "data/rail/railcategory.h"
 #include "data/calculation/railwaystationeventaxis.h"
+#include "data/trainpath/trainpathcollection.h"
+
 
 class Train;
 class Railway;
@@ -73,6 +75,7 @@ class Diagram
     int _releaseCode = 0;
     TypeManager _defaultManager;
     QList<std::shared_ptr<DiagramPage>> _pages;
+    TrainPathCollection _pathcoll;
 
 public:
     Diagram() = default;
@@ -92,6 +95,8 @@ public:
     auto& railCategory() { return _railcat; }
     const auto& railCategory()const { return _railcat; }
     auto& defaultTypeManager(){ return _defaultManager; }
+    auto& pathCollection() { return _pathcoll; }
+    auto& pathCollection()const { return _pathcoll; }
 
     /**
      * 读取默认配置文件 config.json

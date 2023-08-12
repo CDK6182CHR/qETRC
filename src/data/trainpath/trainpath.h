@@ -1,4 +1,4 @@
-#pragma once 
+ï»¿#pragma once 
 #include <vector>
 #include "trainpath.h"
 #include "trainpathseg.h"
@@ -9,7 +9,7 @@ class RailCategory;
 
 /**
  * 2023.8.3
- * The class representing the train path (ÁÐ³µ¾¶Â·).
+ * The class representing the train path (åˆ—è½¦å¾„è·¯).
  * It seems that, directly using the vector of TrainPathSeg (value type) is enough for now
  */
 class TrainPath {
@@ -23,6 +23,12 @@ public:
 		const QString& note):
 		_name(name), _start_station(start_station), _segments(segs), _note(note)
 	{}
+
+	TrainPath(const QJsonObject& obj, const RailCategory& cat) :
+		_name(), _start_station(), _segments(), _note()
+	{
+		fromJson(obj, cat);
+	}
 
 	const QString& name()const { return _name; }
 	void setName(const QString& n) { _name = n; }

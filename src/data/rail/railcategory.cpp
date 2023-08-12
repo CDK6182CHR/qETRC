@@ -159,7 +159,6 @@ void RailCategory::clear()
 {
 	_subcats.clear();
 	_railways.clear();
-	_paths.clear();
 }
 
 bool RailCategory::isNull() const

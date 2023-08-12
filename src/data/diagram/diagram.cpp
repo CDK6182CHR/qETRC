@@ -1386,6 +1386,10 @@ bool Diagram::fromJson(const QJsonObject& obj)
         _pages.append(std::make_shared<DiagramPage>(p->toObject(), *this));
     }
 
+    // 2023.08.12  paths
+    const QJsonArray& arpath = obj.value("paths").toArray();
+    _pathcoll.fromJson(arpath, _railcat);
+
     bindAllTrains();
     return true;
 }
@@ -1413,6 +1417,9 @@ QJsonObject Diagram::toJson() const
         arpage.append(p->toJson());
     }
     obj.insert("pages", arpage);
+
+    QJsonArray arpath = _pathcoll.toJson();
+    obj.insert("paths", arpath);
 
     //配置信息
     QJsonObject objconfig = _config.toJson();
