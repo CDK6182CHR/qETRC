@@ -78,6 +78,9 @@
 #include "viewers/stats/intervalcountdialog.h"
 #include "editors/train/predeftrainfiltermanager.h"
 #include "viewers/stats/trainintervalstatdialog.h"
+#include "editors/trainpath/pathlistwidget.h"
+#include "model/trainpath/pathlistmodel.h"
+
 
 MainWindow::MainWindow(QWidget* parent)
 	: SARibbonMainWindow(parent, true),
@@ -632,7 +635,23 @@ void MainWindow::initDockWidgets()
 			rw, &RoutingWidget::actAdd);
 	}
 
+	// TrainPath 列车径路
+	if constexpr (true) {
+		auto* w = new PathListWidget(_diagram.pathCollection(), undoStack);
+		dock = new ads::CDockWidget(tr("列车径路管理"));
+		dock->setWidget(w);
+		manager->addDockWidget(ads::LeftDockWidgetArea, dock);
+		dock->closeDockWidget();
+		pathListWidget = w;
+		pathListDock = dock;
 
+		connect(pathListWidget->model(), &PathListModel::rowsInserted,
+			naviModel, &DiagramNaviModel::onPathInserted);
+		connect(pathListWidget->model(), &PathListModel::rowsRemoved,
+			naviModel, &DiagramNaviModel::onPathRemoved);
+		connect(pathListWidget->model(), &PathListModel::dataChanged,
+			naviModel, &DiagramNaviModel::onPathChanged);
+	}
 
 
 	// 速览信息
@@ -863,6 +882,12 @@ void MainWindow::initToolbar()
 		act->setMenu(menu);
 		menu->setTitle(tr("线路编辑"));
 		btn = panel->addLargeAction(act);
+
+		act = pathListDock->toggleViewAction();
+		act->setIcon(QIcon(":/icons/polyline.png"));
+		act->setText(tr("列车径路"));
+		act->setToolTip(tr("列车径路\n打开/关闭列车径路管理面板。"));
+		panel->addLargeAction(act);
 
 		act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺编辑"), this);
 		act->setToolTip(tr("标尺编辑 (Ctrl+B)\n"

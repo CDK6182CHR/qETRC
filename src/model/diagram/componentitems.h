@@ -8,6 +8,7 @@
 
 class Diagram;
 class TrainCollection;
+class TrainPathCollection;
 
 /**
  * 用于做导航窗口的ModelItem类
@@ -20,6 +21,8 @@ class Ruler;
 class Forbid;
 class Train;
 class Routing;
+class TrainPath;
+
 
 namespace navi {
 
@@ -89,6 +92,7 @@ namespace navi {
 	class PageListItem;
 	class TrainListItem;
     class RoutingListItem;
+	class PathListItem;
 
 	/**
 	 * @brief The DiagramItem class 运行图结点，也就是根节点 （可能不会显示）
@@ -101,6 +105,7 @@ namespace navi {
 		std::unique_ptr<PageListItem> pageList;
 		std::unique_ptr<TrainListItem> trainList;
         std::unique_ptr<RoutingListItem> routingList;
+		std::unique_ptr<PathListItem> pathList;
 
 	public:
 		enum { Type = 1 };
@@ -109,6 +114,7 @@ namespace navi {
 			RowPages,
 			RowTrains,
             RowRoutings,
+			RowPaths,
 			MaxDiagramRows
 		};
 		DiagramItem(Diagram& diagram);
@@ -329,5 +335,40 @@ namespace navi {
         auto routing()const{return _routing;}
     };
 
+	class PathItem;
+	class PathListItem :public AbstractComponentItem
+	{
+		TrainPathCollection& pathcoll;
+		std::deque<std::unique_ptr<PathItem>> _paths;
+	public:
+		enum { Type = 12 };
+		PathListItem(TrainPathCollection& pathcoll, DiagramItem* parent);
+
+		virtual AbstractComponentItem* child(int i) override;
+		virtual int childCount() const override { return _paths.size(); }
+		virtual QString data(int i) const override;
+		virtual int type() const override { return Type; }
+
+		/**
+		 * These functions are called in DiagramNaviModel
+		 */
+		void onPathInsertedAt(int first, int last);
+		void onPathRemovedAt(int first, int last);
+	};
+
+
+	class PathItem : public AbstractComponentItem
+	{
+		TrainPath* _path;
+	public:
+		enum { Type = 13 };
+		PathItem(TrainPath* path, int row, PathListItem* parent);
+
+		// 通过 AbstractComponentItem 继承
+		virtual AbstractComponentItem* child(int i) override { return nullptr; }
+		virtual int childCount() const override { return 0; }
+		virtual QString data(int i) const override;
+		virtual int type() const override { return Type; }
+	};
 }
 

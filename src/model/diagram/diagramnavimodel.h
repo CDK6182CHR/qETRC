@@ -159,6 +159,17 @@ public slots:
     void onRoutingRemoved(const QModelIndex&, int first, int last);
 
     /**
+     * 2023.08.12  for inserton/deletion of TrainPath.
+     * Invoked by model operations (automatically)
+     */
+    void onPathInserted(const QModelIndex&, int first, int last);
+
+    void onPathRemoved(const QModelIndex&, int first, int last);
+
+    void onPathChanged(const QModelIndex& topLeft,
+        const QModelIndex& bottomRight, const QVector<int>& roles);
+
+    /**
      * 刷新交路部分。当列车导入时调用。
      * Train那个分类由TrainListModel触发更新；交路这个需要单独。
      */

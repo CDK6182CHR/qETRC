@@ -25,5 +25,14 @@ public:
 	void fromJson(const QJsonArray& obj, const RailCategory& cat);
 	QJsonArray toJson()const;
 
+	int size()const { return static_cast<int>(_paths.size()); }
+
 	void clear();
+
+	/**
+	 * Simple linear alg.
+	 */
+	bool isValidNewPathName(const QString& name)const;
+
+	QString validNewPathName(const QString& prefix)const;
 };

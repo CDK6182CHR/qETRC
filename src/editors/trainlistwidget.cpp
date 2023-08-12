@@ -161,7 +161,19 @@ void TrainListWidget::batchChange()
 	if (!ok)return;
 
 	//操作压栈
-	_undo->push(new qecmd::BatchChangeType(coll, rows, nty, model));
+	if (_undo) {
+		_undo->push(new qecmd::BatchChangeType(coll, rows, nty, model));
+	}
+	else {
+		// 2023.08.12: mind _undo may be null. For this case, commit directly
+		for (int i = 0; i < rows.size(); i++) {
+			int index = rows.at(i);
+			auto train = coll.trainAt(index);
+			train->setType(nty);
+			coll.updateTrainType(train, nty);
+		}
+		model->commitBatchChangeType(rows);
+	}
 	QMessageBox::information(this, tr("提示"), tr("类型更新完毕。此功能不会自动重新铺画运行图，如果需要，"
 		"请手动重新铺画或刷新运行图。"));
 }

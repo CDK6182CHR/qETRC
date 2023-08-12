@@ -12,7 +12,8 @@ navi::DiagramItem::DiagramItem(Diagram& diagram) :
 	railList(std::make_unique<RailwayListItem>(diagram, this)),
 	pageList(std::make_unique<PageListItem>(diagram, this)),
     trainList(std::make_unique<TrainListItem>(diagram.trainCollection(), this)),
-    routingList(std::make_unique<RoutingListItem>(diagram.trainCollection(),this))
+    routingList(std::make_unique<RoutingListItem>(diagram.trainCollection(),this)),
+    pathList(std::make_unique<PathListItem>(diagram.pathCollection(),this))
 {
 }
 
@@ -23,6 +24,7 @@ navi::AbstractComponentItem* navi::DiagramItem::child(int i)
 	case RowPages:return pageList.get();
 	case RowTrains:return trainList.get();
     case RowRoutings:return routingList.get();
+    case RowPaths: return pathList.get();
 	default:return nullptr;
     }
 }
@@ -462,3 +464,71 @@ typename navi::AbstractComponentItem*
     }
     return p;
 }
+
+navi::PathListItem::PathListItem(TrainPathCollection& pathcoll, DiagramItem* parent) :
+    AbstractComponentItem(4, parent), pathcoll(pathcoll), _paths()
+{
+    int row = 0;
+    for (const auto& p : pathcoll.paths()) {
+        _paths.emplace_back(std::make_unique<PathItem>(p.get(), row++, this));
+    }
+}
+
+typename navi::AbstractComponentItem* navi::PathListItem::child(int i)
+{
+    return _paths.at(i).get();
+}
+
+QString navi::PathListItem::data(int i) const
+{
+    switch (i) {
+    case ColItemName:return QObject::tr("列车径路");
+    case ColItemNumber:return QString::number(_paths.size());
+    case ColDescription:;
+    default:return {};
+    }
+}
+
+void navi::PathListItem::onPathInsertedAt(int first, int last)
+{
+    int cnt = last - first + 1;
+    auto itr = _paths.begin();
+    std::advance(itr, first);
+    for (int i = 0; i < cnt; i++) {
+        itr = _paths.emplace(itr, std::make_unique<PathItem>(pathcoll.paths().at(first + i).get(), first+i, this));
+        ++itr;
+    }
+    // now update the row numbers
+    for (; itr != _paths.end(); ++itr) {
+        (*itr)->setRow((*itr)->row() + cnt);
+    }
+}
+
+void navi::PathListItem::onPathRemovedAt(int first, int last)
+{
+    int cnt = last - first + 1;
+    auto itr = _paths.begin();
+    std::advance(itr, first);
+    for (int i = 0; i < cnt; i++) {
+        itr = _paths.erase(itr);
+    }
+    for (; itr != _paths.end(); ++itr) {
+        (*itr)->setRow((*itr)->row() - cnt);
+    }
+}
+
+navi::PathItem::PathItem(TrainPath* path, int row, PathListItem* parent):
+    AbstractComponentItem(row, parent), _path(path)
+{
+}
+
+QString navi::PathItem::data(int i) const
+{
+    switch (i) {
+    case ColItemName:return _path->name();
+    case ColItemNumber:;
+    case ColDescription:;
+    default:return {};
+    }
+}
+

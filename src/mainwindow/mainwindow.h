@@ -26,6 +26,7 @@ class DiagramWidget;
 class TrainListWidget;
 class RailStationWidget;
 class RoutingWidget;
+class PathListWidget;
 struct ChangeStationNameData;
 class LocateDialog;
 class RailDBContext;
@@ -55,7 +56,7 @@ class MainWindow : public SARibbonMainWindow
     SARibbonMenu* pageMenu, * railMenu, * appMenu, * forbidMenu, * routingMenu;
     QList<ads::CDockWidget*> diagramDocks;
     QList<DiagramWidget*> diagramWidgets;
-    ads::CDockWidget* naviDock, * trainListDock, * routingDock, * timetableQuickDock;
+    ads::CDockWidget* naviDock, * trainListDock, * routingDock, * timetableQuickDock, * pathListDock;
     ads::CDockWidget* trainInfoDock;
     ads::CDockWidget* undoDock, * centralDock;
     QWidget* centralOccupyWidget;
@@ -64,6 +65,7 @@ class MainWindow : public SARibbonMainWindow
     QList<RailStationWidget*> railStationWidgets;
     QList<ads::CDockWidget*> railStationDocks;
     RoutingWidget* routingWidget;
+    PathListWidget* pathListWidget;
     TimetableQuickWidget* timetableQuickWidget;
     TrainInfoWidget* trainInfoWidget;
     PredefTrainFilterManager* filterManager = nullptr;

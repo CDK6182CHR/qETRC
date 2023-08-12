@@ -388,6 +388,33 @@ void DiagramNaviModel::onRoutingRemoved(const QModelIndex&, int first, int last)
     endRemoveRows();
 }
 
+void DiagramNaviModel::onPathInserted(const QModelIndex&, int first, int last)
+{
+    const auto& par = index(navi::DiagramItem::RowPaths, 0);
+    beginInsertRows(par, first, last);
+    auto* item = static_cast<navi::PathListItem*>(par.internalPointer());
+    item->onPathInsertedAt(first, last);
+    endInsertRows();
+}
+
+void DiagramNaviModel::onPathRemoved(const QModelIndex&, int first, int last)
+{
+    const auto& par = index(navi::DiagramItem::RowPaths, 0);
+    beginRemoveRows(par, first, last);
+    auto* item = static_cast<navi::PathListItem*>(par.internalPointer());
+    item->onPathRemovedAt(first, last);
+    endRemoveRows();
+}
+
+void DiagramNaviModel::onPathChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
+{
+    if (!roles.contains(Qt::DisplayRole))
+        return;
+    auto&& par = index(navi::DiagramItem::RowPaths, 0);
+    emit dataChanged(index(topLeft.row(), 0, par),
+        index(bottomRight.row(), navi::DiagramItem::ColMaxNumber - 1, par), roles);
+}
+
 void DiagramNaviModel::refreshRoutings()
 {
     //auto&& par = index(navi::DiagramItem::RowRoutings, 0);
