@@ -80,6 +80,7 @@
 #include "editors/train/predeftrainfiltermanager.h"
 #include "viewers/stats/trainintervalstatdialog.h"
 #include "log/GlobalLogger.h"
+#include "log/IssueWidget.h"
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -685,6 +686,18 @@ void MainWindow::initDockWidgets()
 		
 		qInstallMessageHandler(qeutil::qeLogHandler);
 	}
+
+	// 问题窗口
+	if constexpr (true) {
+		auto* w = new IssueWidget;
+		dock = new ads::CDockWidget(tr("问题"));
+		dock->setWidget(w);
+		issueWidget = w;
+		issueDock = dock;
+
+		autoHideArea = manager->addAutoHideDockWidget(ads::SideBarBottom, dock);
+		autoHideArea->setSize(200);
+	}
 }
 
 void MainWindow::initToolbar()
@@ -813,6 +826,16 @@ void MainWindow::initToolbar()
 			"历史记录面板记录了可撤销的针对运行图文档的操作记录，可以查看、撤销、重做。"));
         panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
+
+		act = logDock->toggleViewAction();
+		act->setIcon(QIcon(":/icons/text.png"));
+		act->setToolTip(tr("输出窗口\n打开或关闭文本输出窗口"));
+		panel->addMediumAction(act);
+
+		act = issueDock->toggleViewAction();
+		act->setIcon(qApp->style()->standardIcon(QStyle::SP_MessageBoxCritical));
+		act->setToolTip(tr("铺画问题窗口\n打开或关闭铺画问题窗口，显示运行线铺画过程中的错误报告"));
+		panel->addMediumAction(act);
 
 		act = new QAction(QIcon(":/icons/add.png"), tr("添加运行图"), this);
 		act->setToolTip(tr("添加运行图\n选择既有基线数据，建立新的运行图页面。"));

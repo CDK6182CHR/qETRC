@@ -8,6 +8,7 @@
 #include "data/rail/ruler.h"
 #include "data/train/train.h"
 
+#include "log/IssueManager.h"
 
 TrainAdapter::TrainAdapter(std::weak_ptr<Train> train,
     std::weak_ptr<Railway> railway, const Config& config):
@@ -256,10 +257,13 @@ void TrainAdapter::autoLines(const Config& config)
 				//2021.10.23注意：这里的行别判断只依据里程，并不可靠。
 				//现在增加方向不交的判定条件
 				//2022.05.21增加：本站和上站相同的条件。不允许这种同站连续绑定的情况位于运行线开头。
-				qDebug() << "TrainAdapter::autoItem: WARNING: Invalid direction bound encountered" <<
-					rlast->name << ", unbound previous station "
-					<< line->_stations.back().trainStation->name.toSingleLiteral()
-					<< ", for train " << train()->trainName().full() << Qt::endl;
+				//qDebug() << "TrainAdapter::autoItem: WARNING: Invalid direction bound encountered" <<
+				//	rlast->name << ", unbound previous station "
+				//	<< line->_stations.back().trainStation->name.toSingleLiteral()
+				//	<< ", for train " << train()->trainName().full() << Qt::endl;
+
+				qeIssueDebug(IssueInfo(IssueInfo::WithdrawFirstBounding, train(), rail, rcur,
+					QString("Unbound last station %1").arg(rlast->name.toSingleLiteral())));
 				line->_stations.pop_back();
 				loccnt--;
 
