@@ -30,6 +30,8 @@ void PathListWidget::initUI()
             table->setColumnWidth(c++, w);
         }
     }
+    connect(table, &QTableView::doubleClicked,
+        this, &PathListWidget::editPathByModelIndex);
 
     auto* g = new ButtonGroup<3>({ "编辑","添加","删除" });
     g->connectAll(SIGNAL(clicked()), this,
@@ -39,7 +41,8 @@ void PathListWidget::initUI()
 
 void PathListWidget::actEdit()
 {
-    // TODO
+    const auto& idx = table->currentIndex();
+    editPathByModelIndex(idx);
 }
 
 void PathListWidget::actAdd()
@@ -59,6 +62,13 @@ void PathListWidget::actDelete()
     int row = idx.row();
     if (0 <= row && row < pathcoll.size()) {
         actRemovePath(row);
+    }
+}
+
+void PathListWidget::editPathByModelIndex(const QModelIndex& idx)
+{
+    if (idx.isValid()) {
+        emit editPath(idx.row());
     }
 }
 

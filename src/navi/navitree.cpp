@@ -599,6 +599,8 @@ void NaviTree::onDoubleClicked(const QModelIndex& index)
         emit editRouting(static_cast<navi::RoutingItem*>(item)->routing()); break;
     case navi::PageItem::Type:
         emit activatePageAt(item->row()); break;
+    case navi::PathItem::Type:
+        emit editPathNavi(index.row()); break;
     }
 }
 

@@ -55,7 +55,7 @@ class MainWindow : public SARibbonMainWindow
     //窗口，Model的指针
     DiagramNaviModel* naviModel;
     NaviTree* naviView;
-    SARibbonMenu* pageMenu, * railMenu, * appMenu, * forbidMenu, * routingMenu;
+    SARibbonMenu* pageMenu, * railMenu, * appMenu, * forbidMenu, * routingMenu, * pathMenu;
     QList<ads::CDockWidget*> diagramDocks;
     QList<DiagramWidget*> diagramWidgets;
     ads::CDockWidget* naviDock, * trainListDock, * routingDock, * timetableQuickDock, * pathListDock;

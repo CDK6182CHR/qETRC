@@ -20,6 +20,8 @@ class RailStation;
 class ForbidTabWidget;
 class MainWindow;
 class TrainStation;
+class PathEdit;
+class TrainPath;
 namespace ads {
 class CDockWidget;
 }
@@ -47,6 +49,11 @@ class RailContext : public QObject
     QList<ads::CDockWidget*> rulerDocks;
     QList<ForbidTabWidget*> forbidWidgets;
     QList<ads::CDockWidget*> forbidDocks;
+
+    //2023.08.14: trainPaths
+    QList<PathEdit*> pathEdits;
+    QList<ads::CDockWidget*> pathDocks;
+
 public:
     explicit RailContext(Diagram& diagram_, SARibbonContextCategory* context,
         MainWindow* mw_,
@@ -81,6 +88,8 @@ private:
 
     int forbidWidgetIndex(std::shared_ptr<Railway> railway);
     int forbidWidgetIndex(const Railway& railway);
+
+    int pathEditIndex(const TrainPath* path);
 
     ForbidTabWidget* getOpenForbidWidget(std::shared_ptr<Railway> railway);
 
@@ -192,6 +201,14 @@ public slots:
      * 多一个设定到指定index()的逻辑。
      */
     void openForbidWidgetTab(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> railway);
+
+    void openPathEdit(TrainPath* path);
+
+    /**
+     * open editor for path by the index IN THE DATA CLASS.
+     * The index is guarenteed to be valid.
+     */
+    void openPathEditIndex(int idx);
 
     void actChangeRailName(std::shared_ptr<Railway> rail, const QString& name);
     void commitChangeRailName(std::shared_ptr<Railway> rail);

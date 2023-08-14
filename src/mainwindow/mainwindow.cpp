@@ -933,6 +933,8 @@ void MainWindow::initToolbar()
 		act->setIcon(QIcon(":/icons/polyline.png"));
 		act->setText(tr("列车径路"));
 		act->setToolTip(tr("列车径路\n打开/关闭列车径路管理面板。"));
+		pathMenu = new SARibbonMenu(this);
+		act->setMenu(pathMenu);
 		panel->addLargeAction(act);
 
 		act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺编辑"), this);
@@ -1382,6 +1384,12 @@ void MainWindow::initToolbar()
 			contextRail, &RailContext::removeRailwayAtU);
 		connect(contextRail, &RailContext::dulplicateRailway,
 			naviView, &NaviTree::actDulplicateRailway);
+
+		// for paths (delegate the operations ...)
+		connect(naviView, &NaviTree::editPathNavi,
+			contextRail, &RailContext::openPathEditIndex);
+		connect(pathListWidget, &PathListWidget::editPath,
+			contextRail, &RailContext::openPathEditIndex);
 	}
 
 	//context: ruler 9

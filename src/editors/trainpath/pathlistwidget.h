@@ -31,9 +31,13 @@ public:
 private:
 	void initUI();
 
+signals:
+	void editPath(int index);
+
 private slots:
 	void actEdit();
 	void actDelete();
+	void editPathByModelIndex(const QModelIndex& idx);
 
 public slots:
 	void actAdd();

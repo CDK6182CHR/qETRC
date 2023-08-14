@@ -17,6 +17,7 @@
 #include "editors/forbidwidget.h"
 #include "editors/railstationwidget.h"
 #include "data/diagram/diagrampage.h"
+#include "editors/trainpath/pathedit.h"
 
 #include <QStyle>
 #include <QLabel>
@@ -283,6 +284,15 @@ int RailContext::forbidWidgetIndex(const Railway& railway)
 {
 	for (int i = 0; i < forbidWidgets.size(); i++) {
 		if (forbidWidgets.at(i)->getRailway().get() == &railway)
+			return i;
+	}
+	return -1;
+}
+
+int RailContext::pathEditIndex(const TrainPath* path)
+{
+	for (int i = 0; i < pathEdits.size(); i++) {
+		if (pathEdits.at(i)->path() == path)
 			return i;
 	}
 	return -1;
@@ -815,6 +825,39 @@ void RailContext::openForbidWidgetTab(std::shared_ptr<Forbid> forbid,
 {
 	auto* w = getOpenForbidWidget(railway); 
 	w->setCurrentIndex(forbid->index());
+}
+
+void RailContext::openPathEdit(TrainPath* path)
+{
+	int i = pathEditIndex(path);
+	if (i == -1) {
+		//创建
+		auto* pw = new PathEdit();
+		pw->setPath(path);
+		auto* dock = new ads::CDockWidget(tr("列车径路 - %1").arg(path->name()));
+		dock->setWidget(pw);
+		pathEdits.append(pw);
+		pathDocks.append(dock);
+		
+		mw->pathMenu->addAction(dock->toggleViewAction());
+		mw->getManager()->addDockWidgetFloating(dock);
+	}
+	else {
+		//显示
+		auto* dock = pathDocks.at(i);
+		if (dock->isClosed()) {
+			dock->toggleView(true);
+		}
+		else {
+			dock->setAsCurrentTab();
+		}
+	}
+}
+
+void RailContext::openPathEditIndex(int idx)
+{
+	auto* path = diagram.pathCollection().at(idx);
+	openPathEdit(path);
 }
 
 void RailContext::actChangeRailName(std::shared_ptr<Railway> rail, const QString &name)

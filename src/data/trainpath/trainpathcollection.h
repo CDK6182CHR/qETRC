@@ -27,6 +27,8 @@ public:
 
 	int size()const { return static_cast<int>(_paths.size()); }
 
+	auto* at(int i)const { return _paths.at(i).get(); }
+
 	void clear();
 
 	/**
