@@ -1,7 +1,7 @@
 #include "GlobalLogger.h"
 #include <QTextBrowser>
 #include <iostream>
-
+#include "util/utilfunc.h"
 
 std::unique_ptr<GlobalLogger> GlobalLogger::_instance;
 
@@ -40,29 +40,10 @@ GlobalLogger* GlobalLogger::get()
 QString GlobalLogger::formatMsg(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
 	return QString("[%1] %2%3").arg(
-		GlobalLogger::msgTypeToString(type),
+		qeutil::msgTypeToString(type),
 		GlobalLogger::msgLocation(type, context),
 		msg
 	);
-}
-
-QString GlobalLogger::msgTypeToString(QtMsgType type)
-{
-	switch (type)
-	{
-	case QtDebugMsg: return "Debug";
-		break;
-	case QtWarningMsg: return "Warning";
-		break;
-	case QtCriticalMsg: return "Critical";
-		break;
-	case QtFatalMsg: return "Fatal";
-		break;
-	case QtInfoMsg: return "Info";
-		break;
-	default:
-		return "UNKNOWN";
-	}
 }
 
 QString GlobalLogger::msgLocation(QtMsgType type, const QMessageLogContext& context)

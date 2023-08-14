@@ -25,7 +25,6 @@ private:
 	static std::unique_ptr<GlobalLogger> _instance;
 
 	QString formatMsg(QtMsgType type, const QMessageLogContext& context, const QString& msg);
-	static QString msgTypeToString(QtMsgType type);
 	static QString msgLocation(QtMsgType type, const QMessageLogContext& context);
 };
 
