@@ -18,6 +18,7 @@
 #include <SARibbonCustomizeDialog.h>
 #include <QXmlStreamWriter>
 #include <QMimeData>
+#include <QTextBrowser>
 
 #include "model/train/trainlistmodel.h"
 #include "editors/trainlistwidget.h"
@@ -78,6 +79,8 @@
 #include "viewers/stats/intervalcountdialog.h"
 #include "editors/train/predeftrainfiltermanager.h"
 #include "viewers/stats/trainintervalstatdialog.h"
+#include "log/GlobalLogger.h"
+
 
 MainWindow::MainWindow(QWidget* parent)
 	: SARibbonMainWindow(parent, true),
@@ -666,6 +669,21 @@ void MainWindow::initDockWidgets()
 		manager->addDockWidgetTabToArea(dock, area);
 		//container = manager->addAutoHideDockWidget(ads::SideBarRight, dock);
 		//container->setSize(240);
+	}
+
+	// 输出窗口 (日志窗口)
+	if constexpr (true) {
+		auto* w = new QTextBrowser;
+		dock = new ads::CDockWidget(tr("输出"));
+		dock->setWidget(w);
+		logDock = dock;
+		logWidget = w;
+
+		autoHideArea = manager->addAutoHideDockWidget(ads::SideBarBottom, dock);
+		autoHideArea->setSize(150);
+		GlobalLogger::get()->setOutWidget(w);
+		
+		qInstallMessageHandler(qeutil::qeLogHandler);
 	}
 }
 
