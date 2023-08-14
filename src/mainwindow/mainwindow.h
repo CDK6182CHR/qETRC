@@ -38,6 +38,8 @@ class CDockWidget;
 class  GreedyPaintWizard;
 class SARibbonActionsManager;
 class PredefTrainFilterManager;
+class QTextBrowser;
+class IssueWidget;
 
 /**
  * @brief The MainWindow class
@@ -58,6 +60,7 @@ class MainWindow : public SARibbonMainWindow
     QList<DiagramWidget*> diagramWidgets;
     ads::CDockWidget* naviDock, * trainListDock, * routingDock, * timetableQuickDock, * pathListDock;
     ads::CDockWidget* trainInfoDock;
+    ads::CDockWidget* logDock, * issueDock;
     ads::CDockWidget* undoDock, * centralDock;
     QWidget* centralOccupyWidget;
     ads::CDockAreaWidget* centralArea = nullptr;
@@ -69,6 +72,8 @@ class MainWindow : public SARibbonMainWindow
     TimetableQuickWidget* timetableQuickWidget;
     TrainInfoWidget* trainInfoWidget;
     PredefTrainFilterManager* filterManager = nullptr;
+    QTextBrowser* logWidget;
+    IssueWidget* issueWidget;
 
     PageContext* contextPage;
     TrainContext* contextTrain;

@@ -4,6 +4,7 @@
 #include <QString>
 #include <set>
 #include <QList>
+#include <QtLogging>
 
 class QWidget;
 class QStandardItemModel;
@@ -144,4 +145,6 @@ int iround(double x, int m);
 int ifloor(double x, int m);
 
 int iceil(double x, int m);
+
+QString msgTypeToString(QtMsgType type);
 }

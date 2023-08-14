@@ -18,6 +18,7 @@
 #include <SARibbonCustomizeDialog.h>
 #include <QXmlStreamWriter>
 #include <QMimeData>
+#include <QTextBrowser>
 
 #include "model/train/trainlistmodel.h"
 #include "editors/trainlistwidget.h"
@@ -78,6 +79,8 @@
 #include "viewers/stats/intervalcountdialog.h"
 #include "editors/train/predeftrainfiltermanager.h"
 #include "viewers/stats/trainintervalstatdialog.h"
+#include "log/GlobalLogger.h"
+#include "log/IssueWidget.h"
 #include "editors/trainpath/pathlistwidget.h"
 #include "model/trainpath/pathlistmodel.h"
 
@@ -113,7 +116,7 @@ MainWindow::MainWindow(QWidget* parent)
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 	auto secs = static_cast<double>(duration.count()) * std::chrono::microseconds::period::num /
 		std::chrono::microseconds::period::den;
-	qDebug() << "MainWindow init consumes: " << secs << Qt::endl;
+	qInfo() << "MainWindow init consumes: " << secs << Qt::endl;
 	showStatus(tr("主窗口初始化用时: %1 秒").arg(secs));
 }
 
@@ -692,6 +695,33 @@ void MainWindow::initDockWidgets()
 		//container = manager->addAutoHideDockWidget(ads::SideBarRight, dock);
 		//container->setSize(240);
 	}
+
+	// 输出窗口 (日志窗口)
+	if constexpr (true) {
+		auto* w = new QTextBrowser;
+		dock = new ads::CDockWidget(tr("输出"));
+		dock->setWidget(w);
+		logDock = dock;
+		logWidget = w;
+
+		autoHideArea = manager->addAutoHideDockWidget(ads::SideBarBottom, dock);
+		autoHideArea->setSize(150);
+		GlobalLogger::get()->setOutWidget(w);
+		
+		qInstallMessageHandler(qeutil::qeLogHandler);
+	}
+
+	// 问题窗口
+	if constexpr (true) {
+		auto* w = new IssueWidget;
+		dock = new ads::CDockWidget(tr("问题"));
+		dock->setWidget(w);
+		issueWidget = w;
+		issueDock = dock;
+
+		autoHideArea = manager->addAutoHideDockWidget(ads::SideBarBottom, dock);
+		autoHideArea->setSize(200);
+	}
 }
 
 void MainWindow::initToolbar()
@@ -820,6 +850,16 @@ void MainWindow::initToolbar()
 			"历史记录面板记录了可撤销的针对运行图文档的操作记录，可以查看、撤销、重做。"));
         panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
+
+		act = logDock->toggleViewAction();
+		act->setIcon(QIcon(":/icons/text.png"));
+		act->setToolTip(tr("输出窗口\n打开或关闭文本输出窗口"));
+		panel->addMediumAction(act);
+
+		act = issueDock->toggleViewAction();
+		act->setIcon(qApp->style()->standardIcon(QStyle::SP_MessageBoxCritical));
+		act->setToolTip(tr("铺画问题窗口\n打开或关闭铺画问题窗口，显示运行线铺画过程中的错误报告"));
+		panel->addMediumAction(act);
 
 		act = new QAction(QIcon(":/icons/add.png"), tr("添加运行图"), this);
 		act->setToolTip(tr("添加运行图\n选择既有基线数据，建立新的运行图页面。"));
@@ -1546,6 +1586,7 @@ bool MainWindow::openGraph(const QString& filename)
 	// 2022.09.11: 把打开的计时和提示都放到这里来。
 	using namespace std::chrono_literals;
 	auto start = std::chrono::system_clock::now();
+	qInfo() << "Opening diagram file " << filename;
 
 	clearDiagramUnchecked();
 
@@ -1566,7 +1607,7 @@ bool MainWindow::openGraph(const QString& filename)
 		return true;
 	}
 	else {
-		qDebug() << "MainWindow::openGraph: WARNING: open failed: " << filename;
+		qWarning() << "open failed: " << filename;
 		return false;
 	}
 }
@@ -1990,6 +2031,7 @@ void MainWindow::commitPassedStationChange(int n)
 void MainWindow::refreshAll()
 {
 	auto start = std::chrono::system_clock::now();
+	qInfo() << "Refreshing diagram";
 	_diagram.rebindAllTrains();
 	updateAllDiagrams();
 	//直接由Main管理的子页面

@@ -12,6 +12,7 @@
 #include "rulernode.h"
 #include "forbid.h"
 #include "data/diagram/config.h"
+#include "log/IssueManager.h"
 
 
 Railway::Railway(const QString& name) :
@@ -318,9 +319,8 @@ int Railway::stationsBetween(std::shared_ptr<const RailStation> s1,
 		return cnt;
 	}
 	//没找到，方向出了问题
-	qDebug() << "Railway::stationsBetween: WARNING: invalid direction encountered " << s1->name << "->"
-		<< s2->name <<", direction: "<<static_cast<int>(_dir)
-		<< Qt::endl;
+	qWarning() << "invalid direction encountered " << s1->name << "->"
+		<< s2->name << ", direction: " << static_cast<int>(_dir);
 	cnt = 0;
 	_dir = DirFunc::reverse(_dir);
 	s = s1->dirAdjacent(_dir);

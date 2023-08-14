@@ -235,6 +235,25 @@ int qeutil::iceil(double x, int m)
 	return static_cast<int>(std::ceil(x / m)) * m;
 }
 
+QString qeutil::msgTypeToString(QtMsgType type)
+{
+	switch (type)
+	{
+	case QtDebugMsg: return "Debug";
+		break;
+	case QtWarningMsg: return "Warning";
+		break;
+	case QtCriticalMsg: return "Critical";
+		break;
+	case QtFatalMsg: return "Fatal";
+		break;
+	case QtInfoMsg: return "Info";
+		break;
+	default:
+		return "UNKNOWN";
+	}
+}
+
 bool qeutil::timeCompare(const QTime& tm1, const QTime& tm2)
 {
 	static constexpr int secsOfADay = 3600 * 24;

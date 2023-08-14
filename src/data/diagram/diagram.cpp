@@ -8,6 +8,7 @@
 #include "data/rail/forbid.h"
 #include "mainwindow/version.h"
 #include "data/common/qesystem.h"
+#include "log/IssueManager.h"
 
 #include <QFile>
 #include <QJsonObject>
@@ -225,6 +226,7 @@ void Diagram::removeRailwayAtU(int i)
 
 void Diagram::rebindAllTrains()
 {
+    IssueManager::get()->clear();
     foreach (auto t , _trainCollection.trains()) {
         t->clearBoundRailways();
         foreach (auto p , railways()) {
