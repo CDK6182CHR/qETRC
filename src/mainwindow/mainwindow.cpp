@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget* parent)
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 	auto secs = static_cast<double>(duration.count()) * std::chrono::microseconds::period::num /
 		std::chrono::microseconds::period::den;
-	qDebug() << "MainWindow init consumes: " << secs << Qt::endl;
+	qInfo() << "MainWindow init consumes: " << secs << Qt::endl;
 	showStatus(tr("主窗口初始化用时: %1 秒").arg(secs));
 }
 
@@ -1556,6 +1556,7 @@ bool MainWindow::openGraph(const QString& filename)
 	// 2022.09.11: 把打开的计时和提示都放到这里来。
 	using namespace std::chrono_literals;
 	auto start = std::chrono::system_clock::now();
+	qInfo() << "Opening diagram file " << filename;
 
 	clearDiagramUnchecked();
 
@@ -1576,7 +1577,7 @@ bool MainWindow::openGraph(const QString& filename)
 		return true;
 	}
 	else {
-		qDebug() << "MainWindow::openGraph: WARNING: open failed: " << filename;
+		qWarning() << "open failed: " << filename;
 		return false;
 	}
 }
@@ -2000,6 +2001,7 @@ void MainWindow::commitPassedStationChange(int n)
 void MainWindow::refreshAll()
 {
 	auto start = std::chrono::system_clock::now();
+	qInfo() << "Refreshing diagram";
 	_diagram.rebindAllTrains();
 	updateAllDiagrams();
 	//直接由Main管理的子页面

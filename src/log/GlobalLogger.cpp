@@ -53,7 +53,7 @@ QString GlobalLogger::msgLocation(QtMsgType type, const QMessageLogContext& cont
 	case QtWarningMsg: 
 	case QtCriticalMsg: 
 	case QtFatalMsg: 
-		return QString("%1:%2").arg(
+		return QString("%1:%2 ").arg(
 			context.file ? context.file : "",
 			context.function ? context.function : ""
 		);
