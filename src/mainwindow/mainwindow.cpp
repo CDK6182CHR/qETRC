@@ -47,6 +47,7 @@
 #include "pagecontext.h"
 #include "rulercontext.h"
 #include "routingcontext.h"
+#include "pathcontext.h"
 
 #include "version.h"
 
@@ -559,6 +560,9 @@ void MainWindow::initDockWidgets()
 			this, &MainWindow::actBatchParseRouting);
 		connect(naviView, &NaviTree::activatePageAt,
 			this, &MainWindow::activatePageWidget);
+
+		connect(naviView, &NaviTree::focusInPath,
+			this, &MainWindow::focusInPath);
 	}
 	//auto* area = manager->addDockWidget(ads::LeftDockWidgetArea, dock);
 	auto autoHideArea = manager->addAutoHideDockWidget(ads::SideBarLeft, dock);
@@ -660,6 +664,8 @@ void MainWindow::initDockWidgets()
 			pathListWidget, &PathListWidget::actRemovePath);
 		connect(naviView, &NaviTree::duplicatePathNavi,
 			pathListWidget, &PathListWidget::actDuplicate);
+		connect(pathListWidget, &PathListWidget::focusInPath,
+			this, &MainWindow::focusInPath);
 	}
 
 
@@ -1384,12 +1390,6 @@ void MainWindow::initToolbar()
 			contextRail, &RailContext::removeRailwayAtU);
 		connect(contextRail, &RailContext::dulplicateRailway,
 			naviView, &NaviTree::actDulplicateRailway);
-
-		// for paths (delegate the operations ...)
-		connect(naviView, &NaviTree::editPathNavi,
-			contextRail, &RailContext::openPathEditIndex);
-		connect(pathListWidget, &PathListWidget::editPath,
-			contextRail, &RailContext::openPathEditIndex);
 	}
 
 	//context: ruler 9
@@ -1433,6 +1433,17 @@ void MainWindow::initToolbar()
 			contextRouting, &RoutingContext::onRoutingRemoved);
 		connect(contextRouting, &RoutingContext::removeRouting,
 			routingWidget, &RoutingWidget::onRemoveRoutingFromContext);
+	}
+
+	// context: path (A)
+	if constexpr (true) {
+		auto* cat = ribbon->addContextCategory(tr(""));
+		contextPath = new PathContext(_diagram, cat, this, this);
+
+		connect(naviView, &NaviTree::editPathNavi,
+			contextPath, &PathContext::openPathEditIndex);
+		connect(pathListWidget, &PathListWidget::editPath,
+			contextPath, &PathContext::openPathEditIndex);
 	}
 
 	// context: DB
@@ -1531,6 +1542,7 @@ void MainWindow::clearDiagramUnchecked()
 	contextTrain->removeAllTrainWidgets();
 	focusOutTrain();
 	contextRail->removeAllDocks();
+	contextPath->removePathDocks();
 
 	undoStack->clear();
 	undoStack->resetClean();
@@ -2360,6 +2372,18 @@ void MainWindow::focusOutRouting()
 	ribbonBar()->hideContextCategory(contextRouting->context());
 }
 
+void MainWindow::focusInPath(TrainPath* path)
+{
+	contextPath->setPath(path);
+	ribbonBar()->showContextCategory(contextPath->context());
+	showStatus(tr("切换到列车径路 [%2]  可至工具栏列车径路上下文菜单进一步操作").arg(path->name()));
+}
+
+void MainWindow::focusOutPath()
+{
+	ribbonBar()->hideContextCategory(contextPath->context());
+}
+
 void MainWindow::repaintRoutingTrainLines(std::shared_ptr<Routing> routing)
 {
 	for (const auto& p : routing->order()) {
@@ -2381,7 +2405,7 @@ void MainWindow::actSearchTrain()
 		tr("请先输入搜索内容，然后按Tab键选择车次"));
 	if (train) {
 		focusInTrain(train);
-		contextTrain->highlightTrainLine(train);
+        emit contextTrain->highlightTrainLine(train);
 	}
 }
 

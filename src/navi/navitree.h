@@ -11,6 +11,7 @@ class Ruler;
 class Railway;
 class Train;
 class DiagramPage;
+class TrainPath;
 class QUndoStack;
 class DiagramNaviModel;
 class QMenu;
@@ -77,6 +78,7 @@ signals:
     void activatePageAt(int i);
     void focusOutRailway();
     void railwayListChanged();   //只是通知主窗口更新数据  其实都不见得有必要
+    void focusInPath(TrainPath*);
 
     /**
      * 转发给主窗口去画图  所有页面重新铺画

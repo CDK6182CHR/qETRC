@@ -17,7 +17,6 @@
 #include "editors/forbidwidget.h"
 #include "editors/railstationwidget.h"
 #include "data/diagram/diagrampage.h"
-#include "editors/trainpath/pathedit.h"
 
 #include <QStyle>
 #include <QLabel>
@@ -37,7 +36,6 @@
 #include "navi/navitree.h"
 #include "mainwindow/pagecontext.h"
 #include "navi/addpagedialog.h"
-#include "editors/trainpath/pathlistwidget.h"
 
 
 RailContext::RailContext(Diagram& diagram_, SARibbonContextCategory* context, 
@@ -285,15 +283,6 @@ int RailContext::forbidWidgetIndex(const Railway& railway)
 {
 	for (int i = 0; i < forbidWidgets.size(); i++) {
 		if (forbidWidgets.at(i)->getRailway().get() == &railway)
-			return i;
-	}
-	return -1;
-}
-
-int RailContext::pathEditIndex(const TrainPath* path)
-{
-	for (int i = 0; i < pathEdits.size(); i++) {
-		if (pathEdits.at(i)->path() == path)
 			return i;
 	}
 	return -1;
@@ -768,11 +757,6 @@ void RailContext::removeAllDocks()
 	}
 	forbidDocks.clear();
 	forbidWidgets.clear();
-	foreach(auto p, pathDocks) {
-		p->deleteDockWidget();
-	}
-	pathDocks.clear();
-	pathEdits.clear();
 }
 
 void RailContext::setRailway(std::shared_ptr<Railway> rail)
@@ -833,43 +817,6 @@ void RailContext::openForbidWidgetTab(std::shared_ptr<Forbid> forbid,
 	w->setCurrentIndex(forbid->index());
 }
 
-void RailContext::openPathEdit(TrainPath* path)
-{
-	int i = pathEditIndex(path);
-	if (i == -1) {
-		//创建
-		auto* pw = new PathEdit(diagram.railCategory(), diagram.pathCollection());
-		pw->setPath(path);
-		auto* dock = new ads::CDockWidget(tr("列车径路 - %1").arg(path->name()));
-		dock->setWidget(pw);
-		pathEdits.append(pw);
-		pathDocks.append(dock);
-
-		connect(pw, &PathEdit::pathApplied,
-			this, &RailContext::actUpdatePath);
-		connect(mw->pathListWidget, &PathListWidget::pathRemoved,
-			this, &RailContext::onPathRemoved);
-		
-		mw->pathMenu->addAction(dock->toggleViewAction());
-		mw->getManager()->addDockWidgetFloating(dock);
-	}
-	else {
-		//显示
-		auto* dock = pathDocks.at(i);
-		if (dock->isClosed()) {
-			dock->toggleView(true);
-		}
-		else {
-			dock->setAsCurrentTab();
-		}
-	}
-}
-
-void RailContext::openPathEditIndex(int idx)
-{
-	auto* path = diagram.pathCollection().at(idx);
-	openPathEdit(path);
-}
 
 void RailContext::actChangeRailName(std::shared_ptr<Railway> rail, const QString &name)
 {
@@ -925,36 +872,7 @@ void RailContext::undoRemoveRailwayU(std::shared_ptr<Railway> railway, int index
 	mw->naviModel->commitInsertRailway(index, railway);
 }
 
-void RailContext::actUpdatePath(TrainPath* path, std::unique_ptr<TrainPath>& data)
-{
-	mw->getUndoStack()->push(new qecmd::UpdatePath(path, std::move(data), this));
-}
 
-void RailContext::commitUpdatePath(TrainPath* path)
-{
-	// inform the PathListWidget to update path
-	mw->pathListWidget->updatePath(path);
-
-	// update the path editor, if available
-	if (int idx = pathEditIndex(path); idx >= 0) {
-		auto* ed = pathEdits.at(idx);
-		ed->refreshData();
-		pathDocks.at(idx)->setWindowTitle(tr("列车径路 - %1").arg(path->name()));
-	}
-}
-
-void RailContext::onPathRemoved(TrainPath* path)
-{
-	int idx = pathEditIndex(path);
-	if (idx >= 0) {
-		auto* dock = pathDocks.takeAt(idx);
-		dock->deleteDockWidget();
-
-		pathEdits.removeAt(idx);
-	}
-
-	// inform the mainWindow to unfocus on the path, in the later
-}
 
 
 
@@ -1169,21 +1087,3 @@ void qecmd::RemoveRailway::redo()
 
 #endif
 
-qecmd::UpdatePath::UpdatePath(TrainPath* path, std::unique_ptr<TrainPath>&& data_, 
-	RailContext* cont, QUndoCommand* parent):
-	QUndoCommand(QObject::tr("更新列车径路: %1").arg(path->name()), parent),
-	path(path), data(std::move(data_)),cont(cont)
-{
-}
-
-void qecmd::UpdatePath::undo()
-{
-	path->swapDataWith(*data);
-	cont->commitUpdatePath(path);
-}
-
-void qecmd::UpdatePath::redo()
-{
-	path->swapDataWith(*data);
-	cont->commitUpdatePath(path);
-}

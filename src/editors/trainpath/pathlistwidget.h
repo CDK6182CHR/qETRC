@@ -45,10 +45,13 @@ signals:
 	 */
 	void pathRemoved(TrainPath*);
 
+	void focusInPath(TrainPath*);
+
 private slots:
 	void actEdit();
 	void actDelete();
 	void editPathByModelIndex(const QModelIndex& idx);
+	void onCurrentChanged(const QModelIndex& idx);
 
 public slots:
 	void actAdd();

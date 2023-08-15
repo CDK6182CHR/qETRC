@@ -369,6 +369,8 @@ namespace navi {
 		virtual int childCount() const override { return 0; }
 		virtual QString data(int i) const override;
 		virtual int type() const override { return Type; }
+
+		auto* getPath() { return _path; }
 	};
 }
 

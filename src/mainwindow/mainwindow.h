@@ -15,6 +15,7 @@ class PageContext;
 class ViewCategory;
 class RailContext;
 class TrainContext;
+class PathContext;
 class QSpinBox;
 class QUndoView;
 class TimetableQuickWidget;
@@ -80,6 +81,7 @@ class MainWindow : public SARibbonMainWindow
     RailContext* contextRail;
     RulerContext* contextRuler;
     RoutingContext* contextRouting;
+    PathContext* contextPath;
     RailDBContext* contextDB;
     ViewCategory* catView;
 
@@ -100,6 +102,7 @@ class MainWindow : public SARibbonMainWindow
     friend class RailContext;
     friend class RoutingContext;
     friend class TrainContext;
+    friend class PathContext;
     friend class RailDBContext;
 
     bool changed = false;
@@ -286,6 +289,8 @@ private slots:
     void focusOutRuler();
     void focusInRouting(std::shared_ptr<Routing> routing);
     void focusOutRouting();
+    void focusInPath(TrainPath* path);
+    void focusOutPath();
 
     void undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains);
     void redoRemoveTrains(const QList<std::shared_ptr<Train>>& trains);

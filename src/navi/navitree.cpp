@@ -628,6 +628,8 @@ void NaviTree::onCurrentChanged(const QModelIndex& cur, const QModelIndex& prev)
             emit focusInRuler(static_cast<navi::RulerItem*>(icur)->ruler()); break;
         case navi::RoutingItem::Type:
             emit focusInRouting(static_cast<navi::RoutingItem*>(icur)->routing()); break;
+        case navi::PathItem::Type:
+            emit focusInPath(static_cast<navi::PathItem*>(icur)->getPath()); break;
         }
     }
 }

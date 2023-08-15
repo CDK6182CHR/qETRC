@@ -21,8 +21,6 @@ class RailStation;
 class ForbidTabWidget;
 class MainWindow;
 class TrainStation;
-class PathEdit;
-class TrainPath;
 namespace ads {
 class CDockWidget;
 }
@@ -50,10 +48,6 @@ class RailContext : public QObject
     QList<ads::CDockWidget*> rulerDocks;
     QList<ForbidTabWidget*> forbidWidgets;
     QList<ads::CDockWidget*> forbidDocks;
-
-    //2023.08.14: trainPaths
-    QList<PathEdit*> pathEdits;
-    QList<ads::CDockWidget*> pathDocks;
 
 public:
     explicit RailContext(Diagram& diagram_, SARibbonContextCategory* context,
@@ -89,8 +83,6 @@ private:
 
     int forbidWidgetIndex(std::shared_ptr<Railway> railway);
     int forbidWidgetIndex(const Railway& railway);
-
-    int pathEditIndex(const TrainPath* path);
 
     ForbidTabWidget* getOpenForbidWidget(std::shared_ptr<Railway> railway);
 
@@ -203,13 +195,6 @@ public slots:
      */
     void openForbidWidgetTab(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> railway);
 
-    void openPathEdit(TrainPath* path);
-
-    /**
-     * open editor for path by the index IN THE DATA CLASS.
-     * The index is guarenteed to be valid.
-     */
-    void openPathEditIndex(int idx);
 
     void actChangeRailName(std::shared_ptr<Railway> rail, const QString& name);
     void commitChangeRailName(std::shared_ptr<Railway> rail);
@@ -309,15 +294,6 @@ public slots:
     void commitRemoveRailwayU(std::shared_ptr<Railway> railway, int index);
 
     void undoRemoveRailwayU(std::shared_ptr<Railway> railway, int index);
-
-    /**
-     * 操作压栈  更新列车径路
-     */
-    void actUpdatePath(TrainPath* path, std::unique_ptr<TrainPath>& data);
-
-    void commitUpdatePath(TrainPath* path);
-
-    void onPathRemoved(TrainPath* path);
 };
 
 
@@ -460,17 +436,6 @@ namespace qecmd {
         void redo()override;
     };
 
-
-    class UpdatePath :public QUndoCommand {
-        TrainPath* path;
-        std::unique_ptr<TrainPath> data;
-        RailContext* const cont;
-    public:
-        UpdatePath(TrainPath* path, std::unique_ptr<TrainPath>&& data_, RailContext* cont,
-            QUndoCommand* parent = nullptr);
-        virtual void undo()override;
-        virtual void redo()override;
-    };
 }
 
 

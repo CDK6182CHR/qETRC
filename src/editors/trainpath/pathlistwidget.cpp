@@ -37,6 +37,8 @@ void PathListWidget::initUI()
     }
     connect(table, &QTableView::doubleClicked,
         this, &PathListWidget::editPathByModelIndex);
+    connect(table->selectionModel(), &QItemSelectionModel::currentRowChanged,
+        this, &PathListWidget::onCurrentChanged);
 
     auto* g = new ButtonGroup<3>({ "编辑","添加","删除" });
     g->connectAll(SIGNAL(clicked()), this,
@@ -75,6 +77,11 @@ void PathListWidget::editPathByModelIndex(const QModelIndex& idx)
     if (idx.isValid()) {
         emit editPath(idx.row());
     }
+}
+
+void PathListWidget::onCurrentChanged(const QModelIndex& idx)
+{
+    emit focusInPath(pathcoll.at(idx.row()));
 }
 
 void PathListWidget::actRemovePath(int idx)
