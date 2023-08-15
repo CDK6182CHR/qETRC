@@ -1578,6 +1578,7 @@ void Diagram::clear()
     _pages.clear();
     _trainCollection.clear(_defaultManager);
     railways().clear();
+    pathCollection().clear();
     _config = _defaultConfig;
     _config.transparent_config = SystemJson::instance.transparent_config;
     _note = "";
