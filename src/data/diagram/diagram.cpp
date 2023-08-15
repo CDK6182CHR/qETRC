@@ -235,6 +235,12 @@ void Diagram::rebindAllTrains()
     }
 }
 
+void Diagram::refreshAll()
+{
+    _pathcoll.checkValidAll(_railcat);
+    rebindAllTrains();
+}
+
 void Diagram::undoImportRailway()
 {
     auto t = railways().takeLast();

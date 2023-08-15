@@ -44,7 +44,9 @@ public:
 	 */
 	void insertEmptyRow(int row);
 
-	std::shared_ptr<Railway> getRailwayForRow(int row);
+	void removePathRow(int row);
+
+	std::shared_ptr<Railway> getRailwayForRow(int row)const;
 
 	/**
 	 * Called by the delegate AFTER the railway is changed. 
@@ -54,7 +56,12 @@ public:
 	/**
 	 * Called by the delegate AFTER the station is changed.
 	 */
-	void onStationChanged(const QModelIndex& idx);
+	void onStationChanged(int row, int col);
+
+	/**
+	 * Apply the data in the model to the object pointed by `data`
+	 */
+	void appliedData(TrainPath* data)const;
 
 private:
 	void setupRow(int row, const TrainPathSeg& seg, const StationName& lastStation);

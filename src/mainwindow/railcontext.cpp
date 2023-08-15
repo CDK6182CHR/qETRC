@@ -37,6 +37,7 @@
 #include "navi/navitree.h"
 #include "mainwindow/pagecontext.h"
 #include "navi/addpagedialog.h"
+#include "editors/trainpath/pathlistwidget.h"
 
 
 RailContext::RailContext(Diagram& diagram_, SARibbonContextCategory* context, 
@@ -767,6 +768,11 @@ void RailContext::removeAllDocks()
 	}
 	forbidDocks.clear();
 	forbidWidgets.clear();
+	foreach(auto p, pathDocks) {
+		p->deleteDockWidget();
+	}
+	pathDocks.clear();
+	pathEdits.clear();
 }
 
 void RailContext::setRailway(std::shared_ptr<Railway> rail)
@@ -832,12 +838,17 @@ void RailContext::openPathEdit(TrainPath* path)
 	int i = pathEditIndex(path);
 	if (i == -1) {
 		//创建
-		auto* pw = new PathEdit(diagram.railCategory());
+		auto* pw = new PathEdit(diagram.railCategory(), diagram.pathCollection());
 		pw->setPath(path);
 		auto* dock = new ads::CDockWidget(tr("列车径路 - %1").arg(path->name()));
 		dock->setWidget(pw);
 		pathEdits.append(pw);
 		pathDocks.append(dock);
+
+		connect(pw, &PathEdit::pathApplied,
+			this, &RailContext::actUpdatePath);
+		connect(mw->pathListWidget, &PathListWidget::pathRemoved,
+			this, &RailContext::onPathRemoved);
 		
 		mw->pathMenu->addAction(dock->toggleViewAction());
 		mw->getManager()->addDockWidgetFloating(dock);
@@ -912,6 +923,37 @@ void RailContext::commitRemoveRailwayU(std::shared_ptr<Railway> railway, int ind
 void RailContext::undoRemoveRailwayU(std::shared_ptr<Railway> railway, int index)
 {
 	mw->naviModel->commitInsertRailway(index, railway);
+}
+
+void RailContext::actUpdatePath(TrainPath* path, std::unique_ptr<TrainPath>& data)
+{
+	mw->getUndoStack()->push(new qecmd::UpdatePath(path, std::move(data), this));
+}
+
+void RailContext::commitUpdatePath(TrainPath* path)
+{
+	// inform the PathListWidget to update path
+	mw->pathListWidget->updatePath(path);
+
+	// update the path editor, if available
+	if (int idx = pathEditIndex(path); idx >= 0) {
+		auto* ed = pathEdits.at(idx);
+		ed->refreshData();
+		pathDocks.at(idx)->setWindowTitle(tr("列车径路 - %1").arg(path->name()));
+	}
+}
+
+void RailContext::onPathRemoved(TrainPath* path)
+{
+	int idx = pathEditIndex(path);
+	if (idx >= 0) {
+		auto* dock = pathDocks.takeAt(idx);
+		dock->deleteDockWidget();
+
+		pathEdits.removeAt(idx);
+	}
+
+	// inform the mainWindow to unfocus on the path, in the later
 }
 
 
@@ -1110,6 +1152,7 @@ qecmd::RemoveRailway::RemoveRailway(std::shared_ptr<Railway> railway, int index,
 void qecmd::RemoveRailway::undo()
 {
 	// 这里先执行Railway的删除undo  （重新添加）
+	railway->setValid(true);
 	cont->undoRemoveRailwayU(railway, index);
 	QUndoCommand::undo();    
 }
@@ -1118,9 +1161,29 @@ void qecmd::RemoveRailway::redo()
 {
 	QUndoCommand::redo();    // 先redo （执行所有的Page修订删除）
 	
+	railway->setValid(false);
 	// 这里是Railway的删除操作
 	cont->commitRemoveRailwayU(railway, index);
 
 }
 
 #endif
+
+qecmd::UpdatePath::UpdatePath(TrainPath* path, std::unique_ptr<TrainPath>&& data_, 
+	RailContext* cont, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("更新列车径路: %1").arg(path->name()), parent),
+	path(path), data(std::move(data_)),cont(cont)
+{
+}
+
+void qecmd::UpdatePath::undo()
+{
+	path->swapDataWith(*data);
+	cont->commitUpdatePath(path);
+}
+
+void qecmd::UpdatePath::redo()
+{
+	path->swapDataWith(*data);
+	cont->commitUpdatePath(path);
+}

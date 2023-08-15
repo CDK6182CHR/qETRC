@@ -34,7 +34,18 @@ public:
 	/**
 	 * Simple linear alg.
 	 */
-	bool isValidNewPathName(const QString& name)const;
+	bool isValidNewPathName(const QString& name, TrainPath* ignore=nullptr)const;
 
 	QString validNewPathName(const QString& prefix)const;
+
+	/**
+	 * simple linear alg. Find the index of given path
+	 */
+	int pathIndex(const TrainPath* p)const;
+
+	/**
+	 * Refresh the validity of all paths. 
+	 * Called by the global refresh process (F5).
+	 */
+	void checkValidAll(RailCategory& railcat);
 };

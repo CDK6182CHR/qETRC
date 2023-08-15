@@ -97,7 +97,7 @@ void PathRailwayDelegate::setComboConstrained(QComboBox *cb, const QString &cur_
             v.setValue(rail);
             cb->addItem(rail->name(), v);
             if (cur_name == rail->name()){
-                cur_idx = idx;
+                cur_idx = cb->count() - 1;
             }
         }
     }

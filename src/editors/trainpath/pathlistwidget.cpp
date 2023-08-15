@@ -16,6 +16,11 @@ PathListWidget::PathListWidget(TrainPathCollection& pathcoll, QUndoStack* undo, 
     initUI();
 }
 
+void PathListWidget::updatePath(TrainPath* path)
+{
+    _model->updatePath(path);
+}
+
 void PathListWidget::initUI()
 {
     auto* vlay = new QVBoxLayout(this);
@@ -103,12 +108,14 @@ void PathListWidget::commitAddPath(std::unique_ptr<TrainPath>&& path)
 std::unique_ptr<TrainPath> PathListWidget::undoAddPath()
 {
     auto p = _model->popPathAt(pathcoll.size() - 1);
+    emit pathRemoved(p.get());
     return p;
 }
 
 std::unique_ptr<TrainPath> PathListWidget::commitRemovePath(int idx)
 {
     auto p = _model->popPathAt(idx);
+    emit pathRemoved(p.get());
     return p;
 }
 

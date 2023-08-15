@@ -67,3 +67,9 @@ std::unique_ptr<TrainPath> PathListModel::popPathAt(int index)
 	endRemoveRows();
 	return p;
 }
+
+void PathListModel::updatePath(TrainPath* path)
+{
+	int idx = pathcoll.pathIndex(path);
+	emit dataChanged(index(idx, ColStart), index(idx, ColMAX - 1), { Qt::DisplayRole });
+}

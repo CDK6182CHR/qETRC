@@ -22,11 +22,11 @@ void TrainPathCollection::clear()
 	_paths.clear();
 }
 
-bool TrainPathCollection::isValidNewPathName(const QString& name) const
+bool TrainPathCollection::isValidNewPathName(const QString& name, TrainPath* ignore) const
 {
 	if (name.isEmpty()) return false;
 	for (const auto& p : _paths) {
-		if (p->name() == name)
+		if (p->name() == name && p.get()!=ignore)
 			return false;
 	}
 	return true;
@@ -41,5 +41,23 @@ QString TrainPathCollection::validNewPathName(const QString& prefix) const
 		}
 		if (isValidNewPathName(name))
 			return name;
+	}
+}
+
+int TrainPathCollection::pathIndex(const TrainPath* p) const
+{
+	for (int i = 0; i < _paths.size(); i++) {
+		if (_paths.at(i).get() == p) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+void TrainPathCollection::checkValidAll(RailCategory& railcat)
+{
+	for (auto& path : _paths) {
+		path->updateRailways(railcat);
+		path->checkIsValid();
 	}
 }

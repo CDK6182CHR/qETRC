@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QLabel>
+#include <QMessageBox>
 
 #include "model/trainpath/pathmodel.h"
 #include "data/common/qesystem.h"
@@ -16,9 +17,11 @@
 #include "model/trainpath/pathrailwaydelegate.h"
 #include "model/trainpath/pathstationdelegate.h"
 #include "model/delegate/generaldoublespindelegate.h"
+#include "data/trainpath/trainpathcollection.h"
 
-PathEdit::PathEdit(RailCategory& railcat, QWidget* parent):
-	railcat(railcat), model(new PathModel(parent))
+
+PathEdit::PathEdit(RailCategory& railcat, TrainPathCollection& coll, QWidget* parent):
+	railcat(railcat), pathcoll(coll), model(new PathModel(parent))
 {
 	initUI();
 }
@@ -72,8 +75,8 @@ void PathEdit::initUI()
 	edNote->setMaximumHeight(120);
 	vlay->addWidget(edNote);
 	
-	auto* g2 = new ButtonGroup<3>({ "确定", "取消", "刷新" });
-	g2->connectAll(SIGNAL(clicked()), this, { SLOT(actApply()),SLOT(actCancel()), SLOT(actRefresh()) });
+	auto* g2 = new ButtonGroup<2>({ "确定", "还原" });
+	g2->connectAll(SIGNAL(clicked()), this, { SLOT(actApply()), SLOT(actRefresh()) });
 	vlay->addLayout(g2);
 }
 
@@ -95,20 +98,48 @@ void PathEdit::actAddAfter()
 
 void PathEdit::actRemove()
 {
-	// todo
+	const auto& idx = table->currentIndex();
+	if (!idx.isValid()) return;
+
+	model->removePathRow(idx.row());
 }
 
 void PathEdit::actApply()
 {
-	// todo
+	// first check name validity
+	const auto& name = edName->text();
+	if (!pathcoll.isValidNewPathName(name, _path)) {
+		QMessageBox::warning(this, tr("错误"),
+			tr("列车径路名为空或与既有重复"));
+		return;
+	}
+	auto data = std::make_unique<TrainPath>(edName->text());
+	data->setNote(edNote->toPlainText());
+
+	model->appliedData(data.get());
+
+	bool valid = data->checkIsValid();
+
+	if (!valid) {
+		auto res = QMessageBox::question(this, tr("注意"),
+			tr("当前列车径路为不可用状态（在“输出”窗口查看具体原因），"
+				"是否确认提交？"));
+		if (res != QMessageBox::Yes) {
+			return;
+		}
+	}
+
+	emit pathApplied(_path, data);
+
 }
 
-void PathEdit::actCancel()
-{
-	// todo
-}
+//void PathEdit::actCancel()
+//{
+//	refreshData();
+//}
 
 void PathEdit::actRefresh()
 {
-	// todo
+	// todo: back-end update
+	refreshData();
 }

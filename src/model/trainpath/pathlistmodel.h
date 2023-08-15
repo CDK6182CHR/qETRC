@@ -38,4 +38,6 @@ public:
 	void addPathAt(int index, std::unique_ptr<TrainPath>&& path);
 
 	std::unique_ptr<TrainPath> popPathAt(int index);
+
+	void updatePath(TrainPath* path);
 };

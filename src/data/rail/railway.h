@@ -66,6 +66,10 @@ class Railway:
 
     double _diagramHeightCoeff = -1;
 
+    // 2023.08.15: the valid status.
+    // if the railway does not belong to RailCategory (i.e. deleted or is data object), this is false
+    bool _valid = true;
+
 public:
     Railway(const QString& name="");
     // 2021.09.28  删除这个构造函数；因为shared_from_this，
@@ -105,6 +109,9 @@ public:
     /// 必要时实现
     /// </summary>
     void clear();
+
+    bool valid()const { return _valid; }
+    void setValid(bool v) { _valid = v; }
 
     void fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;

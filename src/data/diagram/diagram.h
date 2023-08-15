@@ -303,6 +303,11 @@ public:
     void rebindAllTrains();
 
     /**
+     * 2023.08.15  refresh all data (called by F5)
+     */
+    void refreshAll();
+
+    /**
      * 2021.09.16  删除末尾的最后一条线路。保证没有关联的page之类的，
      * 但需要清除列车的绑定情况。
      */

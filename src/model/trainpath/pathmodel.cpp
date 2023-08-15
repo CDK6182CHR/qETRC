@@ -51,7 +51,23 @@ void PathModel::insertEmptyRow(int row)
 	setItem(row, ColMile, it);
 }
 
-std::shared_ptr<Railway> PathModel::getRailwayForRow(int row)
+void PathModel::removePathRow(int row)
+{
+	removeRow(row);
+
+	if (row == 0 && rowCount()) {
+		// set the new first row to be editable
+		item(0, ColStart)->setEditable(true);
+	}
+
+	if (row != 0 && row < rowCount()) {
+		// is not the last row; update the start station of the next row
+		item(row, ColStart)->setText(item(row - 1, ColEnd)->text());
+		onStationChanged(row, ColStart);
+	}
+}
+
+std::shared_ptr<Railway> PathModel::getRailwayForRow(int row)const
 {
 	return qvariant_cast<std::shared_ptr<Railway>>(item(row, ColRail)->data(qeutil::RailwayRole));
 }
@@ -61,12 +77,39 @@ void PathModel::onRailwayChanged(int row)
 	checkRowValidity(row);
 }
 
-void PathModel::onStationChanged(const QModelIndex& idx)
+void PathModel::onStationChanged(int row, int col)
 {
-	checkRowValidity(idx.row());
-	if (idx.column() == ColEnd && idx.row() < rowCount() - 1) {
-		item(idx.row() + 1, ColStart)->setData(idx.data(Qt::EditRole), Qt::EditRole);
-		checkRowValidity(idx.row() + 1);
+	checkRowValidity(row);
+	if (col == ColEnd && row < rowCount() - 1) {
+		item(row + 1, ColStart)->setData(item(row,col)->data(Qt::EditRole), Qt::EditRole);
+		checkRowValidity(row + 1);
+	}
+}
+
+
+void PathModel::appliedData(TrainPath* data) const
+{
+	data->segments().clear();
+	if (rowCount() == 0) {
+		data->setStartStation({});
+		return;
+	}
+
+	data->setStartStation(item(0, ColStart)->text());
+
+	for (int r = 0; r < rowCount(); r++) {
+		auto rail = getRailwayForRow(r);
+
+		StationName endStation{ item(r, ColEnd)->text() };
+		Direction dir = qvariant_cast<Direction>(item(r, ColDir)->data(qeutil::DirectionRole));
+		double mile = item(r, ColMile)->data(qeutil::DoubleDataRole).toDouble();
+
+		if (rail) {
+			data->segments().emplace_back(rail, endStation, dir, mile);
+		}
+		else {
+			data->segments().emplace_back(item(r, ColRail)->text(), endStation, dir, mile);
+		}
 	}
 }
 

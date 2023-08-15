@@ -6,6 +6,8 @@
 
 class Railway;
 class RailCategory;
+class StationName;
+
 
 /**
  * 2023.08.03  A "segment" for train path.
@@ -22,17 +24,13 @@ struct TrainPathSeg {
 	Direction dir;
 	double mile;
 
-	//TrainPathSeg(const QString& rail_name, const StationName& end_station) :
-	//	rail_name(rail_name), end_station(end_station)
-	//{
+	TrainPathSeg(const QString& rail_name, const StationName& end_station, Direction dir, double mile) :
+		rail_name(rail_name), end_station(end_station), dir(dir), mile(mile)
+	{
 
-	//}
+	}
 
-	//TrainPathSeg(const std::weak_ptr<Railway>& railway, const StationName& end_station) :
-	//	railway(railway), end_station(end_station)
-	//{
-
-	//}
+	TrainPathSeg(const std::shared_ptr<Railway>& railway_, const StationName& end_station, Direction dir, double mile);
 
 	TrainPathSeg(const QJsonObject& obj, const RailCategory& cat);
 
@@ -41,4 +39,18 @@ struct TrainPathSeg {
 	void fromJson(const QJsonObject& obj, const RailCategory& cat);
 	
 	QJsonObject toJson()const;
+
+	/**
+	 * 2023.08.15  check whether the current segment is valid.
+	 * The railway attribute is used directly (rail_name is NOT used).
+	 * The dir/mile may be updated.
+	 */
+	bool checkIsValid(const StationName& start_name);
+
+	/**
+	 * Update the railway.
+	 * If the railway weak_ptr is null, try to find it by name from the category.
+	 * Mind this may be slow if the railway number is large.
+	 */
+	void updateRailway(RailCategory& railcat);
 };

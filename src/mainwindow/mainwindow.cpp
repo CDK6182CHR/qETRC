@@ -2040,7 +2040,7 @@ void MainWindow::refreshAll()
 {
 	auto start = std::chrono::system_clock::now();
 	qInfo() << "Refreshing diagram";
-	_diagram.rebindAllTrains();
+	_diagram.refreshAll();
 	updateAllDiagrams();
 	//直接由Main管理的子页面
 	naviModel->resetModel();

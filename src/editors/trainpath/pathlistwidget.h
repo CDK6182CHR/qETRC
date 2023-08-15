@@ -28,11 +28,22 @@ public:
 	PathListWidget(TrainPathCollection& pathcoll, QUndoStack* undo, QWidget* parent = nullptr);
 	auto* model() { return _model; }
 
+	/**
+ 	 * Called by RailContext upon the path is updated (by editor).
+	 * Simple linear alg.
+	 */
+	void updatePath(TrainPath* path);
+
 private:
 	void initUI();
 
 signals:
 	void editPath(int index);
+
+	/**
+	 * Inform the RailCategory, to close corresponding docks
+	 */
+	void pathRemoved(TrainPath*);
 
 private slots:
 	void actEdit();

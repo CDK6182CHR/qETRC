@@ -63,9 +63,17 @@ public:
 
 	bool empty()const { return _segments.empty(); }
 
+	void swapDataWith(TrainPath& other);
+
 	/**
 	 * Check whether current Path is valid, and set the flag.
-	 * TODO 
+	 * The direction/mile data may be changed.
+	 * Note: this operation may be slow.
 	 */
-	bool updateIsValid();
+	bool checkIsValid();
+
+	/**
+	 *  Try to update the railway of all the segments.
+	 */
+	void updateRailways(RailCategory& cat);
 };

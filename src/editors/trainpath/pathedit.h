@@ -8,11 +8,14 @@ class QTextEdit;
 class QLineEdit;
 class PathModel;
 class RailCategory;
+class TrainPathCollection;
+
 
 class PathEdit :public QWidget
 {
 	Q_OBJECT;
 	RailCategory& railcat;
+	TrainPathCollection& pathcoll;
 	TrainPath* _path;
 
 	QLineEdit* edName;
@@ -20,7 +23,7 @@ class PathEdit :public QWidget
 	QTableView* table;
 	PathModel* const model;
 public:
-	PathEdit(RailCategory& railcat, QWidget* parent = nullptr);
+	PathEdit(RailCategory& railcat, TrainPathCollection& pathcoll, QWidget* parent = nullptr);
 	auto* path() { return _path; }
 
 	void setPath(TrainPath* path);
@@ -30,11 +33,14 @@ public:
 private:
 	void initUI();
 
+signals:
+	void pathApplied(TrainPath* path, std::unique_ptr<TrainPath>& data);
+
 private slots:
 	void actAddBefore(); 
 	void actAddAfter();
 	void actRemove();
 	void actApply();
-	void actCancel();
+	//void actCancel();
 	void actRefresh();
 };

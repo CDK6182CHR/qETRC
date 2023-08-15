@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QUndoCommand>
 #include <QList>
+#include <memory>
 
 #include "data/common/direction.h"
 #include "data/rail/railinfonote.h"
@@ -308,6 +309,15 @@ public slots:
     void commitRemoveRailwayU(std::shared_ptr<Railway> railway, int index);
 
     void undoRemoveRailwayU(std::shared_ptr<Railway> railway, int index);
+
+    /**
+     * 操作压栈  更新列车径路
+     */
+    void actUpdatePath(TrainPath* path, std::unique_ptr<TrainPath>& data);
+
+    void commitUpdatePath(TrainPath* path);
+
+    void onPathRemoved(TrainPath* path);
 };
 
 
@@ -448,6 +458,18 @@ namespace qecmd {
             RailContext* context, QUndoCommand* parent = nullptr);
         void undo()override;
         void redo()override;
+    };
+
+
+    class UpdatePath :public QUndoCommand {
+        TrainPath* path;
+        std::unique_ptr<TrainPath> data;
+        RailContext* const cont;
+    public:
+        UpdatePath(TrainPath* path, std::unique_ptr<TrainPath>&& data_, RailContext* cont,
+            QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
     };
 }
 

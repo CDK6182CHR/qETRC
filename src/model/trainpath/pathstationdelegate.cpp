@@ -51,6 +51,6 @@ void PathStationDelegate::setModelData(QWidget *editor, QAbstractItemModel *mode
     bool updated= (prev_st.toString() != cur_text);
     model->setData(index, cur_text, Qt::EditRole);
     if (updated){
-        pathModel->onStationChanged(index);
+        pathModel->onStationChanged(index.row(), index.column());
     }
 }
