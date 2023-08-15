@@ -1,4 +1,4 @@
-#include "pathdelegates.h"
+#include "pathrailwaydelegate.h"
 
 #include <cassert>
 #include <QComboBox>
@@ -9,7 +9,7 @@
 #include "model/delegate/qedelegate.h"
 
 PathRailwayDelegate::PathRailwayDelegate(RailCategory &cat, PathModel *model, QObject *parent):
-    QStyledItemDelegate(parent), railcat(cat), model(model)
+    QStyledItemDelegate(parent), railcat(cat), pathModel(model)
 {
 
 }
@@ -20,6 +20,7 @@ QWidget *PathRailwayDelegate::createEditor(QWidget *parent, const QStyleOptionVi
     Q_UNUSED(option)
     Q_UNUSED(index)
     auto* ed=new QComboBox(parent);
+    ed->setEditable(true);
     return ed;
 }
 
@@ -28,7 +29,7 @@ void PathRailwayDelegate::setEditorData(QWidget *editor, const QModelIndex &inde
     auto* cb=qobject_cast<QComboBox*>(editor);
     cb->clear();
 
-    const auto& cur_name = index.data().toString();
+    const auto& cur_name = index.data(Qt::EditRole).toString();
 
     if (index.row() == 0){
         // For the first row, any rail is available
@@ -42,16 +43,21 @@ void PathRailwayDelegate::setModelData(QWidget *editor, QAbstractItemModel *mode
                                        const QModelIndex &index) const
 {
     auto* cb=qobject_cast<QComboBox*>(editor);
-    int idx=cb->currentIndex();
+    int idx = cb->currentIndex();
+    auto current_text = cb->currentText();
+    const auto& prev_text = index.data(Qt::EditRole);
+    bool changed = (prev_text != current_text);
     if (idx == -1){
         // No valid railway!
         model->setData(index, {}, qeutil::RailwayRole);
-        model->setData(index, {}, Qt::DisplayRole);
+        model->setData(index, {}, Qt::EditRole);
     }else{
         model->setData(index, cb->currentData(), qeutil::RailwayRole);
-        model->setData(index, cb->currentText(), Qt::DisplayRole);
+        model->setData(index, current_text, Qt::EditRole);
     }
-    // Other check/updates may needed here
+    if (changed) {
+        pathModel->onRailwayChanged(index.row());
+    }
 }
 
 void PathRailwayDelegate::setComboUnconstrained(QComboBox *cb, const QString &cur_name) const
@@ -80,7 +86,7 @@ void PathRailwayDelegate::setComboConstrained(QComboBox *cb, const QString &cur_
     cb->clear();
     int cur_idx=-1;
     assert(row > 0);
-    const auto& start_station_name=model->item(row-1, PathModel::ColEnd)->text();
+    const auto& start_station_name=pathModel->item(row-1, PathModel::ColEnd)->text();
     StationName start_station(start_station_name);
 
     for (int idx=0;idx<railcat.railways().size();idx++){

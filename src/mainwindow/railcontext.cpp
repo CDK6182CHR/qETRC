@@ -832,7 +832,7 @@ void RailContext::openPathEdit(TrainPath* path)
 	int i = pathEditIndex(path);
 	if (i == -1) {
 		//创建
-		auto* pw = new PathEdit();
+		auto* pw = new PathEdit(diagram.railCategory());
 		pw->setPath(path);
 		auto* dock = new ads::CDockWidget(tr("列车径路 - %1").arg(path->name()));
 		dock->setWidget(pw);

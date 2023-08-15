@@ -334,6 +334,11 @@ double Railway::mileBetween(const StationName& s1,
 {
 	const auto& t1 = stationByGeneralName(s1),
 		t2 = stationByGeneralName(s2);
+	return mileBetween(t1, t2);
+}
+
+double Railway::mileBetween(const std::shared_ptr<const RailStation>& t1, const std::shared_ptr<const RailStation>& t2) const
+{
 	if (!t1 || !t2) {
 		return -1;
 	}

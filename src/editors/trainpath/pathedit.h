@@ -7,9 +7,12 @@ class QTableView;
 class QTextEdit;
 class QLineEdit;
 class PathModel;
+class RailCategory;
 
 class PathEdit :public QWidget
 {
+	Q_OBJECT;
+	RailCategory& railcat;
 	TrainPath* _path;
 
 	QLineEdit* edName;
@@ -17,7 +20,7 @@ class PathEdit :public QWidget
 	QTableView* table;
 	PathModel* const model;
 public:
-	PathEdit(QWidget* parent = nullptr);
+	PathEdit(RailCategory& railcat, QWidget* parent = nullptr);
 	auto* path() { return _path; }
 
 	void setPath(TrainPath* path);
@@ -28,7 +31,8 @@ private:
 	void initUI();
 
 private slots:
-	void actAdd();
+	void actAddBefore(); 
+	void actAddAfter();
 	void actRemove();
 	void actApply();
 	void actCancel();

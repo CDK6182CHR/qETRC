@@ -213,6 +213,8 @@ public:
      */
     double mileBetween(const StationName& s1,const StationName& s2)const;
 
+    double mileBetween(const std::shared_ptr<const RailStation>& s1, const std::shared_ptr<const RailStation>& s2)const;
+
     /*
      * Line.isSplited()
      * 上下行分设情况

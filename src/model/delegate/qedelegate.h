@@ -24,6 +24,7 @@ enum {
     GraphVertexRole,
     GraphEdgeRole,
     PredefTrainFilterPointerRole,
+    DirectionRole,
 };
 }
 

@@ -13,9 +13,12 @@
 #include "data/common/qesystem.h"
 #include "data/trainpath/trainpath.h"
 #include "util/buttongroup.hpp"
+#include "model/trainpath/pathrailwaydelegate.h"
+#include "model/trainpath/pathstationdelegate.h"
+#include "model/delegate/generaldoublespindelegate.h"
 
-PathEdit::PathEdit(QWidget* parent):
-	model(new PathModel(parent))
+PathEdit::PathEdit(RailCategory& railcat, QWidget* parent):
+	railcat(railcat), model(new PathModel(parent))
 {
 	initUI();
 }
@@ -53,9 +56,16 @@ void PathEdit::initUI()
 		}
 	}
 	vlay->addWidget(table);
-	auto* g = new ButtonGroup<2>({ "添加", "删除" });
+	table->setEditTriggers(QTableView::AllEditTriggers);
+	table->setItemDelegateForColumn(PathModel::ColRail, new PathRailwayDelegate(railcat, model, this));
+	auto* dele = new PathStationDelegate(model, this);
+	table->setItemDelegateForColumn(PathModel::ColStart, dele);
+	table->setItemDelegateForColumn(PathModel::ColEnd, dele);
+	table->setItemDelegateForColumn(PathModel::ColMile, new GeneralDoubleSpinDelegate(this, 3));
+
+	auto* g = new ButtonGroup<3>({ "前插", "后插", "删除" });
+	g->connectAll(SIGNAL(clicked()), this, { SLOT(actAddBefore()), SLOT(actAddAfter()), SLOT(actRemove()) });
 	vlay->addLayout(g);
-	g->connectAll(SIGNAL(clicked()), this, { SLOT(actAdd()), SLOT(actRemove()) });
 
 	vlay->addWidget(new QLabel("备注: "));
 	edNote = new QTextEdit;
@@ -67,9 +77,20 @@ void PathEdit::initUI()
 	vlay->addLayout(g2);
 }
 
-void PathEdit::actAdd()
+void PathEdit::actAddBefore()
 {
-	// todo
+	const auto& idx = table->currentIndex();
+	int row = idx.row();
+	if (row < 0) row = 0;
+	model->insertEmptyRow(row);
+}
+
+void PathEdit::actAddAfter()
+{
+	const auto& idx = table->currentIndex();
+	int row = idx.row();
+	if (row < 0) row = model->rowCount() - 1;
+	model->insertEmptyRow(row + 1);
 }
 
 void PathEdit::actRemove()

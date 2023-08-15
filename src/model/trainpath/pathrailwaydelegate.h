@@ -8,7 +8,7 @@ class QComboBox;
 class PathRailwayDelegate : public QStyledItemDelegate
 {
     RailCategory& railcat;
-    PathModel* model;
+    PathModel* pathModel;
 public:
     PathRailwayDelegate(RailCategory& cat, PathModel* model, QObject* parent=nullptr);
 
