@@ -4,6 +4,7 @@
 #include "trainpath.h"
 
 class RailCategory;
+class TrainCollection;
 
 /**
  * 2023.08.05  The collection of TrainPaths in current Diagram.
@@ -22,7 +23,7 @@ public:
 	auto& paths() { return _paths; }
 	auto& paths()const { return _paths; }
 
-	void fromJson(const QJsonArray& obj, const RailCategory& cat);
+	void fromJson(const QJsonArray& obj, const RailCategory& cat, TrainCollection& coll);
 	QJsonArray toJson()const;
 
 	int size()const { return static_cast<int>(_paths.size()); }

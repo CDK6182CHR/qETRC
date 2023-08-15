@@ -24,6 +24,7 @@ class TypeManager;
 class Routing;
 class RoutingNode;
 struct AdapterStation;
+class TrainPath;
 
 
 /**
@@ -86,6 +87,8 @@ class Train:
      */
     bool _onPainting=false;
 
+    std::vector<TrainPath*> _paths;
+
 public:
     using StationPtr=std::list<TrainStation>::iterator;
     using ConstStationPtr=std::list<TrainStation>::const_iterator;
@@ -129,6 +132,13 @@ public:
     inline void setPassenger(TrainPassenger t){_passenger=t;}
     inline void setIsShow(bool  s) { _show = s; }
     inline void setOnPainting(bool s) { _onPainting = s; }
+
+    /**
+     * The TrainPaths assigned to this train. 
+     * The data should ALWAYS be valid.
+     */
+    auto& paths() { return _paths; }
+    auto& paths()const { return _paths; }
 
     /**
      * 强制判断是否为客车；如果设置为自动，根据类型

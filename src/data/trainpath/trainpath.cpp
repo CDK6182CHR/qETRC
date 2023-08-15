@@ -2,13 +2,17 @@
 #include <QJsonArray>
 #include <cassert>
 
+#include "data/train/train.h"
+#include "data/train/traincollection.h"
+#include "log/IssueManager.h"
+
 const StationName& TrainPath::endStation() const
 {
 	assert(!empty());
 	return _segments.back().end_station;
 }
 
-void TrainPath::fromJson(const QJsonObject& obj, const RailCategory& cat)
+void TrainPath::fromJson(const QJsonObject& obj, const RailCategory& cat, TrainCollection& coll)
 {
 	_name = obj.value("name").toString();
 	_note = obj.value("note").toString();
@@ -21,6 +25,19 @@ void TrainPath::fromJson(const QJsonObject& obj, const RailCategory& cat)
 		_segments.emplace_back(s.toObject(), cat);
 	}
 
+	const auto& arrtrains = obj.value("trains").toArray();
+	for (const auto& a : arrtrains) {
+		const auto& trainName = a.toString();
+		auto train = coll.findFullName(trainName);
+		if (!train) [[unlikely]] {
+			qCritical() << "Train not found " << train->trainName().full()
+				<< ", required by path " << _name;
+		}
+		else {
+			addTrain(train);
+		}
+	}
+
 	checkIsValid();
 }
 
@@ -29,6 +46,15 @@ QJsonObject TrainPath::toJson() const
 	QJsonArray arr;
 	for (const auto& seg : _segments) {
 		arr.append(seg.toJson());
+	}
+	QJsonArray arrtrain;
+	for (const auto& t : _trains) {
+		if (t.expired()) [[unlikely]] {
+			qCritical() << "Invalid train encountered in path";
+		}
+		else {
+			arrtrain.append(t.lock()->trainName().full());
+		}
 	}
 	return QJsonObject{
 		{"name", _name},
@@ -75,4 +101,10 @@ void TrainPath::updateRailways(RailCategory& cat)
 	for (auto& seg : _segments) {
 		seg.updateRailway(cat);
 	}
+}
+
+void TrainPath::addTrain(std::shared_ptr<Train> train)
+{
+	_trains.emplace_back(train);
+	train->paths().emplace_back(this);
 }

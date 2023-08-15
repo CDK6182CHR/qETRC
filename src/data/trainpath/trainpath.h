@@ -1,10 +1,13 @@
 ﻿#pragma once 
 #include <vector>
+#include <memory>
 #include "trainpath.h"
 #include "trainpathseg.h"
 
 
 class RailCategory;
+class Train;
+class TrainCollection;
 
 
 /**
@@ -18,6 +21,7 @@ class TrainPath {
 	std::vector<TrainPathSeg> _segments;
 	QString _note;
 	bool _valid;
+	std::vector<std::weak_ptr<Train>> _trains;
 
 public:
 
@@ -27,10 +31,10 @@ public:
 	//	_name(name), _start_station(start_station), _segments(segs), _note(note), _valid(true)
 	//{}
 
-	TrainPath(const QJsonObject& obj, const RailCategory& cat) :
+	TrainPath(const QJsonObject& obj, const RailCategory& cat, TrainCollection& coll) :
 		_name(), _start_station(), _segments(), _note()
 	{
-		fromJson(obj, cat);
+		fromJson(obj, cat, coll);
 	}
 
 	TrainPath(const QString& name):
@@ -47,6 +51,9 @@ public:
 	const auto& startStation()const { return _start_station; }
 	void setStartStation(const StationName& n) { _start_station = n; }
 
+	auto& trains() { return _trains; }
+	auto& trains()const { return _trains; }
+
 	bool valid()const { return _valid; }
 
 	/**
@@ -58,7 +65,7 @@ public:
 	const auto& segments()const { return _segments; }
 	auto& segments() { return _segments; }
 
-	void fromJson(const QJsonObject& obj, const RailCategory& cat);
+	void fromJson(const QJsonObject& obj, const RailCategory& cat, TrainCollection& coll);
 	QJsonObject toJson()const;
 
 	bool empty()const { return _segments.empty(); }
@@ -76,4 +83,14 @@ public:
 	 *  Try to update the railway of all the segments.
 	 */
 	void updateRailways(RailCategory& cat);
+
+	/**
+	 * Assign this path to train.
+	 * Add train to this->_trains, and add this to train->_paths at the same time.
+	 * The *order* of trains in path is maintained, but the order of paths in train is not.
+	 * (This is the technique result of the JSON i/o stragety, where only the trains of paths are written.)
+	 * N.B. The function is written in TrainPath but not in Train, currently. This is only, considering the trainpath.cpp
+	 * is much shorter than train.cpp ...
+	 */
+	void addTrain(std::shared_ptr<Train> train);
 };

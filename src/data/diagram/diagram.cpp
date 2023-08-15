@@ -1396,7 +1396,7 @@ bool Diagram::fromJson(const QJsonObject& obj)
 
     // 2023.08.12  paths
     const QJsonArray& arpath = obj.value("paths").toArray();
-    _pathcoll.fromJson(arpath, _railcat);
+    _pathcoll.fromJson(arpath, _railcat, _trainCollection);
 
     bindAllTrains();
     return true;

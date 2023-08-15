@@ -1,10 +1,10 @@
 #include "trainpathcollection.h"
 
-void TrainPathCollection::fromJson(const QJsonArray& obj, const RailCategory& cat)
+void TrainPathCollection::fromJson(const QJsonArray& obj, const RailCategory& cat, TrainCollection& coll)
 {
 	clear();
 	for (const auto& a : obj) {
-		_paths.emplace_back(std::make_unique<TrainPath>(a.toObject(), cat));
+		_paths.emplace_back(std::make_unique<TrainPath>(a.toObject(), cat, coll));
 	}
 }
 
