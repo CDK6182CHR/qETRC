@@ -385,6 +385,8 @@ private slots:
 
     void actRemovePaths();
 
+    void actClearPaths();
+
 };
 
 
@@ -603,6 +605,23 @@ namespace qecmd {
     public:
         RemovePathsFromTrain(std::shared_ptr<Train> train, std::vector<PathInfoInTrain>&& data,
             TrainContext* cont, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+
+    /**
+     * Similar to RemovePathsFromTrain, but this version removes *all* paths, which may be faster and simpler.
+     * The indexes_in_path is generated in the constructor, and not required from outside.\
+     * The operations are directly conducted here for convenience.
+     */
+    class ClearPathsFromTrain : public QUndoCommand {
+        std::shared_ptr<Train> train;
+        std::vector<TrainPath*> paths;
+        std::vector<int> indexes_in_path;
+        TrainContext* const cont;
+    public:
+        ClearPathsFromTrain(std::shared_ptr<Train> train, TrainContext* cont, QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
     };

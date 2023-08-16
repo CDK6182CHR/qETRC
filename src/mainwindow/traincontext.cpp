@@ -30,6 +30,7 @@
 #include <QLabel>
 #include <SARibbonComboBox.h>
 #include <SARibbonCheckBox.h>
+#include <SARibbonMenu.h>
 #include <QDoubleSpinBox>
 #include <QFileDialog>
 #include <util/linestylecombo.h>
@@ -258,6 +259,10 @@ void TrainContext::initUI()
 
 			act = new QAction(qApp->style()->standardIcon(QStyle::SP_TrashIcon), tr("移除"), this);
 			connect(act, &QAction::triggered, this, &TrainContext::actRemovePaths);
+			auto* menu = new SARibbonMenu(mw);
+			menu->addAction(tr("清空"), this, &TrainContext::actClearPaths);
+			act->setMenu(menu);
+
 			btn = new SARibbonToolButton(act);
 			hlay->addWidget(btn);
 			panel->addWidget(w, SARibbonPannelItem::Medium);
@@ -1402,6 +1407,11 @@ void TrainContext::actRemovePaths()
 	mw->getUndoStack()->push(new qecmd::RemovePathsFromTrain(train, std::move(data), this));
 }
 
+void TrainContext::actClearPaths()
+{
+	mw->getUndoStack()->push(new qecmd::ClearPathsFromTrain(train, this));
+}
+
 void TrainContext::setTrain(std::shared_ptr<Train> train_)
 {
 	train = train_;
@@ -1648,4 +1658,40 @@ void qecmd::RemovePathsFromTrain::redo()
 		itr->path->removeTrainWithIndex(train, itr->train_index_in_path, itr->path_index_in_train);
 	}
 	cont->afterChangeTrainPaths(train, data);
+}
+
+qecmd::ClearPathsFromTrain::ClearPathsFromTrain(std::shared_ptr<Train> train_, TrainContext*cont, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("清空列车径路: %1").arg(train_->trainName().full()), parent),
+	train(train_), indexes_in_path(), cont(cont)
+{
+	for (auto p : train->paths()) {
+		int idx = p->getTrainIndex(train);
+		if (idx >= 0) {
+			indexes_in_path.emplace_back(idx);
+		}
+	}
+}
+
+void qecmd::ClearPathsFromTrain::undo()
+{
+	train->paths() = std::move(this->paths);
+	for (int i = 0; i < paths.size(); i++) {
+		auto* p = paths.at(i);
+		int idx = indexes_in_path.at(i);
+
+		p->trains().insert(p->trains().begin() + idx, train);
+	}
+	cont->afterChangeTrainPaths(train, train->paths());
+}
+
+void qecmd::ClearPathsFromTrain::redo()
+{
+	paths = std::move(train->paths());
+	for (int i = 0; i < paths.size(); i++) {
+		auto* p = paths.at(i);
+		int idx = indexes_in_path.at(i);
+
+		p->trains().erase(p->trains().begin() + idx);
+	}
+	cont->afterChangeTrainPaths(train, paths);
 }
