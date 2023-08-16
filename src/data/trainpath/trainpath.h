@@ -93,4 +93,25 @@ public:
 	 * is much shorter than train.cpp ...
 	 */
 	void addTrain(std::shared_ptr<Train> train);
+
+	/**
+	 * 2023.08.16  remove the train from the path, also remove this path from the train.
+	 * Called by the undo command  AssignPathsToTrain.
+	 * In principle, the requested train *should* be the last in the list, and so does the path in train.
+	 */
+	void removeTrainFromBack(std::shared_ptr<Train> train);
+
+	void insertTrainWithIndex(std::shared_ptr<Train> train, int train_index, int path_index_in_train);
+
+	/**
+	 * Remove train at given index. Used by the qecmd::RemovePathsFromTrain
+	 */
+	void removeTrainWithIndex(std::shared_ptr<Train> train, int train_index, int path_index_in_train);
+
+	/**
+	 * Get the index of train in this path.
+	 * Return -1 if not found.
+	 * Simple linear alg.
+	 */
+	int getTrainIndex(std::shared_ptr<Train> train)const;
 };

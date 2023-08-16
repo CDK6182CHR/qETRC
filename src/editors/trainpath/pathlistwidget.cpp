@@ -107,6 +107,11 @@ void PathListWidget::actDuplicate(int idx)
     }
 }
 
+void PathListWidget::refreshData()
+{
+    _model->refreshData();
+}
+
 void PathListWidget::commitAddPath(std::unique_ptr<TrainPath>&& path)
 {
     _model->addPathAt(pathcoll.size(), std::move(path));

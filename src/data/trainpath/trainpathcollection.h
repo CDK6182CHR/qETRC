@@ -49,4 +49,9 @@ public:
 	 * Called by the global refresh process (F5).
 	 */
 	void checkValidAll(RailCategory& railcat);
+
+	/**
+	 * Returns the paths that not assigned to the train.
+	 */
+	std::vector<TrainPath*> unassignedPaths(const Train& train);
 };

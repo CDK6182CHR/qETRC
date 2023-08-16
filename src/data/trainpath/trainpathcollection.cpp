@@ -1,4 +1,7 @@
 #include "trainpathcollection.h"
+#include <set>
+
+#include "data/train/train.h"
 
 void TrainPathCollection::fromJson(const QJsonArray& obj, const RailCategory& cat, TrainCollection& coll)
 {
@@ -60,4 +63,18 @@ void TrainPathCollection::checkValidAll(RailCategory& railcat)
 		path->updateRailways(railcat);
 		path->checkIsValid();
 	}
+}
+
+std::vector<TrainPath*> TrainPathCollection::unassignedPaths(const Train& train)
+{
+	std::set<TrainPath*> assigned(train.paths().begin(), train.paths().end());
+	std::vector<TrainPath*> res{};
+
+	for (const auto& path : _paths) {
+		auto* p = path.get();
+		if (auto itr = assigned.find(p); itr == assigned.end()) {
+			res.emplace_back(p);
+		}
+	}
+	return res;
 }

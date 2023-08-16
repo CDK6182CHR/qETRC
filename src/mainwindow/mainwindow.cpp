@@ -1584,6 +1584,7 @@ void MainWindow::endResetGraph()
 	naviModel->resetModel();
 	trainListWidget->refreshData();
 	routingWidget->refreshData();
+	pathListWidget->refreshData();
 	catView->refreshTypeGroup();
 	catView->refreshFilters();
 
@@ -2057,6 +2058,7 @@ void MainWindow::refreshAll()
 	//直接由Main管理的子页面
 	naviModel->resetModel();
 	trainListWidget->refreshData();
+	pathListWidget->refreshData();
 	for (auto p : railStationWidgets) {
 		p->refreshData();
 	}

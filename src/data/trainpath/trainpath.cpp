@@ -61,7 +61,8 @@ QJsonObject TrainPath::toJson() const
 		{"note", _note},
 		{"start_station", _start_station.toSingleLiteral()},
 		{"valid",_valid},
-		{"segments", arr}
+		{"segments", arr},
+		{"trains", arrtrain}
 	};
 }
 
@@ -107,4 +108,56 @@ void TrainPath::addTrain(std::shared_ptr<Train> train)
 {
 	_trains.emplace_back(train);
 	train->paths().emplace_back(this);
+}
+
+void TrainPath::removeTrainFromBack(std::shared_ptr<Train> train)
+{
+	for (auto itr = _trains.rbegin(); itr != _trains.rend(); ++itr) {
+		if (itr->lock() == train) {
+			_trains.erase(std::prev(itr.base()));  
+			break;
+		}
+	}
+
+	for (auto itr = train->paths().rbegin(); itr != train->paths().rend(); ++itr) {
+		if (*itr == this) {
+			train->paths().erase(std::prev(itr.base()));
+			break;
+		}
+	}
+}
+
+void TrainPath::insertTrainWithIndex(std::shared_ptr<Train> train, int train_index, int path_index_in_train)
+{
+	_trains.insert(_trains.begin() + train_index, train);
+	train->paths().insert(train->paths().begin() + path_index_in_train, this);
+}
+
+void TrainPath::removeTrainWithIndex(std::shared_ptr<Train> train, int train_index, int path_index_in_train)
+{
+	const auto& t = _trains.at(train_index).lock();
+	if (t != train) [[unlikely]] {
+		qCritical() << "train index not matched " << train->trainName().full();
+		return;
+	}
+	auto* p = train->paths().at(path_index_in_train);
+	if (p != this) [[unlikely]] {
+		qCritical() << "path index not matched " << name();
+		return;
+	}
+
+	_trains.erase(_trains.begin() + train_index);
+
+	train->paths().erase(train->paths().begin() + path_index_in_train);
+}
+
+int TrainPath::getTrainIndex(std::shared_ptr<Train> train) const
+{
+	for (int i = 0; i < _trains.size(); i++) {
+		auto t = _trains.at(i).lock();
+		if (t == train) {
+			return i;
+		}
+	}
+	return -1;
 }

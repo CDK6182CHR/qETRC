@@ -73,3 +73,9 @@ void PathListModel::updatePath(TrainPath* path)
 	int idx = pathcoll.pathIndex(path);
 	emit dataChanged(index(idx, ColStart), index(idx, ColMAX - 1), { Qt::DisplayRole });
 }
+
+void PathListModel::refreshData()
+{
+	beginResetModel();
+	endResetModel();
+}

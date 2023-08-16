@@ -44,6 +44,7 @@
 #include "dialogs/correcttimetabledialog.h"
 #include "util/pagecomboforrail.h"
 #include "data/algo/timetablecorrector.h"
+#include "editors/trainpath/selectpathdialog.h"
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
 	MainWindow* mw_) :
@@ -238,6 +239,30 @@ void TrainContext::initUI()
 			tr("还原"), this);
 		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(refreshData()));
+
+		if constexpr (true) {
+			panel = page->addPannel(tr("列车径路"));
+			edPaths = new SARibbonLineEdit;
+			edPaths->setAlignment(Qt::AlignCenter);
+			edPaths->setReadOnly(true);
+			panel->addWidget(edPaths, SARibbonPannelItem::Medium);
+
+			btn = new SARibbonToolButton();
+			btn->setIcon(QIcon(":/icons/add.png"));
+			btn->setText(tr("添加"));
+			connect(btn, &SARibbonToolButton::clicked, this, &TrainContext::actAddPaths);
+			w = new QWidget;
+			hlay = new QHBoxLayout(w);
+			hlay->setContentsMargins(0, 0, 0, 0);
+			hlay->addWidget(btn);
+
+			act = new QAction(qApp->style()->standardIcon(QStyle::SP_TrashIcon), tr("移除"), this);
+			connect(act, &QAction::triggered, this, &TrainContext::actRemovePaths);
+			btn = new SARibbonToolButton(act);
+			hlay->addWidget(btn);
+			panel->addWidget(w, SARibbonPannelItem::Medium);
+
+		}
 
 		panel = page->addPannel(tr("调整"));
 		act = new QAction(QIcon(":/icons/exchange.png"), tr("区间换线"), this);
@@ -987,6 +1012,28 @@ void TrainContext::actDragTime(std::shared_ptr<Train> train, int station_id, con
 	mw->getUndoStack()->push(new qecmd::DragTrainStationTime(train, station_id, data, this));
 }
 
+void TrainContext::afterChangeTrainPaths(std::shared_ptr<Train> train, const std::vector<TrainPath*>& paths)
+{
+	// rebind the train, and repaint train line
+	afterTimetableChanged(train);
+	if (train == this->train) {
+		refreshPath();
+	}
+
+	// update path related data (currently nothing)
+}
+
+void TrainContext::afterChangeTrainPaths(std::shared_ptr<Train> train, const std::vector<qecmd::PathInfoInTrain>& paths)
+{
+	// rebind the train, and repaint train line
+	afterTimetableChanged(train);
+	if (train == this->train) {
+		refreshPath();
+	}
+
+	// update path related data (currently nothing)
+}
+
 void TrainContext::actShowTrainLine()
 {
 	//强制显示列车运行线。如果已经全部显示了也没关系，没有任何效果
@@ -1189,6 +1236,7 @@ void TrainContext::refreshData()
 			edRouting->setText(tr("(无交路)"));
 			btnToRouting->setEnabled(false);
 		}
+		refreshPath();
 		edNamem->setText(train->trainName().full());
 		edStartm->setText(train->starting().toSingleLiteral());
 		edEndm->setText(train->terminal().toSingleLiteral());
@@ -1203,6 +1251,19 @@ void TrainContext::refreshData()
 		btnColor->setText(pen.color().name());
 		spWidth->setValue(pen.widthF());
 		comboLs->setCurrentIndex(static_cast<int>(pen.style()));
+	}
+}
+
+void TrainContext::refreshPath()
+{
+	if (train->paths().empty()) {
+		edPaths->setText(tr("(自动)"));
+	}
+	else if (train->paths().size() == 1) {
+		edPaths->setText(train->paths().front()->name());
+	}
+	else {
+		edPaths->setText(tr("%1 等%2项").arg(train->paths().front()->name(), train->paths().size()));
 	}
 }
 
@@ -1314,6 +1375,31 @@ void TrainContext::actDulplicateTrain()
 {
 	if (!train)return;
 	emit dulplicateTrain(train);
+}
+
+void TrainContext::actAddPaths()
+{
+	auto paths = SelectPathDialog::getPaths(mw, tr("请选择要添加到本次列车的列车径路"),
+		diagram.pathCollection().unassignedPaths(*train));
+	mw->getUndoStack()->push(new qecmd::AssignPathsToTrain(train, std::move(paths), this));
+}
+
+void TrainContext::actRemovePaths()
+{
+	auto indexes = SelectPathDialog::getPathIndexes(mw, tr("请选择要移除的列车径路"),
+		train->paths());
+	std::vector<qecmd::PathInfoInTrain> data{};
+	for (int idx : indexes) {
+		auto* p = train->paths().at(idx);
+		int idx_train = p->getTrainIndex(train);
+		if (idx_train == -1) [[unlikely]] {
+			qCritical() << "idx_train==-1  " << train->trainName().full();
+			continue;
+		}
+		data.emplace_back(p, idx, idx_train);
+	}
+
+	mw->getUndoStack()->push(new qecmd::RemovePathsFromTrain(train, std::move(data), this));
 }
 
 void TrainContext::setTrain(std::shared_ptr<Train> train_)
@@ -1517,3 +1603,49 @@ void qecmd::DragTrainStationTime::commit()
 }
 
 #endif
+
+qecmd::AssignPathsToTrain::AssignPathsToTrain(std::shared_ptr<Train> train, std::vector<TrainPath*>&& paths,
+	TrainContext* cont, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("添加%1列车径路至%2").arg(paths.size()).arg(train->trainName().full())), 
+	train(train), paths(std::move(paths)), cont(cont)
+{
+}
+
+void qecmd::AssignPathsToTrain::undo()
+{
+	for (auto* p : paths) {
+		p->removeTrainFromBack(train);
+	}
+	cont->afterChangeTrainPaths(train, paths);
+}
+
+void qecmd::AssignPathsToTrain::redo()
+{
+	for (auto* p : paths) {
+		p->addTrain(train);
+	}
+	cont->afterChangeTrainPaths(train, paths);
+}
+
+qecmd::RemovePathsFromTrain::RemovePathsFromTrain(std::shared_ptr<Train> train, std::vector<PathInfoInTrain>&& data, 
+	TrainContext* cont, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("从列车%1移除%2径路").arg(train->trainName().full()).arg(data.size()), parent),
+	train(train),data(std::move(data)),cont(cont)
+{
+}
+
+void qecmd::RemovePathsFromTrain::undo()
+{
+	for (const auto& d : data) {
+		d.path->insertTrainWithIndex(train, d.train_index_in_path, d.path_index_in_train);
+	}
+	cont->afterChangeTrainPaths(train, data);
+}
+
+void qecmd::RemovePathsFromTrain::redo()
+{
+	for (auto itr = data.rbegin(); itr != data.rend(); ++itr) {
+		itr->path->removeTrainWithIndex(train, itr->train_index_in_path, itr->path_index_in_train);
+	}
+	cont->afterChangeTrainPaths(train, data);
+}

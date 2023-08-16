@@ -40,4 +40,6 @@ public:
 	std::unique_ptr<TrainPath> popPathAt(int index);
 
 	void updatePath(TrainPath* path);
+
+	void refreshData();
 };

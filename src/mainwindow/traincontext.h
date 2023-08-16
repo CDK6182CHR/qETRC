@@ -25,6 +25,7 @@ class TrainType;
 struct TrainStationBounding;
 namespace qecmd {
     struct StartingTerminalData;
+    struct PathInfoInTrain;
 }
 namespace ads {
 class CDockWidget;
@@ -76,6 +77,8 @@ class TrainContext : public QObject
     SARibbonToolButton* btnColor, * btnAutoUI, * btnToRouting;
     QDoubleSpinBox* spWidth;
     QColor tmpColor;
+
+    SARibbonLineEdit* edPaths;
 
     QList<BasicTrainWidget*> basicWidgets;
     QList<EditTrainWidget*> editWidgets;
@@ -131,6 +134,11 @@ public slots:
     void setTrain(std::shared_ptr<Train> train_);
 
     void refreshData();
+
+    /**
+     * 2023.08.16 setup only the path data.
+     */
+    void refreshPath();
 
     /**
      * 更新所有数据，包括自己的数据和下设的widget
@@ -312,6 +320,15 @@ public slots:
 
     void actDragTime(std::shared_ptr<Train> train, int station_id, const TrainStation& data);
 
+    /**
+     * Post-processing of assign/remove paths to single train.
+     * The operations seems to be the same.
+     * The after- prefix implies the actual operation is not conducted here.
+     */
+    void afterChangeTrainPaths(std::shared_ptr<Train> train, const std::vector<TrainPath*>& paths);
+
+    void afterChangeTrainPaths(std::shared_ptr<Train> train, const std::vector<qecmd::PathInfoInTrain>& data);
+
 private slots:
     void showTrainEvents();
 
@@ -363,6 +380,11 @@ private slots:
     void actCorrection();
 
     void actDulplicateTrain();
+
+    void actAddPaths();
+
+    void actRemovePaths();
+
 };
 
 
@@ -542,6 +564,47 @@ namespace qecmd {
         virtual bool mergeWith(const QUndoCommand* other)override;
     private:
         void commit();
+    };
+
+    /**
+     * Train-centered operation: assign (multiple) paths to (single) train.
+     * The actual operations are performed here in the class.
+     */
+    class AssignPathsToTrain : public QUndoCommand
+    {
+        std::shared_ptr<Train> train;
+        std::vector<TrainPath*> paths;
+        TrainContext* const cont;
+    public:
+        AssignPathsToTrain(std::shared_ptr<Train> train, std::vector<TrainPath*>&& paths,
+            TrainContext* cont, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    /**
+     * This struct logs the path pointer as well as the indexes info of 1-1 path-train data.
+     * The indexes are the ORIGINAL indexes in the list (i.e. BEFORE the removing)
+     */
+    struct PathInfoInTrain {
+        TrainPath* path;
+        int path_index_in_train;
+        int train_index_in_path;
+    };
+
+    /**
+     * Remove paths based on the data.
+     * The info in data is guaranteed to be sorted by the order of `path_index_in_train`.
+     */
+    class RemovePathsFromTrain : public QUndoCommand {
+        std::shared_ptr<Train> train;
+        std::vector<PathInfoInTrain> data;
+        TrainContext* const cont;
+    public:
+        RemovePathsFromTrain(std::shared_ptr<Train> train, std::vector<PathInfoInTrain>&& data,
+            TrainContext* cont, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
     };
 }
 

@@ -61,6 +61,7 @@ public slots:
 
 	void actDuplicate(int idx);
 
+	void refreshData();
 public:
 
 	void commitAddPath(std::unique_ptr<TrainPath>&& path);
