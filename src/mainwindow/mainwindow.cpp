@@ -1302,8 +1302,10 @@ void MainWindow::initToolbar()
 
 		connect(contextTrain, &TrainContext::timetableChanged,
 			trainListWidget->getModel(), &TrainListModel::onTrainChanged);
-		connect(contextTrain, &TrainContext::actRemoveTrain,
-			naviView, &NaviTree::removeSingleTrain);
+		//connect(contextTrain, &TrainContext::actRemoveTrain,
+		//	naviView, &NaviTree::removeSingleTrain);
+		connect(naviView, &NaviTree::removeTrainNavi,
+			contextTrain, &TrainContext::actRemoveSingleTrain);
 		connect(naviView, &NaviTree::editTimetable,
 			contextTrain, &TrainContext::actShowBasicWidget);
 		connect(naviView, &NaviTree::editTrain,
@@ -1368,6 +1370,9 @@ void MainWindow::initToolbar()
 
 		connect(trainListWidget, &TrainListWidget::batchAutoCorrect,
 			contextTrain, &TrainContext::actAutoCorrectionBat, Qt::DirectConnection);
+
+		connect(trainListWidget, &TrainListWidget::removeTrains,
+			contextTrain, &TrainContext::actRemoveTrains);
 	}
 
 	//context: rail 8

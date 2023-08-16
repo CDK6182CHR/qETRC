@@ -67,6 +67,8 @@ signals:
     void editTrain(std::shared_ptr<Train> train);
     void trainShowChanged(std::shared_ptr<Train> train, bool show);
     void addNewTrain();
+    void removeTrains(const QList<std::shared_ptr<Train>>& trains,
+        const QList<int>& indexes);
 
     /**
      * 列车发生排序，但没有增删改

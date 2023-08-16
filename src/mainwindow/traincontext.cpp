@@ -46,6 +46,7 @@
 #include "util/pagecomboforrail.h"
 #include "data/algo/timetablecorrector.h"
 #include "editors/trainpath/selectpathdialog.h"
+#include "model/diagram/diagramnavimodel.h"
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
 	MainWindow* mw_) :
@@ -758,7 +759,7 @@ void TrainContext::actRemoveNonBoundTrains()
 	}
 	else {
 		mw->getUndoStack()->push(new qecmd::RemoveTrains(trains, indexes, diagram.trainCollection(),
-			mw->trainListWidget->getModel()));
+			mw->trainListWidget->getModel(), this));
 		QMessageBox::information(mw, tr("提示"), tr("已删除%1个车次").arg(trains.size()));
 	}
 }
@@ -786,7 +787,7 @@ void TrainContext::actRemoveEmptyTrains()
 }
 	else {
 		mw->getUndoStack()->push(new qecmd::RemoveTrains(trains, indexes, diagram.trainCollection(),
-			mw->trainListWidget->getModel()));
+			mw->trainListWidget->getModel(), this));
 		QMessageBox::information(mw, tr("提示"), tr("已删除%1个车次").arg(trains.size()));
 	}
 }
@@ -1039,6 +1040,24 @@ void TrainContext::afterChangeTrainPaths(std::shared_ptr<Train> train, const std
 	// update path related data (currently nothing)
 }
 
+void TrainContext::actRemoveTrains(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes)
+{
+	auto* s = sender();
+	if (s == mw->trainListWidget) {
+		mw->getUndoStack()->push(new qecmd::RemoveTrains(trains, indexes, diagram.trainCollection(),
+			mw->trainListWidget->getModel(), this));
+	}
+	else [[unlikely]] {
+		qCritical() << "unexpected sender " << s;
+	}
+}
+
+void TrainContext::actRemoveSingleTrain(int index)
+{
+	mw->getUndoStack()->push(new qecmd::RemoveSingleTrain(this, mw->naviModel, diagram.trains().at(index),
+		index));
+}
+
 void TrainContext::actShowTrainLine()
 {
 	//强制显示列车运行线。如果已经全部显示了也没关系，没有任何效果
@@ -1277,7 +1296,7 @@ void TrainContext::actRemoveCurrentTrain()
 	if (train) {
 		int idx = diagram.trainCollection().getTrainIndex(train);
 		if (idx != -1) {
-			emit actRemoveTrain(idx);
+			actRemoveSingleTrain(idx);
 		}
 	}
 }
@@ -1288,7 +1307,7 @@ void TrainContext::actRemoveTrainFromEdit(std::shared_ptr<Train> train)
 	if (train) {
 		int idx = diagram.trainCollection().getTrainIndex(train);
 		if (idx != -1) {
-			emit actRemoveTrain(idx);
+			actRemoveSingleTrain(idx);
 		}
 	}
 }
@@ -1675,8 +1694,8 @@ qecmd::ClearPathsFromTrain::ClearPathsFromTrain(std::shared_ptr<Train> train_, T
 void qecmd::ClearPathsFromTrain::undo()
 {
 	train->paths() = std::move(this->paths);
-	for (int i = 0; i < paths.size(); i++) {
-		auto* p = paths.at(i);
+	for (int i = 0; i < train->paths().size(); i++) {
+		auto* p = train->paths().at(i);
 		int idx = indexes_in_path.at(i);
 
 		p->trains().insert(p->trains().begin() + idx, train);
@@ -1694,4 +1713,114 @@ void qecmd::ClearPathsFromTrain::redo()
 		p->trains().erase(p->trains().begin() + idx);
 	}
 	cont->afterChangeTrainPaths(train, paths);
+}
+
+
+// non-API commands
+namespace qecmd {
+	/**
+	  * 删除一组列车。在TrainListWidget中调用。
+	  * 暂定持有TrainCollection的引用，undo/redo有权限执行添加删除操作。
+	  * 注意indexes应当排好序，并且和trains一一对应！
+	  * --------
+	  * 2023.08.16  modify this class to RemoveTrainsSimple;
+	  * The real (valid) interface class is RemoveTrains, which contains
+	  * clearing TrainPaths as children.
+	  */
+	class RemoveTrainsSimple :
+		public QUndoCommand
+	{
+		QList<std::shared_ptr<Train>> _trains;
+		QList<int> _indexes;
+		TrainCollection& coll;
+		TrainListModel* const model;
+	public:
+		RemoveTrainsSimple(const QList<std::shared_ptr<Train>>& trains,
+			const QList<int>& indexes, TrainCollection& coll_,
+			TrainListModel* model_,
+			QUndoCommand* parent = nullptr);
+
+		virtual void undo()override;
+
+		/**
+		 * 注意push操作会执行这个函数！
+		 * 因为TrainListWidget必须保证删除按钮是有效的（无论是否有Slot接受这个CMD）
+		 * 所以第一次的redo不能在这里做。置标志位。
+		 */
+		virtual void redo()override;
+
+		const auto& trains()const { return _trains; }
+		auto& trains() { return _trains; }
+	};
+
+	/**
+	 * 2023.08.16  moved from navitree to traincontext; also change name to ~Simple
+	 */
+	class RemoveSingleTrainSimple :public QUndoCommand {
+		DiagramNaviModel* const navi;
+		std::shared_ptr<Train> train;
+		int index;
+	public:
+		RemoveSingleTrainSimple(DiagramNaviModel* navi_, std::shared_ptr<Train> train_, int index_,
+			QUndoCommand* parent = nullptr);
+		virtual void undo()override;
+		virtual void redo()override;
+	};
+}
+
+qecmd::RemoveTrainsSimple::RemoveTrainsSimple(const QList<std::shared_ptr<Train>>& trains,
+	const QList<int>& indexes, TrainCollection& coll_, TrainListModel* model_,
+	QUndoCommand* parent) :
+	QUndoCommand(QObject::tr("删除") + QString::number(trains.size()) + QObject::tr("个车次"), parent),
+	_trains(trains), _indexes(indexes), coll(coll_), model(model_)
+{
+}
+
+void qecmd::RemoveTrainsSimple::undo()
+{
+	model->undoRemoveTrains(_trains, _indexes);
+}
+
+void qecmd::RemoveTrainsSimple::redo()
+{
+	model->redoRemoveTrains(_trains, _indexes);
+}
+
+qecmd::RemoveTrains::RemoveTrains(const QList<std::shared_ptr<Train>>& trains,
+	const QList<int>& indexes, TrainCollection& coll_, TrainListModel* model_,
+	TrainContext* cont, QUndoCommand* parent) :
+	QUndoCommand(QObject::tr("删除%1个车次").arg(trains.size()), parent)
+{
+	foreach(auto train, trains) {
+		if (!train->paths().empty()) {
+			new ClearPathsFromTrain(train, cont, this);
+		}
+	}
+	new RemoveTrainsSimple(trains, indexes, coll_, model_, this);
+}
+
+
+qecmd::RemoveSingleTrainSimple::RemoveSingleTrainSimple(DiagramNaviModel* navi_,
+	std::shared_ptr<Train> train_, int index_, QUndoCommand* parent) :
+	QUndoCommand(parent),
+	navi(navi_), train(train_), index(index_) {}
+
+void qecmd::RemoveSingleTrainSimple::undo()
+{
+	navi->undoRemoveSingleTrain(index, train);
+}
+
+void qecmd::RemoveSingleTrainSimple::redo()
+{
+	navi->commitRemoveSingleTrain(index);
+}
+
+qecmd::RemoveSingleTrain::RemoveSingleTrain(TrainContext* cont, DiagramNaviModel* navi_, 
+	std::shared_ptr<Train> train_, int index_, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("删除列车: ") + train_->trainName().full(), parent)
+{
+	if (!train_->paths().empty()) {
+		new ClearPathsFromTrain(train_, cont, this);
+	}
+	new RemoveSingleTrainSimple(navi_, train_, index_, this);
 }

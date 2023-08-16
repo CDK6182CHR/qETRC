@@ -109,6 +109,11 @@ signals:
 
     void duplicatePathNavi(int idx);
 
+    /**
+     * 2023.08.16  the processing of qecmd::RemoveSingleTrain is passed to TrainContext
+     */
+    void removeTrainNavi(int idx);
+
 private slots:
     void showContextMenu(const QPoint& pos);
     
@@ -274,17 +279,6 @@ namespace qecmd {
             QUndoCommand(QObject::tr("批量添加%1个车次").arg(trains_.size()),parent),
             navi(navi_),trains(trains_){}
 
-        virtual void undo()override;
-        virtual void redo()override;
-    };
-
-    class RemoveSingleTrain :public QUndoCommand {
-        DiagramNaviModel* const navi;
-        std::shared_ptr<Train> train;
-        int index;
-    public:
-        RemoveSingleTrain(DiagramNaviModel* navi_,std::shared_ptr<Train> train_, int index_,
-            QUndoCommand* parent=nullptr);
         virtual void undo()override;
         virtual void redo()override;
     };

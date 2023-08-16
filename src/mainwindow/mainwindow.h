@@ -143,6 +143,7 @@ public:
 
     auto* getRulerContext() { return contextRuler; }
     auto* getRailContext() { return contextRail; }
+    auto* getTrainContext() { return contextTrain; }
     auto* getViewCategory() { return catView; }
     auto* getRoutingMenu() { return routingMenu; }
 

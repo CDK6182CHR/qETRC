@@ -204,25 +204,6 @@ void TrainListModel::commitBatchChangeType(const QVector<int>& rows)
 }
 
 
-
-qecmd::RemoveTrains::RemoveTrains(const QList<std::shared_ptr<Train>>& trains,
-    const QList<int>& indexes, TrainCollection& coll_, TrainListModel* model_,
-    QUndoCommand* parent) :
-    QUndoCommand(QObject::tr("删除") + QString::number(trains.size()) + QObject::tr("个车次"), parent),
-    _trains(trains), _indexes(indexes), coll(coll_), model(model_)
-{
-}
-
-void qecmd::RemoveTrains::undo()
-{
-    model->undoRemoveTrains(_trains, _indexes);
-}
-
-void qecmd::RemoveTrains::redo()
-{
-    model->redoRemoveTrains(_trains, _indexes);
-}
-
 qecmd::SortTrains::SortTrains(const QList<std::shared_ptr<Train>>& ord_,
     TrainListModel* model_, QUndoCommand* parent):
     QUndoCommand(QObject::tr("列车排序"),parent),ord(ord_),model(model_)
@@ -273,5 +254,3 @@ void qecmd::BatchChangeType::commit()
     }
     model->commitBatchChangeType(indexes);
 }
-
-

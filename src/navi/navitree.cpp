@@ -437,7 +437,8 @@ void NaviTree::removePage(int index)
 void NaviTree::removeSingleTrain(int index)
 {
     auto train = _model->diagram().trainCollection().trainAt(index);
-    _undo->push(new qecmd::RemoveSingleTrain(_model, train, index));
+    emit removeTrainNavi(index);
+    //_undo->push(new qecmd::RemoveSingleTrain(_model, train, index));
 }
 
 void NaviTree::commitRemovePage(int idx)
@@ -731,25 +732,9 @@ void qecmd::BatchAddTrain::undo()
 }
 
 void qecmd::BatchAddTrain::redo()
-
-    {
-               navi->commitBatchAddTrains(trains);
-           }
-
-
-qecmd::RemoveSingleTrain::RemoveSingleTrain(DiagramNaviModel *navi_,
-     std::shared_ptr<Train> train_, int index_, QUndoCommand *parent):
-    QUndoCommand(QObject::tr("删除列车: ")+train_->trainName().full(),parent),
-    navi(navi_),train(train_),index(index_){}
-
-void qecmd::RemoveSingleTrain::undo()
 {
-    navi->undoRemoveSingleTrain(index, train);
+    navi->commitBatchAddTrains(trains);
 }
 
-void qecmd::RemoveSingleTrain::redo()
-{
-           navi->commitRemoveSingleTrain(index);
-       }
 
 #endif

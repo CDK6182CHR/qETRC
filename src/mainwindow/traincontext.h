@@ -21,6 +21,9 @@ class BasicTrainWidget;
 class EditTrainWidget;
 class Routing;
 class TrainType;
+class TrainListModel;
+class TrainCollection;
+class DiagramNaviModel;
 
 struct TrainStationBounding;
 namespace qecmd {
@@ -94,7 +97,7 @@ public:
 signals:
     void highlightTrainLine(std::shared_ptr<Train> train);
     void timetableChanged(std::shared_ptr<Train> train);
-    void actRemoveTrain(int index);
+    //void actRemoveTrain(int index);
     void focusInRouting(std::shared_ptr<Routing>);
     void dulplicateTrain(std::shared_ptr<Train>);
     
@@ -328,6 +331,16 @@ public slots:
     void afterChangeTrainPaths(std::shared_ptr<Train> train, const std::vector<TrainPath*>& paths);
 
     void afterChangeTrainPaths(std::shared_ptr<Train> train, const std::vector<qecmd::PathInfoInTrain>& data);
+
+    /**
+     * 2023.08.16  move from TrainListWidget, for the clearing of Paths
+     */
+    void actRemoveTrains(const QList<std::shared_ptr<Train>>& trains, const QList<int>& indexes);
+
+    /**
+     * 2023.08.16   moved from NaviTree
+     */
+    void actRemoveSingleTrain(int index);
 
 private slots:
     void showTrainEvents();
@@ -624,6 +637,26 @@ namespace qecmd {
         ClearPathsFromTrain(std::shared_ptr<Train> train, TrainContext* cont, QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    /**
+     * 2023.08.16  remove the trains. See also RemoveTrainsSimple (previous RemoveTrains)
+     * Moved from TrainListModel.h/cpp
+     */
+    class RemoveTrains : public QUndoCommand
+    {
+    public:
+        RemoveTrains(const QList<std::shared_ptr<Train>>& trains,
+            const QList<int>& indexes, TrainCollection& coll_,
+            TrainListModel* model_, TrainContext* cont,
+            QUndoCommand* parent = nullptr);
+    };
+
+    class RemoveSingleTrain : public QUndoCommand
+    {
+    public:
+        RemoveSingleTrain(TrainContext* cont, DiagramNaviModel* navi_,
+            std::shared_ptr<Train> train_, int index_, QUndoCommand* parent = nullptr);
     };
 }
 

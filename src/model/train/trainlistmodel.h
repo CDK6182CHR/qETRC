@@ -133,39 +133,9 @@ public slots:
 };
 
 class TrainType;
+class TrainContext;
 
 namespace qecmd {
-
-    /**
-     * 删除一组列车。在TrainListWidget中调用。
-     * 暂定持有TrainCollection的引用，undo/redo有权限执行添加删除操作。
-     * 注意indexes应当排好序，并且和trains一一对应！
-     */
-    class RemoveTrains :
-        public QUndoCommand
-    {
-        QList<std::shared_ptr<Train>> _trains;
-        QList<int> _indexes;
-        TrainCollection& coll;
-        TrainListModel* const model;
-    public:
-        RemoveTrains(const QList<std::shared_ptr<Train>>& trains,
-            const QList<int>& indexes, TrainCollection& coll_,
-            TrainListModel* model_,
-            QUndoCommand* parent = nullptr);
-
-        virtual void undo()override;
-
-        /**
-         * 注意push操作会执行这个函数！
-         * 因为TrainListWidget必须保证删除按钮是有效的（无论是否有Slot接受这个CMD）
-         * 所以第一次的redo不能在这里做。置标志位。
-         */
-        virtual void redo()override;
-
-        const auto& trains()const { return _trains; }
-        auto& trains() { return _trains; }
-    };
 
     /**
      * 排序。支持合并

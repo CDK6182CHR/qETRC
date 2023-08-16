@@ -202,7 +202,9 @@ void TrainListWidget::actRemoveTrains()
 	}
 
 	if (_undo) {
-		_undo->push(new qecmd::RemoveTrains(trains, rows, coll, model));
+		// 2023.08.16: move the en-stack operation to trainContext
+		emit removeTrains(trains, rows);
+		//_undo->push(new qecmd::RemoveTrains(trains, rows, coll, model));
 	}
 	else {
 		//不支持撤销，就直接执行了
