@@ -223,6 +223,11 @@ public:
     QList<StationPtr>
         findAllGeneralStations(const StationName& name);
 
+    /**
+     * Simple linear alg.
+     */
+    int getPathIndex(const TrainPath* path)const;
+
 
     /**
      * qETRC新增核心函数

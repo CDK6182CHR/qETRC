@@ -47,6 +47,8 @@ signals:
 
 	void focusInPath(TrainPath*);
 
+	void removePath(int idx);
+
 private slots:
 	void actEdit();
 	void actDelete();
@@ -57,7 +59,7 @@ public slots:
 	void actAdd();
 
 	// call from navi
-	void actRemovePath(int idx);
+	//void actRemovePath(int idx);
 
 	void actDuplicate(int idx);
 
@@ -83,15 +85,4 @@ namespace qecmd {
 		virtual void redo()override;
 	};
 
-	class RemoveTrainPath :public QUndoCommand
-	{
-		int idx;
-		PathListWidget*const pw;
-		std::unique_ptr<TrainPath> path;
-		bool first = true;
-	public:
-		RemoveTrainPath(int idx, PathListWidget* pw, QUndoCommand* parent = nullptr);
-		virtual void undo()override;
-		virtual void redo()override;
-	};
 }

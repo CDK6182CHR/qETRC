@@ -6,11 +6,13 @@
 #include <QUndoCommand>
 
 class SARibbonLineEdit;
+class Train;
 class TrainPath;
 class MainWindow;
 class SARibbonContextCategory;
 class Diagram;
 class PathEdit;
+class PathListWidget;
 namespace ads {
     class CDockWidget;
 }
@@ -68,7 +70,13 @@ public slots:
 
     void commitUpdatePath(TrainPath* path);
 
-    void onPathRemoved(TrainPath* path);
+    void afterPathRemoved(TrainPath* path);
+
+    void actClearTrains();
+
+    void afterPathTrainsChanged(TrainPath* path, const std::vector<std::weak_ptr<Train>>& trains);
+
+    void removePath(int idx);
 };
 
 namespace qecmd {
@@ -82,6 +90,34 @@ namespace qecmd {
         virtual void undo()override;
         virtual void redo()override;
     };
+
+    class ClearTrainsFromPath :public QUndoCommand {
+        TrainPath* path;
+        std::vector<int> indexes_in_train;
+        std::vector<std::weak_ptr<Train>> trains;
+        PathContext* const cont;
+    public:
+        ClearTrainsFromPath(TrainPath* path, PathContext* cont, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
+    /**
+     * 2023.08.16  move from pathlistwidget to pathcontext, and add removing trains
+     */
+    class RemoveTrainPath :public QUndoCommand
+    {
+        int idx;
+        PathListWidget* const pw;
+        std::unique_ptr<TrainPath> path;
+        PathContext* const cont;
+    public:
+        // Note: the path pointer p is only used in the constructor
+        RemoveTrainPath(TrainPath* p, int idx, PathListWidget* pw, PathContext* cont, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
+
 
 }
 

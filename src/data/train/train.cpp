@@ -247,8 +247,21 @@ QList<Train::StationPtr> Train::findAllGeneralStations(const StationName &name)
     return res;
 }
 
+int Train::getPathIndex(const TrainPath* path) const
+{
+    for (int n = 0; n < _paths.size(); n++) {
+        if (path == _paths.at(n)) {
+            return n;
+        }
+    }
+    return -1;
+}
+
 std::shared_ptr<TrainAdapter> Train::bindToRailway(std::shared_ptr<Railway> railway, const Config& config)
 {
+    if (!_paths.empty()) {
+        qInfo() << "Train " << trainName().full() << " should be bound using TrainPath (not implemented)";
+    }
     //2021.06.24 新的实现 基于Adapter
     for (auto p = _adapters.begin(); p != _adapters.end(); ++p) {
         if (((*p)->railway()) == railway) {

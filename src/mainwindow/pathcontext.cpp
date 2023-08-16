@@ -12,8 +12,11 @@
 #include <DockManager.h>
 
 #include "mainwindow.h"
+#include "traincontext.h"
 #include "editors/trainpath/pathedit.h"
 #include "editors/trainpath/pathlistwidget.h"
+#include "data/train/train.h"
+
 
 PathContext::PathContext(Diagram &diagram, SARibbonContextCategory *cont,
                            MainWindow *mw, QObject *parent):
@@ -69,6 +72,11 @@ void PathContext::initUI()
     connect(act,&QAction::triggered, this, &PathContext::actEditPath);
     panel->addLargeAction(act);
 
+    panel = page->addPannel(tr("列车"));
+    act = new QAction(qApp->style()->standardIcon(QStyle::SP_TabCloseButton), tr("清空"));
+    connect(act, &QAction::triggered, this, &PathContext::actClearTrains);
+    panel->addLargeAction(act);
+
     panel=page->addPannel(tr(""));
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
         tr("删除径路"), this);
@@ -101,7 +109,8 @@ int PathContext::pathEditIndex(const TrainPath* path)
 void PathContext::actRemovePath()
 {
     int idx = diagram.pathCollection().pathIndex(path);
-    mw->pathListWidget->actRemovePath(idx);
+    removePath(idx);
+    //mw->pathListWidget->actRemovePath(idx);
 }
 
 void PathContext::actDuplicatePath()
@@ -131,7 +140,7 @@ void PathContext::openPathEdit(TrainPath* path)
         connect(pw, &PathEdit::pathApplied,
             this, &PathContext::actUpdatePath);
         connect(mw->pathListWidget, &PathListWidget::pathRemoved,
-            this, &PathContext::onPathRemoved);
+            this, &PathContext::afterPathRemoved);
 
         mw->pathMenu->addAction(dock->toggleViewAction());
         mw->getManager()->addDockWidgetFloating(dock);
@@ -181,7 +190,7 @@ void PathContext::commitUpdatePath(TrainPath* path)
     }
 }
 
-void PathContext::onPathRemoved(TrainPath* path)
+void PathContext::afterPathRemoved(TrainPath* path)
 {
     int idx = pathEditIndex(path);
     if (idx >= 0) {
@@ -190,9 +199,35 @@ void PathContext::onPathRemoved(TrainPath* path)
 
         pathEdits.removeAt(idx);
     }
-
-    // inform the mainWindow to unfocus on the path, in the later
+    if (path == this->path) {
+        mw->focusOutPath();
+    }
 }
+
+void PathContext::actClearTrains()
+{
+    mw->getUndoStack()->push(new qecmd::ClearTrainsFromPath(path, this));
+}
+
+void PathContext::afterPathTrainsChanged(TrainPath* path, const std::vector<std::weak_ptr<Train>>& trains)
+{
+    // rebind and repaint trains
+    auto* c = mw->getTrainContext();
+    for (auto t : trains) {
+        auto train = t.lock();
+        c->afterTimetableChanged(train);
+    }
+    c->refreshPath();
+
+    // update path data (nothing to do for now)
+}
+
+void PathContext::removePath(int idx)
+{
+    auto p = diagram.pathCollection().at(idx);
+    mw->getUndoStack()->push(new qecmd::RemoveTrainPath(p, idx, mw->pathListWidget, this));
+}
+
 
 
 qecmd::UpdatePath::UpdatePath(TrainPath* path, std::unique_ptr<TrainPath>&& data_,
@@ -214,6 +249,60 @@ void qecmd::UpdatePath::redo()
     cont->commitUpdatePath(path);
 }
 
+qecmd::ClearTrainsFromPath::ClearTrainsFromPath(TrainPath* path, PathContext* cont, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("清空径路的列车: %1").arg(path->name()), parent), path(path), cont(cont)
+{
+    for (auto t : path->trains()) {
+        auto train = t.lock();
+        int idx = train->getPathIndex(path);
+        indexes_in_train.emplace_back(idx);
+    }
+}
+
+void qecmd::ClearTrainsFromPath::undo()
+{
+    std::swap(trains, path->trains());
+    for (int i = 0; i < path->trains().size(); i++) {
+        auto train = path->trains().at(i).lock();
+        int idx = indexes_in_train.at(i);
+        train->paths().insert(train->paths().begin() + idx, path);
+    }
+    cont->afterPathTrainsChanged(path, trains);
+}
+
+void qecmd::ClearTrainsFromPath::redo()
+{
+    std::swap(trains, path->trains());
+    for (int i = 0; i < trains.size(); i++) {
+        auto train = trains.at(i).lock();
+        int idx = indexes_in_train.at(i);
+        train->paths().erase(train->paths().begin() + idx);
+    }
+    cont->afterPathTrainsChanged(path, trains);
+}
+
+
+qecmd::RemoveTrainPath::RemoveTrainPath(TrainPath* p, int idx, PathListWidget* pw, PathContext* cont, QUndoCommand* parent) :
+    QUndoCommand(QObject::tr("删除径路: %1").arg(p->name()), parent), idx(idx), pw(pw), path(), cont(cont)
+{
+    if (!p->trains().empty()) {
+        new ClearTrainsFromPath(p, cont, this);
+    }
+}
+
+void qecmd::RemoveTrainPath::undo()
+{
+    pw->undoRemovePath(idx, std::move(path));
+    QUndoCommand::undo();    // re-add the trains
+}
+
+void qecmd::RemoveTrainPath::redo()
+{
+    QUndoCommand::redo();    // clear the trains from path
+    path = pw->commitRemovePath(idx);
+    cont->afterPathRemoved(path.get());
+}
 
 
 #endif
+

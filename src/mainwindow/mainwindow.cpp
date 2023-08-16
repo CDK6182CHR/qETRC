@@ -660,8 +660,6 @@ void MainWindow::initDockWidgets()
 			naviModel, &DiagramNaviModel::onPathChanged);
 		connect(naviView, &NaviTree::actAddPath,
 			pathListWidget, &PathListWidget::actAdd);
-		connect(naviView, &NaviTree::removePathNavi,
-			pathListWidget, &PathListWidget::actRemovePath);
 		connect(naviView, &NaviTree::duplicatePathNavi,
 			pathListWidget, &PathListWidget::actDuplicate);
 		connect(pathListWidget, &PathListWidget::focusInPath,
@@ -1449,6 +1447,10 @@ void MainWindow::initToolbar()
 			contextPath, &PathContext::openPathEditIndex);
 		connect(pathListWidget, &PathListWidget::editPath,
 			contextPath, &PathContext::openPathEditIndex);
+		connect(pathListWidget, &PathListWidget::removePath,
+			contextPath, &PathContext::removePath);
+		connect(naviView, &NaviTree::removePathNavi,
+			contextPath, &PathContext::removePath);
 	}
 
 	// context: DB

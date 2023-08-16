@@ -68,7 +68,8 @@ void PathListWidget::actDelete()
     const auto& idx = table->currentIndex();
     int row = idx.row();
     if (0 <= row && row < pathcoll.size()) {
-        actRemovePath(row);
+        //actRemovePath(row);
+        emit removePath(row);
     }
 }
 
@@ -82,16 +83,6 @@ void PathListWidget::editPathByModelIndex(const QModelIndex& idx)
 void PathListWidget::onCurrentChanged(const QModelIndex& idx)
 {
     emit focusInPath(pathcoll.at(idx.row()));
-}
-
-void PathListWidget::actRemovePath(int idx)
-{
-    if (_undo) {
-        _undo->push(new qecmd::RemoveTrainPath(idx, this));
-    }
-    else {
-        commitRemovePath(idx);
-    }
 }
 
 void PathListWidget::actDuplicate(int idx)
@@ -153,20 +144,3 @@ void qecmd::AddTrainPath::redo()
     pw->commitAddPath(std::move(path));
 }
 
-qecmd::RemoveTrainPath::RemoveTrainPath(int idx, PathListWidget* pw, QUndoCommand* parent):
-    QUndoCommand(parent),idx(idx), pw(pw), path()
-{
-}
-
-void qecmd::RemoveTrainPath::undo()
-{
-    pw->undoRemovePath(idx, std::move(path));
-}
-
-void qecmd::RemoveTrainPath::redo()
-{
-    path = pw->commitRemovePath(idx);
-    if (first) {
-        setText(QObject::tr("删除径路: %1").arg(path->name()));
-    }
-}
