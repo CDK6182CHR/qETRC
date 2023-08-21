@@ -42,4 +42,9 @@ public:
 	void updatePath(TrainPath* path);
 
 	void refreshData();
+
+	/**
+	 * 2023.08.21  called on Railway changed, update (re-check) the validity column of all rows
+	 */
+	void updateAllValidity();
 };

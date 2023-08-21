@@ -10,10 +10,12 @@ class QTableView;
 class PathListModel;
 class TrainPathCollection;
 class QUndoStack;
+class RailCategory;
 
 class PathListWidget : public QWidget
 {
 	Q_OBJECT;
+	RailCategory& railcat;
 	TrainPathCollection& pathcoll;
 	PathListModel* const _model;
 	QTableView* table;
@@ -25,7 +27,7 @@ public:
 	 * The undoStack is used for commit operations directly.
 	 * Note, the `undo` is nullable.
 	 */
-	PathListWidget(TrainPathCollection& pathcoll, QUndoStack* undo, QWidget* parent = nullptr);
+	PathListWidget(RailCategory& railcat, TrainPathCollection& pathcoll, QUndoStack* undo, QWidget* parent = nullptr);
 	auto* model() { return _model; }
 
 	/**
@@ -54,6 +56,13 @@ private slots:
 	void actDelete();
 	void editPathByModelIndex(const QModelIndex& idx);
 	void onCurrentChanged(const QModelIndex& idx);
+
+	/**
+	 * 2023.08.21  Update (re-check) the validity of all paths.
+	 * This does not cause any data change (by the current def.), so no undo stack operations.
+	 * Just commit directly.
+	 */
+	void actUpdateAllValidity();
 
 public slots:
 	void actAdd();

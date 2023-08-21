@@ -5,6 +5,7 @@
 
 class RailCategory;
 class TrainCollection;
+class Railway;
 
 /**
  * 2023.08.05  The collection of TrainPaths in current Diagram.
@@ -49,6 +50,19 @@ public:
 	 * Called by the global refresh process (F5).
 	 */
 	void checkValidAll(RailCategory& railcat);
+
+	/**
+	 * 2023.08.21  update the validity for the paths containing the `rail`.
+	 * Note that this is used for cases where the railway is added or removed. 
+	 * If the railway is only modified, the process in Diagram::updateRailway() is enough.
+	 */
+	void checkValidForRailway(RailCategory& railcat, const Railway* rail);
+
+	/**
+	 * 2023.08.21: upon the railway is removed. All the paths containing such railway
+	 * is set to invalid directly.
+	 */
+	void invalidateForRailway(const Railway* rail);
 
 	/**
 	 * Returns the paths that not assigned to the train.

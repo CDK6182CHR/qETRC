@@ -10,8 +10,8 @@
 #include "data/common/qesystem.h"
 #include "util/buttongroup.hpp"
 
-PathListWidget::PathListWidget(TrainPathCollection& pathcoll, QUndoStack* undo, QWidget* parent):
-    QWidget(parent), pathcoll(pathcoll), _model(new PathListModel(pathcoll,this)), _undo(undo)
+PathListWidget::PathListWidget(RailCategory& railcat, TrainPathCollection& pathcoll, QUndoStack* undo, QWidget* parent):
+    QWidget(parent), railcat(railcat), pathcoll(pathcoll), _model(new PathListModel(pathcoll,this)), _undo(undo)
 {
     initUI();
 }
@@ -39,6 +39,10 @@ void PathListWidget::initUI()
         this, &PathListWidget::editPathByModelIndex);
     connect(table->selectionModel(), &QItemSelectionModel::currentRowChanged,
         this, &PathListWidget::onCurrentChanged);
+
+    auto* btn = new QPushButton(tr("刷新所有径路可用性"));
+    connect(btn, &QPushButton::clicked, this, &PathListWidget::actUpdateAllValidity);
+    vlay->addWidget(btn);
 
     auto* g = new ButtonGroup<3>({ "编辑","添加","删除" });
     g->connectAll(SIGNAL(clicked()), this,
@@ -83,6 +87,12 @@ void PathListWidget::editPathByModelIndex(const QModelIndex& idx)
 void PathListWidget::onCurrentChanged(const QModelIndex& idx)
 {
     emit focusInPath(pathcoll.at(idx.row()));
+}
+
+void PathListWidget::actUpdateAllValidity()
+{
+    pathcoll.checkValidAll(railcat);
+    _model->updateAllValidity();
 }
 
 void PathListWidget::actDuplicate(int idx)

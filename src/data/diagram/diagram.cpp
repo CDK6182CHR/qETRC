@@ -23,6 +23,8 @@ void Diagram::addRailway(std::shared_ptr<Railway> rail)
     foreach (auto p , trains()) {
         p->bindToRailway(rail, _config);
     }
+    // 2023.08.21: for path
+    _pathcoll.checkValidForRailway(_railcat, rail.get());
 }
 
 void Diagram::insertRailwayAt(int i, std::shared_ptr<Railway> rail)
@@ -31,6 +33,8 @@ void Diagram::insertRailwayAt(int i, std::shared_ptr<Railway> rail)
     foreach(auto p, trains()) {
         p->bindToRailway(rail, _config);
     }
+    // 2023.08.21 for path
+    _pathcoll.checkValidForRailway(_railcat, rail.get());
 }
 
 void Diagram::addTrains(const TrainCollection& coll)
@@ -56,6 +60,11 @@ std::shared_ptr<Railway> Diagram::railwayByName(const QString &name)
 
 void Diagram::updateRailway(std::shared_ptr<Railway> r)
 {
+    for (const auto& p : _pathcoll.paths()) {
+        if (p->containsRailway(r.get())) {
+            p->checkIsValid();
+        }
+    }
     foreach (const auto& p, _trainCollection.trains()){
         p->updateBoundRailway(r, _config);
     }
@@ -222,6 +231,8 @@ void Diagram::removeRailwayAtU(int i)
     foreach(auto p, _trainCollection.trains()) {
         p->unbindToRailway(rail);
     }
+    //2023.08.21: update path
+    _pathcoll.invalidateForRailway(rail.get());
 }
 
 void Diagram::rebindAllTrains()
@@ -247,6 +258,7 @@ void Diagram::undoImportRailway()
     foreach(auto p, _trainCollection.trains()) {
         p->unbindToRailway(t);
     }
+    _pathcoll.invalidateForRailway(t.get());
 }
 
 std::map<std::shared_ptr<RailInterval>, int> Diagram::sectionTrainCount(std::shared_ptr<Railway> railway) const

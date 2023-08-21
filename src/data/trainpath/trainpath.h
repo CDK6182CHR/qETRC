@@ -23,6 +23,8 @@ class TrainPath {
 	bool _valid;
 	std::vector<std::weak_ptr<Train>> _trains;
 
+	friend class TrainPathCollection;
+
 public:
 
 	// this ctor is not used by now
@@ -114,4 +116,9 @@ public:
 	 * Simple linear alg.
 	 */
 	int getTrainIndex(std::shared_ptr<Train> train)const;
+
+	/**
+	 * Linear alg., check every seg
+	 */
+	bool containsRailway(const Railway* rail)const;
 };

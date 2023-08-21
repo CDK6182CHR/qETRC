@@ -40,7 +40,7 @@ QVariant PathListModel::headerData(int section, Qt::Orientation orientation, int
 	if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
 		switch (section) {
 		case ColName: return QObject::tr("名称");
-		case ColValid: return QObject::tr("有效");
+		case ColValid: return QObject::tr("可用");
 		case ColStart: return QObject::tr("起点");
 		case ColEnd: return QObject::tr("终点");
 		}
@@ -78,4 +78,9 @@ void PathListModel::refreshData()
 {
 	beginResetModel();
 	endResetModel();
+}
+
+void PathListModel::updateAllValidity()
+{
+	emit dataChanged(index(0, ColValid), index(rowCount() - 1, ColValid), { Qt::CheckStateRole });
 }

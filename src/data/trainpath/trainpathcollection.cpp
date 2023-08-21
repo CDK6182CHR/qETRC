@@ -65,6 +65,25 @@ void TrainPathCollection::checkValidAll(RailCategory& railcat)
 	}
 }
 
+void TrainPathCollection::checkValidForRailway(RailCategory& railcat, const Railway* rail)
+{
+	for (const auto& p : _paths) {
+		if (p->containsRailway(rail)) {
+			p->updateRailways(railcat);
+			p->checkIsValid();
+		}
+	}
+}
+
+void TrainPathCollection::invalidateForRailway(const Railway* rail)
+{
+	for (auto& p : _paths) {
+		if (p->containsRailway(rail)) {
+			p->_valid = false;
+		}
+	}
+}
+
 std::vector<TrainPath*> TrainPathCollection::unassignedPaths(const Train& train)
 {
 	std::set<TrainPath*> assigned(train.paths().begin(), train.paths().end());

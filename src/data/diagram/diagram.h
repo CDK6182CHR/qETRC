@@ -201,6 +201,10 @@ public:
     /**
      * @brief updateRailway  铺画准备
      * 更新指定线路，与所有车次重新绑定
+     * -----------------
+     * 2023.08.21：新增更新列车径路判断。注意，每一次undo/redo之后都应该做这个判断。
+     * 新增约束：此调用仅对线路修改（而非增删）有效。对于增删的情况，列车径路的更新须调用
+     * TrainPathCollection::checkValidForRailway().
      */
     void updateRailway(std::shared_ptr<Railway> r);
 

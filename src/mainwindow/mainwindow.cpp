@@ -171,6 +171,7 @@ void MainWindow::onStationTableChanged(std::shared_ptr<Railway> rail, [[maybe_un
 {
 	_diagram.updateRailway(rail);
 	trainListWidget->getModel()->updateAllMileSpeed();
+	pathListWidget->model()->updateAllValidity();
 	updateRailwayDiagrams(rail);
 	//2022.06.02：如果非equiv变化，贪心推线的要更新！
 	//2022.11.19：删除!equiv条件；单双线变化现在似乎不被认为是non-equiv，但它确实影响推线。
@@ -295,6 +296,7 @@ void MainWindow::onActRailwayRemovedU(std::shared_ptr<Railway> rail)
 	removeRailStationWidget(rail);
 	contextRail->removeRulerWidgetsForRailway(rail);
 	trainListWidget->getModel()->updateAllMileSpeed();
+	pathListWidget->model()->updateAllValidity();
 }
 
 void MainWindow::removeRailStationWidget(std::shared_ptr<Railway> rail)
@@ -644,7 +646,7 @@ void MainWindow::initDockWidgets()
 
 	// TrainPath 列车径路
 	if constexpr (true) {
-		auto* w = new PathListWidget(_diagram.pathCollection(), undoStack);
+		auto* w = new PathListWidget(_diagram.railCategory(), _diagram.pathCollection(), undoStack);
 		dock = new ads::CDockWidget(tr("列车径路管理"));
 		dock->setWidget(w);
 		manager->addDockWidget(ads::LeftDockWidgetArea, dock);
@@ -664,6 +666,8 @@ void MainWindow::initDockWidgets()
 			pathListWidget, &PathListWidget::actDuplicate);
 		connect(pathListWidget, &PathListWidget::focusInPath,
 			this, &MainWindow::focusInPath);
+		connect(naviModel, &DiagramNaviModel::nonEmptyRailwayAdded,
+			pathListWidget->model(), &PathListModel::updateAllValidity);
 	}
 
 
