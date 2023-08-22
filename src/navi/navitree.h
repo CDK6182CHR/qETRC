@@ -113,6 +113,11 @@ signals:
      * 2023.08.16  the processing of qecmd::RemoveSingleTrain is passed to TrainContext
      */
     void removeTrainNavi(int idx);
+    
+    /**
+     * 2023.08.22  ask the RailContext to process this en-stack operation.
+     */
+    void importRailways(QList<std::shared_ptr<Railway>>&);
 
 private slots:
     void showContextMenu(const QPoint& pos);
@@ -185,7 +190,7 @@ public slots:
      */
     void actBatchAddTrains(const QVector<std::shared_ptr<Train>>& trains);
 
-    void importRailways();
+    void actImportRailways();
     void importRailwayFromDB(std::shared_ptr<Railway> railway);
     void addNewPage();
 
@@ -236,15 +241,6 @@ public slots:
 
 
 namespace qecmd {
-    class ImportRailways:public QUndoCommand {
-        DiagramNaviModel* const navi;
-        QList<std::shared_ptr<Railway>> rails;
-    public:
-        ImportRailways(DiagramNaviModel* navi_, const QList<std::shared_ptr<Railway>>& rails_,
-            QUndoCommand* parent=nullptr);
-        virtual void undo()override;
-        virtual void redo()override;
-    };
 
     class AddRailway :public QUndoCommand {
         DiagramNaviModel* const navi;

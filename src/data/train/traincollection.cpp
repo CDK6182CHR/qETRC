@@ -432,6 +432,16 @@ QString TrainCollection::validFilterName(const QString& prefix)
 	// not reachable here
 }
 
+std::vector<std::shared_ptr<Train>> TrainCollection::affectedTrainsByRailInPath(std::shared_ptr<const Railway> rail)
+{
+	std::vector<std::shared_ptr<Train>> res{};
+	foreach(auto p, _trains) {
+		if (p->pathsContainRailway(rail))
+			res.emplace_back(p);
+	}
+	return res;
+}
+
 
 void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 {

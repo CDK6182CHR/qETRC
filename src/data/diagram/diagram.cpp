@@ -30,6 +30,11 @@ void Diagram::addRailway(std::shared_ptr<Railway> rail)
 void Diagram::insertRailwayAt(int i, std::shared_ptr<Railway> rail)
 {
     railways().insert(i, rail);
+    // 2023.08.22: no bind for empty railway; no valid paths could contain an empty railway.
+    // thus, nothing to do for an empty one, and the train lines are not needed to be updated.
+    if (rail->empty())
+        return;
+
     // 2023.08.21 for path
     _pathcoll.checkValidForRailway(_railcat, rail.get());
 
@@ -256,6 +261,8 @@ void Diagram::refreshAll()
 void Diagram::undoImportRailway()
 {
     auto t = railways().takeLast();
+    if (t->empty()) 
+        return;
     foreach(auto p, _trainCollection.trains()) {
         p->unbindToRailway(t);
     }
@@ -794,9 +801,14 @@ QVector<int> Diagram::pageIndexWithRail(std::shared_ptr<const Railway> railway)c
 
 void Diagram::bindAllTrains()
 {
-    foreach (auto p , railways()) {
-        foreach (auto t , _trainCollection.trains()) {
-            t->bindToRailway(p, _config);
+    foreach(auto t, _trainCollection.trains()) {
+        if (t->paths().empty()) {
+            foreach(auto p, railways()) {
+                t->bindToRailway(p, _config);
+            }
+        }
+        else {
+            t->bindWithPath();
         }
     }
 }

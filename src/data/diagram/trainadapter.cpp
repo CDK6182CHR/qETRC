@@ -68,7 +68,8 @@ void TrainAdapter::bindTrainByPath(std::shared_ptr<Train> train, const TrainPath
 			adp = itr->second;
 		}
 		else {
-			adp_map.emplace(std::make_shared<TrainAdapter>(train, rail));
+			adp = std::shared_ptr<TrainAdapter>(new TrainAdapter(train, rail));
+			adp_map.emplace(rail.get(), adp);
 		}
 
 		auto line = std::make_shared<TrainLine>(*adp);

@@ -73,7 +73,7 @@ void NaviTree::initContextMenus()
     //RailList
     meRailList->addActions(common);
     act = meRailList->addAction(tr("导入线路"));
-    connect(act, SIGNAL(triggered()), this, SLOT(importRailways()));
+    connect(act, SIGNAL(triggered()), this, SLOT(actImportRailways()));
     act = meRailList->addAction(tr("添加空白线路"));
     connect(act, SIGNAL(triggered()), this, SLOT(actAddRailway()));
 
@@ -469,7 +469,9 @@ void NaviTree::actDulplicateRailway(std::shared_ptr<Railway> origin)
     auto rail = std::make_shared<Railway>();
     rail->operator=(*origin);
     rail->setName(name);
-    _undo->push(new qecmd::ImportRailways(_model, { rail }));
+    //_undo->push(new qecmd::ImportRailways(_model, { rail }));
+    QList<std::shared_ptr<Railway>> lst{ rail };
+    emit importRailways(lst);
 }
 
 void NaviTree::actDulplicateTrain(std::shared_ptr<Train> origin)
@@ -527,7 +529,7 @@ void NaviTree::actBatchAddTrains(const QVector<std::shared_ptr<Train>>& trains)
     _undo->push(new qecmd::BatchAddTrain(_model, trains));
 }
 
-void NaviTree::importRailways()
+void NaviTree::actImportRailways()
 {
     QString res = QFileDialog::getOpenFileName(this, tr("导入线路"), QString(),
         QObject::tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)"));
@@ -562,7 +564,8 @@ void NaviTree::importRailways()
         p->setName(_model->diagram().validRailwayName(p->name()));
     }
 
-    _undo->push(new qecmd::ImportRailways(_model, rails));
+    emit importRailways(rails);
+    //_undo->push(new qecmd::ImportRailways(_model, rails));
 }
 
 void NaviTree::importRailwayFromDB(std::shared_ptr<Railway> railway)
@@ -570,7 +573,9 @@ void NaviTree::importRailwayFromDB(std::shared_ptr<Railway> railway)
     auto r = std::make_shared<Railway>();   // copy construct!
     r->operator=(*railway);
     r->setName(_model->diagram().validRailwayName(railway->name()));
-    _undo->push(new qecmd::ImportRailways(_model, { r }));
+    //_undo->push(new qecmd::ImportRailways(_model, { r }));
+    QList<std::shared_ptr<Railway>> lst;
+    emit importRailways(lst);
     auto flag = QMessageBox::question(this, tr("qETRC主程序"),
         tr("基线[%1]添加成功。是否立即创建该线路的运行图窗口？").arg(r->name()));
     if (flag == QMessageBox::Yes) {
@@ -671,30 +676,17 @@ void NaviTree::showContextMenu(const QPoint& pos)
     
 }
 
-qecmd::ImportRailways::ImportRailways(DiagramNaviModel* navi_,
-    const QList<std::shared_ptr<Railway>>& rails_, QUndoCommand* parent) :
-    QUndoCommand(QObject::tr("导入") + QString::number(rails_.size()) + QObject::tr("条线路"), parent),
-    navi(navi_), rails(rails_)
-{
-}
-
-void qecmd::ImportRailways::undo()
-{
-    navi->removeTailRailways(rails.size());
-}
-
-void qecmd::ImportRailways::redo()
-{
-    //添加到线路表后面，然后inform change
-    //现在不需要通知别人发生变化...
-    navi->importRailways(rails);
-}
-
 qecmd::AddRailway::AddRailway(DiagramNaviModel* navi_, 
     std::shared_ptr<Railway> rail_, QUndoCommand* parent):
     QUndoCommand(QObject::tr("添加空白线路"),parent),
     navi(navi_),rail(rail_)
 {
+    if (!rail->empty()) {
+        // 2023.08.22: this operation requires the railway to be empty.
+        // The reason is that, the "affected trains" (through paths containing this railway) 
+        // are not detected or updated in this operation.
+        qCritical() << "Rail not empty " << rail->name();
+    }
 }
 
 void qecmd::AddRailway::undo()

@@ -21,6 +21,7 @@ class RailStation;
 class ForbidTabWidget;
 class MainWindow;
 class TrainStation;
+class DiagramNaviModel;
 namespace ads {
 class CDockWidget;
 }
@@ -294,6 +295,11 @@ public slots:
     void commitRemoveRailwayU(std::shared_ptr<Railway> railway, int index);
 
     void undoRemoveRailwayU(std::shared_ptr<Railway> railway, int index);
+
+    /**
+     * 2023.08.22  the processing of import railways is moved from NaviTree to here.
+     */
+    void actImportRailways(QList<std::shared_ptr<Railway>>& rails);
 };
 
 
@@ -434,6 +440,20 @@ namespace qecmd {
             RailContext* context, QUndoCommand* parent = nullptr);
         void undo()override;
         void redo()override;
+    };
+
+    /**
+     * 2023.08.22: move this from navitree to RailContext.
+     * The operations are still carried by NaviView.
+     */
+    class ImportRailways :public QUndoCommand {
+        DiagramNaviModel* const navi;
+        QList<std::shared_ptr<Railway>> rails;
+    public:
+        ImportRailways(DiagramNaviModel* navi_, const QList<std::shared_ptr<Railway>>& rails_,
+            QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
     };
 
 }

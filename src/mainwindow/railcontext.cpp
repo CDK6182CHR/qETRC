@@ -843,7 +843,12 @@ void RailContext::removeRailwayAtU(int i)
 {
 	auto& dia = diagram;
 	auto rail = dia.railwayAt(i);
+
+	// 2023.08.22: re-bind affected trains (that bound by path)
+	std::vector<std::shared_ptr<Train>> affect_trains = diagram.trainCollection().affectedTrainsByRailInPath(rail);
+
 	auto* cmd = new qecmd::RemoveRailway(rail, i, this);
+
 	// 注意这里只会删除一条线路
 	// 可能会涉及多个Page的删除！倒着来
 	for (int i = dia.pages().size() - 1; i >= 0; i--) {
@@ -870,6 +875,12 @@ void RailContext::commitRemoveRailwayU(std::shared_ptr<Railway> railway, int ind
 void RailContext::undoRemoveRailwayU(std::shared_ptr<Railway> railway, int index)
 {
 	mw->naviModel->commitInsertRailway(index, railway);
+}
+
+void RailContext::actImportRailways(QList<std::shared_ptr<Railway>>& rails)
+{
+	// TODO: affected trains
+	mw->getUndoStack()->push(new qecmd::ImportRailways(mw->naviModel, rails));
 }
 
 
@@ -1084,6 +1095,27 @@ void qecmd::RemoveRailway::redo()
 	cont->commitRemoveRailwayU(railway, index);
 
 }
+
+
+qecmd::ImportRailways::ImportRailways(DiagramNaviModel* navi_,
+	const QList<std::shared_ptr<Railway>>& rails_, QUndoCommand* parent) :
+	QUndoCommand(QObject::tr("导入") + QString::number(rails_.size()) + QObject::tr("条线路"), parent),
+	navi(navi_), rails(rails_)
+{
+}
+
+void qecmd::ImportRailways::undo()
+{
+	navi->removeTailRailways(rails.size());
+}
+
+void qecmd::ImportRailways::redo()
+{
+	//添加到线路表后面，然后inform change
+	//现在不需要通知别人发生变化...
+	navi->importRailways(rails);
+}
+
 
 #endif
 

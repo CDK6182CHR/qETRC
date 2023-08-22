@@ -19,6 +19,7 @@ class Routing;
 class TrainType;
 class RailCategory;
 class TrainGroup;
+class TrainPath;
 
 /**
  * @brief The TrainCollection class
@@ -275,6 +276,13 @@ public:
     bool filterNameIsValid(const QString& name, const PredefTrainFilterCore* ignore=nullptr);
 
     QString validFilterName(const QString& prefix);
+
+    /**
+     * 2023.08.22  Returns a list of trains which are affected by the railway.
+     * This affect is only imposed through TrainPath (not TrainAdapter).
+     */
+    std::vector<std::shared_ptr<Train>>
+        affectedTrainsByRailInPath(std::shared_ptr<const Railway> rail);
 
 private:
     /**

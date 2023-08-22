@@ -1397,6 +1397,8 @@ void MainWindow::initToolbar()
 			contextRail, &RailContext::removeRailwayAtU);
 		connect(contextRail, &RailContext::dulplicateRailway,
 			naviView, &NaviTree::actDulplicateRailway);
+		connect(naviView, &NaviTree::importRailways,
+			contextRail, &RailContext::actImportRailways);
 	}
 
 	//context: ruler 9
