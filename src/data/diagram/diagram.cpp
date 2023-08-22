@@ -20,21 +20,22 @@
 void Diagram::addRailway(std::shared_ptr<Railway> rail)
 {
     railways().append(rail);
-    foreach (auto p , trains()) {
-        p->bindToRailway(rail, _config);
-    }
     // 2023.08.21: for path
     _pathcoll.checkValidForRailway(_railcat, rail.get());
+    foreach(auto p, trains()) {
+        p->bindToRailway(rail, _config);
+    }
 }
 
 void Diagram::insertRailwayAt(int i, std::shared_ptr<Railway> rail)
 {
     railways().insert(i, rail);
+    // 2023.08.21 for path
+    _pathcoll.checkValidForRailway(_railcat, rail.get());
+
     foreach(auto p, trains()) {
         p->bindToRailway(rail, _config);
     }
-    // 2023.08.21 for path
-    _pathcoll.checkValidForRailway(_railcat, rail.get());
 }
 
 void Diagram::addTrains(const TrainCollection& coll)

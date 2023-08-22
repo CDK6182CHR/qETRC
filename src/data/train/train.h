@@ -228,6 +228,19 @@ public:
      */
     int getPathIndex(const TrainPath* path)const;
 
+    /**
+     * Returns whether at least one path contain the required railway.
+     * For no-path case, returns false.
+     */
+    bool pathsContainRailway(std::shared_ptr<const Railway> rail)const;
+
+    /**
+     * Bind to railways with paths (internally stored).
+     * Each time before binding, remove the adpaters.
+     * (Mind: currently, partly-update of binding is not allowed)
+     */
+    void bindWithPath();
+
 
     /**
      * qETRC新增核心函数

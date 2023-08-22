@@ -9,6 +9,7 @@
 #include "routing.h"
 #include "util/utilfunc.h"
 #include "typemanager.h"
+#include "data/trainpath/trainpath.h"
 #include <QFile>
 #include <QTextStream>
 
@@ -257,10 +258,30 @@ int Train::getPathIndex(const TrainPath* path) const
     return -1;
 }
 
+bool Train::pathsContainRailway(std::shared_ptr<const Railway> rail) const
+{
+    for (auto* p : _paths) {
+        if (p->containsRailway(rail.get())) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Train::bindWithPath()
+{
+    _adapters.clear();
+    for (const auto& p : _paths) {
+        TrainAdapter::bindTrainByPath(shared_from_this(), p);
+    }
+    invalidateTempData();
+}
+
 std::shared_ptr<TrainAdapter> Train::bindToRailway(std::shared_ptr<Railway> railway, const Config& config)
 {
     if (!_paths.empty()) {
-        qInfo() << "Train " << trainName().full() << " should be bound using TrainPath (not implemented)";
+        //qInfo() << "Train " << trainName().full() << " should be bound using TrainPath (not implemented)";
+        bindWithPath();
     }
     //2021.06.24 新的实现 基于Adapter
     for (auto p = _adapters.begin(); p != _adapters.end(); ++p) {
@@ -281,6 +302,9 @@ std::shared_ptr<TrainAdapter> Train::bindToRailway(std::shared_ptr<Railway> rail
 
 std::shared_ptr<TrainAdapter> Train::updateBoundRailway(std::shared_ptr<Railway> railway, const Config& config)
 {
+    if (!_paths.empty()) {
+        bindWithPath();
+    }
     //2021.06.24  基于Adapter新的实现
     //2021.07.04  TrainLine里面有Adapter的引用。不要move assign，直接删了重来好了
     unbindToRailway(railway);
