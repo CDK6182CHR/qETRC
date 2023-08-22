@@ -1289,6 +1289,7 @@ void TrainContext::refreshData()
 
 void TrainContext::refreshPath()
 {
+	if (!train)return;
 	if (train->paths().empty()) {
 		edPaths->setText(tr("(自动)"));
 	}
@@ -1847,11 +1848,11 @@ void qecmd::RebindTrainsByPaths::undo()
 		std::swap(trains.at(i)->adapters(), adapters.at(i));
 	}
 	// context call
+	cont->afterTrainsReboundByPath(trains, adapters);
 }
 
 void qecmd::RebindTrainsByPaths::redo()
 {
-	static bool first = true;
 	if (first) {
 		assert(adapters.empty());
 		adapters.reserve(trains.size());
@@ -1870,6 +1871,7 @@ void qecmd::RebindTrainsByPaths::redo()
 		}
 	}
 	// call
+	cont->afterTrainsReboundByPath(trains, adapters);
 }
 
 

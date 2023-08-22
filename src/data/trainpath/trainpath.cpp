@@ -6,6 +6,15 @@
 #include "data/train/traincollection.h"
 #include "log/IssueManager.h"
 
+std::vector<std::shared_ptr<Train>> TrainPath::trainsShared()
+{
+	std::vector<std::shared_ptr<Train>> res{};
+	for (auto p : _trains) {
+		res.emplace_back(p.lock());
+	}
+	return res;
+}
+
 const StationName& TrainPath::endStation() const
 {
 	assert(!empty());

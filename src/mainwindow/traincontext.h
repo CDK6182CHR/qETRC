@@ -675,6 +675,7 @@ namespace qecmd {
         std::vector<std::shared_ptr<Train>> trains;
         std::vector<QVector<std::shared_ptr<TrainAdapter>>> adapters;
         TrainContext* const cont;
+        bool first = true;
     public:
         RebindTrainsByPaths(std::vector<std::shared_ptr<Train>>&& trains_,
             TrainContext* cont, QUndoCommand* parent = nullptr);

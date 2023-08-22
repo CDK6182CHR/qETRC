@@ -56,6 +56,8 @@ public:
 	auto& trains() { return _trains; }
 	auto& trains()const { return _trains; }
 
+	std::vector<std::shared_ptr<Train>> trainsShared();
+
 	bool valid()const { return _valid; }
 
 	/**

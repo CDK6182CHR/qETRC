@@ -174,7 +174,10 @@ void PathContext::removePathDocks()
 
 void PathContext::actUpdatePath(TrainPath* path, std::unique_ptr<TrainPath>& data)
 {
-    mw->getUndoStack()->push(new qecmd::UpdatePath(path, std::move(data), this));
+    auto* cmd = new qecmd::UpdatePath(path, std::move(data), this);
+    auto trains = path->trainsShared();
+    new qecmd::RebindTrainsByPaths(std::move(trains), mw->getTrainContext(), cmd);
+    mw->getUndoStack()->push(cmd);
 }
 
 void PathContext::commitUpdatePath(TrainPath* path)
@@ -241,12 +244,14 @@ void qecmd::UpdatePath::undo()
 {
     path->swapDataWith(*data);
     cont->commitUpdatePath(path);
+    QUndoCommand::undo();   // rebind trains
 }
 
 void qecmd::UpdatePath::redo()
 {
     path->swapDataWith(*data);
     cont->commitUpdatePath(path);
+    QUndoCommand::redo();   // rebind trains
 }
 
 qecmd::ClearTrainsFromPath::ClearTrainsFromPath(TrainPath* path, PathContext* cont, QUndoCommand* parent):
@@ -267,7 +272,7 @@ void qecmd::ClearTrainsFromPath::undo()
         int idx = indexes_in_train.at(i);
         train->paths().insert(train->paths().begin() + idx, path);
     }
-    cont->afterPathTrainsChanged(path, trains);
+    cont->afterPathTrainsChanged(path, path->trains());
 }
 
 void qecmd::ClearTrainsFromPath::redo()

@@ -31,7 +31,7 @@ QVariant IssueManager::data(const QModelIndex& index, int role) const
 		switch (index.column())
 		{
 		case ColTrain: return s.info.train->trainName().full();
-		case ColRailway: return s.info.rail->name();
+		case ColRailway: return s.info.rail ? s.info.rail->name() : "";
 		case ColPos: return s.info.posString();
 		case ColType: return IssueInfo::issueTypeToString(s.info.type);
 		case ColMsg: return s.info.msg;
