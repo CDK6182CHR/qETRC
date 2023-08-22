@@ -7,6 +7,7 @@
 
 class TrainCollection;
 struct Config;
+class TrainPath;
 
 /**
  * @brief 与线路数据相结合的列车信息
@@ -26,6 +27,12 @@ class TrainAdapter
      * 注意默认的拷贝行为是不正确的
      */
     QVector<std::shared_ptr<TrainLine>> _lines;
+
+    /**
+     * This version, not auto lines.
+     */
+    TrainAdapter(std::weak_ptr<Train> train, std::weak_ptr<Railway> railway);
+
 public:
 
     /**
@@ -70,6 +77,11 @@ public:
     inline bool isInSameRailway(std::shared_ptr<const Railway> rail)const {
         return _railway.lock() == rail;
     }
+
+    /**
+     * 2023.08.22  New core implementation for binding train with the help of TrainPath.
+     */
+    static void bindTrainByPath(std::shared_ptr<Train> train, const TrainPath* path);
 
     /**
      * @brief listAdapterEvents 列出本次列车在本线的事件表
@@ -153,6 +165,17 @@ private:
      * 自动生成运行线数据  包括原来的bindToRail()功能
      */
     void autoLines(const Config& config);
+
+    /**
+     * Return the relative position of the station comparing to the mile range (specified by segment).
+     * Specifically: 
+     * -1  if the station is encountered BEFORE the range, 
+     * 0   if the station is in the range, and
+     * +1  if the station is encountered AFTER the range.
+     * Here, before/after is in the view of the train running direction.
+     * Mind: how to process the counter mile?
+     */
+    static int stationInSegment(double mile_start, double mile_end, Direction dir, const RailStation& st);
 };
 
 

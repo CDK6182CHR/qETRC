@@ -1728,6 +1728,11 @@ int TrainLine::timetableInterpolationSimple()
 }
 
 
+bool AdapterStation::operator==(const AdapterStation& other) const
+{
+    return trainStation == other.trainStation && railStation.lock() == other.railStation.lock();
+}
+
 bool AdapterStation::operator<(double y) const
 {
     return railStation.lock()->y_coeff.value() < y;

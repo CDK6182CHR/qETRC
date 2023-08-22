@@ -7,8 +7,16 @@
 #include "data/rail/rulernode.h"
 #include "data/rail/ruler.h"
 #include "data/train/train.h"
+#include "data/trainpath/trainpath.h"
 
 #include "log/IssueManager.h"
+
+TrainAdapter::TrainAdapter(std::weak_ptr<Train> train,
+	std::weak_ptr<Railway> railway) :
+	_railway(railway), _train(train)
+{
+}
+
 
 TrainAdapter::TrainAdapter(std::weak_ptr<Train> train,
     std::weak_ptr<Railway> railway, const Config& config):
@@ -35,6 +43,91 @@ void TrainAdapter::print() const
 	}
 }
 
+
+void TrainAdapter::bindTrainByPath(std::shared_ptr<Train> train, const TrainPath* path)
+{
+	if (!path->valid()) {
+		qeIssueCritical(IssueInfo(IssueInfo::InvalidPath, train, {}, {}, QObject::tr("列车径路%1不可用，"
+			"此径路将被忽略").arg(path->name())));
+		return;
+	}
+
+	std::map<Railway*, std::shared_ptr<TrainAdapter>> adp_map;
+	
+	StationName start_station = path->startStation();
+	auto tit_last_bind = train->timetable().begin();
+	for (const auto& seg : path->segments()) {
+		auto rail = seg.railway.lock();
+		auto rst_start = rail->stationByName(start_station);
+		auto rst_end = rail->stationByName(seg.end_station);
+		double mile_start = rst_start->mile;
+		double mile_end = rst_end->mile;
+
+		std::shared_ptr<TrainAdapter> adp{};
+		if (auto itr = adp_map.find(rail.get()); itr != adp_map.end()) {
+			adp = itr->second;
+		}
+		else {
+			adp_map.emplace(std::make_shared<TrainAdapter>(train, rail));
+		}
+
+		auto line = std::make_shared<TrainLine>(*adp);
+		line->_dir = seg.dir;
+
+		// loop over train stations
+		for (auto tit = tit_last_bind; tit != train->timetable().end(); ++tit) {
+			auto rst = rail->stationByGeneralName(tit->name);
+			if (!rst) {
+				// station not in railway, just pass
+				continue;
+			}
+
+			// now, rst is not empty
+			auto ipos = stationInSegment(mile_start, mile_end, seg.dir, *rst);
+			if (ipos < 0) {
+				// before range, nothing to do
+			}
+			else if (ipos > 0) {
+				// out of range, break current loop
+				break;
+			}
+			else {  // ipos == 0, to be bound
+				line->addStation(tit, rst);
+				tit_last_bind = tit;
+			}
+
+			if (rst->name == seg.end_station) {
+				// The last station in the segment is found
+				break;
+			}
+		}
+
+		if (!line->isNull()) {
+			// For TrainPath-guided binding, currently, one-station line is allowed
+			// (if this is not, the deletion of last line should change tit_last_bind)
+			adp->lines().append(line);
+
+			// now, a special case, for the same-railway-turn-back case, set the label validity.
+			if (adp->lines().size() > 1) {
+				auto last_line = adp->lines().at(adp->lines().size() - 2);
+				if (last_line->railway() == rail && last_line->stations().back() == line->stations().front() &&
+					last_line->dir() != line->dir()) {
+					last_line->_endLabel = false;
+					line->_startLabel = false;
+				}
+			}
+		}
+
+		start_station = seg.end_station;
+	}
+
+	for (auto itr = adp_map.begin(); itr != adp_map.end(); ++itr) {
+		auto adp = itr->second;
+		if (!adp->isNull()) {
+			train->adapters().append(adp);
+		}
+	}
+}
 
 AdapterEventList TrainAdapter::listAdapterEvents(const TrainCollection& coll) const
 {
@@ -366,5 +459,29 @@ void TrainAdapter::autoLines(const Config& config)
 	//最后一段运行线
 	if (loccnt >= 2) {
 		_lines.append(line);
+	}
+}
+
+int TrainAdapter::stationInSegment(double mile_start, double mile_end, Direction dir, const RailStation& st)
+{
+	if (dir == Direction::Down) {
+		if (st.mile < mile_start)
+			return -1;
+		else if (st.mile <= mile_end)
+			return 0;
+		else
+			return 1;
+	}
+	else if (dir == Direction::Up) {
+		if (st.mile > mile_start)
+			return -1;
+		else if (st.mile >= mile_end)
+			return 0;
+		else
+			return 1;
+	}
+	else {
+		qCritical() << "Invalid direction " << static_cast<int>(dir);
+		return 0;
 	}
 }

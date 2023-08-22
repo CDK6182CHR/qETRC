@@ -21,6 +21,7 @@ struct IssueInfo {
 		// insert new issue type here
 		// ...
 		WithdrawFirstBounding,
+		InvalidPath,
 		OtherIssueType,
 	};
 

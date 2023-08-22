@@ -29,6 +29,7 @@ struct AdapterStation{
     AdapterStation(std::list<TrainStation>::iterator trainStation_,
         std::weak_ptr<RailStation> railStation_):
         trainStation(trainStation_),railStation(railStation_){}
+    bool operator==(const AdapterStation& other)const;
     bool operator<(double y)const;
     double yCoeff()const;
 };
