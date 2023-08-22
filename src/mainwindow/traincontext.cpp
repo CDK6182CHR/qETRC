@@ -1058,6 +1058,15 @@ void TrainContext::actRemoveSingleTrain(int index)
 		index));
 }
 
+void TrainContext::afterTrainsReboundByPath(const std::vector<std::shared_ptr<Train>>& trains,
+	const std::vector<QVector<std::shared_ptr<TrainAdapter>>>& adapters)
+{
+	for (size_t i = 0; i < trains.size(); i++) {
+		auto adpi = adapters.at(i);    // copy
+		mw->updateTrainLines(trains.at(i), std::move(adpi));
+	}
+}
+
 void TrainContext::actShowTrainLine()
 {
 	//强制显示列车运行线。如果已经全部显示了也没关系，没有任何效果
@@ -1631,7 +1640,6 @@ void qecmd::DragTrainStationTime::commit()
 	cont->onTrainStationTimeChanged(train, true);
 }
 
-#endif
 
 qecmd::AssignPathsToTrain::AssignPathsToTrain(std::shared_ptr<Train> train, std::vector<TrainPath*>&& paths,
 	TrainContext* cont, QUndoCommand* parent):
@@ -1824,3 +1832,46 @@ qecmd::RemoveSingleTrain::RemoveSingleTrain(TrainContext* cont, DiagramNaviModel
 	}
 	new RemoveSingleTrainSimple(navi_, train_, index_, this);
 }
+
+qecmd::RebindTrainsByPaths::RebindTrainsByPaths(std::vector<std::shared_ptr<Train>>&& trains_, 
+	TrainContext* cont, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("重新铺画%1列车").arg(trains_.size()), parent),
+	trains(std::move(trains_)), cont(cont)
+{
+	qDebug() << "RebindTrainsByPaths: " << trains.size() << " trains affected";
+}
+
+void qecmd::RebindTrainsByPaths::undo()
+{
+	for (size_t i = 0; i < trains.size(); i++) {
+		std::swap(trains.at(i)->adapters(), adapters.at(i));
+	}
+	// context call
+}
+
+void qecmd::RebindTrainsByPaths::redo()
+{
+	static bool first = true;
+	if (first) {
+		assert(adapters.empty());
+		adapters.reserve(trains.size());
+
+		for (auto train : trains) {
+			assert(!train->paths().empty());
+			adapters.emplace_back(std::move(train->adapters()));
+			train->bindWithPath();
+		}
+
+		first = false;
+	}
+	else {
+		for (size_t i = 0; i < trains.size(); i++) {
+			std::swap(trains.at(i)->adapters(), adapters.at(i));
+		}
+	}
+	// call
+}
+
+
+
+#endif

@@ -848,6 +848,9 @@ void RailContext::removeRailwayAtU(int i)
 	std::vector<std::shared_ptr<Train>> affect_trains = diagram.trainCollection().affectedTrainsByRailInPath(rail);
 
 	auto* cmd = new qecmd::RemoveRailway(rail, i, this);
+	
+	// re-bind all the affected paths
+	new qecmd::RebindTrainsByPaths(std::move(affect_trains), mw->contextTrain, cmd);
 
 	// 注意这里只会删除一条线路
 	// 可能会涉及多个Page的删除！倒着来

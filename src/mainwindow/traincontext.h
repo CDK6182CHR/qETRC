@@ -342,6 +342,12 @@ public slots:
      */
     void actRemoveSingleTrain(int index);
 
+    /**
+     * 2023.08.22  the post-processing of re-bind trains by paths.
+     */
+    void afterTrainsReboundByPath(const std::vector<std::shared_ptr<Train>>& trains,
+        const std::vector<QVector<std::shared_ptr<TrainAdapter>>>& adapters);
+
 private slots:
     void showTrainEvents();
 
@@ -657,6 +663,24 @@ namespace qecmd {
     public:
         RemoveSingleTrain(TrainContext* cont, DiagramNaviModel* navi_,
             std::shared_ptr<Train> train_, int index_, QUndoCommand* parent = nullptr);
+    };
+
+    /**
+     * 2023.08.22: For the trains bound using path.
+     * On railway or path changed, re-bind all trains, and repaint their train lines.
+     * Currently, the adapters are reserved, only calculated at the first time (ctor).
+     */
+    class RebindTrainsByPaths : public QUndoCommand
+    {
+        std::vector<std::shared_ptr<Train>> trains;
+        std::vector<QVector<std::shared_ptr<TrainAdapter>>> adapters;
+        TrainContext* const cont;
+    public:
+        RebindTrainsByPaths(std::vector<std::shared_ptr<Train>>&& trains_,
+            TrainContext* cont, QUndoCommand* parent = nullptr);
+
+        virtual void undo()override;
+        virtual void redo()override;
     };
 }
 
