@@ -501,7 +501,8 @@ void RailContext::actInverseRail()
 	rail->mergeIntervalData(*railway);
 	rail->reverse();
 	rail->calStationYCoeff();   // 2022.11.13 fix
-	mw->getUndoStack()->push(new qecmd::UpdateRailStations(this, railway, rail, false));
+	mw->getUndoStack()->push(new qecmd::UpdateRailStations(this, railway, rail, false, diagram.pathCollection(),
+		mw->contextTrain));
 }
 
 void RailContext::actShowTrainGap()
@@ -584,7 +585,8 @@ void RailContext::actJointRailApplied(std::shared_ptr<Railway> rail, std::shared
 		rail->resetOrdinate();
 		mw->getUndoStack()->push(new qecmd::ChangeOrdinate(this, rail, -1));
 	}
-	mw->getUndoStack()->push(new qecmd::UpdateRailStations(this, rail, data, false));
+	mw->getUndoStack()->push(new qecmd::UpdateRailStations(this, rail, data, false, diagram.pathCollection(),
+		mw->contextTrain));
 	mw->getUndoStack()->endMacro();
 }
 
@@ -610,7 +612,8 @@ void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
 
 void RailContext::actUpdateTimetable(std::shared_ptr<Railway> railway, std::shared_ptr<Railway> newtable, bool equiv)
 {
-	mw->getUndoStack()->push(new qecmd::UpdateRailStations(this, railway, newtable, equiv));
+	mw->getUndoStack()->push(new qecmd::UpdateRailStations(this, railway, newtable, equiv, diagram.pathCollection(),
+		mw->contextTrain));
 }
 
 void RailContext::actUpdadteForbidData(std::shared_ptr<Forbid> forbid, std::shared_ptr<Railway> data)
@@ -888,8 +891,22 @@ void RailContext::undoRemoveRailwayU(std::shared_ptr<Railway> railway, int index
 
 void RailContext::actImportRailways(QList<std::shared_ptr<Railway>>& rails)
 {
-	// TODO: affected trains
-	mw->getUndoStack()->push(new qecmd::ImportRailways(mw->naviModel, rails));
+	auto* cmd = new qecmd::ImportRailways(mw->naviModel, rails);
+	std::set<std::shared_ptr<Train>> affected_trains{};
+	foreach(auto rail, rails) {
+		for (const auto& path : diagram.pathCollection().paths()) {
+			if (path->containsRailwayByName(rail->name())) {
+				const auto& trains = path->trainsShared();
+				affected_trains.insert(trains.begin(), trains.end());
+			}
+		}
+	}
+	if (!affected_trains.empty()) {
+		new qecmd::RebindTrainsByPaths(std::vector<std::shared_ptr<Train>>(affected_trains.begin(), affected_trains.end()),
+			mw->contextTrain, cmd);
+	}
+
+	mw->getUndoStack()->push(cmd);
 }
 
 
@@ -918,12 +935,20 @@ void qecmd::ChangeRailName::redo()
 
 qecmd::UpdateRailStations::UpdateRailStations(RailContext* context,
 	std::shared_ptr<Railway> old_,
-	std::shared_ptr<Railway> new_, bool equiv_, QUndoCommand* parent) :
+	std::shared_ptr<Railway> new_, bool equiv_, 
+	TrainPathCollection& pathcoll, TrainContext* contTrain,
+	QUndoCommand* parent) :
 	QUndoCommand(parent), cont(context), railold(old_), railnew(new_), equiv(equiv_)
 {
 	qDebug() << "UpdateRailStations: equiv " << equiv << Qt::endl;
 	setText(QObject::tr("更新基线数据: %1").arg(old_->name()));
 	ordinateIndex = old_->ordinateIndex();
+
+	// 2023.08.23: rebind trains
+	auto trains = pathcoll.affectedTrainsByRailway(railold);
+	if (!trains.empty()) {
+		new qecmd::RebindTrainsByPaths(std::move(trains), contTrain, this);
+	}
 }
 
 void qecmd::UpdateRailStations::undo()
@@ -931,12 +956,14 @@ void qecmd::UpdateRailStations::undo()
 	railold->swapBaseWith(*railnew);
 	//railold->setOrdinateIndex(ordinateIndex);
 	cont->commitUpdateTimetable(railold, equiv);
+	QUndoCommand::undo();   // rebind
 }
 
 void qecmd::UpdateRailStations::redo()
 {
 	railold->swapBaseWith(*railnew);
 	cont->commitUpdateTimetable(railold, equiv);
+	QUndoCommand::redo();   // rebind
 }
 
 qecmd::ChangeOrdinate::ChangeOrdinate(RailContext *context_, std::shared_ptr<Railway> rail_,
@@ -1117,6 +1144,7 @@ qecmd::ImportRailways::ImportRailways(DiagramNaviModel* navi_,
 void qecmd::ImportRailways::undo()
 {
 	navi->removeTailRailways(rails.size());
+	QUndoCommand::undo();   // rebind trains
 }
 
 void qecmd::ImportRailways::redo()
@@ -1124,6 +1152,7 @@ void qecmd::ImportRailways::redo()
 	//添加到线路表后面，然后inform change
 	//现在不需要通知别人发生变化...
 	navi->importRailways(rails);
+	QUndoCommand::redo();   // rebind trains
 }
 
 

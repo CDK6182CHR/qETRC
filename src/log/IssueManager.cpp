@@ -90,3 +90,19 @@ void IssueManager::emplaceIssue(QtMsgType type, const IssueInfo& info)
 {
 	emplaceIssue(PaintIssue(type, info));
 }
+
+void IssueManager::clearIssuesForTrain(const Train* train)
+{
+	for (int i = _issues.size() - 1; i >= 0; --i) {
+		if (_issues.at(i).info.train.get() == train) {
+			removeIssueAt(i);
+		}
+	}
+}
+
+void IssueManager::removeIssueAt(int index)
+{
+	beginRemoveRows({}, index, index);
+	_issues.erase(_issues.begin() + index);
+	endRemoveRows();
+}

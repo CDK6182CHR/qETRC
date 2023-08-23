@@ -42,11 +42,13 @@ public:
 
 	void emplaceIssue(QtMsgType type, const IssueInfo& info);
 
+	void clearIssuesForTrain(const Train* train);
+
 private:
 	IssueManager() = default;
 	static std::unique_ptr<IssueManager> _instance;
 
-
+	void removeIssueAt(int index);
 };
 
 

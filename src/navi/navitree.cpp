@@ -574,7 +574,7 @@ void NaviTree::importRailwayFromDB(std::shared_ptr<Railway> railway)
     r->operator=(*railway);
     r->setName(_model->diagram().validRailwayName(railway->name()));
     //_undo->push(new qecmd::ImportRailways(_model, { r }));
-    QList<std::shared_ptr<Railway>> lst;
+    QList<std::shared_ptr<Railway>> lst{ r };
     emit importRailways(lst);
     auto flag = QMessageBox::question(this, tr("qETRC主程序"),
         tr("基线[%1]添加成功。是否立即创建该线路的运行图窗口？").arg(r->name()));

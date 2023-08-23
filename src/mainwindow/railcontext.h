@@ -22,6 +22,8 @@ class ForbidTabWidget;
 class MainWindow;
 class TrainStation;
 class DiagramNaviModel;
+class TrainPathCollection;
+class TrainContext;
 namespace ads {
 class CDockWidget;
 }
@@ -330,7 +332,8 @@ namespace qecmd {
         int ordinateIndex;
     public:
         UpdateRailStations(RailContext* context, std::shared_ptr<Railway> old_,
-            std::shared_ptr<Railway> new_, bool equiv_, QUndoCommand* parent = nullptr);
+            std::shared_ptr<Railway> new_, bool equiv_, TrainPathCollection& pathcoll, TrainContext* contTrain,
+            QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
     };
@@ -449,9 +452,10 @@ namespace qecmd {
     class ImportRailways :public QUndoCommand {
         DiagramNaviModel* const navi;
         QList<std::shared_ptr<Railway>> rails;
+        bool first = true;
     public:
         ImportRailways(DiagramNaviModel* navi_, const QList<std::shared_ptr<Railway>>& rails_,
-            QUndoCommand* parent = nullptr);
+           QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
     };

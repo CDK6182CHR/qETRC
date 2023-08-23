@@ -123,4 +123,11 @@ public:
 	 * Linear alg., check every seg
 	 */
 	bool containsRailway(const Railway* rail)const;
+
+	/**
+	 * See also containsRailway.
+	 * This version uses name, which is provided for the importRailways cmd
+	 * (where the Railway is not actually added)
+	 */
+	bool containsRailwayByName(const QString& name)const;
 };

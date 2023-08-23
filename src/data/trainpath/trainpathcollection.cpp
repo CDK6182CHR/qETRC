@@ -97,3 +97,15 @@ std::vector<TrainPath*> TrainPathCollection::unassignedPaths(const Train& train)
 	}
 	return res;
 }
+
+std::vector<std::shared_ptr<Train>> TrainPathCollection::affectedTrainsByRailway(std::shared_ptr<const Railway> railway) const
+{
+	std::set<std::shared_ptr<Train>> trainset{};
+	for (const auto& path : _paths) {
+		if (path->containsRailway(railway.get())) {
+			auto trains = path->trainsShared();
+			trainset.insert(trains.begin(), trains.end());
+		}
+	}
+	return std::vector<std::shared_ptr<Train>>(trainset.begin(), trainset.end());
+}

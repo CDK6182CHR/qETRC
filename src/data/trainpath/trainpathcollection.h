@@ -68,4 +68,9 @@ public:
 	 * Returns the paths that not assigned to the train.
 	 */
 	std::vector<TrainPath*> unassignedPaths(const Train& train);
+
+	/**
+	 * 2023.08.23  returns the trains that belongs to the paths containing the given railway.
+	 */
+	std::vector<std::shared_ptr<Train>> affectedTrainsByRailway(std::shared_ptr<const Railway> railway)const;
 };

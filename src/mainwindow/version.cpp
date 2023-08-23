@@ -2,16 +2,14 @@
 
 namespace qespec {
 
-const std::string_view VERSION = "V1.4.0";
-const std::string_view LAST_VERSION = "V1.3.7";
-const std::string_view DATE = "20230625";
+const std::string_view VERSION = "V1.5.0";
+const std::string_view LAST_VERSION = "V1.4.0";
+const std::string_view DATE = "20230823";
 const int RELEASE_CODE = 42;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 升级Qt库版本至6.5.1，更新一些尺寸设置。
-2. 重新设计运行图纵线设置系统，增大设置自由度。
-3. 新增类型管理器在当前运行图和默认设置间相互应用的功能。
-4. 新增显示设置和类型管理器的“透明模式”。)";
+const std::string_view UPDATE_LOG = R"(1. 【重要更新】新增列车径路数据项，支持相关数据管理及按径路铺画运行线。
+2. 新增文本输出窗口和铺画问题列表窗口，默认浮动于窗口下方。)";
 }

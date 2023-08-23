@@ -181,3 +181,13 @@ bool TrainPath::containsRailway(const Railway* rail) const
 	}
 	return false;
 }
+
+bool TrainPath::containsRailwayByName(const QString& name) const
+{
+	for (const auto& seg : _segments) {
+		if (seg.railwayName() == name) {
+			return true;
+		}
+	}
+	return false;
+}
