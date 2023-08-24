@@ -15,6 +15,7 @@
 #include "traincontext.h"
 #include "editors/trainpath/pathedit.h"
 #include "editors/trainpath/pathlistwidget.h"
+#include "editors/trainpath/pathtrainsdialog.h"
 #include "data/train/train.h"
 
 
@@ -68,12 +69,21 @@ void PathContext::initUI()
 
     panel=page->addPannel(tr("编辑"));
 
-    auto* act=new QAction(QIcon(":/icons/edit.png"), tr("编辑"));
+    auto* act=new QAction(QIcon(":/icons/edit.png"), tr("编辑"), this);
     connect(act,&QAction::triggered, this, &PathContext::actEditPath);
     panel->addLargeAction(act);
 
     panel = page->addPannel(tr("列车"));
-    act = new QAction(qApp->style()->standardIcon(QStyle::SP_TabCloseButton), tr("清空"));
+
+    act = new QAction(QIcon(":/icons/train.png"), tr("列车表"), this);
+    connect(act, &QAction::triggered, this, &PathContext::actShowTrains);
+    panel->addLargeAction(act);
+
+    act = new QAction(QIcon(":/icons/add.png"), tr("添加列车"), this);
+    connect(act, &QAction::triggered, this, &PathContext::actAddTrains);
+    panel->addLargeAction(act);
+
+    act = new QAction(qApp->style()->standardIcon(QStyle::SP_TabCloseButton), tr("清空"), this);
     connect(act, &QAction::triggered, this, &PathContext::actClearTrains);
     panel->addLargeAction(act);
 
@@ -117,6 +127,19 @@ void PathContext::actDuplicatePath()
 {
     int idx = diagram.pathCollection().pathIndex(path);
     mw->pathListWidget->actDuplicate(idx);
+}
+
+void PathContext::actShowTrains()
+{
+    auto* d = new PathTrainsDialog(diagram.trainCollection(), path, mw);
+    connect(d, &PathTrainsDialog::actAdd, this, &PathContext::actAddTrains);
+
+    d->open();
+}
+
+void PathContext::actAddTrains()
+{
+    // TODO
 }
 
 void PathContext::actEditPath()

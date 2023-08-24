@@ -51,6 +51,9 @@ private slots:
     void actRemovePath();
     void actDuplicatePath();
 
+    void actShowTrains();
+    void actAddTrains();
+
 public slots:
 
     void openPathEdit(TrainPath* path);
@@ -116,6 +119,16 @@ namespace qecmd {
         RemoveTrainPath(TrainPath* p, int idx, PathListWidget* pw, PathContext* cont, QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    /**
+     * 2023.08.24  Remove some trains from the path (but not necessarily all trains)
+     */
+    class RemoveTrainsFromPath : public QUndoCommand
+    {
+        TrainPath* path;
+        // ... 
+        // 2023.08.24  TODO here
     };
 
 
