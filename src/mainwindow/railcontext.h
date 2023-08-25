@@ -91,7 +91,7 @@ private:
 
 signals:
     void railNameChanged(std::shared_ptr<Railway> rail);
-    void stationTableChanged(std::shared_ptr<Railway> rail, bool equiv);
+    //void stationTableChanged(std::shared_ptr<Railway> rail, bool equiv);
     void selectRuler(std::shared_ptr<Ruler> ruler);
 
     /**
@@ -213,10 +213,10 @@ public slots:
     void actToggleForbidShow(std::shared_ptr<Forbid> forbid, Direction dir);
 
     /**
-     * 时刻表更新的执行，
      * 主要负责发射信号以及更新有关页面
+     * 2023.08.25  change name: previous "commitUpdateTimetable" (actually, not timetable...)
      */
-    void commitUpdateTimetable(std::shared_ptr<Railway> railway, bool equiv);
+    void afterRailStationChanged(std::shared_ptr<Railway> railway, bool equiv);
 
     /**
      * 已经完成变换操作后；这里主要触发排图操作

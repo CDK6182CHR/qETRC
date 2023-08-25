@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <QDialog>
 
 class QTableView;
@@ -28,6 +29,9 @@ private:
 
 signals:
     void actAdd();
+
+    // the order of std::set is required
+    void removeTrains(TrainPath*, const std::set<int>& rows);
 
 private slots:
     void actRemove();

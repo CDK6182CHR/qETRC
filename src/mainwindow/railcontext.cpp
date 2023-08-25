@@ -626,10 +626,11 @@ void RailContext::actToggleForbidShow(std::shared_ptr<Forbid> forbid, Direction 
 	mw->getUndoStack()->push(new qecmd::ToggleForbidShow(forbid, dir, this));
 }
 
-void RailContext::commitUpdateTimetable(std::shared_ptr<Railway> railway, bool equiv)
+void RailContext::afterRailStationChanged(std::shared_ptr<Railway> railway, bool equiv)
 {
 	updateRailWidget(railway);
-	emit stationTableChanged(railway, equiv);
+	mw->onStationTableChanged(railway, equiv);
+	//emit stationTableChanged(railway, equiv);  // 2023.08.25: change to direct call
 	foreach(auto p, rulerWidgets) {
 		p->getModel()->updateRailIntervals(railway, equiv);
 	}
@@ -955,14 +956,14 @@ void qecmd::UpdateRailStations::undo()
 {
 	railold->swapBaseWith(*railnew);
 	//railold->setOrdinateIndex(ordinateIndex);
-	cont->commitUpdateTimetable(railold, equiv);
+	cont->afterRailStationChanged(railold, equiv);
 	QUndoCommand::undo();   // rebind
 }
 
 void qecmd::UpdateRailStations::redo()
 {
 	railold->swapBaseWith(*railnew);
-	cont->commitUpdateTimetable(railold, equiv);
+	cont->afterRailStationChanged(railold, equiv);
 	QUndoCommand::redo();   // rebind
 }
 

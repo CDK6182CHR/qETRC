@@ -284,7 +284,10 @@ std::shared_ptr<TrainAdapter> Train::bindToRailway(std::shared_ptr<Railway> rail
 {
     if (!_paths.empty()) {
         //qInfo() << "Train " << trainName().full() << " should be bound using TrainPath (not implemented)";
-        bindWithPath();
+        // 2023.08.25: no process here (not sure); the bind with path operation should be called outer
+        // (usually by qecmd::RebindTrainsByPath)
+        //bindWithPath();
+        return nullptr;
     }
     //2021.06.24 新的实现 基于Adapter
     for (auto p = _adapters.begin(); p != _adapters.end(); ++p) {
@@ -303,16 +306,17 @@ std::shared_ptr<TrainAdapter> Train::bindToRailway(std::shared_ptr<Railway> rail
 }
 
 
-std::shared_ptr<TrainAdapter> Train::updateBoundRailway(std::shared_ptr<Railway> railway, const Config& config)
+void Train::updateBoundRailway(std::shared_ptr<Railway> railway, const Config& config)
 {
     if (!_paths.empty()) {
-        bindWithPath();
+        // 2023.08.25: no operation here (not sure)
+        //bindWithPath();
+        return;
     }
     //2021.06.24  基于Adapter新的实现
     //2021.07.04  TrainLine里面有Adapter的引用。不要move assign，直接删了重来好了
     unbindToRailway(railway);
     bindToRailway(railway, config);
-    return nullptr;
 }
 
 void Train::unbindToRailway(std::shared_ptr<const Railway> railway)

@@ -84,6 +84,7 @@
 #include "log/IssueWidget.h"
 #include "editors/trainpath/pathlistwidget.h"
 #include "model/trainpath/pathlistmodel.h"
+#include "log/IssueManager.h"
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -729,6 +730,9 @@ void MainWindow::initDockWidgets()
 
 		autoHideArea = manager->addAutoHideDockWidget(ads::SideBarBottom, dock);
 		autoHideArea->setSize(200);
+
+		connect(IssueManager::get(), &IssueManager::rowsInserted,
+			[autoHideArea]() {if (!autoHideArea->isVisible()) autoHideArea->toggleCollapseState(); });
 	}
 }
 
@@ -1383,8 +1387,8 @@ void MainWindow::initToolbar()
 		contextRail = new RailContext(_diagram, cat, this, this);
 		connect(contextRail, &RailContext::railNameChanged,
 			naviModel, &DiagramNaviModel::onRailNameChanged);
-		connect(contextRail, &RailContext::stationTableChanged,
-			this, &MainWindow::onStationTableChanged);
+		//connect(contextRail, &RailContext::stationTableChanged,
+		//	this, &MainWindow::onStationTableChanged);
 		connect(contextRail, &RailContext::selectRuler,
 			this, &MainWindow::focusInRuler);
 		connect(contextRail, &RailContext::rulerInsertedAt,

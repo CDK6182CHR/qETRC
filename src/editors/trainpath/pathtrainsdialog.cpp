@@ -59,11 +59,11 @@ void PathTrainsDialog::actRemove()
 {
     const auto& lst=table->selectionModel()->selectedRows();
     auto rows=qeutil::indexRows(lst);
+    emit removeTrains(path, rows);
 
-    // TODO..
-
-    std::vector<std::shared_ptr<Train>> removed_trains{};
-    for(auto itr=rows.rbegin(); itr!=rows.rend();++itr){
-        auto train=model->takeTrainAt(*itr);
+    // the dialog is in modal state, so just simply remove the rows are OK
+    // the actual operations are done by emitting the signal above
+    for(auto itr=rows.rbegin();itr!=rows.rend();++itr){
+        model->removeTrainAt(*itr);
     }
 }

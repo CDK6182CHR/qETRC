@@ -133,7 +133,7 @@ void PathContext::actShowTrains()
 {
     auto* d = new PathTrainsDialog(diagram.trainCollection(), path, mw);
     connect(d, &PathTrainsDialog::actAdd, this, &PathContext::actAddTrains);
-
+    connect(d, &PathTrainsDialog::removeTrains, this, &PathContext::actRemoveTrains);
     d->open();
 }
 
@@ -248,10 +248,35 @@ void PathContext::afterPathTrainsChanged(TrainPath* path, const std::vector<std:
     // update path data (nothing to do for now)
 }
 
+void PathContext::afterPathTrainsChanged(TrainPath* path, const std::vector<qecmd::TrainInfoInPath>& data)
+{
+    // rebind and repaint trains
+    auto* c = mw->getTrainContext();
+    for (const auto& d: data) {
+        auto train = d.train.lock();
+        c->afterTimetableChanged(train);
+    }
+    c->refreshPath();
+
+    // update path data (nothing to do for now)
+}
+
 void PathContext::removePath(int idx)
 {
     auto p = diagram.pathCollection().at(idx);
     mw->getUndoStack()->push(new qecmd::RemoveTrainPath(p, idx, mw->pathListWidget, this));
+}
+
+void PathContext::actRemoveTrains(TrainPath* path, const std::set<int>& indexes)
+{
+    std::vector<qecmd::TrainInfoInPath> info{};
+    for (int idx : indexes) {
+        auto t = path->trains().at(idx).lock();
+        int path_index_in_train = t->getPathIndex(path);
+        info.emplace_back(t, idx, path_index_in_train);
+    }
+
+    mw->getUndoStack()->push(new qecmd::RemoveTrainsFromPath(path, std::move(info), this));
 }
 
 
@@ -334,3 +359,27 @@ void qecmd::RemoveTrainPath::redo()
 
 #endif
 
+qecmd::RemoveTrainsFromPath::RemoveTrainsFromPath(TrainPath* path, std::vector<TrainInfoInPath>&& data_,
+    PathContext* cont, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("从径路[%1]删除%2列车").arg(path->name()).arg(data_.size()), parent), 
+    path(path), data(std::move(data_)), cont(cont)
+{
+}
+
+void qecmd::RemoveTrainsFromPath::undo()
+{
+    // add from first
+    for (const auto& d : data) {
+        path->insertTrainWithIndex(d.train.lock(), d.train_index_in_path, d.path_index_in_train);
+    }
+    cont->afterPathTrainsChanged(path, data);
+}
+
+void qecmd::RemoveTrainsFromPath::redo()
+{
+    // remove from back
+    for (auto itr = data.crbegin(); itr != data.crend(); ++itr) {
+        path->removeTrainWithIndex(itr->train.lock(), itr->train_index_in_path, itr->path_index_in_train);
+    }
+    cont->afterPathTrainsChanged(path, data);
+}

@@ -2,6 +2,7 @@
 
 #ifndef QETRC_MOBILE_2
 
+#include <set>
 #include <QObject>
 #include <QUndoCommand>
 
@@ -15,6 +16,9 @@ class PathEdit;
 class PathListWidget;
 namespace ads {
     class CDockWidget;
+}
+namespace qecmd {
+    struct TrainInfoInPath;
 }
 
 class PathContext : public QObject
@@ -79,7 +83,11 @@ public slots:
 
     void afterPathTrainsChanged(TrainPath* path, const std::vector<std::weak_ptr<Train>>& trains);
 
+    void afterPathTrainsChanged(TrainPath* path, const std::vector<qecmd::TrainInfoInPath>& trains);
+
     void removePath(int idx);
+
+    void actRemoveTrains(TrainPath* path, const std::set<int>& indexes);
 };
 
 namespace qecmd {
@@ -121,14 +129,25 @@ namespace qecmd {
         virtual void redo()override;
     };
 
+    struct TrainInfoInPath {
+        std::weak_ptr<Train> train;
+        int train_index_in_path;
+        int path_index_in_train;
+    };
+
     /**
      * 2023.08.24  Remove some trains from the path (but not necessarily all trains)
      */
     class RemoveTrainsFromPath : public QUndoCommand
     {
         TrainPath* path;
-        // ... 
-        // 2023.08.24  TODO here
+        std::vector<TrainInfoInPath> data;
+        PathContext* const cont;
+    public:
+        RemoveTrainsFromPath(TrainPath* path, std::vector<TrainInfoInPath>&& data_,
+            PathContext* cont, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
     };
 
 

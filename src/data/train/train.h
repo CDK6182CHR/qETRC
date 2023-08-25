@@ -258,8 +258,9 @@ public:
     /**
      * 适用于线路可能发生变化时，
      * 即使已经绑定到同一条线路，也会撤销再重来 （转移构造）
+     * 2023.08.25: change return value to void
      */
-    std::shared_ptr<TrainAdapter> updateBoundRailway(std::shared_ptr<Railway> railway, const Config& config);
+    void updateBoundRailway(std::shared_ptr<Railway> railway, const Config& config);
 
     /**
      * @brief unbindToRailway
