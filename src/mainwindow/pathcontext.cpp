@@ -16,6 +16,7 @@
 #include "editors/trainpath/pathedit.h"
 #include "editors/trainpath/pathlistwidget.h"
 #include "editors/trainpath/pathtrainsdialog.h"
+#include "editors/trainpath/addtrainstopathdialog.h"
 #include "data/train/train.h"
 
 
@@ -139,7 +140,10 @@ void PathContext::actShowTrains()
 
 void PathContext::actAddTrains()
 {
-    // TODO
+    auto* w = new AddTrainsToPathDialog(diagram.trainCollection(), path, mw);
+    connect(w, &AddTrainsToPathDialog::trainsAdded,
+        this, &PathContext::addTrains);
+    w->open();
 }
 
 void PathContext::actEditPath()
@@ -261,6 +265,18 @@ void PathContext::afterPathTrainsChanged(TrainPath* path, const std::vector<qecm
     // update path data (nothing to do for now)
 }
 
+void PathContext::afterPathTrainsChanged(TrainPath* path, const QList<std::shared_ptr<Train>>& trains)
+{
+    // rebind and repaint trains
+    auto* c = mw->getTrainContext();
+    foreach(const auto& t , trains) {
+        c->afterTimetableChanged(t);
+    }
+    c->refreshPath();
+
+    // update path data (nothing to do for now)
+}
+
 void PathContext::removePath(int idx)
 {
     auto p = diagram.pathCollection().at(idx);
@@ -277,6 +293,11 @@ void PathContext::actRemoveTrains(TrainPath* path, const std::set<int>& indexes)
     }
 
     mw->getUndoStack()->push(new qecmd::RemoveTrainsFromPath(path, std::move(info), this));
+}
+
+void PathContext::addTrains(TrainPath* path, QList<std::shared_ptr<Train>> trains)
+{
+    mw->getUndoStack()->push(new qecmd::AddTrainsToPath(path, std::move(trains), this));
 }
 
 
@@ -382,4 +403,27 @@ void qecmd::RemoveTrainsFromPath::redo()
         path->removeTrainWithIndex(itr->train.lock(), itr->train_index_in_path, itr->path_index_in_train);
     }
     cont->afterPathTrainsChanged(path, data);
+}
+
+qecmd::AddTrainsToPath::AddTrainsToPath(TrainPath* path, QList<std::shared_ptr<Train>>&& trains_, 
+    PathContext* cont, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("添加%1列车到径路%2").arg(trains_.size()).arg(path->name())), 
+    path(path), trains(std::move(trains_)), cont(cont)
+{
+}
+
+void qecmd::AddTrainsToPath::undo()
+{
+    for (auto itr = trains.crbegin(); itr != trains.crend(); ++itr) {
+        path->removeTrainFromBack(*itr);
+    }
+    cont->afterPathTrainsChanged(path, trains);
+}
+
+void qecmd::AddTrainsToPath::redo()
+{
+    foreach (auto t , trains) {
+        path->addTrain(t);
+    }
+    cont->afterPathTrainsChanged(path, trains);
 }

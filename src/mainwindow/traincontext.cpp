@@ -244,10 +244,20 @@ void TrainContext::initUI()
 
 		if constexpr (true) {
 			panel = page->addPannel(tr("列车径路"));
+			auto* w1 = new QWidget;
+			auto* hlay1 = new QHBoxLayout(w1);
+			hlay1->setContentsMargins(0, 0, 0, 0);
 			edPaths = new SARibbonLineEdit;
 			edPaths->setAlignment(Qt::AlignCenter);
 			edPaths->setReadOnly(true);
-			panel->addWidget(edPaths, SARibbonPannelItem::Medium);
+			hlay1->addWidget(edPaths);
+			auto* btn1 = new SARibbonToolButton;
+			connect(btn1, &SARibbonToolButton::clicked, this, &TrainContext::actFocusInPath);
+			btn1->setIcon(qApp->style()->standardIcon(QStyle::SP_ArrowRight));
+			btn1->setToolTip(tr("转到列车径路"));
+			hlay1->addWidget(btn1);
+
+			panel->addWidget(w1, SARibbonPannelItem::Medium);
 
 			btn = new SARibbonToolButton();
 			btn->setIcon(QIcon(":/icons/add.png"));
@@ -1439,6 +1449,24 @@ void TrainContext::actRemovePaths()
 void TrainContext::actClearPaths()
 {
 	mw->getUndoStack()->push(new qecmd::ClearPathsFromTrain(train, this));
+}
+
+void TrainContext::actFocusInPath()
+{
+	const auto& paths = train->paths();
+	if (paths.empty()) {
+		return;
+	}
+	else if (paths.size() == 1) {
+		mw->focusInPath(paths.front());
+	}
+	else {
+		auto indexes = SelectPathDialog::getPathIndexes(mw, tr("请选择要转到的列车径路"),
+			train->paths());
+		if (!indexes.empty()) {
+			mw->focusInPath(train->paths().at(indexes.front()));
+		}
+	}
 }
 
 void TrainContext::setTrain(std::shared_ptr<Train> train_)

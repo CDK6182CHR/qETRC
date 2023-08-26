@@ -119,6 +119,11 @@ public:
 	 */
 	int getTrainIndex(std::shared_ptr<Train> train)const;
 
+    /**
+     * Simple linear alg, calling getTrainIndex()
+     */
+    bool containsTrain(std::shared_ptr<Train> train)const;
+
 	/**
 	 * Linear alg., check every seg
 	 */

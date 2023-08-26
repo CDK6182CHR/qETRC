@@ -167,8 +167,13 @@ int TrainPath::getTrainIndex(std::shared_ptr<Train> train) const
 		if (t == train) {
 			return i;
 		}
-	}
-	return -1;
+    }
+    return -1;
+}
+
+bool TrainPath::containsTrain(std::shared_ptr<Train> train) const
+{
+    return getTrainIndex(train) != -1;
 }
 
 bool TrainPath::containsRailway(const Railway* rail) const

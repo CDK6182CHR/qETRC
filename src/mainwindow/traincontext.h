@@ -406,6 +406,8 @@ private slots:
 
     void actClearPaths();
 
+    void actFocusInPath();
+
 };
 
 

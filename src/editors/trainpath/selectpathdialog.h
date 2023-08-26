@@ -29,7 +29,7 @@ public:
         getPaths(QWidget* parent, const QString& prompt, std::vector<TrainPath*> paths);
 
     static std::vector<int>
-        getPathIndexes(QWidget* parent, const QString& prompt, std::vector<TrainPath*> paths);
+        getPathIndexes(QWidget* parent, const QString& prompt, std::vector<TrainPath*> paths, bool multi=true);
 
     auto* getModel(){return model;}
 

@@ -85,9 +85,18 @@ public slots:
 
     void afterPathTrainsChanged(TrainPath* path, const std::vector<qecmd::TrainInfoInPath>& trains);
 
+    void afterPathTrainsChanged(TrainPath* path, const QList<std::shared_ptr<Train>>& trains);
+
     void removePath(int idx);
 
     void actRemoveTrains(TrainPath* path, const std::set<int>& indexes);
+
+    /**
+     * Add train called by the dialog.
+     * Here, the value-type of QList is used for safety. The efficiency should be acceptable since 
+     * QList is an implicitly-shared class.
+     */
+    void addTrains(TrainPath* path, QList<std::shared_ptr<Train>> trains);
 };
 
 namespace qecmd {
@@ -150,6 +159,16 @@ namespace qecmd {
         virtual void redo()override;
     };
 
+    class AddTrainsToPath : public QUndoCommand {
+        TrainPath* path;
+        QList<std::shared_ptr<Train>> trains;
+        PathContext* const cont;
+    public:
+        AddTrainsToPath(TrainPath* path, QList<std::shared_ptr<Train>>&& trains_,
+            PathContext* cont, QUndoCommand* parent = nullptr);
+        virtual void undo()override;
+        virtual void redo()override;
+    };
 
 }
 
