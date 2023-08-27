@@ -87,6 +87,11 @@ private slots:
     void updateTrainLine(std::shared_ptr<Train> table);
 
     /**
+     * 2023.08.27  Try to find possible railway as default for the pageStation
+     */
+    void setDefaultRailway();
+
+    /**
      * pgStation的当前线路变化触发
      * 设置默认的Anchor信息，根据已有的车次信息。
      */

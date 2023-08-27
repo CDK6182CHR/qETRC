@@ -66,6 +66,14 @@ void RulerPaintPageStation::setDefaultAnchor(Direction dir, std::shared_ptr<cons
 
 }
 
+void RulerPaintPageStation::setDefaultRailway(int idx)
+{
+    cbRuler->setRailwayIndex(idx);
+    if (!_railway) {
+        onRailwayChanged(cat.railways().at(idx));
+    }
+}
+
 void RulerPaintPageStation::initUI()
 {
     setTitle(tr("排图参数"));
@@ -100,7 +108,8 @@ void RulerPaintPageStation::initUI()
         new GeneralDoubleSpinDelegate(this));
     table->setModel(model);
 
-    onRailwayChanged(cbRuler->railway());     //此操作触发初始化表格！
+    //2023.08.27: do not set default railway at the beginning; detect possible railway first.
+    //onRailwayChanged(cbRuler->railway());     //此操作触发初始化表格！
 
     vlay->addWidget(table);
 }

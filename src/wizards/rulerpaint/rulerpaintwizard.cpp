@@ -67,6 +67,7 @@ void RulerPaintWizard::initializePage(int id)
     }
     QWizard::initializePage(id);
     if (id == 1) {
+        setDefaultRailway();
         setDefaultAnchorStation();
     }
     else if (id == 2) {
@@ -205,6 +206,44 @@ void RulerPaintWizard::updateTrainLine(std::shared_ptr<Train> table)
     diagram.updateTrain(trainTmp);
     emit paintTmpTrainLine(*trainTmp);
     
+}
+
+void RulerPaintWizard::setDefaultRailway()
+{
+    if (pgStation->railway())
+        return;
+    
+    auto train = pgStart->train();
+    std::optional<Train::ConstStationPtr> st_ref{};
+    if (pgStart->getMode() == RulerPaintPageStart::Append && !train->empty()) {
+        st_ref = train->lastStation();
+    }
+    else if (pgStart->getMode() == RulerPaintPageStart::Prepend && !train->empty()) {
+        st_ref = train->firstStation();
+    }
+    else if (pgStart->getMode() == RulerPaintPageStart::Modify && !train->empty()) {
+        auto itr = train->timetable().begin();
+        std::advance(itr, pgStart->startRow());
+        st_ref = itr;
+    }
+
+    if (st_ref.has_value()) {
+        // Find the railway that contains the station and has adapter for the train
+        // Note, this result may be wrong; so, just a guess
+        for (int i = 0; i < diagram.railways().size(); i++) {
+            auto rail = diagram.railwayAt(i);
+            if (rail->containsGeneralStation((*st_ref)->name)) {
+                if (train->adapterFor(*rail)) {
+                    pgStation->setDefaultRailway(i);
+                    return;
+                }
+            }
+        }
+    }
+    // here: the default railway is not set
+    if (!diagram.railways().empty()) {
+        pgStation->setDefaultRailway(0);
+    }
 }
 
 void RulerPaintWizard::setDefaultAnchorStation()

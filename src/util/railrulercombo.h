@@ -56,6 +56,8 @@ public slots:
      * 重新加载线路列表，可能导致选择的线路、标尺都变化
      */
     void refreshRailwayList();
+
+    void setRailwayIndex(int idx);
 };
 
 

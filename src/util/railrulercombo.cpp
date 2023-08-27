@@ -115,6 +115,11 @@ void RailRulerCombo::refreshRailwayList()
     }
 }
 
+void RailRulerCombo::setRailwayIndex(int idx)
+{
+    cbRail->setCurrentIndex(idx);
+}
+
 RulerCombo::RulerCombo(std::shared_ptr<Railway> railway, QWidget* parent):
     QComboBox(parent),_railway(railway)
 {

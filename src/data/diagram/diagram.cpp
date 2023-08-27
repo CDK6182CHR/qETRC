@@ -250,9 +250,14 @@ void Diagram::rebindAllTrains()
 {
     IssueManager::get()->clear();
     foreach (auto t , _trainCollection.trains()) {
-        t->clearBoundRailways();
-        foreach (auto p , railways()) {
-            t->bindToRailway(p, _config);
+        if (t->paths().empty()) {
+            t->clearBoundRailways();
+            foreach(auto p, railways()) {
+                t->bindToRailway(p, _config);
+            }
+        }
+        else {
+            t->bindWithPath();
         }
     }
 }

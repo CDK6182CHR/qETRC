@@ -47,6 +47,12 @@ public:
      */
     void setDefaultAnchor(Direction dir, 
         std::shared_ptr<const RailStation> st);
+
+    /**
+     * 2023.08.27  add
+     */
+    void setDefaultRailway(int idx);
+
 signals:
     void railwayChanged(std::shared_ptr<Railway>);
 private:
