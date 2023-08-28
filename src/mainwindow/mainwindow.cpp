@@ -1461,6 +1461,8 @@ void MainWindow::initToolbar()
 			contextPath, &PathContext::removePath);
 		connect(naviView, &NaviTree::removePathNavi,
 			contextPath, &PathContext::removePath);
+		connect(pathListWidget, &PathListWidget::emptyPathAdded,
+			contextPath, &PathContext::openPathEdit);
 	}
 
 	// context: DB

@@ -51,6 +51,8 @@ signals:
 
 	void removePath(int idx);
 
+	void emptyPathAdded(TrainPath* path);
+
 private slots:
 	void actEdit();
 	void actDelete();

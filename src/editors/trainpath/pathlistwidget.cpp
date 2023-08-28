@@ -115,7 +115,9 @@ void PathListWidget::refreshData()
 
 void PathListWidget::commitAddPath(std::unique_ptr<TrainPath>&& path)
 {
+    auto* p = path.get();
     _model->addPathAt(pathcoll.size(), std::move(path));
+    emit emptyPathAdded(p);
 }
 
 std::unique_ptr<TrainPath> PathListWidget::undoAddPath()

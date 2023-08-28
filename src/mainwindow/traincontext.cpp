@@ -1307,7 +1307,7 @@ void TrainContext::refreshPath()
 		edPaths->setText(train->paths().front()->name());
 	}
 	else {
-		edPaths->setText(tr("%1 等%2项").arg(train->paths().front()->name(), train->paths().size()));
+		edPaths->setText(tr("%1 等%2项").arg(train->paths().front()->name()).arg(train->paths().size()));
 	}
 }
 
