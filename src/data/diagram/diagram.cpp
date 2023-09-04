@@ -1516,8 +1516,7 @@ bool Diagram::toTrc(const QString& filename, std::shared_ptr<Railway> rail, bool
             p->level << "," << (p->_show ? FALSE : TRUE)
             << ",,"
             << (p->prevSingle ? FALSE : TRUE)
-            << ", 4, 1440, 1440, ";
-        // todo: 天窗...
+            << ",4,1440,1440,";
         if (forbid && prev) {
             //检索区间是否有天窗数据
             auto n = forbid->getNode(prev->name, p->name);

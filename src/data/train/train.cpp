@@ -321,6 +321,10 @@ void Train::updateBoundRailway(std::shared_ptr<Railway> railway, const Config& c
 
 void Train::unbindToRailway(std::shared_ptr<const Railway> railway)
 {
+    // 2023.09.04: do not do this for path-directed trains
+    if (!_paths.empty()) {
+        return;
+    }
     for (auto p = _adapters.begin(); p != _adapters.end(); ++p) {
         if (((*p)->railway()) == railway) {
             _adapters.erase(p);

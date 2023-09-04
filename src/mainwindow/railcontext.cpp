@@ -854,11 +854,14 @@ void RailContext::removeRailwayAtU(int i)
 	// 2023.08.22: the remove/reset pages should be redone before the removing, 
 	// while the rebind should be redone after that. Thus, the rebind operation is implmented using macro, 
 	// while the remove/reset are implemented using parents.
-	mw->getUndoStack()->beginMacro(tr("删除线路: %1").arg(rail->name()));
+
+	// 2023.09.04: The rebind operation should be redone/undone AFTER the operation of removing railway.
+	// Thus, the macro is not suitable for this.
+	//mw->getUndoStack()->beginMacro(tr("删除线路: %1").arg(rail->name()));
 	auto* cmd = new qecmd::RemoveRailway(rail, i, this);
 	
 	// re-bind all the affected paths
-	auto* cmd_rebind = new qecmd::RebindTrainsByPaths(std::move(affect_trains), mw->contextTrain);
+	auto* cmd_rebind = new qecmd::RebindTrainsByPaths(std::move(affect_trains), mw->contextTrain, cmd);
 
 	// 注意这里只会删除一条线路
 	// 可能会涉及多个Page的删除！倒着来
@@ -875,8 +878,8 @@ void RailContext::removeRailwayAtU(int i)
 		}
 	}
 	mw->getUndoStack()->push(cmd);
-	mw->getUndoStack()->push(cmd_rebind);
-	mw->getUndoStack()->endMacro();
+	//mw->getUndoStack()->push(cmd_rebind);
+	//mw->getUndoStack()->endMacro();
 }
 
 void RailContext::commitRemoveRailwayU(std::shared_ptr<Railway> railway, int index)
@@ -1126,12 +1129,12 @@ void qecmd::RemoveRailway::undo()
 
 void qecmd::RemoveRailway::redo()
 {
-	// 2023.08.22: move to last?
-	QUndoCommand::redo();    // 先redo （执行所有的Page修订删除）
-
 	railway->setValid(false);
 	// 这里是Railway的删除操作
 	cont->commitRemoveRailwayU(railway, index);
+
+	// 2023.08.22: move to last?
+	QUndoCommand::redo();    // 先redo （执行所有的Page修订删除）
 }
 
 
