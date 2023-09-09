@@ -95,8 +95,8 @@ void TrackDiagramData::convertItem(events_t::const_reference pa,
     if (line->isStartingStation(pa.second)) {
         bool linkFlag = false;
         if (auto rt = train->routing().lock()) {
-            // 存在交路
-            if (auto* pre = rt->preLinked(*train)) {
+            // 存在交路; 2023.09.09 暂定按站名确定linked
+            if (auto* pre = rt->preLinkedByName(*train)) {
                 // 本车是接续的后车
                 auto it = std::make_shared<TrackItem>(QString("%1-%2")
                     .arg(pre->name(), train->trainName().full()),
@@ -122,7 +122,8 @@ void TrackDiagramData::convertItem(events_t::const_reference pa,
         // 终到 如果有要link的，不处理；否则按正常终到处理
         bool linkFlag = false;
         if (auto rt = train->routing().lock()) {
-            if (auto post = rt->postLinked(*train)) {
+            // 2023.09.09 暂定按站名确定linked
+            if (auto post = rt->postLinkedByName(*train)) {
                 preTrainMap.emplace(pa, post->train().get());
                 linkFlag = true;
             }

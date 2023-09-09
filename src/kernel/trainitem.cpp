@@ -984,7 +984,7 @@ void TrainItem::addLinkLine()
     if (!train()->hasRouting())
         return;
     std::shared_ptr<Routing> rout = train()->routing().lock();
-    auto* pre = rout->preLinked(*train());   // 这里已经保证first, last是同一个车站
+    auto* pre = rout->preLinkedOnRailway(*train(), _railway);   // 这里已经保证first, last是同一个车站
     if (!pre)
         return;
     auto last = pre->train()->lastStation();

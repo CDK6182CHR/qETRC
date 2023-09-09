@@ -427,6 +427,20 @@ public:
 
     std::shared_ptr<RailStation> boundTerminalRail()const;
 
+    /**
+     * 2023.09.09  add overload.
+     * Return the pointer to the TERMINAL station if and only if such station
+     * belongs to the given railway.
+     * This overload is added to solve the following problem: in cases where the terminal station
+     * is bound to multiple railways, the boundTerminal() overload returns the adapterStation to one
+     * of them, but, on which railway the station returned is, cannot be selected. 
+     * See also boundStartingAt()
+     */
+    const AdapterStation* boundTerminalAt(const Railway& railway)const;
+
+    // 2023.09.09  add  see boundTerminal(const Railway&) above.
+    std::shared_ptr<RailStation> boundTerminalAtRail(const Railway& railway)const;
+
     const AdapterStation* boundFirst()const;
 
     const AdapterStation* boundStarting()const;

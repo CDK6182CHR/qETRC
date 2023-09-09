@@ -714,6 +714,27 @@ std::shared_ptr<RailStation> Train::boundTerminalRail() const
     return nullptr;
 }
 
+const AdapterStation* Train::boundTerminalAt(const Railway& railway) const
+{
+    if (_timetable.empty())return nullptr;
+    auto lastIter = _timetable.end(); --lastIter;
+    auto adp = adapterFor(railway);
+    if (!adp) return nullptr;
+    auto* last = adp->lastStation();
+    if (last && last->trainStation == lastIter &&
+        isTerminalStation(last->trainStation->name))
+        return last;
+    return nullptr;
+}
+
+std::shared_ptr<RailStation> Train::boundTerminalAtRail(const Railway& railway) const
+{
+    auto* last = boundTerminalAt(railway);
+    if (last)
+        return last->railStation.lock();
+    return nullptr;
+}
+
 const AdapterStation* Train::boundFirst() const
 {
     if (_timetable.empty())

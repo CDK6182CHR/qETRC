@@ -1,6 +1,7 @@
 ﻿#include "routing.h"
 #include "train.h"
 #include "traincollection.h"
+#include "data/rail/railstation.h"
 
 #include <algorithm>
 #include <QVector>
@@ -510,7 +511,7 @@ QString Routing::orderString() const
     return res;
 }
 
-RoutingNode* Routing::preLinked(const Train& train)
+RoutingNode* Routing::preLinkedByName(const Train& train)
 {
     if (!train.hasRouting() || train.routing().lock().get() != this)
         return nullptr;
@@ -522,13 +523,14 @@ RoutingNode* Routing::preLinked(const Train& train)
         return nullptr;
     auto preend = pre->train()->boundTerminalRail();
     auto curstart = train.boundStartingRail();
-    if (preend == curstart && curstart) {
+    //qDebug() << "preEnd: " << preend->name << "; curstart: " << curstart->name;
+    if (curstart && preend->name.station() == curstart->name.station()) {
         return &(*pre);
     }
     return nullptr;
 }
 
-RoutingNode* Routing::postLinked(const Train& train)
+RoutingNode* Routing::postLinkedByName(const Train& train)
 {
     if (!train.hasRouting() || train.routing().lock().get() != this)
         return nullptr;
@@ -540,8 +542,27 @@ RoutingNode* Routing::postLinked(const Train& train)
         return nullptr;
     auto curend = train.boundTerminalRail();
     auto poststart = post->train()->boundStartingRail();
-    if (curend && curend == poststart) {
+    if (curend && curend->name.station() == poststart->name.station()) {
         return &(*post);
+    }
+    return nullptr;
+}
+
+RoutingNode* Routing::preLinkedOnRailway(const Train& train, const Railway& railway)
+{
+    if (!train.hasRouting() || train.routing().lock().get() != this)
+        return nullptr;
+    auto it = train.routingNode().value_or(_order.end());
+    if (it == _order.begin() || it == _order.end())
+        return nullptr;
+    auto pre = std::prev(it);
+    if (pre->isVirtual())
+        return nullptr;
+    auto preend = pre->train()->boundTerminalAtRail(railway);
+    auto curstart = train.boundStartingAtRail(railway);
+    //qDebug() << "preEnd: " << preend->name << "; curstart: " << curstart->name;
+    if (curstart && preend == curstart) {
+        return &(*pre);
     }
     return nullptr;
 }
@@ -554,11 +575,8 @@ QString Routing::preOrderString(const Train &train)
     if (it == _order.begin()||it==_order.end())
         return {};
     auto pre = std::prev(it);
-    if (pre->isVirtual())
-        return QObject::tr("%1 (否)").arg(pre->name());
-    auto preend = pre->train()->boundTerminalRail();
-    auto curstart = train.boundStartingRail();
-    if (preend == curstart && curstart) {
+
+    if (preLinkedByName(train)) {
         return QObject::tr("%1 (是)").arg(pre->name());
     }
     return QObject::tr("%1 (否)").arg(pre->name());
@@ -574,12 +592,8 @@ QString Routing::postOrderString(const Train &train)
     auto post = std::next(it);
     if (post == _order.end())
         return "-";
-    else if(post->isVirtual()){
-        return QObject::tr("%1 (否)").arg(post->name());
-    }
-    auto curend = train.boundTerminalRail();
-    auto poststart = post->train()->boundStartingRail();
-    if (curend && curend == poststart) {
+
+    if (postLinkedByName(train)) {
         // link
         return QObject::tr("%1 (是)").arg(post->name());
     }

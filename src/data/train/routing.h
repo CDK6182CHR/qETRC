@@ -167,10 +167,14 @@ public:
     /**
      * @brief 如果前序车能够连上，那么返回该节点  pyETRC.data.Circuit.preorderLinked
      * 否则返回空
+     * 2023.09.09: 此版本改为仅使用站名判断。对于实际铺画时需要的连线，采用preLinkedOnRailway()方法。
+     * 原名  preLinked
      */
-    RoutingNode* preLinked(const Train& train);
+    RoutingNode* preLinkedByName(const Train& train);
 
-    RoutingNode* postLinked(const Train& train);
+    RoutingNode* postLinkedByName(const Train& train);
+
+    RoutingNode* preLinkedOnRailway(const Train& train, const Railway& railway);
 
     QString preOrderString(const Train& train);
 
