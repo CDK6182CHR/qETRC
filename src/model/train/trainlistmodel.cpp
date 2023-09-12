@@ -36,6 +36,7 @@ QVariant TrainListModel::data(const QModelIndex& index, int role) const
 		case ColType:return t->type()->name();
 		case ColMile:return QString::number(t->localMile(), 'f', 3);
 		case ColSpeed:return QString::number(t->localTraverseSpeed(), 'f', 3);
+		case ColTechSpeed: return QString::number(t->localTechSpeed(), 'f', 3);
 		}
 	}
 	else if (role == Qt::CheckStateRole) {
@@ -86,6 +87,7 @@ void TrainListModel::sort(int column, Qt::SortOrder order)
         case ColShow:std::stable_sort(lst.begin(), lst.end(), &Train::ltShow); break;
         case ColMile:std::stable_sort(lst.begin(), lst.end(), &Train::ltMile); break;
         case ColSpeed:std::stable_sort(lst.begin(), lst.end(), &Train::ltTravSpeed); break;
+        case ColTechSpeed:std::stable_sort(lst.begin(), lst.end(), &Train::ltTechSpeed); break;
 		default:break;
 		}
 	}
@@ -98,6 +100,7 @@ void TrainListModel::sort(int column, Qt::SortOrder order)
         case ColShow:std::stable_sort(lst.begin(), lst.end(), &Train::gtShow); break;
         case ColMile:std::stable_sort(lst.begin(), lst.end(), &Train::gtMile); break;
         case ColSpeed:std::stable_sort(lst.begin(), lst.end(), &Train::gtTravSpeed); break;
+        case ColTechSpeed:std::stable_sort(lst.begin(), lst.end(), &Train::gtTechSpeed); break;
 		default:break;
 		}
 	}
@@ -123,6 +126,7 @@ QVariant TrainListModel::headerData(int section, Qt::Orientation orientation, in
 		case ColShow:return QObject::tr("显示");
 		case ColMile:return QObject::tr("铺画里程");
 		case ColSpeed:return QObject::tr("铺画旅速");
+		case ColTechSpeed:return QObject::tr("铺画技速");
 		}
 	}
 	return QAbstractTableModel::headerData(section, orientation, role);

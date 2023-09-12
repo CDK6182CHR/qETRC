@@ -34,6 +34,7 @@ class TrainListModel : public QAbstractTableModel
         ColShow,
         ColMile,
         ColSpeed,
+        ColTechSpeed,   // 2023.09.12  add
         MAX_COLUMNS
     };
 public:
