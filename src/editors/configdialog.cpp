@@ -446,7 +446,7 @@ void ConfigDialog::refreshData()
     btnGridColor->setStyleSheet(QStringLiteral(
         "QPushButton { background-color: rgb(%1, %2, %3); }").arg(gridColor.red())
         .arg(gridColor.green()).arg(gridColor.blue()));
-    btnTextColor->setText(gridColor.name().toUpper());
+    btnTextColor->setText(textColor.name().toUpper());  // 2023.09.21  fix
     btnTextColor->setStyleSheet(QStringLiteral(
         "QPushButton { background-color: rgb(%1, %2, %3); }").arg(textColor.red())
         .arg(textColor.green()).arg(textColor.blue()));

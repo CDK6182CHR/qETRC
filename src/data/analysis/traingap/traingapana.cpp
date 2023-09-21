@@ -217,7 +217,16 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, const
      for (auto _p = events.cbegin(); _p != events.cend(); ++_p) {
          const auto& p = *_p;
          if (!filter.check(p->line->train())) continue;
-         if (p->pos & RailStationEvent::Pre) {
+
+         // 2023.09.21  新增条件isPreSingle().has_value()。
+         // 原因是，目前我们规定运行线首站到达时刻和末站出发时刻不构成车站事件，
+         // 几乎等于认为线路首站站前没有事件；事实上，线路首站的站前isPreSingle()是nullopt，
+         // 后面调用preRelatedEvent()会触发异常。首站站前没有间隔也确实是可以理解的。
+         // 一般情况下，这个问题并不会触发，主要是如果发生在线路首末站不规范折返的情况，
+         // 或者更一般地，时刻表中连续两个相同站，将会触发一个不存在的端的事件，导致异常。
+         // 根本原因实际上是，我们允许连续相同站的绑定；但是这个合理性其实存疑。
+         // 暂时这样处理，可能治标不治本。下面Post部分同理。
+         if (st->isPreSingle().has_value() && (p->pos & RailStationEvent::Pre)) {
              // 与站前有交集
              // 既然遇到了一个，那么last一定不是空
              // 2022.09.10: 如果出现Pre，那么pre应该是存在的，这么直接*应该不会遭起
@@ -230,7 +239,7 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, const
                  res.emplace_back(std::make_shared<TrainGap>(lastCounter, p));
              }
          }
-         if (p->pos & RailStationEvent::Post) {
+         if (st->isPostSingle().has_value() && (p->pos & RailStationEvent::Post)) {
              // 与站后有交集
              if (!(p->pos & RailStationEvent::Pre)) {
                  // 这个条件是针对通通的情况，防止重复
