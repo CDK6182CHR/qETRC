@@ -60,6 +60,10 @@ Railway& Railway::operator=(const Railway& other)
 	foreach(auto forbid, other._forbids) {
 		addForbidFrom(forbid);
 	}
+	// 2023.09.30: copy ordinate as well
+	if (other._ordinate) {
+		setOrdinateIndex(other.ordinateIndex());
+	}
 	return *this;
 }
 

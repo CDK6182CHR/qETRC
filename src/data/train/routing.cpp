@@ -524,7 +524,7 @@ RoutingNode* Routing::preLinkedByName(const Train& train)
     auto preend = pre->train()->boundTerminalRail();
     auto curstart = train.boundStartingRail();
     //qDebug() << "preEnd: " << preend->name << "; curstart: " << curstart->name;
-    if (curstart && preend->name.station() == curstart->name.station()) {
+    if (curstart && preend && preend->name.station() == curstart->name.station()) {
         return &(*pre);
     }
     return nullptr;
@@ -542,7 +542,7 @@ RoutingNode* Routing::postLinkedByName(const Train& train)
         return nullptr;
     auto curend = train.boundTerminalRail();
     auto poststart = post->train()->boundStartingRail();
-    if (curend && curend->name.station() == poststart->name.station()) {
+    if (curend && poststart && curend->name.station() == poststart->name.station()) {
         return &(*post);
     }
     return nullptr;

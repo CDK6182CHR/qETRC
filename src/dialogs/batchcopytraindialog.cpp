@@ -156,6 +156,7 @@ void BatchCopyTrainDialog::onApply()
                 qeutil::secsTo(reftime, tm)));
             diagram.updateTrain(nt);
             trains.append(nt);
+            names.insert(name);
         }
         else {
             invalidRows.append(i);
