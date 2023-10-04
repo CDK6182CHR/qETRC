@@ -198,5 +198,7 @@ public slots:
      */
     void setupStationLabels();
 
+    // 2023.10.04 add   for cleaning up temporary data
+    void clearTmpTrainLine();
 };
 

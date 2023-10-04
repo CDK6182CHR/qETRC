@@ -477,6 +477,7 @@ void MainWindow::actExitGreedyPaint()
 		auto t = QMessageBox::question(this, tr("提示"), tr("退出贪心推线模式，关闭对话框并释放资源。\n"
 			"已经配置的排图约束数据将丢失，是否确认？"), QMessageBox::Yes | QMessageBox::No);
 		if (t == QMessageBox::Yes) {
+			greedyWidget->cleanUpTempData();   // 2023.10.04  add
 			greedyWidget->close();
 			greedyWidget->deleteLater();
 			greedyWidget = nullptr;

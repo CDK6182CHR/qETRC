@@ -741,6 +741,11 @@ void GreedyPaintPagePaint::actLoadStopTime()
     }
 }
 
+void GreedyPaintPagePaint::clearTmpTrainLine()
+{
+    onClearTmp();
+}
+
 void GreedyPaintPagePaint::setupStationLabels()
 {
     edStart->setText(_model->startStation()->name.toSingleLiteral());

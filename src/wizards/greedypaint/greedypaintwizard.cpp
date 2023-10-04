@@ -62,6 +62,11 @@ void GreedyPaintWizard::onClose()
     QTabWidget::close();
 }
 
+void GreedyPaintWizard::cleanUpTempData()
+{
+    pgPaint->clearTmpTrainLine();
+}
+
 void GreedyPaintWizard::refreshData(std::shared_ptr<Railway> rail)
 {
     if (painter.railway() == rail && rail) {

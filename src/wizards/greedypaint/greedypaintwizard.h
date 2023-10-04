@@ -44,5 +44,11 @@ public slots:
      * 需要重新生成标尺表格数据，调用这个。
      */
     void refreshData(std::shared_ptr<Railway> rail);
+
+    /**
+     * 2023.10.04  clean up temporary data before exiting paining mode. 
+     * Currently, mainly clear temp train lines.
+     */
+    void cleanUpTempData();
 };
 
