@@ -70,6 +70,7 @@ private:
     std::shared_ptr<Railway> currentRailway();
     std::shared_ptr<RailCategory> currentCategory();
     ACI* currentItem();
+    ACI* currentItemOrRoot();
     
     void clearDBUnchecked();
     void afterResetDB();

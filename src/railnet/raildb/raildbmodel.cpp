@@ -256,7 +256,7 @@ void RailDBModel::commitRemoveRailwayAt(std::shared_ptr<Railway> railway,
     // 现在：idx指向要被删除的东西。
     const auto& par = idx.parent();
     beginRemoveRows(par, idx.row(), idx.row());
-    auto* par_it = static_cast<navi::RailCategoryItem*>(par.internalPointer());
+    auto* par_it = static_cast<navi::RailCategoryItem*>(getParentItem(par));
     par_it->removeRailwayAt(path.back());
     endRemoveRows();
 }
@@ -277,7 +277,8 @@ void RailDBModel::commitInsertRailwaysAt(const QList<std::shared_ptr<Railway>>& 
 {
     auto par = parentIndexByPath(path);
     beginInsertRows(par, path.back(), path.back() + rails.size() - 1);
-    auto* par_it = static_cast<navi::RailCategoryItem*>(par.internalPointer());
+    // 2023.10.05: change to getParentItem() for safety of root
+    auto* par_it = static_cast<navi::RailCategoryItem*>(getParentItem(par));
     par_it->insertRailwaysAt(rails, path.back());
     endInsertRows();
 }
@@ -294,7 +295,7 @@ void RailDBModel::commitRemoveRailwaysAt(const QList<std::shared_ptr<Railway>>& 
     // 现在：idx指向要被删除的东西。
     const auto& par = idx.parent();
     beginRemoveRows(par, idx.row(), idx.row() + rails.size() - 1);
-    auto* par_it = static_cast<navi::RailCategoryItem*>(par.internalPointer());
+    auto* par_it = static_cast<navi::RailCategoryItem*>(getParentItem(par));
     par_it->removeRailwaysAt(path.back(), rails.size());
     endRemoveRows();
 }

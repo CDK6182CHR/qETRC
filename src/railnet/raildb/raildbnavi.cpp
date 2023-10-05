@@ -152,6 +152,13 @@ RailDBNavi::ACI *RailDBNavi::currentItem()
     return model->getItem(tree->currentIndex());
 }
 
+RailDBNavi::ACI* RailDBNavi::currentItemOrRoot()
+{
+    if (auto t = currentItem())
+        return t;
+    else return model->root();
+}
+
 void RailDBNavi::showContextMenu(const QPoint &pos)
 {
     auto&& idx=tree->currentIndex();
@@ -165,23 +172,25 @@ void RailDBNavi::showContextMenu(const QPoint &pos)
 
 void RailDBNavi::actNewRail()
 {
-    auto* it = currentItem();
-    auto idx = tree->currentIndex();
+    auto* it = currentItemOrRoot();   // 2023.10.05  Include root
     if (it->type() == navi::RailwayItemDB::Type) {
         it = it->parent();
-        idx = idx.parent();
     }
     auto path = it->path();
     path.emplace_back(it->childCount());
     auto railway = std::make_shared<Railway>(_raildb->validRailwayNameRec(tr("新线路")));
     _undo->push(new qecmd::InsertRailDB(railway, path, model));
+    auto idx = model->indexByPath(path);
     tree->setCurrentIndex(model->index(it->childCount() - 1, 0, idx));
 }
 
 void RailDBNavi::actNewSubcat()
 {
     auto* it = currentItem();
-    if (!it)return;
+    if (!it) {
+        // 2023.10.05: in this case, we should insert sub-category for root
+        it = model->root();
+    }
     if (it->type() == navi::RailwayItemDB::Type) it = it->parent();
     insertSubcatOf(it);
 }
@@ -361,7 +370,7 @@ void RailDBNavi::actSetAsDefaultFile()
 
 void RailDBNavi::actImportFromDiagram()
 {
-    auto* it = currentItem();
+    auto* it = currentItemOrRoot();  // 2023.10.05  include root
     if (!it)return;
     if (it->type() == navi::RailwayItemDB::Type)it = it->parent();
     auto cat = static_cast<navi::RailCategoryItem*>(it)->category();
@@ -388,7 +397,7 @@ void RailDBNavi::actImportFromDiagram()
 
 void RailDBNavi::actImportFromLib()
 {
-    auto it = currentItem();
+    auto it = currentItemOrRoot();   // 2023.10.05  include root
     if (!it)return;
     if (it->type() == navi::RailwayItemDB::Type) it = it->parent();
     auto* cit = static_cast<navi::RailCategoryItem*>(it);
@@ -441,7 +450,7 @@ void RailDBNavi::actRenameCategory()
 
 void RailDBNavi::actImportFromCurrent()
 {
-    auto* it = currentItem();
+    auto* it = currentItemOrRoot();   // 2023.10.05  add root
     if (!it)return;
     if (it->type() == navi::RailwayItemDB::Type)it = it->parent();
     auto cat = static_cast<navi::RailCategoryItem*>(it)->category();
@@ -491,6 +500,8 @@ void RailDBNavi::onCurrentChanged(const QModelIndex &cur, const QModelIndex &pre
 {
     Q_UNUSED(prev)
     auto* it=model->getItem(cur);
+    if (!it)   // 2023.10.05: on removing the last item
+        return;
     switch (it->type()){
     case navi::RailwayItemDB::Type:
         emit focusInRailway(static_cast<navi::RailwayItemDB*>(it)->railway(),

@@ -26,6 +26,7 @@ public:
     virtual int columnCount(const QModelIndex &parent) const override;
     virtual QVariant data(const QModelIndex &index, int role) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    auto* root()const { return _root.get(); }
     pACI getItem(const QModelIndex& idx)const;
     QModelIndex indexByPath(const std::deque<int>& path);
 
