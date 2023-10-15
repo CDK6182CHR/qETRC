@@ -104,6 +104,8 @@ void StationTimetableSettledDialog::initUI()
     table->resizeColumnsToContents();
     vlay->addWidget(table);
     QScroller::grabGesture(table,QScroller::TouchGesture);
+    connect(table->horizontalHeader(), &QHeaderView::sortIndicatorChanged,
+        table, &QTableView::sortByColumn);
 
     auto* g=new ButtonGroup<2>({"导出CSV","关闭"});
     g->connectAll(SIGNAL(clicked()),this,{SLOT(outputCsv()),SLOT(close())});

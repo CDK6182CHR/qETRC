@@ -33,6 +33,7 @@ class GreedyPainter
 	Direction _dir;
 	QTime _anchorTime;
 	std::map<std::shared_ptr<const RailStation>, int> _settledStops;
+	std::set<const RailStation*> _fixedStations;
 
 	friend class _greedypaint_detail::_RecurseLogger;
 
@@ -76,6 +77,8 @@ public:
 	const auto& constraints()const { return _constraints; }
 	auto& settledStops() { return _settledStops; }
 	const auto& settledStops()const { return _settledStops; }
+	auto& fixedStations() { return _fixedStations; }
+	const auto& fixedStations()const { return _fixedStations; }
 	auto train() { return _train; }
 	auto& logs() { return _logs; }
 	auto& usedForbids() { return _usedForbids; }
