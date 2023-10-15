@@ -330,8 +330,12 @@ void MainWindow::actOpenNewRailWidget()
 	bool ok;
 	auto res = QInputDialog::getItem(this, tr("基线编辑"), tr("请选择需要编辑的基线名称。"
 		"系统将创建新的基线编辑窗口。"), lst, 0, false, &ok);
-	if (ok && !res.isEmpty()) {
-		actOpenRailStationWidget(_diagram.railwayByName(res));
+	if (ok && !res.isEmpty()) {\
+		// 2023.10.15: the rail may be empty even res is not empty (input by user).
+		// e.g. in an emtpy diagram, the rail is always nullptr...   see Github issue #2
+		auto rail = _diagram.railwayByName(res);
+		if (rail)
+			actOpenRailStationWidget(rail);
 	}
 }
 
