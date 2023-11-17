@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <cmath>
 #include <QModelIndex>
+#include <QTime>
 
 
 //QTime qeutil::parseTime(const QString& tm)
@@ -252,6 +253,11 @@ QString qeutil::msgTypeToString(QtMsgType type)
 	default:
 		return "UNKNOWN";
 	}
+}
+
+QString qeutil::timeToStringNullable(const QTime& tm, const QString& fmt)
+{
+	return tm.isValid() ? tm.toString(fmt) : QTime(0, 0).toString();
 }
 
 bool qeutil::timeCompare(const QTime& tm1, const QTime& tm2)

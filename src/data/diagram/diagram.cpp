@@ -1547,8 +1547,8 @@ bool Diagram::toTrc(const QString& filename, std::shared_ptr<Railway> rail, bool
         fout << train->terminal().toSingleLiteral() << Qt::endl;
         for (const auto& t : train->timetable()) {
             //站名，到点，开点，true, NA, track
-            fout << t.name.toSingleLiteral() << "," << t.arrive.toString("hh:mm:ss") << ","
-                << t.depart.toString("hh:mm:ss") << ",true,NA," << t.track << Qt::endl;
+            fout << t.name.toSingleLiteral() << "," << qeutil::timeToStringNullable(t.arrive, "hh:mm:ss") << ","
+                << qeutil::timeToStringNullable(t.depart, "hh:mm:ss") << ",true,NA," << t.track << Qt::endl;
         }
     }
 
