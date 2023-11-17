@@ -147,4 +147,10 @@ int ifloor(double x, int m);
 int iceil(double x, int m);
 
 QString msgTypeToString(QtMsgType type);
+
+/**
+ * 2023.11.17  add  for ETRC output
+ * Write time string if valid, or treated as 0:00
+ */
+QString timeToStringNullable(const QTime& tm, const QString& fmt);
 }
