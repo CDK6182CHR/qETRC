@@ -177,13 +177,16 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 		, _dir);
 
 	if (stop) {
-		if (auto itr = _settledStops.find(st_from); itr != _settledStops.end()) {
-			ev_start.time = ev_start.time.addSecs(itr->second);
-			addLog(std::make_unique<CalculationLogBasic>(
-				CalculationLogAbstract::SetStop, st_from, ev_start.time,
-				CalculationLogAbstract::Depart
-				));
-			_train->timetable().back().business = true;
+		// 2023.12.20  对于锚点站，只有作为到达时刻时，才需要在这里加时间
+		if (st_from != _anchor || _anchorAsArrive) {
+			if (auto itr = _settledStops.find(st_from); itr != _settledStops.end()) {
+				ev_start.time = ev_start.time.addSecs(itr->second);
+				addLog(std::make_unique<CalculationLogBasic>(
+					CalculationLogAbstract::SetStop, st_from, ev_start.time,
+					CalculationLogAbstract::Depart
+					));
+				_train->timetable().back().business = true;
+			}
 		}
 	}
 
@@ -450,13 +453,17 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 		, _dir);
 
 	if (stop) {
-		if (auto itr = _settledStops.find(st_from); itr != _settledStops.end()) {
-			ev_arrive.time = ev_arrive.time.addSecs(-itr->second);
-			addLog(std::make_unique<CalculationLogBasic>(
-				CalculationLogAbstract::SetStop, st_from, ev_arrive.time,
-				CalculationLogAbstract::Arrive
-				));
-			_train->timetable().back().business = true;
+		// 2023.12.20  对于锚点站，只在前面处理，不在这里！
+		// 注意这里正推和反推不一样。这是因为最开始paint()中对锚点时刻的设定不同。
+		if (st_from != _anchor) {
+			if (auto itr = _settledStops.find(st_from); itr != _settledStops.end()) {
+				ev_arrive.time = ev_arrive.time.addSecs(-itr->second);
+				addLog(std::make_unique<CalculationLogBasic>(
+					CalculationLogAbstract::SetStop, st_from, ev_arrive.time,
+					CalculationLogAbstract::Arrive
+					));
+				_train->timetable().back().business = true;
+			}
 		}
 	}
 
