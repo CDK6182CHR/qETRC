@@ -131,7 +131,8 @@ void MainWindow::initUI()
 {
 	initDockWidgets();
 	initToolbar();
-	sa_apply_customize_from_xml_file("customize.xml", this, actMgr);
+	//sa_apply_customize_from_xml_file("customize.xml", this, actMgr);
+	sa_apply_customize_from_xml_file("customize.xml", ribbonBar(), actMgr);   // seems changed in SARibbon v1.0.7
 }
 
 void MainWindow::undoRemoveTrains(const QList<std::shared_ptr<Train>>& trains)
@@ -1503,8 +1504,9 @@ void MainWindow::initToolbar()
 		static_cast<SARibbonBar::RibbonStyle>(SystemJson::instance.ribbon_style));
 
 	// 2022.04.24：测试ActionManager
-	actMgr = new SARibbonActionsManager(this);
-	actMgr->autoRegisteActions(this);
+	// 2023.12.20: seems changed in SARibbon V1.0.7
+	actMgr = new SARibbonActionsManager(this->ribbonBar());
+	actMgr->autoRegisteActions(this->ribbonBar());
 }
 
 void MainWindow::initAppMenu()
