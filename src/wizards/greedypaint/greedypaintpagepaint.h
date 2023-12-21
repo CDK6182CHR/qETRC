@@ -4,6 +4,7 @@
 #include <QStandardItemModel>
 #include <util/buttongroup.hpp>
 #include <data/common/direction.h>
+#include <set>
 
 class QTableView;
 class Train;
@@ -31,6 +32,7 @@ public:
         ColEnd,
         ColMinute,
         ColSecond,
+        ColFix,
         ColActualStop,
         ColArrive,
         ColDepart,
@@ -66,6 +68,11 @@ public:
 
     std::map<std::shared_ptr<const RailStation>, int>
         stopSeconds()const;
+
+    /**
+     * Return the fixed stations.
+     */
+    std::set<const RailStation*> fixedStations()const;
 
 private:
     static QStandardItem* makeCheckItem();
