@@ -171,6 +171,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 
 	auto itr = _settledStops.find(st_to);
 	bool next_stop = ((itr != _settledStops.end()) || (st_to == _end && _localTerminal));
+	bool fixed_from = (_fixedStations.find(st_from.get()) != _fixedStations.end());
 
 	// 注意以后的出发时间以这里面的为准！
 	RailStationEventBase ev_start(qeutil::latterEventType(stop), _tm, qeutil::dirLatterPos(_dir)
@@ -217,7 +218,8 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 		auto ev_conf = ax_from.conflictEvent(ev_start, _constraints, railint->isSingleRail());
 		if (ev_conf) {
 			// 出发时刻冲突
-			if (!stop && st_from != _anchor) {
+			// 2023.10.17: 对于起始站停车时间被固定的，也只能回溯
+			if ((!stop && st_from != _anchor) || fixed_from) {
 				_train->timetable().pop_back();
 				qDebug() << "回溯 " << st_from->name.toSingleLiteral() << Qt::endl;
 				return false;
@@ -273,7 +275,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 				if (qeutil::timeRangeIntersectedExcl(fbdnode->beginTime, fbdnode->endTime, 
 					ev_start.time, tm_to)) {
 					// 发生天窗冲突
-					if (!stop && st_from != _anchor) {
+					if ((!stop && st_from != _anchor) || fixed_from) {
 						_train->timetable().pop_back();
 						return false;
 					}
@@ -300,7 +302,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 			int_secs, railint->isSingleRail(), false);
 		if (rep.type != IntervalConflictReport::NoConflict) {
 			// 存在冲突
-			if (!stop && st_from != _anchor) {
+			if ((!stop && st_from != _anchor) || fixed_from) {
 				_train->timetable().pop_back();
 				return false;
 			}
@@ -383,7 +385,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 			}
 		}
 		else {
-			if (!stop && st_from != _anchor) {
+			if ((!stop && st_from != _anchor) || fixed_from) {
 				// 回溯
 				if (st_from != _anchor)
 				_train->timetable().pop_back();
