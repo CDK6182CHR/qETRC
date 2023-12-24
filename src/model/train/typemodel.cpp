@@ -53,7 +53,12 @@ void TypeConfigModel::setupModel()
     setRowCount(manager.types().size());
     int row=0;
     setupType(row++,manager.getDefaultType());
+    // debug
+    //manager.show();
+    //qDebug() << "setupModel: manager @ " << &manager;
+    //qDebug() << "default type " << manager.getDefaultType()->name() << " " << manager.getDefaultType().get();
     for(auto p=manager.types().begin();p!=manager.types().end();++p){
+        //qDebug() << row << " type " << p.value()->name() << " " << p.value().get();
         if(p.value() != manager.getDefaultType()){
             setupType(row++,p.value());
         }

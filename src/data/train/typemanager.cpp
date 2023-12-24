@@ -14,14 +14,21 @@ TypeManager& TypeManager::operator=(const TypeManager& another)
 {
     _types.clear();
     _regs.clear();
+    // 2023.12.23: special processing for default type
+    defaultType = std::make_shared<TrainType>(*another.defaultType);
+    _types.insert(defaultType->name(), defaultType);
     for (auto p=another._types.begin();p!=another._types.end();++p) {
-        _types.insert(p.key(), std::make_shared<TrainType>(*(p.value())));
+        if (p.value() != another.defaultType) {
+            _types.insert(p.key(), std::make_shared<TrainType>(*(p.value())));
+        }
     }
     for (const auto& p : another._regs) {
         _regs.append(qMakePair(p.first, findOrCreate(p.second->name())));
     }
     defaultPen = another.defaultPen;
-    defaultType = std::make_shared<TrainType>(*(another.defaultType));   //copy
+    //defaultType = std::make_shared<TrainType>(*(another.defaultType));   // 2023.12.24  moved above!
+    //qDebug() << "========== After copy assign show ==========";
+    //show();
     return *this;
 }
 
@@ -153,6 +160,15 @@ TypeManager::updateTypeSetTo(const TypeManager& other)
     return std::make_pair(data, modified);
 }
 
+void TypeManager::show() const
+{
+    qDebug() << "TypeManager @ " << this;
+    qDebug() << "default type " << defaultType->name() << " @ " << defaultType.get();
+    for (auto itr = _types.begin(); itr != _types.end(); ++itr) {
+        qDebug() << "type " << itr.value()->name() << " @ " << itr.value().get();
+    }
+}
+
 bool TypeManager::fromJson(const QJsonObject& obj, bool ignore_transparent)
 {
     if (obj.isEmpty())
@@ -212,7 +228,7 @@ bool TypeManager::fromJson(const QJsonObject& obj, bool ignore_transparent)
 
 void TypeManager::initDefaultTypes()
 {
-    _types.insert(QObject::tr("其他"), defaultType);
+    _types.insert(QObject::tr("其他_"), defaultType);   // 2023.12.23  fix name!
     addType(QObject::tr("快速"), QPen(QColor(255, 0, 0), 1.0));
     addType(QObject::tr("特快"), QPen(QColor(0, 0, 255), 1.0));
     addType(QObject::tr("直达特快"), QPen(QColor(255, 0, 255), 1.0));
