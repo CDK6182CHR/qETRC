@@ -141,6 +141,8 @@ public:
         QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>>>
         updateTypeSetTo(const TypeManager& other);
 
+    void show()const;
+
 private:
     /**
      * 输入格式是pyETRC的config.json或者graph中config对象

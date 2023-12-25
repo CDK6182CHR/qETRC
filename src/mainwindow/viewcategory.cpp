@@ -133,10 +133,20 @@ void ViewCategory::initUI()
     //group->setSelectionBehavior(QAbstractItemView::SelectItems);
     gall->currentViewGroup()->setSelectionMode(QAbstractItemView::MultiSelection);
     gall->currentViewGroup()->setSelectionModel(group->selectionModel());
-    group->setStyleSheet("QListView::item{height:15px;}");
-    group->setGridSize(QSize(group->gridSize().width(), SystemJson::instance.table_row_height));
-    gall->currentViewGroup()->setGridSize(QSize(group->gridSize().width(),
-        SystemJson::instance.table_row_height));
+    //gall->currentViewGroup()->setDisplayRow(SARibbonGalleryGroup::DisplayTwoRow);
+
+    // mind: group和currentViewGroup()不是同一个东西！！
+    // group是展开后的那个，gall->currentViewGroup()是直接显示出来的那个。
+    constexpr const int W = 70;
+    gall->currentViewGroup()->setDisplayRow(SARibbonGalleryGroup::DisplayTwoRow);
+    gall->currentViewGroup()->setGridMinimumWidth(W);
+    group->setDisplayRow(SARibbonGalleryGroup::DisplayTwoRow);
+    group->setGridMinimumWidth(W);
+
+    //group->setStyleSheet("QListView::item{height:10px;}");
+    //group->setGridSize(QSize(group->gridSize().width(), 10));
+    //gall->currentViewGroup()->setGridSize(QSize(group->gridSize().width(),
+    //    10));
 
     //panel = cat->addPannel(tr("显示车次组"));
     act = new QAction(QIcon(":/icons/filter.png"), tr("高级"), this);
