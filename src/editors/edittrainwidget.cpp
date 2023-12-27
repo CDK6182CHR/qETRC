@@ -95,6 +95,8 @@ void EditTrainWidget::initUI()
 
     edTrainName=new QLineEdit;
     flay->addRow(tr("全车次"),edTrainName);
+    connect(edTrainName, &QLineEdit::editingFinished,
+        this, &EditTrainWidget::onTrainFullNameUpdate);
 
     auto* hlay=new QHBoxLayout;
     edDownName=new QLineEdit;
@@ -256,4 +258,11 @@ void EditTrainWidget::setupTypeCombo()
             cbType->addItem(p.key()->name());
         }
     }
+}
+
+void EditTrainWidget::onTrainFullNameUpdate()
+{
+    TrainName tn(edTrainName->text());
+    edDownName->setText(tn.down());
+    edUpName->setText(tn.up());
 }

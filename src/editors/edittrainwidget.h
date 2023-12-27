@@ -72,5 +72,6 @@ private slots:
     void actSwitchToRouting();
 
     void setupTypeCombo();
+    void onTrainFullNameUpdate();
 };
 

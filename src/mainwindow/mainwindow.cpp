@@ -934,7 +934,8 @@ void MainWindow::initToolbar()
 		auto* panel = cat->addPannel(tr("基础数据"));
 
 		auto* act = new QAction(QIcon(":/icons/add.png"), tr("导入线路"), this);
-		connect(act, SIGNAL(triggered()), naviView, SLOT(importRailways()));
+		//connect(act, SIGNAL(triggered()), naviView, SLOT(importRailways()));
+		connect(act, &QAction::triggered, naviView, &NaviTree::actImportRailways);
 		act->setToolTip(tr("导入线路\n从既有运行图文件中导入（其中全部的）线路数据"));
 		auto* btn = panel->addLargeAction(act);
 
