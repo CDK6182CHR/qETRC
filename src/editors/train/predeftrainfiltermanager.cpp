@@ -55,5 +55,6 @@ void PredefTrainFilterManager::commitUpdateFilter(const PredefTrainFilterCore* f
 void PredefTrainFilterManager::refreshData()
 {
     lstWidget->refreshList();
+    editWidget->setCore(nullptr);
     editWidget->refreshData();
 }

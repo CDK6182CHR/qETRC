@@ -1617,6 +1617,11 @@ void MainWindow::endResetGraph()
 
 	spPassedStations->setValue(_diagram.config().max_passed_stations);
 
+	// 2023.12.30  predef train filter
+	if (filterManager) {
+		filterManager->refreshData();
+	}
+
 	updateWindowTitle();
 }
 
