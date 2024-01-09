@@ -50,6 +50,7 @@ SystemJson::SystemJson()
 
 void SystemJson::fromJson(const QJsonObject& obj)
 {
+    language = static_cast<QLocale::Language>(obj.value("language").toInt(language));
     last_file = obj.value("last_file").toString();
     default_file = obj.value("default_file").toString(default_file);
     default_raildb_file = obj.value("default_raildb_file")
@@ -75,6 +76,7 @@ QJsonObject SystemJson::toJson() const
     for (const auto& p : history)
         ar.append(p);
     return QJsonObject{
+        {"language", static_cast<int>(language)},
         {"last_file",last_file},
         {"default_file",default_file},
         {"default_raildb_file",default_raildb_file},

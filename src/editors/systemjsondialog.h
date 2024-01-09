@@ -15,6 +15,7 @@ class QSpinBox;
 class SystemJsonDialog : public QDialog
 {
     Q_OBJECT
+    QComboBox* cbLanguage;
     QSpinBox* spRowHeight;
     QLineEdit* edDefaultFile;
     QComboBox* cbRibbonStyle;
@@ -25,6 +26,8 @@ public:
     SystemJsonDialog(QWidget* parent=nullptr);
 private:
     void initUI();
+
+    void setLanguageCombo();
 private slots:
     void setData();
     void actApply();

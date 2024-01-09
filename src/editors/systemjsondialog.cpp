@@ -36,6 +36,14 @@ void SystemJsonDialog::initUI()
 
     auto* flay=new QFormLayout;
 
+    cbLanguage = new QComboBox;
+    cbLanguage->addItem(QString("中文"), QLocale::Chinese);
+    cbLanguage->addItem(QString("English"), QLocale::English);
+    auto* hlay = new QHBoxLayout;
+    hlay->addWidget(cbLanguage);
+    hlay->addWidget(new QLabel(tr("重新启动软件生效")));
+    flay->addRow(tr("语言"), hlay);
+
     spRowHeight = new QSpinBox;
     spRowHeight->setRange(1,100000);
     spRowHeight->setToolTip(tr("表格行高\n"
@@ -98,6 +106,15 @@ void SystemJsonDialog::initUI()
     g->connectAll(SIGNAL(clicked()),this,{SLOT(actApply()),SLOT(setData()), SLOT(close())});
 }
 
+void SystemJsonDialog::setLanguageCombo()
+{
+    // Currently, a brute-force implementation...
+    switch (SystemJson::instance.language) {
+    case QLocale::Chinese: cbLanguage->setCurrentIndex(0); break;
+    case QLocale::English: cbLanguage->setCurrentIndex(1); break;
+    }
+}
+
 void SystemJsonDialog::setData()
 {
     const auto& t=SystemJson::instance;
@@ -116,11 +133,13 @@ void SystemJsonDialog::setData()
     cbSysStyle->setCurrentText(t.app_style);
     ckDrag->setChecked(t.drag_time);
     ckTransparentConfig->setChecked(t.transparent_config);
+    setLanguageCombo();
 }
 
 void SystemJsonDialog::actApply()
 {
     auto& t=SystemJson::instance;
+    t.language = qvariant_cast<QLocale::Language>(cbLanguage->currentData());
     t.table_row_height = spRowHeight->value();
     t.default_file = edDefaultFile->text();
     if (cbRibbonStyle->currentIndex() == 0){

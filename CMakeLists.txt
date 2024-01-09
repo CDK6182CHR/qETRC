@@ -16,7 +16,7 @@ project(qETRC LANGUAGES CXX VERSION ${qETRC_VERSION})
 #list(PREPEND CMAKE_PREFIX_PATH $ENV{QTDIR}/lib/cmake)
 #message(STATUS "env QTDIR $ENV{QTDIR}")
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
-find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS Core Gui Widgets LinguistTools REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS PrintSupport)
 
 ################## main ##################
@@ -119,6 +119,10 @@ if (WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Release")
     # disable console for release version
     set_property(TARGET qETRC PROPERTY WIN32_EXECUTABLE true)
 endif()
+
+# translations
+qt_add_lupdate(qETRC TS_FILES rsc/tr/qETRC_zh.ts rsc/tr/qETRC_en.ts)
+qt_add_lrelease(qETRC TS_FILES rsc/tr/qETRC_zh.ts rsc/tr/qETRC_en.ts)
 
 install(TARGETS qETRC
     BUNDLE DESTINATION .

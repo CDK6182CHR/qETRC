@@ -3,6 +3,7 @@
 #include <QList>
 #include <QString>
 #include <QJsonObject>
+#include <QLocale>
 
 
 /**
@@ -13,6 +14,7 @@ public:
     static constexpr int history_count = 20;
     static SystemJson instance;
 
+    QLocale::Language language = QLocale::Chinese;
     QString last_file;
     QString default_file = "sample.pyetgr";
     QString default_raildb_file = "CRPassengerMileage.pyetlib";

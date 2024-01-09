@@ -68,6 +68,7 @@ ReleaseNote.pdf
 
 # ignore translation files, since no translation provided currently.
 rsc/tr
+tr/
 
 customize.xml
 
