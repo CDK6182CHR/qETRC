@@ -750,18 +750,18 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
                 defaultPen
             ));
 
-            const char* s0 = rail->ordinate() ? "排图标尺" : "区间距离";
+            QString s0 = rail->ordinate() ? tr("排图标尺") : tr("区间距离");
             leftItems.append(addLeftTableText(
                 s0, textFont, margins.left_white, rect_start_y, margins.ruler_label_width, margins.title_row_height / 2.0
             ));
 
             leftItems.append(addLeftTableText(
-                "下行", textFont, margins.left_white, rect_start_y + margins.title_row_height / 2.0,
+                tr("下行"), textFont, margins.left_white, rect_start_y + margins.title_row_height / 2.0,
                 margins.ruler_label_width / 2.0, margins.title_row_height / 2.0
             ));
 
             leftItems.append(addLeftTableText(
-                "上行", textFont, margins.left_white+ margins.ruler_label_width / 2.0,
+                tr("上行"), textFont, margins.left_white+ margins.ruler_label_width / 2.0,
                 rect_start_y + margins.title_row_height / 2.0, margins.ruler_label_width / 2.0,
                 margins.title_row_height / 2.0
             ));
@@ -778,7 +778,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
 
         if (cfg.show_mile_bar) {
             leftItems.append(addLeftTableText(
-                "延长公里", textFont, cfg.mileBarX(), rect_start_y,
+                tr("延长公里"), textFont, cfg.mileBarX(), rect_start_y,
                 margins.mile_label_width, margins.title_row_height
             ));
         }

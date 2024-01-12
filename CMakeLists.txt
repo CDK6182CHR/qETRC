@@ -121,8 +121,8 @@ if (WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Release")
 endif()
 
 # translations
-qt_add_lupdate(qETRC TS_FILES rsc/tr/qETRC_zh.ts rsc/tr/qETRC_en.ts)
-qt_add_lrelease(qETRC TS_FILES rsc/tr/qETRC_zh.ts rsc/tr/qETRC_en.ts)
+qt_add_lupdate(qETRC TS_FILES tr/qETRC_zh.ts tr/qETRC_en.ts)
+qt_add_lrelease(qETRC TS_FILES tr/qETRC_zh.ts tr/qETRC_en.ts)
 
 install(TARGETS qETRC
     BUNDLE DESTINATION .
