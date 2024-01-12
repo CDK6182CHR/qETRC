@@ -111,6 +111,8 @@ void ImportTrainDialog::actView()
 	edFile->setText(filename);
 }
 
+#include "data/train/traintype.h"
+
 void ImportTrainDialog::actApply()
 {
     auto f = QMessageBox::question(this, tr("导入车次"), tr("导入车次操作不支持撤销。是否确认导入车次？"));
@@ -134,9 +136,13 @@ void ImportTrainDialog::actApply()
         auto oldTrain = diagram.trainCollection().findFullName(train->trainName());
         if (!oldTrain) {
             //可以直接添加
+            //qDebug() << "ImportTrainDialog::actApply: directly adding train " << train->trainName().full();
             train->resetRouting();  // ?
-            diagram.trainCollection().appendTrain(train);
+            // 2024.01.12: we must set train type BEFORE adding it to coll!!
+            // Since the appendTrain() includes updating information process.
             train->setType(coll.typeManager().findOrCreate(train->type()));
+            coll.appendTrain(train);
+            //qDebug() << "TrainType: " << train->type()->name() << " @ " << train->type().get();
             new_cnt++;
         }
         else if (cover) {
@@ -144,6 +150,8 @@ void ImportTrainDialog::actApply()
                 oldTrain->routing().lock()->replaceTrain(oldTrain, train);
             }
             coll.removeTrain(oldTrain);
+            // 2024.01.12: we should also reset the type here!!
+            train->setType(coll.typeManager().findOrCreate(train->type()));
             coll.appendTrain(train);
         }
         else {

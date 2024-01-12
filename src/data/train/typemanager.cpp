@@ -91,6 +91,7 @@ std::shared_ptr<TrainType> TypeManager::findOrCreate(const QString& name)
         return _types.value(name);
     else {
         auto t = std::make_shared<TrainType>(name, defaultPen);
+        //qDebug() << "TypeManager::findOrCreate(QString): create type " << name << " @ " << t.get();
         _types.insert(name, t);
         return t;
     }
@@ -107,6 +108,8 @@ std::shared_ptr<TrainType> TypeManager::findOrCreate(const QString& name, bool p
     else {
         auto t = std::make_shared<TrainType>(name, passenger ?
             defaultPenPassenger : defaultPen, passenger);
+        //qDebug() << "TypeManager::findOrCreate(QString, bool): create type " << name <<
+        //    " @ " << t.get();
         _types.insert(name, t);
         return t;
     }
@@ -118,6 +121,8 @@ std::shared_ptr<TrainType> TypeManager::findOrCreate(std::shared_ptr<TrainType> 
         return _types.value(tp->name());
     else {
         auto it = _types.insert(tp->name(), std::make_shared<TrainType>(*tp));
+        //qDebug() << "TypeManager::findOrCreate(TrainType*): create type " << tp->name() <<
+        //    " @ " << it.value().get();
         return it.value();
     }
 }

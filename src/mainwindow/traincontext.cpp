@@ -345,6 +345,8 @@ void TrainContext::setupTypeCombo()
 	const auto& types = diagram.trainCollection().typeCount();
 	for (auto p = types.begin(); p != types.end(); ++p) {
 		if (p.value() >= 0) {
+			qDebug() << "TrainContext::setupTypeCombo: type " << p.key()->name()
+				<< " @ " << p.key().get() << " count " << p.value();
 			comboType->addItem(p.key()->name());
 		}
 	}
