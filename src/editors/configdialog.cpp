@@ -321,6 +321,26 @@ void ConfigDialog::initUI()
         form->addRow(tr("显示完整车次"),ck);
         ckFullName=ck;
 
+        ck = new QCheckBox;
+        ck->setToolTip(tr("隐藏所有始发站的运行线开始标签"));
+        form->addRow(tr("隐藏始发起始标签"), ck);
+        ckHideStartLabelStarting = ck;
+
+        ck = new QCheckBox;
+        ck->setToolTip(tr("隐藏所有非始发站的运行线开始标签"));
+        form->addRow(tr("隐藏非始发起始标签"), ck);
+        ckHideStartLabelNonStarting = ck;
+
+        ck = new QCheckBox;
+        ck->setToolTip(tr("隐藏所有终到站的运行线结束标签"));
+        form->addRow(tr("隐藏终到结束标签"), ck);
+        ckHideEndLabelTerminal = ck;
+
+        ck = new QCheckBox;
+        ck->setToolTip(tr("隐藏所有非终到站的运行线结束标签"));
+        form->addRow(tr("隐藏非终到结束标签"), ck);
+        ckHideEndLabelNonTerminal = ck;
+
         gb->setLayout(form);
         vlay->addWidget(gb);
     }
@@ -432,6 +452,10 @@ void ConfigDialog::refreshData()
     cbShowTimeMark->setCurrentIndex(_cfg.show_time_mark);
     ckEndLabel->setChecked(_cfg.end_label_name);
     ckFullName->setChecked(_cfg.show_full_train_name);
+    ckHideStartLabelStarting->setChecked(_cfg.hide_start_label_starting);
+    ckHideStartLabelNonStarting->setChecked(_cfg.hide_start_label_non_starting);
+    ckHideEndLabelTerminal->setChecked(_cfg.hide_end_label_terminal);
+    ckHideEndLabelNonTerminal->setChecked(_cfg.hide_end_label_non_terminal);
 
     //标签高度
     ckAvoidCollid->setChecked(_cfg.avoid_cover);
@@ -506,6 +530,10 @@ void ConfigDialog::actApply()
     cnew.show_time_mark = cbShowTimeMark->currentIndex();
     cnew.end_label_name = ckEndLabel->isChecked();
     cnew.show_full_train_name = ckFullName->isChecked();
+    cnew.hide_start_label_starting = ckHideStartLabelStarting->isChecked();
+    cnew.hide_start_label_non_starting = ckHideStartLabelNonStarting->isChecked();
+    cnew.hide_end_label_terminal = ckHideEndLabelTerminal->isChecked();
+    cnew.hide_end_label_non_terminal = ckHideEndLabelNonTerminal->isChecked();
 
     //标签高度
     cnew.avoid_cover = ckAvoidCollid->isChecked();

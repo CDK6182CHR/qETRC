@@ -102,6 +102,11 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
 
     FROM_OBJ_NAME(end_label_name, end_label_checi, Bool);
 
+    FROM_OBJ(hide_start_label_starting, Bool);
+    FROM_OBJ(hide_start_label_non_starting, Bool);
+    FROM_OBJ(hide_end_label_terminal, Bool);
+    FROM_OBJ(hide_end_label_non_terminal, Bool);
+
     FROM_OBJ(show_mile_bar, Bool);
     FROM_OBJ(show_ruler_bar, Bool);
     FROM_OBJ(show_count_bar, Bool);
@@ -159,6 +164,10 @@ QJsonObject Config::toJson() const
         TO_OBJ(bold_grid_width)
         TO_OBJ(valid_width)
         TO_OBJ_NAME(end_label_name,end_label_checi)
+        TO_OBJ(hide_start_label_starting)
+        TO_OBJ(hide_start_label_non_starting)
+        TO_OBJ(hide_end_label_terminal)
+        TO_OBJ(hide_end_label_non_terminal)
         TO_OBJ(show_mile_bar)
         TO_OBJ(show_ruler_bar)
         TO_OBJ(show_count_bar)

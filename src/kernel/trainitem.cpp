@@ -446,10 +446,17 @@ void TrainItem::setLine()
 
     QPen labelPen = trainPen();
     labelPen.setWidth(1);
-    if (_line->startLabel() && startInRange) {
+
+    // 2024.02.09: add global config here
+    bool glb_has_start_label = ((_startAtThis && !config().hide_start_label_starting) 
+        || !config().hide_start_label_non_starting);
+    bool glb_has_end_label = ((_endAtThis && !config().hide_end_label_terminal)
+        || !config().hide_end_label_non_terminal);
+
+    if (glb_has_start_label && _line->startLabel() && startInRange) {
         setStartItem(trainName, labelPen);
     }
-    if (_line->endLabel() && endInRange) {
+    if (glb_has_end_label && _line->endLabel() && endInRange) {
         setEndItem(config().end_label_name ? trainName : " ",
             labelPen);
     }

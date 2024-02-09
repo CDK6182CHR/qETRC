@@ -42,6 +42,8 @@ class ConfigDialog : public QDialog
     QSpinBox* spBoldLevel, * spShowLevel;
     QComboBox* cbShowTimeMark, * cbVLineStyle;
     QCheckBox *ckFullName,*ckEndLabel,*ckAvoidCollid;
+    QCheckBox* ckHideStartLabelStarting, * ckHideStartLabelNonStarting;
+    QCheckBox* ckHideEndLabelTerminal, * ckHideEndLabelNonTerminal;
     QCheckBox* ckShowRuler, * ckShowMile, * ckShowCount; 
     QCheckBox* ckTransparent;
     QPushButton* btnGridColor, * btnTextColor;
