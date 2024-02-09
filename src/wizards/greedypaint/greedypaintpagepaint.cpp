@@ -495,7 +495,7 @@ void GreedyPaintPagePaint::initUI()
     table->setItemDelegateForColumn(GreedyPaintConfigModel::ColMinute,
         new PostiveSpinDelegate(1, this));
     table->setItemDelegateForColumn(GreedyPaintConfigModel::ColSecond,
-        new SecondSpinDelegate(this));
+        new PostiveSpinDelegate(10, this));   // 2024.01.12  remove the constraint on seconds
     auto* tmdele = new QETimeDelegate(this);
     table->setItemDelegateForColumn(GreedyPaintConfigModel::ColArrive,tmdele);
     table->setItemDelegateForColumn(GreedyPaintConfigModel::ColDepart,tmdele);
