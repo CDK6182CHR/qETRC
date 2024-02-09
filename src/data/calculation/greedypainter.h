@@ -95,6 +95,22 @@ public:
 private:
 	void addLog(std::unique_ptr<CalculationLogAbstract> log);
 
+	// 2024.02.09: internal report enum and class, for hint 
+	enum class RecurseStatus {
+		Ok = 0,
+		NoSpace,    // No space for new train line
+		RequireStop,    // Require stop at the start station (very frequently used!)
+		FixedStation,   // The time needed to be adjusted, but the start station is fixed
+	};
+
+	struct RecurseReport {
+		RecurseStatus status;
+		int delay_seconds_hint;   // used for FixedStation type, where the hint is used for guessing next trial time
+		RecurseReport(RecurseStatus s, int delay_sec_hint = 1):
+			status(s), delay_seconds_hint(delay_sec_hint)
+		{}
+	};
+
 	/**
 	 * 递归正向推线算法。
 	 * 递归基本约定：每次调用时，_train中最后一个站是node的前站。
@@ -104,7 +120,7 @@ private:
 	 * @param tm node前站的预告到达时刻
 	 * @param stop node前站是否已包含停车附加时分，即该站是否停车
 	 */
-	bool calForward(std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
+	RecurseReport calForward(std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
 
 	bool calBackward(std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
 };
