@@ -4,6 +4,7 @@
 #include <QStandardItemModel>
 #include <util/buttongroup.hpp>
 #include <data/common/direction.h>
+#include <set>
 
 class QTableView;
 class Train;
@@ -31,6 +32,7 @@ public:
         ColEnd,
         ColMinute,
         ColSecond,
+        ColFix,
         ColActualStop,
         ColArrive,
         ColDepart,
@@ -67,6 +69,11 @@ public:
     std::map<std::shared_ptr<const RailStation>, int>
         stopSeconds()const;
 
+    /**
+     * Return the fixed stations.
+     */
+    std::set<const RailStation*> fixedStations()const;
+
 private:
     static QStandardItem* makeCheckItem();
     static QStandardItem* makeReadonlyItem();
@@ -84,6 +91,7 @@ signals:
     void startStationChanged(std::shared_ptr<const RailStation>);
     void endStationChanged(std::shared_ptr<const RailStation>);
     void anchorStationChanged(std::shared_ptr<const RailStation>);
+    void fixedStationChanged();
     void stopTimeChanged();
 
 private slots:
@@ -185,6 +193,7 @@ private slots:
     void onStartChanged(std::shared_ptr<const RailStation>);
     void onEndChanged(std::shared_ptr<const RailStation>);
     void onAnchorChanged(std::shared_ptr<const RailStation>);
+    void onFixedChanged();
 
     void onClearTmp();
 

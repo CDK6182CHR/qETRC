@@ -45,7 +45,10 @@ bool GreedyPainter::paint(const TrainName& trainName)
 	bool anchor_business = anchor_stop || (_anchor == _start && _localStarting)
 		|| (_anchor == _end && _localTerminal);
 
-	bool flag = false, flag2 = false;
+	//bool flag = false, flag2 = false;
+
+	RecurseReport rep_fwd{ RecurseStatus::Ok };   // the init has no effect
+	RecurseReport rep_back{ RecurseStatus::Ok };
 	
 	// 2022.04.10：这里再套一层循环；最多两次。
 	// 用于解决正推时anchor不停车但反推要求停车的情况。
@@ -57,7 +60,7 @@ bool GreedyPainter::paint(const TrainName& trainName)
 		// 正向推线
 		auto railint = _anchor->dirNextInterval(_dir);
 		try {
-			flag = calForward(railint, _anchorTime,
+			rep_fwd = calForward(railint, _anchorTime,
 				(_anchor == _start && _localStarting) || anchor_stop);
 		}
 		catch (const BackoffExeed&) {
@@ -69,7 +72,7 @@ bool GreedyPainter::paint(const TrainName& trainName)
 		// 反向推线
 		auto railint_bak = _anchor->dirPrevInterval(_dir);
 		try {
-			flag2 = calBackward(railint_bak, tm_arr,
+			rep_back = calBackward(railint_bak, tm_arr,
 				(_anchor == _end && _localTerminal) || anchor_stop);
 		}
 		catch (const BackoffExeed&) {
@@ -77,7 +80,7 @@ bool GreedyPainter::paint(const TrainName& trainName)
 		}
 
 		// 只有一种情况会触发循环，即正推不停车且反推失败
-		if (!flag2 && !anchor_stop) {
+		if (rep_back.status == RecurseStatus::RequireStop && !anchor_stop) {
 			anchor_stop = true;   // 下一轮强行停车
 			addLog(std::make_unique<CalculationLogDescription>(
 				QObject::tr("[重新进行正向推线] 反向推线要求锚点站停车，以锚点站停车重排正向运行线")));
@@ -87,7 +90,7 @@ bool GreedyPainter::paint(const TrainName& trainName)
 		}
 	}
 
-	if (flag && flag2 && !_train->empty()) {
+	if (rep_fwd.status == RecurseStatus::Ok && rep_back.status == RecurseStatus::Ok && !_train->empty()) {
 		if (_localStarting) {
 			_train->setStarting(_start->name);
 			auto& first = _train->timetable().front();
@@ -104,9 +107,9 @@ bool GreedyPainter::paint(const TrainName& trainName)
 				last.business = true;
 			}
 		}
+		return true;
 	}
-
-	return flag;
+	else return false;
 }
 
 void GreedyPainter::addLog(std::unique_ptr<CalculationLogAbstract> log)
@@ -147,13 +150,18 @@ namespace _greedypaint_detail {
 
 }
 
-bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, const QTime& _tm, bool stop)
+#define FWD_FIXED_POP_AND_RETURN \
+if (st_from != _anchor) _train->timetable().pop_back();  \
+return {RecurseStatus::FixedStation, delay_secs};
+
+typename GreedyPainter::RecurseReport
+	GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, const QTime& _tm, bool stop)
 {
 	if (!railint || railint->fromStation() == _end) {
 		addLog(std::make_unique<CalculationLogSimple>(
 			CalculationLogAbstract::ForwardFinished
 			));
-		return true;
+		return { RecurseStatus::Ok };
 	}
 
 	_greedypaint_detail::_RecurseLogger _logger(this, railint.get(), _tm, stop, false);
@@ -161,7 +169,7 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 	auto node = railint->getRulerNode(_ruler);
 	if (node->isNull()) {
 		addLog(std::make_unique<CalculationLogSimple>(CalculationLogAbstract::NoData));
-		return true;
+		return { RecurseStatus::Ok };
 	}
 
 	auto st_from = node->railInterval().fromStation();
@@ -171,6 +179,8 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 
 	auto itr = _settledStops.find(st_to);
 	bool next_stop = ((itr != _settledStops.end()) || (st_to == _end && _localTerminal));
+	bool fixed_from = (_fixedStations.find(st_from.get()) != _fixedStations.end());
+	bool fixed_to = (_fixedStations.find(st_to.get()) != _fixedStations.end());
 
 	// 注意以后的出发时间以这里面的为准！
 	RailStationEventBase ev_start(qeutil::latterEventType(stop), _tm, qeutil::dirLatterPos(_dir)
@@ -210,42 +220,57 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 			if (backoffCount > _maxBackoffTimes) {
 				throw BackoffExeed();
 			}
-			return false;
+			return { RecurseStatus::NoSpace };
 		}
 
 		// 出发时刻检测
 		auto ev_conf = ax_from.conflictEvent(ev_start, _constraints, railint->isSingleRail());
 		if (ev_conf) {
 			// 出发时刻冲突
+			// 2023.10.17: 对于起始站停车时间被固定的，也只能回溯; 2024.02.09: 改到下面的分支里面。
 			if (!stop && st_from != _anchor) {
 				_train->timetable().pop_back();
 				qDebug() << "回溯 " << st_from->name.toSingleLiteral() << Qt::endl;
-				return false;
+				return { RecurseStatus::RequireStop };
 			}
 			else {
 				// 调整出发时刻为使得满足条件
 				if (qeutil::timeCompare(ev_start.time, ev_conf->time)) {
 					// 右冲突事件
-					tot_delay += qeutil::secsTo(ev_start.time, ev_conf->time);
-					ev_start.time = ev_conf->time;
-					addLog(std::make_unique<CalculationLogGap>(CalculationLogAbstract::GapConflict,
-						st_from, ev_start.time, CalculationLogAbstract::Depart,
-						*TrainGap::gapTypeBetween(ev_start, *ev_conf, railint->isSingleRail()),
-						st_from, ev_conf
-						));
+					if (fixed_from) {
+						int delay_secs = qeutil::secsTo(ev_start.time, ev_conf->time);
+						FWD_FIXED_POP_AND_RETURN
+					}
+					else {
+						tot_delay += qeutil::secsTo(ev_start.time, ev_conf->time);
+						ev_start.time = ev_conf->time;
+						addLog(std::make_unique<CalculationLogGap>(CalculationLogAbstract::GapConflict,
+							st_from, ev_start.time, CalculationLogAbstract::Depart,
+							*TrainGap::gapTypeBetween(ev_start, *ev_conf, railint->isSingleRail()),
+							st_from, ev_conf
+							));
+					}
 				}
 				else {
 					// 左冲突事件，将时刻弄到与当前不冲突的地方
 					auto type = TrainGap::gapTypeBetween(*ev_conf, ev_start, railint->isSingleRail());
 					qDebug() << "左冲突：" << ev_conf->toString() << Qt::endl;
-					int gap_min = _constraints.maxConstraint(*type);   
+					int gap_min = _constraints.maxConstraint(*type);
 					auto trial_tm = ev_conf->time.addSecs(gap_min);
-					tot_delay += qeutil::secsTo(ev_start.time, trial_tm);
-					ev_start.time = trial_tm;
-					addLog(std::make_unique<CalculationLogGap>(
-						CalculationLogAbstract::GapConflict, st_from, ev_start.time,
-						CalculationLogAbstract::Depart, *type, st_from, ev_conf
-						));
+
+					if (fixed_from) {
+						int delay_secs = qeutil::secsTo(ev_start.time, trial_tm);
+						FWD_FIXED_POP_AND_RETURN
+					}
+					else {
+						tot_delay += qeutil::secsTo(ev_start.time, trial_tm);
+						ev_start.time = trial_tm;
+						addLog(std::make_unique<CalculationLogGap>(
+							CalculationLogAbstract::GapConflict, st_from, ev_start.time,
+							CalculationLogAbstract::Depart, *type, st_from, ev_conf
+							));
+					}
+
 				}
 				// 到这里只能说解决了当前冲突，并不一定符合出发条件，还要进一步循环！
 				to_try_stop = false;   // 出发时刻改变后优先尝试通过
@@ -275,7 +300,11 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 					// 发生天窗冲突
 					if (!stop && st_from != _anchor) {
 						_train->timetable().pop_back();
-						return false;
+						return {RecurseStatus::RequireStop};
+					}
+					else if (fixed_from) {
+						int delay_secs = qeutil::secsTo(ev_start.time, fbdnode->endTime);
+						FWD_FIXED_POP_AND_RETURN
 					}
 					else {
 						tot_delay += qeutil::secsTo(ev_start.time, fbdnode->endTime);
@@ -302,23 +331,41 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 			// 存在冲突
 			if (!stop && st_from != _anchor) {
 				_train->timetable().pop_back();
-				return false;
+				return { RecurseStatus::RequireStop };
 			}
 			else if (rep.type == IntervalConflictReport::LeftConflict) {
 				// 左冲突
 				auto tm_trial = rep.conflictEvent->time.addSecs(-int_secs);
-				tot_delay += qeutil::secsTo(ev_start.time, tm_trial);
-				ev_start.time = tm_trial;
+				if (fixed_from) {
+					int delay_secs = qeutil::secsTo(ev_start.time, tm_trial);
+					FWD_FIXED_POP_AND_RETURN
+				}
+				else {
+					tot_delay += qeutil::secsTo(ev_start.time, tm_trial);
+					ev_start.time = tm_trial;
+				}
 			}
 			else if (rep.type == IntervalConflictReport::RightConflict) {
 				// 右冲突
-				tot_delay += qeutil::secsTo(ev_start.time, rep.conflictEvent->time);
-				ev_start.time = rep.conflictEvent->time;
+				if (fixed_from) {
+					int delay_secs = qeutil::secsTo(ev_start.time, rep.conflictEvent->time);
+					FWD_FIXED_POP_AND_RETURN
+				}
+				else {
+					tot_delay += qeutil::secsTo(ev_start.time, rep.conflictEvent->time);
+					ev_start.time = rep.conflictEvent->time;
+				}
 			}
 			else {
 				// 只剩下共线冲突了 没有更好的办法，只有延迟一个小量跳过去
-				tot_delay += 1;
-				ev_start.time = ev_start.time.addSecs(1);
+				if (fixed_from) {
+					if (st_from != _anchor) _train->timetable().pop_back();
+					return {RecurseStatus::FixedStation, 1};
+				}
+				else {
+					tot_delay += 1;
+					ev_start.time = ev_start.time.addSecs(1);
+				}
 			}
 
 			addLog(std::make_unique<CalculationLogInterval>(
@@ -343,8 +390,8 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 				CalculationLogAbstract::Arrive
 				));
 			_train->appendStation(st_to->name, tm_to, tm_to, false);
-			bool flag = calForward(railint->nextInterval(), tm_to, false);
-			if (flag) return true;
+			auto ret = calForward(railint->nextInterval(), tm_to, false);
+			if (ret.status == RecurseStatus::Ok) return ret;   // safe to return it directly
 		}
 
 		// 如果走到这里，说明通过的尝试失败
@@ -372,22 +419,42 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 				CalculationLogAbstract::Arrive
 				));
 			_train->appendStation(st_to->name, tm_to, tm_to, false);
-			bool flag = calForward(railint->nextInterval(), tm_to, true);
-			if (flag) {
-				return true;
+			auto ret = calForward(railint->nextInterval(), tm_to, true);
+			if (ret.status == RecurseStatus::Ok) {
+				return ret;
+			}
+			// 2024.02.09: there are two possibilities: 
+			// 1) the BackOff, where there is no possible line in some future interval, 
+			// which is possible in old version; and 
+			// 2) the next station is fixed. If the next station is fixed and current station is not,
+			// we may try to move time for next test. 
+			// For current version (first trial), just move 1 second forward and retry.
+			else if (ret.status == RecurseStatus::FixedStation) {
+				if (!fixed_from) {
+					//_train->timetable().pop_back();
+					to_try_stop = false;
+					ev_start.time = ev_start.time.addSecs(ret.delay_seconds_hint);
+					tot_delay += ret.delay_seconds_hint;
+				}
+				else {
+					if (st_from != _anchor)
+						_train->timetable().pop_back();
+					return ret;
+				}
 			}
 			else {
+				// It should be NoSpace then
 				if (st_from != _anchor)
-				_train->timetable().pop_back();
-				return false;
+					_train->timetable().pop_back();
+				return ret;
 			}
 		}
 		else {
 			if (!stop && st_from != _anchor) {
 				// 回溯
 				if (st_from != _anchor)
-				_train->timetable().pop_back();
-				return false;
+					_train->timetable().pop_back();
+				return { RecurseStatus::RequireStop };
 			}
 
 			int_secs -= node->stop;
@@ -395,9 +462,17 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 			if (qeutil::timeCompare(tm_to, to_conf->time)) {
 				// 右冲突事件，设置出发时间使得到达时间为冲突时刻的时间
 				auto trial_tm = to_conf->time.addSecs(-int_secs);
-				tot_delay += qeutil::secsTo(ev_start.time, trial_tm);
-				ev_start.time = trial_tm;
-				type = *TrainGap::gapTypeBetween(ev_stop, *to_conf, railint->isSingleRail());
+				if (fixed_from) {
+					int delay_secs = qeutil::secsTo(ev_start.time, trial_tm);
+					if (st_from != _anchor)
+						_train->timetable().pop_back();
+					return { RecurseStatus::FixedStation, delay_secs };
+				}
+				else {
+					tot_delay += qeutil::secsTo(ev_start.time, trial_tm);
+					ev_start.time = trial_tm;
+					type = *TrainGap::gapTypeBetween(ev_stop, *to_conf, railint->isSingleRail());
+				}
 			}
 			else {
 				// 左冲突事件，将时刻弄到与当前不冲突的地方
@@ -406,9 +481,17 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 
 				QTime trial_arr = to_conf->time.addSecs(gap_min);
 				QTime trial_dep = trial_arr.addSecs(-int_secs);
+
+				if (fixed_from) {
+					if (st_from != _anchor)
+						_train->timetable().pop_back();
+					int delay_secs = qeutil::secsTo(ev_start.time, trial_dep);
+					return {RecurseStatus::FixedStation, delay_secs}; 
+				}
+				else {
 				tot_delay += qeutil::secsTo(ev_start.time, trial_dep);
 				ev_start.time = trial_dep;
-
+				}
 			}
 			addLog(std::make_unique<CalculationLogGap>(
 				CalculationLogAbstract::GapConflict, st_from, ev_start.time,
@@ -419,7 +502,12 @@ bool GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, cons
 	}
 }
 
-bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, const QTime& _tm, bool stop)
+#define BACK_FIXED_POP_AND_RETURN \
+if (st_from != _anchor) _train->timetable().pop_front(); \
+return {RecurseStatus::FixedStation, delay_secs}; \
+
+typename GreedyPainter::RecurseReport
+	GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, const QTime& _tm, bool stop)
 {
 	// 反向推线，代码基本从正向复制。
 	// 注意现在的from/to按照推线的观点看，与railint的from/to恰好相反。
@@ -429,7 +517,7 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 		addLog(std::make_unique<CalculationLogSimple>(
 			CalculationLogAbstract::Finished
 			));
-		return true;
+		return { RecurseStatus::Ok };
 	}
 
 	_greedypaint_detail::_RecurseLogger _logger(this, railint.get(), _tm, stop, true);
@@ -437,13 +525,15 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 	auto node = railint->getRulerNode(_ruler);
 	if (node->isNull()) {
 		addLog(std::make_unique<CalculationLogSimple>(CalculationLogAbstract::NoData));
-		return true;
+		return { RecurseStatus::Ok };
 	}
 
 	auto st_from = node->railInterval().toStation();
 	auto st_to = node->railInterval().fromStation();
 	const auto& ax_from = _railAxis.at(st_from);
 	const auto& ax_to = _railAxis.at(st_to);
+	auto fixed_from = (_fixedStations.find(st_from.get()) != _fixedStations.end());
+	auto fixed_to = (_fixedStations.find(st_from.get()) != _fixedStations.end());
 
 	auto itr = _settledStops.find(st_to);
 	bool next_stop = ((itr != _settledStops.end()) || (st_to == _start && _localStarting));
@@ -487,7 +577,7 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 			if (backoffCount > _maxBackoffTimes) {
 				throw BackoffExeed();
 			}
-			return false;
+			return { RecurseStatus::NoSpace };
 		}
 
 		// 到达时刻（反向出发）检测
@@ -499,31 +589,45 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 				if (st_from!=_anchor)
 					_train->timetable().pop_front();
 				qDebug() << "回溯 " << st_from->name.toSingleLiteral() << Qt::endl;
-				return false;
+				return { RecurseStatus::RequireStop };
 			}
 			else {
 				// 调整出发时刻为使得满足条件
 				if (qeutil::timeCompare(ev_conf->time, ev_arrive.time)) {
 					// 反向左冲突，原来右冲突
-					tot_delay += qeutil::secsTo(ev_conf->time, ev_arrive.time);
-					ev_arrive.time = ev_conf->time;
-					addLog(std::make_unique<CalculationLogGap>(CalculationLogAbstract::GapConflict,
-						st_from, ev_arrive.time, CalculationLogAbstract::Arrive,
-						*TrainGap::gapTypeBetween(*ev_conf, ev_arrive, railint->isSingleRail()),
-						st_from, ev_conf
-						));
+					int delay_secs = qeutil::secsTo(ev_conf->time, ev_arrive.time);
+					if (fixed_from) {
+						BACK_FIXED_POP_AND_RETURN
+					}
+					else {
+						tot_delay += delay_secs;
+						ev_arrive.time = ev_conf->time;
+						addLog(std::make_unique<CalculationLogGap>(CalculationLogAbstract::GapConflict,
+							st_from, ev_arrive.time, CalculationLogAbstract::Arrive,
+							*TrainGap::gapTypeBetween(*ev_conf, ev_arrive, railint->isSingleRail()),
+							st_from, ev_conf
+							));
+					}
 				}
 				else {
 					// 反向右冲突事件，将时刻弄到与当前不冲突的地方
 					auto type = TrainGap::gapTypeBetween(ev_arrive, *ev_conf, railint->isSingleRail());
 					int gap_min = _constraints.maxConstraint(*type);   
 					auto trial_tm = ev_conf->time.addSecs(-gap_min);
-					tot_delay += qeutil::secsTo(trial_tm, ev_arrive.time);
-					ev_arrive.time = trial_tm;
-					addLog(std::make_unique<CalculationLogGap>(
-						CalculationLogAbstract::GapConflict, st_from, ev_arrive.time,
-						CalculationLogAbstract::Arrive, *type, st_from, ev_conf
-						));
+					int delay_secs = qeutil::secsTo(trial_tm, ev_arrive.time);
+					if (fixed_from) {
+						if (st_from != _anchor) _train->timetable().pop_front();
+						return { RecurseStatus::FixedStation, delay_secs };
+					}
+					else {
+						tot_delay += delay_secs;
+						ev_arrive.time = trial_tm;
+						addLog(std::make_unique<CalculationLogGap>(
+							CalculationLogAbstract::GapConflict, st_from, ev_arrive.time,
+							CalculationLogAbstract::Arrive, *type, st_from, ev_conf
+							));
+					}
+
 				}
 				// 到这里只能说解决了当前冲突，并不一定符合出发条件，还要进一步循环！
 				to_try_stop = false;   // 出发时刻改变后优先尝试通过
@@ -553,8 +657,14 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 					// 发生天窗冲突
 					if (!stop) {
 						if(st_from!=_anchor)
-						_train->timetable().pop_front();
-						return false;
+							_train->timetable().pop_front();
+						return {RecurseStatus::RequireStop};
+					}
+					else if (fixed_from) {
+						if (st_from != _anchor)
+							_train->timetable().pop_front();
+						int delay_secs = qeutil::secsTo(fbdnode->beginTime, ev_arrive.time);
+						return { RecurseStatus::FixedStation, delay_secs };
 					}
 					else {
 						tot_delay += qeutil::secsTo(fbdnode->beginTime, ev_arrive.time);
@@ -581,23 +691,42 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 			if (!stop) {
 				if(st_from != _anchor)
 				_train->timetable().pop_front();
-				return false;
+				return {RecurseStatus::RequireStop};
 			}
 			else if (rep.type == IntervalConflictReport::LeftConflict) {
 				// 左冲突
 				auto tm_trial = rep.conflictEvent->time.addSecs(int_secs);
-				tot_delay += qeutil::secsTo(tm_trial, ev_arrive.time);
-				ev_arrive.time = tm_trial;
+				int delay_secs = qeutil::secsTo(tm_trial, ev_arrive.time);
+				if (fixed_from) {
+					if (st_from != _anchor) _train->timetable().pop_front();
+					return { RecurseStatus::FixedStation, delay_secs };
+				}
+				else {
+					tot_delay += delay_secs;
+					ev_arrive.time = tm_trial;
+				}
 			}
 			else if (rep.type == IntervalConflictReport::RightConflict) {
 				// 右冲突
-				tot_delay += qeutil::secsTo(rep.conflictEvent->time, ev_arrive.time);
-				ev_arrive.time = rep.conflictEvent->time;
+				int delay_secs = qeutil::secsTo(rep.conflictEvent->time, ev_arrive.time);
+				if (fixed_from) {
+					BACK_FIXED_POP_AND_RETURN
+				}
+				else {
+					tot_delay += delay_secs;
+					ev_arrive.time = rep.conflictEvent->time;
+				}
 			}
 			else {
 				// 只剩下共线冲突了 没有更好的办法，只有延迟一个小量跳过去
-				tot_delay -= 1;
-				ev_arrive.time = ev_arrive.time.addSecs(-1);
+				if (fixed_from) {
+					if (_anchor != st_from) _train->timetable().pop_front();
+					return { RecurseStatus::FixedStation, 1 };
+				}
+				else {
+					tot_delay += 1;   // 2024.02.10: it should be plus?
+					ev_arrive.time = ev_arrive.time.addSecs(-1);
+				}
 			}
 
 			addLog(std::make_unique<CalculationLogInterval>(
@@ -622,8 +751,8 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 				CalculationLogAbstract::Depart
 				));
 			_train->prependStation(st_to->name, tm_dep, tm_dep, false);
-			bool flag = calBackward(railint->prevInterval(), tm_dep, false);
-			if (flag) return true;
+			auto ret = calBackward(railint->prevInterval(), tm_dep, false);
+			if (ret.status == RecurseStatus::Ok) return ret;
 		}
 
 		// 如果走到这里，说明通过的尝试失败
@@ -651,14 +780,27 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 				CalculationLogAbstract::Depart
 				));
 			_train->prependStation(st_to->name, tm_dep, tm_dep, false);
-			bool flag = calBackward(railint->prevInterval(), tm_dep, true);
-			if (flag) {
-				return true;
+			auto ret = calBackward(railint->prevInterval(), tm_dep, true);
+			if (ret.status == RecurseStatus::Ok) {
+				return ret;
+			}
+			else if (ret.status == RecurseStatus::FixedStation) {
+				if (!fixed_from) {
+					tot_delay += ret.delay_seconds_hint;
+					ev_arrive.time = ev_arrive.time.addSecs(-ret.delay_seconds_hint);
+					to_try_stop = false;
+				}
+				else {
+					if (st_from != _anchor)
+						_train->timetable().pop_front();
+					return ret;
+				}
 			}
 			else {
-				if(st_from != _anchor)
-				_train->timetable().pop_front();
-				return false;
+				// here: it should be NoSpace
+				if (st_from != _anchor)
+					_train->timetable().pop_front();
+				return ret;
 			}
 		}
 		else {
@@ -666,7 +808,7 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 				// 回溯
 				if (st_from != _anchor)
 				_train->timetable().pop_front();
-				return false;
+				return {RecurseStatus::RequireStop};
 			}
 
 			int_secs -= node->start;
@@ -674,9 +816,15 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 			if (qeutil::timeCompare(to_conf->time, tm_dep)) {
 				// 反向左冲突事件，设置出发时间使得到达时间为冲突时刻的时间
 				auto tm_trial = to_conf->time.addSecs(int_secs);
-				tot_delay += qeutil::secsTo(tm_trial, ev_arrive.time);
-				ev_arrive.time = tm_trial;
-				type = *TrainGap::gapTypeBetween(*to_conf, ev_depart, railint->isSingleRail());
+				int delay_secs = qeutil::secsTo(tm_trial, ev_arrive.time);
+				if (fixed_from) {
+					BACK_FIXED_POP_AND_RETURN
+				}
+				else {
+					tot_delay += delay_secs;
+					ev_arrive.time = tm_trial;
+					type = *TrainGap::gapTypeBetween(*to_conf, ev_depart, railint->isSingleRail());
+				}
 			}
 			else {
 				// 反向右冲突事件，将时刻弄到与当前不冲突的地方
@@ -684,8 +832,14 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 				int gap_min = _constraints.maxConstraint(type);  
 				QTime trial_dep = to_conf->time.addSecs(-gap_min);
 				QTime trial_arr = trial_dep.addSecs(int_secs);
-				tot_delay += qeutil::secsTo(trial_arr, ev_arrive.time);
-				ev_arrive.time = trial_arr;
+				int delay_secs = qeutil::secsTo(trial_arr, ev_arrive.time);
+				if (fixed_from) {
+					BACK_FIXED_POP_AND_RETURN
+				}
+				else {
+					tot_delay += delay_secs;
+					ev_arrive.time = trial_arr;
+				}
 			}
 			addLog(std::make_unique<CalculationLogGap>(
 				CalculationLogAbstract::GapConflict, st_from, ev_arrive.time,
@@ -695,3 +849,4 @@ bool GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, con
 
 	}
 }
+#undef BACK_FIXED_POP_AND_RETURN

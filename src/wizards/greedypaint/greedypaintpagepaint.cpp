@@ -29,7 +29,7 @@ GreedyPaintConfigModel::GreedyPaintConfigModel(QWidget* parent):
     QStandardItemModel(parent)
 {
     setColumnCount(ColMAX);
-    setHorizontalHeaderLabels({ tr("站名"),tr("锚"),tr("起"),tr("止"),tr("停分"),tr("停秒"),
+    setHorizontalHeaderLabels({ tr("站名"),tr("锚"),tr("起"),tr("止"),tr("停分"),tr("停秒"),tr("固定"),
         tr("实停"),tr("到达时刻"),tr("出发时刻") });
     connect(this, &GreedyPaintConfigModel::dataChanged,
         this, &GreedyPaintConfigModel::onDataChanged);
@@ -93,6 +93,9 @@ void GreedyPaintConfigModel::refreshData()
         it = new SI;
         it->setData(0, Qt::EditRole);
         setItem(row, ColSecond, it);
+
+        it = makeCheckItem();
+        setItem(row, ColFix, it);
 
         setItem(row, ColActualStop, makeReadonlyItem());
         setItem(row, ColArrive, makeReadonlyItem());
@@ -209,6 +212,17 @@ std::map<std::shared_ptr<const RailStation>, int> GreedyPaintConfigModel::stopSe
     for (int r = _availableFirstRow; r <= _availableLastRow; r++) {
         if (int secs = stopSecsForRow(r)) {
             res.emplace(stationForRow(r), secs);
+        }
+    }
+    return res;
+}
+
+std::set<const RailStation*> GreedyPaintConfigModel::fixedStations() const
+{
+    std::set<const RailStation*> res{};
+    for (int r = _availableFirstRow; r <= _availableLastRow; r++) {
+        if (auto st = item(r, ColFix)->checkState(); st == Qt::Checked) {
+            res.emplace(stationForRow(r).get());
         }
     }
     return res;
@@ -344,6 +358,7 @@ void GreedyPaintConfigModel::onDataChanged(const QModelIndex& topLeft,
                     case ColAnchor:setAnchorRow(row); break;
                     case ColStart:setStartRow(row); break;
                     case ColEnd:setEndRow(row); break;
+                    case ColFix: emit fixedStationChanged(); break;
                     }
                 }
                 else {
@@ -351,6 +366,7 @@ void GreedyPaintConfigModel::onDataChanged(const QModelIndex& topLeft,
                     switch (c) {
                     case ColStart:unsetStartRow(row); break;
                     case ColEnd:unsetEndRow(row); break;
+                    case ColFix: emit fixedStationChanged(); break;
                     }
                 }
             }
@@ -414,6 +430,8 @@ GreedyPaintPagePaint::GreedyPaintPagePaint(Diagram &diagram_,
         this, &GreedyPaintPagePaint::onAnchorChanged);
     connect(_model, &GreedyPaintConfigModel::stopTimeChanged,
         this, &GreedyPaintPagePaint::paintTmpTrain);
+    connect(_model, &GreedyPaintConfigModel::fixedStationChanged,
+        this, &GreedyPaintPagePaint::onFixedChanged);
 }
 
 void GreedyPaintPagePaint::initUI()
@@ -504,7 +522,7 @@ void GreedyPaintPagePaint::initUI()
     vlay->addWidget(table);
 
     int c = 0;
-    for (auto w : { 120,40,40,40,60,60,70,80,80 }) {
+    for (auto w : { 120,40,40,40,60,60,40,70,80,80 }) {
         table->setColumnWidth(c++, w);
     }
 
@@ -560,6 +578,7 @@ std::shared_ptr<Train> GreedyPaintPagePaint::doPaintTrain()
     painter.setEnd(_model->endStation());
     painter.setAnchorAsArrive(gpAnchorRole->get(0)->isChecked());
     painter.settledStops() = _model->stopSeconds();
+    painter.fixedStations() = _model->fixedStations();
 
     using namespace std::chrono_literals;
     auto tm_start = std::chrono::system_clock::now();
@@ -700,6 +719,11 @@ void GreedyPaintPagePaint::onEndChanged(std::shared_ptr<const RailStation> st)
 void GreedyPaintPagePaint::onAnchorChanged(std::shared_ptr<const RailStation> st)
 {
     edAnchor->setText(st->name.toSingleLiteral());
+    paintTmpTrain();
+}
+
+void GreedyPaintPagePaint::onFixedChanged()
+{
     paintTmpTrain();
 }
 
