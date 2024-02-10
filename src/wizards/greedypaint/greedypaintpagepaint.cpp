@@ -358,6 +358,7 @@ void GreedyPaintConfigModel::onDataChanged(const QModelIndex& topLeft,
                     case ColAnchor:setAnchorRow(row); break;
                     case ColStart:setStartRow(row); break;
                     case ColEnd:setEndRow(row); break;
+                    case ColFix: emit fixedStationChanged(); break;
                     }
                 }
                 else {
@@ -365,6 +366,7 @@ void GreedyPaintConfigModel::onDataChanged(const QModelIndex& topLeft,
                     switch (c) {
                     case ColStart:unsetStartRow(row); break;
                     case ColEnd:unsetEndRow(row); break;
+                    case ColFix: emit fixedStationChanged(); break;
                     }
                 }
             }
@@ -428,6 +430,8 @@ GreedyPaintPagePaint::GreedyPaintPagePaint(Diagram &diagram_,
         this, &GreedyPaintPagePaint::onAnchorChanged);
     connect(_model, &GreedyPaintConfigModel::stopTimeChanged,
         this, &GreedyPaintPagePaint::paintTmpTrain);
+    connect(_model, &GreedyPaintConfigModel::fixedStationChanged,
+        this, &GreedyPaintPagePaint::onFixedChanged);
 }
 
 void GreedyPaintPagePaint::initUI()
@@ -715,6 +719,11 @@ void GreedyPaintPagePaint::onEndChanged(std::shared_ptr<const RailStation> st)
 void GreedyPaintPagePaint::onAnchorChanged(std::shared_ptr<const RailStation> st)
 {
     edAnchor->setText(st->name.toSingleLiteral());
+    paintTmpTrain();
+}
+
+void GreedyPaintPagePaint::onFixedChanged()
+{
     paintTmpTrain();
 }
 

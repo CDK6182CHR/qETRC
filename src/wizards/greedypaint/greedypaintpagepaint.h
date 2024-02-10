@@ -91,6 +91,7 @@ signals:
     void startStationChanged(std::shared_ptr<const RailStation>);
     void endStationChanged(std::shared_ptr<const RailStation>);
     void anchorStationChanged(std::shared_ptr<const RailStation>);
+    void fixedStationChanged();
     void stopTimeChanged();
 
 private slots:
@@ -192,6 +193,7 @@ private slots:
     void onStartChanged(std::shared_ptr<const RailStation>);
     void onEndChanged(std::shared_ptr<const RailStation>);
     void onAnchorChanged(std::shared_ptr<const RailStation>);
+    void onFixedChanged();
 
     void onClearTmp();
 

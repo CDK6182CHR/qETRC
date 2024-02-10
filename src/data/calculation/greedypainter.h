@@ -122,6 +122,6 @@ private:
 	 */
 	RecurseReport calForward(std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
 
-	bool calBackward(std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
+	RecurseReport calBackward(std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
 };
 
