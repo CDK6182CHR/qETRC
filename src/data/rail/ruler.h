@@ -36,6 +36,15 @@ public:
 
     QJsonObject toJson()const;
 
+    bool toCsv(const QString& filename)const;
+
+    /**
+     * 2024.02.11  Import data from CSV. 
+     * Each line should be: From, To, Interval seconds, start seconds, stop seconds; No header line.
+     * Returns the number of lines that have been successfully read.
+     */
+    int fromCsv(const QString& filename);
+
     void show()const;
 
     /**

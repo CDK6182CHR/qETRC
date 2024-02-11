@@ -8,6 +8,7 @@
 #include "data/train/trainstation.h"
 #include <QDebug>
 #include <QJsonArray>
+#include <QFile>
 
 Ruler::Ruler(std::weak_ptr<Railway> railway, const QString &name, bool different, int index):
     RailIntervalData<RulerNode,Ruler>(railway,different,index),
@@ -30,6 +31,74 @@ QJsonObject Ruler::toJson() const
     }
     obj.insert("nodes", nodes);
     return obj;
+}
+
+bool Ruler::toCsv(const QString& filename) const
+{
+    QFile file(filename);
+    file.open(QFile::WriteOnly);
+    if (!file.isOpen()) {
+        qWarning() << "Open file " << filename << " failed";
+        return false;
+    }
+    QTextStream sout(&file);
+
+    // 发站，到站，通通，起，停
+    for (auto it = firstDownNode(); it; it = it->nextNodeCirc()) {
+        sout << it->fromStationName().toSingleLiteral() << ","
+            << it->toStationName().toSingleLiteral() << ","
+            << it->interval << ","
+            << it->start << ","
+            << it->stop << "\n";
+    }
+    file.close();
+
+    return true;
+}
+
+int Ruler::fromCsv(const QString& filename)
+{
+    QFile file(filename);
+    file.open(QFile::ReadOnly);
+    if (!file.isOpen()) {
+        qWarning() << "Open file " << filename << " failed";
+        return 0;
+    }
+    QTextStream sin(&file);
+
+    int cnt = 0;
+    int n = 0;
+    while (!sin.atEnd()) {
+        QString line = sin.readLine();
+        n++;
+        if (line.isEmpty()) continue;
+
+        auto sp = line.split(",");
+        if (sp.size() != 5) {
+            qWarning() << "Invalid row data " << sp;
+            if (sp.size() < 5) continue;
+        }
+
+        const auto& from = sp[0], & to = sp[1];
+        auto node = this->getNode(from, to);
+        if (!node) {
+            qWarning() << "Invalid interval " << from << " -> " << to;
+        }
+        else {
+            int interval = sp[2].toInt();
+            int start = sp[3].toInt();
+            int stop = sp[4].toInt();
+            if (!interval) {
+                qWarning() << "Zero interval time at row " << n << ": " << line;
+            }
+            node->interval = interval;
+            node->start = start;
+            node->stop = stop;
+            cnt++;
+        }
+    }
+    file.close();
+    return cnt;
 }
 
 void Ruler::show() const

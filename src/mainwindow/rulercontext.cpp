@@ -15,6 +15,7 @@
 #include <QLabel>
 #include <QCheckBox>
 #include <QDialogButtonBox>
+#include <QFileDialog>
 
 RulerContext::RulerContext(Diagram& diagram_, SARibbonContextCategory *context, MainWindow *mw_):
     QObject(mw_),diagram(diagram_), cont(context),mw(mw_)
@@ -66,7 +67,6 @@ void RulerContext::initUI()
     act->setToolTip(tr("标尺编辑面板\n显示当前标尺的编辑面板，编辑标尺名称和数据。"));
     connect(act, SIGNAL(triggered()), this, SLOT(actShowEditWidget()));
     auto* btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(70);
 
     act = new QAction(QIcon(":/icons/identify.png"), tr("从车次提取"), this);
     act->setToolTip(tr("从单车次提取标尺\n"
@@ -85,17 +85,27 @@ void RulerContext::initUI()
     connect(act, &QAction::triggered, this, &RulerContext::mergeCurrent);
     panel->addMediumAction(act);
 
+    panel = page->addPannel(tr("导入导出"));
+    act = new QAction(QIcon(":/icons/ruler.png"), tr("导入"), this);
+    act->setToolTip(tr("导入标尺 (csv)\n"
+        "从逗号分隔 (csv) 格式的数据文件中读取标尺数据，并覆盖到当前标尺中"));
+    panel->addLargeAction(act);
+    connect(act, &QAction::triggered, this, &RulerContext::actImportCsv);
+
+    act = new QAction(QIcon(":/icons/copy.png"), tr("导出"), this);
+    act->setToolTip(tr("导出标尺 (csv)\n将当前标尺导出为逗号分隔 (csv) 格式的数据文件"));
+    panel->addLargeAction(act);
+    connect(act, &QAction::triggered, this, &RulerContext::actExportCsv);
+
     panel = page->addPannel(tr("设置"));
     act = new QAction(QIcon(":/icons/ruler.png"), tr("排图标尺"), this);
     act->setToolTip(tr("设为排图标尺\n将当前标尺设置为本线的排图标尺，即作为纵坐标标度"));
     btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
     connect(act, SIGNAL(triggered()), this, SLOT(actSetAsOrdinate()));
 
     act = new QAction(QIcon(":/icons/copy.png"), tr("副本"), this);
     act->setToolTip(tr("创建标尺副本\n使用输入的标尺名称，在本线路下创建当前标尺副本"));
     btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
     connect(act, &QAction::triggered, this, &RulerContext::actDulplicateRuler);
 
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
@@ -103,14 +113,12 @@ void RulerContext::initUI()
     act->setToolTip(tr("删除标尺\n删除当前标尺。如果当前标尺同时是排图标尺，"
         "则同时将本线设置为按里程排图。"));
     btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(70);
     connect(act, SIGNAL(triggered()), this, SLOT(actRemoveRuler()));
 
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
         tr("关闭面板"), this);
     act->setToolTip(tr("关闭面板\n关闭当前的标尺上下文工具栏页面"));
     btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(70);
     connect(act, &QAction::triggered, this, &RulerContext::focusOutRuler);
     
 }
@@ -285,6 +293,48 @@ void RulerContext::actDulplicateRuler()
 void RulerContext::mergeCurrent()
 {
     mergeWith(this->ruler);
+}
+
+void RulerContext::actExportCsv()
+{
+    if (!ruler) return;
+    QString init_filename = QString("%1_%2").arg(ruler->railway()->name(), ruler->name());
+    init_filename.replace("*", "-");   // * cannot appeared in filenames
+    const QString& filename = QFileDialog::getSaveFileName(mw, tr("导出标尺"),
+        init_filename,
+        tr("逗号分隔文件 (*.csv)\n所有文件 (*)"));
+    if (filename.isEmpty())
+        return;
+    bool flag = ruler->toCsv(filename);
+    if (flag)
+        mw->showStatus(tr("导出标尺成功"));
+    else
+        QMessageBox::warning(mw, tr("错误"), tr("导出标尺失败"));
+}
+
+void RulerContext::actImportCsv()
+{
+    if (!ruler) return;
+    auto res = QMessageBox::question(mw, tr("导入标尺"),
+        tr("从CSV文件导入标尺，其中每一行应有5列：发站、到站、通通时分、起步附加、停车附加，"
+            "所有时间以秒为单位。使用导出标尺功能可获得示例文件。\n"
+            "与当前线路匹配的区间的标尺将被导入并覆盖原数据，不匹配的将被忽略。是否继续？"));
+    if (res != QMessageBox::Yes)
+        return;
+
+    const QString& filename = QFileDialog::getOpenFileName(mw, tr("导入标尺"),
+        {},
+        tr("逗号分隔文件 (*.csv)\n所有文件 (*)"));
+    if (filename.isEmpty())
+        return;
+
+    auto r = ruler->clone();
+    int val = r->rulers().front()->fromCsv(filename);
+    if (val) {
+        mw->getUndoStack()->push(new qecmd::UpdateRuler(ruler, r, this));
+    }
+    QMessageBox::information(mw, tr("提示"),
+        tr("已导入%1条数据").arg(val));
 }
 
 void RulerContext::actShowEditWidget()

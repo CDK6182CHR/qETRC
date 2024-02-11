@@ -117,6 +117,9 @@ private slots:
 
     void mergeCurrent();
 
+    void actExportCsv();
+
+    void actImportCsv();
 };
 
 
