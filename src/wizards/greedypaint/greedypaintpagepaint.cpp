@@ -23,6 +23,7 @@
 #include <data/diagram/diagram.h>
 #include <data/train/train.h>
 #include <dialogs/selecttrainstationdialog.h>
+#include <dialogs/batchaddstopdialog.h>
 
 
 GreedyPaintConfigModel::GreedyPaintConfigModel(QWidget* parent):
@@ -459,6 +460,9 @@ void GreedyPaintPagePaint::initUI()
     auto* btn = new QPushButton(tr("导入停站"));
     connect(btn, &QPushButton::clicked, this, &GreedyPaintPagePaint::actLoadStopTime);
     hlay->addWidget(btn);
+    btn = new QPushButton(tr("批量添加停站"));
+    connect(btn, &QPushButton::clicked, this, &GreedyPaintPagePaint::actBatchAddStop);
+    hlay->addWidget(btn);
 
     flay->addRow(tr("锚点时刻"),hlay);
     connect(edAnchorTime, &QTimeEdit::timeChanged, this, &GreedyPaintPagePaint::paintTmpTrain);
@@ -761,6 +765,35 @@ void GreedyPaintPagePaint::actLoadStopTime()
         }
     }
     if (anyUpdate) {
+        _model->updateSettledStops(stopsecs);
+    }
+}
+
+void GreedyPaintPagePaint::actBatchAddStop()
+{
+    auto rep = BatchAddStopDialog::setBatchAdd(this);
+    if (!rep.has_value()) return;
+
+    std::map<std::shared_ptr<const RailStation>, int> stopsecs;
+    if (rep->constr_range) {
+        auto selmod = table->selectionModel();
+        auto sel = selmod->selectedRows();
+        foreach(const auto & idx, sel) {
+            auto st = _model->stationForRow(idx.row());
+            if (!rep->constr_level || st->level <= rep->lowest_level) {
+                stopsecs.emplace(st, rep->stop_secs);
+            }
+        }
+    }
+    else {
+        for (int i = 0; i < _model->rowCount(); i++) {
+            auto st = _model->stationForRow(i);
+            if (!rep->constr_level || st->level <= rep->lowest_level) {
+                stopsecs.emplace(st, rep->stop_secs);
+            }
+        }
+    }
+    if (!stopsecs.empty()) {
         _model->updateSettledStops(stopsecs);
     }
 }

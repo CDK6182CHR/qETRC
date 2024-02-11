@@ -74,11 +74,13 @@ public:
      */
     std::set<const RailStation*> fixedStations()const;
 
+    // 2024.02.11: make public
+    std::shared_ptr<const RailStation> stationForRow(int row)const;
+
 private:
     static QStandardItem* makeCheckItem();
     static QStandardItem* makeReadonlyItem();
 
-    std::shared_ptr<const RailStation> stationForRow(int row)const;
     int stopSecsForRow(int row)const;
 
     void setRowColor(int row, const QColor& color);
@@ -200,6 +202,8 @@ private slots:
     void setTopLevel(bool on);
 
     void actLoadStopTime();
+
+    void actBatchAddStop();
 
 public slots:
     /**

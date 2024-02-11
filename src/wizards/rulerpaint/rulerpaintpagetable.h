@@ -81,6 +81,9 @@ public:
     */
     void setStationStopSecs(const StationName& name, int secs);
 
+    // 2024.02.11: make public
+    void setStopSecs(int row, int secs);
+
 private:
 
     /**
@@ -106,8 +109,6 @@ private:
     void updateFromRow(int row);
 
     int getStopSecs(int row)const;
-
-    void setStopSecs(int row, int secs);
 
     inline bool rowInRange(int row)const {
         return row >= 0 && row < rowCount();
@@ -291,5 +292,6 @@ private slots:
     void showConflict();
     void showTimetable();
     void loadStopTime();
+    void batchAddStop();
 };
 

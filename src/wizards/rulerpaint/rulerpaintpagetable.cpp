@@ -23,6 +23,7 @@
 #include "util/utilfunc.h"
 #include "viewers/traintimetableplane.h"
 #include "dialogs/selecttrainstationdialog.h"
+#include "dialogs/batchaddstopdialog.h"
 
 
 RulerPaintModel::RulerPaintModel(RulerPaintPageTable *page_, QObject *parent):
@@ -579,6 +580,10 @@ void RulerPaintPageTable::initUI()
     hlay->addWidget(btn);
     connect(btn,&QPushButton::clicked,
             this,&RulerPaintPageTable::loadStopTime);
+    btn = new QPushButton(tr("批量添加停点"));
+    hlay->addWidget(btn);
+    connect(btn, &QPushButton::clicked,
+        this, &RulerPaintPageTable::batchAddStop);
 
     flay->addRow(tr("锚点时刻"),hlay);
 
@@ -686,6 +691,30 @@ void RulerPaintPageTable::loadStopTime()
                                                       this);
     for (const auto& t : res) {
         model->setStationStopSecs(t->name, t->stopSec());
+    }
+}
+
+void RulerPaintPageTable::batchAddStop()
+{
+    auto rep = BatchAddStopDialog::setBatchAdd(this);
+    if (!rep.has_value())
+        return;
+
+    if (rep->constr_range) {
+        auto* selmod = table->selectionModel();
+        auto sel = selmod->selectedRows();
+        foreach(const auto & idx, sel) {
+            auto st = model->getRowStation(idx.row());
+            if (!rep->constr_level || st->level <= rep->lowest_level)
+                model->setStopSecs(idx.row(), rep->stop_secs);
+        }
+    }
+    else {
+        for (int i = 0; i < model->rowCount(); i++) {
+            auto st = model->getRowStation(i);
+            if (!rep->constr_level || st->level <= rep->lowest_level)
+                model->setStopSecs(i, rep->stop_secs);
+        }
     }
 }
 
