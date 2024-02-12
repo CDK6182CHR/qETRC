@@ -5,6 +5,9 @@
 #include <util/buttongroup.hpp>
 #include <data/common/direction.h>
 #include <set>
+#include <map>
+#include <QPointer>
+#include <QTime>
 
 class QTableView;
 class Train;
@@ -16,6 +19,11 @@ class Diagram;
 class Ruler;
 class RailStation;
 class StationName;
+class DiagramWidget;
+class Train;
+struct AdapterStation;
+class PaintStationInfoWidget;
+
 
 class GreedyPaintConfigModel : public QStandardItemModel
 {
@@ -77,11 +85,21 @@ public:
     // 2024.02.11: make public
     std::shared_ptr<const RailStation> stationForRow(int row)const;
 
+    // 2024.02.12  similar to rowForStation(const StationName&); linear alg; -1 if not found
+    int rowForStation(std::shared_ptr<const RailStation> st);
+
+    // 2024.02.12: make public
+    int stopSecsForRow(int row)const;
+
+    // 2024.02.12  add  for info widget
+    int actualStopSecsForRow(int row)const;
+    QTime arriveTimeForRow(int row)const;
+    QTime departTimeForRow(int row)const;
+    bool fixedForRow(int row)const;
+
 private:
     static QStandardItem* makeCheckItem();
     static QStandardItem* makeReadonlyItem();
-
-    int stopSecsForRow(int row)const;
 
     void setRowColor(int row, const QColor& color);
     void setRowBackground(int row, const QColor& color);
@@ -120,6 +138,10 @@ private slots:
     void unsetAnchorRow(int row);
     void unsetStartRow(int row);
     void unsetEndRow(int row);
+
+public slots:
+    void setRowFixed(int row, bool on);
+    void setRowStopSeconds(int row, int secs);
 };
 
 class QTextBrowser;
@@ -148,11 +170,15 @@ class GreedyPaintPagePaint : public QWidget
 
     QLineEdit* edStart, * edAnchor, * edEnd;
 
+    std::map<const RailStation*, QPointer<PaintStationInfoWidget>> infoWidgets;
+
 public:
     explicit GreedyPaintPagePaint(Diagram& diagram_,
             GreedyPainter& painter_,
             QWidget *parent = nullptr);
     auto* model() { return _model; }
+
+    auto getTmpTrain() { return trainTmp; }
 private:
     void initUI();
 
@@ -205,6 +231,10 @@ private slots:
 
     void actBatchAddStop();
 
+    void updateInfoWidgets();
+
+    void updateInfoWidget(PaintStationInfoWidget* w);
+
 public slots:
     /**
      * 为一组数据初始化时，设定起始站-锚点站-终止站的标签
@@ -213,5 +243,9 @@ public slots:
 
     // 2023.10.04 add   for cleaning up temporary data
     void clearTmpTrainLine();
+
+    void onPaintingPointClicked(DiagramWidget* d, std::shared_ptr<Train> train, AdapterStation* st);
+
+    void clearInfoWidgets();
 };
 

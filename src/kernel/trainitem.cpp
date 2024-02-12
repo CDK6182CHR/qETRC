@@ -114,7 +114,7 @@ void TrainItem::highlight()
     }
 
     //显示铺画点
-    if (SystemJson::instance.drag_time && !train()->isOnPainting()) {
+    if (SystemJson::instance.drag_time) {
         if (!stationMarks.empty()) {
             for (auto p : stationMarks) {
                 p->setVisible(true);

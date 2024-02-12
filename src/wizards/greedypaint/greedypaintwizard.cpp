@@ -47,6 +47,7 @@ void GreedyPaintWizard::onConstraintChanged()
     pgPaint->model()->setRuler(painter.ruler());
     pgPaint->model()->refreshData();
     pgPaint->setupStationLabels();
+    pgPaint->clearInfoWidgets();
     //}
 }
 
@@ -67,10 +68,16 @@ void GreedyPaintWizard::cleanUpTempData()
     pgPaint->clearTmpTrainLine();
 }
 
+void GreedyPaintWizard::onPaintingPointClicked(DiagramWidget* d, std::shared_ptr<Train> train, AdapterStation* st)
+{
+    pgPaint->onPaintingPointClicked(d, train, st);
+}
+
 void GreedyPaintWizard::refreshData(std::shared_ptr<Railway> rail)
 {
     if (painter.railway() == rail && rail) {
         pgPaint->model()->refreshData();
         pgPaint->setupStationLabels();
+        pgPaint->clearInfoWidgets();
     }
 }

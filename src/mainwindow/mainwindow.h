@@ -245,6 +245,9 @@ protected:
 
     virtual void dropEvent(QDropEvent* e)override;
 
+signals:
+    void paintingPointClicked(DiagramWidget* d, std::shared_ptr<Train> train, AdapterStation* st);
+
 private slots:
     /**
      * act前缀表示action，强调用户直接动作

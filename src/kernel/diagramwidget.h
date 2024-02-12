@@ -25,6 +25,7 @@ class ForbidNode;
 class Routing;
 class DragTimeInfoWidget;
 class PaintStationPointItem;
+class PaintStationInfoWidget;
 namespace qeutil {
     class QEBalloonTip;
 }
@@ -81,9 +82,11 @@ class DiagramWidget : public QGraphicsView
     bool _onDragging = false;
     TrainItem* _draggedItem = nullptr;
     QPointF _dragStartPoint;
+    Direction _paintInfoDir;
 
     DragTimeInfoWidget* _dragInfoWidget = nullptr;
     QGraphicsProxyWidget* _dragInfoProxy = nullptr;
+    std::map<PaintStationInfoWidget*, QGraphicsProxyWidget*> _paintInfoProxies;
 
 public:
     struct SharedActions {
@@ -328,6 +331,11 @@ private:
 
     void dragTimeFinish(const QPointF& pos);
 
+    /**
+     * 2024.02.12 Show painting info widget for painting train.
+     */
+    void showPaintingInfoWidget(const QPointF& pos, TrainItem* item, PaintStationPointItem* point);
+
 signals:
     void showNewStatus(QString);
     void trainSelected(std::shared_ptr<Train> train);
@@ -335,10 +343,12 @@ signals:
     void railFocussedIn(std::shared_ptr<Railway> railway);
 
     void timeDragged(std::shared_ptr<Train> train, int station_id, const TrainStation& data);
+    void paintingPointClicked(DiagramWidget* d, std::shared_ptr<Train> train, AdapterStation* st);
 
 private slots:
     void updateTimeAxis();
     void updateDistanceAxis();
+    void closePaintInfoWidget();
 
 public slots:
 
@@ -377,5 +387,10 @@ public slots:
 
     void locateToMile(std::shared_ptr<const Railway> railway, double mile, const QTime& tm);
 
+    /**
+     * 2024.02.12  add the info widget into scene.
+     * Here, the widget's parent is this.
+     */
+    void addPaintStationInfoWidget(PaintStationInfoWidget* w);
 };
 

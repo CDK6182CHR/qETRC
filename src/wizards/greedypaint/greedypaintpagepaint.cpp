@@ -149,11 +149,40 @@ std::shared_ptr<const RailStation> GreedyPaintConfigModel::stationForRow(int row
     return qvariant_cast<std::shared_ptr<const RailStation>>(it->data(qeutil::RailStationRole));
 }
 
+int GreedyPaintConfigModel::rowForStation(std::shared_ptr<const RailStation> st)
+{
+    for (int i = 0; i < rowCount(); i++) {
+        if (stationForRow(i) == st)
+            return i;
+    }
+    return -1;
+}
+
 int GreedyPaintConfigModel::stopSecsForRow(int row) const
 {
     int mins = item(row, ColMinute)->data(Qt::EditRole).toInt();
     int secs = item(row, ColSecond)->data(Qt::EditRole).toInt();
     return mins * 60 + secs;
+}
+
+int GreedyPaintConfigModel::actualStopSecsForRow(int row) const
+{
+    return item(row, ColActualStop)->data(Qt::EditRole).toInt();
+}
+
+QTime GreedyPaintConfigModel::arriveTimeForRow(int row) const
+{
+    return item(row, ColArrive)->data(Qt::EditRole).toTime();
+}
+
+QTime GreedyPaintConfigModel::departTimeForRow(int row) const
+{
+    return item(row, ColDepart)->data(Qt::EditRole).toTime();
+}
+
+bool GreedyPaintConfigModel::fixedForRow(int row) const
+{
+    return item(row, ColFix)->checkState() == Qt::Checked;
 }
 
 void GreedyPaintConfigModel::setRowColor(int row, const QColor& color)
@@ -413,6 +442,24 @@ void GreedyPaintConfigModel::unsetEndRow(int row)
     Q_UNUSED(row);
     _endRow = -1;
     emit endStationChanged(endStation());
+}
+
+void GreedyPaintConfigModel::setRowFixed(int row, bool on)
+{
+    if (0 <= row && row < rowCount()) {
+        item(row, ColFix)->setCheckState(on ? Qt::Checked : Qt::Unchecked);
+    }
+}
+
+void GreedyPaintConfigModel::setRowStopSeconds(int row, int secs)
+{
+    if (0 <= row && row < rowCount()) {
+        int secs_old = stopSecsForRow(row);
+        if (secs_old != secs) {
+            item(row, ColMinute)->setData(secs / 60, Qt::EditRole);
+            item(row, ColSecond)->setData(secs % 60, Qt::EditRole);
+        }
+    }
 }
 
 
@@ -677,6 +724,8 @@ void GreedyPaintPagePaint::paintTmpTrain()
     diagram.updateTrain(trainTmp);
     emit paintTmpTrainLine(*trainTmp);
 
+    // update info widgets
+    updateInfoWidgets();
 }
 
 void GreedyPaintPagePaint::onApply()
@@ -705,7 +754,7 @@ void GreedyPaintPagePaint::onApply()
     diagram.updateTrain(newtrain);
     newtrain->setOnPainting(false);
     emit trainAdded(newtrain);
-
+    clearInfoWidgets();
 }
 
 void GreedyPaintPagePaint::onStartChanged(std::shared_ptr<const RailStation> st)
@@ -736,6 +785,7 @@ void GreedyPaintPagePaint::onClearTmp()
     if (trainTmp) {
         emit removeTmpTrainLine(*trainTmp);
     }
+    clearInfoWidgets();
 }
 
 void GreedyPaintPagePaint::setTopLevel(bool on)
@@ -801,6 +851,64 @@ void GreedyPaintPagePaint::actBatchAddStop()
 void GreedyPaintPagePaint::clearTmpTrainLine()
 {
     onClearTmp();
+}
+
+#include "kernel/paintstationinfowidget.h"
+#include "kernel/diagramwidget.h"
+
+void GreedyPaintPagePaint::updateInfoWidgets()
+{
+    for (auto p = infoWidgets.begin(); p != infoWidgets.end(); ++p) {
+        if (!p->second.isNull()) {
+            updateInfoWidget(p->second.get());
+        }
+    }
+}
+
+void GreedyPaintPagePaint::updateInfoWidget(PaintStationInfoWidget* w)
+{
+    w->onDataChanged(trainTmp->trainName().full(), 
+        _model->stopSecsForRow(w->id()),
+        _model->actualStopSecsForRow(w->id()),
+        _model->fixedForRow(w->id()),
+        _model->arriveTimeForRow(w->id()),
+        _model->departTimeForRow(w->id()));
+}
+
+void GreedyPaintPagePaint::onPaintingPointClicked(DiagramWidget* d, std::shared_ptr<Train> train, AdapterStation* st)
+{
+    if (train != trainTmp) return;
+    int row = _model->rowForStation(st->railStation.lock());
+    if (row == -1) return;
+
+    // Only one infoWidget is allowed for one station.
+    if (auto wid = infoWidgets.find(st->railStation.lock().get()); wid == infoWidgets.end() || wid->second.isNull()) {
+
+        auto* w = new PaintStationInfoWidget(row, st->railStation.lock(), d, train->trainName().full(), true);
+        updateInfoWidget(w);   // udpate data now
+
+        if (wid != infoWidgets.end()) {
+            infoWidgets.erase(wid);
+        }
+        infoWidgets.emplace(st->railStation.lock().get(), w);
+
+        connect(w, &PaintStationInfoWidget::fixStatusChanged,
+            _model, &GreedyPaintConfigModel::setRowFixed);
+        connect(w, &PaintStationInfoWidget::stopTimeChanged,
+            _model, &GreedyPaintConfigModel::setRowStopSeconds);
+
+        d->addPaintStationInfoWidget(w);
+    }
+}
+
+void GreedyPaintPagePaint::clearInfoWidgets()
+{
+    for (auto p = infoWidgets.begin(); p != infoWidgets.end(); ++p) {
+        if (!p->second.isNull()) {
+            p->second->close();
+        }
+    }
+    infoWidgets.clear();
 }
 
 void GreedyPaintPagePaint::setupStationLabels()

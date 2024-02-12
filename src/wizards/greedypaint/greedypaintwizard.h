@@ -7,6 +7,10 @@
 class GreedyPaintPagePaint;
 class GreedyPaintPageConstraint;
 class TrainFilterSelector;
+class DiagramWidget;
+class Train;
+struct AdapterStation;
+
 
 /**
  * @brief The GreedyPaintWizard class
@@ -50,5 +54,7 @@ public slots:
      * Currently, mainly clear temp train lines.
      */
     void cleanUpTempData();
+
+    void onPaintingPointClicked(DiagramWidget* d, std::shared_ptr<Train> train, AdapterStation* st);
 };
 

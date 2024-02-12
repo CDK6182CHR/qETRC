@@ -31,6 +31,8 @@
 #include "data/rail/forbid.h"
 #include "dragtimeinfowidget.h"
 #include "paintstationpointitem.h"
+#include "paintstationinfowidget.h"
+
 
 DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page, QWidget* parent):
     QGraphicsView(parent), _page(page),_diagram(diagram),startTime(page->config().start_hour,0,0)
@@ -380,6 +382,14 @@ void DiagramWidget::dragTimeFinish(const QPointF& pos)
     
 }
 
+void DiagramWidget::showPaintingInfoWidget(const QPointF& pos, TrainItem* item, PaintStationPointItem* point)
+{
+    _dragStartPoint = pos;   // use this for the point locating widget
+    _paintInfoDir = item->dir();
+    // Mind: for ruler paint case, the station may be out of painting range.
+    emit paintingPointClicked(this, item->train(), point->station());
+}
+
 bool DiagramWidget::toPng(const QString& filename, const QString& title, const QString& note)
 {
     using namespace std::chrono_literals;
@@ -591,9 +601,15 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
 
 
         if (trainItem && pointItem && trainItem->train() == selectedTrain()) {
-            // for drag here
-            if (SystemJson::instance.drag_time) {
-                dragTimeBegin(pos, trainItem, pointItem, ctrl, alt);
+            if (trainItem->train()->isOnPainting()) {
+                // 2024.02.12: show paiting info widget
+                showPaintingInfoWidget(pos, trainItem, pointItem);
+            }
+            else {
+                // for drag here
+                if (SystemJson::instance.drag_time) {
+                    dragTimeBegin(pos, trainItem, pointItem, ctrl, alt);
+                }
             }
         }
         else {
@@ -624,6 +640,7 @@ void DiagramWidget::mouseMoveEvent(QMouseEvent* e)
 
 void DiagramWidget::mouseReleaseEvent(QMouseEvent* e)
 {
+    QGraphicsView::mouseReleaseEvent(e);  // 2024.02.12 
     if (_onDragging) {
         dragTimeFinish(mapToScene(e->pos()));
     }
@@ -1544,6 +1561,16 @@ void DiagramWidget::updateDistanceAxis()
     marginItems.right->setX(sp2.x() - scene()->width() - 20);
 }
 
+void DiagramWidget::closePaintInfoWidget()
+{
+    auto* w0 = sender();
+    auto* w = qobject_cast<PaintStationInfoWidget*>(w0);
+    auto* p = _paintInfoProxies.at(w);
+    p->deleteLater();
+
+    _paintInfoProxies.erase(w);
+}
+
 void DiagramWidget::highlightTrain(std::shared_ptr<Train> train)
 {
     if (!_page->hasTrain(*train))
@@ -1618,4 +1645,33 @@ void DiagramWidget::showTrainEventText()
     dialog->setLayout(layout);
     dialog->show();
     dialog->exec();
+}
+
+void DiagramWidget::addPaintStationInfoWidget(PaintStationInfoWidget* w)
+{
+    auto* proxy = scene()->addWidget(w);
+    proxy->setZValue(18);
+    _paintInfoProxies.emplace(w, proxy);
+
+    qDebug() << "proxy: " << proxy << "; widget: " << w;
+    qDebug() << "widget parent: " << w->parent();
+
+    connect(w, &PaintStationInfoWidget::widgetClosed, this, &DiagramWidget::closePaintInfoWidget);
+    
+    // define the pos
+    QPointF pos(_dragStartPoint);
+    QRect rect = w->rect();
+    constexpr const int SPLIT_X = 10, SPLIT_Y = 10;
+
+    // right-upper for down trains; mind not to exceed right and upper range
+    if (_paintInfoDir == Direction::Down) {
+        pos.setX(std::min(pos.x() + SPLIT_X, scene()->width() - rect.width() - SPLIT_X));
+        pos.setY(std::max(pos.y() - SPLIT_Y - rect.height(), 0.0));
+    }
+    // right-lower for up trains; mind no to exceed buttom and right range
+    else {
+        pos.setX(std::min(pos.x() + SPLIT_X, scene()->width() - rect.width() - SPLIT_X));
+        pos.setY(std::min(pos.y() + SPLIT_Y, scene()->height() - rect.height() - SPLIT_Y));
+    }
+    proxy->setPos(pos);
 }

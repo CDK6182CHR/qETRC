@@ -471,6 +471,8 @@ void MainWindow::actGreedyPaint()
 			naviView, &NaviTree::actAddPaintedTrain);
 		connect(greedyWidget, &GreedyPaintWizard::showStatus,
 			this, &MainWindow::showStatus);
+		connect(this, &MainWindow::paintingPointClicked,
+			greedyWidget, &GreedyPaintWizard::onPaintingPointClicked);
 	}
 	greedyWidget->show();
 }
@@ -2295,6 +2297,7 @@ void MainWindow::insertPageWidget(std::shared_ptr<DiagramPage> page, int index)
 	connect(dw, &DiagramWidget::pageFocussedIn, this, &MainWindow::focusInPage);
 	connect(dw, &DiagramWidget::showNewStatus, this, &MainWindow::showStatus);
 	connect(dw, &DiagramWidget::timeDragged, contextTrain, &TrainContext::actDragTime);
+	connect(dw, &DiagramWidget::paintingPointClicked, this, &MainWindow::paintingPointClicked);   // forward
 	auto end = std::chrono::system_clock::now();
 	showStatus(tr("添加运行图 [%1] 用时%2毫秒").arg(page->name()).arg((end - start) / 1ms));
 }
