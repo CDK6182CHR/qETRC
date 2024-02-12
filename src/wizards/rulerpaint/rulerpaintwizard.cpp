@@ -6,6 +6,8 @@
 #include "rulerpaintpagestation.h"
 #include "rulerpaintpagetable.h"
 #include "data/rail/railway.h"
+#include "kernel/paintstationinfowidget.h"
+#include "kernel/diagramwidget.h"
 
 #include <QMessageBox>
 
@@ -29,7 +31,7 @@ void RulerPaintWizard::reject()
 
     if (trainTmp)
         emit removeTmpTrainLine(*trainTmp);
-    
+    clearInfoWidgets();
     QWizard::reject();
 }
 
@@ -56,6 +58,7 @@ void RulerPaintWizard::accept()
         //执行时刻表变化
         emit trainTimetableModified(pgStart->train(), trainTmp);
     }
+    clearInfoWidgets();
     QWizard::accept();
 }
 
@@ -109,6 +112,7 @@ void RulerPaintWizard::cleanupPage(int id)
         //清理临时运行线
         if (trainTmp)
             emit removeTmpTrainLine(*trainTmp);
+        clearInfoWidgets();
     }
     QWizard::cleanupPage(id);
 }
@@ -140,6 +144,30 @@ void RulerPaintWizard::resetTmpTrain()
     }
     else {
         itrStart = itrEnd = trainTmp->timetable().end();
+    }
+}
+
+void RulerPaintWizard::updateInfoWidget(PaintStationInfoWidget* w)
+{
+    auto* m = pgTable->getModel();
+    int stop_secs = m->getStopSecs(w->id());
+    w->onDataChanged(trainTmp->trainName().full(), stop_secs, stop_secs, false,
+        m->getArrive(w->id()), m->getDepart(w->id()));
+}
+
+void RulerPaintWizard::updateInfoWidgets()
+{
+    for (auto& p : infoWidgets) {
+        if (!p.second.isNull())
+            updateInfoWidget(p.second.get());
+    }
+}
+
+void RulerPaintWizard::clearInfoWidgets()
+{
+    for (auto& p : infoWidgets) {
+        if (!p.second.isNull())
+            p.second->close();
     }
 }
 
@@ -204,8 +232,9 @@ void RulerPaintWizard::updateTrainLine(std::shared_ptr<Train> table)
 
     //绑定、铺画
     diagram.updateTrain(trainTmp);
-    emit paintTmpTrainLine(*trainTmp);
+    emit paintTmpTrainLine(trainTmp);
     
+    updateInfoWidgets();
 }
 
 void RulerPaintWizard::setDefaultRailway()
@@ -278,5 +307,29 @@ void RulerPaintWizard::setDefaultAnchorStation()
                 break;
             }
         }
+    }
+}
+
+void RulerPaintWizard::onPaintingPointClicked(DiagramWidget* d, std::shared_ptr<Train> train, AdapterStation* st)
+{
+    if (train != this->trainTmp) return;
+    auto railst = st->railStation.lock();
+    auto itr = infoWidgets.find(railst.get());
+    if (itr == infoWidgets.end() || itr->second.isNull()) {
+        int row = pgTable->getModel()->getStationRow(railst);
+        if (row == -1) return;
+        if (st->trainStation->arrive != pgTable->getModel()->getArrive(row) ||
+            st->trainStation->depart != pgTable->getModel()->getDepart(row)) {
+            return;
+        }
+
+        auto* w = new PaintStationInfoWidget(row, railst, d, trainTmp->trainName().full(), false);
+        connect(w, &PaintStationInfoWidget::stopTimeChanged,
+            pgTable->getModel(), &RulerPaintModel::setStopSecs);
+        updateInfoWidget(w);
+        
+        infoWidgets[railst.get()] = w;
+
+        d->addPaintStationInfoWidget(w);
     }
 }

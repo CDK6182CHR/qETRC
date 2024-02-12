@@ -433,13 +433,15 @@ void MainWindow::actRulerPaint()
 	connect(wzd, &RulerPaintWizard::removeTmpTrainLine,
 		this, &MainWindow::removeTrainLine);
 	connect(wzd, &RulerPaintWizard::paintTmpTrainLine,
-		this, &MainWindow::addTrainLine);
+		this, &MainWindow::addTrainLineTmp);
 	connect(wzd, &RulerPaintWizard::trainAdded,
 		naviView, &NaviTree::actAddPaintedTrain);
 	connect(wzd, &RulerPaintWizard::trainTimetableModified,
 		contextTrain, &TrainContext::onTrainTimetableChanged);
 	connect(wzd, &RulerPaintWizard::trainInfoModified,
 		contextTrain, &TrainContext::onTrainInfoChanged);
+	connect(this, &MainWindow::paintingPointClicked,
+		wzd, &RulerPaintWizard::onPaintingPointClicked);
 	wzd->show();
 }
 

@@ -3,6 +3,7 @@
 #include <QStandardItemModel>
 #include <memory>
 #include <utility>
+#include <QTime>
 
 #include "util/buttongroup.hpp"
 #include "data/train/train.h"
@@ -14,6 +15,10 @@ class RulerNode;
 class RulerPaintPageTable;
 class QComboBox;
 class Ruler;
+class DiagramWidget;
+struct AdapterStation;
+class PaintStationInfoWidget;
+
 
 /**
  * @brief The RulerPaintModel class
@@ -72,6 +77,11 @@ public:
 
     std::shared_ptr<const RailStation> getRowStation(int row)const;
 
+    /**
+     * 2024.02.12  Linear search; -1 if not found
+     */
+    int getStationRow(std::shared_ptr<const RailStation> st)const;
+
     QTime getRowArrive(int row)const;
 
     QTime getRowDepart(int row)const;
@@ -81,8 +91,10 @@ public:
     */
     void setStationStopSecs(const StationName& name, int secs);
 
-    // 2024.02.11: make public
-    void setStopSecs(int row, int secs);
+    // 2024.02.12  make public
+    int getStopSecs(int row)const;
+    QTime getArrive(int row)const;
+    QTime getDepart(int row)const;
 
 private:
 
@@ -107,8 +119,6 @@ private:
      * 但如果所给行是参考行，则认为到达时刻是正确的。
      */
     void updateFromRow(int row);
-
-    int getStopSecs(int row)const;
 
     inline bool rowInRange(int row)const {
         return row >= 0 && row < rowCount();
@@ -185,6 +195,9 @@ public slots:
     void onStartAtThisChanged();
 
     void onEndAtThisChanged();
+
+    // 2024.02.11: make public
+    void setStopSecs(int row, int secs);
 
 private slots:
 
@@ -293,5 +306,8 @@ private slots:
     void showTimetable();
     void loadStopTime();
     void batchAddStop();
+
+public slots:
+    //void onPaintingPointClicked(DiagramWidget* d, std::shared_ptr<Train> train, AdapterStation* st);
 };
 

@@ -887,10 +887,7 @@ void GreedyPaintPagePaint::onPaintingPointClicked(DiagramWidget* d, std::shared_
         auto* w = new PaintStationInfoWidget(row, st->railStation.lock(), d, train->trainName().full(), true);
         updateInfoWidget(w);   // udpate data now
 
-        if (wid != infoWidgets.end()) {
-            infoWidgets.erase(wid);
-        }
-        infoWidgets.emplace(st->railStation.lock().get(), w);
+        infoWidgets[st->railStation.lock().get()] = w;
 
         connect(w, &PaintStationInfoWidget::fixStatusChanged,
             _model, &GreedyPaintConfigModel::setRowFixed);

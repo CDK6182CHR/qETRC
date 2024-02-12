@@ -111,6 +111,16 @@ std::shared_ptr<const RailStation> RulerPaintModel::getRowStation(int row) const
         item(row, ColStation)->data(qeutil::RailStationRole));
 }
 
+int RulerPaintModel::getStationRow(std::shared_ptr<const RailStation> st) const
+{
+    for (int i = 0; i < rowCount(); i++) {
+        auto sti = getRowStation(i);
+        if (st == sti)
+            return i;
+    }
+    return -1;
+}
+
 QTime RulerPaintModel::getRowArrive(int row) const
 {
     return item(row, ColArrive)->data(Qt::EditRole).toTime();
@@ -254,6 +264,16 @@ int RulerPaintModel::getStopSecs(int row) const
 {
     return item(row,ColMinute)->data(Qt::EditRole).toInt() * 60 +
             item(row,ColSecond)->data(Qt::EditRole).toInt();
+}
+
+QTime RulerPaintModel::getArrive(int row) const
+{
+    return item(row, ColArrive)->data(Qt::EditRole).toTime();
+}
+
+QTime RulerPaintModel::getDepart(int row) const
+{
+    return item(row, ColDepart)->data(Qt::EditRole).toTime();
 }
 
 void RulerPaintModel::setStopSecs(int row, int secs)
@@ -734,3 +754,4 @@ void RulerPaintPageTable::onDoubleClicked(const QModelIndex &idx)
     }
     model->paintTrain();
 }
+

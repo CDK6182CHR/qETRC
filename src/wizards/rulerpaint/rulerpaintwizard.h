@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <QWizard>
 #include <list>
+#include <QPointer>
+#include <map>
 
 #include "data/common/qeglobal.h"   // for meta-type decl
 
@@ -15,6 +17,10 @@ class MainWindow;
 class RulerPaintPageStart;
 class RulerPaintPageStation;
 class RulerPaintPageTable;
+class DiagramWidget;
+struct AdapterStation;
+class PaintStationInfoWidget;
+class RailStation;
 
 /**
  * @brief The RulerPaintWizard class
@@ -33,6 +39,7 @@ class RulerPaintWizard : public QWizard
     std::shared_ptr<Train> trainTmp;         // 整合出来的临时车次
     std::list<TrainStation>::iterator itrStart, itrEnd;      // 注意这是tmp里面的迭代器，只有调整排图启用
 
+    std::map<const RailStation*, QPointer<PaintStationInfoWidget>> infoWidgets;
 public:
     /**
      * 存储数据的field名称
@@ -65,9 +72,13 @@ private:
 
     void resetTmpTrain();
 
+    void updateInfoWidget(PaintStationInfoWidget* w);
+    void updateInfoWidgets();
+    void clearInfoWidgets();
+
 signals:
     void removeTmpTrainLine(const Train& train);
-    void paintTmpTrainLine(Train& train);
+    void paintTmpTrainLine(std::shared_ptr<Train> train);
 
     /**
      * 铺画新列车模式下，接受铺画结果；直接接受trainTmp作为结果
@@ -96,5 +107,8 @@ private slots:
      * 设置默认的Anchor信息，根据已有的车次信息。
      */
     void setDefaultAnchorStation(); 
+
+public slots:
+    void onPaintingPointClicked(DiagramWidget* d, std::shared_ptr<Train> train, AdapterStation* st);
 };
 
