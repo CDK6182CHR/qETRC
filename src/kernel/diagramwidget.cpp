@@ -583,10 +583,14 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
         // 2023.06.04: extract the item manually here
         TrainItem* trainItem=nullptr;
         PaintStationPointItem* pointItem=nullptr;
+        QGraphicsItem* posWidget = nullptr;
 
         if constexpr (true) {
             auto* item = scene()->itemAt(pos, transform());
             while (item) {
+                if (item->isWidget()) {
+                    posWidget = item;
+                }
                 switch (item->type()) {
                 case PaintStationPointItem::Type:
                     pointItem = qgraphicsitem_cast<PaintStationPointItem*>(item);
@@ -611,6 +615,10 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
                     dragTimeBegin(pos, trainItem, pointItem, ctrl, alt);
                 }
             }
+        }
+        else if (posWidget) {
+            // nothing to do for now
+            // 2024.02.12  for widget clicked, unselec/select is not triggered
         }
         else {
             unselectTrain();
@@ -1144,6 +1152,14 @@ void DiagramWidget::paintTrain(Train& train)
                 }
             }
         }
+    }
+}
+
+void DiagramWidget::paintTrainTmp(std::shared_ptr<Train> train)
+{
+    if (train->isOnPainting()) {
+        unselectTrain();
+        highlightTrain(train);
     }
 }
 

@@ -128,9 +128,15 @@ public:
     bool toPng(const QString& filename, const QString& title, const QString& note);
 
     
-
     void paintTrain(std::shared_ptr<Train> train);
     void paintTrain(Train& train);
+
+    /**
+     * 2024.02.12  Note: this is slightly different from the paintTrain(...).
+     * Here, the on-painting train is automatically highlighted. Thus, the paiting methods
+     * should call this function.
+     */
+    void paintTrainTmp(std::shared_ptr<Train> train);
 
     /**
      * 铺画列车运行线。注意paintTrain()不采用此方法，因为这里涉及查找Railway的序号等操作，

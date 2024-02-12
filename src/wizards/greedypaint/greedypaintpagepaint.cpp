@@ -715,14 +715,14 @@ void GreedyPaintPagePaint::paintTmpTrain()
     }
 
     auto train = doPaintTrain();
-    if (!train)return;
+    if (!train) return;
 
     _model->setTimetable(train);
 
     mergeTmpTrain();
 
     diagram.updateTrain(trainTmp);
-    emit paintTmpTrainLine(*trainTmp);
+    emit paintTmpTrainLine(trainTmp);
 
     // update info widgets
     updateInfoWidgets();

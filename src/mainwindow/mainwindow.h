@@ -394,6 +394,11 @@ private slots:
     void addTrainLine(Train& train);
     void removeTrainLine(const Train& train);
 
+    /**
+     * 2024.02.12  for trains on-painting.
+     */
+    void addTrainLineTmp(std::shared_ptr<Train> train);
+
     void actChangeStationName();
 
     void actNaviToRuler();

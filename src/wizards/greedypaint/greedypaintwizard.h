@@ -37,7 +37,7 @@ signals:
     void trainAdded(std::shared_ptr<Train>);
     void showStatus(const QString&);
     void removeTmpTrainLine(const Train& train);
-    void paintTmpTrainLine(Train& train);
+    void paintTmpTrainLine(std::shared_ptr<Train>);
 private slots:
     void onConstraintChanged();
     void onClose();

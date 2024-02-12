@@ -202,7 +202,7 @@ signals:
     void trainAdded(std::shared_ptr<Train>);
 
     void removeTmpTrainLine(const Train& train);
-    void paintTmpTrainLine(Train& train);
+    void paintTmpTrainLine(std::shared_ptr<Train>);
 
     void actClose();
 

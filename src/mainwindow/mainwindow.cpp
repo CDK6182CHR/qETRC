@@ -466,7 +466,7 @@ void MainWindow::actGreedyPaint()
 		connect(greedyWidget, &GreedyPaintWizard::removeTmpTrainLine,
 			this, &MainWindow::removeTrainLine);
 		connect(greedyWidget, &GreedyPaintWizard::paintTmpTrainLine,
-			this, &MainWindow::addTrainLine);
+			this, &MainWindow::addTrainLineTmp);
 		connect(greedyWidget, &GreedyPaintWizard::trainAdded,
 			naviView, &NaviTree::actAddPaintedTrain);
 		connect(greedyWidget, &GreedyPaintWizard::showStatus,
@@ -1679,6 +1679,12 @@ void MainWindow::removeTrainLine(const Train& train)
 {
 	for (auto p : diagramWidgets)
 		p->removeTrain(train);
+}
+
+void MainWindow::addTrainLineTmp(std::shared_ptr<Train> train)
+{
+	for (auto p : diagramWidgets)
+		p->paintTrainTmp(train);
 }
 
 void MainWindow::actChangeStationName()
