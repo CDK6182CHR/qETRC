@@ -26,9 +26,16 @@ int main(int argc, char *argv[])
     else {
         a.installTranslator(&trans);
     }
-    // test:
-    //trans.load("./tr/qETRC_en.qm");
-    //a.installTranslator(&trans);
+    
+    // translation of Qt
+    QTranslator trans2;
+    bool res2 = trans2.load(QLocale{ SystemJson::instance.language }, "./translations/", "qt_");
+    if (!res2) {
+        qWarning() << "load Qt translation file failed!";
+    }
+    else {
+        a.installTranslator(&trans2);
+    }
 
 #ifdef QETRC_MOBILE
     AMainWindow w;

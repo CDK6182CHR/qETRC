@@ -51,7 +51,7 @@ win64: win64_dir win64_tr
 	$(COPY) $(SAMPLE_FILE) $(WIN64_DIR)
 	$(COPY) $(RAIL_LIB_FILE) $(WIN64_DIR)
 	$(COPY) $(SARIBBON_LIB) $(WIN64_DIR)
-	$(COPY) $(QETRC_ROOT)\tr\*.qm $(WIN64_DIR)\tr\
+	$(COPY) $(QETRC_ROOT)\tr\*.qm $(WIN64_DIR)\tr
 	$(QT_PROMPT_SCRIPT) && cd /d $(WIN64_DIR) && cd && windeployqt $(BIN_FILE)
 	cd $(OUTPUT_ROOT) && $(ZIP) $(WIN64_ARCHIVE) $(WIN64_DIR)
 
@@ -61,7 +61,7 @@ win64: win64_dir win64_tr
 win64-patch: patch_dir patch_tr
 	$(COPY) $(BUILD_DIR)\$(BIN_FILE) $(PATCH_DIR)
 	$(COPY) $(NOTE_FILE) $(PATCH_DIR)
-	$(COPY) $(QETRC_ROOT)\tr\*.qm $(PATCH_DIR)\tr\
+	$(COPY) $(QETRC_ROOT)\tr\*.qm $(PATCH_DIR)\tr
 	cd $(OUTPUT_ROOT) && $(ZIP) $(PATCH_ARCHIVE) $(PATCH_DIR)
 	
 # This is for local debug version
