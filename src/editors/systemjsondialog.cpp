@@ -14,6 +14,8 @@
 #include <QStyleFactory>
 #include <QApplication>
 
+#define DISABLE_ENGLISH
+
 SystemJsonDialog::SystemJsonDialog(QWidget *parent):
     QDialog(parent)
 {
@@ -38,7 +40,9 @@ void SystemJsonDialog::initUI()
 
     cbLanguage = new QComboBox;
     cbLanguage->addItem(QString("中文"), QLocale::Chinese);
+#ifndef DISABLE_ENGLISH
     cbLanguage->addItem(QString("English"), QLocale::English);
+#endif
     auto* hlay = new QHBoxLayout;
     hlay->addWidget(cbLanguage);
     hlay->addWidget(new QLabel(tr("重新启动软件生效")));
@@ -111,7 +115,10 @@ void SystemJsonDialog::setLanguageCombo()
     // Currently, a brute-force implementation...
     switch (SystemJson::instance.language) {
     case QLocale::Chinese: cbLanguage->setCurrentIndex(0); break;
+#ifndef DISABLE_ENGLISH
     case QLocale::English: cbLanguage->setCurrentIndex(1); break;
+#endif
+    default: cbLanguage->setCurrentIndex(0); break;
     }
 }
 
