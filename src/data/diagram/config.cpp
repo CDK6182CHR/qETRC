@@ -23,6 +23,7 @@ void MarginConfig::fromJson(const QJsonObject& obj)
     FROM_OBJ(title_row_height, Int);
     FROM_OBJ(first_row_append, Int);
     FROM_OBJ(gap_between_railways, Int);
+    FROM_OBJ(count_label_width, Int);
 }
 
 #define TO_OBJ(_key) {#_key,_key},
@@ -44,6 +45,7 @@ QJsonObject MarginConfig::toJson() const
         TO_OBJ(title_row_height)
         TO_OBJ(first_row_append)
         TO_OBJ(gap_between_railways)
+        TO_OBJ(count_label_width)
     };
 }
 
