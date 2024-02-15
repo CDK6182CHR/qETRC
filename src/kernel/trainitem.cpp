@@ -498,7 +498,8 @@ void TrainItem::setPathItem(const QString& trainName)
                 path.moveTo(parr);
                 started = true;
             }
-            else {
+            // else  // 2024.02.15: no-else; for the first paining point may not be the actual first?
+            {
                 if (xarr < xlast) {
                     //横坐标数值减小，表明出现左入图情况（跨界）
                     if (inlast) {
@@ -525,6 +526,8 @@ void TrainItem::setPathItem(const QString& trainName)
             }
             if (inlast) {
                 //补充右出图情况
+                //qDebug() << "Out of graph: " << train()->trainName().full() << " "
+                //    << xlast << ", " << ylast << ", " << xarr << ", " << ycur;
                 spanRight.append(getOutGraph(xlast, ylast, xarr, ycur, path));
             }
         }
@@ -772,9 +775,10 @@ QTime TrainItem::calTimeByXFromStart(double x_from_start) const
 double TrainItem::getOutGraph(double xin, double yin, double xout, double yout, 
     QPainterPath& path)
 {
+    // Note, that xout may be out of graph or actually in graph (in this case, xout < xin)
     double fullwidth = config().fullWidth();
     double width = config().diagramWidth();
-    double xright = xout + fullwidth;
+    double xright = xout < xin ? xout + fullwidth: xout;
     double yp = yin + (width - xin) * (yout - yin) / (xright - xin);
     QPointF pout(start_x + width, start_y + yp);
     path.lineTo(pout);
@@ -882,7 +886,8 @@ void TrainItem::setStretchedFont(QFont& font, QGraphicsSimpleTextItem* item, dou
 
 void TrainItem::addTimeMarks()
 {
-    auto lastIter = _line->stations().end(); --lastIter;
+    auto lastIter = std::prev(_line->stations().end());
+    auto width = config().diagramWidth();
     for (auto p = _line->stations().begin(); p != _line->stations().end(); ++p) {
         auto ts = p->trainStation;
         auto rs = p->railStation.lock();
@@ -891,7 +896,7 @@ void TrainItem::addTimeMarks()
 
         //标注到点  
         //注意最后一站如果无停点是按照到达来标注的
-        if (ts->isStopped() || p == lastIter) {
+        if (xarr <= width && (ts->isStopped() || p == lastIter)) {
             if (_line->startLabel() || p != _line->stations().begin()) {
                 markArriveTime(xarr, ycur, ts->arrive);
             }
@@ -901,7 +906,7 @@ void TrainItem::addTimeMarks()
         //2022.05.18修正逻辑：无论有没有停点，都要标注开点；
         //除非是结束无标签的最后一站。
         //最后一站：仅当有停点且有结束标签时，才标记开点
-        if (p != lastIter || (ts->isStopped() && _line->endLabel())) {
+        if (xdep <= width && (p != lastIter || (ts->isStopped() && _line->endLabel()))) {
             markDepartTime(xdep, ycur, ts->depart);
         }
     }
@@ -916,6 +921,7 @@ void TrainItem::hideTimeMarks()
 
 void TrainItem::addStationPoints()
 {
+    auto width = config().diagramWidth();
     for (auto p = _line->stations().begin(); p != _line->stations().end(); ++p) {
         auto ts = p->trainStation;
         auto rs = p->railStation.lock();
@@ -926,15 +932,17 @@ void TrainItem::addStationPoints()
         //    << &*p << Qt::endl;
 
         // arrive point
-        auto arr_point_type = (ts->isStopped() ? StationPoint::Arrive : StationPoint::Pass);
-        auto* itarr = new PaintStationPointItem(arr_point_type, &*p, xarr + start_x, ycur + start_y, this);
-        itarr->setZValue(6);
-        itarr->setBrush(pen.color());
-        itarr->setPen(pen);
-        stationMarks.push_back(itarr);
+        if (xarr <= width) {
+            auto arr_point_type = (ts->isStopped() ? StationPoint::Arrive : StationPoint::Pass);
+            auto* itarr = new PaintStationPointItem(arr_point_type, &*p, xarr + start_x, ycur + start_y, this);
+            itarr->setZValue(6);
+            itarr->setBrush(pen.color());
+            itarr->setPen(pen);
+            stationMarks.push_back(itarr);
+        }
 
         // depart point
-        if (ts->isStopped()) {
+        if (xdep <= width && ts->isStopped()) {
             auto* itdep = new PaintStationPointItem(StationPoint::Depart, &*p, xdep + start_x, ycur + start_y, this);
             itdep->setBrush(pen.color());
             itdep->setPen(pen);
