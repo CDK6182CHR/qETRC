@@ -445,7 +445,7 @@ void TrainItem::setLine()
     setPathItem(trainName);
 
     QPen labelPen = trainPen();
-    labelPen.setWidth(1);
+    labelPen.setWidth(0.5);
 
     // 2024.02.09: add global config here
     bool glb_has_start_label = ((_startAtThis && !config().hide_start_label_starting) 
@@ -676,7 +676,10 @@ void TrainItem::setStartItem(const QString& text,const QPen& pen)
             startLabelText->setPos(x0 - w, y0 + height);
         }
     }
-    startLabelItem = new QGraphicsPathItem(label, this);
+    QPainterPathStroker s;
+    s.setWidth(0.01);
+    auto label_out = s.createStroke(label);
+    startLabelItem = new QGraphicsPathItem(label_out, this);
     startLabelItem->setPen(pen);
     _bounding |= startLabelItem->boundingRect();
     _bounding |= startLabelText->boundingRect();
@@ -739,7 +742,10 @@ void TrainItem::setEndItem(const QString& text, const QPen& pen)
             endLabelText->setPos(x0, y0 - h);
         }
     }
-    endLabelItem = new QGraphicsPathItem(label, this);
+    QPainterPathStroker s;
+    s.setWidth(0.01);
+    auto label_out = s.createStroke(label);
+    endLabelItem = new QGraphicsPathItem(label_out, this);
     endLabelItem->setPen(pen);
     _bounding |= endLabelItem->boundingRect();
     _bounding |= endLabelText->boundingRect();
