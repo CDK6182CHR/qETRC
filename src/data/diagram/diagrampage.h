@@ -7,6 +7,7 @@
 
 #include "data/train/train.h"
 #include "config.h"
+#include "data/diagram/routelinklayer.h"
 
 class Railway;
 class Diagram;
@@ -68,6 +69,7 @@ class DiagramPage
      */
     using label_map_t = std::multimap<double, LabelPositionInfo>;
     QHash<const RailStation*, label_map_t> _overLabels, _belowLabels;
+    std::map<const RailStation*, RouteLinkLayerManager> _overLinks, _belowLinks;
 
 public:
     DiagramPage(const Config& config, const QList<std::shared_ptr<Railway>>& railways,
@@ -166,6 +168,9 @@ public:
         return dir == Direction::Down ? belowLabels(st) : overLabels(st);
     }
 
+    inline auto& overLinks(const RailStation* st) { return _overLinks[st]; }
+    inline auto& belowLinks(const RailStation* st) { return _belowLinks[st]; }
+
     /**
     * 当关联的窗口被关闭（删除）时，清理掉相关联的Page中的Item指针。
     * 防止撤销/重做操作出问题。
@@ -177,6 +182,8 @@ public:
      * LabelInfo有可能已经全部被清楚了；这种情况下，析构的时候不要在那边删除。
      */
     inline bool hasLabelInfo()const { return !_belowLabels.isEmpty() || !_overLabels.isEmpty(); }
+    
+    inline bool hasLinkInfo()const { return !_belowLinks.empty() || !_overLinks.empty(); }
 
     bool containsRailway(std::shared_ptr<const Railway> rail)const;
     bool containsRailway(const Railway& railway)const;
