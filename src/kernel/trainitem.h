@@ -49,7 +49,7 @@ class TrainItem : public QGraphicsItem
      * @brief linkItem1
      * 采用交路连线时的连线对象。最多两个（考虑跨日）
      */
-    QGraphicsLineItem* linkItem1 = nullptr, * linkItem2 = nullptr;
+    QGraphicsPathItem* linkItem1 = nullptr, * linkItem2 = nullptr;
 
     /**
      * @brief spanItems
@@ -134,6 +134,11 @@ public:
      * 2021.07.02  将LabelInfo迁移到TrainPage之后，应该可以在析构中执行这个了
      */
     void clearLabelInfo();
+
+    /**
+     * 2024.02.22 similar to clearLabelInfo()
+     */
+    void clearLinkInfo();
 
     Direction dir()const;
 
@@ -257,6 +262,15 @@ private:
      * 添加与交路前序车次之间的连线
      */
     void addLinkLine();
+
+    /**
+     * Determine the height of routing link line.
+     * The direction of the link line is extracted from this->dir().
+     * If floating link is not enabled. simply return 0.
+     */
+    double linkLineHeght(const RailStation* rs, int xlelft, int xright);
+
+    QGraphicsPathItem* drawLinkLine(double x1, double x2, double y, double height);
 
     /**
      * Compute the distance between the time `tm` and the coord `x` along time axis.

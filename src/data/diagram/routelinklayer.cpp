@@ -1,9 +1,12 @@
 #include "routelinklayer.h"
+#include <QDebug>
 
 typename RouteLinkLayer::item_set_t::const_iterator 
 	RouteLinkLayer::occupationInRange(int start_x, int end_x) const
 {
 	auto itr = _items.lower_bound(start_x);
+	if (itr == _items.end()) return itr;
+	qDebug() << "Found occupation: " << itr->start_x << ", " << itr->end_x;
 	// has intersection, return the iterator
 	if (std::max(itr->start_x, start_x) < std::min(itr->end_x, end_x))
 		return itr;
@@ -38,9 +41,15 @@ bool RouteLinkLayer::isOccupiedPBC(int start_x, int end_x, const int width) cons
 	return occupationInRangePBC(start_x, end_x, width) != _items.end();
 }
 
-void RouteLinkLayer::addOccupation(const RouteLinkOccupy& occ)
+void RouteLinkLayer::addOccupation(const RouteLinkOccupy& occ, const int width)
 {
-	_items.emplace(occ);
+	if (occ.start_x > occ.end_x) {
+		_items.emplace(occ.train, occ.start_x, width);
+		_items.emplace(occ.train, 0, occ.end_x);
+	}
+	else {
+		_items.emplace(occ);
+	}
 }
 
 int RouteLinkLayerManager::addOccupation(const RouteLinkOccupy& occ, const int width)
@@ -48,13 +57,13 @@ int RouteLinkLayerManager::addOccupation(const RouteLinkOccupy& occ, const int w
 	for (int i = 0; i < (int)_layers.size(); i++) {
 		auto& lay = _layers.at(i);
 		if (!lay.isOccupiedPBC(occ.start_x, occ.end_x, width)) {
-			lay.addOccupation(occ);
+			lay.addOccupation(occ, width);
 			return i;
 		}
 	}
 	// Now, add to newly created layer
 	RouteLinkLayer lay;
-	lay.addOccupation(occ);
+	lay.addOccupation(occ, width);
 	_layers.emplace_back(std::move(lay));
 	return _layers.size() - 1;
 }

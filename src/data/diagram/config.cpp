@@ -98,6 +98,11 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
     FROM_OBJ(base_label_height, Int);
     FROM_OBJ(step_label_height, Int);
 
+    FROM_OBJ(floating_link_line, Bool);
+    FROM_OBJ(base_link_height, Int);
+    FROM_OBJ(step_link_height, Int);
+    FROM_OBJ(show_link_train_name, Bool);
+
     FROM_OBJ(default_grid_width, Double);
     FROM_OBJ(bold_grid_width, Double);
     FROM_OBJ(valid_width, Int);
@@ -162,6 +167,10 @@ QJsonObject Config::toJson() const
         TO_OBJ(avoid_cover)
         TO_OBJ(base_label_height)
         TO_OBJ(step_label_height)
+        TO_OBJ(floating_link_line)
+        TO_OBJ(base_link_height)
+        TO_OBJ(step_link_height)
+        TO_OBJ(show_link_train_name)
         TO_OBJ(default_grid_width)
         TO_OBJ(bold_grid_width)
         TO_OBJ(valid_width)

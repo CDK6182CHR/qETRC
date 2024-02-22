@@ -73,8 +73,9 @@ public:
 
 	/**
 	 * 2024.02.22 Add occupation. The conflication is NOT checked here!
+	 * MIND: PBC should be considered!!
 	 */
-	void addOccupation(const RouteLinkOccupy& occ);
+	void addOccupation(const RouteLinkOccupy& occ, const int width);
 };
 
 
@@ -91,6 +92,7 @@ public:
 
 	/**
 	 * Add the given occupation info to layers, and return the number of layer it being added to.
+	 * Here, the width should be TOTAL width (i.e. corresponding to 24 hour), even if some part may not be shown.
 	 */
 	int addOccupation(const RouteLinkOccupy& occ, const int width);
 };
