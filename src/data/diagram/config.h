@@ -110,7 +110,7 @@ struct Config
     // 2024.02.22: 交路接续标签浮动高度
     bool floating_link_line = true;
     int base_link_height = 5;
-    int step_link_height = 3;
+    int step_link_height = 5;
     bool show_link_train_name = false;
 
     double default_grid_width = 1.0;

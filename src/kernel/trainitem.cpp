@@ -269,7 +269,9 @@ void TrainItem::clearLinkInfo()
 {
     if (!_page.hasLinkInfo())
         return;
-    // TODO: HERE
+    
+    auto& links = _page.dirLinks(_line->firstRailStation().get(), dir());
+    links.delOccupation(linkLayer, train().get(), link_x_pre, link_x_cur, config().fullWidth());
 }
 
 Direction TrainItem::dir() const
@@ -1031,6 +1033,8 @@ void TrainItem::addLinkLine()
     auto rs = train()->boundStartingAtRail(_railway);
     double xcur = calXFromStart(first_tm);
     double xpre = calXFromStart(last_tm);
+    link_x_pre = xpre;
+    link_x_cur = xcur;
 
     // 2024.02.22: determine the height of the link line
     double height = linkLineHeght(rs.get(), xpre, xcur);
@@ -1038,8 +1042,8 @@ void TrainItem::addLinkLine()
     double width = config().diagramWidth();
     double y = _railway.yValueFromCoeff(rs->y_coeff.value(), config()) + start_y;
     QPen pen = trainPen();
-    pen.setWidth(0.5);
-    //pen.setStyle(Qt::DashLine);   // test: use solid line
+    pen.setWidth(1);
+    pen.setStyle(Qt::DashLine);   // test: use solid line
 
     if (xcur >= xpre) {
         //无需跨界
@@ -1079,6 +1083,7 @@ double TrainItem::linkLineHeght(const RailStation* rs, int xleft, int xright)
     auto& labels = dir() == Direction::Down ? _page.overLinks(rs) : _page.belowLinks(rs);
 
     int layer = labels.addOccupation(RouteLinkOccupy(this->train().get(), xleft, xright), tot_width);
+    this->linkLayer = layer;
     return config().base_link_height + layer * config().step_link_height;
 }
 

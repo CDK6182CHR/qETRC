@@ -170,6 +170,9 @@ public:
 
     inline auto& overLinks(const RailStation* st) { return _overLinks[st]; }
     inline auto& belowLinks(const RailStation* st) { return _belowLinks[st]; }
+    inline auto& dirLinks(const RailStation* st, Direction dir) {
+        return dir == Direction::Down ? overLinks(st) : belowLinks(st);
+    }
 
     /**
     * 当关联的窗口被关闭（删除）时，清理掉相关联的Page中的Item指针。

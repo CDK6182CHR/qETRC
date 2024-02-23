@@ -76,6 +76,19 @@ public:
 	 * MIND: PBC should be considered!!
 	 */
 	void addOccupation(const RouteLinkOccupy& occ, const int width);
+
+	/**
+	 * Delete occupation using the train pointer and the x coords.
+	 * PBC is considered.
+	 */
+	void delOccupation(const Train* train, int x1, int x2, const int width);
+
+private:
+
+	/**
+	 * Simply delete occupation, without PBC
+	 */
+	void delOccupationSimple(const Train* train, int x_end);
 };
 
 
@@ -95,5 +108,7 @@ public:
 	 * Here, the width should be TOTAL width (i.e. corresponding to 24 hour), even if some part may not be shown.
 	 */
 	int addOccupation(const RouteLinkOccupy& occ, const int width);
+
+	void delOccupation(int layer, const Train* train, int x1, int x2, const int width);
 };
 

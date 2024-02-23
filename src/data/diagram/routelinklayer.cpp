@@ -52,6 +52,22 @@ void RouteLinkLayer::addOccupation(const RouteLinkOccupy& occ, const int width)
 	}
 }
 
+void RouteLinkLayer::delOccupation(const Train* train, int x1, int x2, const int width)
+{
+	delOccupationSimple(train, x2);
+	if (x1 > x2) {
+		delOccupationSimple(train, width);
+	}
+}
+
+void RouteLinkLayer::delOccupationSimple(const Train* train, int x_end)
+{
+	auto itr = _items.lower_bound(x_end);
+	if (itr != _items.end() && itr->train == train) {
+		_items.erase(itr);
+	}
+}
+
 int RouteLinkLayerManager::addOccupation(const RouteLinkOccupy& occ, const int width)
 {
 	for (int i = 0; i < (int)_layers.size(); i++) {
@@ -67,3 +83,12 @@ int RouteLinkLayerManager::addOccupation(const RouteLinkOccupy& occ, const int w
 	_layers.emplace_back(std::move(lay));
 	return _layers.size() - 1;
 }
+
+void RouteLinkLayerManager::delOccupation(int layer, const Train* train, int x1, int x2, const int width)
+{
+	if (layer < 0 || layer >= _layers.size()) {
+		return;
+	}
+	_layers[layer].delOccupation(train, x1, x2, width);
+}
+

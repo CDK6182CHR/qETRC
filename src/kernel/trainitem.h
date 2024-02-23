@@ -50,6 +50,8 @@ class TrainItem : public QGraphicsItem
      * 采用交路连线时的连线对象。最多两个（考虑跨日）
      */
     QGraphicsPathItem* linkItem1 = nullptr, * linkItem2 = nullptr;
+    int linkLayer = -1;
+    double link_x_pre = -1, link_x_cur = -1;
 
     /**
      * @brief spanItems
@@ -267,6 +269,7 @@ private:
      * Determine the height of routing link line.
      * The direction of the link line is extracted from this->dir().
      * If floating link is not enabled. simply return 0.
+     * Also, records the layer number of the current link line.
      */
     double linkLineHeght(const RailStation* rs, int xlelft, int xright);
 
