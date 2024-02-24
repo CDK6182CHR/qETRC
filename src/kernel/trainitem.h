@@ -53,6 +53,8 @@ class TrainItem : public QGraphicsItem
     int linkLayer = -1;
     double link_x_pre = -1, link_x_cur = -1;
 
+    static constexpr const double LINK_LINE_WIDTH = 0.5;
+
     /**
      * @brief spanItems
      * 跨越运行图边界处的标签
@@ -273,7 +275,8 @@ private:
      */
     double linkLineHeght(const RailStation* rs, int xlelft, int xright);
 
-    QGraphicsPathItem* drawLinkLine(double x1, double x2, double y, double height);
+    QGraphicsPathItem* drawLinkLine(double x1, double x2, double y, double height, 
+        bool left_start, bool right_end);
 
     /**
      * Compute the distance between the time `tm` and the coord `x` along time axis.

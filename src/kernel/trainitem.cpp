@@ -186,7 +186,7 @@ void TrainItem::highlightWithLink()
     highlight();
     if (!_linkHighlighted) {
         QPen pen = trainPen();
-        pen.setWidthF(pen.widthF() + 1);
+        pen.setWidthF(LINK_LINE_WIDTH + 1);
         pen.setStyle(Qt::DashLine);
         if (linkItem1)
             linkItem1->setPen(pen);
@@ -202,6 +202,7 @@ void TrainItem::unhighlightWithLink()
     unhighlight();
     if (_linkHighlighted) {
         QPen pen = trainPen();
+        pen.setWidth(LINK_LINE_WIDTH);
         pen.setStyle(Qt::DashLine);
         if (linkItem1)
             linkItem1->setPen(pen);
@@ -1042,13 +1043,13 @@ void TrainItem::addLinkLine()
     double width = config().diagramWidth();
     double y = _railway.yValueFromCoeff(rs->y_coeff.value(), config()) + start_y;
     QPen pen = trainPen();
-    pen.setWidth(1);
+    pen.setWidth(LINK_LINE_WIDTH);
     pen.setStyle(Qt::DashLine);   // test: use solid line
 
     if (xcur >= xpre) {
         //无需跨界
         if (xpre <= width) {
-            linkItem1 = drawLinkLine(xpre, std::min(width, xcur), y, height);
+            linkItem1 = drawLinkLine(xpre, std::min(width, xcur), y, height, true, xcur <= width);
             //linkItem1 = new QGraphicsLineItem(
             //    config().totalLeftMargin() + xpre, y, 
             //    config().totalLeftMargin() + std::min(width, xcur), y, this
@@ -1062,7 +1063,7 @@ void TrainItem::addLinkLine()
         //linkItem1 = new QGraphicsLineItem(
         //    config().totalLeftMargin(), y, config().totalLeftMargin() + xcur, y, this
         //);
-        linkItem1 = drawLinkLine(0, xcur, y, height);
+        linkItem1 = drawLinkLine(0, xcur, y, height, false, true);
         linkItem1->setPen(pen);
         //右边的
         if (xpre <= width) {
@@ -1070,7 +1071,7 @@ void TrainItem::addLinkLine()
             //    config().totalLeftMargin() + xpre, y, 
             //    config().totalLeftMargin() + width, y, this
             //);
-            linkItem2 = drawLinkLine(xpre, width, y, height);
+            linkItem2 = drawLinkLine(xpre, width, y, height, true, false);
             linkItem2->setPen(pen);
         }
     }
@@ -1087,7 +1088,8 @@ double TrainItem::linkLineHeght(const RailStation* rs, int xleft, int xright)
     return config().base_link_height + layer * config().step_link_height;
 }
 
-QGraphicsPathItem* TrainItem::drawLinkLine(double x1, double x2, double y, double height)
+QGraphicsPathItem* TrainItem::drawLinkLine(double x1, double x2, double y, double height, 
+    bool left_start, bool right_end)
 {
     QPainterPath path;
     int height_sig = dir() == Direction::Down ? -1 : 1;
@@ -1096,8 +1098,17 @@ QGraphicsPathItem* TrainItem::drawLinkLine(double x1, double x2, double y, doubl
 
     // for a trial version, only the line itself!
 
-    path.moveTo(x1 + left_mag, yh);
+    path.moveTo(x1 + left_mag, y);
+    if (left_start) {
+        path.lineTo(x1 + left_mag, yh);
+    }
+    else {
+        path.moveTo(x1 + left_mag, yh);
+    }
     path.lineTo(x2 + left_mag, yh);
+    if (right_end) {
+        path.lineTo(x2 + left_mag, y);
+    }
 
     // The stroker does not work with dash line
     //QPainterPathStroker stroker;
