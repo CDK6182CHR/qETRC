@@ -124,7 +124,8 @@ struct Config
     int step_link_height = 5;
     LinkLineLabelType link_line_label_type = LinkLineLabelType::NoLabel;
     int show_link_line = 2;  // 显示交路连线：0-不显示；1-仅选中显示；2-总是显示
-    LinkLineColorOption link_line_color, train_label_color;   // 交路连线及标签颜色选项
+    LinkLineColorOption link_line_color = LinkLineColorOption::LineColor; 
+    LinkLineColorOption train_label_color = LinkLineColorOption::LineColor;
 
     double default_grid_width = 1.0;
     double bold_grid_width = 2.5;

@@ -53,6 +53,11 @@ class TrainItem : public QGraphicsItem
     int linkLayer = -1;
     double link_x_pre = -1, link_x_cur = -1;
     QGraphicsSimpleTextItem* linkLabelItem = nullptr;
+    
+    /**
+     * 2024.02.26  用于仅选中车次显示连线的情况。仅在第一次选中时尝试绘制，后面就不用再试了。
+     */
+    bool hasLinkLine = true;
 
     static constexpr const double LINK_LINE_WIDTH = 0.5;
 
@@ -186,6 +191,10 @@ private:
      */
     void setPathItem(const QString& trainName);
 
+    // 2024.02.26 split from setLine: 
+    // returns the text to be shown in train name label
+    QString labelTrainName()const;
+
     void setStartItem(const QString& text, const QPen& pen);
 
     void setEndItem(const QString& text, const QPen& pen);
@@ -253,6 +262,8 @@ private:
 
     void hideStationPoints();
 
+    void hideLinkLine();
+
     /**
      * 详细停点的标记，分为到、开两种情况，一共四个位置，由行别进一步细分
      * 特别说明对折返的处理：无终止标签的最后一站只标记到点，无起始标签的第一站只标记开点
@@ -265,8 +276,9 @@ private:
     /**
      * @brief addLinkLine
      * 添加与交路前序车次之间的连线
+     * 2024.02.26: returns whether the link line is actually added.
      */
-    void addLinkLine(const QString& trainName);
+    bool addLinkLine(const QString& trainName);
 
     /**
      * Determine the height of routing link line.
@@ -275,6 +287,8 @@ private:
      * Also, records the layer number of the current link line.
      */
     double linkLineHeight(const RailStation* rs, int xlelft, int xright);
+
+    QColor linkLineColor()const;
 
     QGraphicsPathItem* drawLinkLine(double x1, double x2, double y, double height, 
         bool left_start, bool right_end, bool hasLabel);

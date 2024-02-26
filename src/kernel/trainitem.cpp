@@ -66,11 +66,15 @@ void TrainItem::highlight()
     //运行线加粗显示
     QPen pen = path->pen();
     pen.setWidthF(pen.widthF() + 1);
+
     path->setPen(pen);
     path->setZValue(2);
-
-    QPen rectPen(pen.color());
     QBrush brush(pen.color());
+    if (config().train_label_color == Config::LinkLineColorOption::TextColor) {
+        brush.setColor(config().text_color);
+    }
+    QPen rectPen(brush.color());
+
     rectPen.setWidthF(0.5);
     pen.setWidthF(2);
     if (startLabelText) {
@@ -125,6 +129,27 @@ void TrainItem::highlight()
         }
     }
 
+    //显示交路连线
+    if (config().show_link_line == 1) {
+        if (hasLinkLine) {
+            if (linkItem1 || linkItem2) {
+                if (linkItem1) {
+                    linkItem1->setVisible(true);
+                }
+                if (linkItem2) {
+                    linkItem2->setVisible(true);
+                }
+                if (linkLabelItem) {
+                    linkLabelItem->setVisible(true);
+                }
+            }
+            else {
+                // 连线没有铺画过。尝试一次绘制
+                hasLinkLine = addLinkLine(labelTrainName());
+            }
+        }
+    }
+
     setZValue(10);
     _isHighlighted = true;
 }
@@ -139,7 +164,12 @@ void TrainItem::unhighlight()
 
     //取消运行线加粗
     QPen pen = path->pen();
+    QColor labelColor = pen.color();
+    if (config().train_label_color == Config::LinkLineColorOption::TextColor) {
+        labelColor = config().text_color;
+    }
     pen.setWidthF(pen.widthF() - 1);
+
     path->setPen(pen);
     path->setZValue(0);
 
@@ -148,7 +178,7 @@ void TrainItem::unhighlight()
         //startLabelItem->setPen(pen);
         startLabelItem->setZValue(0);
         startLabelText->setZValue(0);
-        startLabelText->setBrush(pen.color());
+        startLabelText->setBrush(labelColor);
         startLabelText->scene()->removeItem(startRect);
         delete startRect;
         startRect = nullptr;
@@ -158,7 +188,7 @@ void TrainItem::unhighlight()
         //endLabelItem->setPen(pen);
         endLabelItem->setZValue(0);
         endLabelText->setZValue(0);
-        endLabelText->setBrush(pen.color());
+        endLabelText->setBrush(labelColor);
         endLabelText->scene()->removeItem(endRect);
         delete endRect;
         endRect = nullptr;
@@ -177,6 +207,7 @@ void TrainItem::unhighlight()
         hideTimeMarks();
 
     hideStationPoints();
+    hideLinkLine();
 
     _isHighlighted = false;
 }
@@ -186,6 +217,9 @@ void TrainItem::highlightWithLink()
     highlight();
     if (!_linkHighlighted) {
         QPen pen = trainPen();
+        if (config().link_line_color == Config::LinkLineColorOption::TextColor) {
+            pen.setColor(config().text_color);
+        }
         pen.setWidthF(LINK_LINE_WIDTH + 1);
         pen.setStyle(Qt::DashLine);
         if (linkItem1)
@@ -202,6 +236,9 @@ void TrainItem::unhighlightWithLink()
     unhighlight();
     if (_linkHighlighted) {
         QPen pen = trainPen();
+        if (config().link_line_color == Config::LinkLineColorOption::TextColor) {
+            pen.setColor(config().text_color);
+        }
         pen.setWidth(LINK_LINE_WIDTH);
         pen.setStyle(Qt::DashLine);
         if (linkItem1)
@@ -451,13 +488,15 @@ const MarginConfig &TrainItem::margins() const
 
 void TrainItem::setLine()
 {
-    const QString& trainName = config().show_full_train_name ?
-        train()->trainName().full() : train()->trainName().dirOrFull(_line->dir());
+    const QString& trainName = labelTrainName();
 
     setPathItem(trainName);
 
     QPen labelPen = trainPen();
     labelPen.setWidth(0.5);
+    if (config().train_label_color == Config::LinkLineColorOption::TextColor) {
+        labelPen.setColor(config().text_color);
+    }
 
     // 2024.02.09: add global config here
     bool glb_has_start_label = ((_startAtThis && !config().hide_start_label_starting) 
@@ -472,7 +511,8 @@ void TrainItem::setLine()
         setEndItem(config().end_label_name ? trainName : " ",
             labelPen);
     }
-    addLinkLine(trainName);
+    if (config().show_link_line == 2)
+        hasLinkLine = addLinkLine(trainName);
 }
 
 void TrainItem::setPathItem(const QString& trainName)
@@ -644,6 +684,12 @@ void TrainItem::setPathItem(const QString& trainName)
         spanItems.append(item);
         //_bounding |= item->boundingRect();
     }
+}
+
+QString TrainItem::labelTrainName() const
+{
+    return config().show_full_train_name ?
+        train()->trainName().full() : train()->trainName().dirOrFull(_line->dir());
 }
 
 void TrainItem::setStartItem(const QString& text,const QPen& pen)
@@ -977,6 +1023,19 @@ void TrainItem::hideStationPoints()
     }
 }
 
+void TrainItem::hideLinkLine()
+{
+    // 取消交路连线显示
+    if (config().show_link_line == 1) {
+        if (linkItem1)
+            linkItem1->setVisible(false);
+        if (linkItem2)
+            linkItem2->setVisible(false);
+        if (linkLabelItem)
+            linkLabelItem->setVisible(false);
+    }
+}
+
 void TrainItem::markArriveTime(double x, double y, const QTime& tm)
 {
     //到达时刻：下行标右上，下行标右下
@@ -1012,21 +1071,21 @@ void TrainItem::markDepartTime(double x, double y, const QTime& tm)
     markLabels.append(item);
 }
 
-void TrainItem::addLinkLine(const QString& trainName)
+bool TrainItem::addLinkLine(const QString& trainName)
 {
     if (!train()->hasRouting())
-        return;
+        return false;
     std::shared_ptr<Routing> rout = train()->routing().lock();
     auto* pre = rout->preLinkedOnRailway(*train(), _railway);   // 这里已经保证first, last是同一个车站
     if (!pre)
-        return;
+        return false;
     auto last = pre->train()->lastStation();
     auto first = train()->firstStation();
     if (train()->isNullStation(first) || pre->train()->isNullStation(last))
-        return;
+        return false;
     if (first != _line->firstTrainStation()) {
         // 2021.09.02补正  必须是本线的才绘制
-        return;
+        return false;
     }
     // 到这里：已经判断好了绘制条件
     const QTime& last_tm = last->depart;
@@ -1047,7 +1106,7 @@ void TrainItem::addLinkLine(const QString& trainName)
     }
     if (!label_text.isEmpty()) {
         linkLabelItem = new QGraphicsSimpleTextItem(label_text, this);
-        linkLabelItem->setBrush(trainColor());
+        linkLabelItem->setBrush(linkLineColor());
         xpre_eff = std::min(xpre, xcur - linkLabelItem->boundingRect().width());
     }
 
@@ -1057,6 +1116,7 @@ void TrainItem::addLinkLine(const QString& trainName)
     double width = config().diagramWidth();
     double y = _railway.yValueFromCoeff(rs->y_coeff.value(), config()) + start_y;
     QPen pen = trainPen();
+    pen.setColor(linkLineColor());
     pen.setWidth(LINK_LINE_WIDTH);
     pen.setStyle(Qt::DashLine);   // test: use solid line
 
@@ -1089,6 +1149,7 @@ void TrainItem::addLinkLine(const QString& trainName)
             linkItem2->setPen(pen);
         }
     }
+    return true;
 }
 
 double TrainItem::linkLineHeight(const RailStation* rs, int xleft, int xright)
@@ -1100,6 +1161,15 @@ double TrainItem::linkLineHeight(const RailStation* rs, int xleft, int xright)
     int layer = labels.addOccupation(RouteLinkOccupy(this->train().get(), xleft, xright), tot_width);
     this->linkLayer = layer;
     return config().base_link_height + layer * config().step_link_height;
+}
+
+QColor TrainItem::linkLineColor() const
+{
+    switch (config().link_line_color) {
+    case Config::LinkLineColorOption::LineColor: return trainColor();
+    case Config::LinkLineColorOption::TextColor: return config().text_color;
+    }
+    return trainColor();
 }
 
 QGraphicsPathItem* TrainItem::drawLinkLine(double x1, double x2, double y, double height, 
