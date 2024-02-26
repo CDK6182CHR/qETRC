@@ -52,6 +52,7 @@ class TrainItem : public QGraphicsItem
     QGraphicsPathItem* linkItem1 = nullptr, * linkItem2 = nullptr;
     int linkLayer = -1;
     double link_x_pre = -1, link_x_cur = -1;
+    QGraphicsSimpleTextItem* linkLabelItem = nullptr;
 
     static constexpr const double LINK_LINE_WIDTH = 0.5;
 
@@ -265,7 +266,7 @@ private:
      * @brief addLinkLine
      * 添加与交路前序车次之间的连线
      */
-    void addLinkLine();
+    void addLinkLine(const QString& trainName);
 
     /**
      * Determine the height of routing link line.
@@ -273,10 +274,10 @@ private:
      * If floating link is not enabled. simply return 0.
      * Also, records the layer number of the current link line.
      */
-    double linkLineHeght(const RailStation* rs, int xlelft, int xright);
+    double linkLineHeight(const RailStation* rs, int xlelft, int xright);
 
     QGraphicsPathItem* drawLinkLine(double x1, double x2, double y, double height, 
-        bool left_start, bool right_end);
+        bool left_start, bool right_end, bool hasLabel);
 
     /**
      * Compute the distance between the time `tm` and the coord `x` along time axis.

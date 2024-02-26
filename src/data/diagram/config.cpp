@@ -30,6 +30,8 @@ void MarginConfig::fromJson(const QJsonObject& obj)
 
 #define TO_OBJ_NAME(_key,_strkey) {#_strkey,_key},
 
+#define TO_OBJ_ENUM(_key) {#_key, static_cast<int>(_key)},
+
 QJsonObject MarginConfig::toJson() const
 {
     return QJsonObject{
@@ -49,6 +51,13 @@ QJsonObject MarginConfig::toJson() const
     };
 }
 
+template <typename EnumType>
+static inline void read_enum(EnumType& var, const QJsonObject& obj, const char* key)
+{
+    var = static_cast<EnumType>(obj.value(key).toInt(static_cast<int>(var)));
+}
+
+#define FROM_OBJ_ENUM(_var) read_enum(_var, obj, #_var)
 
 
 bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
@@ -101,7 +110,10 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
     FROM_OBJ(floating_link_line, Bool);
     FROM_OBJ(base_link_height, Int);
     FROM_OBJ(step_link_height, Int);
-    FROM_OBJ(show_link_train_name, Bool);
+    FROM_OBJ_ENUM(link_line_label_type);
+    FROM_OBJ(show_link_line, Int);
+    FROM_OBJ_ENUM(link_line_color);
+    FROM_OBJ_ENUM(train_label_color);
 
     FROM_OBJ(default_grid_width, Double);
     FROM_OBJ(bold_grid_width, Double);
@@ -170,7 +182,10 @@ QJsonObject Config::toJson() const
         TO_OBJ(floating_link_line)
         TO_OBJ(base_link_height)
         TO_OBJ(step_link_height)
-        TO_OBJ(show_link_train_name)
+        TO_OBJ_ENUM(link_line_label_type)
+        TO_OBJ(show_link_line)
+        TO_OBJ_ENUM(link_line_color)
+        TO_OBJ_ENUM(train_label_color)
         TO_OBJ(default_grid_width)
         TO_OBJ(bold_grid_width)
         TO_OBJ(valid_width)

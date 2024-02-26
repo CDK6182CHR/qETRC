@@ -236,6 +236,7 @@ TrainItem::~TrainItem() noexcept
     DELETE_SUB(endRect);
     DELETE_SUB(linkItem1);
     DELETE_SUB(linkItem2);
+    DELETE_SUB(linkLabelItem);
 
     for (auto p : spanItems) {
         delete p;
@@ -471,7 +472,7 @@ void TrainItem::setLine()
         setEndItem(config().end_label_name ? trainName : " ",
             labelPen);
     }
-    addLinkLine();
+    addLinkLine(trainName);
 }
 
 void TrainItem::setPathItem(const QString& trainName)
@@ -819,7 +820,7 @@ const QPen& TrainItem::trainPen() const
 
 QColor TrainItem::trainColor() const
 {
-    return QColor(Qt::red);
+    return trainPen().color();
 }
 
 double TrainItem::determineStartLabelHeight()
@@ -1011,7 +1012,7 @@ void TrainItem::markDepartTime(double x, double y, const QTime& tm)
     markLabels.append(item);
 }
 
-void TrainItem::addLinkLine()
+void TrainItem::addLinkLine(const QString& trainName)
 {
     if (!train()->hasRouting())
         return;
@@ -1034,11 +1035,24 @@ void TrainItem::addLinkLine()
     auto rs = train()->boundStartingAtRail(_railway);
     double xcur = calXFromStart(first_tm);
     double xpre = calXFromStart(last_tm);
+    double xpre_eff = xpre;     // For determining the starting of occupation. Mainly prepared for long text case.
     link_x_pre = xpre;
     link_x_cur = xcur;
 
+    // 2024.02.26: add (optional) link label
+    QString label_text{};
+    switch (config().link_line_label_type) {
+    case Config::LinkLineLabelType::PostTrainName: label_text = trainName; break;
+    case Config::LinkLineLabelType::RoutingName: label_text = rout->name(); break;
+    }
+    if (!label_text.isEmpty()) {
+        linkLabelItem = new QGraphicsSimpleTextItem(label_text, this);
+        linkLabelItem->setBrush(trainColor());
+        xpre_eff = std::min(xpre, xcur - linkLabelItem->boundingRect().width());
+    }
+
     // 2024.02.22: determine the height of the link line
-    double height = linkLineHeght(rs.get(), xpre, xcur);
+    double height = linkLineHeight(rs.get(), xpre_eff, xcur);
 
     double width = config().diagramWidth();
     double y = _railway.yValueFromCoeff(rs->y_coeff.value(), config()) + start_y;
@@ -1049,7 +1063,7 @@ void TrainItem::addLinkLine()
     if (xcur >= xpre) {
         //无需跨界
         if (xpre <= width) {
-            linkItem1 = drawLinkLine(xpre, std::min(width, xcur), y, height, true, xcur <= width);
+            linkItem1 = drawLinkLine(xpre, std::min(width, xcur), y, height, true, xcur <= width, true);
             //linkItem1 = new QGraphicsLineItem(
             //    config().totalLeftMargin() + xpre, y, 
             //    config().totalLeftMargin() + std::min(width, xcur), y, this
@@ -1063,7 +1077,7 @@ void TrainItem::addLinkLine()
         //linkItem1 = new QGraphicsLineItem(
         //    config().totalLeftMargin(), y, config().totalLeftMargin() + xcur, y, this
         //);
-        linkItem1 = drawLinkLine(0, xcur, y, height, false, true);
+        linkItem1 = drawLinkLine(0, xcur, y, height, false, true, true);
         linkItem1->setPen(pen);
         //右边的
         if (xpre <= width) {
@@ -1071,13 +1085,13 @@ void TrainItem::addLinkLine()
             //    config().totalLeftMargin() + xpre, y, 
             //    config().totalLeftMargin() + width, y, this
             //);
-            linkItem2 = drawLinkLine(xpre, width, y, height, true, false);
+            linkItem2 = drawLinkLine(xpre, width, y, height, true, false, false);
             linkItem2->setPen(pen);
         }
     }
 }
 
-double TrainItem::linkLineHeght(const RailStation* rs, int xleft, int xright)
+double TrainItem::linkLineHeight(const RailStation* rs, int xleft, int xright)
 {
     if (!config().floating_link_line) return 0;
     const double tot_width = config().fullWidth();
@@ -1089,7 +1103,7 @@ double TrainItem::linkLineHeght(const RailStation* rs, int xleft, int xright)
 }
 
 QGraphicsPathItem* TrainItem::drawLinkLine(double x1, double x2, double y, double height, 
-    bool left_start, bool right_end)
+    bool left_start, bool right_end, bool hasLabel)
 {
     QPainterPath path;
     int height_sig = dir() == Direction::Down ? -1 : 1;
@@ -1114,6 +1128,13 @@ QGraphicsPathItem* TrainItem::drawLinkLine(double x1, double x2, double y, doubl
     //QPainterPathStroker stroker;
     //stroker.setWidth(0.5);
     //QPainterPath path_s = stroker.createStroke(path);
+
+    if (hasLabel && linkLabelItem) {
+        // In this case, the funciton is responsible for placing the label item
+        const auto& rect = linkLabelItem->boundingRect();
+        double label_y = dir() == Direction::Down ? yh - rect.height() : yh;
+        linkLabelItem->setPos(left_mag + x2 - rect.width(), label_y);
+    }
 
     return new QGraphicsPathItem(path, this);
 }

@@ -50,6 +50,17 @@ public:
  */
 struct Config
 {
+    enum class LinkLineLabelType {
+        NoLabel = 0,
+        PostTrainName, 
+        RoutingName
+    };
+
+    enum class LinkLineColorOption {
+        LineColor = 0,
+        TextColor,
+    };
+
     /**
      * 2023.06.23  whether current object is transparent. If true, the data are not read.
      */
@@ -111,7 +122,9 @@ struct Config
     bool floating_link_line = true;
     int base_link_height = 5;
     int step_link_height = 5;
-    bool show_link_train_name = false;
+    LinkLineLabelType link_line_label_type = LinkLineLabelType::NoLabel;
+    int show_link_line = 2;  // 显示交路连线：0-不显示；1-仅选中显示；2-总是显示
+    LinkLineColorOption link_line_color, train_label_color;   // 交路连线及标签颜色选项
 
     double default_grid_width = 1.0;
     double bold_grid_width = 2.5;

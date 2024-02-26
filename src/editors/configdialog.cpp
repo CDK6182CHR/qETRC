@@ -205,34 +205,59 @@ void ConfigDialog::initUI()
         vlay->addWidget(gb);
     }
 
-    // 4. 格线控制
+    // 5. 运行线
     if constexpr (true) {
-        gb = new QGroupBox(tr("格线控制"));
+        gb = new QGroupBox(tr("运行线控制"));
         form = new QFormLayout;
 
-        sd = new QDoubleSpinBox;
-        sd->setRange(0, 100);
-        sd->setSingleStep(0.5);
-        sd->setToolTip(tr("设置水平和垂直细格线的宽度"));
-        sdSlimWidth = sd;
-        form->addRow(tr("细格线宽度"), sd);
+        sp = new QSpinBox;
+        sp->setRange(1, 10000);
+        sp->setToolTip(tr("当设置值大于1时，点击列车运行线周边所设定数值倍数"
+            "的范围时，仍然可以选中运行线。请注意此时可能增加运行图铺画代价。"));
+        form->addRow(tr("有效选择宽度"), sp);
+        spValidWidth = sp;
 
-        sd = new QDoubleSpinBox;
-        sd->setRange(0, 100);
-        sd->setSingleStep(0.5);
-        sd->setToolTip(tr("设置水平和垂直粗格线宽度"));
-        sdBoldWidth = sd;
-        form->addRow(tr("粗格线宽度"), sd);
+        auto* cb = new QComboBox;
+        cb->addItems({ tr("不显示"),tr("仅选中车次显示"),tr("全部显示") });
+        cb->setToolTip(tr("是否在运行线侧显示图定时刻的分钟个位数。此功能可能带来一定的效率问题。"));
+        form->addRow(tr("图中显示时刻"), cb);
+        cbShowTimeMark = cb;
 
-        auto* btn = new QPushButton;
-        btnGridColor = btn;
-        connect(btn, &QPushButton::clicked, this, &ConfigDialog::actGridColor);
-        form->addRow(tr("格线颜色"), btn);
+        cb = new QComboBox;
+        cb->addItems({ tr("使用运行线颜色"), tr("使用文本颜色") });
+        form->addRow(tr("标签颜色"), cb);
+        cbLabelColor = cb;
 
-        btn = new QPushButton;
-        btnTextColor = btn;
-        connect(btn, &QPushButton::clicked, this, &ConfigDialog::actTextColor);
-        form->addRow(tr("字体颜色"), btn);
+        auto* ck = new QCheckBox;
+        ck->setToolTip(tr("是否在运行线结束标签显示车次"));
+        form->addRow(tr("结束标签车次"), ck);
+        ckEndLabel = ck;
+
+        ck = new QCheckBox;
+        ck->setToolTip(tr("如果选中，则总是在标签上显示完整车次；"
+            "否则优先显示方向车次，如果方向车次为空则显示完整车次。"));
+        form->addRow(tr("显示完整车次"), ck);
+        ckFullName = ck;
+
+        ck = new QCheckBox;
+        ck->setToolTip(tr("隐藏所有始发站的运行线开始标签"));
+        form->addRow(tr("隐藏始发起始标签"), ck);
+        ckHideStartLabelStarting = ck;
+
+        ck = new QCheckBox;
+        ck->setToolTip(tr("隐藏所有非始发站的运行线开始标签"));
+        form->addRow(tr("隐藏非始发起始标签"), ck);
+        ckHideStartLabelNonStarting = ck;
+
+        ck = new QCheckBox;
+        ck->setToolTip(tr("隐藏所有终到站的运行线结束标签"));
+        form->addRow(tr("隐藏终到结束标签"), ck);
+        ckHideEndLabelTerminal = ck;
+
+        ck = new QCheckBox;
+        ck->setToolTip(tr("隐藏所有非终到站的运行线结束标签"));
+        form->addRow(tr("隐藏非终到结束标签"), ck);
+        ckHideEndLabelNonTerminal = ck;
 
         gb->setLayout(form);
         vlay->addWidget(gb);
@@ -290,56 +315,34 @@ void ConfigDialog::initUI()
         vlay->addWidget(gb);
     }
 
+    // 4. 格线控制
+    if constexpr (true) {
+        gb = new QGroupBox(tr("格线控制"));
+        form = new QFormLayout;
 
+        sd = new QDoubleSpinBox;
+        sd->setRange(0, 100);
+        sd->setSingleStep(0.5);
+        sd->setToolTip(tr("设置水平和垂直细格线的宽度"));
+        sdSlimWidth = sd;
+        form->addRow(tr("细格线宽度"), sd);
 
-    // 5. 运行线
-    if constexpr (true){
-        gb=new QGroupBox(tr("运行线控制"));
-        form=new QFormLayout;
+        sd = new QDoubleSpinBox;
+        sd->setRange(0, 100);
+        sd->setSingleStep(0.5);
+        sd->setToolTip(tr("设置水平和垂直粗格线宽度"));
+        sdBoldWidth = sd;
+        form->addRow(tr("粗格线宽度"), sd);
 
-        sp=new QSpinBox;
-        sp->setRange(1,10000);
-        sp->setToolTip(tr("当设置值大于1时，点击列车运行线周边所设定数值倍数"
-            "的范围时，仍然可以选中运行线。请注意此时可能增加运行图铺画代价。" ));
-        form->addRow(tr("有效选择宽度"),sp);
-        spValidWidth=sp;
+        auto* btn = new QPushButton;
+        btnGridColor = btn;
+        connect(btn, &QPushButton::clicked, this, &ConfigDialog::actGridColor);
+        form->addRow(tr("格线颜色"), btn);
 
-        auto* cb=new QComboBox;
-        cb->addItems({tr("不显示"),tr("仅选中车次显示"),tr("全部显示")});
-        cb->setToolTip(tr("是否在运行线侧显示图定时刻的分钟个位数。此功能可能带来一定的效率问题。"));
-        form->addRow(tr("图中显示时刻"),cb);
-        cbShowTimeMark=cb;
-
-        auto* ck=new QCheckBox;
-        ck->setToolTip(tr("是否在运行线结束标签显示车次"));
-        form->addRow(tr("结束标签车次"),ck);
-        ckEndLabel=ck;
-
-        ck=new QCheckBox;
-        ck->setToolTip(tr("如果选中，则总是在标签上显示完整车次；"
-                "否则优先显示方向车次，如果方向车次为空则显示完整车次。"));
-        form->addRow(tr("显示完整车次"),ck);
-        ckFullName=ck;
-
-        ck = new QCheckBox;
-        ck->setToolTip(tr("隐藏所有始发站的运行线开始标签"));
-        form->addRow(tr("隐藏始发起始标签"), ck);
-        ckHideStartLabelStarting = ck;
-
-        ck = new QCheckBox;
-        ck->setToolTip(tr("隐藏所有非始发站的运行线开始标签"));
-        form->addRow(tr("隐藏非始发起始标签"), ck);
-        ckHideStartLabelNonStarting = ck;
-
-        ck = new QCheckBox;
-        ck->setToolTip(tr("隐藏所有终到站的运行线结束标签"));
-        form->addRow(tr("隐藏终到结束标签"), ck);
-        ckHideEndLabelTerminal = ck;
-
-        ck = new QCheckBox;
-        ck->setToolTip(tr("隐藏所有非终到站的运行线结束标签"));
-        form->addRow(tr("隐藏非终到结束标签"), ck);
-        ckHideEndLabelNonTerminal = ck;
+        btn = new QPushButton;
+        btnTextColor = btn;
+        connect(btn, &QPushButton::clicked, this, &ConfigDialog::actTextColor);
+        form->addRow(tr("字体颜色"), btn);
 
         gb->setLayout(form);
         vlay->addWidget(gb);
@@ -377,6 +380,51 @@ void ConfigDialog::initUI()
         sp->setRange(0,10000);
         form->addRow(tr("标签层级高度"),sp);
         spStepHeight=sp;
+
+        gb->setLayout(form);
+        vlay->addWidget(gb);
+    }
+
+    // 7. 交路连线控制  2024.02.26  add
+    if constexpr (true) {
+        gb = new QGroupBox(tr("交路连线控制"));
+        form = new QFormLayout;
+
+        auto* cb = new QComboBox();
+        cb->addItems({ tr("不显示"), tr("仅显示选中车次的前序连线"), tr("显示全部连线") });
+        form->addRow(tr("显示交路连线"), cb);
+        cbShowLinkLine = cb;
+
+        auto* ck = new QCheckBox(tr("启用"));
+        ck->setToolTip(tr("是否将交路连接线浮动于车站水平线显示。若不选中，则交路连线总是与车站水平线重合（即旧版样式）。"));
+        form->addRow(tr("浮动交路连线"), ck);
+        ckFloatLinkLine = ck;
+
+        auto* sp = new QSpinBox;
+        sp->setRange(0, 100000);
+        sp->setSingleStep(1);
+        sp->setToolTip(tr("在浮动交路连线启用的情况下，设置第一条交路连线的高度"));
+        form->addRow(tr("连线基准高度"), sp);
+        spLinkHeightBase = sp;
+
+        sp = new QSpinBox;
+        sp->setRange(0, 100000);
+        sp->setSingleStep(1);
+        sp->setToolTip(tr("在浮动交路连线启用的情况下，设置各层交路连线的高度差"));
+        form->addRow(tr("连线层级高度"), sp);
+        spLinkHeightStep = sp;
+
+        cb = new QComboBox;
+        cb->addItems({ tr("不标注"), tr("标注后续车次"), tr("标注交路名") });
+        cb->setToolTip(tr("设置交路连线上标注的信息。若启用，将标注在交路连线终点位置。"));
+        form->addRow(tr("交路连线标注"), cb);
+        cbLinkLabelType = cb;
+
+        cb = new QComboBox;
+        cb->addItems({ tr("使用运行线颜色"), tr("使用文本颜色") });
+        cb->setToolTip(tr("设置车次标签及交路连线颜色。若设置为使用运行线颜色，则使用后续车次运行线的颜色。"));
+        form->addRow(tr("交路连线颜色"), cb);
+        cbLinkColor = cb;
 
         gb->setLayout(form);
         vlay->addWidget(gb);
@@ -450,6 +498,7 @@ void ConfigDialog::refreshData()
     //运行线控制
     SET_VALUE(spValidWidth, valid_width);
     cbShowTimeMark->setCurrentIndex(_cfg.show_time_mark);
+    cbLabelColor->setCurrentIndex(static_cast<int>(_cfg.train_label_color));
     ckEndLabel->setChecked(_cfg.end_label_name);
     ckFullName->setChecked(_cfg.show_full_train_name);
     ckHideStartLabelStarting->setChecked(_cfg.hide_start_label_starting);
@@ -463,6 +512,14 @@ void ConfigDialog::refreshData()
     SET_VALUE(spEndLabelHeight, end_label_height);
     SET_VALUE(spBaseHeight, base_label_height);
     SET_VALUE(spStepHeight, step_label_height);
+
+    // 交路连线控制
+    cbShowLinkLine->setCurrentIndex(_cfg.show_link_line);
+    ckFloatLinkLine->setChecked(_cfg.floating_link_line);
+    SET_VALUE(spLinkHeightBase, base_link_height);
+    SET_VALUE(spLinkHeightStep, step_link_height);
+    cbLinkLabelType->setCurrentIndex(static_cast<int>(_cfg.link_line_label_type));
+    cbLinkColor->setCurrentIndex(static_cast<int>(_cfg.link_line_color));
 
     gridColor = _cfg.grid_color;
     textColor = _cfg.text_color;
@@ -528,6 +585,7 @@ void ConfigDialog::actApply()
     //运行线控制
     GET_VALUE(spValidWidth, valid_width);
     cnew.show_time_mark = cbShowTimeMark->currentIndex();
+    cnew.train_label_color = static_cast<Config::LinkLineColorOption>(cbLabelColor->currentIndex());
     cnew.end_label_name = ckEndLabel->isChecked();
     cnew.show_full_train_name = ckFullName->isChecked();
     cnew.hide_start_label_starting = ckHideStartLabelStarting->isChecked();
@@ -541,6 +599,14 @@ void ConfigDialog::actApply()
     GET_VALUE(spEndLabelHeight, end_label_height);
     GET_VALUE(spBaseHeight, base_label_height);
     GET_VALUE(spStepHeight, step_label_height);
+
+    // 交路连线控制
+    cnew.show_link_line = cbShowLinkLine->currentIndex();
+    cnew.floating_link_line = ckFloatLinkLine->isChecked();
+    GET_VALUE(spLinkHeightBase, base_link_height);
+    GET_VALUE(spLinkHeightStep, step_link_height);
+    cnew.link_line_label_type = static_cast<Config::LinkLineLabelType>(cbLinkLabelType->currentIndex());
+    cnew.link_line_color = static_cast<Config::LinkLineColorOption>(cbLinkColor->currentIndex());
     
     cnew.grid_color = gridColor;
     cnew.text_color = textColor;

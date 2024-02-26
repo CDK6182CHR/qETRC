@@ -40,8 +40,9 @@ class ConfigDialog : public QDialog
     QDoubleSpinBox* sdScaleX, * sdSlimWidth, * sdBoldWidth, *sdScaleYdist,
             *sdScaleYsec;
     QSpinBox* spBoldLevel, * spShowLevel;
-    QComboBox* cbShowTimeMark, * cbVLineStyle;
-    QCheckBox *ckFullName,*ckEndLabel,*ckAvoidCollid;
+    QComboBox* cbShowTimeMark, * cbVLineStyle, * cbShowLinkLine, * cbLinkLabelType, * cbLinkColor, * cbLabelColor;
+    QCheckBox* ckFullName, * ckEndLabel, * ckAvoidCollid, * ckFloatLinkLine;
+    QSpinBox* spLinkHeightBase, *spLinkHeightStep;
     QCheckBox* ckHideStartLabelStarting, * ckHideStartLabelNonStarting;
     QCheckBox* ckHideEndLabelTerminal, * ckHideEndLabelNonTerminal;
     QCheckBox* ckShowRuler, * ckShowMile, * ckShowCount; 
