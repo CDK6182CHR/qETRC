@@ -41,6 +41,7 @@ class ConfigDialog : public QDialog
             *sdScaleYsec;
     QSpinBox* spBoldLevel, * spShowLevel;
     QComboBox* cbShowTimeMark, * cbVLineStyle, * cbShowLinkLine, * cbLinkLabelType, * cbLinkColor, * cbLabelColor;
+    QComboBox* cbTrainNameMarkStyle;
     QCheckBox* ckFullName, * ckEndLabel, * ckAvoidCollid, * ckFloatLinkLine;
     QSpinBox* spLinkHeightBase, *spLinkHeightStep;
     QCheckBox* ckHideStartLabelStarting, * ckHideStartLabelNonStarting;

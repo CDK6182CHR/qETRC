@@ -350,8 +350,13 @@ void ConfigDialog::initUI()
 
     // 6. 标签控制
     if constexpr (true){
-        gb=new QGroupBox(tr("车次标签高度控制"));
+        gb=new QGroupBox(tr("车次标签控制"));
         form=new QFormLayout;
+
+        auto* cb = new QComboBox;
+        cb->addItems({ tr("标签模式"), tr("交路连线模式") });
+        form->addRow(tr("车次标记形式"), cb);
+        cbTrainNameMarkStyle = cb;
 
         auto* ck=new QCheckBox(tr("启用"));
         ck->setToolTip(tr("若启用，则在同站、同方向的车次标签启用冲突检测，自动设置高度"
@@ -506,7 +511,8 @@ void ConfigDialog::refreshData()
     ckHideEndLabelTerminal->setChecked(_cfg.hide_end_label_terminal);
     ckHideEndLabelNonTerminal->setChecked(_cfg.hide_end_label_non_terminal);
 
-    //标签高度
+    //标签控制
+    cbTrainNameMarkStyle->setCurrentIndex(static_cast<int>(_cfg.train_name_mark_style));
     ckAvoidCollid->setChecked(_cfg.avoid_cover);
     SET_VALUE(spStartLabelHeight, start_label_height);
     SET_VALUE(spEndLabelHeight, end_label_height);
@@ -594,6 +600,7 @@ void ConfigDialog::actApply()
     cnew.hide_end_label_non_terminal = ckHideEndLabelNonTerminal->isChecked();
 
     //标签高度
+    cnew.train_name_mark_style = static_cast<Config::TrainNameMarkStyle>(cbTrainNameMarkStyle->currentIndex());
     cnew.avoid_cover = ckAvoidCollid->isChecked();
     GET_VALUE(spStartLabelHeight, start_label_height);
     GET_VALUE(spEndLabelHeight, end_label_height);

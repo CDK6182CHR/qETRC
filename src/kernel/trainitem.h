@@ -2,6 +2,7 @@
 
 #include <QGraphicsItem>
 #include <QTime>
+#include <Qt>
 
 #include "data/diagram/diagrampage.h"
 #include "data/train/stationpoint.h"
@@ -14,6 +15,7 @@ class Railway;
 class QPointF;
 class PaintStationPointItem;
 class QEMultiLinePath;
+class Routing;
 
 /**
  * @brief The TrainItem class  列车运行线类
@@ -53,6 +55,7 @@ class TrainItem : public QGraphicsItem
     int linkLayer = -1;
     double link_x_pre = -1, link_x_cur = -1;
     QGraphicsSimpleTextItem* linkLabelItem = nullptr;
+    QGraphicsRectItem* linkLabelRect = nullptr;
     
     /**
      * 2024.02.26  用于仅选中车次显示连线的情况。仅在第一次选中时尝试绘制，后面就不用再试了。
@@ -280,6 +283,10 @@ private:
      */
     bool addLinkLine(const QString& trainName);
 
+    typename Qt::PenStyle linkLineStyle()const;
+
+    QString linkLineLabelText(const QString& trainName, const Routing* rout)const;
+
     /**
      * Determine the height of routing link line.
      * The direction of the link line is extracted from this->dir().
@@ -289,6 +296,8 @@ private:
     double linkLineHeight(const RailStation* rs, int xlelft, int xright);
 
     QColor linkLineColor()const;
+
+    QColor labelColor()const;
 
     QGraphicsPathItem* drawLinkLine(double x1, double x2, double y, double height, 
         bool left_start, bool right_end, bool hasLabel);

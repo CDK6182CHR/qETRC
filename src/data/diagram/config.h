@@ -61,6 +61,11 @@ struct Config
         TextColor,
     };
 
+    enum class TrainNameMarkStyle {
+        Label = 0,   // classic label mode
+        Link,    // use routing link line, usually used for subway train working diagrams
+    };
+
     /**
      * 2023.06.23  whether current object is transparent. If true, the data are not read.
      */
@@ -126,6 +131,7 @@ struct Config
     int show_link_line = 2;  // 显示交路连线：0-不显示；1-仅选中显示；2-总是显示
     LinkLineColorOption link_line_color = LinkLineColorOption::LineColor; 
     LinkLineColorOption train_label_color = LinkLineColorOption::LineColor;
+    TrainNameMarkStyle train_name_mark_style = TrainNameMarkStyle::Label;
 
     double default_grid_width = 1.0;
     double bold_grid_width = 2.5;

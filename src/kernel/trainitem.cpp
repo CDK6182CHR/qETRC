@@ -150,6 +150,22 @@ void TrainItem::highlight()
         }
     }
 
+    // 突出显示交路连线车次标记
+    if (config().train_name_mark_style == Config::TrainNameMarkStyle::Link && linkLabelItem) {
+        if (linkLabelRect) {
+            linkLabelRect->show();
+        }
+        else {
+            linkLabelRect = new QGraphicsRectItem(linkLabelItem->boundingRect(), this);
+            linkLabelRect->setPos(linkLabelItem->pos());
+            linkLabelRect->setZValue(5);
+            linkLabelRect->setPen(rectPen);
+            linkLabelRect->setBrush(brush);
+        }
+        linkLabelItem->setZValue(6);
+        linkLabelItem->setBrush(Qt::white);
+    }
+
     setZValue(10);
     _isHighlighted = true;
 }
@@ -209,6 +225,12 @@ void TrainItem::unhighlight()
     hideStationPoints();
     hideLinkLine();
 
+    if (linkLabelRect) {
+        linkLabelRect->hide();
+        linkLabelItem->setZValue(0);
+        linkLabelItem->setBrush(labelColor);
+    }
+
     _isHighlighted = false;
 }
 
@@ -221,7 +243,7 @@ void TrainItem::highlightWithLink()
             pen.setColor(config().text_color);
         }
         pen.setWidthF(LINK_LINE_WIDTH + 1);
-        pen.setStyle(Qt::DashLine);
+        pen.setStyle(linkLineStyle());
         if (linkItem1)
             linkItem1->setPen(pen);
         if (linkItem2) {
@@ -240,7 +262,7 @@ void TrainItem::unhighlightWithLink()
             pen.setColor(config().text_color);
         }
         pen.setWidth(LINK_LINE_WIDTH);
-        pen.setStyle(Qt::DashLine);
+        pen.setStyle(linkLineStyle());
         if (linkItem1)
             linkItem1->setPen(pen);
         if (linkItem2)
@@ -274,6 +296,7 @@ TrainItem::~TrainItem() noexcept
     DELETE_SUB(linkItem1);
     DELETE_SUB(linkItem2);
     DELETE_SUB(linkLabelItem);
+    DELETE_SUB(linkLabelRect);
 
     for (auto p : spanItems) {
         delete p;
@@ -505,6 +528,10 @@ void TrainItem::setLine()
     bool glb_has_end_label = ((_endAtThis && !config().hide_end_label_terminal)
         || !config().hide_end_label_non_terminal);
 
+    // 2024.02.28  for link line mode: we should determine the existence of linkLine BEFORE adding start item..
+    if (config().show_link_line == 2)
+        hasLinkLine = addLinkLine(trainName);
+
     if (glb_has_start_label && _line->startLabel() && startInRange) {
         setStartItem(trainName, labelPen);
     }
@@ -512,8 +539,6 @@ void TrainItem::setLine()
         setEndItem(config().end_label_name ? trainName : " ",
             labelPen);
     }
-    if (config().show_link_line == 2)
-        hasLinkLine = addLinkLine(trainName);
 }
 
 void TrainItem::setPathItem(const QString& trainName)
@@ -697,6 +722,12 @@ QString TrainItem::labelTrainName() const
 
 void TrainItem::setStartItem(const QString& text,const QPen& pen)
 {
+    // 2024.02.28: for link
+    if (config().train_name_mark_style == Config::TrainNameMarkStyle::Link) {
+        if (hasLinkLine)
+            return;
+    }
+
     QEMultiLinePath label(startPoint);
     startLabelText = setStartEndLabelText(text, pen.color());
     double height = determineStartLabelHeight();
@@ -1103,14 +1134,11 @@ bool TrainItem::addLinkLine(const QString& trainName)
     link_x_cur = xcur;
 
     // 2024.02.26: add (optional) link label
-    QString label_text{};
-    switch (config().link_line_label_type) {
-    case Config::LinkLineLabelType::PostTrainName: label_text = trainName; break;
-    case Config::LinkLineLabelType::RoutingName: label_text = rout->name(); break;
-    }
+    auto label_text = linkLineLabelText(trainName, rout.get());
+
     if (!label_text.isEmpty()) {
         linkLabelItem = new QGraphicsSimpleTextItem(label_text, this);
-        linkLabelItem->setBrush(linkLineColor());
+        linkLabelItem->setBrush(labelColor());
         xpre_eff = std::min(xpre, xcur - linkLabelItem->boundingRect().width());
     }
 
@@ -1122,7 +1150,7 @@ bool TrainItem::addLinkLine(const QString& trainName)
     QPen pen = trainPen();
     pen.setColor(linkLineColor());
     pen.setWidth(LINK_LINE_WIDTH);
-    pen.setStyle(Qt::DashLine);   // test: use solid line
+    pen.setStyle(linkLineStyle()); 
 
     if (xcur >= xpre) {
         //无需跨界
@@ -1156,6 +1184,26 @@ bool TrainItem::addLinkLine(const QString& trainName)
     return true;
 }
 
+typename Qt::PenStyle TrainItem::linkLineStyle() const
+{
+    switch (config().train_name_mark_style)
+    {
+    case Config::TrainNameMarkStyle::Label: return Qt::DashLine;
+    case Config::TrainNameMarkStyle::Link: return Qt::SolidLine;
+    }
+    return Qt::SolidLine;
+}
+
+QString TrainItem::linkLineLabelText(const QString& trainName, const Routing* rout) const
+{
+    //if (config().train_name_mark_style == Config::TrainNameMarkStyle::Label) {
+    switch (config().link_line_label_type) {
+    case Config::LinkLineLabelType::PostTrainName: return trainName; break;
+    case Config::LinkLineLabelType::RoutingName: return rout->name(); break;
+    }
+    return trainName;
+}
+
 double TrainItem::linkLineHeight(const RailStation* rs, int xleft, int xright)
 {
     if (!config().floating_link_line) return 0;
@@ -1170,6 +1218,15 @@ double TrainItem::linkLineHeight(const RailStation* rs, int xleft, int xright)
 QColor TrainItem::linkLineColor() const
 {
     switch (config().link_line_color) {
+    case Config::LinkLineColorOption::LineColor: return trainColor();
+    case Config::LinkLineColorOption::TextColor: return config().text_color;
+    }
+    return trainColor();
+}
+
+QColor TrainItem::labelColor() const
+{
+    switch (config().train_label_color) {
     case Config::LinkLineColorOption::LineColor: return trainColor();
     case Config::LinkLineColorOption::TextColor: return config().text_color;
     }
