@@ -8,7 +8,6 @@
 #include "data/common/qesystem.h"
 #include "qemultilinepath.h"
 
-#include <QPainterPath>
 #include <QPointF>
 #include <QPen>
 #include <QGraphicsScene>

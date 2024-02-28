@@ -5,7 +5,7 @@
 #include <QJsonObject>
 
 TypeManager::TypeManager():
-    defaultPen(QColor(0,128,0),0.5),defaultPenPassenger(QColor(0,128,0),1.0),
+    defaultPen(QColor(0,128,0),1.0), defaultPenPassenger(QColor(0,128,0),1.5),
     defaultType(std::make_shared<TrainType>(QObject::tr("其他_"),defaultPen))
 {
 }
@@ -233,14 +233,15 @@ bool TypeManager::fromJson(const QJsonObject& obj, bool ignore_transparent)
 
 void TypeManager::initDefaultTypes()
 {
+    // 2024.02.28: update default pen width for new implementation (w/o stroker)
     _types.insert(QObject::tr("其他_"), defaultType);   // 2023.12.23  fix name!
-    addType(QObject::tr("快速"), QPen(QColor(255, 0, 0), 1.0));
-    addType(QObject::tr("特快"), QPen(QColor(0, 0, 255), 1.0));
-    addType(QObject::tr("直达特快"), QPen(QColor(255, 0, 255), 1.0));
-    addType(QObject::tr("动车组"), QPen(QColor(128, 64, 0), 1.0));
-    addType(QObject::tr("动车"), QPen(QColor(128, 64, 0), 1.0));
-    addType(QObject::tr("高速"), QPen(QColor(255, 0, 190), 1.0));
-    addType(QObject::tr("城际"), QPen(QColor(255, 51, 204), 1.0));
+    addType(QObject::tr("快速"), QPen(QColor(255, 0, 0), 1.5));
+    addType(QObject::tr("特快"), QPen(QColor(0, 0, 255), 1.5));
+    addType(QObject::tr("直达特快"), QPen(QColor(255, 0, 255), 1.5));
+    addType(QObject::tr("动车组"), QPen(QColor(128, 64, 0), 1.5));
+    addType(QObject::tr("动车"), QPen(QColor(128, 64, 0), 1.5));
+    addType(QObject::tr("高速"), QPen(QColor(255, 0, 190), 1.5));
+    addType(QObject::tr("城际"), QPen(QColor(255, 51, 204), 1.5));
 
     appendRegex(QRegularExpression(R"(^G\d+)"), QObject::tr("高速"), true);
     appendRegex(QRegularExpression(R"(^D\d+)"), QObject::tr("动车组"), true);
