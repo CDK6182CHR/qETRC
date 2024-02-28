@@ -13,7 +13,7 @@ class TrainLine;
 class Railway;
 class QPointF;
 class PaintStationPointItem;
-
+class QEMultiLinePath;
 
 /**
  * @brief The TrainItem class  列车运行线类
@@ -218,9 +218,9 @@ private:
      * 铺画越界边界，以及越界标签。注意所给参数都是直接算出的  i.e.正值
      * 返回跨界点纵坐标
      */
-    double getOutGraph(double xin, double yin, double xout, double yout, QPainterPath& path);
+    double getOutGraph(double xin, double yin, double xout, double yout, QEMultiLinePath& path);
 
-    double getInGraph(double xout, double yout, double xin, double yin, QPainterPath& path);
+    double getInGraph(double xout, double yout, double xin, double yin, QEMultiLinePath& path);
 
     /**
      * @brief 封装查询列车绘制图形的方法

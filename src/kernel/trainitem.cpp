@@ -6,6 +6,7 @@
 #include "data/rail/railway.h"
 #include "paintstationpointitem.h"
 #include "data/common/qesystem.h"
+#include "qemultilinepath.h"
 
 #include <QPainterPath>
 #include <QPointF>
@@ -494,6 +495,7 @@ void TrainItem::setLine()
 
     QPen labelPen = trainPen();
     labelPen.setWidth(0.5);
+    labelPen.setStyle(Qt::SolidLine);
     if (config().train_label_color == Config::LinkLineColorOption::TextColor) {
         labelPen.setColor(config().text_color);
     }
@@ -526,7 +528,8 @@ void TrainItem::setPathItem(const QString& trainName)
 
     bool mark = (config().show_time_mark == 2);
 
-    QPainterPath path;
+    //QPainterPath path;
+    QEMultiLinePath path;
 
     QList<double> spanLeft, spanRight;   //跨界点纵坐标
 
@@ -637,14 +640,15 @@ void TrainItem::setPathItem(const QString& trainName)
     }
     QPen pen = trainPen();
 
-    QPainterPathStroker stroker;
-    stroker.setWidth(0.5);
-    auto outpath = stroker.createStroke(path);
-    pathItem = new QGraphicsPathItem(outpath, this);
+    //QPainterPathStroker stroker;
+    //stroker.setWidth(0.5);
+    //auto outpath = stroker.createStroke(path);
+
+    pathItem = new QGraphicsPathItem(path.path(), this);
     pathItem->setPen(pen);
     if (config().valid_width > 1) {
         QPen expen(Qt::transparent, pen.width() * config().valid_width);
-        expandItem = new QGraphicsPathItem(outpath, this);
+        expandItem = new QGraphicsPathItem(path.path(), this);
         expandItem->setPen(expen);
         //_bounding = expandItem->boundingRect();
     }
@@ -694,7 +698,7 @@ QString TrainItem::labelTrainName() const
 
 void TrainItem::setStartItem(const QString& text,const QPen& pen)
 {
-    QPainterPath label(startPoint);
+    QEMultiLinePath label(startPoint);
     startLabelText = setStartEndLabelText(text, pen.color());
     double height = determineStartLabelHeight();
     startLabelHeight = height;
@@ -734,10 +738,10 @@ void TrainItem::setStartItem(const QString& text,const QPen& pen)
             startLabelText->setPos(x0 - w, y0 + height);
         }
     }
-    QPainterPathStroker s;
-    s.setWidth(0.01);
-    auto label_out = s.createStroke(label);
-    startLabelItem = new QGraphicsPathItem(label_out, this);
+    //QPainterPathStroker s;
+    //s.setWidth(0.01);
+    //auto label_out = s.createStroke(label);
+    startLabelItem = new QGraphicsPathItem(label.path(), this);
     startLabelItem->setPen(pen);
     _bounding |= startLabelItem->boundingRect();
     _bounding |= startLabelText->boundingRect();
@@ -745,7 +749,7 @@ void TrainItem::setStartItem(const QString& text,const QPen& pen)
 
 void TrainItem::setEndItem(const QString& text, const QPen& pen)
 {
-    QPainterPath label(endPoint);
+    QEMultiLinePath label(endPoint);
     double x0 = endPoint.x(), y0 = endPoint.y();
     endLabelText = setStartEndLabelText(text, pen.color());
     const auto& t = endLabelText->boundingRect();
@@ -766,8 +770,9 @@ void TrainItem::setEndItem(const QString& text, const QPen& pen)
                 {x0 - beh / 3, y1},
                 { x0 + beh / 3,y1 },
                 { x0,y0 + height },
-                { x0 - beh / 3, y1 },
+                //{ x0 - beh / 3, y1 },
             }));
+            label.closeSubPath();
             label.moveTo(x0 - w / 2, (y0 += height));
             label.lineTo(x0 + w / 2, y0);
             endLabelText->setPos(x0 - w / 2, y0);
@@ -800,10 +805,10 @@ void TrainItem::setEndItem(const QString& text, const QPen& pen)
             endLabelText->setPos(x0, y0 - h);
         }
     }
-    QPainterPathStroker s;
-    s.setWidth(0.01);
-    auto label_out = s.createStroke(label);
-    endLabelItem = new QGraphicsPathItem(label_out, this);
+    //QPainterPathStroker s;
+    //s.setWidth(0.01);
+    //auto label_out = s.createStroke(label);
+    endLabelItem = new QGraphicsPathItem(label.path(), this);
     endLabelItem->setPen(pen);
     _bounding |= endLabelItem->boundingRect();
     _bounding |= endLabelText->boundingRect();
@@ -837,7 +842,7 @@ QTime TrainItem::calTimeByXFromStart(double x_from_start) const
 }
 
 double TrainItem::getOutGraph(double xin, double yin, double xout, double yout, 
-    QPainterPath& path)
+    QEMultiLinePath& path)
 {
     // Note, that xout may be out of graph or actually in graph (in this case, xout < xin)
     double fullwidth = config().fullWidth();
@@ -849,7 +854,7 @@ double TrainItem::getOutGraph(double xin, double yin, double xout, double yout,
     return yp;
 }
 
-double TrainItem::getInGraph(double xout, double yout, double xin, double yin, QPainterPath& path)
+double TrainItem::getInGraph(double xout, double yout, double xin, double yin, QEMultiLinePath& path)
 {
     double fullwidth = config().fullWidth();
     double xleft = xout - fullwidth;
@@ -1175,14 +1180,14 @@ QColor TrainItem::linkLineColor() const
 QGraphicsPathItem* TrainItem::drawLinkLine(double x1, double x2, double y, double height, 
     bool left_start, bool right_end, bool hasLabel)
 {
-    QPainterPath path;
+    
     int height_sig = dir() == Direction::Down ? -1 : 1;
     double left_mag = config().totalLeftMargin();
     double yh = y + height_sig * height;
 
     // for a trial version, only the line itself!
 
-    path.moveTo(x1 + left_mag, y);
+    QEMultiLinePath path(QPointF(x1 + left_mag, y));
     if (left_start) {
         path.lineTo(x1 + left_mag, yh);
     }
@@ -1206,7 +1211,7 @@ QGraphicsPathItem* TrainItem::drawLinkLine(double x1, double x2, double y, doubl
         linkLabelItem->setPos(left_mag + x2 - rect.width(), label_y);
     }
 
-    return new QGraphicsPathItem(path, this);
+    return new QGraphicsPathItem(path.path(), this);
 }
 
 double TrainItem::timeDistancePbc(double x, const QTime& tm) const
