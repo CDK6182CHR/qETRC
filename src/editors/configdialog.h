@@ -96,6 +96,8 @@ private slots:
     void informTransparent();
 
     void onTrainNameMarkStyleChanged(int index);
+
+    void actTrainNameMarkTip();
 };
 
 class ViewCategory;

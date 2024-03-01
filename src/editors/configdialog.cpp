@@ -43,7 +43,7 @@ ConfigDialog::ConfigDialog(Config& cfg, const std::shared_ptr<DiagramPage>& page
 
 void ConfigDialog::initUI()
 {
-    resize(600, 700);
+    resize(650, 700);
     auto* hlay=new QHBoxLayout;
     QVBoxLayout* vlay;
     QFormLayout* form;
@@ -360,8 +360,15 @@ void ConfigDialog::initUI()
 
         auto* cb = new QComboBox;
         cb->addItems({ tr("标签模式"), tr("交路连线模式") });
-        form->addRow(tr("车次标记形式"), cb);
+        auto* chlay = new QHBoxLayout;
         cbTrainNameMarkStyle = cb;
+        chlay->addWidget(cb);
+        auto* btn = new QToolButton;
+        btn->setIcon(qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation));
+        chlay->addWidget(btn);
+        connect(btn, &QPushButton::clicked, this, &ConfigDialog::actTrainNameMarkTip);
+
+        form->addRow(tr("车次标记形式"), chlay);
         connect(cb, &QComboBox::currentIndexChanged, this, &ConfigDialog::onTrainNameMarkStyleChanged);
 
         auto* ck=new QCheckBox(tr("启用"));
@@ -465,11 +472,13 @@ void ConfigDialog::setDisabledWidgetsForMarkStyle(int idx)
 {
     if (idx == 0) {
         // Label mode
+        ckAvoidCollid->setEnabled(true);
         spBaseHeight->setEnabled(true);
         spStepHeight->setEnabled(true);
     }
     else if (idx == 1) {
         // Link mode
+        ckAvoidCollid->setEnabled(false);
         spBaseHeight->setEnabled(false);
         spStepHeight->setEnabled(false);
     }
@@ -722,6 +731,51 @@ void ConfigDialog::informTransparent()
 void ConfigDialog::onTrainNameMarkStyleChanged(int index)
 {
     setDisabledWidgetsForMarkStyle(index);
+}
+
+void ConfigDialog::actTrainNameMarkTip()
+{
+    int idx = cbTrainNameMarkStyle->currentIndex();
+    if (idx == 0) {
+        // label mode
+        auto res = QMessageBox::question(this, tr("提示"), 
+            tr("当前车次标记形式为【标签模式】，推荐采用以下配置：\n"
+            "基准连线高度：5；层级连线高度: 5；\n"
+            "交路连线标注：不标注；\n"
+            "结束标签车次：是；\n"
+            "隐藏有连线的终止标签：否。\n"
+            "是否引入以上设置项？"
+        ));
+        if (res == QMessageBox::Yes) {
+            spLinkHeightBase->setValue(5);
+            spLinkHeightStep->setValue(5);
+            cbLinkLabelType->setCurrentIndex(0);
+            ckEndLabel->setChecked(true);
+            ckHideEndLabelLink->setChecked(false);
+        }
+    }
+    else if (idx == 1) {
+        // link mode
+        auto res = QMessageBox::question(this, tr("提示"),
+            tr("当前车次标记形式为【交路连线模式】，推荐采用以下配置：\n"
+                "交路连线标注：标注后续车次；\n"
+                "显示交路连线：显示全部连线；\n"
+                "浮动交路连线：是；\n"
+                "结束标签车次：否；\n"
+                "隐藏有连线的终止标签：是\n"
+                "基准连线高度、层级连线高度分别采用基准标签高度、层级标签高度。\n"
+                "是否引入以上设置项？"
+            ));
+        if (res == QMessageBox::Yes) {
+            cbLinkLabelType->setCurrentIndex(1);
+            cbShowLinkLine->setCurrentIndex(2);
+            ckFloatLinkLine->setChecked(true);
+            ckEndLabel->setChecked(false);
+            ckHideEndLabelLink->setChecked(true);
+            spLinkHeightBase->setValue(spBaseHeight->value());
+            spLinkHeightStep->setValue(spStepHeight->value());
+        }
+    }
 }
 
 qecmd::ChangeConfig::ChangeConfig(Config& cfg_, const Config& newcfg_, 
