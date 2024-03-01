@@ -332,8 +332,16 @@ void TrainItem::clearLinkInfo()
     if (!_page.hasLinkInfo())
         return;
     
-    auto& links = _page.dirLinks(_line->firstRailStation().get(), dir());
-    links.delOccupation(linkLayer, train().get(), link_x_pre, link_x_cur, config().fullWidth());
+    auto& linksStart = _page.dirLinks(_line->firstRailStation().get(), dir());
+
+    // note: the layer >= 0 check is performed inside the function.
+    linksStart.delOccupation(linkLayer.layer, train().get(), linkLayer.x_pre, linkLayer.x_cur, config().fullWidth());
+    linksStart.delOccupation(startLayer.layer, train().get(), startLayer.x_pre, startLayer.x_cur, config().fullWidth());
+
+    if (endLayer.layer >= 0) {
+        auto& linksEnd = _page.dirLinks(_line->lastRailStation().get(), dir());
+        linksEnd.delOccupation(endLayer.layer, train().get(), endLayer.x_pre, endLayer.x_cur, config().fullWidth());
+    }
 }
 
 Direction TrainItem::dir() const
@@ -524,9 +532,9 @@ void TrainItem::setLine()
 
     // 2024.02.09: add global config here
     bool glb_has_start_label = ((_startAtThis && !config().hide_start_label_starting) 
-        || !config().hide_start_label_non_starting);
+        || (!_startAtThis && !config().hide_start_label_non_starting));
     bool glb_has_end_label = ((_endAtThis && !config().hide_end_label_terminal)
-        || !config().hide_end_label_non_terminal);
+        || (!_endAtThis && !config().hide_end_label_non_terminal));
 
     // 2024.02.28  for link line mode: we should determine the existence of linkLine BEFORE adding start item..
     if (config().show_link_line == 2)
@@ -918,13 +926,31 @@ double TrainItem::determineStartLabelHeight()
         wl = w; wr = 0;
     }
     auto rst = _line->firstRailStation();
-    if (_line->dir() == Direction::Down) {
-        startLabelInfo = determineLabelHeight(_page.overLabels(rst.get()), x, wl, wr);
+
+    if (config().train_name_mark_style == Config::TrainNameMarkStyle::Link) {
+        // debug
+        if (train()->trainName().down() == "D4803") {
+            qDebug() << "hit break point";
+        }
+
+        double width = config().diagramWidth();
+        // 2024.03.01: link-style train name marker
+        double left_marg = config().totalLeftMargin();
+        startLayer.x_pre = std::max(x - wl - left_marg, 0.);
+        startLayer.x_cur = std::min(x + wr - left_marg, width);
+        startLayer.layer = linkLineLayer(rst.get(), startLayer.x_pre, startLayer.x_cur);
+        //qDebug() << "start layer: " << startLayer.layer << ", " << startLayer.x_pre << ", " << startLayer.x_cur;
+        return config().base_link_height + startLayer.layer * config().step_link_height;
     }
     else {
-        startLabelInfo = determineLabelHeight(_page.belowLabels(rst.get()), x, wl, wr);
+        if (_line->dir() == Direction::Down) {
+            startLabelInfo = determineLabelHeight(_page.overLabels(rst.get()), x, wl, wr);
+        }
+        else {
+            startLabelInfo = determineLabelHeight(_page.belowLabels(rst.get()), x, wl, wr);
+        }
+        return startLabelInfo->second.height;
     }
-    return startLabelInfo->second.height;
 }
 
 double TrainItem::determineEndLabelHeight()
@@ -943,13 +969,26 @@ double TrainItem::determineEndLabelHeight()
         wl = 0; wr = w;
     }
     auto rst = _line->lastRailStation();
-    if (dir() == Direction::Down) {
-        endLabelInfo = determineLabelHeight(_page.belowLabels(rst.get()), x, wl, wr);
+
+    if (config().train_name_mark_style == Config::TrainNameMarkStyle::Link) {
+        double width = config().diagramWidth();
+        // 2024.03.01: link-style train name marker
+        double left_marg = config().totalLeftMargin();
+        endLayer.x_pre = std::max(x - wl - left_marg, 0.);
+        endLayer.x_cur = std::min(x + wr - left_marg, width);
+        endLayer.layer = linkLineLayerEnd(rst.get(), endLayer.x_pre, endLayer.x_cur);
+        return config().base_link_height + endLayer.layer * config().step_link_height;
     }
     else {
-        endLabelInfo = determineLabelHeight(_page.overLabels(rst.get()), x, wl, wr);
+        if (dir() == Direction::Down) {
+            endLabelInfo = determineLabelHeight(_page.belowLabels(rst.get()), x, wl, wr);
+        }
+        else {
+            endLabelInfo = determineLabelHeight(_page.overLabels(rst.get()), x, wl, wr);
+        }
+        return endLabelInfo->second.height;
     }
-    return endLabelInfo->second.height;
+
 }
 
 std::multimap<double, LabelPositionInfo>::iterator
@@ -1130,8 +1169,8 @@ bool TrainItem::addLinkLine(const QString& trainName)
     double xcur = calXFromStart(first_tm);
     double xpre = calXFromStart(last_tm);
     double xpre_eff = xpre;     // For determining the starting of occupation. Mainly prepared for long text case.
-    link_x_pre = xpre;
-    link_x_cur = xcur;
+    linkLayer.x_pre = xpre;
+    linkLayer.x_cur = xcur;
 
     // 2024.02.26: add (optional) link label
     auto label_text = linkLineLabelText(trainName, rout.get());
@@ -1139,7 +1178,11 @@ bool TrainItem::addLinkLine(const QString& trainName)
     if (!label_text.isEmpty()) {
         linkLabelItem = new QGraphicsSimpleTextItem(label_text, this);
         linkLabelItem->setBrush(labelColor());
-        xpre_eff = std::min(xpre, xcur - linkLabelItem->boundingRect().width());
+
+        // 对于不跨界的连线，其有效范围由文字和连线中范围大的决定
+        if (xpre <= xcur) {
+            xpre_eff = std::min(xpre, xcur - linkLabelItem->boundingRect().width());
+        }
     }
 
     // 2024.02.22: determine the height of the link line
@@ -1201,18 +1244,30 @@ QString TrainItem::linkLineLabelText(const QString& trainName, const Routing* ro
     case Config::LinkLineLabelType::PostTrainName: return trainName; break;
     case Config::LinkLineLabelType::RoutingName: return rout->name(); break;
     }
-    return trainName;
+    return {};
+}
+
+int TrainItem::linkLineLayer(const RailStation* rs, int xleft, int xright)const
+{
+    const double tot_width = config().fullWidth();
+    auto& labels = dir() == Direction::Down ? _page.overLinks(rs) : _page.belowLinks(rs);
+
+    return labels.addOccupation(RouteLinkOccupy(this->train().get(), xleft, xright), tot_width);
+}
+
+int TrainItem::linkLineLayerEnd(const RailStation* rs, int xleft, int xright) const
+{
+    const double tot_width = config().fullWidth();
+    auto& labels = dir() == Direction::Down ? _page.belowLinks(rs) : _page.overLinks(rs);
+
+    return labels.addOccupation(RouteLinkOccupy(this->train().get(), xleft, xright), tot_width);
 }
 
 double TrainItem::linkLineHeight(const RailStation* rs, int xleft, int xright)
 {
     if (!config().floating_link_line) return 0;
-    const double tot_width = config().fullWidth();
-    auto& labels = dir() == Direction::Down ? _page.overLinks(rs) : _page.belowLinks(rs);
-
-    int layer = labels.addOccupation(RouteLinkOccupy(this->train().get(), xleft, xright), tot_width);
-    this->linkLayer = layer;
-    return config().base_link_height + layer * config().step_link_height;
+    this->linkLayer.layer = linkLineLayer(rs, xleft, xright);
+    return config().base_link_height + this->linkLayer.layer * config().step_link_height;
 }
 
 QColor TrainItem::linkLineColor() const

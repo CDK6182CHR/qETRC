@@ -4,9 +4,10 @@
 typename RouteLinkLayer::item_set_t::const_iterator 
 	RouteLinkLayer::occupationInRange(int start_x, int end_x) const
 {
-	auto itr = _items.lower_bound(start_x);
+	// 2024.03.01: change to upper_bound. If itr->end_x == start_x, there is NOT confilict.
+	auto itr = _items.upper_bound(start_x);
 	if (itr == _items.end()) return itr;
-	qDebug() << "Found occupation: " << itr->start_x << ", " << itr->end_x;
+	//qDebug() << "Found occupation: " << itr->start_x << ", " << itr->end_x;
 	// has intersection, return the iterator
 	if (std::max(itr->start_x, start_x) < std::min(itr->end_x, end_x))
 		return itr;

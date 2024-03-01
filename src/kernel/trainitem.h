@@ -52,10 +52,17 @@ class TrainItem : public QGraphicsItem
      * 采用交路连线时的连线对象。最多两个（考虑跨日）
      */
     QGraphicsPathItem* linkItem1 = nullptr, * linkItem2 = nullptr;
-    int linkLayer = -1;
-    double link_x_pre = -1, link_x_cur = -1;
     QGraphicsSimpleTextItem* linkLabelItem = nullptr;
     QGraphicsRectItem* linkLabelRect = nullptr;
+
+    /**
+     * 2024.03.01: this structure logs the information about one link line determined using the link-layer alg.
+     */
+    struct LinkLayerInfo {
+        int layer = -1;
+        double x_pre = -1, x_cur = -1;
+    };
+    LinkLayerInfo linkLayer, startLayer, endLayer;
     
     /**
      * 2024.02.26  用于仅选中车次显示连线的情况。仅在第一次选中时尝试绘制，后面就不用再试了。
@@ -286,6 +293,17 @@ private:
     typename Qt::PenStyle linkLineStyle()const;
 
     QString linkLineLabelText(const QString& trainName, const Routing* rout)const;
+
+    /**
+     * 2024.03.01  determine the layer number (0, 1, ...) of the link line.
+     */
+    int linkLineLayer(const RailStation* rs, int xleft, int xright)const;
+
+    /**
+     * 2024.03.01  similar to linkLineLayer, but for end point. Actually, used for end label
+     * when link-mode is enabled.
+     */
+    int linkLineLayerEnd(const RailStation* rs, int xleft, int xright)const;
 
     /**
      * Determine the height of routing link line.
