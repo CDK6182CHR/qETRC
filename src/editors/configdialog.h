@@ -45,7 +45,7 @@ class ConfigDialog : public QDialog
     QCheckBox* ckFullName, * ckEndLabel, * ckAvoidCollid, * ckFloatLinkLine;
     QSpinBox* spLinkHeightBase, *spLinkHeightStep;
     QCheckBox* ckHideStartLabelStarting, * ckHideStartLabelNonStarting;
-    QCheckBox* ckHideEndLabelTerminal, * ckHideEndLabelNonTerminal;
+    QCheckBox* ckHideEndLabelTerminal, * ckHideEndLabelNonTerminal, * ckHideEndLabelLink;
     QCheckBox* ckShowRuler, * ckShowMile, * ckShowCount; 
     QCheckBox* ckTransparent;
     QPushButton* btnGridColor, * btnTextColor;
@@ -73,6 +73,7 @@ signals:
 
 private:
     void initUI();
+    void setDisabledWidgetsForMarkStyle(int idx);
 
 private slots:
     void refreshData();
@@ -93,6 +94,8 @@ private slots:
     void actTextColor();
 
     void informTransparent();
+
+    void onTrainNameMarkStyleChanged(int index);
 };
 
 class ViewCategory;

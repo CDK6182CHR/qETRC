@@ -250,6 +250,11 @@ void ConfigDialog::initUI()
         ckHideStartLabelNonStarting = ck;
 
         ck = new QCheckBox;
+        ck->setToolTip(tr("隐藏所有有后续交路连线的运行线终止标签"));
+        form->addRow(tr("隐藏有连线终止标签"), ck);
+        ckHideEndLabelLink = ck;
+         
+        ck = new QCheckBox;
         ck->setToolTip(tr("隐藏所有终到站的运行线结束标签"));
         form->addRow(tr("隐藏终到结束标签"), ck);
         ckHideEndLabelTerminal = ck;
@@ -357,6 +362,7 @@ void ConfigDialog::initUI()
         cb->addItems({ tr("标签模式"), tr("交路连线模式") });
         form->addRow(tr("车次标记形式"), cb);
         cbTrainNameMarkStyle = cb;
+        connect(cb, &QComboBox::currentIndexChanged, this, &ConfigDialog::onTrainNameMarkStyleChanged);
 
         auto* ck=new QCheckBox(tr("启用"));
         ck->setToolTip(tr("若启用，则在同站、同方向的车次标签启用冲突检测，自动设置高度"
@@ -409,14 +415,14 @@ void ConfigDialog::initUI()
         sp->setRange(0, 100000);
         sp->setSingleStep(1);
         sp->setToolTip(tr("在浮动交路连线启用的情况下，设置第一条交路连线的高度"));
-        form->addRow(tr("连线基准高度"), sp);
+        form->addRow(tr("基准连线高度"), sp);
         spLinkHeightBase = sp;
 
         sp = new QSpinBox;
         sp->setRange(0, 100000);
         sp->setSingleStep(1);
         sp->setToolTip(tr("在浮动交路连线启用的情况下，设置各层交路连线的高度差"));
-        form->addRow(tr("连线层级高度"), sp);
+        form->addRow(tr("层级连线高度"), sp);
         spLinkHeightStep = sp;
 
         cb = new QComboBox;
@@ -453,6 +459,20 @@ void ConfigDialog::initUI()
 
     setLayout(tlay);
 
+}
+
+void ConfigDialog::setDisabledWidgetsForMarkStyle(int idx)
+{
+    if (idx == 0) {
+        // Label mode
+        spBaseHeight->setEnabled(true);
+        spStepHeight->setEnabled(true);
+    }
+    else if (idx == 1) {
+        // Link mode
+        spBaseHeight->setEnabled(false);
+        spStepHeight->setEnabled(false);
+    }
 }
 
 #define SET_VALUE(_spin,_key) _spin->setValue(_cfg._key)
@@ -510,6 +530,7 @@ void ConfigDialog::refreshData()
     ckHideStartLabelNonStarting->setChecked(_cfg.hide_start_label_non_starting);
     ckHideEndLabelTerminal->setChecked(_cfg.hide_end_label_terminal);
     ckHideEndLabelNonTerminal->setChecked(_cfg.hide_end_label_non_terminal);
+    ckHideEndLabelLink->setChecked(_cfg.hide_end_label_link);
 
     //标签控制
     cbTrainNameMarkStyle->setCurrentIndex(static_cast<int>(_cfg.train_name_mark_style));
@@ -518,6 +539,7 @@ void ConfigDialog::refreshData()
     SET_VALUE(spEndLabelHeight, end_label_height);
     SET_VALUE(spBaseHeight, base_label_height);
     SET_VALUE(spStepHeight, step_label_height);
+    setDisabledWidgetsForMarkStyle(cbTrainNameMarkStyle->currentIndex());
 
     // 交路连线控制
     cbShowLinkLine->setCurrentIndex(_cfg.show_link_line);
@@ -598,6 +620,7 @@ void ConfigDialog::actApply()
     cnew.hide_start_label_non_starting = ckHideStartLabelNonStarting->isChecked();
     cnew.hide_end_label_terminal = ckHideEndLabelTerminal->isChecked();
     cnew.hide_end_label_non_terminal = ckHideEndLabelNonTerminal->isChecked();
+    cnew.hide_end_label_link = ckHideEndLabelLink->isChecked();
 
     //标签高度
     cnew.train_name_mark_style = static_cast<Config::TrainNameMarkStyle>(cbTrainNameMarkStyle->currentIndex());
@@ -694,6 +717,11 @@ void ConfigDialog::informTransparent()
     //        "若修改并应用了当前显示设置，则透明模式关闭，修改的设置将被保存到运行图文件，"
     //        "从而不再自动与上级的默认设置同步。\n"
     //        "目前透明模式不支持手动设置。"));
+}
+
+void ConfigDialog::onTrainNameMarkStyleChanged(int index)
+{
+    setDisabledWidgetsForMarkStyle(index);
 }
 
 qecmd::ChangeConfig::ChangeConfig(Config& cfg_, const Config& newcfg_, 

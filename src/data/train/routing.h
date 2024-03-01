@@ -176,6 +176,9 @@ public:
 
     RoutingNode* preLinkedOnRailway(const Train& train, const Railway& railway);
 
+    // 2024.03.01  add
+    RoutingNode* postLinkedOnRailway(const Train& train, const Railway& railway);
+
     QString preOrderString(const Train& train);
 
     QString postOrderString(const Train& train);

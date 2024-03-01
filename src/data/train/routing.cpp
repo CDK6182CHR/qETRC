@@ -567,7 +567,27 @@ RoutingNode* Routing::preLinkedOnRailway(const Train& train, const Railway& rail
     return nullptr;
 }
 
-QString Routing::preOrderString(const Train &train) 
+RoutingNode* Routing::postLinkedOnRailway(const Train& train, const Railway& railway)
+{
+    if (!train.hasRouting() || train.routing().lock().get() != this)
+        return nullptr;
+    auto it = train.routingNode().value_or(_order.end());
+    if (it == _order.end()) {
+        return nullptr;
+    }
+    auto post = std::next(it);
+    if (post == _order.end() || post->isVirtual())
+        return nullptr;
+    auto prestart = post->train()->boundStartingAtRail(railway);
+    auto curend = train.boundTerminalAtRail(railway);
+    //qDebug() << "preEnd: " << preend->name << "; curstart: " << curstart->name;
+    if (curend && prestart == curend) {
+        return &(*post);
+    }
+    return nullptr;
+}
+
+QString Routing::preOrderString(const Train &train)
 {
     if (!train.hasRouting() || train.routing().lock().get() != this)
         return {};

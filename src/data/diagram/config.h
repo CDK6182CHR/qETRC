@@ -150,6 +150,7 @@ struct Config
     // 2024.02.09  Below: hide specified labels globally
     bool hide_start_label_starting = false, hide_start_label_non_starting = false;
     bool hide_end_label_terminal = false, hide_end_label_non_terminal = false;
+    bool hide_end_label_link = false;
 
     bool show_ruler_bar = true,
         show_mile_bar = true,

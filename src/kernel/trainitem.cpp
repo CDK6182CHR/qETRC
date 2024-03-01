@@ -787,6 +787,15 @@ void TrainItem::setStartItem(const QString& text,const QPen& pen)
 
 void TrainItem::setEndItem(const QString& text, const QPen& pen)
 {
+    if (config().hide_end_label_link) {
+        auto routw = train()->routing();
+        if (!routw.expired()) {
+            auto rout = routw.lock();
+            if (rout->postLinkedOnRailway(*train(), _railway)) {
+                return;
+            }
+        }
+    }
     QEMultiLinePath label(endPoint);
     double x0 = endPoint.x(), y0 = endPoint.y();
     endLabelText = setStartEndLabelText(text, pen.color());
