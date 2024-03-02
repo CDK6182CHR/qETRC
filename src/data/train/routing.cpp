@@ -206,7 +206,8 @@ bool Routing::parseTrainName(TrainCollection& coll, const QString& t,
                 report.append(QObject::tr("[WARNING] 车次[%1]已经属于交路[%2]，"
                     "设置为虚拟车次。\n").arg(train->trainName().full())
                     .arg(train->routing().lock()->name()));
-                appendVirtualTrain(train->trainName().full(), true);
+                appendVirtualTrain(train->trainName().full(), train->starting().toSingleLiteral(), 
+                    train->terminal().toSingleLiteral(), true);
             }
             else {
                 //实体车次添加成功
@@ -220,7 +221,7 @@ bool Routing::parseTrainName(TrainCollection& coll, const QString& t,
             //找不到车次
             report.append(QObject::tr("[WARNING] 找不到车次[%1]，设置为虚拟车次。\n")
                 .arg(t));
-            appendVirtualTrain(t, true);
+            appendVirtualTrain(t, "", "", true);
         }
     }
     return flag;
@@ -338,8 +339,8 @@ bool Routing::checkForDiagram(QString &report) const
     return flag;
 }
 
-RoutingNode::RoutingNode(const QString &name, bool link):
-    _name(name),_virtual(true),_link(link)
+RoutingNode::RoutingNode(const QString &name, const QString& starting, const QString& terminal, bool link):
+    _name(name), _starting(starting), _terminal(terminal), _virtual(true),_link(link)
 {
 
 }
@@ -355,8 +356,8 @@ QJsonObject RoutingNode::toJson() const
 {
     //start, end暂时不管
     return QJsonObject{
-        {"start",""},
-        {"end",""},
+        {"start",_starting},
+        {"end",_terminal},
         {"checi",_name},
         TOJSON(link)
         TOJSON(virtual)
@@ -431,7 +432,8 @@ void Routing::fromJson(const QJsonObject& obj, TrainCollection& coll)
         //写文件的时候处理一下；其他时候就不管了
         if (v) {
             //直接添加空白的Node
-            appendVirtualTrain(obn.value("checi").toString(), link);
+            appendVirtualTrain(obn.value("checi").toString(), obn.value("start").toString(),
+                obn.value("end").toString(), link);
         }
         else {
             appendTrainFromName(obn.value("checi").toString(), link, coll);
@@ -474,16 +476,16 @@ bool Routing::appendTrainFromName(const QString& trainName, bool link,
 {
     auto t = _coll.findFullName(trainName);
     if (!t) {
-        qDebug() << "Routing::appendTrainFromName: WARNING: TrainName not found: " << trainName <<
+        qWarning() << "Routing::appendTrainFromName: WARNING: TrainName not found: " << trainName <<
             ", will use virtual." << Qt::endl;
-        appendVirtualTrain(trainName, link);
+        appendVirtualTrain(trainName, {}, {}, link);
         return false;
     }
         
     else if (t->hasRouting()) {
-        qDebug() << "Routing::appendTrainFromName: WARNING: train " << trainName << " already has a routing, "
+        qWarning() << "Routing::appendTrainFromName: WARNING: train " << trainName << " already has a routing, "
             << "will use virtual. " << Qt::endl;
-        appendVirtualTrain(trainName, link);
+        appendVirtualTrain(trainName, {}, {}, link);
         return false;
     }
         
@@ -493,9 +495,9 @@ bool Routing::appendTrainFromName(const QString& trainName, bool link,
     return true;
 }
 
-bool Routing::appendVirtualTrain(const QString& trainName, bool link)
+bool Routing::appendVirtualTrain(const QString& trainName, const QString& starting, const QString& terminal, bool link)
 {
-    _order.emplace_back(trainName, link);
+    _order.emplace_back(trainName, starting, terminal, link);
     return true;
 }
 

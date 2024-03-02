@@ -29,7 +29,7 @@ public:
     AddRoutingNodeDialog(TrainCollection& coll_, QWidget* parent=nullptr);
 signals:
     void realTrainAdded(int row, std::shared_ptr<Train> train, bool link);
-    void virtualTrainAdded(int row, const QString& name, bool link);
+    void virtualTrainAdded(int row, const QString& name, const QString& starting, const QString& terminal, bool link);
 private:
     void initUI();
 private slots:

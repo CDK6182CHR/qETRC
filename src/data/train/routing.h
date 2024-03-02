@@ -15,10 +15,13 @@ class Train;
  * 在两车次之间连线，当且仅当：
  * （1）用户勾选了连线；
  * （2）前一车次终到站、后一车次始发站为本线同一车站。
+ * 
+ * 2024.03.02: 新增对虚拟车次的starting/terminal属性
  */
 class RoutingNode{
     std::shared_ptr<Train> _train;
     QString _name;
+    QString _starting, _terminal;
     bool _virtual;
     bool _link;
 
@@ -26,7 +29,7 @@ public:
     /**
      * @brief 仅有车次，创建虚拟交路结点
      */
-    RoutingNode(const QString& name, bool link);
+    RoutingNode(const QString& name, const QString& starting, const QString& terminal, bool link);
 
     /**
      * @brief 具有列车对象，创建实际交路结点
@@ -60,6 +63,10 @@ public:
     //void setVirtual(bool _virtual);
     bool link() const;
     void setLink(bool link);
+
+    // get starting/terminal, only valid for virtual nodes
+    const auto& virtualStarting()const { return _starting; }
+    const auto& virtualTerminal()const { return _terminal; }
 
     QString toString()const;
 
@@ -153,7 +160,7 @@ public:
      */
     bool appendTrainFromName(const QString& trainName, bool link, TrainCollection& coll);
 
-    bool appendVirtualTrain(const QString& trainName, bool link);
+    bool appendVirtualTrain(const QString& trainName, const QString& starting, const QString& terminal, bool link);
 
     /**
      * @brief pyETRC.Circuit.changeTrainToVirtual()

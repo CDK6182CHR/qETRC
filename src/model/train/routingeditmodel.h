@@ -45,12 +45,12 @@ signals:
     void routingInserted(int row);   //主要是通告table改变当前行
 public slots:
     void setRealRow(int row,std::shared_ptr<Train> train, bool link);
-    void setVirtualRow(int row, const QString& name, bool link);
+    void setVirtualRow(int row, const QString& name, const QString& starting, const QString& terminal, bool link);
 
     /**
      * 由插入的Dialog调用。在指定位置插入行。
      */
     void insertRealRow(int row, std::shared_ptr<Train> train,bool link);
-    void insertVirtualRow(int row, const QString& name, bool link);
+    void insertVirtualRow(int row, const QString& name, const QString& starting, const QString& terminal, bool link);
 };
 

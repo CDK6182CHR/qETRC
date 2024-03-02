@@ -206,7 +206,7 @@ void RoutingEdit::onParseDone(std::shared_ptr<Routing> original, std::shared_ptr
         int row = model->rowCount();
         for (const auto& p : tmp->order()) {
             if (p.isVirtual()) {
-                model->insertVirtualRow(row++, p.name(), p.link());
+                model->insertVirtualRow(row++, p.name(), p.virtualStarting(), p.virtualTerminal(), p.link());
             }
             else {
                 model->insertRealRow(row++, p.train(), p.link());

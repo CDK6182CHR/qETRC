@@ -48,10 +48,10 @@ void AddRoutingNodeDialog::initUI()
     flay->addRow(rd,edName);
 
     edStarting=new QLineEdit;
-    edStarting->setFocusPolicy(Qt::NoFocus);
+    //edStarting->setFocusPolicy(Qt::NoFocus);
     flay->addRow(tr("始发站"),edStarting);
     edTerminal=new QLineEdit;
-    edTerminal->setFocusPolicy(Qt::NoFocus);
+    //edTerminal->setFocusPolicy(Qt::NoFocus);
     flay->addRow(tr("终到站"),edTerminal);
 
     ckLink=new QCheckBox(tr("开始处连线"));
@@ -74,6 +74,8 @@ void AddRoutingNodeDialog::virtualToggled(bool on)
 {
     edName->setEnabled(on);
     cbTrain->setEnabled(!on);
+    edStarting->setEnabled(on);
+    edTerminal->setEnabled(on);
     if (on) {
         onTrainChanged(nullptr);
         edName->setFocus();
@@ -104,7 +106,8 @@ void AddRoutingNodeDialog::actApply()
             "虚拟车次不检查是否重复，但需要输入非空车次。"));
             return;
         }else{
-            emit virtualTrainAdded(row,edName->text(),ckLink->isChecked());
+            emit virtualTrainAdded(row,edName->text(), edStarting->text(), edTerminal->text(), 
+                ckLink->isChecked());
         }
 
     }else{

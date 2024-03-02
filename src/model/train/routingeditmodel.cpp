@@ -34,7 +34,8 @@ bool RoutingEditModel::getAppliedOrder(std::shared_ptr<Routing> res)
         bool link = bool(qvariant_cast<Qt::CheckState>(
             item(i, ColLink)->data(Qt::CheckStateRole)));
         if (vir) {
-            res->appendVirtualTrain(item(i, ColTrainName)->text(), link);
+            res->appendVirtualTrain(item(i, ColTrainName)->text(), 
+                item(i, ColStarting)->text(), item(i, ColTerminal)->text(), link);
         }
         else {
             auto train = qvariant_cast<std::shared_ptr<Train>>(
@@ -81,7 +82,7 @@ void RoutingEditModel::setupModelWith(std::shared_ptr<Routing> tmp)
     int row = 0;
     for (const auto& p : tmp->order()) {
         if (p.isVirtual()) {
-            setVirtualRow(row, p.name(), p.link());
+            setVirtualRow(row, p.name(), p.virtualStarting(), p.virtualTerminal(), p.link());
         }
         else {
             setRealRow(row, p.train(), p.link());
@@ -102,7 +103,7 @@ void RoutingEditModel::setupModel()
     int row=0;
     for(const auto& p:routing->order()){
         if (p.isVirtual()){
-            setVirtualRow(row, p.name(), p.link());
+            setVirtualRow(row, p.name(), p.virtualStarting(), p.virtualTerminal(), p.link());
         }else{
             setRealRow(row, p.train(), p.link());
         }
@@ -131,7 +132,8 @@ void RoutingEditModel::setRealRow(int row, std::shared_ptr<Train> train, bool li
     setItem(row,ColLink,it);
 }
 
-void RoutingEditModel::setVirtualRow(int row, const QString &name, bool link)
+void RoutingEditModel::setVirtualRow(int row, const QString& name, const QString& starting, 
+    const QString& terminal, bool link)
 {
     using SI=QStandardItem;
     auto* it=new SI(name);
@@ -141,8 +143,8 @@ void RoutingEditModel::setVirtualRow(int row, const QString &name, bool link)
     it->setData(true,qeutil::BoolDataRole);
     setItem(row,ColVirtual,it);
 
-    setItem(row,ColStarting,new SI("-"));
-    setItem(row,ColTerminal,new SI("-"));
+    setItem(row,ColStarting,new SI(starting));
+    setItem(row,ColTerminal,new SI(terminal));
 
     it=makeCheckItem();
     it->setCheckState(link ? Qt::Checked : Qt::Unchecked);
@@ -156,10 +158,11 @@ void RoutingEditModel::insertRealRow(int row, std::shared_ptr<Train> train, bool
     emit routingInserted(row);
 }
 
-void RoutingEditModel::insertVirtualRow(int row, const QString& name, bool link)
+void RoutingEditModel::insertVirtualRow(int row, const QString& name, const QString& starting, 
+    const QString& terminal, bool link)
 {
     insertRow(row);
-    setVirtualRow(row, name, link);
+    setVirtualRow(row, name, starting, terminal, link);
     emit routingInserted(row);
 }
 
