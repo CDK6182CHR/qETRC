@@ -408,6 +408,20 @@ void TrainListWidget::actAutoTrainTypeBat()
 	}
 }
 
+void TrainListWidget::actAutoTrainPenBat()
+{
+	const auto& lst = batchOpSelectedTrains();
+	std::deque<std::shared_ptr<Train>> trains;
+	foreach(auto t, lst) {
+		if (!t->autoPen()) {
+			trains.emplace_back(t);
+		}
+	}
+	if (!trains.empty()) {
+		emit batchAutoPen(trains);
+	}
+}
+
 void TrainListWidget::actExportTrainEventListBat()
 {
 	auto lst = batchOpSelectedTrains();

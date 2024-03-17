@@ -1038,7 +1038,8 @@ void MainWindow::initToolbar()
 	}
 
 	QAction* actRemoveInterp, * actAutoBusiness, * actImportTimetableCsv, * actImportTrainTrf,
-		* actAutoCorrection, * actRemoveNonBound, * actRemoveNonBoundTrains, * actRemoveEmptyTrains;
+		* actAutoCorrection, * actRemoveNonBound, * actRemoveNonBoundTrains, * actRemoveEmptyTrains,
+		* actAutoPen;
 	//列车
 	if constexpr (true) {
 		auto* cat = ribbon->addCategoryPage(tr("列车(&3)"));
@@ -1074,6 +1075,7 @@ void MainWindow::initToolbar()
 
 		actsub = menu->addAction(tr("自动推断所有列车类型"));
 		connect(actsub, &QAction::triggered, this, &MainWindow::actAutoTrainType);
+		actAutoPen = menu->addAction(tr("自动设置所有列车运行线样式"));
 
 		actAutoBusiness = menu->addAction(tr("自动设置所有营业站"));
 		actAutoCorrection = menu->addAction(tr("自动更正时刻表 (测试)"));
@@ -1261,7 +1263,7 @@ void MainWindow::initToolbar()
 		actRemoveInterp = menu->addAction(tr("删除所有推定结果"));
 		act->setMenu(menu);
 		btn = panel->addMediumAction(act);
-		btn->setPopupMode(QToolButton::DelayedPopup);
+		//btn->setPopupMode(QToolButton::DelayedPopup);
 
 		act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("贪心排图"), this);
 		addAction(act);
@@ -1353,6 +1355,8 @@ void MainWindow::initToolbar()
 			contextTrain, &TrainContext::locateToBoundStation);
 		connect(actAutoBusiness, &QAction::triggered,
 			contextTrain, &TrainContext::actAutoBusiness);
+		connect(actAutoPen, &QAction::triggered,
+			contextTrain, &TrainContext::actAutoPenAll);
 		connect(actAutoCorrection, &QAction::triggered,
 			contextTrain, &TrainContext::actAutoCorrectionAll);
 		connect(actRemoveNonBound, &QAction::triggered,
@@ -1386,6 +1390,9 @@ void MainWindow::initToolbar()
 
 		connect(trainListWidget, &TrainListWidget::batchAutoBusiness,
 			contextTrain, &TrainContext::actAutoBusinessBat, Qt::DirectConnection);
+
+		connect(trainListWidget, &TrainListWidget::batchAutoPen,
+			contextTrain, &TrainContext::batchAutoTrainPen);
 
 		connect(trainListWidget, &TrainListWidget::batchAutoCorrect,
 			contextTrain, &TrainContext::actAutoCorrectionBat, Qt::DirectConnection);

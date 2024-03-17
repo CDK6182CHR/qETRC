@@ -345,8 +345,8 @@ void TrainContext::setupTypeCombo()
 	const auto& types = diagram.trainCollection().typeCount();
 	for (auto p = types.begin(); p != types.end(); ++p) {
 		if (p.value() >= 0) {
-			qDebug() << "TrainContext::setupTypeCombo: type " << p.key()->name()
-				<< " @ " << p.key().get() << " count " << p.value();
+			//qDebug() << "TrainContext::setupTypeCombo: type " << p.key()->name()
+			//	<< " @ " << p.key().get() << " count " << p.value();
 			comboType->addItem(p.key()->name());
 		}
 	}
@@ -517,6 +517,11 @@ void TrainContext::actBatchAutoTrainType(qecmd::AutoTrainType::data_t& data)
 	mw->getUndoStack()->push(new qecmd::AutoTrainType(std::move(data), this));
 }
 
+void TrainContext::batchAutoTrainPen(std::deque<std::shared_ptr<Train>>& trains)
+{
+	mw->getUndoStack()->push(new qecmd::AutoTrainPen(std::move(trains), this));
+}
+
 void TrainContext::commitAutoStartingTerminal(qecmd::StartingTerminalData& data)
 {
 	data.commit();
@@ -540,6 +545,14 @@ void TrainContext::commitAutoType(std::deque<std::pair<std::shared_ptr<Train>, s
 	}
 	mw->trainListWidget->getModel()->updateAllTrainTypes();
 	diagram.trainCollection().refreshTypeCount();
+	refreshCurrentTrainWidgets();
+}
+
+void TrainContext::commitAutoPenOrUndo(const std::deque<std::shared_ptr<Train>>& trains)
+{
+	for (const auto& p : trains) {
+		mw->repaintTrainLines(p);
+	}
 	refreshCurrentTrainWidgets();
 }
 
@@ -1362,6 +1375,17 @@ void TrainContext::actExchangeInterval()
 	dialog->open();
 }
 
+void TrainContext::actAutoPenAll()
+{
+	std::deque<std::shared_ptr<Train>> trains{};
+	foreach(auto t, diagram.trainCollection().trains()) {
+		if (!t->autoPen()) {
+			trains.emplace_back(t);
+		}
+	}
+	batchAutoTrainPen(trains);
+}
+
 void TrainContext::actApplyExchangeInterval(
 	std::shared_ptr<Train> train1, std::shared_ptr<Train> train2, 
 	Train::StationPtr start1, Train::StationPtr end1,
@@ -1560,6 +1584,33 @@ void qecmd::AutoTrainType::redo()
 void qecmd::AutoTrainType::commit()
 {
 	cont->commitAutoType(data);
+}
+
+qecmd::AutoTrainPen::AutoTrainPen(std::deque<std::shared_ptr<Train>>&& trains, 
+	TrainContext* context, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("自动设置运行线"), parent), _trains(std::move(trains)),
+	_pens(), cont(context)
+{
+	for (const auto& t : _trains) {
+		assert(!t->autoPen());
+		_pens.emplace_back(t->pen());
+	}
+}
+
+void qecmd::AutoTrainPen::undo()
+{
+	for (size_t i = 0; i < _trains.size(); i++) {
+		_trains.at(i)->setPen(_pens.at(i));
+	}
+	cont->commitAutoPenOrUndo(_trains);
+}
+
+void qecmd::AutoTrainPen::redo()
+{
+	for (size_t i = 0; i < _trains.size(); i++) {
+		_trains.at(i)->resetPen();
+	}
+	cont->commitAutoPenOrUndo(_trains);
 }
 
 void qecmd::TimetableInterpolation::undo()
