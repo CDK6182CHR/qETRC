@@ -1520,7 +1520,10 @@ bool Diagram::toTrc(const QString& filename, std::shared_ptr<Railway> rail, bool
         if (forbid && prev) {
             //检索区间是否有天窗数据
             auto n = forbid->getNode(prev->name, p->name);
-            if (!n->isNull()) {
+            if (n && !n->isNull()) {
+                // 2024.03.17: n may be null, because the interval may be invalid. 
+                // For example, the previous station may be up-only, thus the interval is invalid.
+                // since ETRC does not support single-direction stations, we just ignore this case.
                 fout << n->beginTime.toString("hh:mm") << "-" <<
                     n->endTime.toString("hh:mm");
             }

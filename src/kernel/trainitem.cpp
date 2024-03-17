@@ -938,9 +938,9 @@ double TrainItem::determineStartLabelHeight()
 
     if (config().train_name_mark_style == Config::TrainNameMarkStyle::Link) {
         // debug
-        if (train()->trainName().down() == "D4803") {
-            qDebug() << "hit break point";
-        }
+        //if (train()->trainName().down() == "D4803") {
+        //    qDebug() << "hit break point";
+        //}
 
         double width = config().diagramWidth();
         // 2024.03.01: link-style train name marker
