@@ -85,7 +85,7 @@ void RailDBNavi::initUI()
 void RailDBNavi::initContext()
 {
     QAction* act;
-    meCat=new QMenu;
+    meCat=new QMenu(this);
     meCat->addAction(tr("展开"), this, &RailDBNavi::actExpand);
     meCat->addAction(tr("折叠"), this, &RailDBNavi::actCollapse);
     meCat->addAction(tr("重命名"), this, &RailDBNavi::actRenameCategory);
@@ -108,7 +108,7 @@ void RailDBNavi::initContext()
     meCat->addAction(tr("从运行图文件导入线路"), this, &RailDBNavi::actImportFromDiagram);
     meCat->addAction(tr("导入子数据库文件"), this, &RailDBNavi::actImportFromLib);
 
-    meRail=new QMenu;
+    meRail=new QMenu(this);
     act=meRail->addAction(tr("编辑"));
     connect(act,&QAction::triggered,this,&RailDBNavi::actEditRail);
     act=meRail->addAction(tr("删除"));

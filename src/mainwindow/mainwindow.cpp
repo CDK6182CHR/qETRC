@@ -774,7 +774,7 @@ void MainWindow::initToolbar()
 		connect(act, &QAction::triggered, this, &MainWindow::closeCurrentTab);
 		ribbon->quickAccessBar()->addAction(act);
 
-		auto* menu = new QMenu();
+        auto* menu = new QMenu(this);
 		act = menu->addAction(tr("使用Office风格Ribbon"));
 		connect(act, SIGNAL(triggered()), this, SLOT(useOfficeStyle()));
 		act = menu->addAction(tr("使用WPS风格Ribbon"));

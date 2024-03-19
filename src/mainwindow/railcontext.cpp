@@ -152,7 +152,7 @@ void RailContext::initUI()
 
 	panel = page->addPannel(tr("标尺"));
 	act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺"), this);
-	auto* me = new SARibbonMenu;
+    auto* me = new SARibbonMenu(mw);
 	act->setToolTip(tr("标尺编辑\n创建或者导航到本线标尺编辑的面板"));
 	meRulerWidgets = me;
 	act->setMenu(me);

@@ -61,7 +61,7 @@ void NaviTree::initContextMenus()
     connect(actExpand, &QAction::triggered, this, &NaviTree::actExpand);
     QAction* actCollapse = new QAction(tr("折叠"),this);
     connect(actCollapse, &QAction::triggered, this, &NaviTree::actCollapse);
-    QAction* actSep = new QAction();
+    QAction* actSep = new QAction(this);
     actSep->setSeparator(true);
     QList<QAction*> common{ actExpand,actCollapse,actSep };
 
