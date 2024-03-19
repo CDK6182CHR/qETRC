@@ -465,8 +465,20 @@ void TrainContext::commitTimetableChange(std::shared_ptr<Train> train, std::shar
 void TrainContext::onTrainStationTimeChanged(std::shared_ptr<Train> train, bool repaint)
 {
 	updateTrainWidget(train);
-	if(repaint)
+	if (repaint) {
 		mw->repaintTrainLines(train);
+		// 2024.03.19: repaint also the next train in the routing, if link line exists
+		if (train->hasRouting()) {
+			auto routw = train->routing();
+			if (!routw.expired()) [[likely]] {
+				auto rout = routw.lock();
+				if (auto* node = rout->postLinkedByName(*train)) {
+					// has post train
+					mw->repaintTrainLinkLine(node->train());
+				}
+			}
+		}
+	}
 	emit timetableChanged(train);
 }
 

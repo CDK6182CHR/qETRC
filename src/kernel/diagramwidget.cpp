@@ -18,6 +18,7 @@
 #include <QTextBrowser>
 #include <QScroller>
 #include <QMenu>
+#include <QGraphicsProxyWidget>
 
 #if defined(QT_PRINTSUPPORT_LIB)
 #include <QPrinter>
@@ -146,6 +147,12 @@ void DiagramWidget::paintGraph()
 void DiagramWidget::clearGraph()
 {
     weakItem = nullptr;
+    // 2024.03.19: clean the drag widget
+    if (_dragInfoProxy) {
+        _dragInfoProxy->deleteLater();
+        _dragInfoWidget = nullptr;
+        _dragInfoProxy = nullptr;
+    }
     _page->clearGraphics();
     scene()->clear();
 }
@@ -249,7 +256,6 @@ void DiagramWidget::hideWeakenItem()
         weakItem->setVisible(false);
 }
 
-#include <QGraphicsProxyWidget>
 
 void DiagramWidget::showPosTip(const QPoint& pos, const QString& msg, const QString& title)
 {
@@ -454,6 +460,20 @@ void DiagramWidget::repaintTrain(std::shared_ptr<Train> train)
     if (isSel) {
         _selectedTrain = train;
         highlightTrain(train);
+    }
+}
+
+void DiagramWidget::repaintTrainLinkLine(std::shared_ptr<Train> train)
+{
+    if (train->empty()) return;
+    foreach (auto adp, train->adapters()) {
+        foreach(auto line, adp->lines()) {
+            if (!line->isNull() && line->firstTrainStation() == train->firstStation()) {
+                if (auto* it = _page->getTrainItem(line.get())) {
+                    it->repaintLinkLine();
+                }
+            }
+        }
     }
 }
 

@@ -141,6 +141,13 @@ public:
 
     virtual bool contains(const QPointF& f)const override;
 
+    /**
+     * 2024.03.19  repaint the link line.
+     * This is used when the previous linked train is updated.
+     * If current item contains no link line, returns directly. Otherwise re-paint it.
+     */
+    void repaintLinkLine();
+
     ~TrainItem()noexcept;
 
     /**
@@ -289,6 +296,8 @@ private:
      * 2024.02.26: returns whether the link line is actually added.
      */
     bool addLinkLine(const QString& trainName);
+
+    void clearLinkLines();
 
     typename Qt::PenStyle linkLineStyle()const;
 

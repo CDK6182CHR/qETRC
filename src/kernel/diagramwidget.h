@@ -170,6 +170,8 @@ public:
      */
     void repaintTrain(std::shared_ptr<Train> train);
 
+    void repaintTrainLinkLine(std::shared_ptr<Train> train);
+
     /**
      * 显示或隐藏列车运行线
      * 如果没有铺画过，现场铺画

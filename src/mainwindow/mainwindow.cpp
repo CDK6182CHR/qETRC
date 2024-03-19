@@ -2161,6 +2161,13 @@ void MainWindow::repaintTrainLines(std::shared_ptr<Train> train)
 	}
 }
 
+void MainWindow::repaintTrainLinkLine(std::shared_ptr<Train> train)
+{
+	for (auto p : diagramWidgets) {
+		p->repaintTrainLinkLine(train);
+	}
+}
+
 int MainWindow::railStationWidgetIndex(std::shared_ptr<Railway> rail) const
 {
 	for (int i = 0; i < railStationWidgets.size(); i++) {

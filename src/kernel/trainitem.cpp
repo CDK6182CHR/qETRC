@@ -283,6 +283,14 @@ if(_item){\
     _item=nullptr; \
 }
 
+void TrainItem::repaintLinkLine()
+{
+    if (!hasLinkLine)
+        return;
+    clearLinkLines();
+    hasLinkLine = addLinkLine(labelTrainName());
+}
+
 TrainItem::~TrainItem() noexcept
 {
     DELETE_SUB(pathItem);
@@ -1234,6 +1242,14 @@ bool TrainItem::addLinkLine(const QString& trainName)
         }
     }
     return true;
+}
+
+void TrainItem::clearLinkLines()
+{
+    DELETE_SUB(linkItem1);
+    DELETE_SUB(linkItem2);
+    DELETE_SUB(linkLabelItem);
+    clearLinkInfo();
 }
 
 typename Qt::PenStyle TrainItem::linkLineStyle() const

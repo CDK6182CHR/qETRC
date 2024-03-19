@@ -161,6 +161,12 @@ public:
     void repaintTrainLines(std::shared_ptr<Train> train);
 
     /**
+     * 2024.03.19 Trial: repaint the train link line (but not the full train)
+     * Used when the PREVIOUS train is changed (possibly including the terminal station)
+     */
+    void repaintTrainLinkLine(std::shared_ptr<Train> train);
+
+    /**
      * 2022.12.29
      * return the index of RailStationWidget by given railway.
      */
