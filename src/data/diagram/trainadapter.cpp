@@ -75,6 +75,8 @@ void TrainAdapter::bindTrainByPath(std::shared_ptr<Train> train, const TrainPath
 		auto line = std::make_shared<TrainLine>(*adp);
 		line->_dir = seg.dir;
 
+		// 2024.03.20: for one-station line case, the deletion of such line causes the restoring of tit_last_bind
+		auto tit_last_bind_before_loop = tit_last_bind;
 		// loop over train stations
 		for (auto tit = tit_last_bind; tit != train->timetable().end(); ++tit) {
 			auto rst = rail->stationByGeneralName(tit->name);
@@ -103,9 +105,10 @@ void TrainAdapter::bindTrainByPath(std::shared_ptr<Train> train, const TrainPath
 			}
 		}
 
-		if (!line->isNull()) {
+		if (line->count() > 1) {
 			// For TrainPath-guided binding, currently, one-station line is allowed
 			// (if this is not, the deletion of last line should change tit_last_bind)
+			// 2024.03.20  CHANGE THIS: one-station line is now NOT allowed
 			adp->lines().append(line);
 
 			// now, a special case, for the same-railway-turn-back case, set the label validity.
@@ -117,6 +120,10 @@ void TrainAdapter::bindTrainByPath(std::shared_ptr<Train> train, const TrainPath
 					line->_startLabel = false;
 				}
 			}
+		}
+		else if (line->count() == 1) {
+			// 2024.03.20: for this case, restore tit_last_bind, since the previous bind is withdrawn
+			tit_last_bind = tit_last_bind_before_loop;
 		}
 
 		start_station = seg.end_station;

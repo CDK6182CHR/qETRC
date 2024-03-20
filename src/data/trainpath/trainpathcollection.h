@@ -34,6 +34,12 @@ public:
 	void clear();
 
 	/**
+	 * 2024.03.20  Clear all the trains in the paths, 
+	 * but the paths are not deleted. This is called when trainCollection().removeAllTrains() is called.
+	 */
+	void clearTrains();
+
+	/**
 	 * Simple linear alg.
 	 */
 	bool isValidNewPathName(const QString& name, TrainPath* ignore=nullptr)const;

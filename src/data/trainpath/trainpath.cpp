@@ -39,7 +39,7 @@ void TrainPath::fromJson(const QJsonObject& obj, const RailCategory& cat, TrainC
 		const auto& trainName = a.toString();
 		auto train = coll.findFullName(trainName);
 		if (!train) [[unlikely]] {
-			qCritical() << "Train not found " << train->trainName().full()
+			qCritical() << "Train not found " << trainName
 				<< ", required by path " << _name;
 		}
 		else {
@@ -158,6 +158,11 @@ void TrainPath::removeTrainWithIndex(std::shared_ptr<Train> train, int train_ind
 	_trains.erase(_trains.begin() + train_index);
 
 	train->paths().erase(train->paths().begin() + path_index_in_train);
+}
+
+void TrainPath::removeAllTrains()
+{
+	_trains.clear();
 }
 
 int TrainPath::getTrainIndex(std::shared_ptr<Train> train) const

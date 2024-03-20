@@ -25,6 +25,13 @@ void TrainPathCollection::clear()
 	_paths.clear();
 }
 
+void TrainPathCollection::clearTrains()
+{
+	for (const auto & p : _paths) {
+		p->removeAllTrains();
+	}
+}
+
 bool TrainPathCollection::isValidNewPathName(const QString& name, TrainPath* ignore) const
 {
 	if (name.isEmpty()) return false;

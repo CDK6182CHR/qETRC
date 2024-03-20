@@ -112,6 +112,8 @@ public:
 	 */
 	void removeTrainWithIndex(std::shared_ptr<Train> train, int train_index, int path_index_in_train);
 
+	void removeAllTrains();
+
 	/**
 	 * Get the index of train in this path.
 	 * Return -1 if not found.

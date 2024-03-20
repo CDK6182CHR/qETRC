@@ -81,7 +81,7 @@ public:
     /**
      * 构造空的运行线，默认显示Item和双标签
      */
-    TrainLine(TrainAdapter& adapter);
+    explicit TrainLine(TrainAdapter& adapter);
     TrainLine(const TrainLine&) = default;
     TrainLine(TrainLine&&) = default;
 
