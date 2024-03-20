@@ -253,7 +253,7 @@ void MainWindow::removeAllTrainsAndRoutings()
 		return;
 
 	_diagram.trainCollection().clearTrainsAndRoutings();
-	_diagram.trainCollection().clearTrains();
+	_diagram.pathCollection().clearTrains();  // 2024.03.20
 	onTrainsImported();   //后操作是一样的
 	contextTrain->resetTrain();
 	timetableQuickWidget->resetTrain();
