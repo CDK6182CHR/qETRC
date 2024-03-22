@@ -305,6 +305,9 @@ void TrackGroup::autoAddSingle(std::shared_ptr<TrackItem> item, bool ignoreMainT
         p = std::next(_tracks.begin());
     }
     for (; p != _tracks.end(); ++p) {
+        //if (item->type == TrackItem::Link) {
+        //    qDebug() << "Link type " << item->toString();
+        //}
         if ((*p)->isIdleFor(item, sameSplitSecs, oppsiteSplitSecs)) {
             break;
         }

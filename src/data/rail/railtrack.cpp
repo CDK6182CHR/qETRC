@@ -109,7 +109,10 @@ Track::const_iterator Track::occupiedInRange(const QTime& tm1, const QTime& tm2)
         //if (qeutil::timeRangeIntersected(itr->fromTime(), itr->toTime(), tm1, tm2))
         //    break;
         // 这里无需考虑PBC。直接比较范围都行
-        if (std::max(itr->fromTime(), tm1) < std::min(itr->toTime(), tm2))
+
+        // 2024.03.22: we should use occupiedRange()
+        auto [p_start, p_end] = itr->occupiedRange();
+        if (std::max(p_start, tm1) < std::min(p_end, tm2))
             break;
     }
     return itr;
@@ -128,16 +131,18 @@ Track::const_iterator Track::conflictItem(const std::shared_ptr<TrackItem>& item
     QTime startOpps = start.addSecs(-oppsiteSplitSecs), endOpps = end.addSecs(oppsiteSplitSecs);
 
     for (auto p = cbegin(); p != cend(); ++p) {
+        // 2024.03.22: for proper treatment of passed train, here we should use occupiedRange(), not fromTime/endTime
+        auto [p_start, p_end] = p->occupiedRange();
         if (p->item->dir == item->dir) {
             // 同向
-            if (qeutil::timeRangeIntersectedExcl(p->fromTime(), p->toTime(),
+            if (qeutil::timeRangeIntersectedExcl(p_start, p_end,
                 startSame, endSame)) {
                 return p;
             }
         }
         else {
             // 反向
-            if (qeutil::timeRangeIntersectedExcl(p->fromTime(), p->toTime(),
+            if (qeutil::timeRangeIntersectedExcl(p_start, p_end,
                 startOpps, endOpps)) {
                 return p;
             }
