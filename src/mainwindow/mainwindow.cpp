@@ -2451,7 +2451,12 @@ void MainWindow::repaintRoutingTrainLines(std::shared_ptr<Routing> routing)
 {
 	for (const auto& p : routing->order()) {
 		if (!p.isVirtual()) {
-			repaintTrainLines(p.train());
+			auto t = p.train();
+			repaintTrainLines(t);
+			// 2024.03.23: also update corresponding widgets
+			if (t == contextTrain->getTrain()) {
+				contextTrain->refreshCurrentTrainWidgets();
+			}
 		}
 	}
 }

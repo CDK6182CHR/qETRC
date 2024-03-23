@@ -18,6 +18,7 @@
 #include "data/common/qesystem.h"
 #include "data/rail/railway.h"
 #include "railcontext.h"
+#include "routingcontext.h"
 #include "data/diagram/trainadapter.h"
 
 #include <DockManager.h>
@@ -133,11 +134,26 @@ void TrainContext::initUI()
 
 		auto* w = new QWidget;
 		auto* vlay = new QVBoxLayout(w);
-		vlay->addWidget(edRouting);
+		auto* hlay = new QHBoxLayout();
+		hlay->addWidget(edRouting);
 		act = new QAction(tr("转到交路"), this);
 		connect(act, &QAction::triggered, this, &TrainContext::actToRouting);
 		btnToRouting = new SARibbonToolButton(act);
-		vlay->addWidget(btnToRouting);
+		btnToRouting->setIcon(qApp->style()->standardIcon(QStyle::SP_ArrowRight));
+		btnToRouting->setText("");
+		hlay->addWidget(btnToRouting);
+		vlay->addLayout(hlay);
+
+		hlay = new QHBoxLayout;
+		btnCreateRouting = new SARibbonToolButton();
+		btnCreateRouting->setIcon(QIcon(":/icons/add.png"));
+		btnCreateRouting->setText(tr("创建"));
+		btnCreateRouting->setToolTip(tr("创建交路\n"
+			"从当前列车创建新交路。默认以当前列车车次名称为交路名，仅包含当前列车。"));
+		connect(btnCreateRouting, &SARibbonToolButton::clicked,
+			this, &TrainContext::actCreateRouting);
+		hlay->addWidget(btnCreateRouting);
+		vlay->addLayout(hlay);
 		panel->addWidget(w, SARibbonPannelItem::Large);
 	}
 
@@ -1301,10 +1317,12 @@ void TrainContext::refreshData()
 		if (train->hasRouting()) {
 			edRouting->setText(train->routing().lock()->name());
 			btnToRouting->setEnabled(true);
+			btnCreateRouting->setEnabled(false);
 		}
 		else {
 			edRouting->setText(tr("(无交路)"));
 			btnToRouting->setEnabled(false);
+			btnCreateRouting->setEnabled(true);
 		}
 		refreshPath();
 		edNamem->setText(train->trainName().full());
@@ -1505,6 +1523,14 @@ void TrainContext::actFocusInPath()
 			mw->focusInPath(train->paths().at(indexes.front()));
 		}
 	}
+}
+
+void TrainContext::actCreateRouting()
+{
+	if (!train || train->hasRouting()) {
+		return;
+	}
+	mw->contextRouting->createRoutingByTrain(train);
 }
 
 void TrainContext::setTrain(std::shared_ptr<Train> train_)

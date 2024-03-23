@@ -88,7 +88,7 @@ class TrainContext : public QObject
     SARibbonComboBox* comboType;
     PenStyleCombo* comboLs;
     SARibbonCheckBox *checkPassen;
-    SARibbonToolButton* btnColor, * btnAutoUI, * btnToRouting;
+    SARibbonToolButton* btnColor, * btnAutoUI, * btnToRouting, * btnCreateRouting;
     QDoubleSpinBox* spWidth;
     QColor tmpColor;
 
@@ -430,6 +430,11 @@ private slots:
     void actClearPaths();
 
     void actFocusInPath();
+
+    /**
+     * 2024.03.23  Create new routing based on current train. 
+     */
+    void actCreateRouting();
 
 };
 

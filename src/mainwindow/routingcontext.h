@@ -106,6 +106,11 @@ public slots:
 
     void openRoutingDiagramWidget(std::shared_ptr<Routing> routing);
 
+    /**
+     * 2024.03.23  Create new routing containing the given train.
+     */
+    void createRoutingByTrain(std::shared_ptr<Train> train);
+
 };
 
 namespace qecmd {

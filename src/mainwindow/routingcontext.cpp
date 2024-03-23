@@ -7,6 +7,7 @@
 #include "editors/routing/detectroutingdialog.h"
 #include "editors/routing/routingdiagramwidget.h"
 #include "data/train/train.h"
+#include "editors/routing/routingwidget.h"
 
 #include <QLabel>
 #include <QLineEdit>
@@ -211,6 +212,17 @@ void RoutingContext::openRoutingDiagramWidget(std::shared_ptr<Routing> routing)
     mw->getManager()->addDockWidgetFloating(dock);
 }
 
+void RoutingContext::createRoutingByTrain(std::shared_ptr<Train> train)
+{
+    auto rout = std::make_shared<Routing>();
+    rout->setName(_diagram.trainCollection().validRoutingName(train->trainName().full()));
+    rout->appendTrain(train, true);
+
+    mw->undoStack->push(new qecmd::AddRouting(rout, mw->routingWidget));
+
+    openRoutingEditWidget(rout);
+}
+
 void RoutingContext::refreshAllData()
 {
     refreshData();
@@ -320,10 +332,13 @@ void RoutingContext::commitRoutingOrderChange(std::shared_ptr<Routing> routing,
 
 void RoutingContext::onRoutingRemoved(std::shared_ptr<Routing> routing)
 {
-    auto s = routing->trainSet();
-    if (!s.empty()) {
-        mw->repaintTrainLines(s);
-    }
+    //auto s = routing->trainSet();
+    //if (!s.empty()) {
+    //    mw->repaintTrainLines(s);
+    //}
+    // 2024.03.23: also update the current train, if affected
+    mw->repaintRoutingTrainLines(routing);
+
     removeRoutingEditWidget(routing);
     if (routing == _routing) {
         _routing.reset();
