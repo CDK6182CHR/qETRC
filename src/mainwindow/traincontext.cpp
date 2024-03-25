@@ -48,6 +48,7 @@
 #include "data/algo/timetablecorrector.h"
 #include "editors/trainpath/selectpathdialog.h"
 #include "model/diagram/diagramnavimodel.h"
+#include "dialogs/selectroutingdialog.h"
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
 	MainWindow* mw_) :
@@ -146,13 +147,23 @@ void TrainContext::initUI()
 
 		hlay = new QHBoxLayout;
 		btnCreateRouting = new SARibbonToolButton();
-		btnCreateRouting->setIcon(QIcon(":/icons/add.png"));
+		btnCreateRouting->setIcon(QIcon(":/icons/new-file.png"));
 		btnCreateRouting->setText(tr("创建"));
 		btnCreateRouting->setToolTip(tr("创建交路\n"
 			"从当前列车创建新交路。默认以当前列车车次名称为交路名，仅包含当前列车。"));
 		connect(btnCreateRouting, &SARibbonToolButton::clicked,
 			this, &TrainContext::actCreateRouting);
 		hlay->addWidget(btnCreateRouting);
+
+		btnAddToRouting = new SARibbonToolButton;
+		btnAddToRouting->setIcon(QIcon(":/icons/add.png"));
+		btnAddToRouting->setText(tr("添加到.."));
+		btnAddToRouting->setToolTip(tr("添加到交路\n"
+			"将当前列车添加（后缀）到指定交路"));
+		hlay->addWidget(btnAddToRouting);
+		connect(btnAddToRouting, &SARibbonToolButton::clicked,
+			this, &TrainContext::actAddToRouting);
+
 		vlay->addLayout(hlay);
 		panel->addWidget(w, SARibbonPannelItem::Large);
 	}
@@ -1318,11 +1329,13 @@ void TrainContext::refreshData()
 			edRouting->setText(train->routing().lock()->name());
 			btnToRouting->setEnabled(true);
 			btnCreateRouting->setEnabled(false);
+			btnAddToRouting->setEnabled(false);
 		}
 		else {
 			edRouting->setText(tr("(无交路)"));
 			btnToRouting->setEnabled(false);
 			btnCreateRouting->setEnabled(true);
+			btnAddToRouting->setEnabled(true);
 		}
 		refreshPath();
 		edNamem->setText(train->trainName().full());
@@ -1531,6 +1544,21 @@ void TrainContext::actCreateRouting()
 		return;
 	}
 	mw->contextRouting->createRoutingByTrain(train);
+}
+
+void TrainContext::actAddToRouting()
+{
+	auto o = SelectRoutingDialog::selectRouting(diagram.trainCollection(), true, mw);
+	if (!o.isAccepted) {
+		return;
+	}
+	else if (o.createNew) {
+		actCreateRouting();
+	}
+	else {
+		auto rout = o.routing;
+		// TODO: add to existing routing ...
+	}
 }
 
 void TrainContext::setTrain(std::shared_ptr<Train> train_)
