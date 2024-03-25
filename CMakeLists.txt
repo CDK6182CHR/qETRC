@@ -5,6 +5,8 @@ set(qETRC_VERSION_MINOR 3)
 set(qETRC_VERSION_PATCH 7)
 #set(qETRC_RELEASE_CODE 40)
 
+option(ENABLE_MSVC_PROFILE "Enable MSVC profiler" OFF)
+
 set(qETRC_VERSION "${qETRC_VERSION_MAJOR}.${qETRC_VERSION_MINOR}.${qETRC_VERSION_PATCH}")
 
 message(STATUS "qETRC version ${qETRC_VERSION}")
@@ -112,6 +114,15 @@ endif()
 
 if (MSVC)
     target_compile_options(qETRC PRIVATE /utf-8 /wd4267 /Zc:__cplusplus ) 
+
+    # MSVC profiler  https://learn.microsoft.com/zh-cn/cpp/build/reference/profile-performance-tools-profiler?view=msvc-170
+    if (ENABLE_MSVC_PROFILE)
+        message(STATUS "MSVC profiler enabled")
+        SET_TARGET_PROPERTIES(SARibbonBar PROPERTIES LINK_FLAGS "/PROFILE")
+        #SET_TARGET_PROPERTIES(ads::qt${QT_VERSION_MAJOR}advanceddocking PROPERTIES LINK_FLAGS "/PROFILE")
+        SET_TARGET_PROPERTIES(qETRC PROPERTIES LINK_FLAGS "/PROFILE")
+    endif ()
+
 endif()
 
 if (WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Release")
