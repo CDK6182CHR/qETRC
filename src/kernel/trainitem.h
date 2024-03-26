@@ -111,6 +111,11 @@ class TrainItem : public QGraphicsItem
     const AdapterStation* _draggedStation=nullptr;
     StationPoint _dragPoint = StationPoint::NotValid;
 
+    enum class DragTranslationType {
+        SinglePoint, Backward, Forward
+    };
+    DragTranslationType _dragTrans = DragTranslationType::SinglePoint;
+
 public:
     enum { Type = UserType + 1 };
     TrainItem(Diagram& diagram, std::shared_ptr<TrainLine> line, Railway& railway, DiagramPage& page, double startY,
@@ -173,7 +178,7 @@ public:
      * 2023.05.28  Begin of dragging, called by MousePressEvent.
      * Find and store the station under drag.
      */
-    bool dragBegin(const QPointF& pos, PaintStationPointItem* point, bool ctrl, bool alt);
+    bool dragBegin(const QPointF& pos, PaintStationPointItem* point, bool ctrl, bool alt, bool shift);
 
     /**
      * 2023.05.30  for drag move event: return the time corresponding to the pos by simply calculation.
@@ -192,7 +197,7 @@ public:
     /**
      * Commit the drag, then set to non-dragging mode.
      */
-    void doDrag(const QTime& tm);
+    void doDrag(const QTime& tm, bool shift);
 
 private:
     
@@ -337,6 +342,10 @@ private:
      */
     double timeDistancePbc(double x, const QTime& tm)const;
 
+    /**
+     * Do time drag for the operated single point
+     */
+    void doDragSingle(const QTime& tm);
 };
 
 

@@ -344,7 +344,8 @@ public slots:
      */
     void actSimpleInterpolation();
 
-    void actDragTime(std::shared_ptr<Train> train, int station_id, const TrainStation& data);
+    void actDragTime(std::shared_ptr<Train> train, int station_id, const TrainStation& data, 
+        Qt::KeyboardModifiers mod);
 
     /**
      * Post-processing of assign/remove paths to single train.
@@ -605,13 +606,14 @@ namespace qecmd {
     {
         std::shared_ptr<Train> train;
         int station_id;
+        Qt::KeyboardModifiers mod;
         TrainStation data;
         TrainContext* const cont;
 
         static constexpr const int ID = 103;
         bool first = true;
     public:
-        DragTrainStationTime(std::shared_ptr<Train> train, int station_id, const TrainStation& data,
+        DragTrainStationTime(std::shared_ptr<Train> train, int station_id, Qt::KeyboardModifiers mod, const TrainStation& data,
             TrainContext* cont, QUndoCommand* parent = nullptr);
 
         virtual void undo()override;

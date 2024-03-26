@@ -1077,9 +1077,10 @@ void TrainContext::actSimpleInterpolation()
 	}
 }
 
-void TrainContext::actDragTime(std::shared_ptr<Train> train, int station_id, const TrainStation& data)
+void TrainContext::actDragTime(std::shared_ptr<Train> train, int station_id, const TrainStation& data, 
+	Qt::KeyboardModifiers mod)
 {
-	mw->getUndoStack()->push(new qecmd::DragTrainStationTime(train, station_id, data, this));
+	mw->getUndoStack()->push(new qecmd::DragTrainStationTime(train, station_id, mod, data, this));
 }
 
 void TrainContext::afterChangeTrainPaths(std::shared_ptr<Train> train, const std::vector<TrainPath*>& paths)
@@ -1751,9 +1752,9 @@ qecmd::TimetableInterpolationSimple::TimetableInterpolationSimple(std::shared_pt
 }
 
 qecmd::DragTrainStationTime::DragTrainStationTime(std::shared_ptr<Train> train, int station_id,
-	const TrainStation& data, TrainContext* cont, QUndoCommand* parent):
+	Qt::KeyboardModifiers mod, const TrainStation& data, TrainContext* cont, QUndoCommand* parent):
 	QUndoCommand(QObject::tr("拖动时刻: %1 @ %2").arg(data.name.toSingleLiteral(), train->trainName().full()),parent),
-	train(train),station_id(station_id),data(data),cont(cont)
+	train(train),station_id(station_id), mod(mod), data(data),cont(cont)
 {
 }
 
@@ -1776,7 +1777,8 @@ bool qecmd::DragTrainStationTime::mergeWith(const QUndoCommand* other)
 {
 	if (id() != other->id())return false;
 	auto cmd = static_cast<const DragTrainStationTime*>(other);
-	if (train == cmd->train && station_id == cmd->station_id) {
+	// 2024.03.26  new requirement: same modifiers
+	if (train == cmd->train && station_id == cmd->station_id && mod == cmd->mod) {
 		// 抛弃中间状态即可
 		return true;
 	}

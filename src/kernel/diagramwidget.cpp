@@ -306,11 +306,14 @@ void DiagramWidget::showTimeTooltip(const QPoint& pos_glb)
     intervalToolTip(prev, itr, *line);
 }
 
-void DiagramWidget::dragTimeBegin(const QPointF& pos, TrainItem* item, PaintStationPointItem* point, bool ctrl, bool alt)
+void DiagramWidget::dragTimeBegin(const QPointF& pos, TrainItem* item, PaintStationPointItem* point, bool ctrl, 
+    bool alt, bool shift, Qt::KeyboardModifiers mod)
 {
-    if ((_onDragging = item->dragBegin(pos, point, ctrl, alt))) {
+    if ((_onDragging = item->dragBegin(pos, point, ctrl, alt, shift))) {
         _draggedItem = item;
         _dragStartPoint = pos;
+        _dragShift = shift;
+        _dragMod = mod;
 
         if (_dragInfoWidget == nullptr) {
             _dragInfoWidget = new DragTimeInfoWidget;
@@ -374,9 +377,9 @@ void DiagramWidget::dragTimeFinish(const QPointF& pos)
 
         // this option commits the drag directly, 
         // and the status in TrainItem is updated
-        _draggedItem->doDrag(tm);
+        _draggedItem->doDrag(tm, _dragShift);
 
-        emit timeDragged(train, station_id, data);
+        emit timeDragged(train, station_id, data, _dragMod);
     }
 
     _onDragging = false;
@@ -589,13 +592,10 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
         return;
     if (e->button() == Qt::LeftButton) {
 
-        bool ctrl=false, alt=false;
-        if (e->modifiers() == Qt::CTRL) {
-            ctrl = true;
-        }
-        else if (e->modifiers() == Qt::ALT){
-            alt = true;
-        }
+        // 2024.03.26: add shift-modifier for translation of whole (partial) train line
+        bool ctrl = e->modifiers() & Qt::ControlModifier;
+        bool alt = e->modifiers() & Qt::AltModifier;
+        bool shift = e->modifiers() & Qt::ShiftModifier;
         
         auto pos = mapToScene(e->pos());
         //auto* item = posTrainItem(pos);
@@ -632,7 +632,7 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
             else {
                 // for drag here
                 if (SystemJson::instance.drag_time) {
-                    dragTimeBegin(pos, trainItem, pointItem, ctrl, alt);
+                    dragTimeBegin(pos, trainItem, pointItem, ctrl, alt, shift, e->modifiers());
                 }
             }
         }

@@ -82,6 +82,8 @@ class DiagramWidget : public QGraphicsView
     bool _onDragging = false;
     TrainItem* _draggedItem = nullptr;
     QPointF _dragStartPoint;
+    bool _dragShift = false;
+    Qt::KeyboardModifiers _dragMod;
     Direction _paintInfoDir;
 
     DragTimeInfoWidget* _dragInfoWidget = nullptr;
@@ -333,7 +335,7 @@ private:
     void showTimeTooltip(const QPoint& pos_glb);
 
     void dragTimeBegin(const QPointF& pos, TrainItem* item, PaintStationPointItem* point,
-        bool ctrl_pressed, bool alt_pressed);
+        bool ctrl_pressed, bool alt_pressed, bool shift_pressed, Qt::KeyboardModifiers mod);
 
     void dragTimeMove(const QPointF& pos);
 
@@ -350,7 +352,8 @@ signals:
     void pageFocussedIn(std::shared_ptr<DiagramPage> page);
     void railFocussedIn(std::shared_ptr<Railway> railway);
 
-    void timeDragged(std::shared_ptr<Train> train, int station_id, const TrainStation& data);
+    void timeDragged(std::shared_ptr<Train> train, int station_id, const TrainStation& data, 
+        Qt::KeyboardModifiers mod);
     void paintingPointClicked(DiagramWidget* d, std::shared_ptr<Train> train, AdapterStation* st);
 
 private slots:

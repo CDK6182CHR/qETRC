@@ -7,6 +7,7 @@
 #include "paintstationpointitem.h"
 #include "data/common/qesystem.h"
 #include "qemultilinepath.h"
+#include "util/utilfunc.h"
 
 #include <QPointF>
 #include <QPen>
@@ -414,7 +415,7 @@ bool TrainItem::dragBegin(const QPointF& pos, PaintStationPointItem* point, bool
 #else 
 
 // 2023.06.04  new version using PaintStationPointItem
-bool TrainItem::dragBegin(const QPointF& pos, PaintStationPointItem* point, bool ctrl, bool alt)
+bool TrainItem::dragBegin(const QPointF& pos, PaintStationPointItem* point, bool ctrl, bool alt, bool shift)
 {
     Q_UNUSED(pos);
     _onDragging = false;
@@ -428,7 +429,8 @@ bool TrainItem::dragBegin(const QPointF& pos, PaintStationPointItem* point, bool
     _dragPoint = point->point();
     
     if (_dragPoint == StationPoint::Pass) {
-        if (ctrl) {
+        // 2024.03.26: for shift case, ctrl-alt-shift means drag backward from arrival time
+        if ((ctrl && !shift) || (ctrl && alt &&shift)) {
             _dragPoint = StationPoint::Arrive;
         }
         else if (alt) {
@@ -436,12 +438,19 @@ bool TrainItem::dragBegin(const QPointF& pos, PaintStationPointItem* point, bool
         }
     }
 
+    if (shift) {
+        _dragTrans = ctrl ? DragTranslationType::Backward : DragTranslationType::Forward;
+    }
+    else {
+        _dragTrans = DragTranslationType::SinglePoint;
+    }
+
     _draggedStation = point->station();
     _onDragging = true;
 
     //qDebug() << "station: " << point->station() << Qt::endl;
 
-    qDebug() << "dragBegin: on station " << _draggedStation->trainStation->name.toSingleLiteral() << Qt::endl;
+    //qDebug() << "dragBegin: on station " << _draggedStation->trainStation->name.toSingleLiteral() << Qt::endl;
 
     return true;
 }
@@ -486,27 +495,38 @@ QTime TrainItem::draggedOldTime() const
     }
 }
 
-void TrainItem::doDrag(const QTime& tm)
+void TrainItem::doDrag(const QTime& tm, bool shift)
 {
     if (!_onDragging) {
         qDebug() << "TrainItem::doDrag: ERROR: unexpected status" << Qt::endl;
         return;
     }
-    switch (_dragPoint)
-    {
-    case StationPoint::Arrive:
-        _draggedStation->trainStation->arrive = tm;
-        break;
-    case StationPoint::Depart:
-        _draggedStation->trainStation->depart = tm;
-        break;
-    case StationPoint::Pass:
-        _draggedStation->trainStation->arrive = tm;
-        _draggedStation->trainStation->depart = tm;
-        break;
-    default:
-        qDebug() << "TrainItem::doDrag: INVALID _dragPoint" << Qt::endl;
-        break;
+    if (shift) {
+        // 2024.03.26: move the part of WHOLE LINE
+        // first: process the selected point
+        auto tm_old = draggedOldTime();
+        int secs = tm_old.secsTo(tm);
+
+        doDragSingle(tm);
+        if (_dragTrans == DragTranslationType::Forward) {
+            auto itr = std::next(_draggedStation->trainStation);
+            for (; itr != train()->timetable().end(); ++itr) {
+                itr->arrive = itr->arrive.addSecs(secs);
+                itr->depart = itr->depart.addSecs(secs);
+            }
+        }
+        else if (_dragTrans == DragTranslationType::Backward) {
+            auto itr = std::make_reverse_iterator(_draggedStation->trainStation);
+            for (; itr != train()->timetable().rend(); ++itr) {
+                itr->arrive = itr->arrive.addSecs(secs);
+                itr->depart = itr->depart.addSecs(secs);
+            }
+        }
+        
+    }
+    else {
+        // original: just move single station
+        doDragSingle(tm);
     }
 
     // finalize
@@ -1362,4 +1382,24 @@ double TrainItem::timeDistancePbc(double x, const QTime& tm) const
     }
     // now tm_x and x should be in the same image under PBC
     return x - tm_x;
+}
+
+void TrainItem::doDragSingle(const QTime& tm)
+{
+    switch (_dragPoint)
+    {
+    case StationPoint::Arrive:
+        _draggedStation->trainStation->arrive = tm;
+        break;
+    case StationPoint::Depart:
+        _draggedStation->trainStation->depart = tm;
+        break;
+    case StationPoint::Pass:
+        _draggedStation->trainStation->arrive = tm;
+        _draggedStation->trainStation->depart = tm;
+        break;
+    default:
+        qDebug() << "TrainItem::doDrag: INVALID _dragPoint" << Qt::endl;
+        break;
+    }
 }
