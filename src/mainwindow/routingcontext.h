@@ -111,6 +111,11 @@ public slots:
      */
     void createRoutingByTrain(std::shared_ptr<Train> train);
 
+    /**
+     * 2024.03.26  add (append) train to given routing
+     */
+    void addTrainToRouting(std::shared_ptr<Routing> routing, std::shared_ptr<Train> train);
+
 };
 
 namespace qecmd {

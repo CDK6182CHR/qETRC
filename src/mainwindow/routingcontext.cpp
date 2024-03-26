@@ -223,6 +223,16 @@ void RoutingContext::createRoutingByTrain(std::shared_ptr<Train> train)
     openRoutingEditWidget(rout);
 }
 
+void RoutingContext::addTrainToRouting(std::shared_ptr<Routing> routing, std::shared_ptr<Train> train)
+{
+    auto data = std::make_shared<Routing>(*routing);   // copy construct;
+    data->appendTrain(train, true);
+
+    mw->undoStack->push(new qecmd::ChangeRoutingOrder(routing, data, this));
+
+    openRoutingEditWidget(routing);
+}
+
 void RoutingContext::refreshAllData()
 {
     refreshData();
@@ -314,14 +324,8 @@ void RoutingContext::actRoutingOrderChange(std::shared_ptr<Routing> routing,
 void RoutingContext::commitRoutingOrderChange(std::shared_ptr<Routing> routing,
     QSet<std::shared_ptr<Train>> takenTrains)
 {
-    for (const auto& p : routing->order()) {
-        if (!p.isVirtual()) {
-            mw->repaintTrainLines(p.train());
-        }
-    }
-    foreach(auto p, takenTrains) {
-        mw->repaintTrainLines(p);
-    }
+    // 2024.03.26: change to mainWindow call, for updating of trainContext if required.
+    mw->repaintRoutingTrainLines(routing);
 
     if (routing == _routing) {
         refreshData();

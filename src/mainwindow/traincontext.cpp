@@ -1548,6 +1548,9 @@ void TrainContext::actCreateRouting()
 
 void TrainContext::actAddToRouting()
 {
+	if (!train || train->hasRouting()) {
+		return;
+	}
 	auto o = SelectRoutingDialog::selectRouting(diagram.trainCollection(), true, mw);
 	if (!o.isAccepted) {
 		return;
@@ -1557,7 +1560,7 @@ void TrainContext::actAddToRouting()
 	}
 	else {
 		auto rout = o.routing;
-		// TODO: add to existing routing ...
+		mw->contextRouting->addTrainToRouting(o.routing, train);
 	}
 }
 
