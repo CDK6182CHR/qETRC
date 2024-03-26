@@ -85,6 +85,7 @@
 #include "editors/trainpath/pathlistwidget.h"
 #include "model/trainpath/pathlistmodel.h"
 #include "log/IssueManager.h"
+#include "defines/icon_specs.h"
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -760,13 +761,13 @@ void MainWindow::initToolbar()
 	if constexpr (true) {
 		//撤销重做
 		QAction* act = undoStack->createUndoAction(this, tr("撤销"));
-		act->setIcon(QIcon(":/icons/undo.png"));
+		act->setIcon(QEICN_undo);
 		act->setShortcut(Qt::CTRL | Qt::Key_Z);
 		act->setShortcutContext(Qt::WindowShortcut);
 		ribbon->quickAccessBar()->addAction(act);
 
 		act = undoStack->createRedoAction(this, tr("重做"));
-		act->setIcon(QIcon(":/icons/redo.png"));
+		act->setIcon(QEICN_redo);
 		act->setShortcut(Qt::CTRL | Qt::Key_Y);
 		ribbon->quickAccessBar()->addAction(act);
 
@@ -785,7 +786,7 @@ void MainWindow::initToolbar()
 
 		// Customize 似乎还不太对，先留在这
 #if 0
-		act = new QAction(QIcon(":/icons/customize.svg"), tr("自定义Ribbon"), this);
+		act = new QAction(QE_ICN_TB_customize, tr("自定义Ribbon"), this);
 		act->setToolTip(tr("自定义Ribbon\n自定义工具栏按钮的排列组合"));
 		connect(act, &QAction::triggered, this, &MainWindow::actCustomizeRibbon);
 		ribbon->quickAccessBar()->addAction(act);
@@ -799,7 +800,7 @@ void MainWindow::initToolbar()
 		SARibbonCategory* cat = ribbon->addCategoryPage(QObject::tr("开始(&1)"));
 		SARibbonPannel* panel = cat->addPannel(QObject::tr("文件"));
 
-		QAction* act = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileIcon),
+		QAction* act = new QAction(QEICN_new_file,
 			QObject::tr("新建"), this);
 		panel->addLargeAction(act);
 		act->setShortcut(Qt::CTRL | Qt::Key_N);
@@ -808,7 +809,7 @@ void MainWindow::initToolbar()
 		connect(act, SIGNAL(triggered()), this, SLOT(actNewGraph()));
 		sharedActions.newfile = act;
 
-		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogOpenButton),
+		act = new QAction(QEICN_open_file,
 			QObject::tr("打开"), this);
 		addAction(act);
 		act->setToolTip(tr("打开 (Ctrl+O)\n关闭当前运行图文件，并打开新的既有运行图文件。"));
@@ -817,7 +818,7 @@ void MainWindow::initToolbar()
 		connect(act, SIGNAL(triggered()), this, SLOT(actOpenGraph()));
 		sharedActions.open = act;
 
-		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogSaveButton),
+		act = new QAction(QEICN_save_file,
 			QObject::tr("保存"), this);
 		act->setToolTip(tr("保存 (Ctrl+S)\n保存当前运行图。如果是新运行图，则需要先选择文件。"));
 		act->setShortcut(Qt::CTRL | Qt::Key_S);
@@ -826,14 +827,14 @@ void MainWindow::initToolbar()
 		connect(act, SIGNAL(triggered()), this, SLOT(actSaveGraph()));
 		sharedActions.save = act;
 
-		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogSaveAllButton),
+		act = new QAction(QEICN_save_file_as,
 			tr("另存为.."), this);
 		act->setToolTip(tr("另存为\n将当前运行图另存为新建文件。"));
 		panel->addMediumAction(act);
 		connect(act, &QAction::triggered, this, &MainWindow::actSaveGraphAs);
 		sharedActions.saveas = act;
 
-		act = new QAction(QIcon(":/icons/ETRC-dynamic.png"), tr("导出为.."), this);
+		act = new QAction(QEICN_export_single_rail, tr("导出为.."), this);
 		act->setToolTip(tr("导出为单线路运行图 (Ctrl+M)\n"
 			"导出为单一线路的pyETRC或ETRC运行图文件格式。"));
 		act->setShortcut(Qt::CTRL | Qt::Key_M);
@@ -847,7 +848,7 @@ void MainWindow::initToolbar()
 		addAction(act);
 		act->setText(QObject::tr("导航"));
 		act->setToolTip(tr("导航面板 (F3)\n打开或关闭运行图总导航面板。"));
-		act->setIcon(QIcon(":/icons/Graph-add.png"));
+		act->setIcon(QEICN_navi);
         panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
 
@@ -855,7 +856,7 @@ void MainWindow::initToolbar()
 		actTrainList = act;
 		act->setText(tr("列车管理"));
 		act->setToolTip(tr("列车管理\n打开或关闭（pyETRC风格的）列车管理列表面板。"));
-		act->setIcon(QApplication::style()->standardIcon(QStyle::SP_FileDialogListView));
+		act->setIcon(QEICN_train_list);
         panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
 
@@ -863,7 +864,7 @@ void MainWindow::initToolbar()
 		pageMenu = menu;
 		menu->setToolTip(tr("运行图窗口\n导航、打开或关闭现有运行图窗口。"));
 		menu->setTitle(QObject::tr("运行图窗口"));
-		menu->setIcon(QIcon(":/icons/diagram.png"));
+		menu->setIcon(QEICN_diagram_widget);
         panel->addLargeMenu(menu);
 		//btn->setMinimumWidth(80);
 
@@ -871,19 +872,19 @@ void MainWindow::initToolbar()
 
 		act = undoDock->toggleViewAction();
 		act->setText(tr("历史记录"));
-		act->setIcon(QIcon(":/icons/clock.png"));
+		act->setIcon(QEICN_history);
 		act->setToolTip(tr("历史记录\n打开或关闭历史记录面板。\n"
 			"历史记录面板记录了可撤销的针对运行图文档的操作记录，可以查看、撤销、重做。"));
         panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
 
 		act = logDock->toggleViewAction();
-		act->setIcon(QIcon(":/icons/text.png"));
+		act->setIcon(QEICN_text_out_widget);
 		act->setToolTip(tr("输出窗口\n打开或关闭文本输出窗口"));
 		panel->addMediumAction(act);
 
 		act = issueDock->toggleViewAction();
-		act->setIcon(qApp->style()->standardIcon(QStyle::SP_MessageBoxCritical));
+		act->setIcon(QEICN_issue_widget);
 		act->setToolTip(tr("铺画问题窗口\n打开或关闭铺画问题窗口，显示运行线铺画过程中的错误报告"));
 		panel->addMediumAction(act);
 

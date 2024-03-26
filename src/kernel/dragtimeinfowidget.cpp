@@ -17,7 +17,7 @@ void DragTimeInfoWidget::showInfo(bool shift, const QString &trainName, const QS
     if (shift) {
         // shift case
         html_base = QObject::tr(R"(
-    平移运行线 <br>  
+    平移区段运行线 <br>  
     <font size=5>%1</font> 次 <font size=5>%2</font> 站 <font size=5>%3</font> 时刻
     <br>
     <font size=5>%4</font> → <font size=5 color="blue">%5</font>
