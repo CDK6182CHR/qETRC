@@ -1077,10 +1077,16 @@ void TrainContext::actSimpleInterpolation()
 	}
 }
 
-void TrainContext::actDragTime(std::shared_ptr<Train> train, int station_id, const TrainStation& data, 
+void TrainContext::actDragTimeSingle(std::shared_ptr<Train> train, int station_id, const TrainStation& data, 
 	Qt::KeyboardModifiers mod)
 {
 	mw->getUndoStack()->push(new qecmd::DragTrainStationTime(train, station_id, mod, data, this));
+}
+
+void TrainContext::actDragTimeNonLocal(std::shared_ptr<Train> train, int station_id, std::shared_ptr<Train> data, 
+	Qt::KeyboardModifiers mod)
+{
+	mw->getUndoStack()->push(new qecmd::DragNonLocalTime(train, data, station_id, mod, this));
 }
 
 void TrainContext::afterChangeTrainPaths(std::shared_ptr<Train> train, const std::vector<TrainPath*>& paths)
@@ -1793,6 +1799,42 @@ void qecmd::DragTrainStationTime::commit()
 	cont->onTrainStationTimeChanged(train, true);
 }
 
+qecmd::DragNonLocalTime::DragNonLocalTime(std::shared_ptr<Train> train, std::shared_ptr<Train> data,
+	int station_id, Qt::KeyboardModifiers mod, TrainContext* cont, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("拖动平移: %1").arg(train->trainName().full()), parent), 
+	train(train), data(data),
+	station_id(station_id), mod(mod), cont(cont)
+{
+}
+
+void qecmd::DragNonLocalTime::undo()
+{
+	std::ranges::swap_ranges(train->timetable(), data->timetable());
+	cont->onTrainStationTimeChanged(train, true);
+}
+
+void qecmd::DragNonLocalTime::redo()
+{
+	if (first) {
+		first = false;
+	}
+	else {
+		std::ranges::swap_ranges(train->timetable(), data->timetable());
+	}
+	cont->onTrainStationTimeChanged(train, true);
+}
+
+bool qecmd::DragNonLocalTime::mergeWith(const QUndoCommand* other)
+{
+	if (id() != other->id())return false;
+	auto cmd = static_cast<const DragNonLocalTime*>(other);
+	// 2024.03.26  new requirement: same modifiers
+	if (train == cmd->train && station_id == cmd->station_id && mod == cmd->mod) {
+		// simply discard interval status
+		return true;
+	}
+	else return false;
+}
 
 qecmd::AssignPathsToTrain::AssignPathsToTrain(std::shared_ptr<Train> train, std::vector<TrainPath*>&& paths,
 	TrainContext* cont, QUndoCommand* parent):

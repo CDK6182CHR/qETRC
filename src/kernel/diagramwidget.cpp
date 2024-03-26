@@ -352,7 +352,7 @@ void DiagramWidget::dragTimeMove(const QPointF& pos)
         auto tm = _draggedItem->posToTime(pos);
         
         auto* st = _draggedItem->draggedStation();
-        _dragInfoWidget->showInfo(_draggedItem->train()->trainName().full(),
+        _dragInfoWidget->showInfo(_dragShift, _draggedItem->train()->trainName().full(),
             st->trainStation->name.toSingleLiteral(), _draggedItem->dragPointString(),
             _draggedItem->draggedOldTime(), tm);
 
@@ -373,13 +373,25 @@ void DiagramWidget::dragTimeFinish(const QPointF& pos)
         auto* st = _draggedItem->draggedStation();
         const auto& train = _draggedItem->train();
         int station_id = std::distance(train->timetable().begin(), st->trainStation);
-        TrainStation data = *(st->trainStation);   // copy construct
 
-        // this option commits the drag directly, 
-        // and the status in TrainItem is updated
-        _draggedItem->doDrag(tm, _dragShift);
+        if (_dragShift) {
+            // nonLocal update
+            auto data = std::make_shared<Train>(*train);   // copy construct
+            _draggedItem->doDrag(tm, _dragShift);
+            emit timeDraggedNonLocal(train, station_id, data, _dragMod);
+        } 
+        else {
+            // old version: local update
+            TrainStation data = *(st->trainStation);   // copy construct
 
-        emit timeDragged(train, station_id, data, _dragMod);
+            // this option commits the drag directly, 
+            // and the status in TrainItem is updated
+            _draggedItem->doDrag(tm, _dragShift);
+
+            emit timeDraggedSingle(train, station_id, data, _dragMod);
+        }
+
+
     }
 
     _onDragging = false;

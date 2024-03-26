@@ -352,7 +352,9 @@ signals:
     void pageFocussedIn(std::shared_ptr<DiagramPage> page);
     void railFocussedIn(std::shared_ptr<Railway> railway);
 
-    void timeDragged(std::shared_ptr<Train> train, int station_id, const TrainStation& data, 
+    void timeDraggedSingle(std::shared_ptr<Train> train, int station_id, const TrainStation& data, 
+        Qt::KeyboardModifiers mod);
+    void timeDraggedNonLocal(std::shared_ptr<Train> trian, int station_id, std::shared_ptr<Train> data,
         Qt::KeyboardModifiers mod);
     void paintingPointClicked(DiagramWidget* d, std::shared_ptr<Train> train, AdapterStation* st);
 

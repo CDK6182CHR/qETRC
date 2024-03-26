@@ -10,15 +10,31 @@ DragTimeInfoWidget::DragTimeInfoWidget(QWidget* parent):
     initUI();
 }
 
-void DragTimeInfoWidget::showInfo(const QString &trainName, const QString &stationName,
+void DragTimeInfoWidget::showInfo(bool shift, const QString &trainName, const QString &stationName,
                                   const QString &pointName, const QTime &oldTime, const QTime &newTime)
 {
-    QString html=QObject::tr(R"(
+    QString html_base{};
+    if (shift) {
+        // shift case
+        html_base = QObject::tr(R"(
+    平移运行线 <br>  
     <font size=5>%1</font> 次 <font size=5>%2</font> 站 <font size=5>%3</font> 时刻
     <br>
     <font size=5>%4</font> → <font size=5 color="blue">%5</font>
-)").arg(trainName, stationName, pointName,
+)");
+    }
+    else {
+        html_base = QObject::tr(R"(
+    调整单站时刻 <br>
+    <font size=5>%1</font> 次 <font size=5>%2</font> 站 <font size=5>%3</font> 时刻
+    <br>
+    <font size=5>%4</font> → <font size=5 color="blue">%5</font>
+)");
+    }
+
+    auto html=html_base.arg(trainName, stationName, pointName,
         oldTime.toString("hh:mm:ss"), newTime.toString("hh:mm:ss"));
+
     labMain->setText(html);
 
     show();

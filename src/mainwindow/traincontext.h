@@ -344,7 +344,13 @@ public slots:
      */
     void actSimpleInterpolation();
 
-    void actDragTime(std::shared_ptr<Train> train, int station_id, const TrainStation& data, 
+    void actDragTimeSingle(std::shared_ptr<Train> train, int station_id, const TrainStation& data, 
+        Qt::KeyboardModifiers mod);
+
+    /**
+     * 2024.03.26  non-local dragging (with Shift pressed)
+     */
+    void actDragTimeNonLocal(std::shared_ptr<Train> train, int station_id, std::shared_ptr<Train> data,
         Qt::KeyboardModifiers mod);
 
     /**
@@ -622,6 +628,29 @@ namespace qecmd {
         virtual bool mergeWith(const QUndoCommand* other)override;
     private:
         void commit();
+    };
+
+    /**
+     * 2024.03.26: non-local dragging of timetable. 
+     * This is different from ChangeTimetable, since the ADDRESSES of the stations should not change
+     */
+    class DragNonLocalTime: public QUndoCommand
+    {
+        std::shared_ptr<Train> train, data;
+        int station_id;
+        Qt::KeyboardModifiers mod;
+        TrainContext* const cont;
+
+        static constexpr const int ID = 104;
+        bool first = true;
+
+    public:
+        DragNonLocalTime(std::shared_ptr<Train> train, std::shared_ptr<Train> data,
+            int station_id, Qt::KeyboardModifiers mod, TrainContext* cont, QUndoCommand* parent = nullptr);
+        virtual void undo()override;   // not changed
+        virtual void redo()override;
+        virtual int id()const override { return ID; }
+        virtual bool mergeWith(const QUndoCommand* other)override;
     };
 
     /**

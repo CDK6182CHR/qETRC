@@ -16,7 +16,7 @@ class DragTimeInfoWidget : public QFrame
 
 public:
     DragTimeInfoWidget(QWidget* parent=nullptr);
-    void showInfo(const QString& trainName, const QString& stationName,
+    void showInfo(bool shift, const QString& trainName, const QString& stationName,
                   const QString& pointName, const QTime& oldTime, const QTime& newTime);
 private:
     void initUI();
