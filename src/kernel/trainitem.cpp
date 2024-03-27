@@ -509,6 +509,10 @@ void TrainItem::doDrag(const QTime& tm, bool shift)
 
         doDragSingle(tm);
         if (_dragTrans == DragTranslationType::Forward) {
+            if (_dragPoint == StationPoint::Arrive) {
+                _draggedStation->trainStation->depart =
+                    _draggedStation->trainStation->depart.addSecs(secs);
+            }
             auto itr = std::next(_draggedStation->trainStation);
             for (; itr != train()->timetable().end(); ++itr) {
                 itr->arrive = itr->arrive.addSecs(secs);
@@ -516,6 +520,10 @@ void TrainItem::doDrag(const QTime& tm, bool shift)
             }
         }
         else if (_dragTrans == DragTranslationType::Backward) {
+            if (_dragPoint == StationPoint::Depart) {
+                _draggedStation->trainStation->arrive =
+                    _draggedStation->trainStation->arrive.addSecs(secs);
+            }
             auto itr = std::make_reverse_iterator(_draggedStation->trainStation);
             for (; itr != train()->timetable().rend(); ++itr) {
                 itr->arrive = itr->arrive.addSecs(secs);
@@ -1151,7 +1159,10 @@ void TrainItem::markArriveTime(double x, double y, const QTime& tm)
 {
     //到达时刻：下行标右上，下行标右下
     int m = tm.minute();
-    if (tm.second() >= 30)m++;
+    // 2024.03.27: options for different round strategies
+    if (config().second_round_option == Config::SecondRoundOption::Round &&
+        tm.second() >= 30)
+        m++;
     auto* item = new QGraphicsSimpleTextItem(QString::number(m % 10), this);
     item->setBrush(pen.color());
     double h = item->boundingRect().height();
@@ -1168,7 +1179,8 @@ void TrainItem::markDepartTime(double x, double y, const QTime& tm)
 {
     //出发时刻 下行标左下，上行标左上
     int m = tm.minute();
-    if (tm.second() >= 30)m++;
+    if (config().second_round_option == Config::SecondRoundOption::Round && tm.second() >= 30)
+        m++;
     auto* item = new QGraphicsSimpleTextItem(QString::number(m % 10), this);
     item->setBrush(pen.color());
     const auto& t = item->boundingRect();

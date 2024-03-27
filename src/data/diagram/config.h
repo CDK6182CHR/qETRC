@@ -67,6 +67,15 @@ struct Config
     };
 
     /**
+     * For the round of seconds when showing time in the diagram, 
+     * where only the minute is shown.
+     */
+    enum class SecondRoundOption {
+        Round = 0,
+        Floor,
+    };
+
+    /**
      * 2023.06.23  whether current object is transparent. If true, the data are not read.
      */
     bool transparent_config = false;
@@ -113,6 +122,7 @@ struct Config
      * 0-一律不；1-选中车次显示；2-全部
      */
     int show_time_mark = 1;
+    SecondRoundOption second_round_option = SecondRoundOption::Round;
 
     /**
      * 自动安排TrainItem配置时，最多允许间隔的站数。超过将分成两个Item

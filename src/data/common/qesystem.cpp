@@ -63,6 +63,7 @@ void SystemJson::fromJson(const QJsonObject& obj)
     auto_highlight_on_selected = obj.value("auto_highlight_on_selected").toBool(true);
     show_start_page = obj.value("show_start_page").toBool(true);
     transparent_config = obj.value("transparent_config").toBool(true);
+    inform_dragging = obj.value("inform_dragging").toBool(true);
 
     const QJsonArray& arhis = obj.value("history").toArray();
     for (const auto& p : arhis) {
@@ -89,6 +90,7 @@ QJsonObject SystemJson::toJson() const
         {"auto_highlight_on_selected",auto_highlight_on_selected},
         {"show_start_page",show_start_page},
         {"transparent_config", transparent_config},
+        {"inform_dragging", inform_dragging},
     };
 }
 

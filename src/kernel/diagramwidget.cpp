@@ -391,7 +391,18 @@ void DiagramWidget::dragTimeFinish(const QPointF& pos)
             emit timeDraggedSingle(train, station_id, data, _dragMod);
         }
 
-
+        if (SystemJson::instance.inform_dragging) {
+            SystemJson::instance.inform_dragging = false;
+            QMessageBox::information(this, tr("提示"),
+                tr("你刚才使用了拖动调整时刻的功能。如果这是误触，可以撤销（Ctrl+Z）此操作。"
+                    "在全局配置选项中，可以关闭拖动调整时刻功能。\n"
+                    "提示：\n"
+                    "按住Shift拖动，可平移所拖动点及之后所有车站的时刻；\n"
+                    "按住Shift+Ctrl拖动，可平移拖动点及之前所有车站的时刻；\n"
+                    "对于无停点的车站，按住Shift+Alt拖动，可平移出发时刻及之后所有车站时刻；\n"
+                    "对于无停点的车站，按住Shift+Alt+Ctrl拖动，可平移到达时刻及之前所有车站的时刻。\n"
+                    "本提示仅展示这一次。"));
+        }
     }
 
     _onDragging = false;

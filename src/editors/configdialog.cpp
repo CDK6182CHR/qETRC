@@ -224,6 +224,12 @@ void ConfigDialog::initUI()
         cbShowTimeMark = cb;
 
         cb = new QComboBox;
+        cb->addItems({ tr("修约至最近分钟数"), tr("舍弃秒尾数") });
+        cb->setToolTip(tr("设置在运行图中显示图定时刻的分钟个位数时，遇有秒数条件下的舍入规则。"));
+        form->addRow(tr("秒数修约选项"), cb);
+        cbSecondRoundOption = cb;
+
+        cb = new QComboBox;
         cb->addItems({ tr("使用运行线颜色"), tr("使用文本颜色") });
         form->addRow(tr("标签颜色"), cb);
         cbLabelColor = cb;
@@ -532,6 +538,7 @@ void ConfigDialog::refreshData()
     //运行线控制
     SET_VALUE(spValidWidth, valid_width);
     cbShowTimeMark->setCurrentIndex(_cfg.show_time_mark);
+    cbSecondRoundOption->setCurrentIndex(static_cast<int>(_cfg.second_round_option));
     cbLabelColor->setCurrentIndex(static_cast<int>(_cfg.train_label_color));
     ckEndLabel->setChecked(_cfg.end_label_name);
     ckFullName->setChecked(_cfg.show_full_train_name);
@@ -622,6 +629,7 @@ void ConfigDialog::actApply()
     //运行线控制
     GET_VALUE(spValidWidth, valid_width);
     cnew.show_time_mark = cbShowTimeMark->currentIndex();
+    cnew.second_round_option = static_cast<Config::SecondRoundOption>(cbSecondRoundOption->currentIndex());
     cnew.train_label_color = static_cast<Config::LinkLineColorOption>(cbLabelColor->currentIndex());
     cnew.end_label_name = ckEndLabel->isChecked();
     cnew.show_full_train_name = ckFullName->isChecked();

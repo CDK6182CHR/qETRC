@@ -52,6 +52,9 @@ public:
     // below: data not yet written to file
     double station_mark_radius=2.0;
 
+    // one-time hints
+    bool inform_dragging = true;
+
     void saveFile();
 
     /**

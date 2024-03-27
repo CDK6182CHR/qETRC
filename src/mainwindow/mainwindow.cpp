@@ -2387,6 +2387,11 @@ void MainWindow::focusOutPage()
 
 void MainWindow::focusInTrain(std::shared_ptr<Train> train)
 {
+	// 2024.03.27: reject trains that on painting to avoid some risks
+	if (train->isOnPainting()) {
+		qInfo() << "Focusing on train " << train->trainName().full() << " which is now paiting is rejected";
+		return;
+	}
 	ribbonBar()->showContextCategory(contextTrain->context());
 	contextTrain->setTrain(train);
 	if (!timetableQuickDock->isClosed()) {
