@@ -771,7 +771,7 @@ void MainWindow::initToolbar()
 		act->setShortcut(Qt::CTRL | Qt::Key_Y);
 		ribbon->quickAccessBar()->addAction(act);
 
-		act = new QAction(qApp->style()->standardIcon(QStyle::SP_DialogCloseButton),
+		act = new QAction(QEICN_close_current,
 			tr("关闭当前面面板 (Ctrl+W)"), this);
 		act->setShortcut(Qt::CTRL | Qt::Key_W);
 		connect(act, &QAction::triggered, this, &MainWindow::closeCurrentTab);
@@ -888,14 +888,14 @@ void MainWindow::initToolbar()
 		act->setToolTip(tr("铺画问题窗口\n打开或关闭铺画问题窗口，显示运行线铺画过程中的错误报告"));
 		panel->addMediumAction(act);
 
-		act = new QAction(QIcon(":/icons/add.png"), tr("添加运行图"), this);
+		act = new QAction(QEICN_add_diagram_page, tr("添加运行图"), this);
 		act->setToolTip(tr("添加运行图\n选择既有基线数据，建立新的运行图页面。"));
 		connect(act, SIGNAL(triggered()), naviView, SLOT(addNewPage()));
         panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
 
 		panel = cat->addPannel(tr("更新"));
-		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_BrowserReload),
+		act = new QAction(QEICN_global_refresh,
 			tr("刷新"), this);
 		act->setToolTip(tr("刷新 (F5)\n重新铺画运行图，更新所有数据面板的信息。"));
 		act->setShortcut(Qt::Key_F5);
@@ -904,7 +904,7 @@ void MainWindow::initToolbar()
 		connect(act, SIGNAL(triggered()), this, SLOT(refreshAll()));
         panel->addLargeAction(act);
 
-		act = new QAction(QIcon(":/icons/brush.png"), tr("更改站名"), this);
+		act = new QAction(QEICN_rename_station, tr("更改站名"), this);
 		act->setToolTip(tr("全局站名修改 (Ctrl+U)\n"
 			"在整个运行图的所有线路、所有车次中，将旧站名改为新站名。"));
         //qactChangeStationName = act;
@@ -915,22 +915,19 @@ void MainWindow::initToolbar()
 		//btn->setMinimumWidth(80);
 
 		panel = cat->addPannel(tr("系统"));
-		act = new QAction(qApp->style()->standardIcon(QStyle::SP_DialogHelpButton), tr("帮助"), this);
+		act = new QAction(QEICN_help, tr("帮助"), this);
 		connect(act, &QAction::triggered, this, &MainWindow::showHelpDialog);
 		panel->addLargeAction(act);
 
-		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation),
-			tr("关于"), this);
+		act = new QAction(QEICN_about, tr("关于"), this);
 		connect(act, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
 		btn->setPopupMode(QToolButton::InstantPopup);
 		menu = new SARibbonMenu(this);
-		menu->addAction(QApplication::style()->standardIcon(QStyle::SP_TitleBarMenuButton),
-			tr("关于Qt"), QApplication::aboutQt);
+		menu->addAction(QEICN_about_qt, tr("关于Qt"), QApplication::aboutQt);
 		act->setMenu(menu);
         btn = panel->addLargeAction(act);
 
-		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_BrowserStop),
-			tr("退出"), this);
+		act = new QAction(QEICN_exit_app, tr("退出"), this);
 		connect(act, SIGNAL(triggered()), this, SLOT(close()));
 		panel->addLargeAction(act);
 
@@ -942,13 +939,13 @@ void MainWindow::initToolbar()
 		auto* cat = ribbon->addCategoryPage(tr("线路(&2)"));
 		auto* panel = cat->addPannel(tr("基础数据"));
 
-		auto* act = new QAction(QIcon(":/icons/add.png"), tr("导入线路"), this);
+		auto* act = new QAction(QEICN_import_rails, tr("导入线路"), this);
 		//connect(act, SIGNAL(triggered()), naviView, SLOT(importRailways()));
 		connect(act, &QAction::triggered, naviView, &NaviTree::actImportRailways);
 		act->setToolTip(tr("导入线路\n从既有运行图文件中导入（其中全部的）线路数据"));
 		auto* btn = panel->addLargeAction(act);
 
-		act = new QAction(QIcon(":/icons/rail.png"), tr("基线编辑"), this);
+		act = new QAction(QEICN_rail_edit, tr("基线编辑"), this);
 		act->setToolTip(tr("基线编辑\n导航到、新建、打开或者关闭（pyETRC风格的）基线编辑面板。"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actOpenNewRailWidget()));
 		auto* menu = new SARibbonMenu(this);
@@ -958,14 +955,14 @@ void MainWindow::initToolbar()
 		btn = panel->addLargeAction(act);
 
 		act = pathListDock->toggleViewAction();
-		act->setIcon(QIcon(":/icons/polyline.png"));
+		act->setIcon(QEICN_train_path);
 		act->setText(tr("列车径路"));
 		act->setToolTip(tr("列车径路\n打开/关闭列车径路管理面板。"));
 		pathMenu = new SARibbonMenu(this);
 		act->setMenu(pathMenu);
 		panel->addLargeAction(act);
 
-		act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺编辑"), this);
+		act = new QAction(QEICN_ruler_edit, tr("标尺编辑"), this);
 		act->setToolTip(tr("标尺编辑 (Ctrl+B)\n"
 			"打开全局任意线路中的任意一个标尺的编辑面板。"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actNaviToRuler()));
@@ -973,21 +970,21 @@ void MainWindow::initToolbar()
 		addAction(act);
 		btn = panel->addLargeAction(act);
 
-		act = new QAction(QIcon(":/icons/forbid.png"), tr("天窗编辑"), this);
+		act = new QAction(QEICN_skylight_edit, tr("天窗编辑"), this);
 		act->setToolTip(tr("天窗编辑\n打开或导航到任意一基线的天窗编辑面板。"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actNaviToForbid()));
 		forbidMenu = new SARibbonMenu(this);
 		act->setMenu(forbidMenu);
 		btn = panel->addLargeAction(act);
 
-		act = new QAction(QIcon(":/icons/new-file.png"), tr("新建线路"), this);
+		act = new QAction(QEICN_new_rail, tr("新建线路"), this);
 		connect(act, SIGNAL(triggered()), naviView, SLOT(actAddRailway()));
 		act->setToolTip(tr("新建线路\n新建空白的铁路线路"));
 		btn = panel->addLargeAction(act);
 
 		panel = cat->addPannel(tr("调整"));
 
-		act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("标尺综合"), this);
+		act = new QAction(QEICN_read_ruler_wizard, tr("标尺综合"), this);
 		act->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_B);
 		addAction(act);
 		act->setToolTip(tr("标尺综合 (Ctrl+Shift+B)\n"
@@ -996,8 +993,7 @@ void MainWindow::initToolbar()
 		btn = panel->addLargeAction(act);
 
 		panel->addSeparator();
-		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileDialogContentsView),
-			tr("定位"), this);
+		act = new QAction(QEICN_locate_to_diagram, tr("定位"), this);
 		act->setToolTip(tr("运行图定位 (Ctrl+G)\n输入时刻，线路及其里程，"
 			"快速定位到运行图面板上。"));
 		act->setShortcut(Qt::CTRL | Qt::Key_G);
@@ -1007,7 +1003,7 @@ void MainWindow::initToolbar()
 
 		panel = cat->addPannel(tr("路网管理"));
 
-		act = new QAction(QIcon(":/icons/database.png"), tr("数据库"), this);
+		act = new QAction(QEICN_rail_db, tr("数据库"), this);
 		act->setToolTip(tr("线路数据库 (Ctrl+H)\n"
 			"查看、编辑或者导入线路数据库中的基线数据。"));
 		connect(act, &QAction::triggered, this, &MainWindow::actRailDBDock);
@@ -1022,7 +1018,7 @@ void MainWindow::initToolbar()
 		//connect(actsub, &QAction::triggered, this, &MainWindow::actRailDB);
 		//act->setMenu(menu);
 
-		act = new QAction(QIcon(":/icons/diagram.png"), tr("快速径路"), this);
+		act = new QAction(QEICN_fast_path, tr("快速径路"), this);
 		act->setToolTip(tr("快速径路生成 (Ctrl+J)\n"
 			"通过线路数据库中的数据，给出经由的关键点表，利用最短路算法生成新线路数据。"));
 		act->setShortcut(Qt::CTRL | Qt::Key_J);
@@ -1030,7 +1026,7 @@ void MainWindow::initToolbar()
 		panel->addMediumAction(act);
 		actQuickPath = act;
 
-		act = new QAction(QIcon(":/icons/polyline.png"), tr("经由选择"), this);
+		act = new QAction(QEICN_route_sel, tr("经由选择"), this);
 		act->setToolTip(tr("交互式经由选择 (Ctrl+K)\n"
 			"通过数据库中的数据，手动指定通过邻站、邻线或者区间最短路方式，"
 			"生成径路可精确控制的新线路数据。"));
@@ -1051,7 +1047,7 @@ void MainWindow::initToolbar()
 		auto* act = actTrainList;
 		auto* btn = panel->addLargeAction(act);
 
-		act = new QAction(QIcon(":/icons/copy.png"), tr("批量操作"), this);
+		act = new QAction(QEICN_train_batch_op, tr("批量操作"), this);
 
 		auto* menu = new SARibbonMenu(tr("列车管理扩展"), this);
 		act->setMenu(menu);
@@ -1097,7 +1093,7 @@ void MainWindow::initToolbar()
 
 		panel->addLargeAction(act);
 		
-		act = new QAction(QIcon(":/icons/add_train.png"), tr("导入车次"), this);
+		act = new QAction(QEICN_import_trains, tr("导入车次"), this);
 		act->setToolTip(tr("导入车次 (Ctrl+D)\n从既有运行图或者车次数据库文件中导入部分或全部的车次。"));
 		act->setShortcut(Qt::CTRL | Qt::Key_D);
 		addAction(act);
@@ -1109,8 +1105,7 @@ void MainWindow::initToolbar()
 		act->setMenu(menu);
 		panel->addLargeAction(act);
 
-		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileDialogContentsView),
-			tr("搜索车次"), this);
+		act = new QAction(QEICN_search_train, tr("搜索车次"), this);
 		act->setToolTip(tr("搜索车次 (Ctrl+F)\n搜索车次，将车次设定为当前车次，并高亮运行线。"));
 		connect(act, &QAction::triggered, this, &MainWindow::actSearchTrain);
 		act->setShortcut(Qt::CTRL | Qt::Key_F);
@@ -1118,7 +1113,7 @@ void MainWindow::initToolbar()
 		panel->addMediumAction(act);
 		diaActions.search = act;
 
-		act = new QAction(QIcon(":/icons/add.png"), tr("新建车次"), this);
+		act = new QAction(QEICN_new_train, tr("新建车次"), this);
 		act->setToolTip(tr("新建车次 (Ctrl+Shift+C)\n新建空白车次"));
 		act->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_C);
 		addAction(act);
@@ -1129,7 +1124,7 @@ void MainWindow::initToolbar()
 		panel = cat->addPannel(tr("工具"));
 
 		act = timetableQuickDock->toggleViewAction();
-		act->setIcon(QIcon(":/icons/clock.png"));
+		act->setIcon(QEICN_timetable_quick);
 		act->setShortcut(Qt::CTRL | Qt::Key_I);
 		addAction(act);
 		act->setToolTip(tr("速览时刻 (Ctrl+I)\n"
@@ -1138,7 +1133,7 @@ void MainWindow::initToolbar()
 		btn->setMinimumWidth(70);
 
 		act = trainInfoDock->toggleViewAction();
-		act->setIcon(QIcon(":/icons/info.png"));
+		act->setIcon(QEICN_train_info_quick);
 		act->setShortcut(Qt::CTRL | Qt::Key_Q);
 		addAction(act);
 		act->setToolTip(tr("速览信息 (Ctrl+Q)\n"
@@ -1146,7 +1141,7 @@ void MainWindow::initToolbar()
 		btn = panel->addLargeAction(act);
 		btn->setMinimumWidth(70);
 
-		act = new QAction(QIcon(":/icons/filter.png"), tr("预设筛选"), this);
+		act = new QAction(QEICN_edit_filters, tr("预设筛选"), this);
 		act->setToolTip(tr("预设筛选器\n编辑运行图预设的列车筛选器"));
 		panel->addLargeAction(act);
 		connect(act, &QAction::triggered, this, &MainWindow::actEditFilters);
@@ -1176,7 +1171,7 @@ void MainWindow::initToolbar()
 		}
 
 		panel = cat->addPannel(tr("选项"));
-		act = new QAction(QIcon(":/icons/weaken.png"), tr("背景虚化"), this);
+		act = new QAction(QEICN_weaken_unselect, tr("背景虚化"), this);
 		act->setToolTip(tr("背景虚化\n若启用，则在选中列车运行线时，自动虚化其他列车运行线。"
 			"点击空白处取消选择则取消虚化。\n"
 			"若此功能出现问题，请刷新运行图。"));
@@ -1188,52 +1183,52 @@ void MainWindow::initToolbar()
 
 		panel = cat->addPannel(tr("交路"));
 		act = routingDock->toggleViewAction();
-		act->setIcon(QIcon(":/icons/polyline.png"));
+		act->setIcon(QEICN_routing_edit);
 
 		routingMenu = new SARibbonMenu(tr("打开的交路编辑"), this);
 		act->setMenu(routingMenu);
 
 		btn = panel->addLargeAction(act);
 
-		act = new QAction(QIcon(":/icons/text.png"), tr("批量解析"), this);
+		act = new QAction(QEICN_routing_batch_parse, tr("批量解析"), this);
 		connect(act, &QAction::triggered, this, &MainWindow::actBatchParseRouting);
 		act->setToolTip(tr("批量文本解析\n批量地从车次套用顺序文本中解析出交路数据"));
 		panel->addMediumAction(act);
 
-		act = new QAction(QIcon(":/icons/identify.png"), tr("批量识别"), this);
+		act = new QAction(QEICN_routing_batch_identify, tr("批量识别"), this);
 		connect(act, &QAction::triggered, this, &MainWindow::actBatchDetectRouting);
 		act->setToolTip(tr("批量识别车次\n对所有交路，尝试识别车次，使得虚拟车次转变为实体车次。"));
 		panel->addMediumAction(act);
 
 		panel = cat->addPannel(tr("分析"));
-		act = new QAction(QIcon(":/icons/compare.png"), tr("车次对照"), this);
+		act = new QAction(QEICN_compare_trains, tr("车次对照"), this);
 		act->setToolTip(tr("两车次运行对照\n在指定线路上，对比两个选定车次的运行情况。"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actTrainDiff()));
 		panel->addMediumAction(act);
 		diaActions.trainRef = act;
 
-		act = new QAction(QIcon(":/icons/identify.png"), tr("时刻诊断"), this);
+		act = new QAction(QEICN_timetable_diagon, tr("时刻诊断"), this);
 		act->setToolTip(tr("车次时刻诊断\n诊断指定车次或所有车次的时刻表是否存在"
 			"可能的问题，例如到开时刻填反。"));
 		connect(act, &QAction::triggered, this, &MainWindow::actDiagnose);
 		panel->addMediumAction(act);
 
-		act = new QAction(QIcon(":/icons/compare.png"), tr("运行图对比"), this);
+		act = new QAction(QEICN_compare_diagram, tr("运行图对比"), this);
 		act->setToolTip(tr("运行图对比\n对比本运行图和指定运行图文件的列车时刻表差异。"));
 		connect(act, &QAction::triggered, this, &MainWindow::actDiagramCompare);
 		panel->addLargeAction(act);
 
-		act = new QAction(QIcon(":/icons/counter.png"), tr("区间对数表"), this);
+		act = new QAction(QEICN_section_count, tr("区间对数表"), this);
 		act->setToolTip(tr("区间车次表\n查询指定线路从指定站出发（到达指定站）的列车对数。"));
 		connect(act, &QAction::triggered, this, &MainWindow::actIntervalCount);
 		panel->addMediumAction(act);
 
-		act = new QAction(QIcon(":/icons/train.png"), tr("区间车次表"), this);
+		act = new QAction(QEICN_section_trains, tr("区间车次表"), this);
 		act->setToolTip(tr("区间车次表\n查询任意两站之间的列车表。"));
 		connect(act, &QAction::triggered, this, &MainWindow::actIntervalTrains);
 		panel->addMediumAction(act);
 
-		act = new QAction(QIcon(":/icons/data.png"), tr("运行统计"), this);
+		act = new QAction(QEICN_interval_stat, tr("运行统计"), this);
 		act->setToolTip(tr("列车区间运行统计\n计算时刻表中给定两站之间的运行时间、里程、速度等。"));
 		connect(act, &QAction::triggered, this, &MainWindow::actTrainIntervalStat);
 		panel->addLargeAction(act);
