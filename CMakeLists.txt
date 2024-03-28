@@ -6,6 +6,8 @@ set(qETRC_VERSION_PATCH 3)
 #set(qETRC_RELEASE_CODE 40)
 
 option(ENABLE_MSVC_PROFILE "Enable MSVC profiler" OFF)
+option(AUTO_INSTALL_SARibbon "Install SARibbon libraries" ON)
+option(AUTO_INSTALL_QWK "Install QWindowKit libraries, dependent by SARibbon" ON)
 
 set(qETRC_VERSION "${qETRC_VERSION_MAJOR}.${qETRC_VERSION_MINOR}.${qETRC_VERSION_PATCH}")
 
@@ -86,7 +88,9 @@ if (NOT ANDROID)
     # disable example building in SARibbon, since some of them requires Qt6 ..
     set(BUILD_EXAMPLES OFF)
 
-    add_subdirectory(external/SARibbon)
+    # 2024.03.28 trial: use find_package for SARibbon
+    # add_subdirectory(external/SARibbon)
+    find_package(SARibbonBar REQUIRED)
     
     # list(APPEND CMAKE_PREFIX_PATH "D:/codes/QtProjects/site-packages/Qt-Advanced-Docking-System/out/install/lib/cmake/qt5advanceddocking")
     # find_package(qt${QT_VERSION_MAJOR}advanceddocking CONFIG REQUIRED)
@@ -101,8 +105,30 @@ if (NOT ANDROID)
     )
     FetchContent_MakeAvailable(ads)
 
-    target_link_libraries(qETRC PRIVATE SARibbonBar)
+    target_link_libraries(qETRC PUBLIC SARibbonBar)
     target_link_libraries(qETRC PRIVATE ads::qt${QT_VERSION_MAJOR}advanceddocking)
+
+    if (AUTO_INSTALL_SARibbon)
+        get_target_property(SARibbonBar_LIB_FILE SARibbonBar LOCATION)
+        message(STATUS "SARibbon lib ${SARibbonBar_LIB_FILE}")
+        install(FILES ${SARibbonBar_LIB_FILE} DESTINATION ${CMAKE_INSTALL_BINDIR})
+    endif (AUTO_INSTALL_SARibbon)
+
+    if (AUTO_INSTALL_QWK) 
+        if (NOT QWindowKit_DIR)
+            set (QWindowKit_DIR ${SARibbonBar_DIR}/../QWindowKit)
+        endif ()
+
+        find_package(QWindowKit CONFIG)
+        if (QWindowKit_FOUND)
+            get_target_property(QWK_CORE_FILE QWindowKit::Core LOCATION)
+            get_target_property(QWK_WIDGETS_FILE QWindowKit::Widgets LOCATION)
+            message(STATUS "QWK lib ${QWK_CORE_FILE}")
+            install(FILES ${QWK_CORE_FILE} ${QWK_WIDGETS_FILE} DESTINATION ${CMAKE_INSTALL_BINDIR})
+        else ()
+            message(STATUS "QWK not found, install not performed")
+        endif ()
+    endif (AUTO_INSTALL_QWK)
 endif()
 
 
@@ -118,7 +144,6 @@ if (MSVC)
     # MSVC profiler  https://learn.microsoft.com/zh-cn/cpp/build/reference/profile-performance-tools-profiler?view=msvc-170
     if (ENABLE_MSVC_PROFILE)
         message(STATUS "MSVC profiler enabled")
-        SET_TARGET_PROPERTIES(SARibbonBar PROPERTIES LINK_FLAGS "/PROFILE")
         #SET_TARGET_PROPERTIES(ads::qt${QT_VERSION_MAJOR}advanceddocking PROPERTIES LINK_FLAGS "/PROFILE")
         SET_TARGET_PROPERTIES(qETRC PROPERTIES LINK_FLAGS "/PROFILE")
     endif ()
