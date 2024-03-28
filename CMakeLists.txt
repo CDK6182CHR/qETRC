@@ -99,7 +99,7 @@ if (NOT ANDROID)
     FetchContent_Declare(
         ads
         # GIT_REPOSITORY ${CMAKE_SOURCE_DIR}/external/Qt-Advanced-Docking-System
-        GIT_REPOSITORY https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System.git
+        GIT_REPOSITORY https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System
         GIT_TAG 4.0.3
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/ads
     )
@@ -109,7 +109,7 @@ if (NOT ANDROID)
     target_link_libraries(qETRC PRIVATE ads::qt${QT_VERSION_MAJOR}advanceddocking)
 
     if (AUTO_INSTALL_SARibbon)
-        get_target_property(SARibbonBar_LIB_FILE SARibbonBar LOCATION)
+        get_target_property(SARibbonBar_LIB_FILE SARibbonBar LOCATION_${CMAKE_BUILD_TYPE})
         message(STATUS "SARibbon lib ${SARibbonBar_LIB_FILE}")
         install(FILES ${SARibbonBar_LIB_FILE} DESTINATION ${CMAKE_INSTALL_BINDIR})
     endif (AUTO_INSTALL_SARibbon)
@@ -121,8 +121,8 @@ if (NOT ANDROID)
 
         find_package(QWindowKit CONFIG)
         if (QWindowKit_FOUND)
-            get_target_property(QWK_CORE_FILE QWindowKit::Core LOCATION)
-            get_target_property(QWK_WIDGETS_FILE QWindowKit::Widgets LOCATION)
+            get_target_property(QWK_CORE_FILE QWindowKit::Core LOCATION_${CMAKE_BUILD_TYPE})
+            get_target_property(QWK_WIDGETS_FILE QWindowKit::Widgets LOCATION_${CMAKE_BUILD_TYPE})
             message(STATUS "QWK lib ${QWK_CORE_FILE}")
             install(FILES ${QWK_CORE_FILE} ${QWK_WIDGETS_FILE} DESTINATION ${CMAKE_INSTALL_BINDIR})
         else ()
@@ -150,7 +150,7 @@ if (MSVC)
 
 endif()
 
-if (WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Release")
+if (WIN32 AND (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
     message("disable console for Release buildings.")
     # disable console for release version
     set_property(TARGET qETRC PROPERTY WIN32_EXECUTABLE true)
@@ -163,6 +163,12 @@ qt_add_lrelease(qETRC TS_FILES tr/qETRC_zh.ts tr/qETRC_en.ts)
 install(TARGETS qETRC
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+# install PDB
+if (MSVC AND NOT CMAKE_BUILD_TYPE STREQUAL "Release")
+    install(FILES $<TARGET_PDB_FILE:${PROJECT_NAME}> 
+    DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif ()
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(qETRC)
