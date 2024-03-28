@@ -37,9 +37,11 @@ void StartupPage::initUI()
     auto* hlay=new QHBoxLayout;
     vlay->addLayout(hlay);
     auto* lab=new QLabel;
-    lab->setPixmap(QPixmap(":/icons/icon-transparent.png"));
+    constexpr const int ICN_HEIGHT = 100;
+    QPixmap pm(":/icons/icon-transparent.png");
+    lab->setPixmap(pm.scaledToHeight(ICN_HEIGHT));
     hlay->addWidget(lab);
-    lab->setFixedHeight(100);
+    lab->setFixedHeight(ICN_HEIGHT);
 
     QFont fontVersion("Arial", 18);
     lab=new QLabel(qespec::VERSION.data());
