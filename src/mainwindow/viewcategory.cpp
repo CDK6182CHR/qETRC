@@ -86,7 +86,7 @@ void ViewCategory::initUI()
     act->setCheckable(true);
     actLineCtrl = act;
     connect(act, SIGNAL(triggered(bool)), this, SLOT(lineControlTriggered(bool)));
-    auto* btn = panel->addLargeAction(act);
+    panel->addLargeAction(act);
 
     act = new QAction(tr("显示下行"), this);
     connect(act, SIGNAL(triggered()), this, SLOT(showDown()));
@@ -110,8 +110,7 @@ void ViewCategory::initUI()
 
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_BrowserReload),
         tr("刷新类型表"), this);
-    btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
+    panel->addLargeAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(refreshTypeGroup()));
 
     act = new QAction(tr("客车类型"), this);
@@ -182,8 +181,7 @@ void ViewCategory::initUI()
     connect(ma, &QAction::triggered, this, &ViewCategory::actSystemJsonDialog);
     act->setMenu(m);
 
-    btn = panel->addLargeAction(act);
-    
+    panel->addLargeAction(act);
 
     act = new QAction(QIcon(":/icons/settings.png"), tr("类型管理"), this);
     connect(act, &QAction::triggered, this, &ViewCategory::actTypeConfig);

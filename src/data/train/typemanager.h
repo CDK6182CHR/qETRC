@@ -1,11 +1,12 @@
-﻿#include <QMap>
+﻿#pragma once
+#include <QMap>
 #include <QPen>
 #include <QString>
 #include <QVector>
 
 class TrainName;
 class TrainType;
-#pragma once
+class QJsonObject;
 
 
 /**
