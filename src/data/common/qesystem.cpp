@@ -57,7 +57,10 @@ void SystemJson::fromJson(const QJsonObject& obj)
             .toString(default_raildb_file);
     table_row_height = obj.value("table_row_height").toInt(table_row_height);
     show_train_tooltip = obj.value("show_train_tooltip").toBool(show_train_tooltip);
-    ribbon_style = obj.value("ribbon_style").toInt(1);
+    ribbon_style = obj.value("ribbon_style").toInt(18);
+    // 2024.03.28: for old version
+    if (ribbon_style == 0) ribbon_style = 17;
+    else if (ribbon_style == 1) ribbon_style = 18;
     ribbon_theme = obj.value("ribbon_theme").toInt(0);
     ribbon_align_center = obj.value("ribbon_align_center").toBool(false);
     weaken_unselected = obj.value("weaken_unselected").toBool(true);
