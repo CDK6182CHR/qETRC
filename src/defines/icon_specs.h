@@ -32,6 +32,7 @@
 #define QEICN_undo QE_RSC_ICON(undo.png)   // 撤销
 #define QEICN_redo QE_RSC_ICON(redo.png)   // 重做
 #define QEICN_close_current QE_STD_ICON(DialogCloseButton)   // 关闭当前面板
+#define QEICN_global_config QE_RSC_ICON(config.png)  // 全局配置选项下拉菜单
 #define QEICN_customize QE_RSC_ICON(customize.svg)  // 自定义toolbar  (not used yet)
 
 

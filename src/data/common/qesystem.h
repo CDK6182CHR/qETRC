@@ -24,6 +24,8 @@ public:
     bool show_train_tooltip = true;
 
     int ribbon_style = 18;
+    int ribbon_theme = 0;
+    bool ribbon_align_center = false;
 
     bool weaken_unselected = true;
 

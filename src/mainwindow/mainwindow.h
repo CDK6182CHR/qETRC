@@ -478,6 +478,10 @@ private slots:
      */
     void closeCurrentTab();
 
+    void actRibbonConfig();
+
+    void onRibbonConfigChanged(bool theme_changed);
+
 public slots:
 
     /**

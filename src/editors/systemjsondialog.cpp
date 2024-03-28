@@ -32,7 +32,8 @@ void SystemJsonDialog::initUI()
     auto* lab=new QLabel(tr("这部分设置是全局的配置选项，保存在system.json文件中。"
         "提交更改后，退出程序并再次启动时，设置全部生效；在此之前，设置项不一定全部生效。"
         "此配置不会修改当前的运行图文件，亦不提供撤销。"
-        "工具栏中可能有其它地方也展示或者可以修改这里的配置项，各处的配置数据不保证同步。"));
+        "工具栏中可能有其它地方也展示或者可以修改这里的配置项，各处的配置数据不保证同步。\n"
+        "若要调整Ribbon风格相关设置，请移步Ribbon设置。"));
     lab->setWordWrap(true);
     vlay->addWidget(lab);
 
@@ -59,6 +60,7 @@ void SystemJsonDialog::initUI()
         "自动打开的运行图文件名。默认为sample.pyetgr"));
     flay->addRow(tr("默认文件"),edDefaultFile);
 
+#if 0
     cbRibbonStyle=new QComboBox;
     cbRibbonStyle->setToolTip(tr("Ribbon风格\n选择默认的Ribbon工具栏风格"));
     cbRibbonStyle->addItem(tr("宽松三行（Office风格）"), SARibbonBar::RibbonStyleLooseThreeRow);
@@ -66,6 +68,7 @@ void SystemJsonDialog::initUI()
     cbRibbonStyle->addItem(tr("宽松两行（Office两行风格）"), SARibbonBar::RibbonStyleLooseTwoRow);
     cbRibbonStyle->addItem(tr("紧凑两行（WPS两行风格）"), SARibbonBar::RibbonStyleCompactTwoRow);
     flay->addRow(tr("Ribbon工具栏风格"),cbRibbonStyle);
+#endif
 
     cbSysStyle = new QComboBox;
     cbSysStyle->setToolTip(tr("界面风格\n选择程序采用的界面风格。这里列出当前系统所支持的风格。"));
@@ -130,6 +133,7 @@ void SystemJsonDialog::setData()
     const auto& t=SystemJson::instance;
     spRowHeight->setValue(t.table_row_height);
     edDefaultFile->setText(t.default_file);
+#if 0
     {
         int ribbon_sty_idx = 0;
         switch (t.ribbon_style) {
@@ -140,6 +144,7 @@ void SystemJsonDialog::setData()
         }
         cbRibbonStyle->setCurrentIndex(ribbon_sty_idx);
     }
+#endif
     ckWeaken->setChecked(t.weaken_unselected);
     ckTooltip->setChecked(t.show_train_tooltip);
     ckCentral->setChecked(t.use_central_widget);
@@ -157,7 +162,9 @@ void SystemJsonDialog::actApply()
     t.language = qvariant_cast<QLocale::Language>(cbLanguage->currentData());
     t.table_row_height = spRowHeight->value();
     t.default_file = edDefaultFile->text();
+#if 0
     t.ribbon_style = qvariant_cast<SARibbonBar::RibbonStyles>(cbRibbonStyle->currentData());
+#endif
     if (t.app_style != cbSysStyle->currentText()) {
         t.app_style = cbSysStyle->currentText();
         auto* sty = QStyleFactory::create(t.app_style);

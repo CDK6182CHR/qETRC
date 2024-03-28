@@ -86,6 +86,7 @@
 #include "model/trainpath/pathlistmodel.h"
 #include "log/IssueManager.h"
 #include "defines/icon_specs.h"
+#include "editors/ribbonconfigdialog.h"
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -760,6 +761,7 @@ void MainWindow::initToolbar()
 	ribbon->showMinimumModeButton();
 
 	//顶上的工具条
+	QAction* actGlobalConfig;
 	if constexpr (true) {
 		//撤销重做
 		QAction* act = undoStack->createUndoAction(this, tr("撤销"));
@@ -779,14 +781,12 @@ void MainWindow::initToolbar()
 		connect(act, &QAction::triggered, this, &MainWindow::closeCurrentTab);
 		ribbon->quickAccessBar()->addAction(act);
 
-#if 0
-        auto* menu = new QMenu(this);
-		act = menu->addAction(tr("使用Office风格Ribbon"));
-		connect(act, SIGNAL(triggered()), this, SLOT(useOfficeStyle()));
-		act = menu->addAction(tr("使用WPS风格Ribbon"));
-		connect(act, SIGNAL(triggered()), this, SLOT(useWpsStyle()));
+        auto* menu = new SARibbonMenu(this);
+		act = menu->addAction(tr("全局配置选项"));
+		actGlobalConfig = act;
+		act = menu->addAction(tr("Ribbon选项"), this, &MainWindow::actRibbonConfig);
+		menu->setIcon(QEICN_global_config);
 		ribbon->quickAccessBar()->addMenu(menu);
-#endif
 
 		// Customize 似乎还不太对，先留在这
 #if 0
@@ -1294,6 +1294,8 @@ void MainWindow::initToolbar()
 		catView = new ViewCategory(this, cat, this);
 		connect(trainListWidget->getModel(), &TrainListModel::trainShowChanged,
 			catView, &ViewCategory::actChangeSingleTrainShow);
+		connect(actGlobalConfig, &QAction::triggered, catView,
+			&ViewCategory::actSystemJsonDialog);
 	}
 
 	//context: page 5
@@ -1512,6 +1514,10 @@ void MainWindow::initToolbar()
 
 	ribbon->setRibbonStyle(
 		static_cast<SARibbonBar::RibbonStyles>(SystemJson::instance.ribbon_style));
+	// 2024.03.28: theme and align
+	ribbon->setRibbonAlignment(SystemJson::instance.ribbon_align_center ? 
+		SARibbonAlignment::AlignCenter : SARibbonAlignment::AlignLeft);
+	setRibbonTheme(static_cast<SARibbonMainWindow::RibbonTheme>(SystemJson::instance.ribbon_theme));
 
 	// 2022.04.24：测试ActionManager
 	// 2023.12.20: seems changed in SARibbon V1.0.7
@@ -1898,6 +1904,24 @@ void MainWindow::closeCurrentTab()
 {
 	if (auto* w = manager->focusedDockWidget()) {
 		w->closeDockWidget();
+	}
+}
+
+void MainWindow::actRibbonConfig()
+{
+	auto* d = new RibbonConfigDialog(this);
+	connect(d, &RibbonConfigDialog::configApplied, this, &MainWindow::onRibbonConfigChanged);
+	d->show();
+}
+
+void MainWindow::onRibbonConfigChanged(bool theme_changed)
+{
+	const auto& d = SystemJson::instance;
+	ribbonBar()->setRibbonStyle(static_cast<SARibbonBar::RibbonStyles>(d.ribbon_style));
+	ribbonBar()->setRibbonAlignment(
+		d.ribbon_align_center ? SARibbonAlignment::AlignCenter : SARibbonAlignment::AlignLeft);
+	if (theme_changed) {
+		setRibbonTheme(static_cast<SARibbonMainWindow::RibbonTheme>(d.ribbon_theme));
 	}
 }
 

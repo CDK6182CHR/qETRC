@@ -18,7 +18,7 @@ class SystemJsonDialog : public QDialog
     QComboBox* cbLanguage;
     QSpinBox* spRowHeight;
     QLineEdit* edDefaultFile;
-    QComboBox* cbRibbonStyle;
+    //QComboBox* cbRibbonStyle;  // 2024.03.28: move to another dialog
     QComboBox* cbSysStyle;
     QCheckBox* ckWeaken, * ckTooltip, * ckCentral, * ckStartup, * ckAutoHighlight;
     QCheckBox* ckDrag, * ckTransparentConfig;

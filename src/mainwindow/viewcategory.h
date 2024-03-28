@@ -133,7 +133,6 @@ private slots:
 
     void actTypeRegex();
     void actTypeRegexDefault();
-    void actSystemJsonDialog();
     
     /**
      * 应用默认设置为当前运行图设置；操作压栈
@@ -249,6 +248,9 @@ public slots:
     void commitRemoveFilter(int id, const PredefTrainFilterCore* filter);
 
     void commitUpdateFilter(PredefTrainFilterCore* filter);
+
+    // 2024.03.28: made public
+    void actSystemJsonDialog();
 };
 
 
