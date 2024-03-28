@@ -3,6 +3,7 @@
 #include <QString>
 #include <memory>
 #include <QPen>
+#include <QMetaType>
 
 class TrainName;
 
@@ -40,6 +41,6 @@ public:
 };
 
 
-Q_DECLARE_METATYPE(std::shared_ptr<TrainType>);
+Q_DECLARE_METATYPE(std::shared_ptr<TrainType>)
 
 

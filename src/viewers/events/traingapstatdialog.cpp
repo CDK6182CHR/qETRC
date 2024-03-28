@@ -48,7 +48,7 @@ void TrainGapStatModel::setupModel()
         it->setData(p->second.begin()->operator*().secs(),Qt::EditRole);
         setItem(row,ColValue,it);
         it=new SI;
-        it->setData(p->second.size(),Qt::EditRole);
+        it->setData(static_cast<int>(p->second.size()),Qt::EditRole);
         setItem(row,ColCount,it);
         row++;
     }
