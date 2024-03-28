@@ -386,6 +386,7 @@ void MainWindow::showAboutDialog()
 	QMessageBox::about(this, tr("关于"), text);
 }
 
+#if 0
 void MainWindow::useWpsStyle()
 {
 	ribbonBar()->setRibbonStyle(SARibbonBar::WpsLiteStyle);
@@ -397,6 +398,7 @@ void MainWindow::useOfficeStyle()
 	ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);
 	SystemJson::instance.ribbon_style = SARibbonBar::OfficeStyle;
 }
+#endif
 
 void MainWindow::actCustomizeRibbon()
 {
@@ -776,12 +778,14 @@ void MainWindow::initToolbar()
 		connect(act, &QAction::triggered, this, &MainWindow::closeCurrentTab);
 		ribbon->quickAccessBar()->addAction(act);
 
+#if 0
         auto* menu = new QMenu(this);
 		act = menu->addAction(tr("使用Office风格Ribbon"));
 		connect(act, SIGNAL(triggered()), this, SLOT(useOfficeStyle()));
 		act = menu->addAction(tr("使用WPS风格Ribbon"));
 		connect(act, SIGNAL(triggered()), this, SLOT(useWpsStyle()));
 		ribbon->quickAccessBar()->addMenu(menu);
+#endif
 
 		// Customize 似乎还不太对，先留在这
 #if 0
@@ -910,7 +914,7 @@ void MainWindow::initToolbar()
 		act->setShortcut(Qt::CTRL | Qt::Key_U);
 		addAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actChangeStationName()));
-        auto* btn = panel->addLargeAction(act);
+        panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
 
 		panel = cat->addPannel(tr("系统"));
@@ -921,12 +925,11 @@ void MainWindow::initToolbar()
 		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation),
 			tr("关于"), this);
 		connect(act, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
-		btn->setPopupMode(QToolButton::InstantPopup);
 		menu = new SARibbonMenu(this);
 		menu->addAction(QApplication::style()->standardIcon(QStyle::SP_TitleBarMenuButton),
 			tr("关于Qt"), QApplication::aboutQt);
 		act->setMenu(menu);
-        btn = panel->addLargeAction(act);
+        panel->addLargeAction(act);
 
 		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_BrowserStop),
 			tr("退出"), this);
@@ -945,7 +948,7 @@ void MainWindow::initToolbar()
 		//connect(act, SIGNAL(triggered()), naviView, SLOT(importRailways()));
 		connect(act, &QAction::triggered, naviView, &NaviTree::actImportRailways);
 		act->setToolTip(tr("导入线路\n从既有运行图文件中导入（其中全部的）线路数据"));
-		auto* btn = panel->addLargeAction(act);
+		panel->addLargeAction(act);
 
 		act = new QAction(QIcon(":/icons/rail.png"), tr("基线编辑"), this);
 		act->setToolTip(tr("基线编辑\n导航到、新建、打开或者关闭（pyETRC风格的）基线编辑面板。"));
@@ -954,7 +957,7 @@ void MainWindow::initToolbar()
 		railMenu = menu;
 		act->setMenu(menu);
 		menu->setTitle(tr("线路编辑"));
-		btn = panel->addLargeAction(act);
+		panel->addLargeAction(act);
 
 		act = pathListDock->toggleViewAction();
 		act->setIcon(QIcon(":/icons/polyline.png"));
@@ -970,19 +973,19 @@ void MainWindow::initToolbar()
 		connect(act, SIGNAL(triggered()), this, SLOT(actNaviToRuler()));
 		act->setShortcut(Qt::CTRL | Qt::Key_B);
 		addAction(act);
-		btn = panel->addLargeAction(act);
+		panel->addLargeAction(act);
 
 		act = new QAction(QIcon(":/icons/forbid.png"), tr("天窗编辑"), this);
 		act->setToolTip(tr("天窗编辑\n打开或导航到任意一基线的天窗编辑面板。"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actNaviToForbid()));
 		forbidMenu = new SARibbonMenu(this);
 		act->setMenu(forbidMenu);
-		btn = panel->addLargeAction(act);
+		panel->addLargeAction(act);
 
 		act = new QAction(QIcon(":/icons/new-file.png"), tr("新建线路"), this);
 		connect(act, SIGNAL(triggered()), naviView, SLOT(actAddRailway()));
 		act->setToolTip(tr("新建线路\n新建空白的铁路线路"));
-		btn = panel->addLargeAction(act);
+		panel->addLargeAction(act);
 
 		panel = cat->addPannel(tr("调整"));
 
@@ -992,7 +995,7 @@ void MainWindow::initToolbar()
 		act->setToolTip(tr("标尺综合 (Ctrl+Shift+B)\n"
 			"从一组选定的车次中，读取一套标尺数据，用于建立新标尺，或更新既有标尺。"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actReadRulerWizard()));
-		btn = panel->addLargeAction(act);
+		panel->addLargeAction(act);
 
 		panel->addSeparator();
 		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileDialogContentsView),
@@ -1002,7 +1005,7 @@ void MainWindow::initToolbar()
 		act->setShortcut(Qt::CTRL | Qt::Key_G);
 		connect(act, &QAction::triggered, this, &MainWindow::actLocateDiagram);
 		addAction(act);
-		btn = panel->addLargeAction(act);
+		panel->addLargeAction(act);
 
 		panel = cat->addPannel(tr("路网管理"));
 
@@ -1012,7 +1015,7 @@ void MainWindow::initToolbar()
 		connect(act, &QAction::triggered, this, &MainWindow::actRailDBDock);
 		act->setShortcut(Qt::CTRL | Qt::Key_H);
 		addAction(act);
-		btn = panel->addLargeAction(act);
+		panel->addLargeAction(act);
 
 		//menu = new SARibbonMenu(this);
 		//auto actsub = menu->addAction(tr("线路数据库 (pyETRC风格)"));
@@ -1048,7 +1051,7 @@ void MainWindow::initToolbar()
 		auto* panel = cat->addPannel(tr("车次管理"));
 
 		auto* act = actTrainList;
-		auto* btn = panel->addLargeAction(act);
+		panel->addLargeAction(act);
 
 		act = new QAction(QIcon(":/icons/copy.png"), tr("批量操作"), this);
 
@@ -1122,7 +1125,7 @@ void MainWindow::initToolbar()
 		act->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_C);
 		addAction(act);
 		diaActions.addTrain = act;
-		btn = panel->addMediumAction(act);
+		panel->addMediumAction(act);
 		connect(act, SIGNAL(triggered()), naviView, SLOT(actAddTrain()));
 
 		panel = cat->addPannel(tr("工具"));
@@ -1133,8 +1136,7 @@ void MainWindow::initToolbar()
 		addAction(act);
 		act->setToolTip(tr("速览时刻 (Ctrl+I)\n"
 			"显示或隐藏pyETRC风格的双行只读时刻表。"));
-		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(70);
+		panel->addLargeAction(act);
 
 		act = trainInfoDock->toggleViewAction();
 		act->setIcon(QIcon(":/icons/info.png"));
@@ -1142,8 +1144,7 @@ void MainWindow::initToolbar()
 		addAction(act);
 		act->setToolTip(tr("速览信息 (Ctrl+Q)\n"
 			"显示或隐藏pyETRC风格的列车信息栏。"));
-		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(70);
+		panel->addLargeAction(act);
 
 		act = new QAction(QIcon(":/icons/filter.png"), tr("预设筛选"), this);
 		act->setToolTip(tr("预设筛选器\n编辑运行图预设的列车筛选器"));
@@ -1170,8 +1171,7 @@ void MainWindow::initToolbar()
 			act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogApplyButton),
 				tr("应用"), this);
 			connect(act, SIGNAL(triggered()), this, SLOT(actChangePassedStations()));
-			btn = panel->addLargeAction(act);
-			btn->setMinimumWidth(80);
+			panel->addLargeAction(act);
 		}
 
 		panel = cat->addPannel(tr("选项"));
@@ -1182,8 +1182,7 @@ void MainWindow::initToolbar()
 		act->setCheckable(true);
 		act->setChecked(SystemJson::instance.weaken_unselected);
 		connect(act, &QAction::triggered, this, &MainWindow::actToggleWeakenUnselected);
-		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
+		panel->addLargeAction(act);
 
 		panel = cat->addPannel(tr("交路"));
 		act = routingDock->toggleViewAction();
@@ -1192,7 +1191,7 @@ void MainWindow::initToolbar()
 		routingMenu = new SARibbonMenu(tr("打开的交路编辑"), this);
 		act->setMenu(routingMenu);
 
-		btn = panel->addLargeAction(act);
+		panel->addLargeAction(act);
 
 		act = new QAction(QIcon(":/icons/text.png"), tr("批量解析"), this);
 		connect(act, &QAction::triggered, this, &MainWindow::actBatchParseRouting);
@@ -1244,8 +1243,7 @@ void MainWindow::initToolbar()
 		act->setShortcut(Qt::CTRL | Qt::Key_R);
 		act->setToolTip(tr("标尺排图向导 (Ctrl+R)\n使用指定线路的指定标尺，"
 			"铺画新的列车运行线，或者重新铺画既有列车运行线的一部分。"));
-		btn = panel->addLargeAction(act);
-		btn->setMinimumWidth(80);
+		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actRulerPaint()));
 		diaActions.rulerPaint = act;
 
@@ -1264,7 +1262,7 @@ void MainWindow::initToolbar()
 		menu = new SARibbonMenu(this);
 		actRemoveInterp = menu->addAction(tr("删除所有推定结果"));
 		act->setMenu(menu);
-		btn = panel->addMediumAction(act);
+		panel->addMediumAction(act);
 		//btn->setPopupMode(QToolButton::DelayedPopup);
 
 		act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("贪心排图"), this);
@@ -1517,7 +1515,7 @@ void MainWindow::initToolbar()
 		SLOT(actPopupAppButton()));
 
 	ribbon->setRibbonStyle(
-		static_cast<SARibbonBar::RibbonStyle>(SystemJson::instance.ribbon_style));
+		static_cast<SARibbonBar::RibbonStyles>(SystemJson::instance.ribbon_style));
 
 	// 2022.04.24：测试ActionManager
 	// 2023.12.20: seems changed in SARibbon V1.0.7

@@ -66,13 +66,13 @@ void RulerContext::initUI()
     auto* act = new QAction(QIcon(":/icons/edit.png"), tr("编辑"), this);
     act->setToolTip(tr("标尺编辑面板\n显示当前标尺的编辑面板，编辑标尺名称和数据。"));
     connect(act, SIGNAL(triggered()), this, SLOT(actShowEditWidget()));
-    auto* btn = panel->addLargeAction(act);
+    panel->addLargeAction(act);
 
     act = new QAction(QIcon(":/icons/identify.png"), tr("从车次提取"), this);
     act->setToolTip(tr("从单车次提取标尺\n"
         "从单个车次在本线的运行情况提取标尺数据，并覆盖到本标尺中。"));
     connect(act, SIGNAL(triggered()), this, SLOT(actReadFromSingleTrain()));
-    btn = panel->addMediumAction(act);
+    panel->addMediumAction(act);
 
     act = new QAction(QIcon(":/icons/clock.png"), tr("从速度计算"), this);
     act->setToolTip(tr("从运行速度计算\n"
@@ -100,25 +100,25 @@ void RulerContext::initUI()
     panel = page->addPannel(tr("设置"));
     act = new QAction(QIcon(":/icons/ruler.png"), tr("排图标尺"), this);
     act->setToolTip(tr("设为排图标尺\n将当前标尺设置为本线的排图标尺，即作为纵坐标标度"));
-    btn = panel->addLargeAction(act);
+    panel->addLargeAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(actSetAsOrdinate()));
 
     act = new QAction(QIcon(":/icons/copy.png"), tr("副本"), this);
     act->setToolTip(tr("创建标尺副本\n使用输入的标尺名称，在本线路下创建当前标尺副本"));
-    btn = panel->addLargeAction(act);
+    panel->addLargeAction(act);
     connect(act, &QAction::triggered, this, &RulerContext::actDulplicateRuler);
 
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
         tr("删除标尺"), this);
     act->setToolTip(tr("删除标尺\n删除当前标尺。如果当前标尺同时是排图标尺，"
         "则同时将本线设置为按里程排图。"));
-    btn = panel->addLargeAction(act);
+    panel->addLargeAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(actRemoveRuler()));
 
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
         tr("关闭面板"), this);
     act->setToolTip(tr("关闭面板\n关闭当前的标尺上下文工具栏页面"));
-    btn = panel->addLargeAction(act);
+    panel->addLargeAction(act);
     connect(act, &QAction::triggered, this, &RulerContext::focusOutRuler);
     
 }

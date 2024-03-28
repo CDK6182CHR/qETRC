@@ -375,8 +375,11 @@ private slots:
 
     void showAboutDialog();
 
+#if 0
+    // 2024.03.28: For switching Ribbon style, use SystemJsonDialog
     void useWpsStyle();
     void useOfficeStyle();
+#endif
 
     /**
      * 自定义Ribbon界面

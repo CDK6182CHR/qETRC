@@ -23,7 +23,7 @@ public:
 
     bool show_train_tooltip = true;
 
-    int ribbon_style = 1;
+    int ribbon_style = 18;
 
     bool weaken_unselected = true;
 

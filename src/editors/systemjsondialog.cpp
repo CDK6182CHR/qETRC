@@ -61,7 +61,10 @@ void SystemJsonDialog::initUI()
 
     cbRibbonStyle=new QComboBox;
     cbRibbonStyle->setToolTip(tr("Ribbon风格\n选择默认的Ribbon工具栏风格"));
-    cbRibbonStyle->addItems({tr("Office风格"),tr("WPS风格")});
+    cbRibbonStyle->addItem(tr("宽松三行（Office风格）"), SARibbonBar::RibbonStyleLooseThreeRow);
+    cbRibbonStyle->addItem(tr("紧凑三行（WPS风格）"), SARibbonBar::RibbonStyleCompactThreeRow);
+    cbRibbonStyle->addItem(tr("宽松两行（Office两行风格）"), SARibbonBar::RibbonStyleLooseTwoRow);
+    cbRibbonStyle->addItem(tr("紧凑两行（WPS两行风格）"), SARibbonBar::RibbonStyleCompactTwoRow);
     flay->addRow(tr("Ribbon工具栏风格"),cbRibbonStyle);
 
     cbSysStyle = new QComboBox;
@@ -127,10 +130,15 @@ void SystemJsonDialog::setData()
     const auto& t=SystemJson::instance;
     spRowHeight->setValue(t.table_row_height);
     edDefaultFile->setText(t.default_file);
-    if (t.ribbon_style == static_cast<int>(SARibbonBar::OfficeStyle)){
-        cbRibbonStyle->setCurrentIndex(0);
-    }else{
-        cbRibbonStyle->setCurrentIndex(1);
+    {
+        int ribbon_sty_idx = 0;
+        switch (t.ribbon_style) {
+        case SARibbonBar::RibbonStyleLooseThreeRow: ribbon_sty_idx = 0; break;
+        case SARibbonBar::RibbonStyleCompactThreeRow: ribbon_sty_idx = 1; break;
+        case SARibbonBar::RibbonStyleLooseTwoRow: ribbon_sty_idx = 2; break;
+        case SARibbonBar::RibbonStyleCompactTwoRow: ribbon_sty_idx = 3; break;
+        }
+        cbRibbonStyle->setCurrentIndex(ribbon_sty_idx);
     }
     ckWeaken->setChecked(t.weaken_unselected);
     ckTooltip->setChecked(t.show_train_tooltip);
@@ -149,11 +157,7 @@ void SystemJsonDialog::actApply()
     t.language = qvariant_cast<QLocale::Language>(cbLanguage->currentData());
     t.table_row_height = spRowHeight->value();
     t.default_file = edDefaultFile->text();
-    if (cbRibbonStyle->currentIndex() == 0){
-        t.ribbon_style = SARibbonBar::OfficeStyle;
-    }else{
-        t.ribbon_style = SARibbonBar::WpsLiteStyle;
-    }
+    t.ribbon_style = qvariant_cast<SARibbonBar::RibbonStyles>(cbRibbonStyle->currentData());
     if (t.app_style != cbSysStyle->currentText()) {
         t.app_style = cbSysStyle->currentText();
         auto* sty = QStyleFactory::create(t.app_style);

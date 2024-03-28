@@ -45,28 +45,24 @@ void RoutingContext::initUI()
     auto* act = new QAction(QIcon(":/icons/trainline.png"), tr("高亮显示"), this);
     act->setCheckable(true);
     connect(act, &QAction::triggered, this, &RoutingContext::toggleHighlight);
-    auto* btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
-    btnHighlight = btn;
+    panel->addLargeAction(act);
+    btnHighlight = panel->actionToRibbonToolButton(act);
 
     panel=page->addPannel(tr("编辑"));
     act=new QAction(QIcon(":/icons/edit.png"),tr("交路编辑"),this);
     connect(act,SIGNAL(triggered()),this,SLOT(actEdit()));
-    btn=panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
+    panel->addLargeAction(act);
 
     act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
         tr("删除交路"), this);
     connect(act, &QAction::triggered, this, &RoutingContext::actRemoveRouting);
-    btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
+    panel->addLargeAction(act);
 
     panel = page->addPannel(tr("工具"));
     act = new QAction(QIcon(":/icons/routing-diagram.png"), tr("交路图"), this);
     act->setToolTip(tr("交路图\n显示当前交路的（“中国动车组交路查询”风格的）示意图"));
     connect(act, &QAction::triggered, this, &RoutingContext::actRoutingDiagram);
-    btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(60);
+    panel->addLargeAction(act);
 
     act = new QAction(QIcon(":/icons/text.png"), tr("文本解析"), this);
     act->setToolTip(tr("单交路文本解析\n"
@@ -86,8 +82,7 @@ void RoutingContext::initUI()
         tr("关闭面板"), this);
     act->setToolTip(tr("关闭面板\n关闭当前的交路编辑上下文工具栏面板。"));
     connect(act, &QAction::triggered, mw, &MainWindow::focusOutRouting);
-    btn = panel->addLargeAction(act);
-    btn->setMinimumWidth(80);
+    panel->addLargeAction(act);
 }
 
 int RoutingContext::getRoutingWidgetIndex(std::shared_ptr<Routing> routing)
