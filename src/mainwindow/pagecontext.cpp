@@ -86,8 +86,7 @@ void PageContext::initUI()
     me->addAction(tr("重设页面"), this, &PageContext::actResetPage);
     act->setMenu(me);
 
-    panel->addLargeAction(act);
-    //btn->setMinimumWidth(70);
+    panel->addLargeAction(act, QToolButton::MenuButtonPopup);
   
 
     act = new QAction(QIcon(":/icons/pdf.png"), tr("导出"), this);
@@ -121,7 +120,7 @@ void PageContext::initUI()
     me = new SARibbonMenu(mw);
     me->addAction(tr("转到线路"), this, &PageContext::actSwitchToRailway);
     act->setMenu(me);
-    panel->addLargeAction(act);
+    panel->addLargeAction(act, QToolButton::MenuButtonPopup);
     //btn->setMinimumWidth(80);
 
     panel = page->addPannel(tr("比例控制"));

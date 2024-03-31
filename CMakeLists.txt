@@ -95,12 +95,16 @@ if (NOT ANDROID)
     # list(APPEND CMAKE_PREFIX_PATH "D:/codes/QtProjects/site-packages/Qt-Advanced-Docking-System/out/install/lib/cmake/qt5advanceddocking")
     # find_package(qt${QT_VERSION_MAJOR}advanceddocking CONFIG REQUIRED)
 
+    if (NOT ADS_REPO_URL)
+        set(ADS_REPO_URL https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System)
+    endif ()
+
     # try: using FetchContent
     FetchContent_Declare(
         ads
         # GIT_REPOSITORY ${CMAKE_SOURCE_DIR}/external/Qt-Advanced-Docking-System
-        GIT_REPOSITORY https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System
-        GIT_TAG 4.0.3
+        GIT_REPOSITORY ${ADS_REPO_URL}
+        GIT_TAG 4.2.1
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/ads
     )
     FetchContent_MakeAvailable(ads)

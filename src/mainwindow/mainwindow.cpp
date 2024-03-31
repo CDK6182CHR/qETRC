@@ -928,7 +928,7 @@ void MainWindow::initToolbar()
 		menu = new SARibbonMenu(this);
 		menu->addAction(QEICN_about_qt, tr("关于Qt"), QApplication::aboutQt);
 		act->setMenu(menu);
-        panel->addLargeAction(act);
+        panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 		act = new QAction(QEICN_exit_app, tr("退出"), this);
 		connect(act, SIGNAL(triggered()), this, SLOT(close()));
@@ -955,7 +955,7 @@ void MainWindow::initToolbar()
 		railMenu = menu;
 		act->setMenu(menu);
 		menu->setTitle(tr("线路编辑"));
-		panel->addLargeAction(act);
+		panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 		act = pathListDock->toggleViewAction();
 		act->setIcon(QEICN_train_path);
@@ -963,7 +963,7 @@ void MainWindow::initToolbar()
 		act->setToolTip(tr("列车径路\n打开/关闭列车径路管理面板。"));
 		pathMenu = new SARibbonMenu(this);
 		act->setMenu(pathMenu);
-		panel->addLargeAction(act);
+		panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 		act = new QAction(QEICN_ruler_edit, tr("标尺编辑"), this);
 		act->setToolTip(tr("标尺编辑 (Ctrl+B)\n"
@@ -978,7 +978,7 @@ void MainWindow::initToolbar()
 		connect(act, SIGNAL(triggered()), this, SLOT(actNaviToForbid()));
 		forbidMenu = new SARibbonMenu(this);
 		act->setMenu(forbidMenu);
-		panel->addLargeAction(act);
+		panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 		act = new QAction(QEICN_new_rail, tr("新建线路"), this);
 		connect(act, SIGNAL(triggered()), naviView, SLOT(actAddRailway()));
@@ -1106,7 +1106,7 @@ void MainWindow::initToolbar()
 		actImportTimetableCsv = menu->addAction(tr("导入时刻表 (CSV)"));
 		actImportTrainTrf = menu->addAction(tr("批量导入车次 (trf)"));
 		act->setMenu(menu);
-		panel->addLargeAction(act);
+		panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 		act = new QAction(QEICN_search_train, tr("搜索车次"), this);
 		act->setToolTip(tr("搜索车次 (Ctrl+F)\n搜索车次，将车次设定为当前车次，并高亮运行线。"));
@@ -1187,7 +1187,7 @@ void MainWindow::initToolbar()
 		routingMenu = new SARibbonMenu(tr("打开的交路编辑"), this);
 		act->setMenu(routingMenu);
 
-		panel->addLargeAction(act);
+		panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 		act = new QAction(QEICN_routing_batch_parse, tr("批量解析"), this);
 		connect(act, &QAction::triggered, this, &MainWindow::actBatchParseRouting);
@@ -1258,7 +1258,7 @@ void MainWindow::initToolbar()
 		menu = new SARibbonMenu(this);
 		actRemoveInterp = menu->addAction(tr("删除所有推定结果"));
 		act->setMenu(menu);
-		panel->addMediumAction(act);
+		panel->addMediumAction(act, QToolButton::MenuButtonPopup);
 		//btn->setPopupMode(QToolButton::DelayedPopup);
 
 		act = new QAction(QIcon(":/icons/ruler_pen.png"), tr("贪心排图"), this);
@@ -1272,7 +1272,7 @@ void MainWindow::initToolbar()
 		menu->addAction(tr("退出贪心排图状态"), this, &MainWindow::actExitGreedyPaint);
 		act->setMenu(menu);
 
-		panel->addLargeAction(act);
+		panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 		connect(act, &QAction::triggered, this, &MainWindow::actGreedyPaint);
 
 #ifdef QETRC_GREEDYPAINT_TEST

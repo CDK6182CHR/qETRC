@@ -148,7 +148,7 @@ void RailContext::initUI()
 	act->setToolTip(tr("天窗编辑\n打开或切换到到当前线路的天窗编辑面板"));
 	connect(act, SIGNAL(triggered()), this, SLOT(actOpenForbidWidget()));
 	act->setMenu(mw->forbidMenu);
-	panel->addLargeAction(act);
+	panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 	panel = page->addPannel(tr("标尺"));
 	act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺"), this);
@@ -157,7 +157,7 @@ void RailContext::initUI()
 	meRulerWidgets = me;
 	act->setMenu(me);
 	connect(act, SIGNAL(triggered()), this, SLOT(actSelectRuler()));
-	panel->addLargeAction(act);
+	panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 	act = new QAction(QIcon(":/icons/add.png"), tr("新建标尺"), this);
 	act->setToolTip(tr("新建标尺\n新建本线的空白标尺"));

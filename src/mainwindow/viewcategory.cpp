@@ -156,7 +156,7 @@ void ViewCategory::initUI()
     act->setMenu(meFilters);
     mw->addAction(act);
     connect(act, &QAction::triggered, filter, &TrainFilterDialog::showDialog);
-    panel->addLargeAction(act);
+    panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 
     panel = cat->addPannel(tr("设置"));
@@ -181,7 +181,7 @@ void ViewCategory::initUI()
     connect(ma, &QAction::triggered, this, &ViewCategory::actSystemJsonDialog);
     act->setMenu(m);
 
-    panel->addLargeAction(act);
+    panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
     act = new QAction(QIcon(":/icons/settings.png"), tr("类型管理"), this);
     connect(act, &QAction::triggered, this, &ViewCategory::actTypeConfig);
@@ -197,7 +197,7 @@ void ViewCategory::initUI()
     m->addAction(tr("应用默认类型管理到当前运行图"), this, &ViewCategory::actApplyDefaultTypeSetToColl);
     m->addAction(tr("保存当前运行图类型管理为默认"), this, &ViewCategory::actApplyCollTypeSetToDefault);
     act->setMenu(m);
-    panel->addMediumAction(act);
+    panel->addMediumAction(act, QToolButton::MenuButtonPopup);
 
     act = new QAction(QIcon(":/icons/filter.png"), tr("类型规则"), this);
     connect(act, &QAction::triggered, this, &ViewCategory::actTypeRegex);
@@ -212,7 +212,7 @@ void ViewCategory::initUI()
     m->addAction(tr("应用默认类型规则到当前运行图"), this, &ViewCategory::actApplyDefaultTypeRegexToColl);
     m->addAction(tr("保存当前运行图类型规则为默认"), this, &ViewCategory::actApplyCollTypeRegexToDefault);
     act->setMenu(m);
-    panel->addMediumAction(act);
+    panel->addMediumAction(act, QToolButton::MenuButtonPopup);
 }
 
 void ViewCategory::setupTrainFilterMenu()
