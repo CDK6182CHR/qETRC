@@ -8,6 +8,7 @@
 #include "viewcategory.h"
 #include "util/selectrailwaycombo.h"
 #include "navi/addpagedialog.h"
+#include "defines/icon_specs.h"
 
 #include <DockWidget.h>
 #include <QLabel>
@@ -79,7 +80,7 @@ void PageContext::initUI()
 
     panel = page->addPannel(tr("基本"));
 
-    auto* act = new QAction(QIcon(":/icons/edit.png"), tr("编辑"), this);
+    auto* act = mw->makeAction(QEICN_edit_page, tr("编辑"), tr("编辑运行图页面"));
     connect(act, SIGNAL(triggered()), this, SLOT(actEdit()));
 
     auto* me = new SARibbonMenu(mw);
@@ -89,12 +90,12 @@ void PageContext::initUI()
     panel->addLargeAction(act, QToolButton::MenuButtonPopup);
   
 
-    act = new QAction(QIcon(":/icons/pdf.png"), tr("导出"), this);
+    act = mw->makeAction(QEICN_export_page, tr("导出"), tr("导出运行图页面"));
     panel->addLargeAction(act);
     //btn->setMinimumWidth(70);
     connect(act, SIGNAL(triggered()), this, SLOT(actPrint()));
 
-    act = new QAction(QIcon(":/icons/config.png"), tr("显示设置"), this);
+    act = mw->makeAction(QEICN_appearance_config_page, tr("显示设置"), tr("页面显示设置"));
     connect(act, &QAction::triggered, this, &PageContext::actConfig);
     me = new SARibbonMenu(mw);
     me->addAction(tr("将运行图显示设置应用到当前页面"), this,
@@ -107,14 +108,13 @@ void PageContext::initUI()
 
     panel = page->addPannel("导航");
 
-    act = new QAction(qApp->style()->standardIcon(QStyle::SP_FileDialogContentsView), tr("转到..."), 
-        this);
+    act = mw->makeAction(QEICN_switch_to_page, tr("转到..."), tr("转到页面"));
     act->setToolTip(tr("转到运行图页面\n打开或者切换到当前运行图页面。"));
     connect(act, &QAction::triggered, this, &PageContext::actActivatePage);
     panel->addLargeAction(act);
     //btn->setMinimumWidth(70);
 
-    act = new QAction(QIcon(":/icons/rail.png"), tr("编辑线路"), this);
+    act = mw->makeAction(QEICN_edit_rail_page, tr("编辑线路"), tr("编辑页面线路"));
     act->setToolTip(tr("编辑线路\n编辑当前运行图页面中的线路数据"));
     connect(act, &QAction::triggered, this, &PageContext::actEditRailway);
     me = new SARibbonMenu(mw);
@@ -124,38 +124,36 @@ void PageContext::initUI()
     //btn->setMinimumWidth(80);
 
     panel = page->addPannel(tr("比例控制"));
-    act = new QAction(QIcon(":/icons/h_expand.png"), tr("水平放大"), this);
+    act = mw->makeAction(QEICN_h_expand, tr("水平放大"));
     panel->addMediumAction(act);
     connect(act, &QAction::triggered, this, &PageContext::hExpand);
 
-    act = new QAction(QIcon(":/icons/h_shrink.png"), tr("水平缩小"), this);
+    act = mw->makeAction(QEICN_h_shrink, tr("水平缩小"));
     panel->addMediumAction(act);
     connect(act, &QAction::triggered, this, &PageContext::hShrink);
 
-    act = new QAction(QIcon(":/icons/v_expand.png"), tr("垂直放大"), this);
+    act = mw->makeAction(QEICN_v_expand, tr("垂直放大"));
     panel->addMediumAction(act);
     connect(act, &QAction::triggered, this, &PageContext::vExpand);
 
-    act = new QAction(QIcon(":/icons/v_shrink.png"), tr("垂直缩小"), this);
+    act = mw->makeAction(QEICN_v_shrink, tr("垂直缩小"));
     panel->addMediumAction(act);
     connect(act, &QAction::triggered, this, &PageContext::vShrink);
 
     panel = page->addPannel("");
 
-    act = new QAction(QIcon(":/icons/copy.png"), tr("副本"), this);
+    act = mw->makeAction(QEICN_page_copy, tr("副本"), tr("页面副本"));
     act->setToolTip(tr("创建运行图页面副本\n创建当前运行图页面的副本。注意页面中的基线并不会被复制。"));
     panel->addLargeAction(act);
     connect(act, &QAction::triggered, this, &PageContext::actDulplicate);
 
-    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
-        tr("删除"), this);
+    act = mw->makeAction(QEICN_del_page, tr("删除"), tr("删除页面"));
     act->setToolTip(tr("删除运行图\n删除当前运行图页面，"
         "但线路、车次信息不会被删除。"));
     panel->addLargeAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(actRemovePage()));
 
-    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
-        tr("关闭面板"), this);
+    act = mw->makeAction(QEICN_close_page_context, tr("关闭面板"), tr("关闭页面面板"));
     act->setToolTip(tr("关闭面板\n关闭当前的运行图页面上下文工具栏页面"));
     connect(act, &QAction::triggered, mw, &MainWindow::focusOutPage);
     panel->addLargeAction(act);

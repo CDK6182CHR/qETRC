@@ -2027,6 +2027,13 @@ QAction* MainWindow::makeAction(const QIcon& icon, const QString& text, const QS
 	return act;
 }
 
+QAction* MainWindow::makeAction(const QString& text)
+{
+	auto* act = new QAction(text, this);
+	act->setObjectName(text);
+	return act;
+}
+
 void MainWindow::closeEvent(QCloseEvent* e)
 {
 	if (!contextDB->deactiveOnClose()) {

@@ -247,6 +247,8 @@ private:
 
     QAction* makeAction(const QIcon& icon, const QString& text, const QString& objName);
 
+    QAction* makeAction(const QString& text);
+
 protected:
     virtual void closeEvent(QCloseEvent* e)override;
 

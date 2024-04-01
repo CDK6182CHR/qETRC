@@ -15,6 +15,7 @@
 #include "data/diagram/diagrampage.h"
 #include "editors/train/predeftrainfiltermanager.h"
 #include "editors/train/trainfiltercombo.h"
+#include "defines/icon_specs.h"
 
 #include <SARibbonPannelItem.h>
 #include <SARibbonGallery.h>
@@ -82,47 +83,45 @@ void ViewCategory::initUI()
     w->setLayout(rdDirType);
     panel->addWidget(w, SARibbonPannelItem::Large);
 
-    QAction* act = new QAction(QIcon(":/icons/diagram.png"), tr("运行线级别控制"), this);
+    QAction* act = mw->makeAction(QEICN_line_level_hide, tr("运行线级别控制"));
     act->setCheckable(true);
     actLineCtrl = act;
     connect(act, SIGNAL(triggered(bool)), this, SLOT(lineControlTriggered(bool)));
     panel->addLargeAction(act);
 
-    act = new QAction(tr("显示下行"), this);
+    act = mw->makeAction(tr("显示下行"));
     connect(act, SIGNAL(triggered()), this, SLOT(showDown()));
     panel->addMediumAction(act);
 
-    act = new QAction(tr("隐藏下行"), this);
+    act = mw->makeAction(tr("隐藏下行"));
     connect(act, SIGNAL(triggered()), this, SLOT(hideDown()));
     panel->addMediumAction(act);
 
 
-    act = new QAction(tr("显示上行"), this);
+    act = mw->makeAction(tr("显示上行"));
     connect(act, SIGNAL(triggered()), this, SLOT(showUp()));
     panel->addMediumAction(act);
 
-    act = new QAction(tr("隐藏上行"), this);
+    act = mw->makeAction(tr("隐藏上行"));
     connect(act, SIGNAL(triggered()), this, SLOT(hideUp()));
     panel->addMediumAction(act);
 
     //类型显示控制
     panel = cat->addPannel(tr("类型显示控制"));
 
-    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_BrowserReload),
-        tr("刷新类型表"), this);
+    act = mw->makeAction(QEICN_refresh_type_list, tr("刷新类型表"));
     panel->addLargeAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(refreshTypeGroup()));
 
-    act = new QAction(tr("客车类型"), this);
+    act = mw->makeAction(tr("客车类型"));
     connect(act, SIGNAL(triggered()), this, SLOT(selectPassengers()));
     panel->addMediumAction(act);
 
-    act = new QAction(tr("反向选择"), this);
+    act = mw->makeAction(tr("反向选择"));
     connect(act, SIGNAL(triggered()), this, SLOT(selectReversed()));
     panel->addMediumAction(act);
 
-    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogApplyButton),
-        tr("应用"), this);
+    act = mw->makeAction(QEICN_apply_type_show, tr("应用"), tr("应用显示类型设置"));
     connect(act, SIGNAL(triggered()), this, SLOT(applyTypeShow()));
     panel->addLargeAction(act);
 
@@ -148,7 +147,7 @@ void ViewCategory::initUI()
     //    10));
 
     //panel = cat->addPannel(tr("显示车次组"));
-    act = new QAction(QIcon(":/icons/filter.png"), tr("高级"), this);
+    act = mw->makeAction(QEICN_advanced_show_filter, tr("高级"), tr("高级显示类型设置"));
     act->setToolTip(tr("高级显示类型筛选 (Ctrl+Shift+L)\n"
         "使用（与pyETRC一致的）车次筛选器来决定显示车次的集合。"));
     act->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_L);
@@ -160,7 +159,7 @@ void ViewCategory::initUI()
 
 
     panel = cat->addPannel(tr("设置"));
-    act = new QAction(QIcon(":/icons/config.png"), tr("显示设置"), this);
+    act = mw->makeAction(QEICN_appearance_config_diagram, tr("显示设置"), tr("运行图文件显示设置"));
     connect(act, SIGNAL(triggered()), this, SLOT(actShowConfig()));
 
     auto* m = new SARibbonMenu(cat);
@@ -183,7 +182,7 @@ void ViewCategory::initUI()
 
     panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
-    act = new QAction(QIcon(":/icons/settings.png"), tr("类型管理"), this);
+    act = mw->makeAction(QEICN_type_manager_diagram, tr("类型管理"));
     connect(act, &QAction::triggered, this, &ViewCategory::actTypeConfig);
     act->setToolTip(tr("类型管理\n管理[当前运行图文件]的列车类型，及各种类型的颜色、线形等。"));
     
@@ -199,7 +198,7 @@ void ViewCategory::initUI()
     act->setMenu(m);
     panel->addMediumAction(act, QToolButton::MenuButtonPopup);
 
-    act = new QAction(QIcon(":/icons/filter.png"), tr("类型规则"), this);
+    act = mw->makeAction(QEICN_type_regex, tr("类型规则"));
     connect(act, &QAction::triggered, this, &ViewCategory::actTypeRegex);
     act->setToolTip(tr("类型判定规则\n编辑[当前运行图文件]的由正则表达式判定车次所属类型的规则。"));
 

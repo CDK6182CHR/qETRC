@@ -105,3 +105,32 @@
 #define QEICN_batch_copy_trains QE_RSC_ICON(copy.png)   // 批量复制车次
 #define QEICN_timetable_interp QE_RSC_ICON(add.png)    // 时刻插值
 #define QEICN_greedy_paint QE_RSC_ICON(ruler_pen.png)   // 贪心推线
+
+///////// 工具栏 显示 (4) /////////
+
+#define QEICN_line_level_hide QE_RSC_ICON(diagram.png)   // 运行线级别显示控制
+#define QEICN_refresh_type_list QE_STD_ICON(BrowserReload)   // 刷新类型表
+#define QEICN_apply_type_show QE_STD_ICON(DialogApplyButton)   // 应用显示类型设置
+#define QEICN_advanced_show_filter QE_RSC_ICON(filter.png)   // 高级显示类型设置
+
+#define QEICN_appearance_config_diagram QE_RSC_ICON(config.png)   // 显示设置（运行图文件级别）
+#define QEICN_type_manager_diagram QE_RSC_ICON(settings.png)   // 类型管理
+#define QEICN_type_regex QE_RSC_ICON(filter.png)   // 类型规则（正则表达式）
+
+
+///////// 工具栏 运行图 (5) /////////
+
+#define QEICN_edit_page QE_RSC_ICON(edit.png)  // 编辑运行图页面
+#define QEICN_export_page QE_RSC_ICON(pdf.png)   // 导出运行图页面
+#define QEICN_appearance_config_page QE_RSC_ICON(config.png)   // 显示设置 （运行图页面级别）
+#define QEICN_switch_to_page QE_STD_ICON(FileDialogContentsView) // 转到运行图页面
+#define QEICN_edit_rail_page QE_RSC_ICON(rail.png)   // 编辑线路（运行图页面）
+
+#define QEICN_h_expand QE_RSC_ICON(h_expand.png)   // 水平放大
+#define QEICN_h_shrink QE_RSC_ICON(h_shrink.png)   // 水平缩小
+#define QEICN_v_expand QE_RSC_ICON(v_expand.png)   // 垂直放大
+#define QEICN_v_shrink QE_RSC_ICON(v_shrink.png)   // 垂直缩小
+
+#define QEICN_page_copy QE_RSC_ICON(copy.png)   // 运行图页面副本
+#define QEICN_del_page QE_STD_ICON(TrashIcon)   // 删除运行图页面
+#define QEICN_close_page_context QE_STD_ICON(DialogCloseButton)   // 关闭运行图页面菜单
