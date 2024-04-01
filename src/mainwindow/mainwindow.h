@@ -238,7 +238,14 @@ private:
      */
     bool checkOpenFile();
 
-    
+    /**
+     * 2024.04.01  Create action and setup the action's name.
+     * This is used for action manager (not yet implemented/used).
+     * See, SARibbon MainWindowExampe MainWindow::createAction()
+     */
+    QAction* makeAction(const QIcon& icon, const QString& text);
+
+    QAction* makeAction(const QIcon& icon, const QString& text, const QString& objName);
 
 protected:
     virtual void closeEvent(QCloseEvent* e)override;

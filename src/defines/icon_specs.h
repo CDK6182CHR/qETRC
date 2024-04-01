@@ -87,6 +87,7 @@
 #define QEICN_train_info_quick QE_RSC_ICON(info.png)   // 速览信息窗口
 #define QEICN_edit_filters QE_RSC_ICON(filter.png)     // 编辑预设的列车筛选器
 
+#define QEICN_apply_pass_stations QE_STD_ICON(DialogApplyButton)   // 应用最大跨越站数
 #define QEICN_weaken_unselect QE_RSC_ICON(weaken.png)   // 选择运行线时，背景虚化
 
 #define QEICN_routing_edit QE_RSC_ICON(polyline.png)   // 交路编辑页面
@@ -99,3 +100,8 @@
 #define QEICN_section_count QE_RSC_ICON(counter.png)   // 区间对数表
 #define QEICN_section_trains QE_RSC_ICON(train.png)   // 区间车次表
 #define QEICN_interval_stat QE_RSC_ICON(data.png)   // 列车区间运行统计
+
+#define QEICN_ruler_paint QE_RSC_ICON(ruler_pen.png)   // 标尺排图
+#define QEICN_batch_copy_trains QE_RSC_ICON(copy.png)   // 批量复制车次
+#define QEICN_timetable_interp QE_RSC_ICON(add.png)    // 时刻插值
+#define QEICN_greedy_paint QE_RSC_ICON(ruler_pen.png)   // 贪心推线
