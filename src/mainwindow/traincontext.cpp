@@ -49,6 +49,7 @@
 #include "editors/trainpath/selectpathdialog.h"
 #include "model/diagram/diagramnavimodel.h"
 #include "dialogs/selectroutingdialog.h"
+#include "defines/icon_specs.h"
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
 	MainWindow* mw_) :
@@ -97,31 +98,31 @@ void TrainContext::initUI()
 			panel->addWidget(w, SARibbonPannelItem::Large);
 		}
 
-		auto* act = new QAction(QIcon(":/icons/trainline.png"), tr("运行线"), this);
+		auto* act = mw->makeAction(QEICN_train_line, tr("运行线"), tr("高亮列车运行线"));
 		act->setToolTip(tr("高亮列车运行线\n在所有运行图窗口中，高亮本次列车运行线"));
 		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actShowTrainLine()));
 
 		panel = page->addPannel(tr("分析"));
 
-		act = new QAction(QIcon(":/icons/clock.png"), tr("事件表"), this);
+		act = mw->makeAction(QEICN_train_events, tr("事件表"), tr("列车事件表"));
 		connect(act, SIGNAL(triggered()), this, SLOT(showTrainEvents()));
 		panel->addLargeAction(act);
 		mw->diaActions.eventList = act;
 
-		act = new QAction(QIcon(":/icons/line-manage.png"), tr("运行线一览"), this);
+		act = mw->makeAction(QEICN_train_line_list, tr("运行线一览"));
 		act->setToolTip(tr("运行线一览表\n显示本次列车所有运行线基础信息及其铺画情况"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actShowTrainLineDialog()));
 		panel->addLargeAction(act);
 
-		act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺对照"), this);
+		act = mw->makeAction(QEICN_ruler_diff, tr("标尺对照"));
 		act->setToolTip(tr("标尺对照\n将本次列车运行情况与指定线路、标尺进行对照，"
 			"以确定本次列车是否符合指定标尺，或与指定标尺差异如何。"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actRulerRef()));
 		panel->addLargeAction(act);
 		mw->diaActions.rulerRef = act;
 
-		act = new QAction(QIcon(":/icons/identify.png"), tr("时刻诊断"), this);
+		act = mw->makeAction(QEICN_timetable_diagno_train , tr("时刻诊断"), tr("列车时刻诊断"));
 		act->setToolTip(tr("列车时刻表诊断\n检查本次列车时刻表可能存在的问题，"
 			"例如到开时刻填反等。"));
 		connect(act, &QAction::triggered, this, &TrainContext::actDiagnose);
@@ -137,7 +138,7 @@ void TrainContext::initUI()
 		auto* vlay = new QVBoxLayout(w);
 		auto* hlay = new QHBoxLayout();
 		hlay->addWidget(edRouting);
-		act = new QAction(tr("转到交路"), this);
+		act = mw->makeAction(tr("转到交路"));
 		connect(act, &QAction::triggered, this, &TrainContext::actToRouting);
 		btnToRouting = new SARibbonToolButton(act);
 		btnToRouting->setIcon(qApp->style()->standardIcon(QStyle::SP_ArrowRight));
@@ -231,7 +232,7 @@ void TrainContext::initUI()
 
 		panel->addSeparator();
 
-		auto* act = new QAction(tr("自动运行线"), this);
+		auto* act = mw->makeAction(tr("自动运行线"));
 		act->setCheckable(true);
 		panel->addMediumAction(act);
 		btnAutoUI = panel->actionToRibbonToolButton(act);
@@ -239,7 +240,7 @@ void TrainContext::initUI()
 			"否则可针对本车次单独设置。"));
 		connect(act, SIGNAL(triggered(bool)), this, SLOT(onAutoUIChanged(bool)));
 
-		act = new QAction(tr("颜色"), this);
+		act = mw->makeAction(tr("颜色"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actSelectColor()));
 		panel->addMediumAction(act);
 		btnColor = panel->actionToRibbonToolButton(act);
@@ -260,13 +261,11 @@ void TrainContext::initUI()
 		w->setFixedWidth(120);
 		panel->addWidget(w, SARibbonPannelItem::Large);
 
-		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogApplyButton), 
-			tr("应用"), this);
+		act = mw->makeAction(QEICN_apply_train_info, tr("应用"), tr("应用列车信息"));
 		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actApply()));
 
-		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCancelButton),
-			tr("还原"), this);
+		act = mw->makeAction(QEICN_reset_train_info, tr("还原"), tr("还原列车信息"));
 		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(refreshData()));
 
@@ -288,7 +287,7 @@ void TrainContext::initUI()
 			panel->addWidget(w1, SARibbonPannelItem::Medium);
 
 			auto* btn = new SARibbonToolButton();
-			btn->setIcon(QIcon(":/icons/add.png"));
+			btn->setIcon(QEICN_add_path_to_train);
 			btn->setText(tr("添加"));
 			connect(btn, &SARibbonToolButton::clicked, this, &TrainContext::actAddPaths);
 			w = new QWidget;
@@ -296,7 +295,7 @@ void TrainContext::initUI()
 			hlay->setContentsMargins(0, 0, 0, 0);
 			hlay->addWidget(btn);
 
-			act = new QAction(qApp->style()->standardIcon(QStyle::SP_TrashIcon), tr("移除"), this);
+			act = mw->makeAction(QEICN_remove_path_from_train, tr("移除"), tr("从列车移除径路"));
 			connect(act, &QAction::triggered, this, &TrainContext::actRemovePaths);
 			auto* menu = new SARibbonMenu(mw);
 			menu->addAction(tr("清空"), this, &TrainContext::actClearPaths);
@@ -309,25 +308,25 @@ void TrainContext::initUI()
 		}
 
 		panel = page->addPannel(tr("调整"));
-		act = new QAction(QIcon(":/icons/exchange.png"), tr("区间换线"), this);
+		act = mw->makeAction(QEICN_interval_exchange, tr("区间换线"));
 		act->setToolTip(tr("区间换线\n交换本次列车和另一列车在所选区间的运行线"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actExchangeInterval()));
 		panel->addMediumAction(act);
 		mw->diaActions.intervalExchange = act;
 
-		act = new QAction(QIcon(":/icons/adjust.png"), tr("时刻平移"), this);
+		act = mw->makeAction(QEICN_timetable_adjust, tr("时刻平移"));
 		act->setToolTip(tr("时刻平移\n将本车次部分或全部车站时刻前移或后移一段时间"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actAdjustTimetable()));
 		panel->addMediumAction(act);
 		mw->diaActions.timeAdjust = act;
 
-		act = new QAction(QIcon(":/icons/settings.png"), tr("时刻修正"), this);
+		act = mw->makeAction(QEICN_timetable_correction, tr("时刻修正"));
 		act->setToolTip(tr("时刻修正\n修正本次列车时刻表中的一些常见类型错误，"
 			"例如到发时刻排反、顺序错排等。"));
 		connect(act, &QAction::triggered, this, &TrainContext::actCorrection);
 		panel->addLargeAction(act);
 
-		act = new QAction(QIcon(":/icons/add.png"), tr("快速推定"), this);
+		act = mw->makeAction(QEICN_timetable_simple_interp, tr("快速推定"));
 		act->setToolTip(tr("快速推定通过站时刻\n根据里程信息，快速推定本次列车在当前线路的通过站时刻，"
 			"不做外插且不考虑起停附加时分。"));
 		connect(act, &QAction::triggered, this, &TrainContext::actSimpleInterpolation);
@@ -337,28 +336,26 @@ void TrainContext::initUI()
 		panel = page->addPannel(tr(""));
 
 
-		act = new QAction(QIcon(":/icons/timetable.png"), tr("时刻表"), this);
+		act = mw->makeAction(QEICN_edit_timetable, tr("时刻表"));
 		act->setToolTip(tr("时刻表编辑\n显示简洁的、仅包含时刻表的编辑页面"));
 		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actShowBasicWidget()));
 
-		act = new QAction(QIcon(":/icons/edit.png"), tr("编辑"), this);
+		act = mw->makeAction(QEICN_edit_train, tr("编辑"));
 		act->setToolTip(tr("列车编辑\n显示（pyETRC风格的）完整列车编辑页面"));
 		panel->addLargeAction(act);
 		connect(act, &QAction::triggered, this, &TrainContext::actShowEditWidget);
 
-		act = new QAction(QIcon(":/icons/copy.png"), tr("副本"), this);
+		act = mw->makeAction(QEICN_copy_train, tr("列车副本"));
 		act->setToolTip(tr("创建列车副本\n以新输入的全车次创建当前车次的副本。"));
 		panel->addLargeAction(act);
 		connect(act, &QAction::triggered, this, &TrainContext::actDulplicateTrain);
 
-		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
-			tr("删除"), this);
+		act = mw->makeAction(QEICN_del_train, tr("删除"), tr("删除列车"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actRemoveCurrentTrain()));
 		panel->addLargeAction(act);
 
-		act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
-			tr("关闭面板"), this);
+		act = mw->makeAction(QEICN_close_train_context, tr("关闭面板"), tr("关闭列车面板"));
 		act->setToolTip(tr("关闭面板\n关闭当前的列车上下文工具栏页面"));
 		connect(act, &QAction::triggered, mw, &MainWindow::focusOutTrain);
 		panel->addLargeAction(act);

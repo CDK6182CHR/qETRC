@@ -134,3 +134,40 @@
 #define QEICN_page_copy QE_RSC_ICON(copy.png)   // 运行图页面副本
 #define QEICN_del_page QE_STD_ICON(TrashIcon)   // 删除运行图页面
 #define QEICN_close_page_context QE_STD_ICON(DialogCloseButton)   // 关闭运行图页面菜单
+
+///////// 工具栏 列车审阅 (6) /////////
+
+#define QEICN_train_line QE_RSC_ICON(trainline.png)   // 高亮列车运行线
+#define QEICN_train_events QE_RSC_ICON(clock.png)    // 列车事件表
+#define QEICN_train_line_list QE_RSC_ICON(line-manage.png)   // 运行线一览
+#define QEICN_ruler_diff QE_RSC_ICON(ruler.png)   // 标尺对照
+#define QEICN_timetable_diagno_train QE_RSC_ICON(identify.png)   // 时刻诊断（列车）
+
+///////// 工具栏 列车编辑 (7) /////////
+
+#define QEICN_apply_train_info QE_STD_ICON(DialogApplyButton)   // 应用 列车基本信息
+#define QEICN_reset_train_info QE_STD_ICON(DialogCancelButton)  // 还原 列车基本信息
+#define QEICN_add_path_to_train QE_RSC_ICON(add.png)   // 添加径路到列车
+#define QEICN_remove_path_from_train QE_STD_ICON(TrashIcon)   // 从列车移除径路
+
+#define QEICN_interval_exchange QE_RSC_ICON(exchange.png)   // 区间换线
+#define QEICN_timetable_adjust QE_RSC_ICON(adjust.png)   // 时刻平移
+#define QEICN_timetable_correction QE_RSC_ICON(settings.png)  // 时刻修正
+#define QEICN_timetable_simple_interp QE_RSC_ICON(add.png)   // 快速推定通过站时刻
+
+#define QEICN_edit_timetable QE_RSC_ICON(timetable.png)   // 编辑时刻表
+#define QEICN_edit_train QE_RSC_ICON(edit.png)   // 编辑列车所有数据
+
+#define QEICN_copy_train QE_RSC_ICON(copy.png)   // 创建列车副本
+#define QEICN_del_train QE_STD_ICON(TrashIcon)   // 删除列车
+#define QEICN_close_train_context QE_STD_ICON(DialogCloseButton)   // 关闭列车面板
+
+///////// 工具栏 线路工具 (8) /////////
+
+#define QEICN_edit_rail QE_RSC_ICON(rail.png)   // 基线编辑
+#define QEICN_edit_skylight QE_RSC_ICON(forbid.png)   // 天窗编辑
+#define QEICN_edit_ruler QE_RSC_ICON(ruler.png)   // 标尺编辑
+#define QEICN_add_ruler QE_RSC_ICON(add.png)   // 新建标尺
+
+#define QEICN_reverse_rail QE_RSC_ICON(exchange1.png)   // 线路反排
+#define QEICN_joint_rail QE_RSC_ICON(joint.png)   // 线路拼接

@@ -17,6 +17,7 @@
 #include "editors/forbidwidget.h"
 #include "editors/railstationwidget.h"
 #include "data/diagram/diagrampage.h"
+#include "defines/icon_specs.h"
 
 #include <QStyle>
 #include <QLabel>
@@ -140,18 +141,18 @@ void RailContext::initUI()
 	panel = page->addPannel(tr("编辑"));
 
 	QAction* act;
-	act = new QAction(QIcon(":/icons/rail.png"), tr("基线编辑"), this);
+	act = mw->makeAction(QEICN_edit_rail, tr("基线编辑"));
 	panel->addLargeAction(act);
 	connect(act, SIGNAL(triggered()), this, SLOT(actOpenStationWidget()));
 
-	act = new QAction(QIcon(":/icons/forbid.png"), tr("天窗编辑"), this);
+	act = mw->makeAction(QEICN_edit_skylight, tr("天窗编辑"));
 	act->setToolTip(tr("天窗编辑\n打开或切换到到当前线路的天窗编辑面板"));
 	connect(act, SIGNAL(triggered()), this, SLOT(actOpenForbidWidget()));
 	act->setMenu(mw->forbidMenu);
 	panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 	panel = page->addPannel(tr("标尺"));
-	act = new QAction(QIcon(":/icons/ruler.png"), tr("标尺"), this);
+	act = mw->makeAction(QEICN_edit_ruler, tr("标尺"));
     auto* me = new SARibbonMenu(mw);
 	act->setToolTip(tr("标尺编辑\n创建或者导航到本线标尺编辑的面板"));
 	meRulerWidgets = me;
@@ -159,17 +160,17 @@ void RailContext::initUI()
 	connect(act, SIGNAL(triggered()), this, SLOT(actSelectRuler()));
 	panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
-	act = new QAction(QIcon(":/icons/add.png"), tr("新建标尺"), this);
+	act = mw->makeAction(QEICN_add_ruler, tr("新建标尺"));
 	act->setToolTip(tr("新建标尺\n新建本线的空白标尺"));
 	connect(act, SIGNAL(triggered()), this, SLOT(actAddNewRuler()));
 	panel->addLargeAction(act);
 
 	panel = page->addPannel(tr("调整"));
-	act = new QAction(QIcon(":/icons/exchange1.png"), tr("线路反排"), this);
+	act = mw->makeAction(QEICN_reverse_rail, tr("线路反排"));
 	connect(act, SIGNAL(triggered()), this, SLOT(actInverseRail()));
 	panel->addMediumAction(act);
 
-	act = new QAction(QIcon(":/icons/joint.png"), tr("线路拼接"), this);
+	act = mw->makeAction(QEICN_joint_rail, tr("线路拼接"));
 	connect(act, &QAction::triggered, this, &RailContext::actJointRail);
 	panel->addMediumAction(act);
 
