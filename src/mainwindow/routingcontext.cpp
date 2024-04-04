@@ -42,6 +42,7 @@ void RoutingContext::initUI()
     edName->setAlignment(Qt::AlignCenter);
     edName->setFixedWidth(150);
     vlay->addWidget(edName);
+    w->setObjectName(tr("交路名面板"));
     panel->addWidget(w, SARibbonPannelItem::Large);
 
     auto* act = mw->makeAction(QEICN_highlight_routing, tr("高亮显示"), tr("高亮显示交路"));

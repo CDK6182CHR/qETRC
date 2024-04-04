@@ -789,7 +789,7 @@ void MainWindow::initToolbar()
 
 		// Customize 似乎还不太对，先留在这
 #if 0
-		act = new QAction(QE_ICN_TB_customize, tr("自定义Ribbon"), this);
+		act = new QAction(QEICN_customize, tr("自定义Ribbon"), this);
 		act->setToolTip(tr("自定义Ribbon\n自定义工具栏按钮的排列组合"));
 		connect(act, &QAction::triggered, this, &MainWindow::actCustomizeRibbon);
 		ribbon->quickAccessBar()->addAction(act);
@@ -852,6 +852,7 @@ void MainWindow::initToolbar()
 		//btn->setMinimumWidth(80);
 
 		act = trainListDock->toggleViewAction();
+		act->setObjectName(tr("列车管理面板开关"));
 		actTrainList = act;
 		act->setText(tr("列车管理"));
 		act->setToolTip(tr("列车管理\n打开或关闭（pyETRC风格的）列车管理列表面板。"));
@@ -870,6 +871,7 @@ void MainWindow::initToolbar()
 		//undo  试一下把dock也放在这里初始化...
 
 		act = undoDock->toggleViewAction();
+		act->setObjectName(tr("历史记录"));
 		act->setText(tr("历史记录"));
 		act->setIcon(QEICN_history);
 		act->setToolTip(tr("历史记录\n打开或关闭历史记录面板。\n"
@@ -1176,6 +1178,7 @@ void MainWindow::initToolbar()
 
 		panel = cat->addPannel(tr("交路"));
 		act = routingDock->toggleViewAction();
+		act->setObjectName(tr("交路面板开关"));
 		act->setIcon(QEICN_routing_edit);
 
 		routingMenu = new SARibbonMenu(tr("打开的交路编辑"), this);

@@ -81,6 +81,7 @@ void ViewCategory::initUI()
     rdDirType->get(0)->setChecked(true);
     QWidget* w = new QWidget;
     w->setLayout(rdDirType);
+    w->setObjectName(tr("入图/出图行别面板"));
     panel->addWidget(w, SARibbonPannelItem::Large);
 
     QAction* act = mw->makeAction(QEICN_line_level_hide, tr("运行线级别控制"));
@@ -126,6 +127,7 @@ void ViewCategory::initUI()
     panel->addLargeAction(act);
 
     gall = panel->addGallery();
+    gall->setObjectName(tr("显示类型面板"));
     group = gall->addGalleryGroup();
     group->setSelectionMode(QAbstractItemView::MultiSelection);
     //group->setSelectionBehavior(QAbstractItemView::SelectItems);
