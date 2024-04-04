@@ -1023,7 +1023,7 @@ void MainWindow::initToolbar()
 		panel->addMediumAction(act);
 		actQuickPath = act;
 
-		act = makeAction(QEICN_route_sel, tr("经由选择"));
+		act = makeAction(QEICN_route_sel, tr("经由选择"), tr("经由选择-主页"));
 		act->setToolTip(tr("交互式经由选择 (Ctrl+K)\n"
 			"通过数据库中的数据，手动指定通过邻站、邻线或者区间最短路方式，"
 			"生成径路可精确控制的新线路数据。"));
@@ -1049,7 +1049,7 @@ void MainWindow::initToolbar()
 		auto* menu = new SARibbonMenu(tr("列车管理扩展"), this);
 		act->setMenu(menu);
 
-		auto* actsub = new QAction(tr("删除所有车次"), this);
+		auto* actsub = makeAction(tr("删除所有车次"));
 		connect(actsub, SIGNAL(triggered()), this, SLOT(removeAllTrains()));
 		menu->addAction(actsub);
 
@@ -1155,6 +1155,7 @@ void MainWindow::initToolbar()
 			vlay->addWidget(new QLabel(tr("最大跨越站数")));
 			vlay->addWidget(sp);
 			w->setLayout(vlay);
+			w->setObjectName(tr("最大跨越站数面板"));
 
 			panel->addWidget(w, SARibbonPannelItem::Large);
 

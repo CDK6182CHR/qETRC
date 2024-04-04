@@ -95,6 +95,7 @@ void TrainContext::initUI()
 			vlay->addLayout(hlay);
 			w->setLayout(vlay);
 			w->setMaximumWidth(200);
+			w->setObjectName(tr("车次信息面板-只读"));
 			panel->addWidget(w, SARibbonPannelItem::Large);
 		}
 
@@ -166,6 +167,7 @@ void TrainContext::initUI()
 			this, &TrainContext::actAddToRouting);
 
 		vlay->addLayout(hlay);
+		w->setObjectName(tr("车次交路面板"));
 		panel->addWidget(w, SARibbonPannelItem::Large);
 	}
 
@@ -193,6 +195,7 @@ void TrainContext::initUI()
 		vlay->addLayout(hlay);
 		w->setLayout(vlay);
 		w->setFixedWidth(200);
+		w->setObjectName(tr("车次信息面板-编辑"));
 		panel->addWidget(w, SARibbonPannelItem::Large);
 		connect(edNamem, SIGNAL(editingFinished()), this,
 			SLOT(onFullNameChanged()));
@@ -228,6 +231,7 @@ void TrainContext::initUI()
 
 		w->setLayout(vlay);
 		w->setFixedWidth(200);
+		w->setObjectName(tr("列车类型面板"));
 		panel->addWidget(w, SARibbonPannelItem::Large);
 
 		panel->addSeparator();
@@ -259,6 +263,7 @@ void TrainContext::initUI()
 		vlay->addWidget(comboLs);
 		w->setLayout(vlay);
 		w->setFixedWidth(120);
+		w->setObjectName(tr("运行线样式面板"));
 		panel->addWidget(w, SARibbonPannelItem::Large);
 
 		act = mw->makeAction(QEICN_apply_train_info, tr("应用"), tr("应用列车信息"));
@@ -280,9 +285,10 @@ void TrainContext::initUI()
 			hlay1->addWidget(edPaths);
 			auto* btn1 = new SARibbonToolButton;
 			connect(btn1, &SARibbonToolButton::clicked, this, &TrainContext::actFocusInPath);
-			btn1->setIcon(qApp->style()->standardIcon(QStyle::SP_ArrowRight));
+			btn1->setIcon(QEICN_train_to_path);
 			btn1->setToolTip(tr("转到列车径路"));
 			hlay1->addWidget(btn1);
+			w1->setObjectName(tr("列车_径路信息"));
 
 			panel->addWidget(w1, SARibbonPannelItem::Medium);
 
@@ -303,6 +309,7 @@ void TrainContext::initUI()
 
 			btn = new SARibbonToolButton(act);
 			hlay->addWidget(btn);
+			w->setObjectName(tr("列车_径路设置"));
 			panel->addWidget(w, SARibbonPannelItem::Medium);
 
 		}

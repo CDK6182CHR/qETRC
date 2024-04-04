@@ -18,6 +18,7 @@
 #include "editors/trainpath/pathtrainsdialog.h"
 #include "editors/trainpath/addtrainstopathdialog.h"
 #include "data/train/train.h"
+#include "defines/icon_specs.h"
 
 
 PathContext::PathContext(Diagram &diagram, SARibbonContextCategory *cont,
@@ -70,38 +71,36 @@ void PathContext::initUI()
 
     panel=page->addPannel(tr("编辑"));
 
-    auto* act=new QAction(QIcon(":/icons/edit.png"), tr("编辑"), this);
+    auto* act = mw->makeAction(QEICN_edit_path, tr("编辑"), tr("编辑径路"));
     connect(act,&QAction::triggered, this, &PathContext::actEditPath);
     panel->addLargeAction(act);
 
     panel = page->addPannel(tr("列车"));
 
-    act = new QAction(QIcon(":/icons/train.png"), tr("列车表"), this);
+    act = mw->makeAction(QEICN_path_trains, tr("列车表"), tr("径路列车表"));
     connect(act, &QAction::triggered, this, &PathContext::actShowTrains);
     panel->addLargeAction(act);
 
-    act = new QAction(QIcon(":/icons/add.png"), tr("添加列车"), this);
+    act = mw->makeAction(QEICN_path_add_trains, tr("添加列车"), tr("添加列车到径路"));
     connect(act, &QAction::triggered, this, &PathContext::actAddTrains);
     panel->addLargeAction(act);
 
-    act = new QAction(qApp->style()->standardIcon(QStyle::SP_TabCloseButton), tr("清空"), this);
+    act = mw->makeAction(QEICN_path_clear_trains, tr("清空"), tr("清空径路列车"));
     connect(act, &QAction::triggered, this, &PathContext::actClearTrains);
     panel->addLargeAction(act);
 
     panel=page->addPannel(tr(""));
-    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
-        tr("删除径路"), this);
+    act = mw->makeAction(QEICN_del_path, tr("删除径路"));
     act->setToolTip(tr("删除径路\n删除当前列车径路"));
     panel->addLargeAction(act);
     connect(act, &QAction::triggered, this, &PathContext::actRemovePath);
 
-    act = new QAction(QIcon(":/icons/copy.png"), tr("副本"), this);
+    act = mw->makeAction(QEICN_copy_path, tr("副本"), tr("径路副本"));
     act->setToolTip(tr("创建径路副本\n创建当前列车径路副本"));
     panel->addLargeAction(act);
     connect(act, &QAction::triggered, this, &PathContext::actDuplicatePath);
 
-    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
-        tr("关闭面板"), this);
+    act = mw->makeAction(QEICN_close_path_context, tr("关闭面板"), tr("关闭径路面板"));
     connect(act, &QAction::triggered, mw, &MainWindow::focusOutPath);
     act->setToolTip(tr("关闭面板\n关闭当前的列车径路上下文工具栏页面。"));
     panel->addLargeAction(act);

@@ -65,7 +65,7 @@
 #define QEICN_import_rails QE_RSC_ICON(add.png)   // 导入线路
 #define QEICN_rail_edit QE_RSC_ICON(rail.png)     // 基线编辑
 #define QEICN_train_path QE_RSC_ICON(polyline.png)   // 列车径路 管理面板
-#define QEICN_ruler_edit QE_RSC_ICON(ruler.phg)   // 标尺编辑
+#define QEICN_ruler_edit QE_RSC_ICON(ruler.png)   // 标尺编辑
 #define QEICN_skylight_edit QE_RSC_ICON(forbid.png)  // 天窗编辑
 #define QEICN_new_rail QE_RSC_ICON(new-file.png)   // 新建线路
 
@@ -147,6 +147,7 @@
 
 #define QEICN_apply_train_info QE_STD_ICON(DialogApplyButton)   // 应用 列车基本信息
 #define QEICN_reset_train_info QE_STD_ICON(DialogCancelButton)  // 还原 列车基本信息
+#define QEICN_train_to_path QE_STD_ICON(ArrowRight)   // 转到列车径路
 #define QEICN_add_path_to_train QE_RSC_ICON(add.png)   // 添加径路到列车
 #define QEICN_remove_path_from_train QE_STD_ICON(TrashIcon)   // 从列车移除径路
 
@@ -166,8 +167,74 @@
 
 #define QEICN_edit_rail QE_RSC_ICON(rail.png)   // 基线编辑
 #define QEICN_edit_skylight QE_RSC_ICON(forbid.png)   // 天窗编辑
-#define QEICN_edit_ruler QE_RSC_ICON(ruler.png)   // 标尺编辑
+#define QEICN_edit_ruler_rail QE_RSC_ICON(ruler.png)   // 标尺编辑 从线路进入
 #define QEICN_add_ruler QE_RSC_ICON(add.png)   // 新建标尺
 
 #define QEICN_reverse_rail QE_RSC_ICON(exchange1.png)   // 线路反排
 #define QEICN_joint_rail QE_RSC_ICON(joint.png)   // 线路拼接
+#define QEICN_section_count QE_RSC_ICON(counter.png)   // 断面对数表
+#define QEICN_station_trains QE_RSC_ICON(timetable.png)   // 车站车次表
+#define QEICN_station_events QE_RSC_ICON(electronic-clock.png)  // 车站事件表
+#define QEICN_section_events QE_RSC_ICON(diagram.png)   // 断面事件表
+#define QEICN_time_snap QE_RSC_ICON(clock.png)   // 运行快照 同一时刻下的所有列车状态
+
+#define QEICN_station_tracks QE_RSC_ICON(rail.png)   // 股道分析
+#define QEICN_rail_topo QE_RSC_ICON(diagram.png)  // 线路拓扑
+#define QEICN_headway_list QE_RSC_ICON(h_expand.png)  // 列车间隔分析
+#define QEICN_headway_summary QE_RSC_ICON(adjust-2.png)  // 列车间隔汇总
+
+#define QEICN_create_page_from_rail QE_RSC_ICON(diagram.png)   // 快速创建单线路运行图页面
+#define QEICN_del_railway QE_STD_ICON(TrashIcon)   // 删除基线
+#define QEICN_copy_railway QE_RSC_ICON(copy.png)   // 创建基线副本
+#define QEICN_close_rail_context QE_STD_ICON(DialogCloseButton)  // 关闭基线面板
+
+///////// 工具栏 标尺管理 (9) /////////
+
+#define QEICN_edit_ruler QE_RSC_ICON(edit.png)    // 编辑标尺
+#define QEICN_ruler_from_train QE_RSC_ICON(identify.png)   // 从车次提取标尺
+#define QEICN_ruler_from_speed QE_RSC_ICON(clock.png)   // 从速度计算标尺
+
+#define QEICN_merge_ruler QE_STD_ICON(ArrowBack)   // 合并标尺
+#define QEICN_import_ruler_csv QE_RSC_ICON(ruler.png)   // 导入标尺 (CSV)
+#define QEICN_export_ruler_csv QE_RSC_ICON(copy.png)    // 导出标尺 (CSV)
+#define QEICN_ordinate_ruler QE_RSC_ICON(ruler.png)   // 设置为排图标尺
+
+#define QEICN_copy_ruler QE_RSC_ICON(copy.png)   // 创建标尺副本
+#define QEICN_del_ruler QE_STD_ICON(TrashIcon)   // 删除标尺
+#define QEICN_close_ruler_context QE_STD_ICON(DialogCloseButton)   // 关闭标尺面板
+
+///////// 工具栏 交路编辑 (0) /////////
+
+#define QEICN_highlight_routing QE_RSC_ICON(trainline.png)   // 高亮显示
+#define QEICN_edit_routing QE_RSC_ICON(edit.png)   // 交路编辑
+#define QEICN_del_routing QE_STD_ICON(TrashIcon)   // 删除交路
+
+#define QEICN_routing_diagram QE_RSC_ICON(routing-diagram.png)   // 交路图
+#define QEICN_parse_routing QE_RSC_ICON(text.png)   // 文本解析
+#define QEICN_identify_trains QE_RSC_ICON(identify.png)   // 识别车次
+#define QEICN_close_routing_context QE_STD_ICON(DialogCloseButton)   // 关闭交路面板
+
+///////// 工具栏 列车径路 (A) /////////
+
+#define QEICN_edit_path QE_RSC_ICON(edit.png)   // 编辑 列车径路
+#define QEICN_path_trains QE_RSC_ICON(train.png)   // 列车表
+#define QEICN_path_add_trains QE_RSC_ICON(add.png)   // 添加列车到径路
+#define QEICN_path_clear_trains QE_STD_ICON(TabCloseButton)   // 清空列车
+
+#define QEICN_del_path QE_STD_ICON(TrashIcon)   // 删除径路
+#define QEICN_copy_path QE_RSC_ICON(copy.png)   // 创建径路副本
+#define QEICN_close_path_context QE_STD_ICON(DialogCloseButton)  // 关闭径路面板
+
+///////// 工具栏 路网管理 /////////
+
+#define QEICN_path_selector QE_RSC_ICON(polyline.png)   // 经由选择
+#define QEICN_adjacent_list QE_STD_ICON(FileDialogContentsView)   // 邻接表
+#define QEICN_refresh_net QE_STD_ICON(BrowserReload)  // 刷新线网
+
+#define QEICN_export_rail_to_diagram QE_RSC_ICON(diagram.png)   // 导出线路到运行图
+#define QEICN_export_rail_to_file QE_STD_ICON(FileIcon)   // 导出线路到文件
+#define QEICN_del_rail_db QE_STD_ICON(TrashIcon)   // 删除线路 （数据库）
+
+#define QEICN_ruler_db QE_RSC_ICON(ruler.png)   // 编辑标尺
+#define QEICN_skylight_db QE_RSC_ICON(forbid.png)  // 编辑天窗
+#define QEICN_close_db_context QE_STD_ICON(DialogCloseButton)  // 关闭线路数据库

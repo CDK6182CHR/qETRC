@@ -8,6 +8,7 @@
 #include "editors/routing/routingdiagramwidget.h"
 #include "data/train/train.h"
 #include "editors/routing/routingwidget.h"
+#include "defines/icon_specs.h"
 
 #include <QLabel>
 #include <QLineEdit>
@@ -43,35 +44,34 @@ void RoutingContext::initUI()
     vlay->addWidget(edName);
     panel->addWidget(w, SARibbonPannelItem::Large);
 
-    auto* act = new QAction(QIcon(":/icons/trainline.png"), tr("高亮显示"), this);
+    auto* act = mw->makeAction(QEICN_highlight_routing, tr("高亮显示"), tr("高亮显示交路"));
     act->setCheckable(true);
     connect(act, &QAction::triggered, this, &RoutingContext::toggleHighlight);
     panel->addLargeAction(act);
     btnHighlight = panel->actionToRibbonToolButton(act);
 
     panel=page->addPannel(tr("编辑"));
-    act=new QAction(QIcon(":/icons/edit.png"),tr("交路编辑"),this);
+    act=mw->makeAction(QEICN_edit_routing,tr("交路编辑"));
     connect(act,SIGNAL(triggered()),this,SLOT(actEdit()));
     panel->addLargeAction(act);
 
-    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
-        tr("删除交路"), this);
+    act = mw->makeAction(QEICN_del_routing, tr("删除交路"));
     connect(act, &QAction::triggered, this, &RoutingContext::actRemoveRouting);
     panel->addLargeAction(act);
 
     panel = page->addPannel(tr("工具"));
-    act = new QAction(QIcon(":/icons/routing-diagram.png"), tr("交路图"), this);
+    act = mw->makeAction(QEICN_routing_diagram, tr("交路图"));
     act->setToolTip(tr("交路图\n显示当前交路的（“中国动车组交路查询”风格的）示意图"));
     connect(act, &QAction::triggered, this, &RoutingContext::actRoutingDiagram);
     panel->addLargeAction(act);
 
-    act = new QAction(QIcon(":/icons/text.png"), tr("文本解析"), this);
+    act = mw->makeAction(QEICN_parse_routing, tr("文本解析"));
     act->setToolTip(tr("单交路文本解析\n"
         "输入车次套用的文本，从中解析交路序列，并直接应用于当前交路。"));
     connect(act, &QAction::triggered, this, &RoutingContext::actParseText);
     panel->addMediumAction(act);
 
-    act = new QAction(QIcon(":/icons/identify.png"), tr("识别车次"), this);
+    act = mw->makeAction(QEICN_identify_trains, tr("识别车次"));
     act->setToolTip(tr("单交路车次识别\n"
         "识别当前交路中的虚拟车次，尝试改变为实体车次，并直接应用结果。"));
     connect(act, &QAction::triggered, this, &RoutingContext::actDetectTrain);
@@ -79,8 +79,7 @@ void RoutingContext::initUI()
     panel->addMediumAction(act);
 
     panel = page->addPannel("");
-    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
-        tr("关闭面板"), this);
+    act = mw->makeAction(QEICN_close_routing_context, tr("关闭面板"));
     act->setToolTip(tr("关闭面板\n关闭当前的交路编辑上下文工具栏面板。"));
     connect(act, &QAction::triggered, mw, &MainWindow::focusOutRouting);
     panel->addLargeAction(act);

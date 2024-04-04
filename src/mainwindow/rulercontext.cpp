@@ -4,6 +4,7 @@
 #include "rulercontext.h"
 #include "mainwindow.h"
 #include "railcontext.h"
+#include "defines/icon_specs.h"
 
 #include "dialogs/rulerfromtraindialog.h"
 #include "dialogs/rulerfromspeeddialog.h"
@@ -63,60 +64,58 @@ void RulerContext::initUI()
     panel->addWidget(ed, SARibbonPannelItem::Medium);
 
     panel = page->addPannel(tr("编辑"));
-    auto* act = new QAction(QIcon(":/icons/edit.png"), tr("编辑"), this);
+    auto* act = mw->makeAction(QEICN_edit_ruler, tr("编辑"), tr("编辑标尺"));
     act->setToolTip(tr("标尺编辑面板\n显示当前标尺的编辑面板，编辑标尺名称和数据。"));
     connect(act, SIGNAL(triggered()), this, SLOT(actShowEditWidget()));
     panel->addLargeAction(act);
 
-    act = new QAction(QIcon(":/icons/identify.png"), tr("从车次提取"), this);
+    act = mw->makeAction(QEICN_ruler_from_train, tr("从车次提取"));
     act->setToolTip(tr("从单车次提取标尺\n"
         "从单个车次在本线的运行情况提取标尺数据，并覆盖到本标尺中。"));
     connect(act, SIGNAL(triggered()), this, SLOT(actReadFromSingleTrain()));
     panel->addMediumAction(act);
 
-    act = new QAction(QIcon(":/icons/clock.png"), tr("从速度计算"), this);
+    act = mw->makeAction(QEICN_ruler_from_speed, tr("从速度计算"));
     act->setToolTip(tr("从运行速度计算\n"
         "从通通运行速度（不含起停附加时分）计算近似标尺，并覆盖到本标尺中。"));
     connect(act, &QAction::triggered, this, &RulerContext::actFromSpeed);
     panel->addMediumAction(act);
 
-    act = new QAction(qApp->style()->standardIcon(QStyle::SP_ArrowBack), tr("合并标尺"), this);
+    act = mw->makeAction(QEICN_merge_ruler, tr("合并标尺"));
     act->setToolTip(tr("合并标尺\n与本线路的其他标尺合并。"));
     connect(act, &QAction::triggered, this, &RulerContext::mergeCurrent);
     panel->addMediumAction(act);
 
     panel = page->addPannel(tr("导入导出"));
-    act = new QAction(QIcon(":/icons/ruler.png"), tr("导入"), this);
+    act = mw->makeAction(QEICN_import_ruler_csv, tr("导入"), tr("导入标尺"));
     act->setToolTip(tr("导入标尺 (csv)\n"
         "从逗号分隔 (csv) 格式的数据文件中读取标尺数据，并覆盖到当前标尺中"));
     panel->addLargeAction(act);
     connect(act, &QAction::triggered, this, &RulerContext::actImportCsv);
 
-    act = new QAction(QIcon(":/icons/copy.png"), tr("导出"), this);
+    act = mw->makeAction(QEICN_export_ruler_csv, tr("导出"), tr("导出标尺"));
     act->setToolTip(tr("导出标尺 (csv)\n将当前标尺导出为逗号分隔 (csv) 格式的数据文件"));
     panel->addLargeAction(act);
     connect(act, &QAction::triggered, this, &RulerContext::actExportCsv);
 
     panel = page->addPannel(tr("设置"));
-    act = new QAction(QIcon(":/icons/ruler.png"), tr("排图标尺"), this);
+    act = mw->makeAction(QEICN_ordinate_ruler, tr("排图标尺"));
     act->setToolTip(tr("设为排图标尺\n将当前标尺设置为本线的排图标尺，即作为纵坐标标度"));
     panel->addLargeAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(actSetAsOrdinate()));
 
-    act = new QAction(QIcon(":/icons/copy.png"), tr("副本"), this);
+    act = mw->makeAction(QEICN_copy_ruler, tr("副本"), tr("标尺副本"));
     act->setToolTip(tr("创建标尺副本\n使用输入的标尺名称，在本线路下创建当前标尺副本"));
     panel->addLargeAction(act);
     connect(act, &QAction::triggered, this, &RulerContext::actDulplicateRuler);
 
-    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),
-        tr("删除标尺"), this);
+    act = mw->makeAction(QEICN_del_ruler, tr("删除标尺"));
     act->setToolTip(tr("删除标尺\n删除当前标尺。如果当前标尺同时是排图标尺，"
         "则同时将本线设置为按里程排图。"));
     panel->addLargeAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(actRemoveRuler()));
 
-    act = new QAction(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton),
-        tr("关闭面板"), this);
+    act = mw->makeAction(QEICN_close_ruler_context, tr("关闭面板"), tr("关闭标尺面板"));
     act->setToolTip(tr("关闭面板\n关闭当前的标尺上下文工具栏页面"));
     panel->addLargeAction(act);
     connect(act, &QAction::triggered, this, &RulerContext::focusOutRuler);
