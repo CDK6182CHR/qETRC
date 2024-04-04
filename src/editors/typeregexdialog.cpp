@@ -6,6 +6,7 @@
 #include "data/common/qesystem.h"
 #include "util/buttongroup.hpp"
 #include "mainwindow/version.h"
+#include "defines/icon_specs.h"
 
 #include <QLabel>
 #include <QTableView>
@@ -43,7 +44,7 @@ void TypeRegexDialog::initUI()
         auto* hlay = new QHBoxLayout;
         hlay->addWidget(ckTransparent);
         auto* tb = new QToolButton;
-        tb->setIcon(qApp->style()->standardIcon(QStyle::SP_MessageBoxQuestion));
+        tb->setIcon(QEICN_type_regex_transparent_help);
         hlay->addWidget(tb);
         connect(tb, &QToolButton::clicked, this, &TypeRegexDialog::informTransparent);
         vlay->addLayout(hlay);

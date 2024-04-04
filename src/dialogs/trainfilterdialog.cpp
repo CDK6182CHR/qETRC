@@ -3,6 +3,7 @@
 #include "editors/train/trainfilterbasicwidget.h"
 #include "editors/train/trainfiltercombo.h"
 #include "data/train/predeftrainfiltercore.h"
+#include "defines/icon_specs.h"
 
 #include <QFormLayout>
 #include <QMessageBox>
@@ -43,7 +44,7 @@ void TrainFilterDialog::initUI()
             this,&TrainFilterDialog::onComboChanged);
     hlay->addWidget(combo);
     auto* btn=new QToolButton;
-    btn->setIcon(qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation));
+    btn->setIcon(QEICN_train_filter_info);
     connect(btn,&QPushButton::clicked,this,&TrainFilterDialog::informPredef);
     hlay->addWidget(btn);
 

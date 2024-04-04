@@ -52,8 +52,9 @@ void RailDBContext::initUI()
         dbDock->closeDockWidget();
     }
     act = dbDock->toggleViewAction();
-    act->setIcon(QIcon(":/icons/database.png"));
+    act->setIcon(QEICN_rail_db_toggle);
     act->setText(tr("数据库面板"));
+    act->setObjectName(tr("线路数据库面板"));
     act->setToolTip(tr("线路数据库面板 (Ctrl+H)\n"
         "显示或隐藏线路数据库管理面板。"));
     panel->addLargeAction(act);
@@ -66,7 +67,8 @@ void RailDBContext::initUI()
             this, &RailDBContext::onQuickToggled);
     }
     act = quickDock->toggleViewAction();
-    act->setIcon(QIcon(":/icons/diagram.png"));
+    act->setObjectName(tr("快速切片"));
+    act->setIcon(QEICN_quick_path);
     act->setToolTip(tr("快速径路选择 (Ctrl+J)\n"
         "给出关键点，用最短路算法计算径路，生成切片。"));
     panel->addLargeAction(act);

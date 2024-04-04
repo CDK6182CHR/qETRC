@@ -14,6 +14,7 @@
 #include "data/train/predeftrainfiltercore.h"
 #include "util/buttongroup.hpp"
 #include "data/train/traincollection.h"
+#include "defines/icon_specs.h"
 
 PredefTrainFilterWidget::PredefTrainFilterWidget(TrainCollection &coll, QWidget *parent)
     : QWidget{parent}, coll(coll)
@@ -37,7 +38,7 @@ void PredefTrainFilterWidget::initUI()
     edName=new QLineEdit;
     hlay->addWidget(edName);
     auto* btn=new QToolButton;
-    btn->setIcon(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation));
+    btn->setIcon(QEICN_train_filter_info_widget);
     hlay->addWidget(btn);
     connect(btn,&QToolButton::clicked,this,
             &PredefTrainFilterWidget::informPredef);

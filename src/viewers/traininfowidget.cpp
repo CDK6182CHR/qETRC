@@ -18,6 +18,7 @@
 #include "data/train/traintype.h"
 #include "util/utilfunc.h"
 #include "util/dialogadapter.h"
+#include "defines/icon_specs.h"
 
 TrainInfoWidget::TrainInfoWidget(QWidget *parent) : QScrollArea(parent)
 {
@@ -62,7 +63,7 @@ void TrainInfoWidget::initUI()
     auto* hlay = new QHBoxLayout;
     hlay->addWidget(edRouting);
     auto* tb = new QToolButton(this);
-    tb->setIcon(QIcon(qApp->style()->standardIcon(QStyle::SP_ArrowRight)));
+    tb->setIcon(QEICN_train_info_to_routing);
     connect(tb, &QToolButton::clicked, this, &TrainInfoWidget::actSwitchToRouting);
     tb->setToolTip(tr("转到当前交路\n将当前列车所属的交路（如果存在）设置为“当前交路”，"
         "可切换到工具栏的交路上下文页面对交路操作。"));

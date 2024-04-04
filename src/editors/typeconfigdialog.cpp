@@ -7,6 +7,7 @@
 #include "data/train/traintype.h"
 #include "data/train/typemanager.h"
 #include "mainwindow/version.h"
+#include "defines/icon_specs.h"
 #include <model/delegate/linestyledelegate.h>
 
 #include <util/qecontrolledtable.h>
@@ -50,7 +51,7 @@ void TypeConfigDialog::initUI()
         ckTransparent->setChecked(manager.isTransparent());
         hlay->addWidget(ckTransparent);
         auto* tb = new QToolButton;
-        tb->setIcon(QApplication::style()->standardIcon(QStyle::SP_MessageBoxQuestion));
+        tb->setIcon(QEICN_type_config_transparent_help);
         hlay->addWidget(tb);
         connect(tb, &QToolButton::clicked, this, &TypeConfigDialog::informTransparent);
         vlay->addLayout(hlay);

@@ -67,6 +67,7 @@ void PathContext::initUI()
         vlay->addWidget(ed);
         w->setLayout(vlay);
         w->setObjectName(tr("径路名面板"));
+        w->setWindowTitle(tr("径路名称"));
         panel->addWidget(w, SARibbonPannelItem::Large);
     }
 

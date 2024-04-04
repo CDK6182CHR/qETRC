@@ -54,6 +54,7 @@ void RulerContext::initUI()
     ed->setToolTip(tr("当前标尺名称\n不可编辑；如需编辑请至编辑面板操作"));
     edRulerName = ed;
     ed->setObjectName(tr("标尺名称-只读"));
+    ed->setWindowTitle(tr("标尺名称"));
     panel->addWidget(ed, SARibbonPannelItem::Medium);
 
     ed = new QLineEdit;
@@ -63,6 +64,7 @@ void RulerContext::initUI()
     edRailName = ed;
     ed->setFixedWidth(150);
     ed->setObjectName(tr("标尺线路名称"));
+    ed->setWindowTitle(tr("标尺线路名称"));
     panel->addWidget(ed, SARibbonPannelItem::Medium);
 
     panel = page->addPannel(tr("编辑"));

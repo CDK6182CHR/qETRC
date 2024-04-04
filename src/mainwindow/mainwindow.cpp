@@ -593,7 +593,7 @@ void MainWindow::initDockWidgets()
 	if constexpr (true) {
 		QUndoView* view = new QUndoView(undoStack);
 		undoView = view;
-		view->setCleanIcon(qApp->style()->standardIcon(QStyle::SP_DialogSaveButton));
+		view->setCleanIcon(QEICN_undo_stack_clean);
 		auto* dock = new ads::CDockWidget(tr("历史记录"));
 		dock->setWidget(view);
 		undoDock = dock;
@@ -788,7 +788,8 @@ void MainWindow::initToolbar()
 		ribbon->quickAccessBar()->addMenu(menu);
 
 		// Customize 似乎还不太对，先留在这
-#if 0
+		// 2024.04.04: Enable it
+#if 1
 		act = new QAction(QEICN_customize, tr("自定义Ribbon"), this);
 		act->setToolTip(tr("自定义Ribbon\n自定义工具栏按钮的排列组合"));
 		connect(act, &QAction::triggered, this, &MainWindow::actCustomizeRibbon);
@@ -857,7 +858,7 @@ void MainWindow::initToolbar()
 		act->setText(tr("列车管理"));
 		act->setToolTip(tr("列车管理\n打开或关闭（pyETRC风格的）列车管理列表面板。"));
 		act->setIcon(QEICN_train_list);
-        panel->addLargeAction(act);
+        //panel->addLargeAction(act);   // 2024.04.04: not add to this page, to avoid dulplication
 		//btn->setMinimumWidth(80);
 
 		SARibbonMenu* menu = new SARibbonMenu(this);
@@ -956,6 +957,7 @@ void MainWindow::initToolbar()
 		act = pathListDock->toggleViewAction();
 		act->setIcon(QEICN_train_path);
 		act->setText(tr("列车径路"));
+		act->setObjectName(tr("列车径路面板"));
 		act->setToolTip(tr("列车径路\n打开/关闭列车径路管理面板。"));
 		pathMenu = new SARibbonMenu(this);
 		act->setMenu(pathMenu);
@@ -1126,6 +1128,7 @@ void MainWindow::initToolbar()
 		act->setIcon(QEICN_timetable_quick);
 		act->setShortcut(Qt::CTRL | Qt::Key_I);
 		addAction(act);
+		act->setObjectName(tr("速览时刻"));
 		act->setToolTip(tr("速览时刻 (Ctrl+I)\n"
 			"显示或隐藏pyETRC风格的双行只读时刻表。"));
 		panel->addLargeAction(act);
@@ -1133,6 +1136,7 @@ void MainWindow::initToolbar()
 		act = trainInfoDock->toggleViewAction();
 		act->setIcon(QEICN_train_info_quick);
 		act->setShortcut(Qt::CTRL | Qt::Key_Q);
+		act->setObjectName(tr("速览信息"));
 		addAction(act);
 		act->setToolTip(tr("速览信息 (Ctrl+Q)\n"
 			"显示或隐藏pyETRC风格的列车信息栏。"));
@@ -1158,6 +1162,7 @@ void MainWindow::initToolbar()
 			vlay->addWidget(sp);
 			w->setLayout(vlay);
 			w->setObjectName(tr("最大跨越站数面板"));
+			w->setWindowTitle(tr("最大跨越站数"));
 
 			panel->addWidget(w, SARibbonPannelItem::Large);
 
@@ -2335,7 +2340,7 @@ void MainWindow::insertPageWidget(std::shared_ptr<DiagramPage> page, int index)
 	auto start = std::chrono::system_clock::now();
 	DiagramWidget* dw = new DiagramWidget(_diagram, page);
 	auto* dock = new ads::CDockWidget(page->name());
-	dock->setIcon(QIcon(":/icons/diagram.png"));
+	dock->setIcon(QEICN_diagram_page_title);
 	dock->setWidget(dw);
 
 	if (SystemJson::instance.use_central_widget) {

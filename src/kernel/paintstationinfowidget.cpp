@@ -13,6 +13,8 @@
 #include "data/rail/railstation.h"
 #include "data/common/stationname.h"
 #include "util/utilfunc.h"
+#include "defines/icon_specs.h"
+
 
 PaintStationInfoWidget::PaintStationInfoWidget(int id, std::shared_ptr<const RailStation> station, DiagramWidget* d,
 	const QString& trainName, bool greedy, QWidget* parent):
@@ -42,7 +44,7 @@ void PaintStationInfoWidget::initUI(const QString& trainName)
 	hlay->addWidget(lab);
 	hlay->addStretch(2);
 	auto* btn = new QToolButton();
-	btn->setIcon(qApp->style()->standardIcon(QStyle::SP_DialogCloseButton));
+	btn->setIcon(QEICN_paint_station_info_close);
 	connect(btn, &QToolButton::clicked, this, &PaintStationInfoWidget::close);
 	hlay->addWidget(btn);
 	vlay->addLayout(hlay);

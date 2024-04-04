@@ -6,6 +6,7 @@
 #include "mainwindow/mainwindow.h"
 #include "data/diagram/diagrampage.h"
 #include "mainwindow/version.h"
+#include "defines/icon_specs.h"
 
 #include <QCheckBox>
 #include <QColorDialog>
@@ -65,7 +66,7 @@ void ConfigDialog::initUI()
         chlay->addWidget(ckTransparent);
 
         auto* tb = new QToolButton;
-        tb->setIcon(QApplication::style()->standardIcon(QStyle::SP_MessageBoxQuestion));
+        tb->setIcon(QEICN_config_transparent_help);
         connect(tb, &QToolButton::clicked, this, &ConfigDialog::informTransparent);
         chlay->addWidget(tb);
 
@@ -370,7 +371,7 @@ void ConfigDialog::initUI()
         cbTrainNameMarkStyle = cb;
         chlay->addWidget(cb);
         auto* btn = new QToolButton;
-        btn->setIcon(qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation));
+        btn->setIcon(QEICN_config_link_mode_setup_info);
         chlay->addWidget(btn);
         connect(btn, &QPushButton::clicked, this, &ConfigDialog::actTrainNameMarkTip);
 

@@ -111,6 +111,7 @@ void RailContext::initUI()
 		vlay->addWidget(ed);
 		w->setLayout(vlay);
 		w->setObjectName(tr("当前线路信息"));
+		w->setWindowTitle(tr("当前线路"));
 		panel->addWidget(w, SARibbonPannelItem::Large);
 	}
 
@@ -136,6 +137,7 @@ void RailContext::initUI()
 		vlay->addWidget(cb);
 		w->setLayout(vlay);
 		w->setObjectName(tr("纵坐标标尺面板"));
+		w->setWindowTitle(tr("纵坐标标尺"));
 
 		panel->addWidget(w, SARibbonPannelItem::Large);
 	}

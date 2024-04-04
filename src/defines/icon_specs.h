@@ -143,6 +143,10 @@
 #define QEICN_ruler_diff QE_RSC_ICON(ruler.png)   // 标尺对照
 #define QEICN_timetable_diagno_train QE_RSC_ICON(identify.png)   // 时刻诊断（列车）
 
+#define QEICN_train_to_routing QE_STD_ICON(ArrowRight)   // 转到交路
+#define QEICN_create_routing_train QE_RSC_ICON(new-file.png)   // 从列车创建交路
+#define QEICN_add_train_to_routing QE_RSC_ICON(add.png)   // 将列车添加到交路
+
 ///////// 工具栏 列车编辑 (7) /////////
 
 #define QEICN_apply_train_info QE_STD_ICON(DialogApplyButton)   // 应用 列车基本信息
@@ -227,6 +231,8 @@
 
 ///////// 工具栏 路网管理 /////////
 
+#define QEICN_rail_db_toggle QE_RSC_ICON(database.png)   // 线路数据库面板开关
+#define QEICN_quick_path QE_RSC_ICON(diagram.png)   // 快速径路切片
 #define QEICN_path_selector QE_RSC_ICON(polyline.png)   // 经由选择
 #define QEICN_adjacent_list QE_STD_ICON(FileDialogContentsView)   // 邻接表
 #define QEICN_refresh_net QE_STD_ICON(BrowserReload)  // 刷新线网
@@ -238,3 +244,19 @@
 #define QEICN_ruler_db QE_RSC_ICON(ruler.png)   // 编辑标尺
 #define QEICN_skylight_db QE_RSC_ICON(forbid.png)  // 编辑天窗
 #define QEICN_close_db_context QE_STD_ICON(DialogCloseButton)  // 关闭线路数据库
+
+////////////// 非工具栏图标 //////////////
+
+#define QEICN_diagram_page_title QE_RSC_ICON(diagram.png)   // 运行图页面标题栏图标
+#define QEICN_train_info_to_routing QE_STD_ICON(ArrowRight)   // 速览信息中 转到交路
+#define QEICN_train_filter_info QE_STD_ICON(MessageBoxInformation)   // 列车筛选器中 关于预设筛选器的信息
+#define QEICN_train_filter_info_widget QE_STD_ICON(MessageBoxInformation)  // 预设筛选器管理中 关于预设筛选器的信息
+
+#define QEICN_config_transparent_help QE_STD_ICON(MessageBoxQuestion)   // 显示设置中 关于透明模式的信息
+#define QEICN_config_link_mode_setup_info QE_STD_ICON(MessageBoxInformation)   // 显示设置中 连线模式的信息和自动设置
+
+#define QEICN_type_config_transparent_help QE_STD_ICON(MessageBoxQuestion)   // 类型管理中 关于透明模式的信息
+#define QEICN_type_regex_transparent_help QE_STD_ICON(MessageBoxQuestion)   // 类型规则中 关于透明模式的信息
+
+#define QEICN_paint_station_info_close QE_STD_ICON(DialogCloseButton)   // 铺画列车信息窗口的关闭按钮
+#define QEICN_undo_stack_clean QE_STD_ICON(DialogSaveButton)   // 历史记录面板中 标记clean位置的图标

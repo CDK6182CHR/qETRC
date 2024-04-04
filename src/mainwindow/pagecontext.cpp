@@ -75,6 +75,7 @@ void PageContext::initUI()
         vlay->addWidget(ed);
 
         w->setLayout(vlay);
+        w->setWindowTitle(tr("运行图页面名"));
         w->setObjectName(tr("页面名面板"));
         panel->addWidget(w, SARibbonPannelItem::Large);
     }
