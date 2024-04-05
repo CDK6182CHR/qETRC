@@ -104,7 +104,7 @@ if (NOT ANDROID)
         ads
         # GIT_REPOSITORY ${CMAKE_SOURCE_DIR}/external/Qt-Advanced-Docking-System
         GIT_REPOSITORY ${ADS_REPO_URL}
-        GIT_TAG 4.2.1
+        GIT_TAG 4.0.3
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/ads
     )
     FetchContent_MakeAvailable(ads)

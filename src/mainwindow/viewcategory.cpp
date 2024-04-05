@@ -133,6 +133,8 @@ void ViewCategory::initUI()
     group = gall->addGalleryGroup();
     group->setSelectionMode(QAbstractItemView::MultiSelection);
     //group->setSelectionBehavior(QAbstractItemView::SelectItems);
+    //group->setObjectName(tr("显示类型面板当前"));
+    //gall->currentViewGroup()->setObjectName(tr("显示类型面板当前"));
     gall->currentViewGroup()->setSelectionMode(QAbstractItemView::MultiSelection);
     gall->currentViewGroup()->setSelectionModel(group->selectionModel());
     //gall->currentViewGroup()->setDisplayRow(SARibbonGalleryGroup::DisplayTwoRow);
@@ -590,7 +592,7 @@ void ViewCategory::refreshTypeGroup()
     for (auto p = coll.typeCount().cbegin(); p != coll.typeCount().cend(); ++p) {
         if (p.value() <= 0)
             continue;
-        auto* act = new QAction(p.key()->name(), this);
+        auto* act = new QAction(p.key()->name(), gall);
         auto* item = new SARibbonGalleryItem(act);
         model->append(item);
         if (!cfg.not_show_types.contains(p.key()->name())) {

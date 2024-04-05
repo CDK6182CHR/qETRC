@@ -140,7 +140,7 @@ void TrainContext::initUI()
 		auto* vlay = new QVBoxLayout(w);
 		auto* hlay = new QHBoxLayout();
 		hlay->addWidget(edRouting);
-		act = mw->makeAction(tr("转到交路"));
+		act = new QAction(tr("转到交路"), w);
 		connect(act, &QAction::triggered, this, &TrainContext::actToRouting);
 		btnToRouting = new SARibbonToolButton(act);
 		btnToRouting->setIcon(QEICN_train_to_routing);
@@ -308,13 +308,17 @@ void TrainContext::initUI()
 			hlay->setContentsMargins(0, 0, 0, 0);
 			hlay->addWidget(btn);
 
-			act = mw->makeAction(QEICN_remove_path_from_train, tr("移除"), tr("从列车移除径路"));
-			connect(act, &QAction::triggered, this, &TrainContext::actRemovePaths);
+			//act = mw->makeAction(QEICN_remove_path_from_train, tr("移除"), tr("从列车移除径路"));
+			//connect(act, &QAction::triggered, this, &TrainContext::actRemovePaths);
 			auto* menu = new SARibbonMenu(mw);
 			menu->addAction(tr("清空"), this, &TrainContext::actClearPaths);
-			act->setMenu(menu);
 
-			btn = new SARibbonToolButton(act);
+			btn = new SARibbonToolButton;
+			btn->setText(tr("移除"));
+			btn->setObjectName(tr("从列车移除径路"));
+			connect(btn, &QToolButton::clicked, this, &TrainContext::actRemovePaths);
+			btn->setPopupMode(QToolButton::MenuButtonPopup);
+			btn->setMenu(menu);
 			hlay->addWidget(btn);
 			w->setObjectName(tr("列车_径路设置"));
 			w->setWindowTitle(tr("径路设置"));
@@ -1537,6 +1541,8 @@ void TrainContext::actRemovePaths()
 
 void TrainContext::actClearPaths()
 {
+	if (!train)
+		return;
 	mw->getUndoStack()->push(new qecmd::ClearPathsFromTrain(train, this));
 }
 

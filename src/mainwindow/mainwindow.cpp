@@ -765,12 +765,14 @@ void MainWindow::initToolbar()
 	if constexpr (true) {
 		//撤销重做
 		QAction* act = undoStack->createUndoAction(this, tr("撤销"));
+		act->setObjectName(tr("撤销"));
 		act->setIcon(QEICN_undo);
 		act->setShortcut(Qt::CTRL | Qt::Key_Z);
 		act->setShortcutContext(Qt::WindowShortcut);
 		ribbon->quickAccessBar()->addAction(act);
 
 		act = undoStack->createRedoAction(this, tr("重做"));
+		act->setObjectName(tr("重做"));
 		act->setIcon(QEICN_redo);
 		act->setShortcut(Qt::CTRL | Qt::Key_Y);
 		ribbon->quickAccessBar()->addAction(act);
@@ -781,16 +783,19 @@ void MainWindow::initToolbar()
 		ribbon->quickAccessBar()->addAction(act);
 
         auto* menu = new SARibbonMenu(this);
-		act = menu->addAction(tr("全局配置选项"));
-		actGlobalConfig = act;
-		act = menu->addAction(tr("Ribbon选项"), this, &MainWindow::actRibbonConfig);
-		menu->setIcon(QEICN_global_config);
-		ribbon->quickAccessBar()->addMenu(menu);
+		act = makeAction(tr("全局配置选项菜单"));
+		act->setObjectName(tr("全局选项菜单"));
+		auto* actsub = menu->addAction(tr("全局配置选项"));
+		actGlobalConfig = actsub;
+		actsub = menu->addAction(tr("Ribbon选项"), this, &MainWindow::actRibbonConfig);
+		act->setIcon(QEICN_global_config);
+		act->setMenu(menu);
+		ribbon->quickAccessBar()->addAction(act, Qt::ToolButtonIconOnly, QToolButton::InstantPopup);
 
 		// Customize 似乎还不太对，先留在这
 		// 2024.04.04: Enable it
 #if 1
-		act = new QAction(QEICN_customize, tr("自定义Ribbon"), this);
+		act = makeAction(QEICN_customize, tr("自定义Ribbon"));
 		act->setToolTip(tr("自定义Ribbon\n自定义工具栏按钮的排列组合"));
 		connect(act, &QAction::triggered, this, &MainWindow::actCustomizeRibbon);
 		ribbon->quickAccessBar()->addAction(act);
@@ -847,6 +852,7 @@ void MainWindow::initToolbar()
 		act->setShortcut(Qt::Key_F3);
 		addAction(act);
 		act->setText(QObject::tr("导航"));
+		act->setObjectName(tr("导航面板"));
 		act->setToolTip(tr("导航面板 (F3)\n打开或关闭运行图总导航面板。"));
 		act->setIcon(QEICN_navi);
         panel->addLargeAction(act);
@@ -882,11 +888,13 @@ void MainWindow::initToolbar()
 
 		act = logDock->toggleViewAction();
 		act->setIcon(QEICN_text_out_widget);
+		act->setObjectName(tr("输出窗口开关"));
 		act->setToolTip(tr("输出窗口\n打开或关闭文本输出窗口"));
 		panel->addMediumAction(act);
 
 		act = issueDock->toggleViewAction();
 		act->setIcon(QEICN_issue_widget);
+		act->setObjectName(tr("问题窗口开关"));
 		act->setToolTip(tr("铺画问题窗口\n打开或关闭铺画问题窗口，显示运行线铺画过程中的错误报告"));
 		panel->addMediumAction(act);
 
@@ -1053,17 +1061,17 @@ void MainWindow::initToolbar()
 		auto* menu = new SARibbonMenu(tr("列车管理扩展"), this);
 		act->setMenu(menu);
 
-		auto* actsub = makeAction(tr("删除所有车次"));
+		auto* actsub = new QAction(tr("删除所有车次"), menu);
 		connect(actsub, SIGNAL(triggered()), this, SLOT(removeAllTrains()));
 		menu->addAction(actsub);
 
-		actsub = new QAction(tr("删除所有车次和交路"), this);
+		actsub = new QAction(tr("删除所有车次和交路"), menu);
 		connect(actsub, &QAction::triggered, this, &MainWindow::removeAllTrainsAndRoutings);
 		menu->addAction(actsub);
 
 		menu->addSeparator();
 
-		actsub = new QAction(tr("自动始发终到站适配"), this);
+		actsub = new QAction(tr("自动始发终到站适配"), menu);
 		menu->addAction(actsub);
 		connect(actsub, SIGNAL(triggered()), this, SLOT(actAutoStartingTerminal()));
 
@@ -2308,7 +2316,7 @@ void MainWindow::resetRecentActions()
 
 	int i = 0;
 	for (const auto& p : SystemJson::instance.history) {
-		auto* act = new QAction(tr("%1. %2").arg(++i).arg(p), this);
+		auto* act = new QAction(tr("%1. %2").arg(++i).arg(p), appMenu);
 		appMenu->addAction(act);
 		actRecent.append(act);
 		act->setData(p);
