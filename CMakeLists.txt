@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 
 set(qETRC_VERSION_MAJOR 1)
-set(qETRC_VERSION_MINOR 6)
-set(qETRC_VERSION_PATCH 3)
+set(qETRC_VERSION_MINOR 7)
+set(qETRC_VERSION_PATCH 0)
 #set(qETRC_RELEASE_CODE 40)
 
 option(ENABLE_MSVC_PROFILE "Enable MSVC profiler" OFF)
@@ -33,8 +33,8 @@ file(GLOB_RECURSE qETRC_SOURCES "src/*.cpp")
 file(GLOB_RECURSE qETRC_HEADERS "src/*.h")
 file(GLOB_RECURSE qETRC_HEADERS_PP "src/*.hpp")
 
-if (NOT ANDROID)
-    set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/qETRC_resource.rc")
+if (MSVC)
+    set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/icon.rc")
 endif()
 
 # add_executable(qETRC
@@ -158,6 +158,16 @@ if (WIN32 AND (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL 
     message("disable console for Release buildings.")
     # disable console for release version
     set_property(TARGET qETRC PROPERTY WIN32_EXECUTABLE true)
+endif()
+
+if(WIN32)
+    include(cmake/WinResource.cmake)
+	create_win32_resource_version(
+                TARGET qETRC
+                FILENAME qETRC
+		EXT "exe"
+		DESCRIPTION "qETRC train working diagram system."
+	)
 endif()
 
 # translations
