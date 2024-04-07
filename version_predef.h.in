@@ -1,0 +1,3 @@
+#pragma once
+
+#define QETRC_VERSION "@PROJECT_VERSION@"

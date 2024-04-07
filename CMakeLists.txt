@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 set(qETRC_VERSION_MAJOR 1)
 set(qETRC_VERSION_MINOR 7)
-set(qETRC_VERSION_PATCH 0)
+set(qETRC_VERSION_PATCH 1)
 #set(qETRC_RELEASE_CODE 40)
 
 option(ENABLE_MSVC_PROFILE "Enable MSVC profiler" OFF)
@@ -28,6 +28,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+configure_file(
+    version_predef.h.in
+    version_predef.h
+    @ONLY
+)
 
 file(GLOB_RECURSE qETRC_SOURCES "src/*.cpp")
 file(GLOB_RECURSE qETRC_HEADERS "src/*.h")
