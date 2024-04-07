@@ -5,6 +5,7 @@
 #include "mainwindow.h"
 #include "railcontext.h"
 #include "defines/icon_specs.h"
+#include "wizards/greedypaint/greedypaintwizard.h"
 
 #include "dialogs/rulerfromtraindialog.h"
 #include "dialogs/rulerfromspeeddialog.h"
@@ -168,6 +169,11 @@ void RulerContext::commitRemoveRuler(std::shared_ptr<Ruler> ruler, bool isord)
 
     if(ruler==this->ruler)
         emit focusOutRuler();
+
+    // 2024.04.07: for greedy painter
+    if (mw->greedyWidget) {
+        mw->greedyWidget->onRulerRemoved(ruler, rail);
+    }
 }
 
 void RulerContext::undoRemoveRuler(std::shared_ptr<Ruler> ruler, bool isord)

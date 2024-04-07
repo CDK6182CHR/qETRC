@@ -73,8 +73,27 @@ void GreedyPaintWizard::onPaintingPointClicked(DiagramWidget* d, std::shared_ptr
     pgPaint->onPaintingPointClicked(d, train, st);
 }
 
+void GreedyPaintWizard::onRulerRemoved(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> rail)
+{
+    if (ruler == painter.ruler()) {
+        painter.setRuler(nullptr);
+    }
+    refreshData(rail);
+    setCurrentIndex(0);
+}
+
+void GreedyPaintWizard::onRailwayRemoved(std::shared_ptr<Railway> rail)
+{
+    if (rail == painter.railway()) {
+        painter.setRailway(nullptr);
+    }
+    refreshData(rail);
+    setCurrentIndex(0);
+}
+
 void GreedyPaintWizard::refreshData(std::shared_ptr<Railway> rail)
 {
+    pgConst->refreshData();   // 2024.04.07  
     if (painter.railway() == rail && rail) {
         pgPaint->model()->refreshData();
         pgPaint->setupStationLabels();

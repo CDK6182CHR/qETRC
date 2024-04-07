@@ -18,6 +18,7 @@
 #include "editors/railstationwidget.h"
 #include "data/diagram/diagrampage.h"
 #include "defines/icon_specs.h"
+#include "wizards/greedypaint/greedypaintwizard.h"
 
 #include <QStyle>
 #include <QLabel>
@@ -889,6 +890,11 @@ void RailContext::commitRemoveRailwayU(std::shared_ptr<Railway> railway, int ind
 {
 	Q_UNUSED(railway)
 	mw->naviModel->commitRemoveRailwayAtU(index);
+
+	// 2024.04.07: for greedy painter
+	if (mw->greedyWidget) {
+		mw->greedyWidget->onRailwayRemoved(railway);
+	}
 }
 
 void RailContext::undoRemoveRailwayU(std::shared_ptr<Railway> railway, int index)

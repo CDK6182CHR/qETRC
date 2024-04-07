@@ -66,5 +66,9 @@ private slots:
     void onGetGapFromCurrent();
 
     void informFilter();
+
+public slots:
+    // 2024.04.07: mainly for updating the data of cbRuler
+    void refreshData();
 };
 

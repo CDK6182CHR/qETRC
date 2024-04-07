@@ -207,3 +207,9 @@ void GreedyPaintPageConstraint::informFilter()
     QMessageBox::information(this,tr("提示"),tr("列车筛选器决定排图过程中需要考虑冲突的列车，" 
         "和自动提取最小间隔时考虑的列车。未被筛选器选中的车次，在贪心推线算法运行过程中将被直接忽略。"));
 }
+
+void GreedyPaintPageConstraint::refreshData()
+{
+    cbRuler->refreshRailwayList();
+    cbRuler->refreshRulerList();
+}

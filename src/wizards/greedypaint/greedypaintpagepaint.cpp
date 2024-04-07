@@ -57,6 +57,10 @@ void GreedyPaintConfigModel::refreshData()
         setRowCount(0);
         return;
     }
+    if (!_ruler->isValid()) {
+        qWarning() << "Invalid ruler encountered!";
+        return;
+    }
     //blockSignals(true);
 
     using SI = QStandardItem;
@@ -910,6 +914,9 @@ void GreedyPaintPagePaint::clearInfoWidgets()
 
 void GreedyPaintPagePaint::setupStationLabels()
 {
+    // 2024.04.07: for empty rail, just return
+    if (model()->ruler()->railway()->empty())
+        return;
     edStart->setText(_model->startStation()->name.toSingleLiteral());
     edEnd->setText(_model->endStation()->name.toSingleLiteral());
     edAnchor->setText(_model->anchorStation()->name.toSingleLiteral());

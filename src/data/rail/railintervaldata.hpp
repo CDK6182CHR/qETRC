@@ -24,6 +24,14 @@ protected:
     bool _different;
     int _index;
 
+    /**
+     * 2024.04.07  Add this field to trace the status of current object.
+     * If the object (i.e. ruler/forbid) is removed from the railway, this status is false.
+     * This is set because it is dangerous if data is accessed when `this` is removed, as the addition/deletion
+     * of the stations may be not applied.
+     */
+    bool _valid = true;
+
     friend class Railway;
 
     /*
@@ -40,6 +48,8 @@ public:
 
     inline int index()const{return _index;}
     inline bool different()const{return _different;}
+    inline bool isValid()const { return _valid; }
+    inline void setValid(bool v) { this->_valid = v; }
 
     /**
      * 如果设置为false，将下行数据改换为相应反向区间的数据。

@@ -414,6 +414,7 @@ void Railway::removeRuler(std::shared_ptr<Ruler> ruler)
 	for (; p; p = nextIntervalCirc(p)) {
 		p->_rulerNodes.removeAt(index);
 	}
+	ruler->setValid(false);
 }
 
 std::shared_ptr<Ruler> Railway::takeLastRuler()
@@ -426,6 +427,7 @@ std::shared_ptr<Ruler> Railway::takeLastRuler()
 void Railway::undoRemoveRuler(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> data)
 {
 	int idx = ruler->index();
+	ruler->setValid(true);
 	_rulers.insert(idx, ruler);
 	//修改序号
 	for (int i = idx + 1; i < _rulers.size(); i++) {
@@ -450,6 +452,7 @@ void Railway::clearRulers()
 	for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
 		p->_rulerNodes.clear();
 	}
+	std::ranges::for_each(_rulers, [](auto pruler) {pruler->setValid(false); });
 	_rulers.clear();
 }
 
@@ -459,6 +462,7 @@ void Railway::clearForbids()
 	for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
 		p->_forbidNodes.clear();
 	}
+	std::ranges::for_each(_forbids, [](auto pforbid) {pforbid->setValid(false); });
 	_forbids.clear();
 }
 

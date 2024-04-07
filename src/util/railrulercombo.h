@@ -57,6 +57,8 @@ public slots:
      */
     void refreshRailwayList();
 
+    void refreshAll();
+
     void setRailwayIndex(int idx);
 };
 

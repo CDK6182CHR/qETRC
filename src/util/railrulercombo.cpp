@@ -4,6 +4,7 @@
 #include <QtWidgets>
 #include "data/rail/railcategory.h"
 #include "data/rail/rail.h"
+#include "defines/icon_specs.h"
 
 RailRulerCombo::RailRulerCombo(RailCategory &cat_, QWidget *parent):
     QHBoxLayout(parent),cat(cat_),withEmptyRuler(false)
@@ -52,6 +53,10 @@ void RailRulerCombo::initUI()
     cbRuler->setEditable(false);
     addWidget(cbRail);
     addWidget(cbRuler);
+    auto* btn = new QToolButton;
+    btn->setIcon(QEICN_ruler_combo_refresh);
+    connect(btn, &QToolButton::clicked, this, &RailRulerCombo::refreshAll);
+    addWidget(btn);
 
     connect(cbRail,SIGNAL(currentIndexChanged(int)),this,
             SLOT(onRailIndexChanged(int)));
@@ -113,6 +118,12 @@ void RailRulerCombo::refreshRailwayList()
     for(auto p:cat.railways()){
         cbRail->addItem(p->name());
     }
+}
+
+void RailRulerCombo::refreshAll()
+{
+    refreshRailwayList();
+    refreshRulerList();
 }
 
 void RailRulerCombo::setRailwayIndex(int idx)

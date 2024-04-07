@@ -65,6 +65,10 @@ void RulerPaintPageStart::initUI()
     setSubTitle(tr("欢迎使用标尺排图向导。此功能覆盖原pyETRC中的[标尺排图向导]和[区间重排]两个功能，"
         "取决于所选模式的不同。"));
     auto* vlay=new QVBoxLayout;
+    auto* lab = new QLabel(tr("<font color=\"red\">注意：在本功能运行期间，请勿修改或删除所选的线路/标尺，"
+        "请勿尝试以任何（除本向导外的）其他方式修改正在铺画的列车运行线，否则可能造成不可预知的后果。</font>"));
+    lab->setWordWrap(true);
+    vlay->addWidget(lab);
     gpMode=new RadioButtonGroup<4,QVBoxLayout>({"铺画新车次","前缀到既有车次","后缀到既有车次",
                                    "重排既有车次的部分运行线"},this);
     vlay->addLayout(gpMode);

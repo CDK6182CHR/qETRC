@@ -56,5 +56,12 @@ public slots:
     void cleanUpTempData();
 
     void onPaintingPointClicked(DiagramWidget* d, std::shared_ptr<Train> train, AdapterStation* st);
+
+    /**
+     * 2024.04.07: Check status on ruler or railway is removed to avoid dangerous cases.
+     */
+    void onRulerRemoved(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> rail);
+
+    void onRailwayRemoved(std::shared_ptr<Railway> rail);
 };
 

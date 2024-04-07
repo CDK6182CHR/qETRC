@@ -260,3 +260,5 @@
 
 #define QEICN_paint_station_info_close QE_STD_ICON(DialogCloseButton)   // 铺画列车信息窗口的关闭按钮
 #define QEICN_undo_stack_clean QE_STD_ICON(DialogSaveButton)   // 历史记录面板中 标记clean位置的图标
+
+#define QEICN_ruler_combo_refresh QE_STD_ICON(BrowserReload)   // RulerCombo中的刷新
