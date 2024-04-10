@@ -159,6 +159,7 @@ void DiagramWidget::clearGraph()
 
 #include <QThread>
 #include <QProgressDialog>
+#include <QApplication>
 
 // Trial: using QThread for working
 class ToPDFTask : public QThread
@@ -179,9 +180,6 @@ public:
 protected:
     virtual void run()override {
         //pd->setLabelText(tr("正在初始化printer"));
-        sleep(10);
-        // it seems: we cannot call GUI operations in QThread (unfortunately, it is done in paintToFile)
-        return;
         QPrinter printer(QPrinter::HighResolution);
         printer.setOutputFormat(QPrinter::PdfFormat);
         printer.setOutputFileName(filename);
@@ -198,8 +196,12 @@ protected:
         exit(1);
         painter.scale(printer.width() / dw->scene()->width(), printer.width() / dw->scene()->width());
 
-        dw->paintToFile(painter, title, note);
+        //dw->paintToFile(painter, title, note);
         //pd->setValue(2);
+        //https://blog.csdn.net/weixin_44084447/article/details/123119101
+        QMetaObject::invokeMethod(qApp, [this, &painter]() {
+            dw->paintToFile(painter, title, note);
+            });
     }
 };
 

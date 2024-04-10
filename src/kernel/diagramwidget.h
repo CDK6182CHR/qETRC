@@ -316,8 +316,9 @@ private:
 
     /**
      * 输出PDF和PNG的公共操作
+     * 2024.04.10: refactor to public slots (previous private function) for multi-threaded impl.
      */
-    void paintToFile(QPainter& painter, const QString& title, const QString& note);
+    //void paintToFile(QPainter& painter, const QString& title, const QString& note);
 
     /**
      * 显示用于虚化非选择车次的蒙板
@@ -406,5 +407,12 @@ public slots:
      * Here, the widget's parent is this.
      */
     void addPaintStationInfoWidget(PaintStationInfoWidget* w);
+
+    /**
+     * 输出PDF和PNG的公共操作
+     * 2024.04.10: refactor to public slots (previous private function) for multi-threaded impl.
+     */
+     void paintToFile(QPainter& painter, const QString& title, const QString& note);
+
 };
 
