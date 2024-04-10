@@ -157,6 +157,39 @@ void DiagramWidget::clearGraph()
     scene()->clear();
 }
 
+#include <QThread>
+#include <QProgressDialog>
+
+// Trial: using QThread for working
+class ToPDFTask : public QThread
+{
+    DiagramWidget* dw;
+    QString filename, title, note;
+public:
+    ToPDFTask(DiagramWidget* dw, const QString& filename, const QString& title, const QString& note, QObject* parent=nullptr) :
+        QThread(parent), dw(dw), filename(filename), title(title),note(note) {}
+
+protected:
+    virtual void run()override {
+        QPrinter printer(QPrinter::HighResolution);
+        printer.setOutputFormat(QPrinter::PdfFormat);
+        printer.setOutputFileName(filename);
+        constexpr double note_apdx = 80;
+
+        QSize size(dw->scene()->width(), dw->scene()->height() + 100 + note_apdx);
+        QPageSize pageSize(size);
+        printer.setPageSize(pageSize);
+
+        QPainter painter;
+        painter.begin(&printer);
+
+        exit(1);
+        painter.scale(printer.width() / dw->scene()->width(), printer.width() / dw->scene()->width());
+
+        dw->paintToFile(painter, title, note);
+    }
+};
+
 bool DiagramWidget::toPdf(const QString& filename, const QString& title, const QString& note)
 {
 #if ! defined(QT_PRINTSUPPORT_LIB)
@@ -169,27 +202,18 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
 #else
     using namespace std::chrono_literals;
     auto start = std::chrono::system_clock::now();
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setOutputFileName(filename);
-    constexpr double note_apdx = 80;
 
-    QSize size(scene()->width(), scene()->height() + 100 + note_apdx);
-    QPageSize pageSize(size);
-    printer.setPageSize(pageSize);
-
-    QPainter painter;
-    painter.begin(&printer);
-
-    if (!painter.isActive()) {
-        QMessageBox::warning(this, QObject::tr("错误"), QObject::tr("保存PDF失败，可能是文件占用。"));
-        return false;
-    }
-    painter.scale(printer.width() / scene()->width(), printer.width() / scene()->width());
-
-    paintToFile(painter, title, note);
+    QProgressDialog d(tr("导出PDF"),tr("取消"), 0, 2, this);
+    d.setRange(0, 2);
+    d.setWindowModality(Qt::NonModal);
+    d.setValue(1);
+    ToPDFTask task(this, filename, title, note, this);
+    connect(&task, &ToPDFTask::finished, &d, &QProgressDialog::reset);
+    task.start();
+    
+    task.wait();
     auto end = std::chrono::system_clock::now();
-    emit showNewStatus(tr("导出PDF  用时%1毫秒").arg((end - start) / 1ms));
+    //emit showNewStatus(tr("导出PDF  用时%1毫秒").arg((end - start) / 1ms));
     return true;
 #endif
 }

@@ -125,6 +125,7 @@ public:
     auto selectedTrain() { return _selectedTrain; }
     void setSelectedTrain(std::shared_ptr<Train> train) { _selectedTrain = train; }
 
+    friend class ToPDFTask;
     bool toPdf(const QString& filename, const QString& title, const QString& note);
 
     bool toPng(const QString& filename, const QString& title, const QString& note);
