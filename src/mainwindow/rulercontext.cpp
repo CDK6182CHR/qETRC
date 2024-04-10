@@ -393,6 +393,7 @@ void qecmd::RemoveRuler::undo()
     ruler->railway()->undoRemoveRuler(ruler, data);
     if (isOrd) {
         ruler->railway()->setOrdinate(ruler);
+        ruler->railway()->calStationYCoeff();   // 2024.04.10 add
     }
     cont->undoRemoveRuler(ruler, isOrd);
 }

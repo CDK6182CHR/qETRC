@@ -402,6 +402,7 @@ void Railway::removeRuler(std::shared_ptr<Ruler> ruler)
 	int index = ruler->index();
 	if (index == ordinateIndex()) {
 		resetOrdinate();
+		calStationYCoeff();   // 2024.04.10  FIX
 	}
 	//首先从头结点里面抹掉
 	_rulers.removeAt(index);
