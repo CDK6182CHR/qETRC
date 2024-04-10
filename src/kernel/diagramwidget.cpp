@@ -192,8 +192,14 @@ protected:
 
         QPainter painter;
         painter.begin(&printer);
+        
+        if (!painter.isActive()) {
+            QMetaObject::invokeMethod(qApp, [this]() {
+                QMessageBox::warning(dw, tr("错误"), tr("导出PDF失败，可能因为文件占用"));
+                });
+            QThread::exit(1);
+        }
 
-        exit(1);
         painter.scale(printer.width() / dw->scene()->width(), printer.width() / dw->scene()->width());
 
         //dw->paintToFile(painter, title, note);
@@ -201,7 +207,7 @@ protected:
         //https://blog.csdn.net/weixin_44084447/article/details/123119101
         QMetaObject::invokeMethod(qApp, [this, &painter]() {
             dw->paintToFile(painter, title, note);
-            });
+            }, Qt::BlockingQueuedConnection);  // to make sure local variables valid, here must use BlockingQueuedConnection
     }
 };
 
@@ -223,12 +229,19 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
 
     QProgressDialog* pd =new QProgressDialog(tr("导出PDF"), tr("取消"), 0, 2, this);
     pd->setWindowModality(Qt::NonModal);
-    pd->open();
-    connect(task, &QThread::finished, pd, &QProgressDialog::reset);
-    // MIND: memory leakage not handled
+    //pd->open();
+    connect(task, &QThread::finished, 
+        [pd, task, start, this]() {
+            pd->reset();
+            pd->deleteLater();
+            task->deleteLater();
+
+            auto end = std::chrono::system_clock::now();
+            emit showNewStatus(tr("导出PDF  用时%1毫秒").arg((end - start) / 1ms));
+        });
 
 
-    auto end = std::chrono::system_clock::now();
+    
     //emit showNewStatus(tr("导出PDF  用时%1毫秒").arg((end - start) / 1ms));
     return true;
 #endif
