@@ -56,6 +56,7 @@ void PrintDiagramDialog::onSavePdf()
     if (fn.isEmpty())
         return;
     bool flag = dw->toPdf(fn, edName->text(), edNote->toPlainText());
+    return;   // tmp process
     if (flag) {
         QMessageBox::information(this, tr("提示"), tr("导出PDF文档成功"));
         done(QDialog::Accepted);

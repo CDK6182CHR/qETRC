@@ -165,16 +165,28 @@ class ToPDFTask : public QThread
 {
     DiagramWidget* dw;
     QString filename, title, note;
+    //QProgressDialog* pd;
 public:
-    ToPDFTask(DiagramWidget* dw, const QString& filename, const QString& title, const QString& note, QObject* parent=nullptr) :
-        QThread(parent), dw(dw), filename(filename), title(title),note(note) {}
+    ToPDFTask(DiagramWidget* dw, const QString& filename, const QString& title, const QString& note, QObject* parent = nullptr) :
+        QThread(parent), dw(dw), filename(filename), title(title), note(note)
+    {
+        //pd = new QProgressDialog(tr("导出PDF"), tr("取消"), 0, 2, dw);
+        //pd->setAttribute(Qt::WA_DeleteOnClose);
+        //pd->setWindowModality(Qt::NonModal);
+        //connect(this, &QThread::finished, this, &QObject::deleteLater);
+    }
 
 protected:
     virtual void run()override {
+        //pd->setLabelText(tr("正在初始化printer"));
+        sleep(10);
+        // it seems: we cannot call GUI operations in QThread (unfortunately, it is done in paintToFile)
+        return;
         QPrinter printer(QPrinter::HighResolution);
         printer.setOutputFormat(QPrinter::PdfFormat);
         printer.setOutputFileName(filename);
         constexpr double note_apdx = 80;
+        //pd->setValue(1);
 
         QSize size(dw->scene()->width(), dw->scene()->height() + 100 + note_apdx);
         QPageSize pageSize(size);
@@ -187,6 +199,7 @@ protected:
         painter.scale(printer.width() / dw->scene()->width(), printer.width() / dw->scene()->width());
 
         dw->paintToFile(painter, title, note);
+        //pd->setValue(2);
     }
 };
 
@@ -203,15 +216,16 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
     using namespace std::chrono_literals;
     auto start = std::chrono::system_clock::now();
 
-    QProgressDialog d(tr("导出PDF"),tr("取消"), 0, 2, this);
-    d.setRange(0, 2);
-    d.setWindowModality(Qt::NonModal);
-    d.setValue(1);
-    ToPDFTask task(this, filename, title, note, this);
-    connect(&task, &ToPDFTask::finished, &d, &QProgressDialog::reset);
-    task.start();
-    
-    task.wait();
+    auto* task=new ToPDFTask(this, filename, title, note, this);
+    task->start();
+
+    QProgressDialog* pd =new QProgressDialog(tr("导出PDF"), tr("取消"), 0, 2, this);
+    pd->setWindowModality(Qt::NonModal);
+    pd->open();
+    connect(task, &QThread::finished, pd, &QProgressDialog::reset);
+    // MIND: memory leakage not handled
+
+
     auto end = std::chrono::system_clock::now();
     //emit showNewStatus(tr("导出PDF  用时%1毫秒").arg((end - start) / 1ms));
     return true;
