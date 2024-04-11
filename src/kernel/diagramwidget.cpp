@@ -33,6 +33,7 @@
 #include "dragtimeinfowidget.h"
 #include "paintstationpointitem.h"
 #include "paintstationinfowidget.h"
+#include "util/qeprogressthread.h"
 
 
 DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page, QWidget* parent):
@@ -157,61 +158,7 @@ void DiagramWidget::clearGraph()
     scene()->clear();
 }
 
-#include <QThread>
-#include <QProgressDialog>
-#include <QApplication>
-
-// Trial: using QThread for working
-class ToPDFTask : public QThread
-{
-    DiagramWidget* dw;
-    QString filename, title, note;
-    //QProgressDialog* pd;
-public:
-    ToPDFTask(DiagramWidget* dw, const QString& filename, const QString& title, const QString& note, QObject* parent = nullptr) :
-        QThread(parent), dw(dw), filename(filename), title(title), note(note)
-    {
-        //pd = new QProgressDialog(tr("导出PDF"), tr("取消"), 0, 2, dw);
-        //pd->setAttribute(Qt::WA_DeleteOnClose);
-        //pd->setWindowModality(Qt::NonModal);
-        //connect(this, &QThread::finished, this, &QObject::deleteLater);
-    }
-
-protected:
-    virtual void run()override {
-        //pd->setLabelText(tr("正在初始化printer"));
-        QPrinter printer(QPrinter::HighResolution);
-        printer.setOutputFormat(QPrinter::PdfFormat);
-        printer.setOutputFileName(filename);
-        constexpr double note_apdx = 80;
-        //pd->setValue(1);
-
-        QSize size(dw->scene()->width(), dw->scene()->height() + 100 + note_apdx);
-        QPageSize pageSize(size);
-        printer.setPageSize(pageSize);
-
-        QPainter painter;
-        painter.begin(&printer);
-        
-        if (!painter.isActive()) {
-            QMetaObject::invokeMethod(qApp, [this]() {
-                QMessageBox::warning(dw, tr("错误"), tr("导出PDF失败，可能因为文件占用"));
-                });
-            QThread::exit(1);
-        }
-
-        painter.scale(printer.width() / dw->scene()->width(), printer.width() / dw->scene()->width());
-
-        //dw->paintToFile(painter, title, note);
-        //pd->setValue(2);
-        //https://blog.csdn.net/weixin_44084447/article/details/123119101
-        QMetaObject::invokeMethod(qApp, [this, &painter]() {
-            dw->paintToFile(painter, title, note);
-            }, Qt::BlockingQueuedConnection);  // to make sure local variables valid, here must use BlockingQueuedConnection
-    }
-};
-
-bool DiagramWidget::toPdf(const QString& filename, const QString& title, const QString& note)
+void DiagramWidget::toPdfAsync(const QString& filename, const QString& title, const QString& note, QWidget* parent)
 {
 #if ! defined(QT_PRINTSUPPORT_LIB)
     Q_UNUSED(filename);
@@ -219,11 +166,74 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
     Q_UNUSED(note)
     QMessageBox::warning(this,tr("错误"),tr("由于当前平台不支持QtPrintSupport, "
         "无法使用导出PDF功能。请考虑使用导出PNG功能。"));
-    return false;
+    return;
 #else
     using namespace std::chrono_literals;
     auto start = std::chrono::system_clock::now();
 
+    // 2024.04.11: we should capture values since this kernel is executed in async.
+    auto* task = new QEProgressThread([filename, title, note, this](QEProgressThread* d)->int {
+        d->setLabelText(tr("正在初始化printer"));
+        QPrinter printer(QPrinter::HighResolution);
+        printer.setOutputFormat(QPrinter::PdfFormat);
+        printer.setOutputFileName(filename);
+        constexpr double note_apdx = 80;
+        //pd->setValue(1);
+
+        QSize size(scene()->width(), scene()->height() + 100 + note_apdx);
+        QPageSize pageSize(size);
+        printer.setPageSize(pageSize);
+
+        QPainter painter;
+        painter.begin(&printer);
+
+        if (!painter.isActive()) {
+            return 1;
+        }
+
+        painter.scale(printer.width() / scene()->width(), printer.width() / scene()->width());
+
+        d->setLabelText(tr("正在进行绘图操作"));
+        //https://blog.csdn.net/weixin_44084447/article/details/123119101
+        QMetaObject::invokeMethod(d, [this, &painter, &title, &note]() {
+            paintToFile(painter, title, note);
+            }, Qt::BlockingQueuedConnection);  // to make sure local variables valid, here must use BlockingQueuedConnection
+
+        return 0;     
+        },   // end of kernel
+        parent);
+
+    task->progressDialog()->setWindowTitle(tr("导出PDF"));
+    task->progressDialog()->setRange(0, 2);
+    task->progressDialog()->setValue(1);
+    task->progressDialog()->setCancelButton(nullptr);
+
+    connect(task, &QThread::finished, [this, start, task, filename, parent]() {
+        if (task->returnCode() == 0) {
+            // succ
+            auto end = std::chrono::system_clock::now();
+            emit showNewStatus(tr("导出PDF  用时%1毫秒").arg((end - start) / 1ms));
+            QMetaObject::invokeMethod(this,
+                [this, filename]() {
+                    QMessageBox::information(this, tr("提示"),
+                        tr("已成功导出至PDF文件：\n%1").arg(filename));
+                });
+        }
+        else {
+            QMetaObject::invokeMethod(this,
+                [this, filename]() {
+                    QMessageBox::warning(this, tr("错误"),
+                        tr("导出失败，可能因为文件占用"));
+                });
+        }
+        task->deleteLater();
+        });
+        
+    // TODO: deal with the possible deletion of dialogs...
+
+    task->start();
+
+#if 0
     auto* task=new ToPDFTask(this, filename, title, note, this);
     task->start();
 
@@ -243,7 +253,8 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
 
     
     //emit showNewStatus(tr("导出PDF  用时%1毫秒").arg((end - start) / 1ms));
-    return true;
+    return;
+#endif
 #endif
 }
 

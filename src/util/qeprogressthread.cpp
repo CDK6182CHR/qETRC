@@ -12,8 +12,14 @@ QEProgressThread::QEProgressThread(functor_t&& func, QWidget* parent):
 	connect(this, &QThread::finished, [this]() {
 		dlg->reset();
 		dlg->deleteLater();
-		this->deleteLater();
+		//this->deleteLater();  // not called here; use it outside
 		});
+}
+
+void QEProgressThread::run()
+{
+	_ret = func(this);
+	exit(_ret);
 }
 
 void QEProgressThread::setLabelText(const QString& txt)

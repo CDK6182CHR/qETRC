@@ -125,8 +125,12 @@ public:
     auto selectedTrain() { return _selectedTrain; }
     void setSelectedTrain(std::shared_ptr<Train> train) { _selectedTrain = train; }
 
-    friend class ToPDFTask;
-    bool toPdf(const QString& filename, const QString& title, const QString& note);
+    void toPdf(const QString& filename, const QString& title, const QString& note);
+
+    /**
+     * 2024.04.10: Change to async impl. The parent is used for constructing QProgressDialog.
+     */
+    void toPdfAsync(const QString& filename, const QString& title, const QString& note, QWidget* parent);
 
     bool toPng(const QString& filename, const QString& title, const QString& note);
 

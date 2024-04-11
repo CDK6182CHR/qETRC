@@ -1,10 +1,9 @@
 #pragma once
 
 #include <QThread>
+#include <QProgressDialog>
 #include <functional>
 
-class QProgressDialog;
-class QWidget;
 
 /**
  * 2024.04.10  This is a QThread combined with QProgressDialog.
@@ -16,17 +15,24 @@ class QEProgressThread : public QThread
 	Q_OBJECT;
 
 #if __cpp_lib_move_only_function >= 202110L
-	using functor_t = std::move_only_function<void(QEProgressThread*> );
+	using functor_t = std::move_only_function<int(QEProgressThread*> );
 #else
-	using functor_t = std::function<void(QEProgressThread*)>;
+	using functor_t = std::function<int(QEProgressThread*)>;
 #endif
 
 	QProgressDialog* dlg;
 	functor_t func;
+	int _ret = 0;
 
 public:
 	QEProgressThread(functor_t&& func, QWidget* parent = nullptr);
 	auto* progressDialog() { return dlg; }
+	int returnCode()const { return _ret; }
+protected:
+	virtual void run()override;
+
+signals:
+	void finishedWithCode(int code);
 
 public slots:
 	// encapsule some functions. Note these functions are designed to be called inside run() with QMetaObject::invokeMethod.

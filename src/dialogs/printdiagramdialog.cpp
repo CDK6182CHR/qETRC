@@ -55,8 +55,8 @@ void PrintDiagramDialog::onSavePdf()
         tr("PDF文档 (*.pdf)"));
     if (fn.isEmpty())
         return;
+#if 0
     bool flag = dw->toPdf(fn, edName->text(), edNote->toPlainText());
-    return;   // tmp process
     if (flag) {
         QMessageBox::information(this, tr("提示"), tr("导出PDF文档成功"));
         done(QDialog::Accepted);
@@ -64,6 +64,10 @@ void PrintDiagramDialog::onSavePdf()
     else {
         QMessageBox::warning(this, tr("错误"), tr("导出PDF文档失败，可能因为文件占用。"));
     }
+#else 
+    // 2024.04.10: async impl
+    dw->toPdfAsync(fn, edName->text(), edNote->toPlainText(), this);
+#endif
 }
 
 void PrintDiagramDialog::onSavePng()
