@@ -19,6 +19,7 @@
 #include <QScroller>
 #include <QMenu>
 #include <QGraphicsProxyWidget>
+#include <QTimer>
 
 #if defined(QT_PRINTSUPPORT_LIB)
 #include <QPrinter>
@@ -173,7 +174,7 @@ void DiagramWidget::toPdfAsync(const QString& filename, const QString& title, co
 
     // 2024.04.11: we should capture values since this kernel is executed in async.
     auto* task = new QEProgressThread([filename, title, note, this](QEProgressThread* d)->int {
-        d->setLabelText(tr("正在初始化printer"));
+        //d->setLabelText(tr("正在初始化printer"));
         QPrinter printer(QPrinter::HighResolution);
         printer.setOutputFormat(QPrinter::PdfFormat);
         printer.setOutputFileName(filename);
@@ -193,7 +194,7 @@ void DiagramWidget::toPdfAsync(const QString& filename, const QString& title, co
 
         painter.scale(printer.width() / scene()->width(), printer.width() / scene()->width());
 
-        d->setLabelText(tr("正在进行绘图操作"));
+        //d->setLabelText(tr("正在进行绘图操作"));
         //https://blog.csdn.net/weixin_44084447/article/details/123119101
         QMetaObject::invokeMethod(d, [this, &painter, &title, &note]() {
             paintToFile(painter, title, note);
@@ -203,10 +204,24 @@ void DiagramWidget::toPdfAsync(const QString& filename, const QString& title, co
         },   // end of kernel
         parent);
 
+    parent->setAttribute(Qt::WA_DeleteOnClose, false);   // for safety, disable auto delete!
+
     task->progressDialog()->setWindowTitle(tr("导出PDF"));
-    task->progressDialog()->setRange(0, 2);
-    task->progressDialog()->setValue(1);
+    task->progressDialog()->setLabelText(tr("正在导出运行图\n请不要删除此运行图页面"));
+    //task->progressDialog()->setWindowModality(Qt::WindowModal);
+    task->progressDialog()->setMinimumDuration(500);
+    task->progressDialog()->setRange(0, 30);
+    task->progressDialog()->setValue(0);
     task->progressDialog()->setCancelButton(nullptr);
+
+    auto* timer = new QTimer(task);
+    timer->setInterval(1000);
+    timer->callOnTimeout([task]() {
+        if (auto v = task->progressDialog()->value(); v <= 28) {
+            task->setValue(v + 1);
+        }
+        });
+    timer->start();
 
     connect(task, &QThread::finished, [this, start, task, filename, parent]() {
         if (task->returnCode() == 0) {
@@ -227,10 +242,14 @@ void DiagramWidget::toPdfAsync(const QString& filename, const QString& title, co
                 });
         }
         task->deleteLater();
+        if (parent->isHidden()) {   // TODO: is this thread-safe?
+            parent->deleteLater();
+        }
+        else {
+            parent->setAttribute(Qt::WA_DeleteOnClose);
+        }
         });
         
-    // TODO: deal with the possible deletion of dialogs...
-
     task->start();
 
 #if 0
