@@ -125,7 +125,7 @@ public:
     auto selectedTrain() { return _selectedTrain; }
     void setSelectedTrain(std::shared_ptr<Train> train) { _selectedTrain = train; }
 
-    void toPdf(const QString& filename, const QString& title, const QString& note);
+    bool toPdf(const QString& filename, const QString& title, const QString& note);
 
     /**
      * 2024.04.10: Change to async impl. The parent is used for constructing QProgressDialog.

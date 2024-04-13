@@ -159,6 +159,43 @@ void DiagramWidget::clearGraph()
     scene()->clear();
 }
 
+bool DiagramWidget::toPdf(const QString& filename, const QString& title, const QString& note)
+{
+#if ! defined(QT_PRINTSUPPORT_LIB)
+    Q_UNUSED(filename);
+    Q_UNUSED(title);
+    Q_UNUSED(note)
+        QMessageBox::warning(this, tr("错误"), tr("由于当前平台不支持QtPrintSupport, "
+            "无法使用导出PDF功能。请考虑使用导出PNG功能。"));
+    return false;
+#else
+    using namespace std::chrono_literals;
+    auto start = std::chrono::system_clock::now();
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(filename);
+    constexpr double note_apdx = 80;
+
+    QSize size(scene()->width(), scene()->height() + 100 + note_apdx);
+    QPageSize pageSize(size);
+    printer.setPageSize(pageSize);
+
+    QPainter painter;
+    painter.begin(&printer);
+
+    if (!painter.isActive()) {
+        QMessageBox::warning(this, QObject::tr("错误"), QObject::tr("保存PDF失败，可能是文件占用。"));
+        return false;
+    }
+    painter.scale(printer.width() / scene()->width(), printer.width() / scene()->width());
+
+    paintToFile(painter, title, note);
+    auto end = std::chrono::system_clock::now();
+    emit showNewStatus(tr("导出PDF  用时%1毫秒").arg((end - start) / 1ms));
+    return true;
+#endif
+}
+
 void DiagramWidget::toPdfAsync(const QString& filename, const QString& title, const QString& note, QWidget* parent)
 {
 #if ! defined(QT_PRINTSUPPORT_LIB)
@@ -242,7 +279,7 @@ void DiagramWidget::toPdfAsync(const QString& filename, const QString& title, co
                 });
         }
         task->deleteLater();
-        if (parent->isHidden()) {   // TODO: is this thread-safe?
+        if (parent->isHidden()) {   // It should be safe as this slot is handled in event loop?
             parent->deleteLater();
         }
         else {
