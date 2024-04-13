@@ -1596,6 +1596,10 @@ void MainWindow::clearDiagramUnchecked()
 	contextRail->removeAllDocks();
 	contextPath->removePathDocks();
 
+	// 2024.04.13: clear the two quick widgets
+	timetableQuickWidget->resetTrain();
+	trainInfoWidget->setTrain(nullptr);
+
 	undoStack->clear();
 	undoStack->resetClean();
 

@@ -44,7 +44,9 @@ private:
     
 public slots:
     void setTrain(std::shared_ptr<Train> train);
+    void resetTrain();
     void refreshData();
+    void clearData();
 
 private slots:
     void toText();

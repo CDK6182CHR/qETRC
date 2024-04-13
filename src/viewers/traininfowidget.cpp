@@ -120,10 +120,18 @@ void TrainInfoWidget::setTrain(std::shared_ptr<Train> train)
     refreshData();
 }
 
+void TrainInfoWidget::resetTrain()
+{
+    this->train = nullptr;
+    clearData();
+}
+
 void TrainInfoWidget::refreshData()
 {
-    if (!train)
+    if (!train) {
+        clearData();
         return;
+    }
     edName->setText(train->trainName().full());
     edNameDir->setText(tr("%1 / %2").arg(train->trainName().down(),
                                          train->trainName().up()));
@@ -199,6 +207,23 @@ void TrainInfoWidget::refreshData()
         edPost->clear();
         edOrder->clear();
     }
+}
+
+void TrainInfoWidget::clearData()
+{
+    // For the lineEdits
+    std::initializer_list<QLineEdit*> lineEdits{
+        edName, edNameDir, edStartEnd, edType, edPassen,
+        edStations, edLines, edMile, edTime, edSpeed,
+        edTechSpeed, edRouting, edModel, edOwner, edPre, edPost,
+        edTotTime,edTotRun, edTotStay, edTotMile, edTotSpeed, edTotTechSpeed
+    };
+    for (auto* p : lineEdits) {
+        p->clear();
+    }
+
+    // Other widgets
+    edOrder->clear();
 }
 
 void TrainInfoWidget::toText()

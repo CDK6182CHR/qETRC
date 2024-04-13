@@ -550,11 +550,18 @@ void TrainContext::commitTraininfoChange(std::shared_ptr<Train> train, std::shar
 
 void TrainContext::removeAllTrainWidgets()
 {
-	for (auto p : basicDocks) {
+	foreach (auto p , basicDocks) {
 		p->deleteDockWidget();
 	}
 	basicDocks.clear();
 	basicWidgets.clear();
+	
+	// 2024.04.13: remove also edit widgets
+	foreach(auto p, editDocks) {
+		p->deleteDockWidget();
+	}
+	editDocks.clear();
+	editWidgets.clear();
 }
 
 void TrainContext::commitExchangeTrainInterval(std::shared_ptr<Train> train1, std::shared_ptr<Train> train2)

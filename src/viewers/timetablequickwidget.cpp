@@ -148,7 +148,11 @@ void TimetableQuickWidget::resetTrain()
 void TimetableQuickWidget::refreshData()
 {
     model->setTrain(train);
-    if(!train)return;
+    if (!train) {
+        // 2024.04.13: clear data on close diagram etc
+        edName->clear();
+        return;
+    }
     edName->setText(tr("%1 (%2->%3)").arg(train->trainName().full(),
                                           train->starting().toSingleLiteral(),
                                           train->terminal().toSingleLiteral()));
