@@ -242,6 +242,8 @@ void TypeManager::initDefaultTypes()
     addType(QObject::tr("动车"), QPen(QColor(128, 64, 0), 1.5));
     addType(QObject::tr("高速"), QPen(QColor(255, 0, 190), 1.5));
     addType(QObject::tr("城际"), QPen(QColor(255, 51, 204), 1.5));
+    addType(QObject::tr("市郊"), QPen(QColor(133, 46, 255), 1.5));
+    addType(QObject::tr("临客"), QPen(QColor(128, 128, 128), 1.5));
 
     appendRegex(QRegularExpression(R"(^G\d+)"), QObject::tr("高速"), true);
     appendRegex(QRegularExpression(R"(^D\d+)"), QObject::tr("动车组"), true);
@@ -249,6 +251,7 @@ void TypeManager::initDefaultTypes()
     appendRegex(QRegularExpression(R"(^Z\d+)"), QObject::tr("直达特快"), true);
     appendRegex(QRegularExpression(R"(^T\d+)"), QObject::tr("特快"), true);
     appendRegex(QRegularExpression(R"(^K\d+)"), QObject::tr("快速"), true);
+    appendRegex(QRegularExpression(R"(^S\d+)"), QObject::tr("市郊"), true);
     appendRegex(QRegularExpression(R"(^[1-5]\d{3}$)"), QObject::tr("普快"), true);
     appendRegex(QRegularExpression(R"(^[1-5]\d{3}\D)"), QObject::tr("普快"), true);
     appendRegex(QRegularExpression(R"(^6\d{3}$)"), QObject::tr("普客"), true);

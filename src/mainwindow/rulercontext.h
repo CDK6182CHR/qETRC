@@ -120,6 +120,8 @@ private slots:
     void actExportCsv();
 
     void actImportCsv();
+
+    void actChangeRuler();
 };
 
 

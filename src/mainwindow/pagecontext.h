@@ -79,6 +79,8 @@ private slots:
 
     void vShrink();
 
+    void actChangePage();
+
 public slots:
     void onEditApplied(std::shared_ptr<DiagramPage> page,std::shared_ptr<DiagramPage> newinfo);
 

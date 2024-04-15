@@ -448,6 +448,8 @@ private slots:
      */
     void actAddToRouting();
 
+    void actChangeTrain();
+
 };
 
 

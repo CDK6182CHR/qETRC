@@ -120,6 +120,7 @@
 
 ///////// 工具栏 运行图 (5) /////////
 
+#define QEICN_change_page QE_RSC_ICON(exchange.png)   // 切换页面
 #define QEICN_edit_page QE_RSC_ICON(edit.png)  // 编辑运行图页面
 #define QEICN_export_page QE_RSC_ICON(pdf.png)   // 导出运行图页面
 #define QEICN_appearance_config_page QE_RSC_ICON(config.png)   // 显示设置 （运行图页面级别）
@@ -137,6 +138,7 @@
 
 ///////// 工具栏 列车审阅 (6) /////////
 
+#define QEICN_change_train QE_RSC_ICON(exchange.png)   // 切换列车
 #define QEICN_train_line QE_RSC_ICON(trainline.png)   // 高亮列车运行线
 #define QEICN_train_events QE_RSC_ICON(clock.png)    // 列车事件表
 #define QEICN_train_line_list QE_RSC_ICON(line-manage.png)   // 运行线一览
@@ -169,6 +171,7 @@
 
 ///////// 工具栏 线路工具 (8) /////////
 
+#define QEICN_change_rail QE_RSC_ICON(exchange.png)   // 切换线路
 #define QEICN_edit_rail QE_RSC_ICON(rail.png)   // 基线编辑
 #define QEICN_edit_skylight QE_RSC_ICON(forbid.png)   // 天窗编辑
 #define QEICN_edit_ruler_rail QE_RSC_ICON(ruler.png)   // 标尺编辑 从线路进入
@@ -194,6 +197,7 @@
 
 ///////// 工具栏 标尺管理 (9) /////////
 
+#define QEICN_change_ruler QE_RSC_ICON(exchange.png)   // 切换标尺
 #define QEICN_edit_ruler QE_RSC_ICON(edit.png)    // 编辑标尺
 #define QEICN_ruler_from_train QE_RSC_ICON(identify.png)   // 从车次提取标尺
 #define QEICN_ruler_from_speed QE_RSC_ICON(clock.png)   // 从速度计算标尺

@@ -50,6 +50,7 @@
 #include "model/diagram/diagramnavimodel.h"
 #include "dialogs/selectroutingdialog.h"
 #include "defines/icon_specs.h"
+#include "util/selecttraincombo.h"
 
 TrainContext::TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_,
 	MainWindow* mw_) :
@@ -77,12 +78,18 @@ void TrainContext::initUI()
 		if constexpr (true) {
 			QWidget* w = new QWidget;
 			auto* vlay = new QVBoxLayout;
+			auto* hlay = new QHBoxLayout;
 			edName = new SARibbonLineEdit;
 			edName->setAlignment(Qt::AlignCenter);
 			edName->setFocusPolicy(Qt::NoFocus);
-			vlay->addWidget(edName);
+			hlay->addWidget(edName);
+			auto* btn = new QToolButton;
+			btn->setIcon(QEICN_change_train);
+			hlay->addWidget(btn);
+			connect(btn, &QToolButton::clicked, this, &TrainContext::actChangeTrain);
+			vlay->addLayout(hlay);
 
-			auto* hlay = new QHBoxLayout;
+			hlay = new QHBoxLayout;
 			edStart = new SARibbonLineEdit;
 			edStart->setFocusPolicy(Qt::NoFocus);
 			edStart->setAlignment(Qt::AlignCenter);
@@ -1594,6 +1601,15 @@ void TrainContext::actAddToRouting()
 	else {
 		auto rout = o.routing;
 		mw->contextRouting->addTrainToRouting(o.routing, train);
+	}
+}
+
+void TrainContext::actChangeTrain()
+{
+	auto train = SelectTrainCombo::dialogGetTrain(diagram.trainCollection(), mw, tr("选择车次"), 
+		tr("请选择要切换到的车次。注意，这会同时切换当前所选的车次；现有工具栏上更改的数据不会保留。"));
+	if (train) {
+		mw->focusInTrain(train);
 	}
 }
 

@@ -6,6 +6,7 @@
 #include "railcontext.h"
 #include "defines/icon_specs.h"
 #include "wizards/greedypaint/greedypaintwizard.h"
+#include "util/railrulercombo.h"
 
 #include "dialogs/rulerfromtraindialog.h"
 #include "dialogs/rulerfromspeeddialog.h"
@@ -48,15 +49,25 @@ void RulerContext::initUI()
     auto* page = cont->addCategoryPage(tr("标尺管理(&9)"));
     auto* panel = page->addPannel(tr("当前标尺"));
 
+    auto* w = new QWidget;
+    auto* hlay = new QHBoxLayout(w);
     auto* ed = new QLineEdit;
     ed->setFocusPolicy(Qt::NoFocus);
     ed->setAlignment(Qt::AlignCenter);
-    ed->setFixedWidth(150);
+    //ed->setFixedWidth(150);
     ed->setToolTip(tr("当前标尺名称\n不可编辑；如需编辑请至编辑面板操作"));
     edRulerName = ed;
-    ed->setObjectName(tr("标尺名称-只读"));
-    ed->setWindowTitle(tr("标尺名称"));
-    panel->addWidget(ed, SARibbonPannelItem::Medium);
+    hlay->addWidget(ed);
+    auto* btn = new SARibbonToolButton();
+    btn->setIcon(QEICN_change_ruler);
+    btn->setButtonType(SARibbonToolButton::SmallButton);
+    connect(btn, &QToolButton::clicked, this, &RulerContext::actChangeRuler);
+    hlay->addWidget(btn);
+    hlay->setContentsMargins(0, 0, 0, 0);
+
+    w->setObjectName(tr("标尺名称-只读"));
+    w->setWindowTitle(tr("标尺名称"));
+    panel->addWidget(w, SARibbonPannelItem::Medium);
 
     ed = new QLineEdit;
     ed->setFocusPolicy(Qt::NoFocus);
@@ -344,6 +355,15 @@ void RulerContext::actImportCsv()
     }
     QMessageBox::information(mw, tr("提示"),
         tr("已导入%1条数据").arg(val));
+}
+
+void RulerContext::actChangeRuler()
+{
+    auto ruler = RailRulerCombo::dialogGetRuler(diagram.railCategory(), mw, tr("选择标尺"),
+        tr("请选择要切换到的标尺"));
+    if (ruler) {
+        mw->focusInRuler(ruler);
+    }
 }
 
 void RulerContext::actShowEditWidget()

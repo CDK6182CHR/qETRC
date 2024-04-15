@@ -19,6 +19,7 @@
 #include "data/diagram/diagrampage.h"
 #include "defines/icon_specs.h"
 #include "wizards/greedypaint/greedypaintwizard.h"
+#include "util/selectrailwaycombo.h"
 
 #include <QStyle>
 #include <QLabel>
@@ -100,10 +101,22 @@ void RailContext::initUI()
 
 		QWidget* w = new QWidget;
 		auto* vlay = new QVBoxLayout;
+		auto* hlay = new QHBoxLayout;
 
 		auto* lab = new QLabel(tr("当前线路"));
 		lab->setAlignment(Qt::AlignCenter);
-		vlay->addWidget(lab);
+		hlay->addWidget(lab);
+
+		auto* btn = new SARibbonToolButton;
+		btn->setIcon(QEICN_change_rail);
+		btn->setButtonType(SARibbonToolButton::SmallButton);
+		//btn->setToolButtonStyle(Qt::ToolButtonIconOnly);
+		btn->setText(tr("切换"));
+		btn->setToolTip(tr("切换当前面板所管理的线路"));
+		connect(btn, &SARibbonToolButton::clicked,
+			this, &RailContext::actChangeRail);
+		hlay->addWidget(btn);
+		vlay->addLayout(hlay);
 
 		ed->setFocusPolicy(Qt::NoFocus);
 		ed->setAlignment(Qt::AlignCenter);
@@ -127,14 +140,15 @@ void RailContext::initUI()
 		cb->setEditable(false);
 		cb->setMinimumWidth(120);
 		cb->setMinimumHeight(25);
+		//cb->lineEdit()->setAlignment(Qt::AlignCenter);   // NOT VALID!
 		connect(cb, SIGNAL(currentIndexChanged(int)), this, SLOT(actChangeOrdinate(int)));
 
 		//panel->addWidget(cb, SARibbonPannelItem::Large);
 
 		auto* lab = new QLabel(tr("纵坐标标尺"));
 		lab->setAlignment(Qt::AlignCenter);
-
 		vlay->addWidget(lab);
+
 		vlay->addWidget(cb);
 		w->setLayout(vlay);
 		w->setObjectName(tr("纵坐标标尺面板"));
@@ -592,6 +606,14 @@ void RailContext::actJointRailApplied(std::shared_ptr<Railway> rail, std::shared
 	mw->getUndoStack()->push(new qecmd::UpdateRailStations(this, rail, data, false, diagram.pathCollection(),
 		mw->contextTrain));
 	mw->getUndoStack()->endMacro();
+}
+
+void RailContext::actChangeRail()
+{
+	auto t = SelectRailwayCombo::dialogGetRailway(diagram.railCategory(), mw);
+	if (t) {
+		mw->focusInRailway(t);
+	}
 }
 
 void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)

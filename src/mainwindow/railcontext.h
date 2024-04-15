@@ -173,6 +173,11 @@ private slots:
 
     void actJointRailApplied(std::shared_ptr<Railway> rail, std::shared_ptr<Railway> data);
 
+    /**
+     * 2024.04.14  Change railway. Currently, by dialog.
+     */
+    void actChangeRail();
+
 public slots:
 
     /**

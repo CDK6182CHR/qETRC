@@ -9,6 +9,7 @@
 #include "util/selectrailwaycombo.h"
 #include "navi/addpagedialog.h"
 #include "defines/icon_specs.h"
+#include "util/combos/selectpagecombo.h"
 
 #include <DockWidget.h>
 #include <QLabel>
@@ -68,9 +69,16 @@ void PageContext::initUI()
 
         auto* w = new QWidget;
         auto* vlay = new QVBoxLayout;
+        auto* hlay = new QHBoxLayout;
         auto* label = new QLabel(tr("当前运行图"));
         label->setAlignment(Qt::AlignCenter);
-        vlay->addWidget(label);
+        hlay->addWidget(label);
+        auto* btn = new SARibbonToolButton;
+        btn->setIcon(QEICN_change_page);
+        btn->setText(tr("切换"));
+        hlay->addWidget(btn);
+        vlay->addLayout(hlay);
+        connect(btn, &QToolButton::clicked, this, &PageContext::actChangePage);
 
         vlay->addWidget(ed);
 
@@ -299,6 +307,15 @@ void PageContext::vShrink()
     }
 
     mw->getViewCategory()->onActPageScaleApplied(cfg, newcfg, true, page);
+}
+
+void PageContext::actChangePage()
+{
+    auto page = SelectPageCombo::dialogGetPage(diagram.pages(), mw, tr("选择页面"),
+        tr("请选择要切换到的运行图页面"));
+    if (page) {
+        mw->focusInPage(page);
+    }
 }
 
 void PageContext::commitEditInfo(std::shared_ptr<DiagramPage> page, std::shared_ptr<DiagramPage> newinfo)
