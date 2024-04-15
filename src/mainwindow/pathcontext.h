@@ -58,6 +58,8 @@ private slots:
     void actShowTrains();
     void actAddTrains();
 
+    void actChangePath();
+
 public slots:
 
     void openPathEdit(TrainPath* path);

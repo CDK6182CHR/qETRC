@@ -61,6 +61,8 @@ private slots:
 
     void actRoutingDiagram();
 
+    void actChangeRouting();
+
 public slots:
     void refreshData();
     void refreshAllData();

@@ -9,6 +9,7 @@
 #include "data/train/train.h"
 #include "editors/routing/routingwidget.h"
 #include "defines/icon_specs.h"
+#include "dialogs/selectroutingdialog.h"
 
 #include <QLabel>
 #include <QLineEdit>
@@ -32,10 +33,17 @@ void RoutingContext::initUI()
 
     auto* w = new QWidget;
     auto* vlay = new QVBoxLayout(w);
+    auto* hlay = new QHBoxLayout;
 
     auto* lab = new QLabel(tr("当前交路"));
-    vlay->addWidget(lab);
+    hlay->addWidget(lab);
     lab->setAlignment(Qt::AlignCenter);
+    auto* btn = new SARibbonToolButton;
+    btn->setIcon(QEICN_change_routing);
+    btn->setText(tr("切换"));
+    connect(btn, &QToolButton::clicked, this, &RoutingContext::actChangeRouting);
+    hlay->addWidget(btn);
+    vlay->addLayout(hlay);
 
     edName = new QLineEdit;
     edName->setFocusPolicy(Qt::NoFocus);
@@ -189,6 +197,14 @@ void RoutingContext::actRoutingDiagram()
 {
     if (!_routing)return;
     openRoutingDiagramWidget(_routing);
+}
+
+void RoutingContext::actChangeRouting()
+{
+    auto ret = SelectRoutingDialog::selectRouting(_diagram.trainCollection(), false, mw);
+    if (ret.isAccepted && ret.routing) {
+        mw->focusInRouting(ret.routing);
+    }
 }
 
 void RoutingContext::openRoutingDiagramWidget(std::shared_ptr<Routing> routing)

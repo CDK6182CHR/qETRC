@@ -105,6 +105,15 @@ std::vector<TrainPath*> TrainPathCollection::unassignedPaths(const Train& train)
 	return res;
 }
 
+std::vector<TrainPath*> TrainPathCollection::pathPointers() const
+{
+	std::vector<TrainPath*> res{};
+	for (const auto& p : _paths) {
+		res.emplace_back(p.get());
+	}
+	return res;
+}
+
 std::vector<std::shared_ptr<Train>> TrainPathCollection::affectedTrainsByRailway(std::shared_ptr<const Railway> railway) const
 {
 	std::set<std::shared_ptr<Train>> trainset{};

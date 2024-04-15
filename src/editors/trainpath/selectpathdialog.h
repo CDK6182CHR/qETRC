@@ -6,6 +6,7 @@
 class TrainPath;
 class QTableView;
 class PathListReadModel;
+class TrainPathCollection;
 /**
  * The dialog for selecting (possibly multiple) trainpaths.
  * Also provide static functions.
@@ -26,7 +27,7 @@ public:
     std::vector<int> selectedIndexes();
 
     static std::vector<TrainPath*>
-        getPaths(QWidget* parent, const QString& prompt, std::vector<TrainPath*> paths);
+        getPaths(QWidget* parent, const QString& prompt, std::vector<TrainPath*> paths, bool single=false);
 
     static std::vector<int>
         getPathIndexes(QWidget* parent, const QString& prompt, std::vector<TrainPath*> paths, bool multi=true);

@@ -213,6 +213,7 @@
 
 ///////// 工具栏 交路编辑 (0) /////////
 
+#define QEICN_change_routing QE_RSC_ICON(exchange.png)   // 切换交路
 #define QEICN_highlight_routing QE_RSC_ICON(trainline.png)   // 高亮显示
 #define QEICN_edit_routing QE_RSC_ICON(edit.png)   // 交路编辑
 #define QEICN_del_routing QE_STD_ICON(TrashIcon)   // 删除交路
@@ -224,6 +225,7 @@
 
 ///////// 工具栏 列车径路 (A) /////////
 
+#define QEICN_change_path QE_RSC_ICON(exchange.png)   // 切换列车径路
 #define QEICN_edit_path QE_RSC_ICON(edit.png)   // 编辑 列车径路
 #define QEICN_path_trains QE_RSC_ICON(train.png)   // 列车表
 #define QEICN_path_add_trains QE_RSC_ICON(add.png)   // 添加列车到径路

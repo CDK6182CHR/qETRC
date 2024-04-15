@@ -40,11 +40,15 @@ std::vector<int> SelectPathDialog::selectedIndexes()
     return res;
 }
 
-std::vector<TrainPath *> SelectPathDialog::getPaths(QWidget *parent, const QString &prompt, std::vector<TrainPath *> paths)
+std::vector<TrainPath *> SelectPathDialog::getPaths(QWidget *parent, const QString &prompt, std::vector<TrainPath *> paths, bool single)
 {
     SelectPathDialog d{prompt, parent};
     d.setAttribute(Qt::WA_DeleteOnClose, false);
     d.getModel()->resetData(paths);
+    if (single) {
+        d.table->setSelectionMode(QTableView::SingleSelection);
+    }
+
     auto res = d.exec();
 
     if (!res) return {};

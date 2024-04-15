@@ -19,6 +19,7 @@
 #include "editors/trainpath/addtrainstopathdialog.h"
 #include "data/train/train.h"
 #include "defines/icon_specs.h"
+#include "editors/trainpath/selectpathdialog.h"
 
 
 PathContext::PathContext(Diagram &diagram, SARibbonContextCategory *cont,
@@ -55,10 +56,17 @@ void PathContext::initUI()
 
         QWidget* w = new QWidget;
         auto* vlay = new QVBoxLayout;
+        auto* hlay = new QHBoxLayout;
 
         auto* lab = new QLabel(tr("当前列车径路"));
         lab->setAlignment(Qt::AlignCenter);
-        vlay->addWidget(lab);
+        hlay->addWidget(lab);
+        auto* btn = new SARibbonToolButton();
+        btn->setIcon(QEICN_change_path);
+        //btn->setText(tr("切换"));
+        connect(btn, &QToolButton::clicked, this, &PathContext::actChangePath);
+        hlay->addWidget(btn);
+        vlay->addLayout(hlay);
 
         ed->setReadOnly(true);
         ed->setAlignment(Qt::AlignCenter);
@@ -145,6 +153,15 @@ void PathContext::actAddTrains()
     connect(w, &AddTrainsToPathDialog::trainsAdded,
         this, &PathContext::addTrains);
     w->open();
+}
+
+void PathContext::actChangePath()
+{
+    auto res = SelectPathDialog::getPaths(mw, tr("请选择要切换到的列车径路，将同时设为当前列车径路。"),
+        diagram.pathCollection().pathPointers(), true);
+    if (!res.empty()) {
+        mw->focusInPath(res.front());
+    }
 }
 
 void PathContext::actEditPath()

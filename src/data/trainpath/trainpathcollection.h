@@ -76,6 +76,11 @@ public:
 	std::vector<TrainPath*> unassignedPaths(const Train& train);
 
 	/**
+	 * 2024.04.15: Returns the raw-pointers of paths, for usages of some other classes.
+	 */
+	std::vector<TrainPath*> pathPointers()const;
+
+	/**
 	 * 2023.08.23  returns the trains that belongs to the paths containing the given railway.
 	 */
 	std::vector<std::shared_ptr<Train>> affectedTrainsByRailway(std::shared_ptr<const Railway> railway)const;
