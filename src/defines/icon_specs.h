@@ -268,3 +268,6 @@
 #define QEICN_undo_stack_clean QE_STD_ICON(DialogSaveButton)   // 历史记录面板中 标记clean位置的图标
 
 #define QEICN_ruler_combo_refresh QE_STD_ICON(BrowserReload)   // RulerCombo中的刷新
+
+#define QEICN_train_editor_change QE_RSC_ICON(exchange.png)   // 列车编辑页面 切换车次
+#define QEICN_train_editor_sync QE_RSC_ICON(exchange1.png)    // 列车编辑页面 保持与选择同步

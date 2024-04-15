@@ -569,6 +569,7 @@ void TrainContext::removeAllTrainWidgets()
 	}
 	editDocks.clear();
 	editWidgets.clear();
+	syncEditors.clear();   // 2024.04.15
 }
 
 void TrainContext::commitExchangeTrainInterval(std::shared_ptr<Train> train1, std::shared_ptr<Train> train2)
@@ -1221,8 +1222,9 @@ void TrainContext::showEditWidget(std::shared_ptr<Train> train)
 	if (idx == -1) {
 		//创建
 		auto* w = new EditTrainWidget(diagram.trainCollection(), train);
-		w->setTrain(train);
 		auto* dock = new ads::CDockWidget(tr("列车编辑 - %1").arg(train->trainName().full()));
+		connect(w, &QWidget::windowTitleChanged, dock, &ads::CDockWidget::setWindowTitle);
+		w->setTrain(train);
 		dock->setWidget(w);
 		dock->resize(600, 800);
 		connect(dock, &ads::CDockWidget::closed, this, &TrainContext::onEditDockClosed);
@@ -1234,6 +1236,15 @@ void TrainContext::showEditWidget(std::shared_ptr<Train> train)
 			mw, &MainWindow::focusInRouting);
 		connect(w, &EditTrainWidget::removeTrain,
 			this, &TrainContext::actRemoveTrainFromEdit);
+		connect(w, &EditTrainWidget::synchronizationChanged, [this, w](bool on) {
+			if (on) {
+				syncEditors.insert(w);
+				w->setTrain(this->getTrain());
+			}
+			else {
+				syncEditors.remove(w);
+			}
+			});
 		mw->getManager()->addDockWidgetFloating(dock);
 		editWidgets.append(w);
 		editDocks.append(dock);
@@ -1390,6 +1401,11 @@ void TrainContext::refreshData()
 		btnColor->setText(pen.color().name());
 		spWidth->setValue(pen.widthF());
 		comboLs->setCurrentIndex(static_cast<int>(pen.style()));
+
+		// 2024.04.15: update the syncrhonized editors
+		foreach(auto p, syncEditors) {
+			p->setTrain(train);
+		}
 	}
 }
 

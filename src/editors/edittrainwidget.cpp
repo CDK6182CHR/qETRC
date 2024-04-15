@@ -13,6 +13,7 @@
 #include <QHeaderView>
 #include <QColorDialog>
 #include <QMessageBox>
+#include <QToolButton>
 #include <data/common/qesystem.h>
 
 #include <util/linestylecombo.h>
@@ -23,6 +24,8 @@
 #include <data/train/traintype.h>
 #include <data/train/traincollection.h>
 #include <data/train/routing.h>
+#include <defines/icon_specs.h>
+#include <util/selecttraincombo.h>
 
 #include "timetablewidget.h"
 
@@ -45,6 +48,7 @@ void EditTrainWidget::setTrain(const std::shared_ptr<Train> &train)
     //暂定更改/初始化Train时才更新一次TypeCombo。
     setupTypeCombo();
     refreshBasicData();
+    setWindowTitle(tr("列车编辑 - %1").arg(train->trainName().full()));
 }
 
 void EditTrainWidget::refreshData()
@@ -88,17 +92,46 @@ TimetableStdModel* EditTrainWidget::getModel()
     return ctable->model();
 }
 
+bool EditTrainWidget::isSynchronized() const
+{
+    return btnSync->isChecked();
+}
+
 void EditTrainWidget::initUI()
 {
     auto* vlay=new QVBoxLayout(this);
     auto* flay=new QFormLayout;
 
     edTrainName=new QLineEdit;
-    flay->addRow(tr("全车次"),edTrainName);
+    auto* hlay = new QHBoxLayout;
     connect(edTrainName, &QLineEdit::editingFinished,
         this, &EditTrainWidget::onTrainFullNameUpdate);
+    hlay->addWidget(edTrainName);
 
-    auto* hlay=new QHBoxLayout;
+    auto*tb = new QToolButton;
+    tb->setIcon(QEICN_train_editor_change);
+    tb->setToolTip(tr("切换车次\n切换当前面板所编辑的车次，请注意当前所做的修改不会保存"));
+    connect(tb, &QToolButton::clicked, [this]() {
+        auto train = SelectTrainCombo::dialogGetTrain(coll, this, tr("选择车次"),
+            tr("请选择要切换到的车次，当前所做的修改不会保存"));
+        if (train) {
+            this->setTrain(train);
+        }
+        });
+    hlay->addWidget(tb);
+
+    tb = new QToolButton;
+    btnSync = tb;
+    tb->setIcon(QEICN_train_editor_sync);
+    tb->setToolTip(tr("与当前车次同步\n保持当前面板所编辑的车次与所选择的车次同步。当选择新车次时，自动切换到新车次。"
+        "请注意及时保存更改。"));
+    tb->setCheckable(true);
+    connect(tb, &QToolButton::clicked, this, &EditTrainWidget::synchronizationChanged);
+    hlay->addWidget(tb);
+
+    flay->addRow(tr("全车次"), hlay);
+
+    hlay=new QHBoxLayout;
     edDownName=new QLineEdit;
     hlay->addWidget(edDownName);
     auto* lab=new QLabel(tr("/"));

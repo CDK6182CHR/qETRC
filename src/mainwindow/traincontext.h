@@ -6,6 +6,7 @@
 #include <QColor>
 #include <deque>
 #include <QUndoCommand>
+#include <QSet>
 
 #include <data/train/train.h>
 
@@ -97,6 +98,7 @@ class TrainContext : public QObject
     QList<BasicTrainWidget*> basicWidgets;
     QList<EditTrainWidget*> editWidgets;
     QList<ads::CDockWidget*> basicDocks, editDocks;
+    QSet<EditTrainWidget*> syncEditors;
 
     LocateBoundingDialog* dlgLocate = nullptr;
 public:
