@@ -482,7 +482,31 @@ void TrainContext::refreshAllData()
 void TrainContext::removeTrainWidget(std::shared_ptr<Train> train)
 {
 	removeBasicDockAt(getBasicWidgetIndex(train));
-	removeEditDockAt(getEditWidgetIndex(train));
+	//removeEditDockAt(getEditWidgetIndex(train));
+	// 2024.04.16: for editWidget, the synchronized ones are kept
+	{
+		auto pd = editDocks.begin();
+		auto pw = editWidgets.begin();
+		for (; pd != editDocks.end();) {
+			auto* w = *pw;
+			auto* d = *pd;
+			if (w->train() == train) {
+				if (w->isSynchronized()) {
+					w->resetTrain();
+					++pw; ++pd;
+				}
+				else {
+					// Remove it!
+					pw = editWidgets.erase(pw);
+					pd = editDocks.erase(pd);
+					d->deleteDockWidget();
+				}
+			}
+			else {
+				++pw; ++pd;
+			}
+		}
+	}
 }
 
 void TrainContext::onTrainTimetableChanged(std::shared_ptr<Train> train, std::shared_ptr<Train> table)
@@ -564,12 +588,32 @@ void TrainContext::removeAllTrainWidgets()
 	basicWidgets.clear();
 	
 	// 2024.04.13: remove also edit widgets
-	foreach(auto p, editDocks) {
-		p->deleteDockWidget();
+	// 2024.04.16: keep the widgets that are synchronized with selection
+	{
+		auto pw = editWidgets.begin();
+		auto pd = editDocks.begin();
+		for (; pw != editWidgets.end();) {
+			if ((*pw)->isSynchronized()) {
+				// reset train and keep this widget
+				(*pw)->resetTrain();
+				++pw;
+				++pd;
+			}
+			else {
+				auto* d = *pd;
+				pw = editWidgets.erase(pw);
+				pd = editDocks.erase(pd);
+				d->deleteDockWidget();
+			}
+		}
 	}
-	editDocks.clear();
-	editWidgets.clear();
-	syncEditors.clear();   // 2024.04.15
+	
+	//foreach(auto p, editDocks) {
+	//	p->deleteDockWidget();
+	//}
+	//editDocks.clear();
+	//editWidgets.clear();
+	//syncEditors.clear();   // 2024.04.15
 }
 
 void TrainContext::commitExchangeTrainInterval(std::shared_ptr<Train> train1, std::shared_ptr<Train> train2)

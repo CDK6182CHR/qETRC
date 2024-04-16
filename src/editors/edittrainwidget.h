@@ -53,6 +53,7 @@ public:
                              QWidget *parent = nullptr);
     auto train(){return _train;}
     void setTrain(const std::shared_ptr<Train>& train);
+    void resetTrain();   // 2024.04.16  equivalent to setTrain(nullptr)
     void refreshData();
     void refreshBasicData();
     TimetableStdModel* getModel();

@@ -48,7 +48,14 @@ void EditTrainWidget::setTrain(const std::shared_ptr<Train> &train)
     //暂定更改/初始化Train时才更新一次TypeCombo。
     setupTypeCombo();
     refreshBasicData();
-    setWindowTitle(tr("列车编辑 - %1").arg(train->trainName().full()));
+    if (train)
+        setWindowTitle(tr("列车编辑 - %1").arg(train->trainName().full()));
+    setEnabled(!!train);
+}
+
+void EditTrainWidget::resetTrain()
+{
+    setTrain(nullptr);
 }
 
 void EditTrainWidget::refreshData()
