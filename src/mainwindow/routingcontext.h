@@ -5,6 +5,8 @@
 #include <SARibbonContextCategory.h>
 #include <QUndoCommand>
 #include <DockWidget.h>
+#include <QSet>
+#include <QList>
 #include "editors/routing/routingedit.h"
 
 class Routing;
@@ -26,6 +28,7 @@ class RoutingContext : public QObject
     QList<RoutingEdit*> routingEdits;
     QList<RoutingDiagramWidget*> diagramWidgets;
     QList<ads::CDockWidget*> routingDocks, diagramDocks;
+    QSet<RoutingEdit*> syncEdits;
     bool updating = false;
     SARibbonToolButton* btnHighlight;
 
@@ -69,7 +72,14 @@ public slots:
     void setRouting(std::shared_ptr<Routing> routing);
     void openRoutingEditWidget(std::shared_ptr<Routing> routing);
     void removeRoutingEditWidget(std::shared_ptr<Routing> routing);
+    // 2024.04.19: this version removes only the non-synchronized widget
+    void removeNonSyncRoutingEditWidget(std::shared_ptr<Routing> routing);
     void removeRoutingEditWidgetAt(int i);
+
+    /**
+     * 2024.04.19  add: called on close diagram. The synchronized widgets are kept.
+     */
+    void removeAllRoutingDocks();
 
     /**
      * 这时实际的操作。这个操作不需要undo。

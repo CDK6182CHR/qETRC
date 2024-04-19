@@ -148,6 +148,9 @@ void RoutingContext::refreshData()
         edName->setText(_routing->name());
         btnHighlight->setChecked(_routing->isHighlighted());
     }
+    foreach(auto w, syncEdits) {
+        w->setRouting(_routing);
+    }
 }
 
 void RoutingContext::toggleHighlight(bool on)
@@ -273,8 +276,18 @@ void RoutingContext::openRoutingEditWidget(std::shared_ptr<Routing> routing)
             &RoutingContext::actRoutingInfoChange);
         connect(w, &RoutingEdit::routingOrderChanged, this,
             &RoutingContext::actRoutingOrderChange);
+        connect(w, &QWidget::windowTitleChanged, dock, &ads::CDockWidget::setWindowTitle);
         connect(w, &RoutingEdit::focusInRouting,
             mw, &MainWindow::focusInRouting);
+        connect(w, &RoutingEdit::synchronizationChanged, [this, w](bool on) {
+            if (on) {
+                this->syncEdits.insert(w);
+                w->setRouting(this->routing());
+            }
+            else {
+                this->syncEdits.remove(w);
+            }
+            });
     }
     else {
         auto dock = routingDocks.at(i);
@@ -296,11 +309,65 @@ void RoutingContext::removeRoutingEditWidget(std::shared_ptr<Routing> routing)
     }
 }
 
+void RoutingContext::removeNonSyncRoutingEditWidget(std::shared_ptr<Routing> routing)
+{
+    // for routing editors
+    {
+        auto ie = routingEdits.begin();
+        auto id = routingDocks.begin();
+        while (ie != routingEdits.end()) {
+            auto* e = *ie;
+            if (e->getRouting() != routing) {
+                ++ie; ++id;
+            }
+            else if (e->isSynchronized()) {
+                e->resetRouting();
+                ++ie; ++id;
+            }
+            else {
+                auto* d = *id;
+                ie = routingEdits.erase(ie);
+                id = routingDocks.erase(id);
+                d->deleteDockWidget();
+            }
+        }
+    }
+}
+
 void RoutingContext::removeRoutingEditWidgetAt(int i)
 {
     auto* dock = routingDocks.takeAt(i);
     routingEdits.removeAt(i);
     dock->deleteDockWidget();
+}
+
+void RoutingContext::removeAllRoutingDocks()
+{
+    // for routing editors
+    {
+        auto ie = routingEdits.begin();
+        auto id = routingDocks.begin();
+        while (ie != routingEdits.end()) {
+            auto* e = *ie;
+            if (e->isSynchronized()) {
+                e->resetRouting();
+                ++ie; ++id;
+            }
+            else {
+                auto* d = *id;
+                ie = routingEdits.erase(ie);
+                id = routingDocks.erase(id);
+                d->deleteDockWidget();
+            }
+        }
+    }
+
+    // for routing diagrams
+    foreach(auto d, diagramDocks) {
+        d->deleteDockWidget();
+    }
+    diagramDocks.clear();
+    diagramWidgets.clear();
 }
 
 void RoutingContext::onRoutingHighlightChanged(std::shared_ptr<Routing> routing, bool on)
@@ -355,7 +422,7 @@ void RoutingContext::onRoutingRemoved(std::shared_ptr<Routing> routing)
     // 2024.03.23: also update the current train, if affected
     mw->repaintRoutingTrainLines(routing);
 
-    removeRoutingEditWidget(routing);
+    removeNonSyncRoutingEditWidget(routing);
     if (routing == _routing) {
         _routing.reset();
         mw->focusOutRouting();

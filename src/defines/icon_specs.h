@@ -271,3 +271,6 @@
 
 #define QEICN_train_editor_change QE_RSC_ICON(exchange.png)   // 列车编辑页面 切换车次
 #define QEICN_train_editor_sync QE_RSC_ICON(exchange1.png)    // 列车编辑页面 保持与选择同步
+
+#define QEICN_routing_editor_change QE_RSC_ICON(exchange.png)   // 交路编辑页面 切换车次
+#define QEICN_routing_editor_sync QE_RSC_ICON(exchange1.png)    // 交路编辑页面 保持与选择同步

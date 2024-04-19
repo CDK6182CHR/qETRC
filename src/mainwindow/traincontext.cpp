@@ -188,12 +188,19 @@ void TrainContext::initUI()
 
 		auto* w = new QWidget;
 		auto* vlay = new QVBoxLayout;
+		auto* hlay = new QHBoxLayout;
 		edNamem = new SARibbonLineEdit;
 		edNamem->setAlignment(Qt::AlignCenter);
 		edNamem->setToolTip(tr("列车全车次\n用以唯一识别列车，不能与其他车次重复"));
-		vlay->addWidget(edNamem);
+		hlay->addWidget(edNamem);
+		auto* btn = new SARibbonToolButton();
+		btn->setIcon(QEICN_change_train);
+		btn->setToolTip(tr("切换车次\n切换当前页面所编辑的列车。当前的修改不会保留，请注意及时提交数据。"));
+		connect(btn, &QToolButton::clicked, this, &TrainContext::actChangeTrain);
+		hlay->addWidget(btn);
+		vlay->addLayout(hlay);
 
-		auto* hlay = new QHBoxLayout;
+		hlay = new QHBoxLayout;
 		edNameDown = new SARibbonLineEdit;
 		edNameDown->setAlignment(Qt::AlignCenter);
 		edNameDown->setToolTip(tr("下行车次"));
@@ -201,6 +208,7 @@ void TrainContext::initUI()
 		hlay->addWidget(new QLabel("/"));
 		edNameUp = new SARibbonLineEdit;
 		edNameUp->setToolTip(tr("上行车次"));
+		edNameUp->setAlignment(Qt::AlignCenter);
 		hlay->addWidget(edNameUp);
 		vlay->addLayout(hlay);
 		w->setLayout(vlay);

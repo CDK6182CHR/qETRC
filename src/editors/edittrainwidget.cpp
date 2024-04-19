@@ -50,6 +50,8 @@ void EditTrainWidget::setTrain(const std::shared_ptr<Train> &train)
     refreshBasicData();
     if (train)
         setWindowTitle(tr("列车编辑 - %1").arg(train->trainName().full()));
+    else
+        setWindowTitle(tr("列车编辑 (空白)"));
     setEnabled(!!train);
 }
 

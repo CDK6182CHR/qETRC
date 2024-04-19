@@ -1595,6 +1595,7 @@ void MainWindow::clearDiagramUnchecked()
 	focusOutTrain();
 	contextRail->removeAllDocks();
 	contextPath->removePathDocks();
+	contextRouting->removeAllRoutingDocks();
 
 	// 2024.04.13: clear the two quick widgets
 	timetableQuickWidget->resetTrain();

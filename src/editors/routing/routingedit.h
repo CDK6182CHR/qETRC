@@ -11,7 +11,7 @@ class QTableView;
 class QTextEdit;
 class QLineEdit;
 class TrainCollection;
-
+class QToolButton;
 
 /**
  * @brief The RoutingEdit class
@@ -28,12 +28,14 @@ class RoutingEdit : public QWidget
     QTableView* table;
     QTextEdit* edNote;
     QLineEdit *edName,*edModel,*edOwner;
+    QToolButton* btnSync;
     AddRoutingNodeDialog* dlgAdd = nullptr;
 public:
     explicit RoutingEdit(TrainCollection& coll_, std::shared_ptr<Routing> routing_, QWidget *parent = nullptr);
     auto getRouting(){return routing;}
     auto* getModel(){return model;}
     virtual bool event(QEvent* e)override;
+    bool isSynchronized()const;
 private:
     void initUI();
 
@@ -48,9 +50,13 @@ signals:
 
     void focusInRouting(std::shared_ptr<Routing>);
 
+    void synchronizationChanged(bool on);
+
 public slots:
     void refreshData();
     void refreshBasicData();
+    void setRouting(std::shared_ptr<Routing> r);
+    void resetRouting();
 
 private slots:
     void actAddBefore();

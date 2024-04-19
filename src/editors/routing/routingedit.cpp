@@ -9,6 +9,7 @@
 #include <QTextEdit>
 #include <QEvent>
 #include <QMessageBox>
+#include <QToolButton>
 
 #include "data/train/routing.h"
 #include "util/buttongroup.hpp"
@@ -16,6 +17,8 @@
 #include "data/train/traincollection.h"
 #include "parseroutingdialog.h"
 #include "detectroutingdialog.h"
+#include "defines/icon_specs.h"
+#include "dialogs/selectroutingdialog.h"
 
 RoutingEdit::RoutingEdit(TrainCollection& coll_, std::shared_ptr<Routing> routing_, QWidget *parent) :
     QWidget(parent),coll(coll_), routing(routing_),model(new RoutingEditModel(routing,this))
@@ -33,10 +36,33 @@ void RoutingEdit::refreshData()
 
 void RoutingEdit::refreshBasicData()
 {
+    if (!routing)
+        return;
     edName->setText(routing->name());
     edModel->setText(routing->model());
     edOwner->setText(routing->owner());
     edNote->setText(routing->note());
+}
+
+void RoutingEdit::setRouting(std::shared_ptr<Routing> r)
+{
+    this->routing = r;
+    model->setRouting(r);
+    refreshBasicData();
+
+    if (r){
+        setWindowTitle(tr("交路编辑 - %1").arg(r->name()));
+        setEnabled(true);
+    }
+    else {
+        setWindowTitle(tr("交路编辑 (空白)"));
+        setEnabled(false);
+    }
+}
+
+void RoutingEdit::resetRouting()
+{
+    setRouting(nullptr);
 }
 
 bool RoutingEdit::event(QEvent* e)
@@ -48,12 +74,38 @@ bool RoutingEdit::event(QEvent* e)
     return QWidget::event(e);
 }
 
+bool RoutingEdit::isSynchronized() const
+{
+    return btnSync->isChecked();
+}
+
 void RoutingEdit::initUI()
 {
     auto* vlay=new QVBoxLayout(this);
     auto* flay=new QFormLayout;
+    auto* hlay = new QHBoxLayout;
     edName=new QLineEdit;
-    flay->addRow(tr("交路名称"),edName);
+    //flay->addRow(tr("交路名称"),edName);
+    hlay->addWidget(edName);
+    auto* tb = new QToolButton;
+    tb->setToolTip(tr("切换交路\n切换当前编辑器所编辑的交路。请注意提交和保存数据。"));
+    tb->setIcon(QEICN_routing_editor_change);
+    connect(tb, &QToolButton::clicked, [this]() {
+        auto ret = SelectRoutingDialog::selectRouting(coll, false, this);
+        if (ret.isAccepted && ret.routing) {
+            this->setRouting(ret.routing);
+        }
+        });
+    hlay->addWidget(tb);
+    tb = new QToolButton;
+    btnSync = tb;
+    tb->setToolTip(tr("保持与选择同步\n保持当前交路编辑面板与所选择的交路同步。请注意及时提交和保存数据。"));
+    tb->setIcon(QEICN_routing_editor_sync);
+    connect(tb, &QToolButton::clicked, this, &RoutingEdit::synchronizationChanged);
+    tb->setCheckable(true);
+    hlay->addWidget(tb);
+    flay->addRow(tr("交路名称"), hlay);
+
     edModel=new QLineEdit;
     flay->addRow(tr("车底型号"),edModel);
     edOwner=new QLineEdit;
