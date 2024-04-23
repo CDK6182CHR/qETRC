@@ -17,6 +17,8 @@ void PredefTrainFilterCore::fromJson(const QJsonObject &obj, const TrainCollecti
     includes.clear();
     excludes.clear();
     routings.clear();
+    startings.clear();
+    terminals.clear();
 
     LOAD_BOOL(useType);
     LOAD_BOOL(useInclude);
@@ -25,6 +27,8 @@ void PredefTrainFilterCore::fromJson(const QJsonObject &obj, const TrainCollecti
     LOAD_BOOL(showOnly);
     LOAD_BOOL(useInverse);
     LOAD_BOOL(selNullRouting);
+    LOAD_BOOL(useStarting);
+    LOAD_BOOL(useTerminal);
 
     passengerType=static_cast<TrainPassenger>(obj.value("passengerType").toInt(1));
 
@@ -43,6 +47,16 @@ void PredefTrainFilterCore::fromJson(const QJsonObject &obj, const TrainCollecti
     const auto& arExc=obj.value("excludes").toArray();
     foreach(const auto& t,arExc){
         excludes.push_back(QRegularExpression(t.toString()));
+    }
+
+    const auto& arStart = obj.value("startings").toArray();
+    foreach(const auto& t, arStart) {
+        startings.push_back(QRegularExpression(t.toString()));
+    }
+
+    const auto& arTerm = obj.value("terminals").toArray();
+    foreach(const auto& t, arTerm) {
+        terminals.push_back(QRegularExpression(t.toString()));
     }
 
     const auto& arRout=obj.value("routings").toArray();
@@ -71,6 +85,8 @@ QJsonObject PredefTrainFilterCore::toJson() const
     DUMP(showOnly);
     DUMP(useInverse);
     DUMP(selNullRouting);
+    DUMP(useStarting);
+    DUMP(useTerminal);
     res.insert("passengerType", static_cast<int>(passengerType));
 
     QJsonArray arTypes;
@@ -96,6 +112,19 @@ QJsonObject PredefTrainFilterCore::toJson() const
         arRouting.append(rt->name());
     }
     res.insert("routings", arRouting);
+
+    QJsonArray arStarting;
+    foreach(const auto& reg, startings) {
+        arStarting.append(reg.pattern());
+    }
+    res.insert("startings", arStarting);
+
+    QJsonArray arTerminal;
+    foreach(const auto& reg, terminals) {
+        arTerminal.append(reg.pattern());
+    }
+    res.insert("terminals", arTerminal);
+
     return res;
 }
 

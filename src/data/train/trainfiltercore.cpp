@@ -66,10 +66,33 @@ bool TrainFilterCore::checkShow(std::shared_ptr<const Train> train) const
     else return train->isShow();
 }
 
+bool TrainFilterCore::checkStarting(std::shared_ptr<const Train> train) const
+{
+    if (!useStarting) return true;
+    foreach(const auto & reg, startings) {
+        if (reg.match(train->starting().toSingleLiteral()).hasMatch()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool TrainFilterCore::checkTerminal(std::shared_ptr<const Train> train) const
+{
+    if (!useTerminal) return true;
+    foreach(const auto & reg, terminals) {
+        if (reg.match(train->terminal().toSingleLiteral()).hasMatch()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool TrainFilterCore::check(std::shared_ptr<const Train> train) const
 {
     bool res = (checkType(train)
         && checkRouting(train) && checkPassenger(train) && checkShow(train)
+        && checkStarting(train) && checkTerminal(train)
         && !checkExclude(train)) || checkInclude(train);
     if (useInverse)return !res;
     return res;

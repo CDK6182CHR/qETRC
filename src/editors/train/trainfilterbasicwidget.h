@@ -8,6 +8,7 @@ class SelectTrainTypeListWidget;
 class TrainFilterCore;
 class SelectRoutingListWidget;
 class TrainNameRegexTable;
+class StationNameRegexTable;
 class QCheckBox;
 class TrainCollection;
 
@@ -24,10 +25,12 @@ class TrainFilterBasicWidget : public QWidget
 
     QCheckBox* ckType,*ckInclude,*ckExclude,*ckRouting;
     QCheckBox* ckShowOnly,*ckInverse;
+    QCheckBox* ckStarting, * ckTerminal;
     RadioButtonGroup<3> *gpPassen;
 
     SelectTrainTypeListWidget* lstType=nullptr;
     TrainNameRegexTable* tabInclude=nullptr,*tabExclude=nullptr;
+    StationNameRegexTable* tabStarting = nullptr, * tabTerminal = nullptr;
     SelectRoutingListWidget* lstRouting=nullptr;
 public:
     explicit TrainFilterBasicWidget(TrainCollection& coll, TrainFilterCore* core, QWidget *parent = nullptr);

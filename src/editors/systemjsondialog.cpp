@@ -13,6 +13,8 @@
 #include <SARibbonBar.h>
 #include <QStyleFactory>
 #include <QApplication>
+#include <QMessageBox>
+#include "defines/icon_specs.h"
 
 #define DISABLE_ENGLISH
 
@@ -101,9 +103,25 @@ void SystemJsonDialog::initUI()
     ckStartup->setToolTip(tr("启动程序时显示提示页面"));
     flay->addRow(tr("启动提示页"), ckStartup);
 
+    hlay = new QHBoxLayout;
     ckDrag = new QCheckBox(tr("启用"));
     ckDrag->setToolTip(tr("拖动运行线上停点调整时刻。对于通过站，按住Ctrl调整到达时刻，Alt调整出发时刻，否则同时调整。"));
-    flay->addRow(tr("拖动调整时刻"), ckDrag);
+    hlay->addWidget(ckDrag);
+    auto* btn = new QToolButton();
+    btn->setIcon(QEICN_system_dialog_drag_info);
+    hlay->addWidget(btn);
+    connect(btn, &QToolButton::clicked, [this]() {
+        QMessageBox::information(this, tr("提示"),
+            tr("拖动调整时刻功能提示：\n"
+                "直接拖动可调整单个车站时刻；\n"
+                "对于无停点的车站，直接拖动将同时拖动到达、出发时刻并保持一致，按住Ctrl仅拖动到达时刻，按住Alt仅拖动出发时刻；\n"
+                "按住Shift拖动，可平移所拖动点及之后所有车站的时刻；\n"
+                "按住Shift+Ctrl拖动，可平移拖动点及之前所有车站的时刻；\n"
+                "对于无停点的车站，按住Shift+Alt拖动，可平移出发时刻及之后所有车站时刻；\n"
+                "对于无停点的车站，按住Shift+Alt+Ctrl拖动，可平移到达时刻及之前所有车站的时刻。\n"
+                "本提示仅自动弹出这一次，后续可在“全局配置选项”中查看。"));
+        });
+    flay->addRow(tr("拖动调整时刻"), hlay);
 
     ckTransparentConfig = new QCheckBox(tr("启用"));
     ckTransparentConfig->setToolTip(tr("对新创建的运行图的显示设置、类型管理默认使用透明模式。"));

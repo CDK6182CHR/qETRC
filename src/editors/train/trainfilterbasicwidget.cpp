@@ -2,6 +2,7 @@
 #include "data/train/trainfiltercore.h"
 #include "selecttraintypelistwidget.h"
 #include "trainnameregextable.h"
+#include "editors/rail/stationnameregextable.h"
 #include "selectroutinglistwidget.h"
 
 #include <QCheckBox>
@@ -39,6 +40,15 @@ void TrainFilterBasicWidget::appliedData(TrainFilterCore* core)
         core->routings = res.first;
         core->selNullRouting = res.second;
     }
+    core->useStarting = ckStarting->isChecked();
+    if (core->useStarting) {
+        core->startings = tabStarting->names();
+    }
+    core->useTerminal = ckTerminal->isChecked();
+    if (core->useTerminal) {
+        core->terminals = tabTerminal->names();
+    }
+
     core->showOnly = ckShowOnly->isChecked();
     core->useInverse = ckInverse->isChecked();
 
@@ -73,6 +83,16 @@ void TrainFilterBasicWidget::initUI()
     ckRouting = new QCheckBox(tr("属于交路"));
     lstRouting = new SelectRoutingListWidget(coll);
     fold = new QEFoldWidget(ckRouting, lstRouting);
+    vlay->addWidget(fold);
+
+    ckStarting = new QCheckBox(tr("始发于所选站"));
+    tabStarting = new StationNameRegexTable;
+    fold = new QEFoldWidget(ckStarting, tabStarting);
+    vlay->addWidget(fold);
+
+    ckTerminal = new QCheckBox(tr("终到于所选站"));
+    tabTerminal = new StationNameRegexTable;
+    fold = new QEFoldWidget(ckTerminal, tabTerminal);
     vlay->addWidget(fold);
 
     auto* flay = new QFormLayout;
@@ -113,6 +133,8 @@ void TrainFilterBasicWidget::clearNotChecked()
     ckRouting->setChecked(false);
     ckShowOnly->setChecked(false);
     ckInverse->setChecked(false);
+    ckStarting->setChecked(false);
+    ckTerminal->setChecked(false);
     gpPassen->get(2)->setChecked(true);
 }
 
@@ -131,11 +153,15 @@ void TrainFilterBasicWidget::refreshDataWith(const TrainFilterCore *_core)
     tabInclude->refreshData(_core->includes);
     tabExclude->refreshData(_core->excludes);
     lstRouting->refreshRoutingsWithSelection(std::make_pair(_core->routings, _core->selNullRouting));
+    tabStarting->refreshData(_core->startings);
+    tabTerminal->refreshData(_core->terminals);
 
     ckType->setChecked(_core->useType);
     ckInclude->setChecked(_core->useInclude);
     ckExclude->setChecked(_core->useExclude);
     ckRouting->setChecked(_core->useRouting);
+    ckStarting->setChecked(_core->useStarting);
+    ckTerminal->setChecked(_core->useTerminal);
 
     ckShowOnly->setChecked(_core->showOnly);
     ckInverse->setChecked(_core->useInverse);

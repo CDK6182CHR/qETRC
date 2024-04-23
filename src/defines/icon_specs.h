@@ -274,3 +274,5 @@
 
 #define QEICN_routing_editor_change QE_RSC_ICON(exchange.png)   // 交路编辑页面 切换车次
 #define QEICN_routing_editor_sync QE_RSC_ICON(exchange1.png)    // 交路编辑页面 保持与选择同步
+
+#define QEICN_system_dialog_drag_info QE_STD_ICON(MessageBoxInformation)   // 全局配置选项中 关于拖动时刻的信息

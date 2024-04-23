@@ -28,11 +28,13 @@ protected:
     //Diagram& diagram;
 
     bool useType=false, useInclude=false, useExclude=false;
+    bool useStarting = false, useTerminal = false;
     bool useRouting=false, showOnly=false, useInverse=false;
     TrainPassenger passengerType = TrainPassenger::Auto;
 
     QSet<std::shared_ptr<const TrainType>> types;
     QVector<QRegularExpression> includes, excludes;
+    QVector<QRegularExpression> startings, terminals;
     QSet<std::shared_ptr<const Routing>> routings;
     bool selNullRouting=false;
 
@@ -58,5 +60,6 @@ private:
     bool checkRouting(std::shared_ptr<const Train> train)const;
     bool checkPassenger(std::shared_ptr<const Train> train)const;
     bool checkShow(std::shared_ptr<const Train> train)const;
-
+    bool checkStarting(std::shared_ptr<const Train> train)const;
+    bool checkTerminal(std::shared_ptr<const Train> train)const;
 };
