@@ -39,14 +39,21 @@ void TrainIntervalStat::computeTrainPart(TrainIntervalStatResult &res)
     auto itr_last=_startIter;
     auto itr=std::next(_startIter);
 
-    int stopCount=0;
-    int runSecs=0,stopSecs=0;
+    int stopCount = 0;
+    int runSecs = 0, stopSecs = 0;
+
+    // 2024.05.03  for first station
+    if (_include_ends && _startIter->isStopped()) {
+        stopCount++;
+        stopSecs += _startIter->stopSec();
+    }
+
     // loop invariant: each time the loop processes the interval ENDED at itr
     for (int i=0;i<res.settledStationsCount-1;i++){
         int intervalSecs=qeutil::secsTo(itr_last->depart, itr->arrive);
         runSecs+=intervalSecs;
 
-        if (i<res.settledStationsCount-2){
+        if (i<res.settledStationsCount-2 || _include_ends){
             // not last
             if (itr->isStopped()){
                 stopCount++;

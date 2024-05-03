@@ -24,10 +24,18 @@ class TrainIntervalStat
     // for computation temporary:
     int _startIndex,_endIndex;
     std::list<TrainStation>::const_iterator _startIter,_endIter;
+    bool _include_ends = false;   // 2024.05.03: whether to include stop time of first and last station
 public:
     TrainIntervalStat(const std::shared_ptr<const Train>& train=nullptr);
     void setTrain(std::shared_ptr<const Train> train){this->train=train;}
+
+    /**
+     * 2024.05.03 note: the range includes both sides.
+     * The stopping time in both start and end are considered.
+     */
     void setRange(int start, int end);
+
+    void setIncludeEnds(bool on) { _include_ends = on; }
 
     /**
      * @brief compute

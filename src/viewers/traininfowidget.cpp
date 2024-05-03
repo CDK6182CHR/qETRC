@@ -159,6 +159,7 @@ void TrainInfoWidget::refreshData()
     }
     else {
         TrainIntervalStat stat{ train };
+        stat.setIncludeEnds(true);   // 2024.05.03
         stat.setRange(0, train->stationCount() - 1);
         res = stat.compute();
     }
