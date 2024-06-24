@@ -276,7 +276,7 @@ private:
     //def _addTimeAxisMark(self, value: int, gridColor: QtGui.QColor,
     //    font : QtGui.QFont, x : int)
     QGraphicsSimpleTextItem*
-        addTimeAxisMark(int value, const QFont& font, int x);
+        addTimeAxisMark(int value, const QFont& font, const QColor& grd_color, int x);
 
     void selectTrain(TrainItem* item);
 

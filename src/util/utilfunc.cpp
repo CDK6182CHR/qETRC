@@ -260,6 +260,7 @@ QString qeutil::timeToStringNullable(const QTime& tm, const QString& fmt)
 	return tm.isValid() ? tm.toString(fmt) : QTime(0, 0).toString();
 }
 
+
 bool qeutil::timeCompare(const QTime& tm1, const QTime& tm2)
 {
 	static constexpr int secsOfADay = 3600 * 24;
@@ -284,4 +285,18 @@ bool qeutil::timeCrossed(const QTime& start1, const QTime& start2,
 QString qeutil::secsToStringHour(int secs)
 {
     return QString::asprintf("%d:%02d:%02d",secs/3600,secs%3600/60,secs%60);
+}
+
+QColor qeutil::inversedColor(const QColor& color)
+{
+	return QColor(255 - color.red(), 255 - color.green(), 255 - color.blue(), color.alpha());
+}
+
+void qeutil::inverseColorIf(QColor& color, bool on)
+{
+	if (on) {
+		color.setRed(255 - color.red());
+		color.setGreen(255 - color.green());
+		color.setBlue(255 - color.blue());
+	}
 }

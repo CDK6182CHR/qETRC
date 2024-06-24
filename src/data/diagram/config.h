@@ -89,6 +89,8 @@ struct Config
     QColor
         grid_color=QColor(170,170,127),  // #AAAA7F
         text_color=QColor(0,0,255);      // #0000FF
+    QColor background_color = QColor(255, 255, 255);   // 2024.06.24 experimental
+    bool inverse_color = false;   // inverse ALL specified colors
     
     // 默认客车和货车线宽，好像也没用了
     double
@@ -224,4 +226,21 @@ struct Config
      * 左侧排图标尺和延长公里栏的总宽度
      */
     double leftTitleRectWidth()const;
+
+    /**
+     * Returns the masked color, that is, inversed if required.
+     */
+    QColor maskedColor(const QColor& color)const;
+
+    QColor grid_color_masked()const {
+        return maskedColor(grid_color);
+    }
+
+    QColor text_color_masked()const {
+        return maskedColor(text_color);
+    }
+
+    QColor background_color_masked()const {
+        return maskedColor(background_color);
+    }
 };

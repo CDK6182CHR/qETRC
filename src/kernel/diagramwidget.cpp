@@ -76,6 +76,7 @@ void DiagramWidget::paintGraph()
     _selectedTrain = nullptr;
     emit showNewStatus(QString("正在铺画运行图"));
 
+    scene()->setBackgroundBrush(config().background_color);
     const Config& cfg = config();
     const auto& margins = cfg.margins;
     int hstart = cfg.start_hour, hend = cfg.end_hour;
@@ -92,7 +93,7 @@ void DiagramWidget::paintGraph()
         //p->calStationYCoeff();
         height += p->diagramHeight(cfg);
     }
-    const QColor& gridColor = cfg.grid_color;
+    const QColor& gridColor = cfg.grid_color_masked();
     
     scene()->setSceneRect(0, 0, width + cfg.totalLeftMargin() + cfg.totalRightMargin(),
         height + cfg.margins.up + cfg.margins.down);
@@ -361,7 +362,9 @@ void DiagramWidget::showWeakenItem()
         //);
         weakItem = new QGraphicsRectItem(0, 0, scene()->width(), scene()->height());
         scene()->addItem(weakItem);
-        weakItem->setBrush(QColor(255, 255, 255, 150));
+        QColor bgcolor(config().background_color);
+        bgcolor.setAlpha(150);
+        weakItem->setBrush(bgcolor);
         weakItem->setZValue(9);
         weakItem->setPen(QPen(Qt::transparent));
     }
@@ -857,7 +860,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     const Config& cfg = config();
     const auto& margins = cfg.margins;
     const QColor& textColor = cfg.text_color;
-    QColor brushColor(Qt::white);
+    QColor brushColor(config().background_color);
     brushColor.setAlpha(200);
     double label_start_x = cfg.leftStationBarX();
 
@@ -883,7 +886,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     rectRight->setPen(QPen(Qt::transparent));
     rightItems.append(rectRight);
 
-    const QColor& gridColor = cfg.grid_color;
+    const QColor& gridColor = cfg.grid_color_masked();
     QPen defaultPen(gridColor, cfg.default_grid_width),
         boldPen(gridColor, cfg.bold_grid_width);
 
@@ -1185,17 +1188,18 @@ void DiagramWidget::setVLines(double width, int hour_count,
     int bold_line_factor = static_cast<int>(std::round(
         config().minutes_per_vertical_bold / config().minutes_per_vertical_line));
 
+    QColor grd_color = config().grid_color_masked();
     QPen
-        pen_bold(config().grid_color, config().bold_grid_width),
-        pen_dash(config().grid_color, config().default_grid_width, Qt::DashLine),
-        pen_solid(config().grid_color, config().default_grid_width);
+        pen_bold(grd_color, config().bold_grid_width),
+        pen_dash(grd_color, config().default_grid_width, Qt::DashLine),
+        pen_solid(grd_color, config().default_grid_width);
     pen_dash.setDashPattern({ 5,5 });
     const auto& pen_second = config().dash_as_second_level_vline ? pen_dash : pen_solid;
     const auto& pen_third = config().dash_as_second_level_vline ? pen_solid : pen_dash;
 
     QList<QGraphicsItem*> topItems, bottomItems;
 
-    QColor color(Qt::white);
+    QColor color(config().background_color);
     color.setAlpha(200);
 
     topItems.append(scene()->addRect(
@@ -1204,7 +1208,7 @@ void DiagramWidget::setVLines(double width, int hour_count,
     ));
     topItems.append(scene()->addLine(
         config().totalLeftMargin() - 15, 35,
-        width + config().totalLeftMargin() + 15, 35, QPen(config().grid_color, 2)
+        width + config().totalLeftMargin() + 15, 35, QPen(grd_color, 2)
     ));
 
     bottomItems.append(scene()->addRect(
@@ -1214,7 +1218,7 @@ void DiagramWidget::setVLines(double width, int hour_count,
     bottomItems.append(scene()->addLine(
         config().totalLeftMargin() - 15, scene()->height() - 35,
         width + config().totalLeftMargin() + 15,
-        scene()->height() - 35, QPen(config().grid_color, 2)
+        scene()->height() - 35, QPen(grd_color, 2)
     ));
 
     QFont font;
@@ -1228,11 +1232,11 @@ void DiagramWidget::setVLines(double width, int hour_count,
     for (int i = 0; i < hour_count + 1; i++) {
         double x = config().totalLeftMargin() + i * 3600 / config().seconds_per_pix;
         int hour = (i + config().start_hour) % 24;
-        auto* textItem1 = addTimeAxisMark(hour, font, x);
+        auto* textItem1 = addTimeAxisMark(hour, font, grd_color, x);
         textItem1->setY(30 - textItem1->boundingRect().height());
         topItems.append(textItem1);
 
-        auto* textItem2 = addTimeAxisMark(hour, font, x);
+        auto* textItem2 = addTimeAxisMark(hour, font, grd_color, x);
         textItem2->setY(scene()->height() - 30);
         bottomItems.append(textItem2);
 
@@ -1263,10 +1267,10 @@ void DiagramWidget::setVLines(double width, int hour_count,
             }
             if (j % minute_marks_gap == centerj % minute_marks_gap) {
                 //标记分钟数
-                textItem1 = addTimeAxisMark(int(std::round(minu)), fontmin, x);
+                textItem1 = addTimeAxisMark(int(std::round(minu)), fontmin, grd_color, x);
                 textItem1->setY(30 - textItem1->boundingRect().height());
                 topItems.append(textItem1);
-                textItem2 = addTimeAxisMark(int(std::round(minu)), fontmin, x);
+                textItem2 = addTimeAxisMark(int(std::round(minu)), fontmin, grd_color, x);
                 textItem2->setY(scene()->height() - 30);
                 bottomItems.append(textItem2);
             }
@@ -1447,11 +1451,11 @@ QGraphicsSimpleTextItem* DiagramWidget::alignedTextItem(const QString& text,
     return textItem;
 }
 
-QGraphicsSimpleTextItem* DiagramWidget::addTimeAxisMark(int value, const QFont& font, int x)
+QGraphicsSimpleTextItem* DiagramWidget::addTimeAxisMark(int value, const QFont& font, const QColor& grd_color, int x)
 {
     auto* item = scene()->addSimpleText(QString::number(value), font);
     item->setX(x - item->boundingRect().width() / 2);
-    item->setBrush(config().grid_color);
+    item->setBrush(grd_color);
     return item;
 }
 

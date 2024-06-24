@@ -153,4 +153,14 @@ QString msgTypeToString(QtMsgType type);
  * Write time string if valid, or treated as 0:00
  */
 QString timeToStringNullable(const QTime& tm, const QString& fmt);
+
+
+/**
+ * 2024.06.24: get the invserse color: for (r,g,b,a), returns
+ * (255-r, 255-g, 255-b, a).
+ */
+QColor inversedColor(const QColor& color);
+
+void inverseColorIf(QColor& color, bool on);
+
 }

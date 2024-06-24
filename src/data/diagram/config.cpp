@@ -1,6 +1,7 @@
 ﻿#include "config.h"
 #include <QJsonArray>
 #include "data/common/qesystem.h"
+#include "util/utilfunc.h"
 
 #define FROM_OBJ(_key,_type) \
 _key = obj.value(#_key).to##_type(_key)
@@ -75,7 +76,9 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
     //color这里暴力一下，默认值直接用hard-code
     grid_color = QColor(obj.value("grid_color").toString("#AAAA7F"));
     text_color = QColor(obj.value("text_color").toString("#0000FF"));
-    
+    background_color = QColor(obj.value("background_color").toString("#FFFFFF"));
+    FROM_OBJ(inverse_color, Bool);
+
     FROM_OBJ_NAME(default_passenger_width, default_keche_width, Double);
     FROM_OBJ_NAME(default_freight_width, default_huoche_width, Double);
     FROM_OBJ(default_db_file, String);
@@ -155,6 +158,7 @@ QJsonObject Config::toJson() const
         TO_OBJ(seconds_per_pix)
         TO_OBJ(seconds_per_pix_y)
         TO_OBJ(pixels_per_km)
+        TO_OBJ(inverse_color)
         TO_OBJ_NAME(default_passenger_width,
             default_keche_width)
         TO_OBJ_NAME(default_freight_width,
@@ -207,6 +211,7 @@ QJsonObject Config::toJson() const
     };
     obj.insert("grid_color", grid_color.name());
     obj.insert("text_color", text_color.name());
+    obj.insert("background_color", background_color.name());
     obj.insert("margins", margins.toJson());
     QJsonArray ns;
     for (auto p = not_show_types.begin(); p != not_show_types.end(); ++p) {
@@ -273,6 +278,11 @@ double Config::leftTitleRectWidth() const
     if (show_mile_bar)res += margins.mile_label_width;
     if (show_ruler_bar)res += margins.ruler_label_width;
     return res;
+}
+
+QColor Config::maskedColor(const QColor& color) const
+{
+    return inverse_color ? qeutil::inversedColor(color) : color;
 }
 
 double Config::leftStationBarX() const
