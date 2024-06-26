@@ -76,7 +76,7 @@ void DiagramWidget::paintGraph()
     _selectedTrain = nullptr;
     emit showNewStatus(QString("正在铺画运行图"));
 
-    scene()->setBackgroundBrush(config().background_color);
+    scene()->setBackgroundBrush(config().background_color_masked());
     const Config& cfg = config();
     const auto& margins = cfg.margins;
     int hstart = cfg.start_hour, hend = cfg.end_hour;
@@ -322,7 +322,7 @@ void DiagramWidget::paintToFile(QPainter& painter, const QString& title, const Q
     marginItems.top->setY(0);
     marginItems.bottom->setY(0);
     nowItem->setPos(0, 0);
-    painter.setPen(QPen(config().text_color));
+    painter.setPen(QPen(config().text_color_masked()));
     QFont font;
     font.setPixelSize(40);
     font.setBold(true);
@@ -362,7 +362,7 @@ void DiagramWidget::showWeakenItem()
         //);
         weakItem = new QGraphicsRectItem(0, 0, scene()->width(), scene()->height());
         scene()->addItem(weakItem);
-        QColor bgcolor(config().background_color);
+        QColor bgcolor(config().background_color_masked());
         bgcolor.setAlpha(150);
         weakItem->setBrush(bgcolor);
         weakItem->setZValue(9);
@@ -859,8 +859,8 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
 {
     const Config& cfg = config();
     const auto& margins = cfg.margins;
-    const QColor& textColor = cfg.text_color;
-    QColor brushColor(config().background_color);
+    const QColor& textColor = cfg.text_color_masked();
+    QColor brushColor(config().background_color_masked());
     brushColor.setAlpha(200);
     double label_start_x = cfg.leftStationBarX();
 
@@ -945,18 +945,19 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
 
             QString s0 = rail->ordinate() ? tr("排图标尺") : tr("区间距离");
             leftItems.append(addLeftTableText(
-                s0, textFont, margins.left_white, rect_start_y, margins.ruler_label_width, margins.title_row_height / 2.0
+                s0, textFont, margins.left_white, rect_start_y, margins.ruler_label_width, margins.title_row_height / 2.0,
+                textColor
             ));
 
             leftItems.append(addLeftTableText(
                 tr("下行"), textFont, margins.left_white, rect_start_y + margins.title_row_height / 2.0,
-                margins.ruler_label_width / 2.0, margins.title_row_height / 2.0
+                margins.ruler_label_width / 2.0, margins.title_row_height / 2.0, textColor
             ));
 
             leftItems.append(addLeftTableText(
                 tr("上行"), textFont, margins.left_white+ margins.ruler_label_width / 2.0,
                 rect_start_y + margins.title_row_height / 2.0, margins.ruler_label_width / 2.0,
-                margins.title_row_height / 2.0
+                margins.title_row_height / 2.0, textColor
             ));
 
             //改为无条件上下行分开标注
@@ -972,7 +973,7 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
         if (cfg.show_mile_bar) {
             leftItems.append(addLeftTableText(
                 tr("延长公里"), textFont, cfg.mileBarX(), rect_start_y,
-                margins.mile_label_width, margins.title_row_height
+                margins.mile_label_width, margins.title_row_height, textColor
             ));
         }
 
@@ -1016,19 +1017,19 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
         rightItems.append(addLeftTableText(tr("客货对数"),
             textFont, scene()->width() - margins.right_white - margins.count_label_width,
             rect_start_y, margins.count_label_width,
-            margins.title_row_height / 2.0
+            margins.title_row_height / 2.0, textColor
         ));
 
         rightItems.append(addLeftTableText(tr("下行"),
             textFont, scene()->width() - margins.right_white - margins.count_label_width,
             rect_start_y + margins.title_row_height / 2.0,
-            margins.count_label_width / 2.0, margins.title_row_height / 2.0
+            margins.count_label_width / 2.0, margins.title_row_height / 2.0, textColor
         ));
 
         rightItems.append(addLeftTableText(tr("上行"),
             textFont, scene()->width() - margins.right_white - margins.count_label_width / 2.0,
             rect_start_y + margins.title_row_height / 2.0,
-            margins.count_label_width / 2.0, margins.title_row_height / 2.0
+            margins.count_label_width / 2.0, margins.title_row_height / 2.0, textColor
         ));
 
     }
@@ -1041,12 +1042,12 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
                 boldPen : defaultPen;
             double h = start_y + rail->yValueFromCoeff(p->y_coeff.value(), cfg);
             drawSingleHLine(textFont, h, p->name.toDisplayLiteral(),
-                pen, width, leftItems, rightItems, label_start_x);
+                pen, textColor, width, leftItems, rightItems, label_start_x);
             //延长公里
             if (cfg.show_mile_bar) {
                 leftItems.append(addStationTableText(
                     QString::number(p->mile, 'f', 1), textFont,
-                    cfg.mileBarX() , h, margins.mile_label_width
+                    cfg.mileBarX() , h, margins.mile_label_width, textColor
                 ));
             }
 
@@ -1129,14 +1130,14 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
                 leftItems.append(alignedTextItem(
                     text, textFont,
                     margins.ruler_label_width / 2.0, x,
-                    (lasty + y) / 2, false, 0.9
+                    (lasty + y) / 2,textColor, false, 0.9
                 ));
             }
             if (cfg.show_count_bar) {
                 rightItems.append(alignedTextItem(
                     tr("%1/%2").arg(maxpassen).arg(maxfreigh), textFont,
                     margins.count_label_width / 2.0, xright,
-                    (lasty + y) / 2, false, 0.9
+                    (lasty + y) / 2, textColor, false, 0.9
                 ));
             }
 
@@ -1199,7 +1200,7 @@ void DiagramWidget::setVLines(double width, int hour_count,
 
     QList<QGraphicsItem*> topItems, bottomItems;
 
-    QColor color(config().background_color);
+    QColor color(config().background_color_masked());
     color.setAlpha(200);
 
     topItems.append(scene()->addRect(
@@ -1349,16 +1350,14 @@ void DiagramWidget::paintTrainLine(std::shared_ptr<TrainLine> line)
 }
 
 QGraphicsSimpleTextItem* DiagramWidget::addLeftTableText(const char* str, 
-    const QFont& textFont, double start_x, double start_y, double width, double height)
+    const QFont& textFont, double start_x, double start_y, double width, double height, const QColor& textColor)
 {
-    return addLeftTableText(QObject::tr(str), textFont, start_x, start_y, width, height);
+    return addLeftTableText(QObject::tr(str), textFont, start_x, start_y, width, height, textColor);
 }
 
 QGraphicsSimpleTextItem* DiagramWidget::addLeftTableText(const QString& str, 
-    const QFont& textFont, double start_x, double start_y, double width, double height)
+    const QFont& textFont, double start_x, double start_y, double width, double height, const QColor& textColor)
 {
-    const QColor& textColor = config().text_color;
-
     auto* text = scene()->addSimpleText(str);
     QFont font(textFont);   //copy
     double width1 = text->boundingRect().width();
@@ -1375,9 +1374,8 @@ QGraphicsSimpleTextItem* DiagramWidget::addLeftTableText(const QString& str,
 }
 
 QGraphicsSimpleTextItem* DiagramWidget::addStationTableText(const QString& str,
-    const QFont& textFont, double start_x, double center_y, double width)
+    const QFont& textFont, double start_x, double center_y, double width, const QColor& textColor)
 {
-    const QColor& textColor = config().text_color;
     //start_x += margins.left_white;
 
     auto* text = scene()->addSimpleText(str);
@@ -1396,17 +1394,17 @@ QGraphicsSimpleTextItem* DiagramWidget::addStationTableText(const QString& str,
 }
 
 void DiagramWidget::drawSingleHLine(const QFont& textFont, double y, 
-    const QString& name, const QPen& pen, double width, 
+    const QString& name, const QPen& pen, const QColor& textColor, double width, 
     QList<QGraphicsItem*>& leftItems, 
     QList<QGraphicsItem*>& rightItems, double label_start_x)
 {
     scene()->addLine(config().totalLeftMargin(), y, width + config().totalLeftMargin(), y, pen);
 
     leftItems.append(alignedTextItem(name, textFont, margins().label_width - 5,
-        label_start_x + 5, y));
+        label_start_x + 5, y, textColor));
     
     rightItems.append(alignedTextItem(name, textFont, margins().label_width,
-                                      scene()->width() - config().rightRectWidth()-5 - margins().right_white , y));
+                                      scene()->width() - config().rightRectWidth()-5 - margins().right_white , y, textColor));
 }
 
 const MarginConfig& DiagramWidget::margins() const
@@ -1420,11 +1418,11 @@ const Config &DiagramWidget::config() const
 }
 
 QGraphicsSimpleTextItem* DiagramWidget::alignedTextItem(const QString& text, 
-    const QFont& baseFont, double label_width, double start_x, double center_y, 
+    const QFont& baseFont, double label_width, double start_x, double center_y, const QColor& textColor,
     bool use_stretch,double scale)
 {
     auto* textItem = scene()->addSimpleText(text, baseFont);
-    textItem->setBrush(config().text_color);
+    textItem->setBrush(textColor);
     textItem->setY(center_y - textItem->boundingRect().height() / 2);
     double textWidth = textItem->boundingRect().width();
     QFont font(baseFont);

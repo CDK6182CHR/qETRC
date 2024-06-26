@@ -292,6 +292,11 @@ QColor qeutil::inversedColor(const QColor& color)
 	return QColor(255 - color.red(), 255 - color.green(), 255 - color.blue(), color.alpha());
 }
 
+QColor qeutil::inversedColorIf(const QColor& color, bool stat)
+{
+	return stat ? color : inversedColor(color);
+}
+
 void qeutil::inverseColorIf(QColor& color, bool on)
 {
 	if (on) {

@@ -238,24 +238,24 @@ private:
      */
     QGraphicsSimpleTextItem*
         addLeftTableText(const char* str, const QFont& testFont, double start_x, double start_y,
-            double width, double height);
+            double width, double height, const QColor& textColor);
 
     QGraphicsSimpleTextItem*
         addLeftTableText(const QString& str, const QFont& testFont, double start_x, double start_y,
-            double width, double height);
+            double width, double height, const QColor& textColor);
 
     /**
      * def _addStationTableText(self, text, textFont, textColor, start_x, center_y, width):
      */
     QGraphicsSimpleTextItem*
         addStationTableText(const QString& str, const QFont& textFont, double start_x, double center_y,
-            double width);
+            double width, const QColor& textColor);
 
     /*
     def _drawSingleHLine(self, textColor, textFont, y, name, pen, width, leftItems, rightItems, dir_,
                          label_start_x):
     */
-    void drawSingleHLine(const QFont& textFont, double y, const QString& name, const QPen& pen,
+    void drawSingleHLine(const QFont& textFont, double y, const QString& name, const QPen& pen, const QColor& textColor,
         double width, QList<QGraphicsItem*>& leftItems,
         QList<QGraphicsItem*>& rightItems, double label_start_x);
 
@@ -270,7 +270,7 @@ private:
      */
     QGraphicsSimpleTextItem*
         alignedTextItem(const QString& text, const QFont& baseFont, double label_width,
-            double start_x, double center_y, bool use_stretch = true,
+            double start_x, double center_y, const QColor& textColor, bool use_stretch = true,
             double scale = 1.0);
 
     //def _addTimeAxisMark(self, value: int, gridColor: QtGui.QColor,

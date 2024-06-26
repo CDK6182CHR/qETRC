@@ -72,7 +72,7 @@ void TrainItem::highlight()
     path->setZValue(2);
     QBrush brush(pen.color());
     if (config().train_label_color == Config::LinkLineColorOption::TextColor) {
-        brush.setColor(config().text_color);
+        brush.setColor(config().text_color_masked());
     }
     QPen rectPen(brush.color());
 
@@ -183,7 +183,7 @@ void TrainItem::unhighlight()
     QPen pen = path->pen();
     QColor labelColor = pen.color();
     if (config().train_label_color == Config::LinkLineColorOption::TextColor) {
-        labelColor = config().text_color;
+        labelColor = config().text_color_masked();
     }
     pen.setWidthF(pen.widthF() - 1);
 
@@ -241,7 +241,7 @@ void TrainItem::highlightWithLink()
     if (!_linkHighlighted) {
         QPen pen = trainPen();
         if (config().link_line_color == Config::LinkLineColorOption::TextColor) {
-            pen.setColor(config().text_color);
+            pen.setColor(config().text_color_masked());
         }
         pen.setWidthF(LINK_LINE_WIDTH + 1);
         pen.setStyle(linkLineStyle());
@@ -260,7 +260,7 @@ void TrainItem::unhighlightWithLink()
     if (_linkHighlighted) {
         QPen pen = trainPen();
         if (config().link_line_color == Config::LinkLineColorOption::TextColor) {
-            pen.setColor(config().text_color);
+            pen.setColor(config().text_color_masked());
         }
         pen.setWidth(LINK_LINE_WIDTH);
         pen.setStyle(linkLineStyle());
@@ -563,7 +563,7 @@ void TrainItem::setLine()
     labelPen.setWidth(0.5);
     labelPen.setStyle(Qt::SolidLine);
     if (config().train_label_color == Config::LinkLineColorOption::TextColor) {
-        labelPen.setColor(config().text_color);
+        labelPen.setColor(config().text_color_masked());
     }
 
     // 2024.02.09: add global config here
@@ -954,7 +954,7 @@ const QPen& TrainItem::trainPen() const
 
 QColor TrainItem::trainColor() const
 {
-    return trainPen().color();
+    return qeutil::inversedColorIf(trainPen().color(), config().inverse_color);
 }
 
 double TrainItem::determineStartLabelHeight()
@@ -1331,7 +1331,7 @@ QColor TrainItem::linkLineColor() const
 {
     switch (config().link_line_color) {
     case Config::LinkLineColorOption::LineColor: return trainColor();
-    case Config::LinkLineColorOption::TextColor: return config().text_color;
+    case Config::LinkLineColorOption::TextColor: return config().text_color_masked();
     }
     return trainColor();
 }
@@ -1340,7 +1340,7 @@ QColor TrainItem::labelColor() const
 {
     switch (config().train_label_color) {
     case Config::LinkLineColorOption::LineColor: return trainColor();
-    case Config::LinkLineColorOption::TextColor: return config().text_color;
+    case Config::LinkLineColorOption::TextColor: return config().text_color_masked();
     }
     return trainColor();
 }

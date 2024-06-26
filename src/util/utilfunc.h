@@ -161,6 +161,8 @@ QString timeToStringNullable(const QTime& tm, const QString& fmt);
  */
 QColor inversedColor(const QColor& color);
 
+QColor inversedColorIf(const QColor& color, bool stat);
+
 void inverseColorIf(QColor& color, bool on);
 
 }
