@@ -182,6 +182,7 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
     printer.setPageSize(pageSize);
 
     QPainter painter;
+    painter.setBackground(config().background_color_masked());
     painter.begin(&printer);
 
     if (!painter.isActive()) {
@@ -222,9 +223,11 @@ void DiagramWidget::toPdfAsync(const QString& filename, const QString& title, co
         QSize size(scene()->width(), scene()->height() + 100 + note_apdx);
         QPageSize pageSize(size);
         printer.setPageSize(pageSize);
-
+       
         QPainter painter;
         painter.begin(&printer);
+        painter.fillRect(QRect(0, 0, printer.width(), printer.height()), config().background_color_masked());
+        //painter.setBackground(config().background_color_masked());
 
         if (!painter.isActive()) {
             return 1;
@@ -554,7 +557,7 @@ bool DiagramWidget::toPng(const QString& filename, const QString& title, const Q
     constexpr int note_apdx = 80;
     QImage image(scene()->width(), scene()->height() + 100 + note_apdx,
         QImage::Format_ARGB32);
-    image.fill(Qt::white);
+    image.fill(config().background_color_masked());
     QPainter painter;
     painter.begin(&image);
     paintToFile(painter, title, note);
