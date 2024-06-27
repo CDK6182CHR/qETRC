@@ -4,14 +4,13 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.7.1";
-const std::string_view DATE = "20240426";
-const int RELEASE_CODE = 55;
+const std::string_view LAST_VERSION = "V1.7.2";
+const std::string_view DATE = "20240627";
+const int RELEASE_CODE = 56;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 新增工具栏上下文页面中切换所选对象。
-2. 对列车编辑和交路编辑支持切换对象以及与所选对象同步。
-3. 在列车筛选器中，新增按始发站、终到站筛选。)";
+const std::string_view UPDATE_LOG = R"(1. 新增运行图背景色设置、反色设置。
+2. 在速览信息窗口中，停站时间、总时间的统计现在包含起止站。)";
 }
