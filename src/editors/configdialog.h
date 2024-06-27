@@ -24,7 +24,7 @@ class ConfigDialog : public QDialog
     /**
      * @brief _cfg
      * 暂定每个Dialog对象都是一次性的，只负责配置一个Config对象。
-     * 目前只有全局的，但以后可能会允许每个Page分别配置。
+     * 用于全局配置和每个页面的配置。
      */
     Config& _cfg;
     const bool forDefault;
@@ -47,10 +47,10 @@ class ConfigDialog : public QDialog
     QCheckBox* ckHideStartLabelStarting, * ckHideStartLabelNonStarting;
     QCheckBox* ckHideEndLabelTerminal, * ckHideEndLabelNonTerminal, * ckHideEndLabelLink;
     QCheckBox* ckShowRuler, * ckShowMile, * ckShowCount; 
-    QCheckBox* ckTransparent;
-    QPushButton* btnGridColor, * btnTextColor;
+    QCheckBox* ckTransparent, * ckInverseColor;
+    QPushButton* btnGridColor, * btnTextColor, * btnBgColor;
 
-    QColor gridColor, textColor;
+    QColor gridColor, textColor, bgColor;
     
 
 public:
@@ -92,6 +92,8 @@ private slots:
     void actGridColor();
 
     void actTextColor();
+
+    void actBgColor();
 
     void informTransparent();
 

@@ -24,7 +24,10 @@ TrainItem::TrainItem(Diagram& diagram, std::shared_ptr<TrainLine> line,
     _endAtThis = train()->isTerminalStation(_line->lastStationName());
     startLabelInfo = _page.startingNullLabel(_line->firstRailStation().get(),_line->dir());
     endLabelInfo = _page.terminalNullLabel(_line->lastRailStation().get(), _line->dir());
-    pen = trainPen();
+    pen = line->train()->pen();
+    if (config().inverse_color) {
+        pen.setColor(qeutil::inversedColor(pen.color()));
+    }
 
     // 如果这里报QtGui.dll的错误，考虑trainType()是不是空！
     setLine();
@@ -86,7 +89,7 @@ void TrainItem::highlight()
         startRect->setPen(rectPen);
         startRect->setBrush(brush);
         startLabelText->setZValue(6);
-        startLabelText->setBrush(Qt::white);
+        startLabelText->setBrush(config().background_color_masked());   // 2024.06.27: use bg-color for highlighted train name
     }
     if (endLabelText && config().end_label_name) {
         endRect = new QGraphicsRectItem(endLabelText->boundingRect(), this);
@@ -95,7 +98,7 @@ void TrainItem::highlight()
         endRect->setPen(rectPen);
         endRect->setBrush(brush);
         endLabelText->setZValue(6);
-        endLabelText->setBrush(Qt::white);
+        endLabelText->setBrush(config().background_color_masked());
     }
 
     //跨界点
@@ -949,12 +952,12 @@ double TrainItem::getInGraph(double xout, double yout, double xin, double yin, Q
 
 const QPen& TrainItem::trainPen() const
 {
-    return train()->pen();
+    return this->pen;
 }
 
 QColor TrainItem::trainColor() const
 {
-    return qeutil::inversedColorIf(trainPen().color(), config().inverse_color);
+    return pen.color();
 }
 
 double TrainItem::determineStartLabelHeight()

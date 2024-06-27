@@ -260,6 +260,7 @@
 
 #define QEICN_config_transparent_help QE_STD_ICON(MessageBoxQuestion)   // 显示设置中 关于透明模式的信息
 #define QEICN_config_link_mode_setup_info QE_STD_ICON(MessageBoxInformation)   // 显示设置中 连线模式的信息和自动设置
+#define QEICN_config_inverse_color_info QE_STD_ICON(MessageBoxInformation)   // 显示设置中 反色的信息
 
 #define QEICN_type_config_transparent_help QE_STD_ICON(MessageBoxQuestion)   // 类型管理中 关于透明模式的信息
 #define QEICN_type_regex_transparent_help QE_STD_ICON(MessageBoxQuestion)   // 类型规则中 关于透明模式的信息

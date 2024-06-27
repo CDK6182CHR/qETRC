@@ -329,7 +329,7 @@ void ConfigDialog::initUI()
 
     // 4. 格线控制
     if constexpr (true) {
-        gb = new QGroupBox(tr("格线控制"));
+        gb = new QGroupBox(tr("格线及背景控制"));
         form = new QFormLayout;
 
         sd = new QDoubleSpinBox;
@@ -355,6 +355,24 @@ void ConfigDialog::initUI()
         btnTextColor = btn;
         connect(btn, &QPushButton::clicked, this, &ConfigDialog::actTextColor);
         form->addRow(tr("字体颜色"), btn);
+
+        btn = new QPushButton;
+        btnBgColor = btn;
+        connect(btn, &QPushButton::clicked, this, &ConfigDialog::actBgColor);
+        form->addRow(tr("背景颜色"), btn);
+
+        auto* chlay = new QHBoxLayout;
+        ckInverseColor = new QCheckBox(tr("启用反色"));
+        chlay->addWidget(ckInverseColor);
+
+        auto* mbtn = new QToolButton;
+        mbtn->setIcon(QEICN_config_inverse_color_info);
+        chlay->addWidget(mbtn);
+        form->addRow(tr("反色"), chlay);
+        connect(mbtn, &QToolButton::clicked, [this]() {
+            QMessageBox::information(this, tr("反色"), tr("若启用反色，则本程序中设置的所有颜色都将被取反色，"
+                "包括格线颜色、字体颜色、背景颜色以及运行线颜色等。"));
+            });
 
         gb->setLayout(form);
         vlay->addWidget(gb);
@@ -521,6 +539,23 @@ void ConfigDialog::refreshData()
     //格线控制
     SET_VALUE(sdSlimWidth, default_grid_width);
     SET_VALUE(sdBoldWidth, bold_grid_width);
+    ckInverseColor->setChecked(_cfg.inverse_color);
+
+    gridColor = _cfg.grid_color;
+    textColor = _cfg.text_color;
+    bgColor = _cfg.background_color;
+    btnGridColor->setText(gridColor.name().toUpper());
+    btnGridColor->setStyleSheet(QStringLiteral(
+        "QPushButton { background-color: rgb(%1, %2, %3); }").arg(gridColor.red())
+        .arg(gridColor.green()).arg(gridColor.blue()));
+    btnTextColor->setText(textColor.name().toUpper());  // 2023.09.21  fix
+    btnTextColor->setStyleSheet(QStringLiteral(
+        "QPushButton { background-color: rgb(%1, %2, %3); }").arg(textColor.red())
+        .arg(textColor.green()).arg(textColor.blue()));
+    btnBgColor->setText(bgColor.name().toUpper());
+    btnBgColor->setStyleSheet(QStringLiteral(
+        "QPushButton { background-color: rgb(%1, %2, %3); }").arg(bgColor.red())
+        .arg(bgColor.green()).arg(bgColor.blue()));
 
     //空间轴
     SET_VALUE(sdScaleYdist, pixels_per_km);
@@ -565,17 +600,6 @@ void ConfigDialog::refreshData()
     SET_VALUE(spLinkHeightStep, step_link_height);
     cbLinkLabelType->setCurrentIndex(static_cast<int>(_cfg.link_line_label_type));
     cbLinkColor->setCurrentIndex(static_cast<int>(_cfg.link_line_color));
-
-    gridColor = _cfg.grid_color;
-    textColor = _cfg.text_color;
-    btnGridColor->setText(gridColor.name().toUpper());
-    btnGridColor->setStyleSheet(QStringLiteral(
-        "QPushButton { background-color: rgb(%1, %2, %3); }").arg(gridColor.red())
-        .arg(gridColor.green()).arg(gridColor.blue()));
-    btnTextColor->setText(textColor.name().toUpper());  // 2023.09.21  fix
-    btnTextColor->setStyleSheet(QStringLiteral(
-        "QPushButton { background-color: rgb(%1, %2, %3); }").arg(textColor.red())
-        .arg(textColor.green()).arg(textColor.blue()));
 }
 
 #undef SET_VALUE
@@ -617,6 +641,11 @@ void ConfigDialog::actApply()
     //格线控制
     GET_VALUE(sdSlimWidth, default_grid_width);
     GET_VALUE(sdBoldWidth, bold_grid_width);
+    cnew.inverse_color = ckInverseColor->isChecked();
+
+    cnew.grid_color = gridColor;
+    cnew.text_color = textColor;
+    cnew.background_color = bgColor;
 
     //空间轴
     GET_VALUE(sdScaleYdist, pixels_per_km);
@@ -655,9 +684,6 @@ void ConfigDialog::actApply()
     GET_VALUE(spLinkHeightStep, step_link_height);
     cnew.link_line_label_type = static_cast<Config::LinkLineLabelType>(cbLinkLabelType->currentIndex());
     cnew.link_line_color = static_cast<Config::LinkLineColorOption>(cbLinkColor->currentIndex());
-    
-    cnew.grid_color = gridColor;
-    cnew.text_color = textColor;
 
     // check and warnings
     QString warns{};
@@ -722,6 +748,19 @@ void ConfigDialog::actTextColor()
         btnTextColor->setStyleSheet(QStringLiteral(
             "QPushButton { background-color: rgb(%1, %2, %3); }").arg(textColor.red())
             .arg(textColor.green()).arg(textColor.blue()));
+    }
+}
+
+void ConfigDialog::actBgColor()
+{
+    auto color = QColorDialog::getColor(textColor, this, tr("背景颜色"));
+    if (color.isValid()) {
+        bgColor = color;
+        btnBgColor->setText(color.name());
+        btnBgColor->setText(gridColor.name().toUpper());
+        btnBgColor->setStyleSheet(QStringLiteral(
+            "QPushButton { background-color: rgb(%1, %2, %3); }").arg(bgColor.red())
+            .arg(bgColor.green()).arg(bgColor.blue()));
     }
 }
 

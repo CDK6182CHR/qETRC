@@ -98,6 +98,10 @@ class TrainItem : public QGraphicsItem
     double spanItemWidth = -1, spanItemHeight = -1;
     double startLabelHeight = -1, endLabelHeight = -1;
 
+    /**
+     * 2024.06.27 update: use this for the *actual* pen for drawing train lines.
+     * This may be different from train->pen(), if inverse_color is configured.
+     */
     QPen pen;
 
     const double start_x, start_y;
