@@ -526,8 +526,19 @@ public slots:
 
     /**
      * 全局刷新：重新绑定线路，重新铺画运行图，更新所有打开的窗口
+     * ----------------------
+     * 2024.07.21 修订：更温和一些，不要重新绑定线路。
+     * 原因是更改列车显示部分的undo/redo依赖TrainLine。如果重新绑定，TrainLine对象全部清空，
+     * 再进行undo/redo操作会导致程序崩溃。
+     * 新增rebindAndRefresh()方法，用于取代原有的重新绑定并刷新的功能。
      */
     void refreshAll();
+
+    /**
+     * 2024.07.21  Rebind all trains and refresh status. Invalidate undo stack. 
+     * See documents in refreshAll().
+     */
+    void rebindAndRefresh();
 
     /**
      * 应用更改站名。操作压栈。

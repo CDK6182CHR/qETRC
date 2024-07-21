@@ -279,8 +279,9 @@ void ViewCategory::setDirTrainsShow(Direction dir, bool show)
             }
         }
     }
-    if(!lines.empty())
+    if (!lines.empty()) {
         mw->undoStack->push(new qecmd::ChangeTrainShow(lines, show, this));
+    }
 }
 
 void ViewCategory::setTrainShow(std::shared_ptr<TrainLine> line, bool show)

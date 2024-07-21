@@ -260,6 +260,8 @@ namespace qecmd {
     /**
      * 注意，全都按照TrainLine来处理。Adapter的，分包成Line。
      * 注意只把真正变化了的放进来。
+     * 2024.07.19  NOTE: This action relies on *trainlines* (not trains themselves), 
+     * thus it may be dangerous if the trainlines are re-bound, etc.
      */
     class ChangeTrainShow :
         public QUndoCommand {

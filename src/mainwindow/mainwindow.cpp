@@ -911,7 +911,11 @@ void MainWindow::initToolbar()
 		diaActions.refreshAll = act;
 		addAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(refreshAll()));
-        panel->addLargeAction(act);
+
+		menu = new SARibbonMenu(tr("刷新扩展"), this);
+		menu->addAction(tr("重置状态"), this, &MainWindow::rebindAndRefresh);
+		act->setMenu(menu);
+        panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 		act = makeAction(QEICN_rename_station, tr("更改站名"));
 		act->setToolTip(tr("全局站名修改 (Ctrl+U)\n"
@@ -2159,8 +2163,8 @@ void MainWindow::commitPassedStationChange(int n)
 void MainWindow::refreshAll()
 {
 	auto start = std::chrono::system_clock::now();
-	qInfo() << "Refreshing diagram";
-	_diagram.refreshAll();
+	//qInfo() << "Refreshing diagram";
+	//_diagram.refreshAll();
 	updateAllDiagrams();
 	//直接由Main管理的子页面
 	naviModel->resetModel();
@@ -2179,6 +2183,28 @@ void MainWindow::refreshAll()
 	updateWindowTitle();
 	auto end = std::chrono::system_clock::now();
 	showStatus(tr("全部刷新完毕  用时 %1 毫秒").arg((end - start) / std::chrono::milliseconds(1)));
+}
+
+void MainWindow::rebindAndRefresh()
+{
+	auto ret = QMessageBox::question(this, tr("重置状态"),
+		tr("重置状态：此操作重新绑定列车与线路并刷新所有面板状态。\n"
+			"此操作不可撤销，且将使得以往所有操作不可撤销，请谨慎操作！是否继续？"));
+	if (ret != QMessageBox::Yes)
+		return;
+	ret = QMessageBox::question(this, tr("确认"),
+		tr("再次确认：此操作不可撤销，且将使得以往所有操作都不可撤销！\n"
+			"除非线路与列车绑定数据出现明显问题，否则建议使用[刷新]功能。\n"
+			"是否确认？"));
+	if (ret != QMessageBox::Yes)
+		return;
+
+	auto start = std::chrono::steady_clock::now();
+	undoStack->clear();
+	_diagram.refreshAll();
+	qInfo() << tr("重新绑定所有列车 用时 %1 毫秒").arg((std::chrono::steady_clock::now() - start) / std::chrono::milliseconds(1));
+
+	refreshAll();
 }
 
 void MainWindow::applyChangeStationName(const ChangeStationNameData& data)
