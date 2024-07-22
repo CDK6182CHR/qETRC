@@ -4,13 +4,12 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.7.2";
-const std::string_view DATE = "20240627";
-const int RELEASE_CODE = 56;
+const std::string_view LAST_VERSION = "V1.7.3";
+const std::string_view DATE = "20240722";
+const int RELEASE_CODE = 57;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 新增运行图背景色设置、反色设置。
-2. 在速览信息窗口中，停站时间、总时间的统计现在包含起止站。)";
+const std::string_view UPDATE_LOG = R"(调整“刷新”功能定义，并新增“重置状态”功能，以解决与列车显示状态筛选相关的闪退问题。)";
 }
