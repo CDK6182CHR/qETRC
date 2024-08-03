@@ -7,6 +7,8 @@
 #include <DockWidget.h>
 #include <QSet>
 #include <QList>
+#include <memory>
+#include <vector>
 #include "editors/routing/routingedit.h"
 
 class Routing;
@@ -14,6 +16,8 @@ class MainWindow;
 class Diagram;
 class QLineEdit;
 class RoutingDiagramWidget;
+struct SplitRoutingData;
+class RoutingWidget;
 
 /**
  * @brief The RoutingContext class
@@ -128,6 +132,11 @@ public slots:
      */
     void addTrainToRouting(std::shared_ptr<Routing> routing, std::shared_ptr<Train> train);
 
+    /**
+     * 2024.08.03 Push stack: split routing into pieces
+     */
+    void actSplitRouting(std::shared_ptr<Routing> routing, std::vector<SplitRoutingData>& data);
+
 };
 
 namespace qecmd {
@@ -171,6 +180,15 @@ namespace qecmd {
     };
 
 
+    class SplitRouting : public QUndoCommand
+    {
+        std::shared_ptr<Routing> routing;
+        std::vector<SplitRoutingData> data;
+        RoutingContext* const cont;
+    public:
+        SplitRouting(std::shared_ptr<Routing> routing, std::vector<SplitRoutingData>&& data,
+            RoutingContext* cont, RoutingWidget* rw, QUndoCommand* parent = nullptr);
+    };
 }
 
 #endif

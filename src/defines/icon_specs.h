@@ -216,6 +216,7 @@
 #define QEICN_change_routing QE_RSC_ICON(exchange.png)   // 切换交路
 #define QEICN_highlight_routing QE_RSC_ICON(trainline.png)   // 高亮显示
 #define QEICN_edit_routing QE_RSC_ICON(edit.png)   // 交路编辑
+#define QEICN_split_routing QE_RSC_ICON(copy.png)   // 交路拆分
 #define QEICN_del_routing QE_STD_ICON(TrashIcon)   // 删除交路
 
 #define QEICN_routing_diagram QE_RSC_ICON(routing-diagram.png)   // 交路图

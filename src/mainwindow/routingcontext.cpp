@@ -10,6 +10,7 @@
 #include "editors/routing/routingwidget.h"
 #include "defines/icon_specs.h"
 #include "dialogs/selectroutingdialog.h"
+#include "editors/routing/splitroutingdialog.h"
 
 #include <QLabel>
 #include <QLineEdit>
@@ -64,6 +65,17 @@ void RoutingContext::initUI()
     act=mw->makeAction(QEICN_edit_routing,tr("交路编辑"));
     connect(act,SIGNAL(triggered()),this,SLOT(actEdit()));
     panel->addLargeAction(act);
+
+    act = mw->makeAction(QEICN_split_routing, tr("拆分交路"));
+    panel->addLargeAction(act);
+    act->setToolTip(tr("拆分交路\n将当前交路拆分为一个或多个交路"));
+    connect(act, &QAction::triggered, [this]() {
+        if (!routing())return;
+        auto* d = new SplitRoutingDialog(_diagram.trainCollection(), routing(), mw);
+        connect(d, &SplitRoutingDialog::splitApplied, this,
+            &RoutingContext::actSplitRouting);
+        d->open();
+        });
 
     act = mw->makeAction(QEICN_del_routing, tr("删除交路"));
     connect(act, &QAction::triggered, this, &RoutingContext::actRemoveRouting);
@@ -248,6 +260,12 @@ void RoutingContext::addTrainToRouting(std::shared_ptr<Routing> routing, std::sh
     openRoutingEditWidget(routing);
 }
 
+void RoutingContext::actSplitRouting(std::shared_ptr<Routing> routing, std::vector<SplitRoutingData>& data)
+{
+    mw->undoStack->push(new qecmd::SplitRouting(routing, std::move(data), this,
+        mw->routingWidget));
+}
+
 void RoutingContext::refreshAllData()
 {
     refreshData();
@@ -279,6 +297,8 @@ void RoutingContext::openRoutingEditWidget(std::shared_ptr<Routing> routing)
         connect(w, &QWidget::windowTitleChanged, dock, &ads::CDockWidget::setWindowTitle);
         connect(w, &RoutingEdit::focusInRouting,
             mw, &MainWindow::focusInRouting);
+        connect(w, &RoutingEdit::routingSplit,
+            this, &RoutingContext::actSplitRouting);
         connect(w, &RoutingEdit::synchronizationChanged, [this, w](bool on) {
             if (on) {
                 this->syncEdits.insert(w);
@@ -516,3 +536,37 @@ void qecmd::BatchChangeRoutings::redo()
 }
 
 #endif
+
+qecmd::SplitRouting::SplitRouting(std::shared_ptr<Routing> routing, std::vector<SplitRoutingData>&& data_, 
+    RoutingContext* cont, RoutingWidget* rw, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("拆分交路: %1").arg(routing->name()), parent),
+    routing(routing), data(std::move(data_)),cont(cont)
+{
+    auto rc = routing->copyBase();
+    rc->order().operator=(routing->order());   // copy constructor
+    std::list<RoutingNode> order_removed;
+    auto itr = rc->order().begin();
+    std::advance(itr, data.front().idx_first);
+    order_removed.splice(order_removed.end(), rc->order(),
+        itr, rc->order().end());
+
+    // First: change the order of the current routing
+    new qecmd::ChangeRoutingOrder(routing, rc, cont, this);
+
+    // Now for each new routings
+    for (const auto& d : data) {
+        auto nr = routing->copyBase();
+        nr->setName(d.name);
+        new qecmd::AddRouting(nr, rw, this);
+
+        auto nr_new = nr->copyBase();
+        // Each time we take from the first of order_removed list
+        auto itr_end = order_removed.begin();
+        std::advance(itr_end, d.idx_last - d.idx_first);
+        nr_new->order().splice(nr_new->order().end(), order_removed,
+            order_removed.begin(), itr_end);
+        new qecmd::ChangeRoutingOrder(nr, nr_new, cont, this);
+    }
+}
+
+

@@ -8,7 +8,7 @@
 #include <cmath>
 #include <QModelIndex>
 #include <QTime>
-
+#include <QStandardItem>
 
 //QTime qeutil::parseTime(const QString& tm)
 //{
@@ -304,4 +304,18 @@ void qeutil::inverseColorIf(QColor& color, bool on)
 		color.setGreen(255 - color.green());
 		color.setBlue(255 - color.blue());
 	}
+}
+
+QStandardItem* qeutil::makeCheckItem()
+{
+	auto* it = new QStandardItem;
+	it->setCheckable(true);
+	return it;
+}
+
+QStandardItem* qeutil::makeReadOnlyItem(const QString& text)
+{
+	auto* it = new QStandardItem(text);
+	it->setEditable(false);
+	return it;
 }

@@ -12,6 +12,7 @@ class QTextEdit;
 class QLineEdit;
 class TrainCollection;
 class QToolButton;
+struct SplitRoutingData;
 
 /**
  * @brief The RoutingEdit class
@@ -52,6 +53,8 @@ signals:
 
     void synchronizationChanged(bool on);
 
+    void routingSplit(std::shared_ptr<Routing>, std::vector<SplitRoutingData>&);
+
 public slots:
     void refreshData();
     void refreshBasicData();
@@ -69,6 +72,7 @@ private slots:
     void actDetect();
     void actApply();
     void actCancel();
+    void actSplit();
     void rowInserted(int row);
     void onParseDone(std::shared_ptr<Routing>original, std::shared_ptr<Routing> tmp);
     void onDetectDone(std::shared_ptr<const Routing> origin, std::shared_ptr<Routing> tmp);

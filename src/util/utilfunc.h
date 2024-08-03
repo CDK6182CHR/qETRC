@@ -9,6 +9,7 @@
 class QWidget;
 class QStandardItemModel;
 class QModelIndex;
+class QStandardItem;
 
 namespace qeutil{
 
@@ -165,4 +166,7 @@ QColor inversedColorIf(const QColor& color, bool stat);
 
 void inverseColorIf(QColor& color, bool on);
 
+QStandardItem* makeCheckItem();
+
+QStandardItem* makeReadOnlyItem(const QString& text);
 }
