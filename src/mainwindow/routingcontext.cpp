@@ -11,6 +11,8 @@
 #include "defines/icon_specs.h"
 #include "dialogs/selectroutingdialog.h"
 #include "editors/routing/splitroutingdialog.h"
+#include "editors/routing/mergeroutingdialog.h"
+#include "dialogs/selectroutingdialog.h"
 
 #include <QLabel>
 #include <QLineEdit>
@@ -76,6 +78,11 @@ void RoutingContext::initUI()
             &RoutingContext::actSplitRouting);
         d->open();
         });
+
+    act = mw->makeAction(QEICN_merge_routing, tr("合并交路"));
+    panel->addLargeAction(act);
+    act->setToolTip(tr("合并交路\n选择交路，将其合并到当前交路，并删除该交路"));
+    connect(act, &QAction::triggered, this, &RoutingContext::actMergeRouting);
 
     act = mw->makeAction(QEICN_del_routing, tr("删除交路"));
     connect(act, &QAction::triggered, this, &RoutingContext::actRemoveRouting);
@@ -220,6 +227,35 @@ void RoutingContext::actChangeRouting()
     if (ret.isAccepted && ret.routing) {
         mw->focusInRouting(ret.routing);
     }
+}
+
+void RoutingContext::actMergeRouting()
+{
+    if (!routing())
+        return;
+    auto* d = new MergeRoutingDialog(_diagram.trainCollection(), routing(), mw);
+    connect(d, &MergeRoutingDialog::mergeApplied,
+        [this](std::shared_ptr<Routing> routing, std::shared_ptr<Routing> other, bool sel_pos, int pos) {
+            auto* cmd = new QUndoCommand(tr("合并至交路: %1").arg(routing->name()));
+            int idx = _diagram.trainCollection().getRoutingIndex(other);
+            new qecmd::RemoveRouting(idx, other, mw->routingWidget, cmd);
+
+            auto rc = routing->copyBase();
+            rc->order().operator=(routing->order());
+            auto itr = rc->order().begin();
+            if (sel_pos) {
+                std::advance(itr, pos);
+            }
+            else {
+                itr = rc->order().end();
+            }
+            auto other_order_copy = other->order();   // copy construct
+            rc->order().splice(itr, std::move(other_order_copy));
+            new qecmd::ChangeRoutingOrder(routing, rc, this, cmd);
+
+            mw->getUndoStack()->push(cmd);
+        });
+    d->open();
 }
 
 void RoutingContext::openRoutingDiagramWidget(std::shared_ptr<Routing> routing)

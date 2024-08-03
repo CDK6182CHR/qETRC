@@ -70,6 +70,8 @@ private slots:
 
     void actChangeRouting();
 
+    void actMergeRouting();
+
 public slots:
     void refreshData();
     void refreshAllData();
@@ -189,6 +191,7 @@ namespace qecmd {
         SplitRouting(std::shared_ptr<Routing> routing, std::vector<SplitRoutingData>&& data,
             RoutingContext* cont, RoutingWidget* rw, QUndoCommand* parent = nullptr);
     };
+
 }
 
 #endif
