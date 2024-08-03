@@ -72,6 +72,9 @@ void SelectRoutingDialog::initUI()
     connect(btn, &QPushButton::clicked, this, &SelectRoutingDialog::actApply);
     hlay->addWidget(btn);
 
+    connect(table, &QTableView::doubleClicked, this,
+        &SelectRoutingDialog::actApply);
+
     if (allowNew){
         btn=new QPushButton(tr("新建"));
         connect(btn, &QPushButton::clicked, this, &SelectRoutingDialog::actNew);
