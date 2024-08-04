@@ -4,12 +4,14 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.7.3";
-const std::string_view DATE = "20240722";
-const int RELEASE_CODE = 57;
+const std::string_view LAST_VERSION = "V1.7.4";
+const std::string_view DATE = "20240804";
+const int RELEASE_CODE = 58;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(调整“刷新”功能定义，并新增“重置状态”功能，以解决与列车显示状态筛选相关的闪退问题。)";
+const std::string_view UPDATE_LOG = R"(1. 新增拆分交路、合并交路功能。
+2. 新增交路里程查看功能。
+3. 新增选择交路页面双击提交。)";
 }
