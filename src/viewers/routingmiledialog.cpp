@@ -4,6 +4,12 @@
 #include "data/train/train.h"
 #include "util/utilfunc.h"
 #include "data/analysis/runstat/trainintervalstat.h"
+#include "data/common/qesystem.h"
+
+#include <QLabel>
+#include <QTableView>
+#include <QVBoxLayout>
+#include <QHeaderView>
 
 
 RoutingMileModel::RoutingMileModel(std::shared_ptr<Routing> routing, QObject *parent):
@@ -43,6 +49,7 @@ void RoutingMileModel::setupModel()
             setItem(r,ColTerminal,new SI(itr->train()->terminal().toSingleLiteral()));
 
             TrainIntervalStat stat{itr->train()};
+            stat.setRange(0, itr->train()->stationCount() - 1);
             auto res = stat.compute();
             if (res.railResults.isValid) {
                 double this_mile = res.railResults.totalMiles;
@@ -58,5 +65,45 @@ void RoutingMileModel::setupModel()
                 mile_valid=false;
             }
         }
+
+        it = new SI;
+        it->setEditable(false);
+        it->setCheckState(qeutil::boolToCheckState(itr->link()));
+        it->setCheckable(false);
+        setItem(r, ColLink, it);
     }
+}
+
+RoutingMileDialog::RoutingMileDialog(std::shared_ptr<Routing> routing, QWidget *parent):
+    QDialog(parent), m_routing(routing), m_model(new RoutingMileModel(routing, this))
+{
+    setAttribute(Qt::WA_DeleteOnClose);
+    setWindowTitle(tr("交路里程 - %1").arg(m_routing->name()));
+    initUI();
+}
+
+void RoutingMileDialog::initUI()
+{
+    resize(800, 600);
+    auto* vlay=new QVBoxLayout(this);
+    auto* lab=new QLabel(tr("本窗口提供交路中各次列车的总里程，以及交路累计里程的统计。"
+                              "注意，由于列车并不一定全程在线路上有铺画运行线，其全程里程并不总是可得，"
+                              "交路里程也并不总是可得。"));
+    lab->setWordWrap(true);
+    vlay->addWidget(lab);
+
+    m_table=new QTableView;
+    m_table->setModel(m_model);
+
+    m_table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    m_table->setEditTriggers(QTableView::NoEditTriggers);
+
+    {
+        int c = 0;
+        for(int w: {120, 40, 100, 100, 40, 100, 100}) {
+            m_table->setColumnWidth(c++, w);
+        }
+    }
+
+    vlay->addWidget(m_table);
 }

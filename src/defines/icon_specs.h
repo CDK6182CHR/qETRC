@@ -221,6 +221,7 @@
 #define QEICN_del_routing QE_STD_ICON(TrashIcon)   // 删除交路
 
 #define QEICN_routing_diagram QE_RSC_ICON(routing-diagram.png)   // 交路图
+#define QEICN_routing_mile QE_RSC_ICON(ruler.png)   // 交路里程表
 #define QEICN_parse_routing QE_RSC_ICON(text.png)   // 文本解析
 #define QEICN_identify_trains QE_RSC_ICON(identify.png)   // 识别车次
 #define QEICN_close_routing_context QE_STD_ICON(DialogCloseButton)   // 关闭交路面板

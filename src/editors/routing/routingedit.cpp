@@ -20,6 +20,7 @@
 #include "defines/icon_specs.h"
 #include "dialogs/selectroutingdialog.h"
 #include "splitroutingdialog.h"
+#include "viewers/routingmiledialog.h"
 
 RoutingEdit::RoutingEdit(TrainCollection& coll_, std::shared_ptr<Routing> routing_, QWidget *parent) :
     QWidget(parent),coll(coll_), routing(routing_),model(new RoutingEditModel(routing,this))
@@ -118,8 +119,8 @@ void RoutingEdit::initUI()
     g->connectAll(SIGNAL(clicked()),this,{SLOT(actAddBefore()),SLOT(actAddAfter()),
       SLOT(actRemove()),SLOT(actMoveUp()),SLOT(actMoveDown()) });
     g->setMinimumWidth(80);
-    auto* g1 = new ButtonGroup<4>({ "解析文本","识别车次", "拆分", "刷新"});
-    g1->connectAll(SIGNAL(clicked()), this, { SLOT(actParse()), SLOT(actDetect()), SLOT(actSplit()), SLOT(refreshData()) });
+    auto* g1 = new ButtonGroup<5>({ "解析文本","识别车次", "拆分", "里程表", "刷新"});
+    g1->connectAll(SIGNAL(clicked()), this, { SLOT(actParse()), SLOT(actDetect()), SLOT(actSplit()), SLOT(actMile()), SLOT(refreshData()) });
     vlay->addLayout(g1);
 
     table=new QTableView;
@@ -253,6 +254,13 @@ void RoutingEdit::actSplit()
     auto* d = new SplitRoutingDialog(coll, routing, this);
     connect(d, &SplitRoutingDialog::splitApplied,
         this, &RoutingEdit::routingSplit);
+    d->open();
+}
+
+void RoutingEdit::actMile()
+{
+    if (!routing) return;
+    auto* d = new RoutingMileDialog(routing, this);
     d->open();
 }
 

@@ -13,6 +13,7 @@
 #include "editors/routing/splitroutingdialog.h"
 #include "editors/routing/mergeroutingdialog.h"
 #include "dialogs/selectroutingdialog.h"
+#include "viewers/routingmiledialog.h"
 
 #include <QLabel>
 #include <QLineEdit>
@@ -92,6 +93,15 @@ void RoutingContext::initUI()
     act = mw->makeAction(QEICN_routing_diagram, tr("交路图"));
     act->setToolTip(tr("交路图\n显示当前交路的（“中国动车组交路查询”风格的）示意图"));
     connect(act, &QAction::triggered, this, &RoutingContext::actRoutingDiagram);
+    panel->addLargeAction(act);
+
+    act = mw->makeAction(QEICN_routing_mile, tr("里程表"));
+    act->setToolTip(tr("里程表\n显示当前交路的各车次总里程及交路累计里程（若可得）。"));
+    connect(act, &QAction::triggered, [this]() {
+        if (!_routing) return;
+        auto* d = new RoutingMileDialog(routing(), mw);
+        d->open();
+        });
     panel->addLargeAction(act);
 
     act = mw->makeAction(QEICN_parse_routing, tr("文本解析"));

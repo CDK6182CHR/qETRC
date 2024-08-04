@@ -5,6 +5,7 @@
 #include <memory>
 
 class Routing;
+class QTableView;
 
 /**
  * @brief The RoutingMileModel class is provided for showing the mile
@@ -37,6 +38,7 @@ class RoutingMileDialog : public QDialog
     Q_OBJECT
     std::shared_ptr<Routing> m_routing;
     RoutingMileModel* m_model;
+    QTableView* m_table;
 public:
     RoutingMileDialog(std::shared_ptr<Routing> routing, QWidget* parent=nullptr);
 private:
