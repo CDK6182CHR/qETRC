@@ -88,12 +88,12 @@ public:
 
 class CalculationLogGap: public CalculationLogStation {
     typename TrainGap::GapTypesV2 _gapType;
-    std::shared_ptr<RailStation> _conflictStation;
+    std::shared_ptr<const RailStation> _conflictStation;
     std::shared_ptr<RailStationEvent> _event;
 public:
-    CalculationLogGap(Reason reason, std::shared_ptr<RailStation> station,
+    CalculationLogGap(Reason reason, std::shared_ptr<const RailStation> station,
         const QTime time, ModifiedField field, typename TrainGap::GapTypesV2 gapType,
-        std::shared_ptr<RailStation> conflictStation,
+        std::shared_ptr<const RailStation> conflictStation,
         std::shared_ptr<RailStationEvent> event_);
     virtual QString reasonString()const override;
     virtual QString objectString()const override;
@@ -129,7 +129,7 @@ class CalculationLogBackoff :public CalculationLogStation
 {
     int count;
 public:
-    CalculationLogBackoff(std::shared_ptr<RailStation> station,
+    CalculationLogBackoff(std::shared_ptr<const RailStation> station,
         const QTime time, ModifiedField field, int _count);
     virtual QString reasonString()const override;
 };

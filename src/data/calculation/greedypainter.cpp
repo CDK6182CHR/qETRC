@@ -60,7 +60,7 @@ bool GreedyPainter::paint(const TrainName& trainName)
 		// 正向推线
 		auto railint = _anchor->dirNextInterval(_dir);
 		try {
-			rep_fwd = calForward(railint, _anchorTime,
+			rep_fwd = calForward(_anchor, railint, _anchorTime,
 				(_anchor == _start && _localStarting) || anchor_stop);
 		}
 		catch (const BackoffExeed&) {
@@ -72,7 +72,7 @@ bool GreedyPainter::paint(const TrainName& trainName)
 		// 反向推线
 		auto railint_bak = _anchor->dirPrevInterval(_dir);
 		try {
-			rep_back = calBackward(railint_bak, tm_arr,
+			rep_back = calBackward(_anchor, railint_bak, tm_arr,
 				(_anchor == _end && _localTerminal) || anchor_stop);
 		}
 		catch (const BackoffExeed&) {
@@ -155,9 +155,31 @@ if (st_from != _anchor) _train->timetable().pop_back();  \
 return {RecurseStatus::FixedStation, delay_secs};
 
 typename GreedyPainter::RecurseReport
-	GreedyPainter::calForward(std::shared_ptr<const RailInterval> railint, const QTime& _tm, bool stop)
+	GreedyPainter::calForward(std::shared_ptr<const RailStation> st_from, 
+		std::shared_ptr<const RailInterval> railint, const QTime& _tm, bool stop)
 {
+
+	// 注意以后的出发时间以这里面的为准！
+	RailStationEventBase ev_start(qeutil::latterEventType(stop), _tm, qeutil::dirLatterPos(_dir)
+		, _dir);
+
+	// 2024.08.07: move this here; for final station with stop time.
+	if (stop) {
+		// 2023.12.20  对于锚点站，只有作为到达时刻时，才需要在这里加时间
+		if (st_from != _anchor || _anchorAsArrive) {
+			if (auto itr = _settledStops.find(st_from); itr != _settledStops.end()) {
+				ev_start.time = ev_start.time.addSecs(itr->second);
+				addLog(std::make_unique<CalculationLogBasic>(
+					CalculationLogAbstract::SetStop, st_from, ev_start.time,
+					CalculationLogAbstract::Depart
+					));
+				_train->timetable().back().business = true;
+			}
+		}
+	}
+
 	if (!railint || railint->fromStation() == _end) {
+		_train->timetable().back().depart = ev_start.time;
 		addLog(std::make_unique<CalculationLogSimple>(
 			CalculationLogAbstract::ForwardFinished
 			));
@@ -172,7 +194,7 @@ typename GreedyPainter::RecurseReport
 		return { RecurseStatus::Ok };
 	}
 
-	auto st_from = node->railInterval().fromStation();
+	//auto st_from = node->railInterval().fromStation();
 	auto st_to = node->railInterval().toStation();
 	const auto& ax_from = _railAxis.at(st_from);
 	const auto& ax_to = _railAxis.at(st_to);
@@ -181,24 +203,6 @@ typename GreedyPainter::RecurseReport
 	bool next_stop = ((itr != _settledStops.end()) || (st_to == _end && _localTerminal));
 	bool fixed_from = (_fixedStations.find(st_from.get()) != _fixedStations.end());
 	bool fixed_to = (_fixedStations.find(st_to.get()) != _fixedStations.end());
-
-	// 注意以后的出发时间以这里面的为准！
-	RailStationEventBase ev_start(qeutil::latterEventType(stop), _tm, qeutil::dirLatterPos(_dir)
-		, _dir);
-
-	if (stop) {
-		// 2023.12.20  对于锚点站，只有作为到达时刻时，才需要在这里加时间
-		if (st_from != _anchor || _anchorAsArrive) {
-			if (auto itr = _settledStops.find(st_from); itr != _settledStops.end()) {
-				ev_start.time = ev_start.time.addSecs(itr->second);
-				addLog(std::make_unique<CalculationLogBasic>(
-					CalculationLogAbstract::SetStop, st_from, ev_start.time,
-					CalculationLogAbstract::Depart
-					));
-				_train->timetable().back().business = true;
-			}
-		}
-	}
 
 	int tot_delay = qeutil::secsTo(_tm, ev_start.time);
 
@@ -390,7 +394,7 @@ typename GreedyPainter::RecurseReport
 				CalculationLogAbstract::Arrive
 				));
 			_train->appendStation(st_to->name, tm_to, tm_to, false);
-			auto ret = calForward(railint->nextInterval(), tm_to, false);
+			auto ret = calForward(st_to, railint->nextInterval(), tm_to, false);
 			if (ret.status == RecurseStatus::Ok) return ret;   // safe to return it directly
 		}
 
@@ -419,7 +423,7 @@ typename GreedyPainter::RecurseReport
 				CalculationLogAbstract::Arrive
 				));
 			_train->appendStation(st_to->name, tm_to, tm_to, false);
-			auto ret = calForward(railint->nextInterval(), tm_to, true);
+			auto ret = calForward(st_to, railint->nextInterval(), tm_to, true);
 			if (ret.status == RecurseStatus::Ok) {
 				return ret;
 			}
@@ -507,36 +511,12 @@ if (st_from != _anchor) _train->timetable().pop_front(); \
 return {RecurseStatus::FixedStation, delay_secs}; \
 
 typename GreedyPainter::RecurseReport
-	GreedyPainter::calBackward(std::shared_ptr<const RailInterval> railint, const QTime& _tm, bool stop)
+	GreedyPainter::calBackward(std::shared_ptr<const RailStation> st_from, std::shared_ptr<const RailInterval> railint, 
+		const QTime& _tm, bool stop)
 {
 	// 反向推线，代码基本从正向复制。
 	// 注意现在的from/to按照推线的观点看，与railint的from/to恰好相反。
 	// 暂时还有个坑：如果正推时锚点站没停车但反推是要求锚点站停车，如何处理。
-
-	if (!railint || railint->toStation() == _start) {
-		addLog(std::make_unique<CalculationLogSimple>(
-			CalculationLogAbstract::Finished
-			));
-		return { RecurseStatus::Ok };
-	}
-
-	_greedypaint_detail::RecurseLogger _logger(this, railint.get(), _tm, stop, true);
-
-	auto node = railint->getRulerNode(_ruler);
-	if (node->isNull()) {
-		addLog(std::make_unique<CalculationLogSimple>(CalculationLogAbstract::NoData));
-		return { RecurseStatus::Ok };
-	}
-
-	auto st_from = node->railInterval().toStation();
-	auto st_to = node->railInterval().fromStation();
-	const auto& ax_from = _railAxis.at(st_from);
-	const auto& ax_to = _railAxis.at(st_to);
-	auto fixed_from = (_fixedStations.find(st_from.get()) != _fixedStations.end());
-	auto fixed_to = (_fixedStations.find(st_from.get()) != _fixedStations.end());
-
-	auto itr = _settledStops.find(st_to);
-	bool next_stop = ((itr != _settledStops.end()) || (st_to == _start && _localStarting));
 
 	// 注意以后的出发时间以这里面的为准！
 	RailStationEventBase ev_arrive(qeutil::formerEventType(stop), _tm, qeutil::dirFormerPos(_dir)
@@ -552,10 +532,36 @@ typename GreedyPainter::RecurseReport
 					CalculationLogAbstract::SetStop, st_from, ev_arrive.time,
 					CalculationLogAbstract::Arrive
 					));
-				_train->timetable().back().business = true;
+				_train->timetable().front().business = true;
 			}
 		}
 	}
+
+	if (!railint || railint->toStation() == _start) {
+		_train->timetable().front().arrive = ev_arrive.time;
+		addLog(std::make_unique<CalculationLogSimple>(
+			CalculationLogAbstract::Finished
+			));
+		return { RecurseStatus::Ok };
+	}
+
+	_greedypaint_detail::RecurseLogger _logger(this, railint.get(), _tm, stop, true);
+
+	auto node = railint->getRulerNode(_ruler);
+	if (node->isNull()) {
+		addLog(std::make_unique<CalculationLogSimple>(CalculationLogAbstract::NoData));
+		return { RecurseStatus::Ok };
+	}
+
+	//auto st_from = node->railInterval().toStation();
+	auto st_to = node->railInterval().fromStation();
+	const auto& ax_from = _railAxis.at(st_from);
+	const auto& ax_to = _railAxis.at(st_to);
+	auto fixed_from = (_fixedStations.find(st_from.get()) != _fixedStations.end());
+	auto fixed_to = (_fixedStations.find(st_from.get()) != _fixedStations.end());
+
+	auto itr = _settledStops.find(st_to);
+	bool next_stop = ((itr != _settledStops.end()) || (st_to == _start && _localStarting));
 
 	int tot_delay = qeutil::secsTo(ev_arrive.time, _tm);
 
@@ -751,7 +757,7 @@ typename GreedyPainter::RecurseReport
 				CalculationLogAbstract::Depart
 				));
 			_train->prependStation(st_to->name, tm_dep, tm_dep, false);
-			auto ret = calBackward(railint->prevInterval(), tm_dep, false);
+			auto ret = calBackward(st_to, railint->prevInterval(), tm_dep, false);
 			if (ret.status == RecurseStatus::Ok) return ret;
 		}
 
@@ -780,7 +786,7 @@ typename GreedyPainter::RecurseReport
 				CalculationLogAbstract::Depart
 				));
 			_train->prependStation(st_to->name, tm_dep, tm_dep, false);
-			auto ret = calBackward(railint->prevInterval(), tm_dep, true);
+			auto ret = calBackward(st_to, railint->prevInterval(), tm_dep, true);
 			if (ret.status == RecurseStatus::Ok) {
 				return ret;
 			}

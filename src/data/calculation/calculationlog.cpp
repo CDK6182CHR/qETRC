@@ -57,8 +57,8 @@ QString CalculationLogBasic::reasonString() const
     }
 }
 
-CalculationLogGap::CalculationLogGap(Reason reason, std::shared_ptr<RailStation> station, const QTime time,
-    ModifiedField field, TrainGap::GapTypesV2 gapType, std::shared_ptr<RailStation> conflictStation,
+CalculationLogGap::CalculationLogGap(Reason reason, std::shared_ptr<const RailStation> station, const QTime time,
+    ModifiedField field, TrainGap::GapTypesV2 gapType, std::shared_ptr<const RailStation> conflictStation,
     std::shared_ptr<RailStationEvent> event_) :
     CalculationLogStation(reason, station, time, field), _gapType(gapType), _conflictStation(conflictStation),
     _event(event_)
@@ -122,7 +122,7 @@ QString CalculationLogForbid::reasonString() const
     }
 }
 
-CalculationLogBackoff::CalculationLogBackoff(std::shared_ptr<RailStation> station, 
+CalculationLogBackoff::CalculationLogBackoff(std::shared_ptr<const RailStation> station, 
     const QTime time, ModifiedField field, int _count):
     CalculationLogStation(Backoff,station,time,field),count(_count)
 {

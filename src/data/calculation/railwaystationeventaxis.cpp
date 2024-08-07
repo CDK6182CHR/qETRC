@@ -2,8 +2,8 @@
 #include <util/utilfunc.h>
 #include <QDebug>
 
-IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_ptr<RailStation> from, 
-    std::shared_ptr<RailStation> to, Direction dir, const QTime& tm_start, 
+IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_ptr<const RailStation> from, 
+    std::shared_ptr<const RailStation> to, Direction dir, const QTime& tm_start, 
     int secs, bool singleLine, bool backward) const
 {
     auto& ax_from = this->at(from);

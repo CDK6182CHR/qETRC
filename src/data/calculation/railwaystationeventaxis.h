@@ -9,9 +9,9 @@
  * 目前主要是StationEventAxis的集合，但需要支持站间查找的功能。
  */
 class RailwayStationEventAxis :
-    public std::map<std::shared_ptr<RailStation>, StationEventAxis>
+    public std::map<std::shared_ptr<const RailStation>, StationEventAxis>
 {
-    using Base = std::map<std::shared_ptr<RailStation>, StationEventAxis>;
+    using Base = std::map<std::shared_ptr<const RailStation>, StationEventAxis>;
 public:
     using Base::map;
 
@@ -35,7 +35,7 @@ public:
      */
     IntervalConflictReport
         intervalConflicted(
-            std::shared_ptr<RailStation> from, std::shared_ptr<RailStation> to, Direction dir,
+            std::shared_ptr<const RailStation> from, std::shared_ptr<const RailStation> to, Direction dir,
             const QTime& tm_start, int secs, bool singleLine, bool backward)const;
 
 private:

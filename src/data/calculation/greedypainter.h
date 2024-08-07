@@ -119,9 +119,11 @@ private:
 	 * @param node 排图标尺的当前区间，同时包含区间的所有数据
 	 * @param tm node前站的预告到达时刻
 	 * @param stop node前站是否已包含停车附加时分，即该站是否停车
+	 * -----
+	 * 2024.08.07  添加区间前站参数 st_from。用于在递归终止前，处理最后一站的图定停车时间。
 	 */
-	RecurseReport calForward(std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
+	RecurseReport calForward(std::shared_ptr<const RailStation> st_from, std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
 
-	RecurseReport calBackward(std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
+	RecurseReport calBackward(std::shared_ptr<const RailStation> st_from, std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
 };
 
