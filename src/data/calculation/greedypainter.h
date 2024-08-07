@@ -5,7 +5,7 @@
 #include "calculationlog.h"
 
 namespace _greedypaint_detail {
-	class _RecurseLogger;
+	class RecurseLogger;
 }
 
 class Diagram;
@@ -35,7 +35,7 @@ class GreedyPainter
 	std::map<std::shared_ptr<const RailStation>, int> _settledStops;
 	std::set<const RailStation*> _fixedStations;
 
-	friend class _greedypaint_detail::_RecurseLogger;
+	friend class _greedypaint_detail::RecurseLogger;
 
 	/**
 	 * @brief _train

@@ -913,6 +913,7 @@ void MainWindow::initToolbar()
 		connect(act, SIGNAL(triggered()), this, SLOT(refreshAll()));
 
 		menu = new SARibbonMenu(tr("刷新扩展"), this);
+		menu->addAction(tr("刷新"), this, &MainWindow::refreshAll);
 		menu->addAction(tr("重置状态"), this, &MainWindow::rebindAndRefresh);
 		act->setMenu(menu);
         panel->addLargeAction(act, QToolButton::MenuButtonPopup);
@@ -1283,6 +1284,7 @@ void MainWindow::initToolbar()
 		diaActions.greedyPaint = act;
 
 		menu = new SARibbonMenu(this);
+		menu->addAction(tr("贪心排图向导"), this, &MainWindow::actGreedyPaint);
 		menu->addAction(tr("退出贪心排图状态"), this, &MainWindow::actExitGreedyPaint);
 		act->setMenu(menu);
 

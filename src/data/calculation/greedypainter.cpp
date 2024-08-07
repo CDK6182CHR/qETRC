@@ -126,13 +126,13 @@ namespace _greedypaint_detail {
 	/**
 	 * 使用RAII机制记录递归的进入和退出
 	 */
-	class _RecurseLogger {
+	class RecurseLogger {
 		GreedyPainter* painter;
 		const RailInterval* railint;
 		const QTime& tm;
 		bool stop, isBack;
 	public:
-		_RecurseLogger(GreedyPainter* painter, const RailInterval* railint,
+		RecurseLogger(GreedyPainter* painter, const RailInterval* railint,
 			const QTime& tm, bool stop, bool isBack) :
 			painter(painter), railint(railint), tm(tm), stop(stop), isBack(isBack)
 		{
@@ -141,7 +141,7 @@ namespace _greedypaint_detail {
 				));
 		}
 
-		~_RecurseLogger() {
+		~RecurseLogger() {
 			painter->addLog(std::make_unique<CalculationLogSub>(
 				CalculationLogAbstract::SubExit, railint, tm, stop, isBack
 				));
@@ -164,7 +164,7 @@ typename GreedyPainter::RecurseReport
 		return { RecurseStatus::Ok };
 	}
 
-	_greedypaint_detail::_RecurseLogger _logger(this, railint.get(), _tm, stop, false);
+	_greedypaint_detail::RecurseLogger _logger(this, railint.get(), _tm, stop, false);
 
 	auto node = railint->getRulerNode(_ruler);
 	if (node->isNull()) {
@@ -520,7 +520,7 @@ typename GreedyPainter::RecurseReport
 		return { RecurseStatus::Ok };
 	}
 
-	_greedypaint_detail::_RecurseLogger _logger(this, railint.get(), _tm, stop, true);
+	_greedypaint_detail::RecurseLogger _logger(this, railint.get(), _tm, stop, true);
 
 	auto node = railint->getRulerNode(_ruler);
 	if (node->isNull()) {
