@@ -218,6 +218,22 @@ public:
      */
     std::shared_ptr<DiagramPage> clone()const;
 
+    /**
+     * 2024.08.08  Returns the maximal height of the labels at the top of the diagram
+     * (i.e. over-labels of the first station).
+     * An extra label-step-height is added.
+     * Provided for automatically set the top/bottom margin.
+     */
+    double topLabelMaxHeight()const;
+
+    double bottomLabelMaxHeight()const;
+
+private:
+    /**
+     * The generalized implementation. See top/bottum LabelMaxHeight.
+     */
+    double labelMaxHeight(const label_map_t& labels, const RouteLinkLayerManager& links)const;
+
 };
 
 //inline auto overNullLabel() { return _overLabels.end(); }

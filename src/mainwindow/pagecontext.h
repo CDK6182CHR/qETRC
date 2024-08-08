@@ -96,6 +96,11 @@ public slots:
 
     void actSwitchToRailway();
 
+    /**
+     * 2024.08.08  Automatically set top/down margins according to labels.
+     */
+    void actAutoTopDownMargin();
+
 signals:
     void pageRemoved(int i);
     void pageNameChanged(int index);

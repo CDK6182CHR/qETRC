@@ -124,6 +124,7 @@
 #define QEICN_edit_page QE_RSC_ICON(edit.png)  // 编辑运行图页面
 #define QEICN_export_page QE_RSC_ICON(pdf.png)   // 导出运行图页面
 #define QEICN_appearance_config_page QE_RSC_ICON(config.png)   // 显示设置 （运行图页面级别）
+#define QEICN_auto_top_bottom_margin QE_RSC_ICON(adjust.png)   // 自动调整上下边距
 #define QEICN_switch_to_page QE_STD_ICON(FileDialogContentsView) // 转到运行图页面
 #define QEICN_edit_rail_page QE_RSC_ICON(rail.png)   // 编辑线路（运行图页面）
 

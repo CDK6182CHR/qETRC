@@ -114,6 +114,10 @@ void PageContext::initUI()
     panel->addLargeAction(act, QToolButton::MenuButtonPopup);
     //btn->setMinimumWidth(80);
 
+    act = mw->makeAction(QEICN_auto_top_bottom_margin, tr("自动上下边距"));
+    connect(act, &QAction::triggered, this, &PageContext::actAutoTopDownMargin);
+    panel->addLargeAction(act);
+
     act->setToolTip(tr("显示设置\n设置当前运行图页面的显示参数，不影响其他运行图页面。"));
 
     panel = page->addPannel("导航");
@@ -246,6 +250,22 @@ void PageContext::actSwitchToRailway()
     if (auto rail = selectRailway()) {
         mw->focusInRailway(rail);
     }
+}
+
+void PageContext::actAutoTopDownMargin()
+{
+    if (!page) return;
+    Config cfg_new = page->config();  // copy construct
+
+    // 35 for the top axis of time, which is fixed in current impl.
+    // the extra 5 makes it clearer. 
+    cfg_new.margins.up = page->topLabelMaxHeight() + 35 + 5;
+
+    // here the constant 10 comes from the literal 27 in updateTimeAxis.
+    // that is: 35 - 27 = 8, and we get a "ceil" of it.
+    cfg_new.margins.down = page->bottomLabelMaxHeight() + 35 + 10 + 5;
+
+    mw->undoStack->push(new qecmd::ChangePageConfig(page->configRef(), cfg_new, true, page, mw->catView));
 }
 
 void PageContext::actResetPage()

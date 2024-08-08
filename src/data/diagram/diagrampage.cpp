@@ -267,3 +267,49 @@ std::shared_ptr<DiagramPage> DiagramPage::clone() const
     auto page = std::make_shared<DiagramPage>(config(), _railways, _name, _note);
     return page;
 }
+
+double DiagramPage::topLabelMaxHeight() const
+{
+    auto* first_station = _railways[0]->empty() ? nullptr: _railways[0]->stations().front().get();
+    //qDebug() << "topLabelMaxHeight first station " << first_station;
+    const auto& labels = first_station && _overLabels.contains(first_station) ? _overLabels[first_station] : label_map_t{};
+    auto link_itr = _overLinks.find(first_station);
+    const auto& links = first_station && link_itr != _overLinks.end() ? link_itr->second : RouteLinkLayerManager{};
+    return labelMaxHeight(labels, links);
+}
+
+double DiagramPage::bottomLabelMaxHeight() const
+{
+    auto* last_station = _railways.back()->empty() ? nullptr : _railways[0]->stations().back().get();
+    const auto& labels = last_station && _belowLabels.contains(last_station) ? _belowLabels[last_station] : label_map_t{};
+    auto link_itr = _belowLinks.find(last_station);
+    const auto& links = last_station && link_itr != _belowLinks.end() ? link_itr->second : RouteLinkLayerManager{};
+    return labelMaxHeight(labels, links);
+}
+
+double DiagramPage::labelMaxHeight(const label_map_t& labels, const RouteLinkLayerManager& links) const
+{
+    //qDebug() << "labelMaxHeight: labels and links size: " << labels.size() << ", " << links.num_layers();
+    double label_height = 0, link_height = 0;
+    if (_config.floating_link_line || _config.train_name_mark_style == Config::TrainNameMarkStyle::Link) {
+        // In this case, the link layer height is considered
+        // An extra 1 is imported by multiplying num_layers (instead of num_layers - 1), 
+        // which is just what we desired
+        link_height = _config.base_link_height + _config.step_link_height * links.num_layers();
+    }
+    if (_config.train_name_mark_style != Config::TrainNameMarkStyle::Link) {
+        // In this case, the (classic) label height managing is used
+        if (_config.avoid_cover) {
+            double mx_height = 0.;
+            for (auto& p : labels) {
+                mx_height = std::max(p.second.height, mx_height);
+            }
+            label_height = mx_height + _config.step_label_height;
+        }
+        else {
+            label_height = std::max(_config.start_label_height, _config.end_label_height) * 2.;
+        }
+    }
+    //qDebug() << "label_height, link_height " << label_height << " " << link_height;
+    return std::max(label_height, link_height);
+}

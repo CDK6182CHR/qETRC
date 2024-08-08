@@ -103,6 +103,8 @@ class RouteLinkLayerManager {
 public:
 	RouteLinkLayerManager() = default;
 
+	size_t num_layers()const { return _layers.size(); }
+
 	/**
 	 * Add the given occupation info to layers, and return the number of layer it being added to.
 	 * Here, the width should be TOTAL width (i.e. corresponding to 24 hour), even if some part may not be shown.
