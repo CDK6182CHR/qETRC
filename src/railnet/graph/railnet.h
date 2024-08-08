@@ -34,6 +34,10 @@ public:
      */
     void fromRailCategory(const RailCategory* cat);
 
+
+    // 2024.08.08: set to public; similar to fromRailCategory
+    void addRailway(const Railway* railway);
+
     /**
      * @brief stationByGeneralName
      * 2023.01.24  find a vertex that could be bound to givene station name.
@@ -107,7 +111,6 @@ public:
 
 
 private:
-    void addRailway(const Railway* railway);
 
     /**
      * @brief 由points所给关键点表返回单向的Railway对象。所有站都只有下行通过。

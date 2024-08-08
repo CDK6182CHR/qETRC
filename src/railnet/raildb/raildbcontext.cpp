@@ -86,6 +86,23 @@ void RailDBContext::initUI()
     connect(act, &QAction::triggered, this, &RailDBContext::actShowAdj);
 
     panel = page->addPannel(tr("调整"));
+
+    act = mw->addAction(QEICN_raildb_include_diagram, tr("运行图线路"));
+    act->setCheckable(true);
+    act->setToolTip(tr("包含运行图线路\n"
+        "若选中此项，则生成的有向图模型将包含当前运行图文件中的线路（线路数据库中的线路仍会包含），"
+        "但与线路数据库中线路重名的线路，不会被包含。"));
+    panel->addLargeAction(act);
+    _actIncludeDiagramRails = act;
+    connect(act, &QAction::triggered, [this]() {
+        auto ret = QMessageBox::question(mw, tr("线网有向图模型"),
+            tr("包含当前运行图线路选项已设置为[%1]。需要刷新线网图模型才能生效，是否立即刷新？")
+            .arg(_actIncludeDiagramRails->isChecked() ? tr("开") : tr("关")));
+        if (ret == QMessageBox::Yes) {
+            actRefreshNet();
+        }
+        });
+
     act = mw->makeAction(QEICN_refresh_net, tr("刷新线网"));
     panel->addLargeAction(act);
     connect(act, &QAction::triggered, this, &RailDBContext::actRefreshNet);
@@ -236,8 +253,10 @@ void RailDBContext::actShowAdj()
 
 void RailDBContext::actRefreshNet()
 {
-    net.clear();
-    net.fromRailCategory(_raildb.get());
+    //net.clear();
+    //net.fromRailCategory(_raildb.get());
+    // 2024.08.08: currently, exactly same as loadNet()
+    loadNet();
 
     // 这里放后续的刷新工作
 }
@@ -275,6 +294,15 @@ void RailDBContext::loadNet()
     auto start = std::chrono::system_clock::now();
     net.clear();
     net.fromRailCategory(_raildb.get());
+    if (_actIncludeDiagramRails->isChecked()) {
+        foreach(const auto & rail, mw->diagram().railCategory().railways()) {
+            if (_raildb->railNameIsValidRec(rail->name(), nullptr)) {
+                qInfo() << tr("从当前运行图中添加线路: ") << rail->name();
+                net.addRailway(rail.get());
+            }
+        }
+    }
+
     auto end = std::chrono::system_clock::now();
     mw->showStatus(tr("线网有向图加载完毕  共%1站 用时%2毫秒").arg(net.size())
         .arg((end - start) / 1ms));

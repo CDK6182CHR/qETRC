@@ -231,7 +231,7 @@ void PageContext::commitResetPage(std::shared_ptr<DiagramPage> page, std::shared
     page->swap(*newinfo);
     if (page->name() != newinfo->name()) {
         int i = mw->_diagram.getPageIndex(page);
-        mw->diagramDocks.at(i)->setWindowTitle(tr("运行图 - ") + page->name());
+        mw->diagramDocks.at(i)->setWindowTitle(page->name());
         emit pageNameChanged(i);
     }
     mw->updatePageDiagram(page);

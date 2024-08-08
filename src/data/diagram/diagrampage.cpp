@@ -280,7 +280,7 @@ double DiagramPage::topLabelMaxHeight() const
 
 double DiagramPage::bottomLabelMaxHeight() const
 {
-    auto* last_station = _railways.back()->empty() ? nullptr : _railways[0]->stations().back().get();
+    auto* last_station = _railways.back()->empty() ? nullptr : _railways.back()->stations().back().get();
     const auto& labels = last_station && _belowLabels.contains(last_station) ? _belowLabels[last_station] : label_map_t{};
     auto link_itr = _belowLinks.find(last_station);
     const auto& links = last_station && link_itr != _belowLinks.end() ? link_itr->second : RouteLinkLayerManager{};

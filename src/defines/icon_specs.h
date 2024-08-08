@@ -245,6 +245,7 @@
 #define QEICN_quick_path QE_RSC_ICON(diagram.png)   // 快速径路切片
 #define QEICN_path_selector QE_RSC_ICON(polyline.png)   // 经由选择
 #define QEICN_adjacent_list QE_STD_ICON(FileDialogContentsView)   // 邻接表
+#define QEICN_raildb_include_diagram QE_RSC_ICON(rail.png)   // 线路数据库 有向图模型包含当前运行图线路
 #define QEICN_refresh_net QE_STD_ICON(BrowserReload)  // 刷新线网
 
 #define QEICN_export_rail_to_diagram QE_RSC_ICON(diagram.png)   // 导出线路到运行图

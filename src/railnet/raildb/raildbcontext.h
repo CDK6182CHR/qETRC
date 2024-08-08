@@ -10,6 +10,7 @@ class SARibbonContextCategory;
 class MainWindow;
 class RailDBWindow;
 class RailDBNavi;
+class QAction;
 
 class QuickPathSelector;
 
@@ -33,6 +34,7 @@ class RailDBContext : public QObject
     RailDBWindow* const window;   // 必须在raildb之前初始化！
     QuickPathSelector* quickSelector=nullptr;  // 必须在net之前初始化
     const std::shared_ptr<RailDB> _raildb;
+    QAction* _actIncludeDiagramRails;
     RailNet net;
     bool _active = false;
 
