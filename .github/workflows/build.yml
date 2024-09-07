@@ -1,0 +1,76 @@
+name: Build qETRC
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-linux-ubuntu:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        # there are submodules in the repository
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 \
+          libxcb-render-util0 libxcb-render0 libxcb-shape0 libxcb-shm0 libxcb-sync1 libxcb-util1 \
+          libxcb-xfixes0 libxcb-xkb1 libxcb1 libxkbcommon-x11-0 libxkbcommon0 \
+          libgl1-mesa-dev libglu1-mesa-dev
+
+
+      - name: Install Qt using qt installer
+        run: |
+          wget ${{ vars.QT_INSTALLER_URL }} -O qt-installer.run
+          chmod +x qt-installer.run
+          ./qt-installer.run --email ${{ secrets.QT_EMAIL }} --pw ${{ secrets.QT_PASSWORD }} \
+          --root $HOME/Qt --accept-licenses --default-answer --confirm-command --accept-obligations install qt6.7.0-full
+
+      - name: Build SARibbon
+        run: |
+          cd external/SARibbon
+          mkdir build
+          cd build
+          cmake .. -D CMAKE_PREFIX_PATH=$HOME/Qt/6.7.0/gcc_64
+          cmake --build .
+          sudo cmake --install .
+
+      - name: Build qETRC
+        run: |
+          mkdir build
+          cd build
+          cmake .. -D CMAKE_PREFIX_PATH=$HOME/Qt/6.7.0/gcc_64
+          cmake --build .
+
+      - name: Put to artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qETRC
+          path: build/qETRC
+
+#       - name: Pack .deb
+#         run: |
+#           mkdir -p package/DEBIAN
+#           echo "Package: qETRC" > package/DEBIAN/control
+#           echo "Version: 1.0.0" >> package/DEBIAN/control
+#           echo "Section: base" >> package/DEBIAN/control
+#           echo "Priority: optional" >> package/DEBIAN/control
+#           echo "Architecture: amd64" >> package/DEBIAN/control
+#           echo "Maintainer: Your Name <your.email@example.com>" >> package/DEBIAN/control
+#           echo "Description: qETRC application" >> package/DEBIAN/control
+#           mkdir -p package/usr/local/bin
+#           cp build/qETRC package/usr/local/bin/
+#           dpkg-deb --build package qETRC-1.0.0.deb
+#
+#       - name: Upload .deb artifact
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: qETRC-deb
+#           path: qETRC-1.0.0.deb
