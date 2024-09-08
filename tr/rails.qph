@@ -1,0 +1,63 @@
+<!DOCTYPE QPH>
+<QPH sourcelanguage="zh_CN" language="en_US">
+<phrase>
+    <source>车次</source>
+    <target>train</target>
+</phrase>
+<phrase>
+    <source>基线</source>
+    <target>track</target>
+    <definition>the railway</definition>
+</phrase>
+<phrase>
+    <source>线路</source>
+    <target>route</target>
+    <definition>operational lines</definition>
+</phrase>
+<phrase>
+    <source>qETRC</source>
+    <target>qETRC</target>
+    <definition>application name</definition>
+</phrase>
+<phrase>
+    <source>运行图</source>
+    <target>diagram</target>
+</phrase>
+<phrase>
+    <source>运行线</source>
+    <target>diagram line</target>
+</phrase>
+<phrase>
+    <source>列车运行线</source>
+    <target>diagram line</target>
+</phrase>
+<phrase>
+    <source>标尺</source>
+    <target>benchmark</target>
+</phrase>
+<phrase>
+    <source>交路</source>
+    <target>operational train</target>
+</phrase>
+<phrase>
+    <source>类型</source>
+    <target>class</target>
+    <definition>train class, e.g., ltd. exp., local, exp. local, etc.</definition>
+</phrase>
+<phrase>
+    <source>技术</source>
+    <target>technical</target>
+</phrase>
+<phrase>
+    <source>铺画</source>
+    <target>draw</target>
+</phrase>
+<phrase>
+    <source>时间</source>
+    <target>time</target>
+</phrase>
+<phrase>
+    <source>附加</source>
+    <target>amendation</target>
+</phrase>
+</QPH>
