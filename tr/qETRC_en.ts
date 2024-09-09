@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/mobile/adiagrampage.cpp" line="27"/>
         <source>转到车次</source>
-        <translation type="unfinished">Move to train</translation>
+        <translation>Move to train</translation>
     </message>
     <message>
         <location filename="../src/mobile/adiagrampage.cpp" line="84"/>
@@ -393,7 +393,7 @@ The app will not check if the virtual train is a duplicate, but will check if th
         <location filename="../src/railnet/graph/adjacentlistmodel.cpp" line="10"/>
         <source>标尺数</source>
         <translatorcomment>not fixed</translatorcomment>
-        <translation type="unfinished">Milestones</translation>
+        <translation>Benchmarks</translation>
     </message>
 </context>
 <context>
@@ -401,7 +401,7 @@ The app will not check if the virtual train is a duplicate, but will check if th
     <message>
         <location filename="../src/railnet/graph/adjacentlistwidget.cpp" line="30"/>
         <source>邻接表 （出边表）: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Adjacent table</translation>
     </message>
     <message>
         <location filename="../src/railnet/graph/adjacentlistwidget.cpp" line="45"/>
@@ -801,77 +801,77 @@ Click [Generate] to generate trains and departure times in the table below. Plea
     <message>
         <location filename="../src/editors/configdialog.cpp" line="28"/>
         <source>系统默认显示设置</source>
-        <translation type="unfinished"></translation>
+        <translation>System default display settings</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="31"/>
         <source>运行图显示设置</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagram display settings</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="40"/>
         <source>运行图显示设置 - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagram displaly settings - %1</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="60"/>
         <source>透明模式</source>
-        <translation type="unfinished"></translation>
+        <translation>Transparent mode</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="64"/>
         <source>当前设置使用透明模式</source>
-        <translation type="unfinished"></translation>
+        <translation>Current setting uses transparent mode</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="80"/>
         <source>时间轴</source>
-        <translation type="unfinished"></translation>
+        <translation>Timeline</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="86"/>
         <source>运行图起始的时刻，整点小时</source>
-        <translation type="unfinished"></translation>
+        <translation>The starting time of the diagram, in hours</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="87"/>
         <source>起始时刻</source>
-        <translation type="unfinished">Starting time</translation>
+        <translation>Starting time</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="91"/>
         <source>运行图结束的时刻，整点小时</source>
-        <translation type="unfinished"></translation>
+        <translation>The ending time of the diagram, in hours</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="92"/>
         <source>结束时刻</source>
-        <translation type="unfinished"></translation>
+        <translation>Ending time</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="97"/>
         <source>时间轴上每个像素对应的秒数。数值越大，显示横轴比例越小</source>
-        <translation type="unfinished"></translation>
+        <translation>The time each pixel represents on the x-axis. The larger the value is, the smaller the scale is</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="98"/>
         <source>横轴每像素秒数</source>
-        <translation type="unfinished"></translation>
+        <translation>Time per pixel</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="108"/>
         <source>第二级细实线，第三级细虚线</source>
-        <translation type="unfinished"></translation>
+        <translation>Secondary: thin solid lines; Tertiary: thin dashed lines</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="109"/>
         <source>第二级细虚线，第三级细实线</source>
-        <translation type="unfinished"></translation>
+        <translation>Secondary: thin dashed lines; Tertiary: thin solid lines</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="110"/>
         <source>纵线形式</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertical line style</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="114"/>
@@ -883,12 +883,12 @@ Click [Generate] to generate trains and departure times in the table below. Plea
         <location filename="../src/editors/configdialog.cpp" line="122"/>
         <location filename="../src/editors/configdialog.cpp" line="129"/>
         <source> 分钟 (min)</source>
-        <translation type="unfinished"></translation>
+        <translation> min</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="116"/>
         <source>一级纵线间隔</source>
-        <translation type="unfinished"></translation>
+        <translation>Primary vertical line interval</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="121"/>
@@ -898,7 +898,7 @@ Click [Generate] to generate trains and departure times in the table below. Plea
     <message>
         <location filename="../src/editors/configdialog.cpp" line="123"/>
         <source>二级纵线间隔</source>
-        <translation type="unfinished"></translation>
+        <translation>Secondary vertical line interval</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="128"/>
@@ -908,7 +908,7 @@ Click [Generate] to generate trains and departure times in the table below. Plea
     <message>
         <location filename="../src/editors/configdialog.cpp" line="130"/>
         <source>三级纵线间隔</source>
-        <translation type="unfinished"></translation>
+        <translation>Tertiary vertical line interval</translation>
     </message>
     <message>
         <location filename="../src/editors/configdialog.cpp" line="135"/>
@@ -2035,13 +2035,13 @@ JSON文件 (*.json)
         <location filename="../src/kernel/diagramwidget.cpp" line="956"/>
         <location filename="../src/kernel/diagramwidget.cpp" line="1026"/>
         <source>下行</source>
-        <translation type="unfinished">Downwards</translation>
+        <translation type="unfinished">Down</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="961"/>
         <location filename="../src/kernel/diagramwidget.cpp" line="1032"/>
         <source>上行</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Up</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="978"/>
@@ -2351,12 +2351,12 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/editors/forbidwidget.cpp" line="45"/>
         <source>下行</source>
-        <translation type="unfinished">Downwards</translation>
+        <translation type="unfinished">Down</translation>
     </message>
     <message>
         <location filename="../src/editors/forbidwidget.cpp" line="46"/>
         <source>上行</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Up</translation>
     </message>
     <message>
         <location filename="../src/editors/forbidwidget.cpp" line="49"/>
@@ -2554,7 +2554,7 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/wizards/greedypaint/greedypaintfasttest.cpp" line="74"/>
         <source>下行</source>
-        <translation>Downwards</translation>
+        <translation type="unfinished">Down</translation>
     </message>
     <message>
         <location filename="../src/wizards/greedypaint/greedypaintfasttest.cpp" line="78"/>
@@ -3998,13 +3998,12 @@ Generate fine-controlled new route data by manually assigning neighbouring stati
     <message>
         <location filename="../src/mainwindow/mainwindow.cpp" line="1058"/>
         <source>车次管理</source>
-        <translation type="unfinished">Train management</translation>
+        <translation>Train management</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/mainwindow.cpp" line="1063"/>
         <source>批量操作</source>
-        <translation type="unfinished">Batch
-actions</translation>
+        <translation>Batch actions</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/mainwindow.cpp" line="1065"/>
@@ -5019,29 +5018,31 @@ This action may affect a wide range of subjects. Are you sure to continue?</tran
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="16"/>
         <source>导出单线路运行图</source>
-        <translation type="unfinished"></translation>
+        <translation>Output monoroute diagram</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="25"/>
         <source>此功能提供导出到ETRC和pyETRC所支持的运行图格式。由于pyETRC和ETRC皆只支持单一线路的运行图，故请选择一条线路进行导出。
 请注意pyETRC可以直接打开本系统的运行图文件（无需使用本功能导出），但这种情况下只能读取第一条线路。
 请注意导出ETRC运行图文件将带来显著的数据损失，通常先导出再读入ETRC文件得不到相同的结果。</source>
-        <translation type="unfinished"></translation>
+        <translation>This tool allows outputting ETRC and pyETRC format diagram files. Both tools only allow one route in one diagram file. Please select only one route to export.
+Please note that pyETRC can directly read diagram files created in qETRC (without the need to export), but it is only able to read the first route in this case.
+Please note that exporting as ETRC diagram files may bring significant data loses. Exporting as ETRC files and importing them again will result in different data.</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="34"/>
         <source>选择线路</source>
-        <translation type="unfinished">Select route</translation>
+        <translation>Select route</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="35"/>
         <source>仅导出经由所选线路运行的车次</source>
-        <translation type="unfinished"></translation>
+        <translation>Only export trains running on the selected route</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="36"/>
         <source>选项</source>
-        <translation type="unfinished">Options</translation>
+        <translation>Options</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="49"/>
@@ -5049,61 +5050,63 @@ This action may affect a wide range of subjects. Are you sure to continue?</tran
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="68"/>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="78"/>
         <source>错误</source>
-        <translation type="unfinished">Error</translation>
+        <translation>Error</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="49"/>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="68"/>
         <source>请先选择线路！</source>
-        <translation type="unfinished"></translation>
+        <translation>Please select the route first!</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="52"/>
         <source>导出ETRC运行图文件</source>
-        <translation type="unfinished"></translation>
+        <translation>Export as ETRC diagram files</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="53"/>
         <source>ETRC运行图文件 (*.trc)
 所有文件 (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>ETRC diagram fiels (*.trc)
+All files (*)</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="57"/>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="76"/>
         <source>提示</source>
-        <translation type="unfinished">Hint</translation>
+        <translation>Hint</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="57"/>
         <source>导出ETRC运行图文件成功</source>
-        <translation type="unfinished"></translation>
+        <translation>Successfully exported as ETRC diagram file</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="59"/>
         <source>导出ETRC运行图文件失败</source>
-        <translation type="unfinished"></translation>
+        <translation>Failed to export as ETRC diagram file</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="71"/>
         <source>导出pyETRC单线路运行图文件</source>
-        <translation type="unfinished"></translation>
+        <translation>Export as pyETRC monoroute diagram file</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="72"/>
         <source>pyETRC运行图文件 (*.pyetgr;*.json)
 所有文件 (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>pyETRC diagram files (*.pyetgr; *.json)
+All files (*)</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="76"/>
         <source>导出pyETRC单线路运行图文件成功</source>
-        <translation type="unfinished"></translation>
+        <translation>Successfully exported as pyETRC monoroute diagram file</translation>
     </message>
     <message>
         <location filename="../src/dialogs/outputsubdiagramdialog.cpp" line="78"/>
         <source>导出pyETRC单线路运行图文件失败</source>
-        <translation type="unfinished"></translation>
+        <translation>Failed to export as pyETRC monoroute file</translation>
     </message>
 </context>
 <context>
@@ -5624,12 +5627,12 @@ Close the current train path toolbar panel.</translation>
     <message>
         <location filename="../src/editors/trainpath/pathlistwidget.cpp" line="43"/>
         <source>刷新所有径路可用性</source>
-        <translation type="unfinished"></translation>
+        <translation>Refresh all path availability</translation>
     </message>
     <message>
         <location filename="../src/editors/trainpath/pathlistwidget.cpp" line="61"/>
         <source>新径路</source>
-        <translation type="unfinished"></translation>
+        <translation>New path</translation>
     </message>
 </context>
 <context>
@@ -5829,12 +5832,12 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
     <message>
         <location filename="../src/editors/trainpath/pathtrainsdialog.cpp" line="18"/>
         <source>径路列车表 - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Path train list - %1</translation>
     </message>
     <message>
         <location filename="../src/editors/trainpath/pathtrainsdialog.cpp" line="34"/>
         <source>以下为包含径路 [%1] 的列车。</source>
-        <translation type="unfinished"></translation>
+        <translation>These are the trains containing path [%1].</translation>
     </message>
 </context>
 <context>
@@ -5842,7 +5845,7 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
     <message>
         <location filename="../src/editors/train/predeftrainfiltermanager.cpp" line="10"/>
         <source>预置列车筛选器</source>
-        <translation type="unfinished"></translation>
+        <translation>Preset train filter</translation>
     </message>
 </context>
 <context>
@@ -5964,192 +5967,193 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
     <message>
         <location filename="../src/data/analysis/runstat/trainlinenet.cpp" line="25"/>
         <source>起始站或终止站未铺画</source>
-        <translation type="unfinished"></translation>
+        <translation>Departure or terminal station not drawn</translation>
     </message>
     <message>
         <location filename="../src/data/analysis/runstat/trainlinenet.cpp" line="33"/>
         <source>起始站至终止站之间的列车运行线无法构成完整路径</source>
-        <translation type="unfinished"></translation>
+        <translation>The diagram line between the departure and terminal station cannot create a full path</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="29"/>
         <source>[%1] 将[%2]站[%3]时刻设置为[%4]</source>
-        <translation type="unfinished"></translation>
+        <translation>[%1] Set the [%3] time of [%2] station to [%4]</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="34"/>
         <source> (对象: %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Object: %1)</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="42"/>
         <location filename="../src/data/diagram/trainevents.cpp" line="102"/>
         <location filename="../src/kernel/trainitem.cpp" line="471"/>
         <source>到达</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrival</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="43"/>
         <location filename="../src/data/diagram/trainevents.cpp" line="104"/>
         <location filename="../src/kernel/trainitem.cpp" line="472"/>
         <source>出发</source>
-        <translation type="unfinished"></translation>
+        <translation>Departure</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="52"/>
         <source>设定停车站</source>
-        <translation type="unfinished"></translation>
+        <translation>Set stopping station</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="53"/>
         <source>区间自动推线</source>
-        <translation type="unfinished"></translation>
+        <translation>Section autodraw</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="54"/>
         <source>排图成功</source>
-        <translation type="unfinished"></translation>
+        <translation>Successfully drawn diagram lines</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="55"/>
         <source>标尺无数据</source>
-        <translation type="unfinished"></translation>
+        <translation>No data in benchmark</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="56"/>
         <source>ERROR: Non-base type</source>
-        <translation type="unfinished"></translation>
+        <translation>Error: Non-base type</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="71"/>
         <source>%1站%2间隔冲突</source>
-        <translation type="unfinished"></translation>
+        <translation>%2 interval collision at %1 station</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="75"/>
         <source>ERROR: Non-gap type</source>
-        <translation type="unfinished"></translation>
+        <translation>ERROR: Non-gap type</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="94"/>
         <source>%1区间运行冲突 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%2 running collision in section %1</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="98"/>
         <source>ERROR: Non-interval type</source>
-        <translation type="unfinished"></translation>
+        <translation>Error: Non-interval type</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="118"/>
         <source>与%1区间天窗%2冲突</source>
-        <translation type="unfinished"></translation>
+        <translation>Collides with opening %2 of section %1</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="134"/>
         <source>无可用线位，推线分支终止  计数：%1</source>
-        <translation type="unfinished"></translation>
+        <translation>No available spaces to draw. End of drawing process  Counter: %1</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="143"/>
         <source>[回溯次数已达上限] 排图异常终止</source>
-        <translation type="unfinished"></translation>
+        <translation>[Max recursion attempts] Unexpected end of drawing</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="145"/>
         <source>[正向排图成功] 进入反向排图</source>
-        <translation type="unfinished"></translation>
+        <translation>[Successfully drawn on forward direction] Starting to draw on reverse direction</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="146"/>
         <source>[排图成功]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Successfully drawn]</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="148"/>
         <source>[标尺无数据] 排图结束</source>
-        <translation type="unfinished"></translation>
+        <translation>[Benchmark has no data] End of drawing process</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="171"/>
         <source>反向推线递归子问题</source>
-        <translation type="unfinished"></translation>
+        <translation>Reverse drawing recursion sub-issue</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="174"/>
         <source>正向推线递归子问题</source>
-        <translation type="unfinished"></translation>
+        <translation>Forward drawing recursion sub-issue</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="179"/>
         <source>反向推线递归返回</source>
-        <translation type="unfinished"></translation>
+        <translation>Reverse drawing recursion return</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="182"/>
         <source>正向推线递归返回</source>
-        <translation type="unfinished"></translation>
+        <translation>Forward drawing recursion return</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/calculationlog.cpp" line="192"/>
         <source>[%1] 区间=(%2) 起始时刻=%3 stop=%4</source>
-        <translation type="unfinished"></translation>
+        <translation>[%1] Section = (%2) Start time = %3 Stop = %4</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/gapconstraints.cpp" line="18"/>
         <source>%1. %2: %3 s
 </source>
-        <translation type="unfinished"></translation>
+        <translation>%1. %2: %3 s
+</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/greedypainter.cpp" line="86"/>
         <source>[重新进行正向推线] 反向推线要求锚点站停车，以锚点站停车重排正向运行线</source>
-        <translation type="unfinished"></translation>
+        <translation>[Redoing forward drawing] Reverse drawing demads for stopping at anchor station. Redrawing on forward direction stopping at anchor station</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/intervalconflictreport.cpp" line="9"/>
         <source>无冲突</source>
-        <translation type="unfinished"></translation>
+        <translation>No collisions</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/intervalconflictreport.cpp" line="11"/>
         <source>左冲突</source>
-        <translation type="unfinished"></translation>
+        <translation>Collision at left side</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/intervalconflictreport.cpp" line="13"/>
         <source>右冲突</source>
-        <translation type="unfinished"></translation>
+        <translation>Collision at right side</translation>
     </message>
     <message>
         <location filename="../src/data/calculation/intervalconflictreport.cpp" line="15"/>
         <source>共线冲突</source>
-        <translation type="unfinished"></translation>
+        <translation>Intersection collision</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/diagram.cpp" line="139"/>
         <source>默认运行图</source>
-        <translation type="unfinished"></translation>
+        <translation>Default diagram</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainadapter.cpp" line="50"/>
         <source>列车径路%1不可用，此径路将被忽略</source>
-        <translation type="unfinished"></translation>
+        <translation>Trail path %1 is invalid. This path will be omitted</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="96"/>
         <source>交会</source>
-        <translation type="unfinished"></translation>
+        <translation>Meet</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="98"/>
         <source>越行</source>
-        <translation type="unfinished"></translation>
+        <translation>Overtake</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="100"/>
         <source>让行</source>
-        <translation type="unfinished"></translation>
+        <translation>Yield</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="107"/>
@@ -6157,80 +6161,80 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
         <location filename="../src/kernel/trainitem.cpp" line="473"/>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="121"/>
         <source>通过</source>
-        <translation type="unfinished"></translation>
+        <translation>Pass</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="109"/>
         <location filename="../src/data/rail/railtrack.cpp" line="26"/>
         <source>始发</source>
-        <translation type="unfinished">Departure</translation>
+        <translation>Departure</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="111"/>
         <location filename="../src/data/rail/railtrack.cpp" line="28"/>
         <source>终到</source>
-        <translation type="unfinished">Terminal</translation>
+        <translation>Terminal</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="113"/>
         <source>共线</source>
-        <translation type="unfinished"></translation>
+        <translation>Share lines</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="115"/>
         <source>非法事件</source>
-        <translation type="unfinished"></translation>
+        <translation>Illegal events</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="141"/>
         <location filename="../src/data/diagram/trainevents.cpp" line="158"/>
         <location filename="../src/data/diagram/traingap.cpp" line="194"/>
         <source>站前</source>
-        <translation type="unfinished"></translation>
+        <translation>Pre-station</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="142"/>
         <location filename="../src/data/diagram/trainevents.cpp" line="159"/>
         <location filename="../src/data/diagram/traingap.cpp" line="195"/>
         <source>站后</source>
-        <translation type="unfinished"></translation>
+        <translation>Post-station</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="143"/>
         <location filename="../src/data/diagram/trainevents.cpp" line="160"/>
         <location filename="../src/data/diagram/traingap.cpp" line="196"/>
         <source>前后</source>
-        <translation type="unfinished"></translation>
+        <translation>Pre-post</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="205"/>
         <source>停时过长</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop time is too long</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="208"/>
         <source>区间过长</source>
-        <translation type="unfinished"></translation>
+        <translation>Section is too long</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="210"/>
         <source>区间交会</source>
-        <translation type="unfinished"></translation>
+        <translation>Meet at section</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="212"/>
         <source>区间越行</source>
-        <translation type="unfinished"></translation>
+        <translation>Overtake at section</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="214"/>
         <source>天窗冲突</source>
-        <translation type="unfinished"></translation>
+        <translation>Opening collision</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainevents.cpp" line="216"/>
         <source>系统错误</source>
-        <translation type="unfinished"></translation>
+        <translation>System error</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/traingap.cpp" line="49"/>
@@ -6238,12 +6242,12 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
         <location filename="../src/data/diagram/traingap.cpp" line="207"/>
         <location filename="../src/data/diagram/traingap.cpp" line="262"/>
         <source>待避</source>
-        <translation type="unfinished"></translation>
+        <translation>Yield</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/traingap.cpp" line="54"/>
         <source>对向</source>
-        <translation type="unfinished"></translation>
+        <translation>Opposite</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/traingap.cpp" line="57"/>
@@ -6252,7 +6256,7 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
         <location filename="../src/data/common/direction.h" line="44"/>
         <location filename="../src/data/rail/railstation.h" line="28"/>
         <source>下行</source>
-        <translation type="unfinished">Downwards</translation>
+        <translation type="unfinished">Down</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/traingap.cpp" line="60"/>
@@ -6261,14 +6265,14 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
         <location filename="../src/data/common/direction.h" line="45"/>
         <location filename="../src/data/rail/railstation.h" line="30"/>
         <source>上行</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Up</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/traingap.cpp" line="66"/>
         <location filename="../src/data/diagram/traingap.cpp" line="163"/>
         <location filename="../src/data/diagram/traingap.cpp" line="230"/>
         <source>通通</source>
-        <translation type="unfinished"></translation>
+        <translation>Pass-pass</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/traingap.cpp" line="73"/>
@@ -6278,7 +6282,7 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
         <location filename="../src/data/diagram/traingap.cpp" line="237"/>
         <location filename="../src/data/diagram/traingap.cpp" line="247"/>
         <source>到</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrive</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/traingap.cpp" line="75"/>
@@ -6288,7 +6292,7 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
         <location filename="../src/data/diagram/traingap.cpp" line="239"/>
         <location filename="../src/data/diagram/traingap.cpp" line="249"/>
         <source>发</source>
-        <translation type="unfinished"></translation>
+        <translation>Depart</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/traingap.cpp" line="78"/>
@@ -6300,66 +6304,66 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
         <location filename="../src/data/diagram/trainline.cpp" line="1347"/>
         <location filename="../src/data/diagram/trainline.cpp" line="1350"/>
         <source>通</source>
-        <translation type="unfinished"></translation>
+        <translation>Pass</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/traingap.cpp" line="147"/>
         <location filename="../src/data/diagram/traingap.cpp" line="214"/>
         <source>下上</source>
-        <translation type="unfinished"></translation>
+        <translation>Down-up</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/traingap.cpp" line="150"/>
         <location filename="../src/data/diagram/traingap.cpp" line="217"/>
         <source>上下</source>
-        <translation type="unfinished"></translation>
+        <translation>Up-down</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/traingap.cpp" line="197"/>
         <source>对侧</source>
-        <translation type="unfinished"></translation>
+        <translation>Opposite direction</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="310"/>
         <source>上一区间运行时长为[%1]，超过20小时，应考虑到开时刻是否填反。</source>
-        <translation type="unfinished"></translation>
+        <translation>The running time of the last section is [%1], which is over 20 hours. The arrival and departure time may be completed incorrectly.</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="317"/>
         <source>上一区间运行时长为[%1]，超过12小时，可能导致事件前后顺序判断出错。</source>
-        <translation type="unfinished"></translation>
+        <translation>The running time of the last section is [%1], which is over 12 hours. This may cause the system to incorrectly determine some events, and the event sequence.</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="326"/>
         <source>本站停车时长为[%1]，超过20小时，应考虑到开时刻是否填反。</source>
-        <translation type="unfinished"></translation>
+        <translation>The stopping time at this station is [%1], which is over 20 hours. The arrival and departure time may be completed incorrectly.</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="333"/>
         <source>本站停车时长为[%1]，超过12小时，可能导致事件前后顺序判断出错。</source>
-        <translation type="unfinished"></translation>
+        <translation>The stopping time at this station is [%1], which is over 12 hours. This may cause the system to incorrectly determine some events, and the event sequence.</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="355"/>
         <source>区间[%1-%2]的纵坐标变化为0，无法推定中间站时刻。</source>
-        <translation type="unfinished"></translation>
+        <translation>Section [%1-%2] have a y-axis difference of 0; the system cannot presump the intermediate station times.</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="381"/>
         <source>非预期的区间终止：在匹配站表的[%1-%2]区间。可能是运行线行别出现问题。</source>
-        <translation type="unfinished"></translation>
+        <translation>Unexpected end of section in [%1-%2] section. There may be a problem in the diagram line direction control settings.</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="405"/>
         <source>与天窗[%1]冲突，天窗时间是[%2-%3]，区间运行时间（可能包含推定）是[%4-%5]。</source>
-        <translation type="unfinished"></translation>
+        <translation>Collides with opening [%1]. The opening ranges from [%2-%3], the section running time (this may include presumped times) is [%4-%5].</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="443"/>
         <location filename="../src/data/diagram/trainline.cpp" line="1530"/>
         <location filename="../src/data/diagram/trainline.cpp" line="1575"/>
         <source>推算</source>
-        <translation type="unfinished"></translation>
+        <translation>Presump</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="477"/>
@@ -6372,22 +6376,22 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
         <location filename="../src/data/diagram/trainline.cpp" line="1694"/>
         <location filename="../src/data/train/train.cpp" line="1010"/>
         <source>推定</source>
-        <translation type="unfinished"></translation>
+        <translation>Presumped</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="513"/>
         <source>区间越行??</source>
-        <translation type="unfinished"></translation>
+        <translation>Overtake in section??</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="531"/>
         <source>站内共线</source>
-        <translation type="unfinished"></translation>
+        <translation>Intersectes in station</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="775"/>
         <source>在里程[%1]，时刻[%2]与车次[%3]发生[%4]</source>
-        <translation type="unfinished"></translation>
+        <translation>Time [%2] resulted [%4] action at [%1] with train [%3]</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="828"/>
@@ -7642,79 +7646,81 @@ All files (*.*)</translation>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="32"/>
         <source>同时导出标尺</source>
-        <translation type="unfinished"></translation>
+        <translation>Also export benchmarks</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="37"/>
         <source>最小标尺区间数: </source>
-        <translation type="unfinished"></translation>
+        <translation>Minimum benchmark section count: </translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="40"/>
         <source>最小标尺区间数
 指定导出标尺所需要具有的最少有效区间数。有效区间数小于指定值的标尺将被删除。设置为1以导出全部标尺。</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimum benchmark section count
+The minimum number of sections a benchmark must contain to allow exporting. Benchmarks containing less sections will be omitted. Set it to 1 to export all benchmarks.</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="43"/>
         <source>标尺</source>
-        <translation type="unfinished"></translation>
+        <translation>Benchmarks</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="51"/>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="56"/>
         <source>反向径路</source>
-        <translation type="unfinished"></translation>
+        <translation>Reverse path</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="55"/>
         <source>正向径路</source>
-        <translation type="unfinished"></translation>
+        <translation>Forward path</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="66"/>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="78"/>
         <source>站名</source>
-        <translation type="unfinished"></translation>
+        <translation>Station</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="110"/>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="136"/>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="145"/>
         <source>错误</source>
-        <translation type="unfinished">Error</translation>
+        <translation>Error</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="110"/>
         <source>正向径路为空，无法生成。
 注：径路表中的空白项将被忽略。</source>
-        <translation type="unfinished"></translation>
+        <translation>Forward path is empty; cannot generate
+Note: empty entries in the path table will be ignored.</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="134"/>
         <source>径路生成完成  用时%1毫秒</source>
-        <translation type="unfinished"></translation>
+        <translation>Successfully generated paths in %1 ms</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="136"/>
         <source>径路未能生成，原因如下：
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Failed to generate path: %1</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="145"/>
         <source>使用强制生成径路功能，需给出至少两个非空关键点。</source>
-        <translation type="unfinished"></translation>
+        <translation>Force generate path. This requries at least two non-empty critical points.</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="149"/>
         <source>%1-%2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1-%2</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="155"/>
         <source>说明</source>
-        <translation type="unfinished"></translation>
+        <translation>Info</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/quickpathselector.cpp" line="155"/>
@@ -8909,12 +8915,12 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/railnet/path/railpreviewdialog.cpp" line="57"/>
         <source>下行</source>
-        <translation type="unfinished">Downwards</translation>
+        <translation type="unfinished">Down</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/railpreviewdialog.cpp" line="57"/>
         <source>上行</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Up</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/railpreviewdialog.cpp" line="58"/>
@@ -8932,7 +8938,7 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/util/railrulercombo.h" line="35"/>
         <source>选择标尺</source>
-        <translation type="unfinished">Select benchmark</translation>
+        <translation>Select benchmark</translation>
     </message>
 </context>
 <context>
@@ -9377,12 +9383,12 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/editors/railstationwidget.cpp" line="97"/>
         <source>下行</source>
-        <translation type="unfinished">Downwards</translation>
+        <translation type="unfinished">Down</translation>
     </message>
     <message>
         <location filename="../src/editors/railstationwidget.cpp" line="97"/>
         <source>上行</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Up</translation>
     </message>
     <message>
         <location filename="../src/editors/railstationwidget.cpp" line="97"/>
@@ -9521,7 +9527,7 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/model/rail/railtrackadjustmodel.cpp" line="51"/>
         <source>股道名称</source>
-        <translation type="unfinished"></translation>
+        <translation>Home name</translation>
     </message>
 </context>
 <context>
@@ -10114,122 +10120,127 @@ Choose the default ribbon toolbar style</translation>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="34"/>
         <source>交路编辑(&amp;0)</source>
-        <translation type="unfinished"></translation>
+        <translation>Operational train editing (&amp;0)</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="36"/>
         <source>基本信息</source>
-        <translation type="unfinished">Basic information</translation>
+        <translation>Basic information</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="42"/>
         <source>当前交路</source>
-        <translation type="unfinished"></translation>
+        <translation>Current operational train</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="47"/>
         <source>切换</source>
-        <translation type="unfinished">Switch</translation>
+        <translation>Switch</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="57"/>
         <source>交路名面板</source>
-        <translation type="unfinished"></translation>
+        <translation>Operational train name panel</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="58"/>
         <source>交路名</source>
-        <translation type="unfinished"></translation>
+        <translation>Operational train name</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="61"/>
         <source>高亮显示</source>
-        <translation type="unfinished"></translation>
+        <translation>Highlight</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="61"/>
         <source>高亮显示交路</source>
-        <translation type="unfinished"></translation>
+        <translation>Highlight the operational train</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="67"/>
         <source>编辑</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="68"/>
         <source>交路编辑</source>
-        <translation type="unfinished"></translation>
+        <translation>Operational train editing</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="72"/>
         <source>拆分交路</source>
-        <translation type="unfinished"></translation>
+        <translation>Split operational train</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="74"/>
         <source>拆分交路
 将当前交路拆分为一个或多个交路</source>
-        <translation type="unfinished"></translation>
+        <translation>Split operational train
+Split the current operational train into multiple operational trains</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="83"/>
         <source>合并交路</source>
-        <translation type="unfinished"></translation>
+        <translation>Merge operational trains</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="85"/>
         <source>合并交路
 选择交路，将其合并到当前交路，并删除该交路</source>
-        <translation type="unfinished"></translation>
+        <translation>Merge operational trains
+Select operational trains to merge with the current one. The selected one will be deleted after merging</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="88"/>
         <source>删除交路</source>
-        <translation type="unfinished">Delete operational trains</translation>
+        <translation>Delete operational trains</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="92"/>
         <source>工具</source>
-        <translation type="unfinished">Tools</translation>
+        <translation>Tools</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="93"/>
         <source>交路图</source>
-        <translation type="unfinished"></translation>
+        <translation>Operational train map</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="94"/>
         <source>交路图
 显示当前交路的（“中国动车组交路查询”风格的）示意图</source>
-        <translation type="unfinished"></translation>
+        <translation>Operational train map
+Show the (&quot;Chinese MU operational train search&quot; style) operational train map of the current operational train</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="98"/>
         <source>里程表</source>
-        <translation type="unfinished"></translation>
+        <translation>Length table</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="99"/>
         <source>里程表
 显示当前交路的各车次总里程及交路累计里程（若可得）。</source>
-        <translation type="unfinished"></translation>
+        <translation>Length table
+Show the length table of the current operational train, and the length of each train in the operational train respectively, if possible.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="107"/>
         <source>文本解析</source>
-        <translation type="unfinished"></translation>
+        <translation>Text analysis</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="108"/>
         <source>单交路文本解析
 输入车次套用的文本，从中解析交路序列，并直接应用于当前交路。</source>
-        <translation type="unfinished"></translation>
+        <translation>Single operational train text analysis
+Enter the text used for operational trains and analyze for the operational trin sequence. Afterwards, apply it to the current operational train.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="113"/>
         <source>识别车次</source>
-        <translation type="unfinished"></translation>
+        <translation>Train number analysis</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/routingcontext.cpp" line="114"/>
@@ -10317,7 +10328,7 @@ Choose the default ribbon toolbar style</translation>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="78"/>
         <source>交路示意图 - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Operational train map - %1</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="100"/>
@@ -10327,75 +10338,75 @@ Choose the default ribbon toolbar style</translation>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="107"/>
         <source>扫描整个时刻表</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan whole timetable</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="110"/>
         <source>跨日算法</source>
-        <translation type="unfinished"></translation>
+        <translation>cross-day algorithm</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="115"/>
         <source>水平缩放</source>
-        <translation type="unfinished">Horizontal scaling</translation>
+        <translation>Horizontal scaling</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="123"/>
         <source>垂直缩放</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertical scaling</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="129"/>
         <source>导出为</source>
-        <translation type="unfinished"></translation>
+        <translation>Export as...</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="157"/>
         <source>输出PDF</source>
-        <translation type="unfinished"></translation>
+        <translation>Export PDF</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="158"/>
         <source>PDF文档(*.pdf)</source>
-        <translation type="unfinished"></translation>
+        <translation>PDF documents (*.pdf)</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="162"/>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="175"/>
         <source>提示</source>
-        <translation type="unfinished">Hint</translation>
+        <translation>Hint</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="162"/>
         <source>导出PDF交路图成功</source>
-        <translation type="unfinished"></translation>
+        <translation>Successfully exported as PDF operational train map</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="164"/>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="177"/>
         <source>错误</source>
-        <translation type="unfinished">Error</translation>
+        <translation>Error</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="164"/>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="177"/>
         <source>导出失败，可能因为文件冲突。</source>
-        <translation type="unfinished"></translation>
+        <translation>Failed to export. This may be caused by file collision.</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="170"/>
         <source>输出PNG</source>
-        <translation type="unfinished"></translation>
+        <translation>Export as PNG</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="171"/>
         <source>PNG图片(*.png)</source>
-        <translation type="unfinished"></translation>
+        <translation>PNG images (*.png)</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="175"/>
         <source>导出PNG交路图成功</source>
-        <translation type="unfinished"></translation>
+        <translation>Successfully exported as PNG image</translation>
     </message>
 </context>
 <context>
@@ -10538,12 +10549,12 @@ Choose the default ribbon toolbar style</translation>
     <message>
         <location filename="../src/viewers/routingmiledialog.cpp" line="81"/>
         <source>交路里程 - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Operational train operation distance - %1</translation>
     </message>
     <message>
         <location filename="../src/viewers/routingmiledialog.cpp" line="89"/>
         <source>本窗口提供交路中各次列车的总里程，以及交路累计里程的统计。注意，由于列车并不一定全程在线路上有铺画运行线，其全程里程并不总是可得，交路里程也并不总是可得。</source>
-        <translation type="unfinished"></translation>
+        <translation>This window provides information about the total operation distance of different trains in an operational train, and the distance sum. Please note that the sum and separate distances may not be always available, as the train might not provide full valid drawable diagram lines.</translation>
     </message>
 </context>
 <context>
@@ -10589,12 +10600,12 @@ Choose the default ribbon toolbar style</translation>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="26"/>
         <source>站名</source>
-        <translation type="unfinished"></translation>
+        <translation>Station</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/routingdiagramwidget.cpp" line="26"/>
         <source>纵坐标</source>
-        <translation type="unfinished"></translation>
+        <translation>y-pos</translation>
     </message>
 </context>
 <context>
@@ -10602,7 +10613,7 @@ Choose the default ribbon toolbar style</translation>
     <message>
         <location filename="../src/editors/routing/routingwidget.cpp" line="70"/>
         <source>新交路</source>
-        <translation type="unfinished"></translation>
+        <translation>New operational train</translation>
     </message>
 </context>
 <context>
@@ -11404,12 +11415,12 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/rulerrefdialog.cpp" line="151"/>
         <source>标尺对照 - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Compare benchmarks - %1</translation>
     </message>
     <message>
         <location filename="../src/viewers/rulerrefdialog.cpp" line="198"/>
         <source>(空)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Empty)</translation>
     </message>
 </context>
 <context>
@@ -11590,7 +11601,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/editors/trainpath/selectpathdialog.cpp" line="79"/>
         <source>选择列车径路</source>
-        <translation type="unfinished"></translation>
+        <translation>Choose train path</translation>
     </message>
 </context>
 <context>
@@ -11788,7 +11799,7 @@ Are you sure to continue?</translation>
         <location filename="../src/util/selectrailwaycombo.h" line="21"/>
         <location filename="../src/util/selectrailwaycombo.h" line="33"/>
         <source>选择线路</source>
-        <translation type="unfinished">Select route</translation>
+        <translation>Select route</translation>
     </message>
 </context>
 <context>
@@ -11845,7 +11856,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/editors/train/selectroutinglistwidget.cpp" line="40"/>
         <source>(无交路)</source>
-        <translation type="unfinished"></translation>
+        <translation>(No operational trains)</translation>
     </message>
 </context>
 <context>
@@ -11876,12 +11887,12 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/dialogs/selecttrainstationdialog.cpp" line="69"/>
         <source>选择时刻表车站</source>
-        <translation type="unfinished"></translation>
+        <translation>Choose timetable station</translation>
     </message>
     <message>
         <location filename="../src/dialogs/selecttrainstationdialog.cpp" line="74"/>
         <source>请在下表选择车站: </source>
-        <translation type="unfinished"></translation>
+        <translation>Please select stations from the following table: </translation>
     </message>
 </context>
 <context>
@@ -11889,7 +11900,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/editors/train/trainfilterhelpers.cpp" line="24"/>
         <source>选择类型</source>
-        <translation type="unfinished"></translation>
+        <translation>Select class</translation>
     </message>
 </context>
 <context>
@@ -12477,7 +12488,7 @@ You can select an interface style from this OS support style list.</translation>
     <message>
         <location filename="../src/wizards/timeinterp/timeinterppagepreview.cpp" line="55"/>
         <source>确认</source>
-        <translation type="unfinished">Confirm</translation>
+        <translation>Confirm</translation>
     </message>
     <message>
         <location filename="../src/wizards/timeinterp/timeinterppagepreview.cpp" line="67"/>
@@ -13077,7 +13088,7 @@ Current classes will be listed in the dropdown. The class will be determined aut
     <message>
         <location filename="../src/mainwindow/traincontext.cpp" line="245"/>
         <source>旅客列车</source>
-        <translation type="unfinished">Passenger</translation>
+        <translation>Passenger</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/traincontext.cpp" line="247"/>
@@ -13099,7 +13110,7 @@ If it is semi-selected then it will be determined by train class</translation>
     <message>
         <location filename="../src/mainwindow/traincontext.cpp" line="259"/>
         <source>自动运行线</source>
-        <translation type="unfinished">Autostyle</translation>
+        <translation>Autostyle</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/traincontext.cpp" line="263"/>
@@ -14082,7 +14093,7 @@ This action is undoable. Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/events/traingapstatdialog.cpp" line="74"/>
         <source>这里统计了当前所选计算配置（单双线，车次筛选）条件下，出现的所有不同类型的列车间隔的最小值以及相应的（该类型出现的）总次数。在列车间隔分析的窗口中，最小值对应的条目以红字标出</source>
-        <translation type="unfinished"></translation>
+        <translation>This contains all train information about the minimun train interval values of different class of trains, including the count, based on current settings (single / double line, train number filter). The entry corresponds to the minimun value will be marked red in the train interval analysis window</translation>
     </message>
 </context>
 <context>
