@@ -2,8 +2,6 @@ name: Build qETRC
 
 on:
   push:
-    branches:
-      - master
   workflow_dispatch:
 
 jobs:
@@ -24,7 +22,6 @@ jobs:
           libxcb-render-util0 libxcb-render0 libxcb-shape0 libxcb-shm0 libxcb-sync1 libxcb-util1 \
           libxcb-xfixes0 libxcb-xkb1 libxcb1 libxkbcommon-x11-0 libxkbcommon0 \
           libgl1-mesa-dev libglu1-mesa-dev
-
 
       - name: Install Qt using qt installer
         run: |
@@ -55,22 +52,28 @@ jobs:
           name: qETRC
           path: build/qETRC
 
-#       - name: Pack .deb
-#         run: |
-#           mkdir -p package/DEBIAN
-#           echo "Package: qETRC" > package/DEBIAN/control
-#           echo "Version: 1.0.0" >> package/DEBIAN/control
-#           echo "Section: base" >> package/DEBIAN/control
-#           echo "Priority: optional" >> package/DEBIAN/control
-#           echo "Architecture: amd64" >> package/DEBIAN/control
-#           echo "Maintainer: Your Name <your.email@example.com>" >> package/DEBIAN/control
-#           echo "Description: qETRC application" >> package/DEBIAN/control
-#           mkdir -p package/usr/local/bin
-#           cp build/qETRC package/usr/local/bin/
-#           dpkg-deb --build package qETRC-1.0.0.deb
-#
-#       - name: Upload .deb artifact
-#         uses: actions/upload-artifact@v4
-#         with:
-#           name: qETRC-deb
-#           path: qETRC-1.0.0.deb
+      - name: Pack .deb
+        run: |
+          mkdir -p package/DEBIAN
+          echo "Package: qETRC"       > package/DEBIAN/control
+          echo "Version: nightly"    >> package/DEBIAN/control
+          echo "Section: base"       >> package/DEBIAN/control
+          echo "Priority: optional"  >> package/DEBIAN/control
+          echo "Architecture: amd64" >> package/DEBIAN/control
+          echo "Maintainer: ${{ vars.MAINTAINER_NAME }} <${{ vars.MAINTAINER_EMAIL }}>" \
+                                     >> package/DEBIAN/control
+          echo "Description: qETRC is a feature-rich railway timetabling application" \
+                                     >> package/DEBIAN/control
+          mkdir -p package/usr/local/bin
+          mkdir -p package/usr/local/lib
+          # Use ldd here to get a whole list of dependencies. If the dependency is already
+          # available on the remote then ignore. Function WIP
+          cp build/qETRC package/usr/local/bin/
+          ldd package/usr/local/bin/qETRC
+          dpkg-deb --build package qETRC-nightly.deb
+
+      - name: Upload .deb artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qETRC-deb
+          path: qETRC-nightly.deb
