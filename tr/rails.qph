@@ -60,4 +60,12 @@
     <source>附加</source>
     <target>amendation</target>
 </phrase>
+<phrase>
+    <source>正则</source>
+    <target>regex</target>
+</phrase>
+<phrase>
+    <source>正则表达式</source>
+    <target>regular expression</target>
+</phrase>
 </QPH>

@@ -3463,6 +3463,12 @@ mxy0268@qq.com
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/mainwindow/mainwindow.cpp" line="384"/>
+        <source>英文版翻译：WenSimEHRP  萧迩珀
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/mainwindow/mainwindow.cpp" line="385"/>
         <source>许可证：GPLv3
 </source>
