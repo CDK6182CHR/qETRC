@@ -401,7 +401,7 @@ The app will not check if the virtual train is a duplicate, but will check if th
     <message>
         <location filename="../src/railnet/graph/adjacentlistwidget.cpp" line="30"/>
         <source>邻接表 （出边表）: </source>
-        <translation type="unfinished">Adjacent table</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/railnet/graph/adjacentlistwidget.cpp" line="45"/>
@@ -1704,7 +1704,7 @@ Click [Generate] to generate trains and departure times in the table below. Plea
     <message>
         <location filename="../src/viewers/diagnosisdialog.cpp" line="126"/>
         <source>选择车次</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select train</translation>
     </message>
     <message>
         <location filename="../src/viewers/diagnosisdialog.cpp" line="128"/>
@@ -1724,7 +1724,7 @@ Click [Generate] to generate trains and departure times in the table below. Plea
     <message>
         <location filename="../src/viewers/diagnosisdialog.cpp" line="155"/>
         <source>说明</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Info</translation>
     </message>
     <message>
         <location filename="../src/viewers/diagnosisdialog.cpp" line="176"/>
@@ -1934,59 +1934,60 @@ JSON文件 (*.json)
         <location filename="../src/kernel/diagramwidget.cpp" line="1547"/>
         <location filename="../src/kernel/diagramwidget.cpp" line="1554"/>
         <source>错误</source>
-        <translation type="unfinished">Error</translation>
+        <translation>Error</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="169"/>
         <location filename="../src/kernel/diagramwidget.cpp" line="207"/>
         <source>由于当前平台不支持QtPrintSupport, 无法使用导出PDF功能。请考虑使用导出PNG功能。</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot export as PDF file as the current platform does not support QtPrintSupport. Please consider exporting as PNG images.</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="196"/>
         <location filename="../src/kernel/diagramwidget.cpp" line="271"/>
         <location filename="../src/kernel/diagramwidget.cpp" line="310"/>
         <source>导出PDF  用时%1毫秒</source>
-        <translation type="unfinished"></translation>
+        <translation>Exported as PDF in %1 ms</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="250"/>
         <location filename="../src/kernel/diagramwidget.cpp" line="300"/>
         <source>导出PDF</source>
-        <translation type="unfinished"></translation>
+        <translation>Export as PDF</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="251"/>
         <source>正在导出运行图
 请不要删除此运行图页面</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporting diagrams
+Please do not delete this diagram page</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="274"/>
         <location filename="../src/kernel/diagramwidget.cpp" line="522"/>
         <source>提示</source>
-        <translation type="unfinished">Hint</translation>
+        <translation>Hint</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="275"/>
         <source>已成功导出至PDF文件：
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Successfully exported as %1</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="282"/>
         <source>导出失败，可能因为文件占用</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Failed </translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="300"/>
         <source>取消</source>
-        <translation type="unfinished">Cancel</translation>
+        <translation>Cancel</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="347"/>
         <source>由 %1_%2 导出</source>
-        <translation type="unfinished"></translation>
+        <translation>Exported by %1_%2</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="523"/>
@@ -2004,44 +2005,44 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="567"/>
         <source>导出PNG  用时%1毫秒</source>
-        <translation type="unfinished"></translation>
+        <translation>Exported as PNG in %1 ms</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="679"/>
         <source>重新铺画当前运行图</source>
-        <translation type="unfinished"></translation>
+        <translation>Redraw the current diagram</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="686"/>
         <source>放大视图</source>
-        <translation type="unfinished"></translation>
+        <translation>Enlarge</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="693"/>
         <source>缩小视图</source>
-        <translation type="unfinished"></translation>
+        <translation>Shrink</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="949"/>
         <source>排图标尺</source>
-        <translation type="unfinished">Drawing benchmark</translation>
+        <translation>Drawing benchmark</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="949"/>
         <source>区间距离</source>
-        <translation type="unfinished"></translation>
+        <translation>Section distance</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="956"/>
         <location filename="../src/kernel/diagramwidget.cpp" line="1026"/>
         <source>下行</source>
-        <translation type="unfinished">Down</translation>
+        <translation>Down</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="961"/>
         <location filename="../src/kernel/diagramwidget.cpp" line="1032"/>
         <source>上行</source>
-        <translation type="unfinished">Up</translation>
+        <translation>Up</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="978"/>
@@ -2056,12 +2057,12 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="1141"/>
         <source>%1/%2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1/%2</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="1482"/>
         <source>运行图 [%1] 选中车次运行线 [%2]</source>
-        <translation type="unfinished"></translation>
+        <translation>Selected diagram line [%2] in diagram [%1]</translation>
     </message>
     <message>
         <location filename="../src/kernel/diagramwidget.cpp" line="1530"/>
@@ -2128,27 +2129,27 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/mainwindow/pagecontext.cpp" line="352"/>
         <source>运行图页面 - 基本信息</source>
-        <translation type="unfinished"></translation>
+        <translation>DIagram page - basic info</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/pagecontext.cpp" line="359"/>
         <source>页面名称</source>
-        <translation type="unfinished"></translation>
+        <translation>Page name</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/pagecontext.cpp" line="361"/>
         <source>备注：</source>
-        <translation type="unfinished">Remarks:</translation>
+        <translation>Remarks:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/pagecontext.cpp" line="377"/>
         <source>错误</source>
-        <translation type="unfinished">Error</translation>
+        <translation>Error</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/pagecontext.cpp" line="377"/>
         <source>运行图名称不能为空或与其他运行图名称冲突。</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagram name must be unique and not empty</translation>
     </message>
 </context>
 <context>
@@ -2156,99 +2157,101 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="52"/>
         <source>列车编辑 - %1</source>
-        <translation type="unfinished">Train editing - %1</translation>
+        <translation>Train editing - %1</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="54"/>
         <source>列车编辑 (空白)</source>
-        <translation type="unfinished"></translation>
+        <translation>Train editing (empty)</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="122"/>
         <source>切换车次
 切换当前面板所编辑的车次，请注意当前所做的修改不会保存</source>
-        <translation type="unfinished"></translation>
+        <translation>Switch trains
+Switch the current train editing. Please note that current changes will not be saved</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="124"/>
         <source>选择车次</source>
-        <translation type="unfinished"></translation>
+        <translation>Select train</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="125"/>
         <source>请选择要切换到的车次，当前所做的修改不会保存</source>
-        <translation type="unfinished"></translation>
+        <translation>Please select the train to switch to. All unsaved changes will not be saved</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="135"/>
         <source>与当前车次同步
 保持当前面板所编辑的车次与所选择的车次同步。当选择新车次时，自动切换到新车次。请注意及时保存更改。</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync with current train
+Sync the train on panel with the train selected. When selected a different train, the system will automatically switch to the new train.</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="141"/>
         <source>全车次</source>
-        <translation type="unfinished">Full train number</translation>
+        <translation>Full train number</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="146"/>
         <source>/</source>
-        <translation type="unfinished"></translation>
+        <translation>/</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="152"/>
         <source>下行/上行</source>
-        <translation type="unfinished"></translation>
+        <translation>Down / Up</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="156"/>
         <source>-&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>-&gt;</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="163"/>
         <source>始发终到</source>
-        <translation type="unfinished">Departure -&gt; terminal</translation>
+        <translation>Departure -&gt; terminal</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="170"/>
         <source>旅客列车</source>
-        <translation type="unfinished">Passenger</translation>
+        <translation>Passenger</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="173"/>
         <source>列车种类</source>
-        <translation type="unfinished">Train class</translation>
+        <translation>Train class</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="176"/>
         <source>自动</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatic</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="185"/>
         <source>宽度 </source>
-        <translation type="unfinished"></translation>
+        <translation>Width</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="193"/>
         <source>运行线设置</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagram line settings</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="199"/>
         <source>转到..</source>
-        <translation type="unfinished"></translation>
+        <translation>Turn to...</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="203"/>
         <source>车底交路</source>
-        <translation type="unfinished"></translation>
+        <translation>Operational train type</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="222"/>
         <source>错误</source>
-        <translation type="unfinished">Error</translation>
+        <translation>Error</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="223"/>
@@ -2258,7 +2261,7 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="279"/>
         <source>运行线颜色</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagram line colour</translation>
     </message>
 </context>
 <context>
@@ -2633,7 +2636,7 @@ Running records:
     <message>
         <location filename="../src/wizards/greedypaint/greedypaintfasttest.cpp" line="194"/>
         <source>排图成功</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Successfully drawn diagram lines</translation>
     </message>
     <message>
         <location filename="../src/wizards/greedypaint/greedypaintfasttest.cpp" line="196"/>
@@ -3532,7 +3535,7 @@ Please be so kind to submit an issue on GitHub if you spot a typo or translation
     <message>
         <location filename="../src/mainwindow/mainwindow.cpp" line="491"/>
         <source>当前没有进入贪心推线模式，无需退出。</source>
-        <translation type="unfinished"></translation>
+        <translation>Currently not in Greedy drawing mode; no need to exit.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/mainwindow.cpp" line="494"/>
@@ -3544,7 +3547,8 @@ Please be so kind to submit an issue on GitHub if you spot a typo or translation
         <location filename="../src/mainwindow/mainwindow.cpp" line="494"/>
         <source>退出贪心推线模式，关闭对话框并释放资源。
 已经配置的排图约束数据将丢失，是否确认？</source>
-        <translation type="unfinished"></translation>
+        <translation>Exit Greedy drawing mode, end the session, and release memory.
+All configured drawing restriction data will be lost. Are you sure to continue?</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/mainwindow.cpp" line="524"/>
@@ -3562,8 +3566,7 @@ Please be so kind to submit an issue on GitHub if you spot a typo or translation
         <location filename="../src/mainwindow/mainwindow.cpp" line="613"/>
         <location filename="../src/mainwindow/mainwindow.cpp" line="864"/>
         <source>列车管理</source>
-        <translation type="unfinished">Train
-management</translation>
+        <translation>Train management</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/mainwindow.cpp" line="645"/>
@@ -4631,7 +4634,7 @@ All files (*.*)</translation>
     <message>
         <location filename="../src/editors/routing/mergeroutingdialog.cpp" line="75"/>
         <source>当前交路</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Current operational train</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/mergeroutingdialog.cpp" line="82"/>
@@ -4641,7 +4644,7 @@ All files (*.*)</translation>
     <message>
         <location filename="../src/editors/routing/mergeroutingdialog.cpp" line="84"/>
         <source>合并交路</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Merge operational trains</translation>
     </message>
     <message>
         <location filename="../src/editors/routing/mergeroutingdialog.cpp" line="93"/>
@@ -5655,7 +5658,7 @@ Close the current train path toolbar panel.</translation>
     <message>
         <location filename="../src/model/trainpath/pathmodel.cpp" line="11"/>
         <source>行别</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Direction</translation>
     </message>
     <message>
         <location filename="../src/model/trainpath/pathmodel.cpp" line="11"/>
@@ -6256,7 +6259,7 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
         <location filename="../src/data/common/direction.h" line="44"/>
         <location filename="../src/data/rail/railstation.h" line="28"/>
         <source>下行</source>
-        <translation type="unfinished">Down</translation>
+        <translation>Down</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/traingap.cpp" line="60"/>
@@ -6265,7 +6268,7 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
         <location filename="../src/data/common/direction.h" line="45"/>
         <location filename="../src/data/rail/railstation.h" line="30"/>
         <source>上行</source>
-        <translation type="unfinished">Up</translation>
+        <translation>Up</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/traingap.cpp" line="66"/>
@@ -6396,7 +6399,7 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="828"/>
         <source>在单线区间[%5] 里程标[%1]，时刻[%2]与车次[%3]发生[%4]事件</source>
-        <translation type="unfinished"></translation>
+        <translation>Time [%2] had [%4] event with train [%3] at milestone [%1] of single track section [%5]</translation>
     </message>
     <message>
         <location filename="../src/data/diagram/trainline.cpp" line="1307"/>
@@ -7270,7 +7273,7 @@ All files (*.*)</translation>
     <message>
         <location filename="../src/model/rail/gapconstraintmodel.cpp" line="58"/>
         <source>最小间隔</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Minimal interval</translation>
     </message>
     <message>
         <location filename="../src/model/train/timetablequickmodel.cpp" line="333"/>
@@ -7553,12 +7556,12 @@ All files (*.*)</translation>
     <message>
         <location filename="../src/data/rail/railstation.h" line="26"/>
         <source>不通过</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Not pass</translation>
     </message>
     <message>
         <location filename="../src/data/rail/railstation.h" line="32"/>
         <source>上下行</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Down-up</translation>
     </message>
     <message>
         <location filename="../src/dialogs/changestationnamedialog.h" line="67"/>
@@ -7638,7 +7641,7 @@ All files (*.*)</translation>
     <message>
         <location filename="../src/navi/navitree.h" line="275"/>
         <source>批量添加%1个车次</source>
-        <translation type="unfinished"></translation>
+        <translation>Batch add %1 trains</translation>
     </message>
 </context>
 <context>
@@ -7815,7 +7818,7 @@ Note: empty entries in the path table will be ignored.</translation>
         <location filename="../src/mainwindow/railcontext.cpp" line="173"/>
         <location filename="../src/mainwindow/railcontext.cpp" line="174"/>
         <source>标尺</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Benchmarks</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/railcontext.cpp" line="176"/>
@@ -8211,7 +8214,7 @@ Note: empty entries in the path table will be ignored.</translation>
     <message>
         <location filename="../src/railnet/raildb/raildbcontext.cpp" line="111"/>
         <source>标尺</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Benchmarks</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbcontext.cpp" line="111"/>
@@ -8331,12 +8334,12 @@ Note: empty entries in the path table will be ignored.</translation>
     <message>
         <location filename="../src/railnet/raildb/raildbmodel.cpp" line="76"/>
         <source>作者</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Author</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbmodel.cpp" line="77"/>
         <source>版本</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Version</translation>
     </message>
 </context>
 <context>
@@ -8656,182 +8659,182 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="53"/>
         <source>线路数据库 - 历史记录</source>
-        <translation type="unfinished"></translation>
+        <translation>Route database - history</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="78"/>
         <source>文件</source>
-        <translation type="unfinished">Files</translation>
+        <translation>Files</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="79"/>
         <source>新建</source>
-        <translation type="unfinished">New</translation>
+        <translation>New</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="80"/>
         <source>打开</source>
-        <translation type="unfinished">Open</translation>
+        <translation>Open</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="81"/>
         <source>保存</source>
-        <translation type="unfinished">Save</translation>
+        <translation>Save</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="82"/>
         <source>另存为</source>
-        <translation type="unfinished">Save as</translation>
+        <translation>Save as</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="84"/>
         <source>将当前数据库文件设为默认文件</source>
-        <translation type="unfinished"></translation>
+        <translation>Set the current database file as default</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="86"/>
         <source>退出线路数据库</source>
-        <translation type="unfinished"></translation>
+        <translation>Exit route database</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="88"/>
         <source>编辑</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="89"/>
         <source>撤销</source>
-        <translation type="unfinished">Undo</translation>
+        <translation>Undo</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="90"/>
         <source>重做</source>
-        <translation type="unfinished">Redo</translation>
+        <translation>Redo</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="91"/>
         <source>历史记录</source>
-        <translation type="unfinished">History</translation>
+        <translation>History</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="93"/>
         <source>编辑列表所选线路</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit selected routes in list</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="94"/>
         <source>在列表所选类新建线路</source>
-        <translation type="unfinished"></translation>
+        <translation>Create a new line in the selected category</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="95"/>
         <source>删除列表所选线路</source>
-        <translation type="unfinished"></translation>
+        <translation>Delete selected lines in list</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="97"/>
         <source>编辑列表所选线路的标尺</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit benchmarks of selected lines in list</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="98"/>
         <source>编辑列表所选线路的天窗</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit openings of selected lines in list</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="100"/>
         <source>新建子分类</source>
-        <translation type="unfinished">New subcategory</translation>
+        <translation>New subcategory</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="101"/>
         <source>新建平行分类</source>
-        <translation type="unfinished"></translation>
+        <translation>New parallel category</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="102"/>
         <source>删除列表所选分类</source>
-        <translation type="unfinished"></translation>
+        <translation>Delete selected category in list</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="104"/>
         <source>查看</source>
-        <translation type="unfinished"></translation>
+        <translation>View</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="105"/>
         <source>刷新线路表</source>
-        <translation type="unfinished"></translation>
+        <translation>Refresh route list</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="106"/>
         <source>全部展开</source>
-        <translation type="unfinished"></translation>
+        <translation>Expand all</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="107"/>
         <source>全部折叠</source>
-        <translation type="unfinished"></translation>
+        <translation>Collapse all</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="109"/>
         <source>导入</source>
-        <translation type="unfinished">Import</translation>
+        <translation>Import</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="110"/>
         <source>从当前运行图导入</source>
-        <translation type="unfinished"></translation>
+        <translation>Import from diagram</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="111"/>
         <source>从运行图文件导入</source>
-        <translation type="unfinished"></translation>
+        <translation>Import from diagram file</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="112"/>
         <source>从子数据库文件导入</source>
-        <translation type="unfinished"></translation>
+        <translation>Import from subdatabase file</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="114"/>
         <source>导出</source>
-        <translation type="unfinished">Export</translation>
+        <translation>Export</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="115"/>
         <source>导出列表所选线路至运行图</source>
-        <translation type="unfinished"></translation>
+        <translation>Export selected lines to diagram</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="116"/>
         <source>导出列表所选分类为独立数据库</source>
-        <translation type="unfinished"></translation>
+        <translation>Export selected catrgories as independent databases</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="130"/>
         <source>线路数据库 - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Route database - %1</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="137"/>
         <source>线路数据库</source>
-        <translation type="unfinished">Route database</translation>
+        <translation>Route database</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="138"/>
         <source>当前编辑的线路[%1]可能已经被修改。是否保存改动？</source>
-        <translation type="unfinished"></translation>
+        <translation>The current editing route [%1] may be modified. Are you sure to save?</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="172"/>
         <source>错误</source>
-        <translation type="unfinished">Error</translation>
+        <translation>Error</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbwindow.cpp" line="172"/>
         <source>当前没有在编辑的线路。请先选择要编辑的线路，或新建线路，再提交。</source>
-        <translation type="unfinished"></translation>
+        <translation>No editing routes. Please submit after selecting a route to edit, or creating a new route.</translation>
     </message>
 </context>
 <context>
@@ -8839,27 +8842,27 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/model/diagram/railtablemodel.cpp" line="77"/>
         <source>线名</source>
-        <translation type="unfinished">Line name</translation>
+        <translation>Line name</translation>
     </message>
     <message>
         <location filename="../src/model/diagram/railtablemodel.cpp" line="78"/>
         <source>起点</source>
-        <translation type="unfinished">Start</translation>
+        <translation>Start</translation>
     </message>
     <message>
         <location filename="../src/model/diagram/railtablemodel.cpp" line="79"/>
         <source>终点</source>
-        <translation type="unfinished">End</translation>
+        <translation>End</translation>
     </message>
     <message>
         <location filename="../src/model/diagram/railtablemodel.cpp" line="80"/>
         <source>里程</source>
-        <translation type="unfinished">Length</translation>
+        <translation>Length</translation>
     </message>
     <message>
         <location filename="../src/model/diagram/railtablemodel.cpp" line="81"/>
         <source>站数</source>
-        <translation type="unfinished">Station count</translation>
+        <translation>Station count</translation>
     </message>
 </context>
 <context>
@@ -8867,22 +8870,22 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/editors/railstationwidget.cpp" line="185"/>
         <source>备注 - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Remarks - %1</translation>
     </message>
     <message>
         <location filename="../src/editors/railstationwidget.cpp" line="203"/>
         <source>作者</source>
-        <translation type="unfinished"></translation>
+        <translation>Author</translation>
     </message>
     <message>
         <location filename="../src/editors/railstationwidget.cpp" line="205"/>
         <source>版本</source>
-        <translation type="unfinished"></translation>
+        <translation>Version</translation>
     </message>
     <message>
         <location filename="../src/editors/railstationwidget.cpp" line="208"/>
         <source>其他说明：</source>
-        <translation type="unfinished"></translation>
+        <translation>Other information:</translation>
     </message>
 </context>
 <context>
@@ -8890,47 +8893,47 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/railnet/path/railpreviewdialog.cpp" line="24"/>
         <source>径路预览</source>
-        <translation type="unfinished"></translation>
+        <translation>Path preview</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/railpreviewdialog.cpp" line="31"/>
         <source>以下是生成的线路信息，可进行修改。修改直接生效，且不可撤销。点击[确定]将生成的线路添加到当前运行图中，[取消]以终止本次会话。</source>
-        <translation type="unfinished"></translation>
+        <translation>This is the generated route information. You can change it as needed; all changes will take effect immediatly and are undoable. Click [Confrim] to add the generated route to the current diagram. and click [Cancel] to end the current session.</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/railpreviewdialog.cpp" line="41"/>
         <source>查看经由</source>
-        <translation type="unfinished"></translation>
+        <translation>View path</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/railpreviewdialog.cpp" line="43"/>
         <source>线路名称</source>
-        <translation type="unfinished"></translation>
+        <translation>Route name</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/railpreviewdialog.cpp" line="57"/>
         <source>不通过</source>
-        <translation type="unfinished"></translation>
+        <translation>Not pass</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/railpreviewdialog.cpp" line="57"/>
         <source>下行</source>
-        <translation type="unfinished">Down</translation>
+        <translation>Down</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/railpreviewdialog.cpp" line="57"/>
         <source>上行</source>
-        <translation type="unfinished">Up</translation>
+        <translation>Up</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/railpreviewdialog.cpp" line="58"/>
         <source>上下行</source>
-        <translation type="unfinished"></translation>
+        <translation>Down-up</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/railpreviewdialog.cpp" line="99"/>
         <source>经由查看</source>
-        <translation type="unfinished"></translation>
+        <translation>View path</translation>
     </message>
 </context>
 <context>
@@ -8946,7 +8949,7 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/viewers/events/railsectionevents.cpp" line="85"/>
         <source>断面事件表 - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Slice event list - %1</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/railsectionevents.cpp" line="95"/>
@@ -9197,7 +9200,7 @@ JSON文件 (*.json)
         <location filename="../src/viewers/events/railstationeventlist.cpp" line="206"/>
         <location filename="../src/viewers/events/railstationeventlist.cpp" line="232"/>
         <source>站前</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pre-station</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/railstationeventlist.cpp" line="200"/>
@@ -9205,14 +9208,14 @@ JSON文件 (*.json)
         <location filename="../src/viewers/events/railstationeventlist.cpp" line="232"/>
         <location filename="../src/viewers/events/railstationeventlist.cpp" line="233"/>
         <source>前后</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pre-post</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/railstationeventlist.cpp" line="217"/>
         <location filename="../src/viewers/events/railstationeventlist.cpp" line="223"/>
         <location filename="../src/viewers/events/railstationeventlist.cpp" line="233"/>
         <source>站后</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Post-station</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/railstationeventlist.cpp" line="266"/>
@@ -9378,7 +9381,7 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/editors/railstationwidget.cpp" line="97"/>
         <source>不通过</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Not pass</translation>
     </message>
     <message>
         <location filename="../src/editors/railstationwidget.cpp" line="97"/>
@@ -9393,7 +9396,7 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/editors/railstationwidget.cpp" line="97"/>
         <source>上下行</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Down-up</translation>
     </message>
     <message>
         <location filename="../src/editors/railstationwidget.cpp" line="109"/>
@@ -9426,27 +9429,27 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/model/diagram/railtablemodel.cpp" line="36"/>
         <source>线名</source>
-        <translation type="unfinished">Line name</translation>
+        <translation>Line name</translation>
     </message>
     <message>
         <location filename="../src/model/diagram/railtablemodel.cpp" line="37"/>
         <source>起点</source>
-        <translation type="unfinished">Start</translation>
+        <translation>Start</translation>
     </message>
     <message>
         <location filename="../src/model/diagram/railtablemodel.cpp" line="38"/>
         <source>终点</source>
-        <translation type="unfinished">End</translation>
+        <translation>End</translation>
     </message>
     <message>
         <location filename="../src/model/diagram/railtablemodel.cpp" line="39"/>
         <source>里程</source>
-        <translation type="unfinished">Length</translation>
+        <translation>Length</translation>
     </message>
     <message>
         <location filename="../src/model/diagram/railtablemodel.cpp" line="40"/>
         <source>站数</source>
-        <translation type="unfinished">Station count</translation>
+        <translation>Station count</translation>
     </message>
 </context>
 <context>
@@ -9454,7 +9457,7 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/viewers/railtopotable.cpp" line="27"/>
         <source>线路拓扑 - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Route topology - %1</translation>
     </message>
     <message>
         <location filename="../src/viewers/railtopotable.cpp" line="72"/>
@@ -9571,7 +9574,7 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/viewers/events/railtrackwidget.cpp" line="66"/>
         <source>股道名称</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Home name</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/railtrackwidget.cpp" line="155"/>
@@ -9856,7 +9859,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/wizards/readruler/readrulerpagetrain.cpp" line="52"/>
         <source>选择车次</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select train</translation>
     </message>
     <message>
         <location filename="../src/wizards/readruler/readrulerpagetrain.cpp" line="53"/>
@@ -10092,7 +10095,7 @@ Choose the default ribbon toolbar style</translation>
     <message>
         <location filename="../src/model/train/routingcollectionmodel.cpp" line="68"/>
         <source>交路名</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Operational train name</translation>
     </message>
     <message>
         <location filename="../src/model/train/routingcollectionmodel.cpp" line="69"/>
@@ -10526,7 +10529,7 @@ Enter the text used for operational trains and analyze for the operational trin 
     <message>
         <location filename="../src/model/train/routinglistmodel.cpp" line="46"/>
         <source>交路名</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Operational train name</translation>
     </message>
     <message>
         <location filename="../src/model/train/routinglistmodel.cpp" line="48"/>
@@ -10995,7 +10998,7 @@ Benchmarks that contains the current route&apos;s sections will be imported and 
     <message>
         <location filename="../src/dialogs/rulerfromtraindialog.cpp" line="33"/>
         <source>选择车次</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select train</translation>
     </message>
     <message>
         <location filename="../src/dialogs/rulerfromtraindialog.cpp" line="38"/>
@@ -11099,7 +11102,7 @@ Benchmarks that contains the current route&apos;s sections will be imported and 
     <message>
         <location filename="../src/railnet/graph/edgedatamodels.cpp" line="8"/>
         <source>通通</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pass-pass</translation>
     </message>
     <message>
         <location filename="../src/railnet/graph/edgedatamodels.cpp" line="8"/>
@@ -11167,7 +11170,7 @@ Benchmarks that contains the current route&apos;s sections will be imported and 
     <message>
         <location filename="../src/wizards/rulerpaint/rulerpaintpagetable.cpp" line="179"/>
         <source>通通</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pass-pass</translation>
     </message>
     <message>
         <location filename="../src/wizards/rulerpaint/rulerpaintpagetable.cpp" line="301"/>
@@ -11186,7 +11189,7 @@ Benchmarks that contains the current route&apos;s sections will be imported and 
         <location filename="../src/wizards/rulerpaint/rulerpaintpagetable.cpp" line="324"/>
         <location filename="../src/wizards/rulerpaint/rulerpaintpagetable.cpp" line="340"/>
         <source>通</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pass</translation>
     </message>
     <message>
         <location filename="../src/wizards/rulerpaint/rulerpaintpagetable.cpp" line="315"/>
@@ -11267,7 +11270,7 @@ Benchmarks that contains the current route&apos;s sections will be imported and 
         <location filename="../src/wizards/rulerpaint/rulerpaintpagestart.cpp" line="139"/>
         <location filename="../src/wizards/rulerpaint/rulerpaintpagestart.cpp" line="159"/>
         <source>选择车次</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select train</translation>
     </message>
     <message>
         <location filename="../src/wizards/rulerpaint/rulerpaintpagestart.cpp" line="131"/>
@@ -11433,7 +11436,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/rulerrefdialog.cpp" line="22"/>
         <source>通通</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pass-pass</translation>
     </message>
     <message>
         <location filename="../src/viewers/rulerrefdialog.cpp" line="22"/>
@@ -11578,7 +11581,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/sectioncountdialog.cpp" line="26"/>
         <source>行别</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Direction</translation>
     </message>
     <message>
         <location filename="../src/viewers/sectioncountdialog.cpp" line="26"/>
@@ -11697,7 +11700,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/wizards/selectpath/selectpathwizard.cpp" line="40"/>
         <source>正向径路</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Forward path</translation>
     </message>
     <message>
         <location filename="../src/wizards/selectpath/selectpathwizard.cpp" line="41"/>
@@ -11707,7 +11710,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/wizards/selectpath/selectpathwizard.cpp" line="51"/>
         <source>反向径路</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reverse path</translation>
     </message>
     <message>
         <location filename="../src/wizards/selectpath/selectpathwizard.cpp" line="52"/>
@@ -11848,7 +11851,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/editors/train/trainfilterhelpers.cpp" line="175"/>
         <source>(无交路)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(No operational trains)</translation>
     </message>
 </context>
 <context>
@@ -11879,7 +11882,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/util/selecttraincombo.h" line="38"/>
         <source>选择车次</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select train</translation>
     </message>
 </context>
 <context>
@@ -11967,7 +11970,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/editors/routing/splitroutingdialog.cpp" line="158"/>
         <source>交路名</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Operational train name</translation>
     </message>
 </context>
 <context>
@@ -12092,79 +12095,79 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="35"/>
         <source>车次</source>
-        <translation type="unfinished">Train</translation>
+        <translation>Train</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="35"/>
         <source>站名</source>
-        <translation type="unfinished"></translation>
+        <translation>Station</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="35"/>
         <source>到点</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrive</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="35"/>
         <source>开点</source>
-        <translation type="unfinished"></translation>
+        <translation>Depart</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="35"/>
         <source>类型</source>
-        <translation type="unfinished">Class</translation>
+        <translation>Class</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="35"/>
         <source>停站</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="36"/>
         <source>行别</source>
-        <translation type="unfinished"></translation>
+        <translation>Direction</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="36"/>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="51"/>
         <source>始发</source>
-        <translation type="unfinished">Departure</translation>
+        <translation>Departure</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="36"/>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="53"/>
         <source>终到</source>
-        <translation type="unfinished">Terminal</translation>
+        <translation>Terminal</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="36"/>
         <source>股道</source>
-        <translation type="unfinished">Home</translation>
+        <translation>Home</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="36"/>
         <source>车底</source>
-        <translation type="unfinished">Operational train type</translation>
+        <translation>Operational train type</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="36"/>
         <source>担当</source>
-        <translation type="unfinished">Operational train</translation>
+        <translation>Operational train</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="36"/>
         <source>备注</source>
-        <translation type="unfinished">Remarks</translation>
+        <translation>Remarks</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="55"/>
         <source>停车</source>
-        <translation type="unfinished">Stop</translation>
+        <translation>Stop</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtimetablesettled.cpp" line="56"/>
         <source>通过</source>
-        <translation type="unfinished"></translation>
+        <translation>Pass</translation>
     </message>
 </context>
 <context>
@@ -12173,22 +12176,22 @@ Are you sure to continue?</translation>
         <location filename="../src/viewers/events/stationtraingapdialog.cpp" line="136"/>
         <location filename="../src/viewers/events/stationtraingapdialog.cpp" line="152"/>
         <source>车站间隔分析 - %1 @ %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Station interval analysis - %1 @ %2</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtraingapdialog.cpp" line="189"/>
         <source>车次筛选器</source>
-        <translation type="unfinished"></translation>
+        <translation>Train filter</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtraingapdialog.cpp" line="192"/>
         <source>刷新</source>
-        <translation type="unfinished">Refresh</translation>
+        <translation>Refresh</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtraingapdialog.cpp" line="195"/>
         <source>选项</source>
-        <translation type="unfinished">Options</translation>
+        <translation>Options</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtraingapdialog.cpp" line="202"/>
@@ -12204,7 +12207,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/events/stationtraingapdialog.cpp" line="205"/>
         <source>最小间隔</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimal interval</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/stationtraingapdialog.cpp" line="208"/>
@@ -12289,7 +12292,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="24"/>
         <source>全局选项</source>
-        <translation type="unfinished"></translation>
+        <translation>Global options</translation>
     </message>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="34"/>
@@ -12325,7 +12328,8 @@ Table row default height. Default value is 25.</translation>
         <location filename="../src/editors/systemjsondialog.cpp" line="61"/>
         <source>默认运行图文件
 程序启动时，如果上次打开的运行图不能正常打开，自动打开的运行图文件名。默认为sample.pyetgr</source>
-        <translation type="unfinished"></translation>
+        <translation>Default diagram file
+The default diagram file to open if the most recently edited file cannot be opened. This defaults to sample.pyetgr</translation>
     </message>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="63"/>
@@ -12347,17 +12351,17 @@ Choose the default ribbon toolbar style</translation>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="69"/>
         <source>紧凑三行（WPS风格）</source>
-        <translation type="unfinished">Compact three rows (WPS style)</translation>
+        <translation>Compact three rows (WPS style)</translation>
     </message>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="70"/>
         <source>宽松两行（Office两行风格）</source>
-        <translation>Loose two rows (MS Office two line style)</translation>
+        <translation>Loose two rows (MS Office two row style)</translation>
     </message>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="71"/>
         <source>紧凑两行（WPS两行风格）</source>
-        <translation type="unfinished">Compact two rows (WPS two line style)</translation>
+        <translation>Compact two rows (WPS two row style)</translation>
     </message>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="72"/>
@@ -12390,34 +12394,37 @@ You can select an interface style from this OS support style list.</translation>
         <location filename="../src/editors/systemjsondialog.cpp" line="81"/>
         <source>虚化非选择运行线
 在选择运行线时，是否虚化其他的未显示运行线。</source>
-        <translation type="unfinished"></translation>
+        <translation>Blur unselected diagram lines
+Choose to blur unselected diagram line when selected one.</translation>
     </message>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="82"/>
         <source>虚化非选择运行线</source>
-        <translation type="unfinished"></translation>
+        <translation>Blur unselected diagram lines</translation>
     </message>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="85"/>
         <source>悬停提示运行情况
 对当前选中的运行线，鼠标悬停时显示鼠标所在区间（车站）的运行（停车）情况。理论上可能带来较大的计算负担。</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Show running status on hover
+</translation>
     </message>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="87"/>
         <source>悬停提示运行情况</source>
-        <translation type="unfinished"></translation>
+        <translation>Show running status on hover</translation>
     </message>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="90"/>
         <source>中心运行图面板
 如果启用，则窗口停靠面板管理系统总是保留中央面板（即使没有任何面板在上面），此时新的运行图窗口将添加到中央面板；如果不启用，则停靠面板可以任意安排，新的运行图窗口从右侧添加。</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Centre align panels
+ldkjfslkdfjlsdkfjslkfjslkdfjdslkfjdsl not compelteksjflksdjf</translation>
     </message>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="94"/>
         <source>中心运行图面板</source>
-        <translation type="unfinished"></translation>
+        <translation>Centre align panels</translation>
     </message>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="97"/>
@@ -12433,7 +12440,7 @@ You can select an interface style from this OS support style list.</translation>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="102"/>
         <source>显示</source>
-        <translation type="unfinished"></translation>
+        <translation>Display</translation>
     </message>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="103"/>
@@ -12443,7 +12450,7 @@ You can select an interface style from this OS support style list.</translation>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="104"/>
         <source>启动提示页</source>
-        <translation type="unfinished"></translation>
+        <translation>Display welcome page</translation>
     </message>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="108"/>
@@ -12480,7 +12487,7 @@ You can select an interface style from this OS support style list.</translation>
     <message>
         <location filename="../src/editors/systemjsondialog.cpp" line="128"/>
         <source>透明设置</source>
-        <translation type="unfinished"></translation>
+        <translation>Transparency settings</translation>
     </message>
 </context>
 <context>
@@ -12850,7 +12857,7 @@ You can select an interface style from this OS support style list.</translation>
     <message>
         <location filename="../src/viewers/compare/traincomparedialog.cpp" line="17"/>
         <source>说明</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Info</translation>
     </message>
     <message>
         <location filename="../src/viewers/compare/traincomparedialog.cpp" line="17"/>
@@ -13439,12 +13446,14 @@ This action is undoable. Are you sure to continue?</translation>
         <source>此功能以内置算法，尝试自动更正时刻表中可能的顺序错误问题。
 请注意此功能未经过充分测试，不一定能解决问题。建议做好数据保存和备份。
 是否继续？</source>
-        <translation type="unfinished"></translation>
+        <translation>This tool uses its built-in algorithm to attempt autocorrect possible order errors in the timetable.
+Please note that this feature is not fully tested yet, and may not entirely solve the errors. It is suggested to backup timetable data first.
+Are you sure to continue?</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/traincontext.cpp" line="852"/>
         <source>删除未铺画车站</source>
-        <translation type="unfinished">Delete undrawn stations</translation>
+        <translation>Delete undrawn stations</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/traincontext.cpp" line="853"/>
@@ -13629,7 +13638,7 @@ This action is undoable. Are you sure to continue?</translation>
     <message>
         <location filename="../src/mainwindow/traincontext.cpp" line="1436"/>
         <source>(无交路)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(No operational trains)</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/traincontext.cpp" line="1468"/>
@@ -13674,7 +13683,7 @@ This action is undoable. Are you sure to continue?</translation>
     <message>
         <location filename="../src/mainwindow/traincontext.cpp" line="1677"/>
         <source>选择车次</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select train</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/traincontext.cpp" line="1678"/>
@@ -13892,7 +13901,7 @@ This action is undoable. Are you sure to continue?</translation>
         <location filename="../src/viewers/events/traineventdialog.cpp" line="181"/>
         <location filename="../src/viewers/events/traineventdialog.cpp" line="214"/>
         <source>%1-%2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1-%2</translation>
     </message>
 </context>
 <context>
@@ -13900,7 +13909,7 @@ This action is undoable. Are you sure to continue?</translation>
     <message>
         <location filename="../src/dialogs/trainfilter.cpp" line="22"/>
         <source>车次筛选器</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Train filter</translation>
     </message>
     <message>
         <location filename="../src/dialogs/trainfilter.cpp" line="40"/>
@@ -13910,7 +13919,7 @@ This action is undoable. Are you sure to continue?</translation>
     <message>
         <location filename="../src/dialogs/trainfilter.cpp" line="41"/>
         <source>选择类型</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select class</translation>
     </message>
     <message>
         <location filename="../src/dialogs/trainfilter.cpp" line="45"/>
@@ -14043,7 +14052,7 @@ This action is undoable. Are you sure to continue?</translation>
     <message>
         <location filename="../src/dialogs/trainfilterdialog.cpp" line="18"/>
         <source>车次筛选器</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Train filter</translation>
     </message>
     <message>
         <location filename="../src/dialogs/trainfilterdialog.cpp" line="51"/>
@@ -14111,7 +14120,7 @@ This action is undoable. Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/events/traingapstatdialog.cpp" line="29"/>
         <source>最小间隔</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Minimal interval</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/traingapstatdialog.cpp" line="29"/>
@@ -14150,7 +14159,7 @@ This action is undoable. Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/events/traingapstatdialog.cpp" line="235"/>
         <source>最小间隔</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Minimal interval</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/traingapstatdialog.cpp" line="237"/>
@@ -14699,27 +14708,27 @@ This action is undoable. Are you sure to continue?</translation>
     <message>
         <location filename="../src/editors/trainlistwidget.cpp" line="49"/>
         <source>清空筛选</source>
-        <translation type="unfinished"></translation>
+        <translation>Clear filter</translation>
     </message>
     <message>
         <location filename="../src/editors/trainlistwidget.cpp" line="81"/>
         <source>全选</source>
-        <translation type="unfinished"></translation>
+        <translation>Select all</translation>
     </message>
     <message>
         <location filename="../src/editors/trainlistwidget.cpp" line="82"/>
         <source>全不选</source>
-        <translation type="unfinished"></translation>
+        <translation>Deselect all</translation>
     </message>
     <message>
         <location filename="../src/editors/trainlistwidget.cpp" line="83"/>
         <source>反选</source>
-        <translation type="unfinished"></translation>
+        <translation>Invert</translation>
     </message>
     <message>
         <location filename="../src/editors/trainlistwidget.cpp" line="86"/>
         <source>批量分类</source>
-        <translation type="unfinished"></translation>
+        <translation>Batch classification</translation>
     </message>
     <message>
         <location filename="../src/editors/trainlistwidget.cpp" line="88"/>
@@ -14731,12 +14740,12 @@ This action is undoable. Are you sure to continue?</translation>
         <location filename="../src/editors/trainlistwidget.cpp" line="271"/>
         <location filename="../src/editors/trainlistwidget.cpp" line="321"/>
         <source>自动始发终到站适配</source>
-        <translation type="unfinished">Departure / terminal stations adaptation</translation>
+        <translation>Departure / terminal stations adaptation</translation>
     </message>
     <message>
         <location filename="../src/editors/trainlistwidget.cpp" line="90"/>
         <source>自动始发终到站适配 (放宽)</source>
-        <translation type="unfinished">Departure / terminal stations adaptation (permissive)</translation>
+        <translation>Departure / terminal stations adaptation (permissive)</translation>
     </message>
     <message>
         <location filename="../src/editors/trainlistwidget.cpp" line="91"/>
@@ -14894,7 +14903,8 @@ This action is undoable. Are you sure to continue?</translation>
         <location filename="../src/editors/trainlistwidget.cpp" line="450"/>
         <source>CSV文件 (*.csv)
 所有文件 (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>CSV datasheets (*.csv)
+All files (*)</translation>
     </message>
 </context>
 <context>
@@ -15124,7 +15134,7 @@ This action is undoable. Are you sure to continue?</translation>
     <message>
         <location filename="../src/mainwindow/viewcategory.cpp" line="78"/>
         <source>行别显示控制</source>
-        <translation type="unfinished"></translation>
+        <translation>Direction display control</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/viewcategory.cpp" line="84"/>
@@ -15227,7 +15237,7 @@ This action is undoable. Are you sure to continue?</translation>
     <message>
         <location filename="../src/mainwindow/viewcategory.cpp" line="172"/>
         <source>系统默认显示设置</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">System default display settings</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/viewcategory.cpp" line="175"/>
@@ -15325,7 +15335,8 @@ This action is undoable. Are you sure to continue?</translation>
         <location filename="../src/mainwindow/viewcategory.cpp" line="394"/>
         <source>自1.0.1版本开始，每个运行图页面（DiagramPage）可以设置不同的运行图显示。此处的设定只决定此后新增的页面的默认设置情况，不会影响既有运行图的设置。如需调整既有运行图页面的显示设置，请至对应运行图页面的上下文菜单，或将当前显示设置应用到所有页面。
 此提示在程序每次运行期间，展示一次。</source>
-        <translation type="unfinished"></translation>
+        <translation>Starting from version  1.0.1 each diagram page can have different diagram display style. The settings here only effect new diagrams, and will not effect default diagrams. To adjust default diagrams&apos; display settings, please refer to their own display panels, or apply current setting to all pages.
+This window will pop out once on every run.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/viewcategory.cpp" line="423"/>
