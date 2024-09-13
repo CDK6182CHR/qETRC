@@ -1809,7 +1809,7 @@ Click [Generate] to generate trains and departure times in the table below. Plea
     <message>
         <location filename="../src/viewers/diagnosisdialog.cpp" line="27"/>
         <source>描述</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Description</translation>
     </message>
 </context>
 <context>
@@ -2256,7 +2256,7 @@ Sync the train on panel with the train selected. When selected a different train
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="223"/>
         <source>全车次不能为空或与其他车次冲突，请重新编辑。</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">The full train number cannot be empty and must be unique. Please edit again.</translation>
     </message>
     <message>
         <location filename="../src/editors/edittrainwidget.cpp" line="279"/>
@@ -2959,7 +2959,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/dialogs/importtraindialog.cpp" line="52"/>
         <source>筛选</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Filter</translation>
     </message>
     <message>
         <location filename="../src/dialogs/importtraindialog.cpp" line="55"/>
@@ -3108,12 +3108,12 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/stats/intervalcountdialog.cpp" line="22"/>
         <source>发站</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dep. Station</translation>
     </message>
     <message>
         <location filename="../src/viewers/stats/intervalcountdialog.cpp" line="22"/>
         <source>到站</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Term. Station</translation>
     </message>
     <message>
         <location filename="../src/viewers/stats/intervalcountdialog.cpp" line="22"/>
@@ -3166,12 +3166,12 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/stats/intervaltraindialog.cpp" line="49"/>
         <source>发站</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dep. Station</translation>
     </message>
     <message>
         <location filename="../src/viewers/stats/intervaltraindialog.cpp" line="62"/>
         <source>到站</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Term. Station</translation>
     </message>
     <message>
         <location filename="../src/viewers/stats/intervaltraindialog.cpp" line="66"/>
@@ -3181,7 +3181,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/stats/intervaltraindialog.cpp" line="73"/>
         <source>筛选</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Filter</translation>
     </message>
     <message>
         <location filename="../src/viewers/stats/intervaltraindialog.cpp" line="91"/>
@@ -3235,7 +3235,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/stats/intervaltraintable.cpp" line="16"/>
         <source>发站</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dep. Station</translation>
     </message>
     <message>
         <location filename="../src/viewers/stats/intervaltraintable.cpp" line="16"/>
@@ -3245,7 +3245,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/stats/intervaltraintable.cpp" line="16"/>
         <source>到站</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Term. Station</translation>
     </message>
     <message>
         <location filename="../src/viewers/stats/intervaltraintable.cpp" line="16"/>
@@ -5752,7 +5752,7 @@ Hint: 出现这种问题，最有可能是选择的路径关键点中存在单�
     <message>
         <location filename="../src/railnet/path/pathselectwidget.cpp" line="98"/>
         <source>当前线路</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Current route</translation>
     </message>
     <message>
         <location filename="../src/railnet/path/pathselectwidget.cpp" line="144"/>
@@ -7270,7 +7270,7 @@ All files (*.*)</translation>
     <message>
         <location filename="../src/model/diagram/diagramnavimodel.cpp" line="79"/>
         <source>数量</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Amount</translation>
     </message>
     <message>
         <location filename="../src/model/diagram/diagramnavimodel.cpp" line="80"/>
@@ -8223,7 +8223,7 @@ Are you sure to delete route [%1]?</translation>
     <message>
         <location filename="../src/railnet/raildb/raildbcontext.cpp" line="106"/>
         <source>删除线路</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Delete routes</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbcontext.cpp" line="106"/>
@@ -8503,7 +8503,7 @@ Are you sure to delete route [%1]?</translation>
     <message>
         <location filename="../src/railnet/raildb/raildbnavi.cpp" line="277"/>
         <source>天窗编辑 - %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opening editing - %1</translation>
     </message>
     <message>
         <location filename="../src/railnet/raildb/raildbnavi.cpp" line="305"/>
@@ -9198,7 +9198,7 @@ JSON文件 (*.json)
     <message>
         <location filename="../src/viewers/events/railstationeventlist.cpp" line="115"/>
         <source>筛选</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Filter</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/railstationeventlist.cpp" line="118"/>
@@ -12311,7 +12311,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/events/stationtraingapdialog.cpp" line="41"/>
         <source>数量</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Amount</translation>
     </message>
 </context>
 <context>
@@ -12767,7 +12767,7 @@ ldkjfslkdfjlsdkfjslkfjslkdfjdslkfjdsl not compelteksjflksdjf</translation>
     <message>
         <location filename="../src/viewers/timetablequickwidget.cpp" line="156"/>
         <source>%1 (%2-&gt;%3)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 (%2 -&gt; %3)</translation>
     </message>
 </context>
 <context>
@@ -13832,7 +13832,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/events/traineventdialog.cpp" line="274"/>
         <source>打开文件失败</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Failed to open the file</translation>
     </message>
     <message>
         <location filename="../src/viewers/events/traineventdialog.cpp" line="284"/>
@@ -14371,7 +14371,7 @@ Are you sure to continue?</translation>
     <message>
         <location filename="../src/viewers/traininfowidget.cpp" line="97"/>
         <source>交路序列</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Operational train sequence</translation>
     </message>
     <message>
         <location filename="../src/viewers/traininfowidget.cpp" line="101"/>
@@ -15109,7 +15109,7 @@ All files (*)</translation>
     <message>
         <location filename="../src/railnet/graph/vertexlistwidget.cpp" line="18"/>
         <source>站名</source>
-        <translation type="unfinished"></translation>
+        <translation>Station</translation>
     </message>
     <message>
         <location filename="../src/railnet/graph/vertexlistwidget.cpp" line="18"/>
@@ -15328,7 +15328,7 @@ All files (*)</translation>
     <message>
         <location filename="../src/mainwindow/viewcategory.cpp" line="207"/>
         <source>类型规则</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Class rules</translation>
     </message>
     <message>
         <location filename="../src/mainwindow/viewcategory.cpp" line="209"/>
