@@ -381,7 +381,7 @@ void MainWindow::showAboutDialog()
 		.arg(qespec::RELEASE_CODE)
 		.arg(qespec::DATE.data());
 	text += tr("主要开发者：萧迩珀  \nmxy0268@qq.com\n");
-	//text += tr("英文版翻译：WinSim  萧迩珀\n");
+	text += tr("英文版翻译：WenSimEHRP  萧迩珀\n");
 	text += tr("许可证：GPLv3\n");
 	text += tr("QQ群：865211882\nhttps://github.com/CDK6182CHR/qETRC\n"
 		"https://gitee.com/xep0268/qETRC");

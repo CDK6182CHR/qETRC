@@ -67,8 +67,8 @@ sample.json
 ReleaseNote.pdf
 
 # ignore translation files, since no translation provided currently.
-rsc/tr
-tr/
+# rsc/tr
+# tr/
 
 customize.xml
 
