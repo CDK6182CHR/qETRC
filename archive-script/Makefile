@@ -30,7 +30,7 @@ PDB_ARCHIVE = qETRC-pdb-archive$(SUFFIX).7z
 SARIBBON_LIB = $(BUILD_DIR)\SARibbonBarrd.dll 
 QWK_CORE_LIB = $(BUILD_DIR)\QWKCorerd.dll 
 QWK_WIDGETS_LIB = $(BUILD_DIR)\QWKWidgetsrd.dll
-ADS_LIB = $(BUILD_DIR)\qt5advanceddocking.dll
+ADS_LIB = $(BUILD_DIR)\qt6advanceddocking.dll
 
 # Other files
 NOTE_FILE = ..\ReleaseNote.pdf
@@ -56,6 +56,7 @@ win64: win64_dir win64_tr
 	$(COPY) $(SARIBBON_LIB) $(WIN64_DIR)
 	$(COPY) $(QWK_CORE_LIB) $(WIN64_DIR)
 	$(COPY) $(QWK_WIDGETS_LIB) $(WIN64_DIR)
+	$(COPY) $(ADS_LIB) $(WIN64_DIR)
 	$(COPY) $(QETRC_ROOT)\tr\*.qm $(WIN64_DIR)\tr
 	$(QT_PROMPT_SCRIPT) && cd /d $(WIN64_DIR) && cd && windeployqt $(BIN_FILE)
 	cd $(OUTPUT_ROOT) && $(ZIP) $(WIN64_ARCHIVE) $(WIN64_DIR)
@@ -88,6 +89,7 @@ local:
 	$(COPY) $(SARIBBON_LIB) $(LOCAL_DIR)
 	$(COPY) $(QWK_CORE_LIB) $(LOCAL_DIR)
 	$(COPY) $(QWK_WIDGETS_LIB) $(LOCAL_DIR)
+	$(COPY) $(ADS_LIB) $(WIN64_DIR)
 	-mkdir $(LOCAL_DIR)\tr 
 	$(COPY) $(QETRC_ROOT)\tr\*.qm $(LOCAL_DIR)\tr\
 
