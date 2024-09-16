@@ -39,12 +39,12 @@ void RibbonConfigDialog::initUI()
     flay->addRow(tr("Ribbon工具栏风格"),cbStyle);
 
     cbTheme=new QComboBox; 
-    cbTheme->addItem("Theme Win7", SARibbonMainWindow::RibbonThemeWindows7);
-    cbTheme->addItem("Theme Office2013", SARibbonMainWindow::RibbonThemeOffice2013);
-    cbTheme->addItem("Theme Office2016 Blue", SARibbonMainWindow::RibbonThemeOffice2016Blue);
-    cbTheme->addItem("Theme Office2021 Blue", SARibbonMainWindow::RibbonThemeOffice2021Blue);
-    cbTheme->addItem("Theme Dark", SARibbonMainWindow::RibbonThemeDark);
-    cbTheme->addItem("Theme Dark2", SARibbonMainWindow::RibbonThemeDark2);
+    cbTheme->addItem("Theme Win7", static_cast<int>(SARibbonTheme::RibbonThemeWindows7));
+    cbTheme->addItem("Theme Office2013", static_cast<int>(SARibbonTheme::RibbonThemeOffice2013));
+    cbTheme->addItem("Theme Office2016 Blue", static_cast<int>(SARibbonTheme::RibbonThemeOffice2016Blue));
+    cbTheme->addItem("Theme Office2021 Blue", static_cast<int>(SARibbonTheme::RibbonThemeOffice2021Blue));
+    cbTheme->addItem("Theme Dark", static_cast<int>(SARibbonTheme::RibbonThemeDark));
+    cbTheme->addItem("Theme Dark2", static_cast<int>(SARibbonTheme::RibbonThemeDark2));
     flay->addRow(tr("Ribbon工具栏主题"), cbTheme);
 
     ckCenter=new QCheckBox(tr("启用"));

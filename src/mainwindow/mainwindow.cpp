@@ -1533,7 +1533,7 @@ void MainWindow::initToolbar()
 	// 2024.03.28: theme and align
 	ribbon->setRibbonAlignment(SystemJson::instance.ribbon_align_center ? 
 		SARibbonAlignment::AlignCenter : SARibbonAlignment::AlignLeft);
-	setRibbonTheme(static_cast<SARibbonMainWindow::RibbonTheme>(SystemJson::instance.ribbon_theme));
+	setRibbonTheme(static_cast<SARibbonTheme>(SystemJson::instance.ribbon_theme));
 
 	// 2022.04.24：测试ActionManager
 	// 2023.12.20: seems changed in SARibbon V1.0.7
@@ -1942,7 +1942,7 @@ void MainWindow::onRibbonConfigChanged(bool theme_changed)
 	ribbonBar()->setRibbonAlignment(
 		d.ribbon_align_center ? SARibbonAlignment::AlignCenter : SARibbonAlignment::AlignLeft);
 	if (theme_changed) {
-		setRibbonTheme(static_cast<SARibbonMainWindow::RibbonTheme>(d.ribbon_theme));
+		setRibbonTheme(static_cast<SARibbonTheme>(d.ribbon_theme));
 	}
 }
 
