@@ -19,6 +19,7 @@
 #include <QXmlStreamWriter>
 #include <QMimeData>
 #include <QTextBrowser>
+#include <QTimer>
 
 #include "model/train/trainlistmodel.h"
 #include "editors/trainlistwidget.h"
@@ -1533,7 +1534,14 @@ void MainWindow::initToolbar()
 	// 2024.03.28: theme and align
 	ribbon->setRibbonAlignment(SystemJson::instance.ribbon_align_center ? 
 		SARibbonAlignment::AlignCenter : SARibbonAlignment::AlignLeft);
-	setRibbonTheme(static_cast<SARibbonTheme>(SystemJson::instance.ribbon_theme));
+	
+	// 2024.10.19: according to SARibbon comment (see `setRibbonTheme`), avoid setting theme in constructor
+	QTimer::singleShot(0, this, [this]() {
+		this->setRibbonTheme(static_cast<SARibbonTheme>(SystemJson::instance.ribbon_theme)); });
+	
+	//setRibbonTheme(static_cast<SARibbonTheme>(SystemJson::instance.ribbon_theme));
+
+
 
 	// 2022.04.24：测试ActionManager
 	// 2023.12.20: seems changed in SARibbon V1.0.7
