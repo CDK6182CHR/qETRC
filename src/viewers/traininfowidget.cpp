@@ -114,6 +114,17 @@ QLineEdit *TrainInfoWidget::makeLineEdit(const QString &title) const
     return ed;
 }
 
+bool TrainInfoWidget::checkNotEditingTrain()
+{
+    if (this->train && train->isOnPainting()) {
+        QMessageBox::warning(this, tr("错误"),
+            tr("当前车次正在排图，本面板仅能查看列车信息，不可编辑。\n"
+                "请勿尝试通过任何（除正在使用的标尺排图/贪心推线页面外的其他）方式修改正在铺画列车的数据，否则将导致不可预测的结果。"));
+        return false;
+    }
+    return true;
+}
+
 void TrainInfoWidget::setTrain(std::shared_ptr<Train> train)
 {
     this->train=train;
@@ -293,13 +304,14 @@ void TrainInfoWidget::toText()
 
 void TrainInfoWidget::actEditTimetable()
 {
-    if (train)
+    if (train && checkNotEditingTrain()) {
         emit editTimetable(train);
+    }
 }
 
 void TrainInfoWidget::actEditTrain()
 {
-    if(train)
+    if(train && checkNotEditingTrain())
         emit editTrain(train);
 }
 

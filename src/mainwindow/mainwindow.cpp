@@ -2476,13 +2476,17 @@ void MainWindow::focusOutPage()
 
 void MainWindow::focusInTrain(std::shared_ptr<Train> train)
 {
-	// 2024.03.27: reject trains that on painting to avoid some risks
-	if (train->isOnPainting()) {
-		qInfo() << "Focusing on train " << train->trainName().full() << " which is now paiting is rejected";
-		return;
-	}
 	ribbonBar()->showContextCategory(contextTrain->context());
-	contextTrain->setTrain(train);
+
+	// 2024.03.27: reject trains that on painting to avoid some risks
+	// 2024.12.02: show the timetable and train info, but not focused in the toolbar, according to some feedback...
+	if (train->isOnPainting()) {
+		qInfo() << "Focusing on train " << train->trainName().full() << " which is now paiting, only show timetable and info";
+	}
+	else {
+		contextTrain->setTrain(train);
+	}
+
 	if (!timetableQuickDock->isClosed()) {
 		timetableQuickWidget->setTrain(train);
 	}

@@ -41,6 +41,8 @@ signals:
 private:
     void initUI();
     QLineEdit* makeLineEdit(const QString& title)const;
+
+    bool checkNotEditingTrain();
     
 public slots:
     void setTrain(std::shared_ptr<Train> train);

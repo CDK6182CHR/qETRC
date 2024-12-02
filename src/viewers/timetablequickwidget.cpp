@@ -93,12 +93,24 @@ void TimetableQuickWidget::setTrain(std::shared_ptr<Train> train)
 {
     this->train=train;
     refreshData();
+
+    if (train && train->isOnPainting()) {
+        ckEdit->setChecked(false);
+    }
 }
 
 void TimetableQuickWidget::onEditCheckChanged(bool on)
 {
     if (on) {
-        table->setEditTriggers(QTableView::AllEditTriggers);
+        if (this->train && train->isOnPainting()) {
+            QMessageBox::warning(this, tr("错误"), tr("当前车次正在排图，本面板仅能查看时刻表，不可编辑。\n"
+                "请勿尝试通过任何（除正在使用的标尺排图/贪心推线页面外的其他）方式修改正在铺画列车的数据，否则将导致不可预测的结果。"));
+            ckEdit->setChecked(false);
+            return;
+        }
+        else {
+            table->setEditTriggers(QTableView::AllEditTriggers);
+        }
     }
     else {
         table->setEditTriggers(QTableView::NoEditTriggers);
