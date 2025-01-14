@@ -1550,7 +1550,9 @@ std::optional<QTime> TrainLine::sectionTime(double y) const
         auto q = std::prev(p);
         double y0 = q->railStation.lock()->y_coeff.value();
         double yn = p->railStation.lock()->y_coeff.value();
-        int dsn = q->trainStation->depart.secsTo(p->trainStation->arrive);
+        //int dsn = q->trainStation->depart.secsTo(p->trainStation->arrive);
+        // 2025.01.14: we should consider PBC!
+        int dsn = qeutil::secsTo(q->trainStation->depart, p->trainStation->arrive);
         int dsi = std::round((y - y0) / (yn - y0) * dsn);
         return q->trainStation->depart.addSecs(dsi);
     }

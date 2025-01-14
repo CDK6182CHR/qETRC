@@ -47,7 +47,7 @@ void RailSectionEventsModel::setupModel()
     using SI = QStandardItem;
     lst = diagram.sectionEvents(railway, y);
 
-    beginResetModel();
+    //beginResetModel();
     setRowCount(static_cast<int>(lst.size()));
     for (int i = 0; i < (int)lst.size(); i++) {
         const auto& p = lst.at(i);
@@ -71,7 +71,7 @@ void RailSectionEventsModel::setupModel()
             setItem(i, ColOwner, new SI("-"));
         }
     }
-    endResetModel();
+    //endResetModel();
 }
 
 
