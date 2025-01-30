@@ -280,6 +280,13 @@ public:
     void applyBindOn(TrainCollection& coll);
 
     /**
+     * 2025.01.30 
+     * 绑定指定的列车到本图所有线路。
+     * 所给列车并不要求属于本图。
+     */
+    void applyBindOn(std::shared_ptr<Train> train);
+
+    /**
      * 所给线名是否非空且不与别人重复，但忽略rail所示对象
      */
     bool isValidRailName(const QString& name, std::shared_ptr<Railway> rail);

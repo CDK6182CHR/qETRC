@@ -197,6 +197,13 @@ void Diagram::applyBindOn(TrainCollection& coll)
     }
 }
 
+void Diagram::applyBindOn(std::shared_ptr<Train> train)
+{
+    foreach (auto p, railways()) {
+        train->bindToRailway(p, _config);
+    }
+}
+
 bool Diagram::isValidRailName(const QString& name, std::shared_ptr<Railway> rail)
 {
     if (name.isEmpty())

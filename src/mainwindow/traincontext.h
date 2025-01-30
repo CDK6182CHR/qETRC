@@ -430,6 +430,10 @@ private slots:
 
     void actCorrection();
 
+    void actSplitTrain();
+
+    void actApplySplitTrain(std::shared_ptr<Train> train, QVector<std::shared_ptr<Train>> newTrains);
+
     void actDulplicateTrain();
 
     void actAddPaths();

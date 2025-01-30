@@ -20,6 +20,7 @@
 #include "railcontext.h"
 #include "routingcontext.h"
 #include "data/diagram/trainadapter.h"
+#include "dialogs/splittraindialog.h"
 
 #include <DockManager.h>
 
@@ -366,6 +367,11 @@ void TrainContext::initUI()
 		connect(act, &QAction::triggered, this, &TrainContext::actSimpleInterpolation);
 		panel->addLargeAction(act);
 		mw->diaActions.simpleInterp = act;
+
+		act = mw->makeAction(QEICN_split_train, tr("拆分车次"));
+		act->setToolTip(tr("拆分车次\n将所选车次分段拆分为若干新车次"));
+		connect(act, &QAction::triggered, this, &TrainContext::actSplitTrain);
+		panel->addLargeAction(act);
 
 		panel = page->addPannel(tr(""));
 
@@ -1588,6 +1594,32 @@ void TrainContext::actCorrection()
 	connect(dlg, &CorrectTimetableDialog::correctionApplied,
 		this, &TrainContext::onTrainTimetableChanged);
 	dlg->show();
+}
+
+void TrainContext::actSplitTrain()
+{
+	if (!train)
+		return;
+	auto* dialog = new SplitTrainDialog(diagram.trainCollection(), train, mw);
+	connect(dialog, &SplitTrainDialog::splitApplied, this, &TrainContext::actApplySplitTrain);
+	dialog->open();
+}
+
+void TrainContext::actApplySplitTrain(std::shared_ptr<Train> train, QVector<std::shared_ptr<Train>> newTrains)
+{
+	int idx = diagram.trainCollection().getTrainIndex(train);
+	assert(idx >= 0);
+
+	auto* stk = mw->getUndoStack();
+	stk->beginMacro(tr("拆分车次: %1").arg(train->trainName().full()));
+
+	stk->push(new qecmd::RemoveSingleTrain(this, mw->naviModel, train, idx));
+	foreach(auto p, newTrains) {
+		diagram.applyBindOn(p);
+		stk->push(new qecmd::AddNewTrain(mw->naviModel, p));
+	}
+
+	stk->endMacro();
 }
 
 void TrainContext::actDulplicateTrain()
