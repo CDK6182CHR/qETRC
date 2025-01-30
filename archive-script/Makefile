@@ -12,7 +12,7 @@ QETRC_ROOT = D:\codes\QtProjects\qETRC\qETRC
 
 # use MSVC build 
 # 2024.03.28: use RelWithDebInfo build
-BUILD_DIR = ..\out\install\x64-RD\bin
+BUILD_DIR = ..\out2022\install\x64-RD-2022\bin
 BIN_FILE = qETRC.exe
 PDB_FILE = qETRC.pdb
 QT_PROMPT_SCRIPT = D:\programs\Qt\6.5.1\msvc2019_64\bin\qtenv2.bat

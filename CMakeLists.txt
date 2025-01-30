@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 set(qETRC_VERSION_MAJOR 1)
 set(qETRC_VERSION_MINOR 7)
-set(qETRC_VERSION_PATCH 5)
+set(qETRC_VERSION_PATCH 7)
 #set(qETRC_RELEASE_CODE 40)
 
 option(ENABLE_MSVC_PROFILE "Enable MSVC profiler" OFF)
@@ -115,11 +115,11 @@ if (NOT ANDROID)
     )
     FetchContent_MakeAvailable(ads)
 
-    target_link_libraries(qETRC PUBLIC SARibbonBar)
+    target_link_libraries(qETRC PUBLIC SARibbonBar::SARibbonBar)
     target_link_libraries(qETRC PRIVATE ads::qt${QT_VERSION_MAJOR}advanceddocking)
 
     if (AUTO_INSTALL_SARibbon)
-        get_target_property(SARibbonBar_LIB_FILE SARibbonBar LOCATION_${CMAKE_BUILD_TYPE})
+        get_target_property(SARibbonBar_LIB_FILE SARibbonBar::SARibbonBar LOCATION_${CMAKE_BUILD_TYPE})
         message(STATUS "SARibbon lib ${SARibbonBar_LIB_FILE}")
         install(FILES ${SARibbonBar_LIB_FILE} DESTINATION ${CMAKE_INSTALL_BINDIR})
     endif (AUTO_INSTALL_SARibbon)

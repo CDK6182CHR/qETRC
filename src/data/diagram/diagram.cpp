@@ -398,10 +398,10 @@ RailwayStationEventAxis Diagram::stationEventAxisForRail(std::shared_ptr<Railway
 std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>> Diagram::sectionEvents(std::shared_ptr<Railway> railway, double y) const
 {
     SectionEventList res;
-    for (auto train : _trainCollection.trains()) {
-        for (auto adp : train->adapters()) {
+    foreach (auto train , _trainCollection.trains()) {
+        foreach (auto adp , train->adapters()) {
             if (adp->isInSameRailway(railway)) {
-                for (auto line : adp->lines()) {
+                foreach (auto line , adp->lines()) {
                     auto t = line->sectionTime(y);
                     if (t.has_value()) {
                         res.emplace_back(line, t.value());

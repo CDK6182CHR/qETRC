@@ -81,5 +81,6 @@ external/ads
 # CMake
 build
 out
+out2022
 CMakeSettings.json
 RC*
