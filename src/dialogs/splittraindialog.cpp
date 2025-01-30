@@ -8,6 +8,7 @@
 #include <QHeaderView>
 #include <QDialogButtonBox>
 #include <QMessageBox>
+#include <QCheckBox>
 
 #include "data/common/qesystem.h"
 #include "data/train/train.h"
@@ -40,7 +41,7 @@ SplitTrainModel::SplitTrainModel(std::shared_ptr<Train> train, QObject *parent):
         });
 }
 
-QVector<std::shared_ptr<Train>> SplitTrainModel::acceptedData(TrainCollection& coll, QWidget* report_parent)
+QVector<std::shared_ptr<Train>> SplitTrainModel::acceptedData(TrainCollection& coll, QWidget* report_parent, bool cross_terminal)
 {
     QVector<std::shared_ptr<Train>> res{};
 
@@ -70,7 +71,8 @@ QVector<std::shared_ptr<Train>> SplitTrainModel::acceptedData(TrainCollection& c
 
             if (row - start_row >= 0) {
                 // Generate a new train here!
-                auto nt = createTrain(coll, report_parent, last_train_name, start_row, row);
+                auto nt = createTrain(coll, report_parent, last_train_name, start_row, row, 
+                    start_row > 0 && cross_terminal, cross_terminal);
                 if (!nt)
                     return {};
                 res.emplace_back(std::move(nt));
@@ -87,7 +89,7 @@ QVector<std::shared_ptr<Train>> SplitTrainModel::acceptedData(TrainCollection& c
     }
 
     // Process the last train part
-    auto nt = createTrain(coll, report_parent, last_train_name, start_row, rowCount() - 1);
+    auto nt = createTrain(coll, report_parent, last_train_name, start_row, rowCount() - 1, start_row>0 && cross_terminal, false);
     if (!nt)
         return {};
     res.emplace_back(std::move(nt));
@@ -146,7 +148,7 @@ void SplitTrainModel::refreshData()
 }
 
 std::shared_ptr<Train> SplitTrainModel::createTrain(TrainCollection& coll, QWidget* report_parent, const TrainName& name, 
-    int start_row, int end_row)
+    int start_row, int end_row, bool first_starting, bool last_terminal)
 {
     if (!coll.trainNameIsValid(name, _train)) {
         QMessageBox::warning(report_parent, tr("错误"),
@@ -161,6 +163,17 @@ std::shared_ptr<Train> SplitTrainModel::createTrain(TrainCollection& coll, QWidg
     auto itr_start = _train->timetable().begin(); std::advance(itr_start, start_row);
     auto itr_end = _train->timetable().begin(); std::advance(itr_end, end_row + 1);
     nt->timetable() = std::decay_t<decltype(nt->timetable())>(itr_start, itr_end);   // Copy
+
+    // Requires timetable to be non-empty
+    if (first_starting) {
+        nt->timetable().front().arrive = nt->timetable().front().depart;
+        nt->setStarting(nt->timetable().front().name);
+    }
+    if (last_terminal) {
+        nt->timetable().back().depart = nt->timetable().back().arrive;
+        nt->setTerminal(nt->timetable().back().name);
+    }
+
     return nt;
 }
 
@@ -175,7 +188,7 @@ SplitTrainDialog::SplitTrainDialog(TrainCollection& coll, std::shared_ptr<Train>
 
 void SplitTrainDialog::accept()
 {
-    auto data = m_model->acceptedData(m_coll, this);
+    auto data = m_model->acceptedData(m_coll, this, m_ckCrossTerminal->isChecked());
     if (data.empty()) {
         // Invalid data; error message should have been produced
         return;
@@ -202,6 +215,9 @@ void SplitTrainDialog::initUI()
         "新列车的全车次名。若第一行被勾选，则当前车次名将被修改为所配置的新车次名。"));
     lab->setWordWrap(true);
     vlay->addWidget(lab);
+    m_ckCrossTerminal = new QCheckBox(tr("拆分交叉站设置为始发终到站"));
+    m_ckCrossTerminal->setChecked(true);
+    vlay->addWidget(m_ckCrossTerminal);
 
     m_table = new QTableView;
     m_table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);

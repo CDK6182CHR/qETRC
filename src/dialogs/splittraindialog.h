@@ -7,6 +7,7 @@ class Train;
 class QTableView;
 class TrainCollection;
 class TrainName;
+class QCheckBox;
 
 class SplitTrainModel: public QStandardItemModel
 {
@@ -29,7 +30,7 @@ public:
      * Process the data in the table, and generate the new trains.
      * The data will be checked here.
      */
-    QVector<std::shared_ptr<Train>> acceptedData(TrainCollection& coll, QWidget* report_parent);
+    QVector<std::shared_ptr<Train>> acceptedData(TrainCollection& coll, QWidget* report_parent, bool check_terminal);
 
 private:
     void setupModel();
@@ -40,7 +41,7 @@ private:
      * The train name is checked here. Returns nullptr on failed.
      */
     std::shared_ptr<Train> createTrain(TrainCollection& coll, QWidget* report_parent,
-        const TrainName& name, int start_row, int end_row);
+        const TrainName& name, int start_row, int end_row, bool first_starting, bool last_terminal);
 };
 
 
@@ -56,6 +57,7 @@ class SplitTrainDialog : public QDialog
     std::shared_ptr<Train> m_train;
     SplitTrainModel* m_model;
     QTableView* m_table;
+    QCheckBox* m_ckCrossTerminal;
 public:
     SplitTrainDialog(TrainCollection& coll, std::shared_ptr<Train> train, QWidget* parent=nullptr);
 
