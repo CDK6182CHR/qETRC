@@ -1315,7 +1315,7 @@ void TrainContext::showEditWidget(std::shared_ptr<Train> train)
 	}
 	else {
 		//保证可见
-		auto* dock = basicDocks.at(idx);
+		auto* dock = editDocks.at(idx);
 		if (dock->isClosed()) {
 			dock->toggleView(true);
 		}
