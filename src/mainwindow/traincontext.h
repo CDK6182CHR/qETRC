@@ -380,6 +380,8 @@ public slots:
     void afterTrainsReboundByPath(const std::vector<std::shared_ptr<Train>>& trains,
         const std::vector<QVector<std::shared_ptr<TrainAdapter>>>& adapters);
 
+    void actMergeTrains();
+
 private slots:
     void showTrainEvents();
 
@@ -433,8 +435,6 @@ private slots:
     void actSplitTrain();
 
     void actApplySplitTrain(std::shared_ptr<Train> train, QVector<std::shared_ptr<Train>> newTrains);
-
-    void actMergeTrains();
 
     void actDulplicateTrain();
 

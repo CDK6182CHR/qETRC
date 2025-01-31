@@ -1,6 +1,7 @@
 ﻿#include "mergetrainsdialog.h"
 
 #include <optional>
+#include <set>
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -29,6 +30,16 @@ void MergeTrainsDialog::accept()
 	if (trains.empty()) {
 		QMessageBox::warning(this, tr("错误"), tr("未选择任何列车"));
 		return;
+	}
+
+	// Check duplicated trains
+	std::set<std::shared_ptr<Train>> trainSet;
+	for (size_t i = 0; i < trains.size(); i++) {
+		if (trainSet.contains(trains.at(i))) {
+			QMessageBox::warning(this, tr("错误"), tr("第%1行：所选车次重复：%2").arg(i + 1).arg(trains.at(i)->trainName().full()));
+			return;
+		}
+		trainSet.emplace(trains.at(i));
 	}
 
 	std::optional<TrainName> newName;

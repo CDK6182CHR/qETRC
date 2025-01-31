@@ -1053,7 +1053,7 @@ void MainWindow::initToolbar()
 
 	QAction* actRemoveInterp, * actAutoBusiness, * actImportTimetableCsv, * actImportTrainTrf,
 		* actAutoCorrection, * actRemoveNonBound, * actRemoveNonBoundTrains, * actRemoveEmptyTrains,
-		* actAutoPen;
+		* actAutoPen, * actMergeTrains;
 	//列车
 	if constexpr (true) {
 		auto* cat = ribbon->addCategoryPage(tr("列车(&3)"));
@@ -1248,6 +1248,12 @@ void MainWindow::initToolbar()
 		connect(act, &QAction::triggered, this, &MainWindow::actTrainIntervalStat);
 		panel->addLargeAction(act);
 
+		panel = cat->addPannel(tr("调整"));
+		act = makeAction(QEICN_merge_trains, tr("合并车次"));
+		act->setToolTip(tr("合并车次\n将多个车次按顺序合并为新建车次"));
+		actMergeTrains = act;
+		panel->addLargeAction(act);
+
 		panel = cat->addPannel(tr("排图"));
 
 		act = makeAction(QEICN_ruler_paint, tr("标尺排图"));
@@ -1414,6 +1420,9 @@ void MainWindow::initToolbar()
 
 		connect(trainListWidget, &TrainListWidget::removeTrains,
 			contextTrain, &TrainContext::actRemoveTrains);
+
+		connect(actMergeTrains, &QAction::triggered,
+			contextTrain, &TrainContext::actMergeTrains);
 	}
 
 	//context: rail 8
