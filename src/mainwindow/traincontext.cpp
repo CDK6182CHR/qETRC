@@ -21,6 +21,7 @@
 #include "routingcontext.h"
 #include "data/diagram/trainadapter.h"
 #include "dialogs/splittraindialog.h"
+#include "dialogs/mergetrainsdialog.h"
 
 #include <DockManager.h>
 
@@ -371,7 +372,12 @@ void TrainContext::initUI()
 		act = mw->makeAction(QEICN_split_train, tr("拆分车次"));
 		act->setToolTip(tr("拆分车次\n将所选车次分段拆分为若干新车次"));
 		connect(act, &QAction::triggered, this, &TrainContext::actSplitTrain);
-		panel->addLargeAction(act);
+		panel->addMediumAction(act);
+
+		act = mw->makeAction(QEICN_merge_trains, tr("合并车次"));
+		act->setToolTip(tr("合并车次\n将所选的一组列车按顺序合并为一个新车次"));
+		connect(act, &QAction::triggered, this, &TrainContext::actMergeTrains);
+		panel->addMediumAction(act);
 
 		panel = page->addPannel(tr(""));
 
@@ -1620,6 +1626,38 @@ void TrainContext::actApplySplitTrain(std::shared_ptr<Train> train, QVector<std:
 	}
 
 	stk->endMacro();
+}
+
+void TrainContext::actMergeTrains()
+{
+	auto* dlg = new MergeTrainsDialog(diagram.trainCollection(), mw);
+	connect(dlg, &MergeTrainsDialog::mergeApplied,
+		[this](std::vector<std::shared_ptr<Train>> trains, std::shared_ptr<Train> newTrain) {
+			// First bind the new train
+			diagram.applyBindOn(newTrain);
+			QList<int> trainIndexes;
+			auto* stk = mw->getUndoStack();
+			for (auto p : trains) {
+				int idx = diagram.trainCollection().getTrainIndex(p);   // Linear search
+				assert(idx >= 0);
+				trainIndexes.emplace_back(idx);
+			}
+
+			// Note: the RemoveTrains API requires the list to be sorted
+			std::sort(trainIndexes.begin(), trainIndexes.end());
+
+			QList<std::shared_ptr<Train>> trainList;   // For compatibility with old codes..
+			foreach (int idx , trainIndexes) {
+				trainList.emplace_back(diagram.trainCollection().trainAt(idx));
+			}
+
+			stk->beginMacro(tr("合并%1车次为: %2").arg(trains.size()).arg(newTrain->trainName().full()));
+			stk->push(new qecmd::RemoveTrains(trainList, trainIndexes, diagram.trainCollection(),
+				mw->trainListWidget->getModel(), this));
+			stk->push(new qecmd::AddNewTrain(mw->naviModel, newTrain));
+			stk->endMacro();
+		});
+	dlg->open();
 }
 
 void TrainContext::actDulplicateTrain()

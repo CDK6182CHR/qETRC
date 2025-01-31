@@ -180,7 +180,7 @@ std::shared_ptr<Train> SplitTrainModel::createTrain(TrainCollection& coll, QWidg
 SplitTrainDialog::SplitTrainDialog(TrainCollection& coll, std::shared_ptr<Train> train, QWidget* parent):
     QDialog(parent),
     m_coll(coll), m_train(train),
-    m_model(new SplitTrainModel(train))
+    m_model(new SplitTrainModel(train, this))
 {
     setWindowTitle(tr("拆分车次 - %1").arg(train->trainName().full()));
     initUI();

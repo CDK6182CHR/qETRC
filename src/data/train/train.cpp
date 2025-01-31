@@ -1223,6 +1223,65 @@ std::shared_ptr<Train> Train::fromTrf(const QString& filename)
     return train;
 }
 
+namespace {
+    std::shared_ptr<Train> merge_init_train(std::shared_ptr<Train> first_candidate, std::optional<TrainName> newName)
+    {
+        if (newName.has_value()) {
+            auto ret = std::make_shared<Train>(newName.value());
+            ret->setPassenger(first_candidate->passenger());
+            ret->setType(first_candidate->type());
+            return ret;
+        }
+        else {
+            auto ret = std::make_shared<Train>(
+                first_candidate->trainName(), first_candidate->starting(), first_candidate->terminal(),
+                first_candidate->passenger()
+            );
+            ret->setType(first_candidate->type());
+            return ret;
+        }
+    }
+}
+
+std::shared_ptr<Train> Train::mergeTrains(std::vector<std::shared_ptr<Train>> trains, std::optional<TrainName> newName, bool merge_cross)
+{
+    auto res = merge_init_train(trains.front(), newName);
+
+    for (size_t i = 0; i < trains.size(); i++) {
+        auto p = trains.at(i);
+
+        if (p->empty())
+            continue;
+        
+        bool ignore_first = false;
+
+        if (merge_cross) {
+            // Try to merge the crossing station
+            if (!res->timetable().empty()) {
+                if (res->timetable().back().name == p->timetable().front().name) {
+                    res->timetable().back().depart = p->timetable().front().depart;
+                    ignore_first = true;
+                }
+            }
+        }
+
+        if (ignore_first) {
+            res->timetable().insert(res->timetable().end(),
+                std::next(p->timetable().begin()), p->timetable().end());
+        }
+        else {
+            // merge directly
+            res->timetable().insert(res->timetable().end(),
+                p->timetable().begin(), p->timetable().end());
+        }
+    }
+
+    // Process the starting and terminal stations
+    res->setStarting(trains.front()->starting());
+    res->setTerminal(trains.back()->terminal());
+    return res;
+}
+
 bool Train::gtMile(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
 {
     return t1->localMile() > t2->localMile();

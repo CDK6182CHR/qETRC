@@ -633,6 +633,14 @@ public:
      */
     static std::shared_ptr<Train> fromTrf(const QString& filename);
 
+    /**
+     * 2025.01.31  Merge multiple trains into one single new train.
+     * All data of the merged trains are not changed.
+     * The input train list must be non-empty.
+     */
+    static std::shared_ptr<Train> mergeTrains(std::vector<std::shared_ptr<Train>> trains, std::optional<TrainName> newName,
+        bool merge_cross);
+
 private:
 
     /**

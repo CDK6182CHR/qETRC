@@ -163,6 +163,7 @@
 #define QEICN_timetable_correction QE_RSC_ICON(settings.png)  // 时刻修正
 #define QEICN_timetable_simple_interp QE_RSC_ICON(add.png)   // 快速推定通过站时刻
 #define QEICN_split_train QE_RSC_ICON(copy.png)   // 拆分车次
+#define QEICN_merge_trains QE_RSC_ICON(joint.png)   // 合并车次
 
 #define QEICN_edit_timetable QE_RSC_ICON(timetable.png)   // 编辑时刻表
 #define QEICN_edit_train QE_RSC_ICON(edit.png)   // 编辑列车所有数据
