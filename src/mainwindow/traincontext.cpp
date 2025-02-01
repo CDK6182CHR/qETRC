@@ -657,6 +657,11 @@ void TrainContext::batchAutoTrainPen(std::deque<std::shared_ptr<Train>>& trains)
 	mw->getUndoStack()->push(new qecmd::AutoTrainPen(std::move(trains), this));
 }
 
+void TrainContext::batchManualTrainPen(std::deque<std::shared_ptr<Train>> trains)
+{
+	mw->getUndoStack()->push(new qecmd::ManualTrainPen(std::move(trains), this));
+}
+
 void TrainContext::commitAutoStartingTerminal(qecmd::StartingTerminalData& data)
 {
 	data.commit();
@@ -1558,6 +1563,17 @@ void TrainContext::actAutoPenAll()
 	batchAutoTrainPen(trains);
 }
 
+void TrainContext::actManualPenAll()
+{
+	std::deque<std::shared_ptr<Train>> trains{};
+	foreach(auto t, diagram.trainCollection().trains()) {
+		if (t->autoPen()) {
+			trains.emplace_back(t);
+		}
+	}
+	batchManualTrainPen(trains);
+}
+
 void TrainContext::actApplyExchangeInterval(
 	std::shared_ptr<Train> train1, std::shared_ptr<Train> train2, 
 	Train::StationPtr start1, Train::StationPtr end1,
@@ -1876,6 +1892,33 @@ void qecmd::AutoTrainPen::redo()
 {
 	for (size_t i = 0; i < _trains.size(); i++) {
 		_trains.at(i)->resetPen();
+	}
+	cont->commitAutoPenOrUndo(_trains);
+}
+
+
+qecmd::ManualTrainPen::ManualTrainPen(std::deque<std::shared_ptr<Train>>&& trains, TrainContext* context, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("批量取消自动设置运行线: 影响%1车次").arg(trains.size()), parent),
+	_trains(std::move(trains)), cont(context)
+{
+	// Copy the data
+	for (auto p : _trains) {
+		_pens.emplace_back(p->pen());
+	}
+}
+
+void qecmd::ManualTrainPen::undo()
+{
+	for (auto p : _trains) {
+		p->resetPen();
+	}
+	cont->commitAutoPenOrUndo(_trains);
+}
+
+void qecmd::ManualTrainPen::redo()
+{
+	for (size_t i = 0; i < _trains.size(); i++) {
+		_trains.at(i)->setPen(_pens.at(i));
 	}
 	cont->commitAutoPenOrUndo(_trains);
 }

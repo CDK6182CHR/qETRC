@@ -63,6 +63,17 @@ namespace qecmd {
         virtual void redo()override;
     };
 
+    class ManualTrainPen : public QUndoCommand {
+        std::deque<std::shared_ptr<Train>> _trains;
+        std::deque<QPen> _pens;
+        TrainContext* const cont;
+
+    public:
+        ManualTrainPen(std::deque<std::shared_ptr<Train>> && trains, TrainContext* context, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
     class ChangeTrainPen : public QUndoCommand {
         std::deque<std::shared_ptr<Train>> _trains;
         std::deque<std::optional<QPen>> _pens;
@@ -252,12 +263,19 @@ public slots:
     void batchAutoTrainPen(std::deque<std::shared_ptr<Train>>& trains);
 
     /**
+     * 2025.02.01  批量取消自动运行线（保留当前运行线设置为手动设置）
+     */
+    void batchManualTrainPen(std::deque<std::shared_ptr<Train>> trains);
+
+    /**
      * 2025.02.01  批量设置运行线类型  操作压栈 
      */
     void batchChangeTrainPen(std::deque<std::shared_ptr<Train>> trains, std::optional<QPen> pen);
 
     // 2024.03.17：操作压栈。MainWindow的全部车次操作。
     void actAutoPenAll();
+
+    void actManualPenAll();
 
     /**
      * 自动始发终到的执行：执行始发终到站变更；铺画运行线；更新TrainList和相关Widget

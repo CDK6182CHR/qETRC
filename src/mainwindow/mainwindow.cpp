@@ -1053,7 +1053,7 @@ void MainWindow::initToolbar()
 
 	QAction* actRemoveInterp, * actAutoBusiness, * actImportTimetableCsv, * actImportTrainTrf,
 		* actAutoCorrection, * actRemoveNonBound, * actRemoveNonBoundTrains, * actRemoveEmptyTrains,
-		* actAutoPen, * actMergeTrains;
+		* actAutoPen, *actManualPen, * actMergeTrains;
 	//列车
 	if constexpr (true) {
 		auto* cat = ribbon->addCategoryPage(tr("列车(&3)"));
@@ -1090,6 +1090,7 @@ void MainWindow::initToolbar()
 		actsub = menu->addAction(tr("自动推断所有列车类型"));
 		connect(actsub, &QAction::triggered, this, &MainWindow::actAutoTrainType);
 		actAutoPen = menu->addAction(tr("自动设置所有列车运行线样式"));
+		actManualPen = menu->addAction(tr("取消所有列车自动设置运行线样式"));
 
 		actAutoBusiness = menu->addAction(tr("自动设置所有营业站"));
 		actAutoCorrection = menu->addAction(tr("自动更正时刻表 (测试)"));
@@ -1378,6 +1379,8 @@ void MainWindow::initToolbar()
 			contextTrain, &TrainContext::actAutoBusiness);
 		connect(actAutoPen, &QAction::triggered,
 			contextTrain, &TrainContext::actAutoPenAll);
+		connect(actManualPen, &QAction::triggered,
+			contextTrain, &TrainContext::actManualPenAll);
 		connect(actAutoCorrection, &QAction::triggered,
 			contextTrain, &TrainContext::actAutoCorrectionAll);
 		connect(actRemoveNonBound, &QAction::triggered,
@@ -1414,6 +1417,9 @@ void MainWindow::initToolbar()
 
 		connect(trainListWidget, &TrainListWidget::batchAutoPen,
 			contextTrain, &TrainContext::batchAutoTrainPen);
+
+		connect(trainListWidget, &TrainListWidget::batchManualPen,
+			contextTrain, &TrainContext::batchManualTrainPen);
 
 		connect(trainListWidget, &TrainListWidget::batchChangePen,
 			contextTrain, &TrainContext::batchChangeTrainPen);

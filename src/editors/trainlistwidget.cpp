@@ -92,6 +92,7 @@ void TrainListWidget::initUI()
 	menu->addAction(tr("自动始发终到站适配 (放宽)"), this, &TrainListWidget::actAutoStartingTerminalLooserBat);
 	menu->addAction(tr("自动推断列车类型"), this, &TrainListWidget::actAutoTrainTypeBat);
 	menu->addAction(tr("自动设置运行线样式"), this, &TrainListWidget::actAutoTrainPenBat);
+	menu->addAction(tr("取消自动运行线样式"), this, &TrainListWidget::actManualTrainPenBat);
 	menu->addAction(tr("自动设置营业站"), this, &TrainListWidget::actAutoBusinessBat);
 	menu->addAction(tr("自动更正时刻表 (测试)"), this, &TrainListWidget::actAutoCorrectionBat);
 	menu->addSeparator();
@@ -422,6 +423,20 @@ void TrainListWidget::actAutoTrainPenBat()
 	}
 	if (!trains.empty()) {
 		emit batchAutoPen(trains);
+	}
+}
+
+void TrainListWidget::actManualTrainPenBat()
+{
+	const auto& lst = batchOpSelectedTrains();
+	std::deque<std::shared_ptr<Train>> trains;
+	foreach(auto t, lst) {
+		if (t->autoPen()) {
+			trains.emplace_back(t);
+		}
+	}
+	if (!trains.empty()) {
+		emit batchManualPen(trains);
 	}
 }
 
