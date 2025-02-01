@@ -162,6 +162,10 @@ public:
      */
     const QPen& pen()const;
 
+    auto& penRaw()const { return _pen; }
+
+    auto& penRawRef() { return _pen; }
+
     /**
      * 是否采用自动UI （类型设置的UI）
      */
@@ -173,6 +177,8 @@ public:
     void resetPen();
 
     void setPen(const QPen& pen);
+
+    void setPenRaw(std::optional<QPen> pen);
 
     inline ConstStationPtr nullStation()const { return _timetable.cend(); }
     inline StationPtr nullStation(){return _timetable.end();}

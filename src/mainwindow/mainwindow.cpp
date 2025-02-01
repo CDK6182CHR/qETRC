@@ -1415,6 +1415,9 @@ void MainWindow::initToolbar()
 		connect(trainListWidget, &TrainListWidget::batchAutoPen,
 			contextTrain, &TrainContext::batchAutoTrainPen);
 
+		connect(trainListWidget, &TrainListWidget::batchChangePen,
+			contextTrain, &TrainContext::batchChangeTrainPen);
+
 		connect(trainListWidget, &TrainListWidget::batchAutoCorrect,
 			contextTrain, &TrainContext::actAutoCorrectionBat, Qt::DirectConnection);
 

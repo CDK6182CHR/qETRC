@@ -85,6 +85,8 @@ signals:
 
     void batchAutoPen(std::deque<std::shared_ptr<Train>>&);
 
+    void batchChangePen(std::deque<std::shared_ptr<Train>> trains, std::optional<QPen> pen);
+
     void batchAutoCorrect(const QList<std::shared_ptr<Train>>&);
         
 private slots:
@@ -120,6 +122,7 @@ private slots:
     void actAutoStartingTerminalLooserBat();
     void actAutoTrainTypeBat();
     void actAutoTrainPenBat();
+    void actChangePenBat();
 
     /**
      * 2022.05.14

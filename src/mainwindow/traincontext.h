@@ -62,6 +62,19 @@ namespace qecmd {
         virtual void undo()override;
         virtual void redo()override;
     };
+
+    class ChangeTrainPen : public QUndoCommand {
+        std::deque<std::shared_ptr<Train>> _trains;
+        std::deque<std::optional<QPen>> _pens;
+        TrainContext* const cont;
+    public:
+        ChangeTrainPen(std::deque<std::shared_ptr<Train>>&& trains, std::optional<QPen> pen, TrainContext* context,
+            QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    private:
+        void commit();
+    };
 }
 
 
@@ -238,6 +251,11 @@ public slots:
     // 输入的参数将被move!!
     void batchAutoTrainPen(std::deque<std::shared_ptr<Train>>& trains);
 
+    /**
+     * 2025.02.01  批量设置运行线类型  操作压栈 
+     */
+    void batchChangeTrainPen(std::deque<std::shared_ptr<Train>> trains, std::optional<QPen> pen);
+
     // 2024.03.17：操作压栈。MainWindow的全部车次操作。
     void actAutoPenAll();
 
@@ -256,6 +274,8 @@ public slots:
      * 2024.03.17  for Undo/redo autoPen. The same operations after the data is set in the qecmd class.
      */
     void commitAutoPenOrUndo(const std::deque<std::shared_ptr<Train>>& trains);
+
+    void commitBatchChangeTrainPen(const std::deque<std::shared_ptr<Train>>& trains);
 
     void actInterpolation(const QVector<std::shared_ptr<Train>>& trains,
         const QVector<std::shared_ptr<Train>>& data);

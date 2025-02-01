@@ -20,6 +20,7 @@
 #include <model/train/trainlistmodel.h>
 #include <mainwindow/traincontext.h>
 #include <data/diagram/trainline.h>
+#include <editors/train/trainpenwidget.h>
 
 TrainListWidget::TrainListWidget(TrainCollection& coll_, QUndoStack* undo, QWidget* parent):
     QWidget(parent), coll(coll_),_undo(undo),
@@ -84,6 +85,7 @@ void TrainListWidget::initUI()
 	menu->addSeparator();
 
 	menu->addAction(tr("批量分类"), this, &TrainListWidget::batchChange);
+	menu->addAction(tr("批量设置运行线样式"), this, &TrainListWidget::actChangePenBat);
 	menu->addSeparator();
 	menu->addAction(tr("按时刻表重设始发终到"), this, &TrainListWidget::actResetStartingTerminalFromTimetableBat);
 	menu->addAction(tr("自动始发终到站适配"), this, &TrainListWidget::actAutoStartingTerminalBat);
@@ -420,6 +422,19 @@ void TrainListWidget::actAutoTrainPenBat()
 	}
 	if (!trains.empty()) {
 		emit batchAutoPen(trains);
+	}
+}
+
+void TrainListWidget::actChangePenBat()
+{
+	auto lst = batchOpSelectedTrains();
+	std::deque<std::shared_ptr<Train>> trains(std::make_move_iterator(lst.begin()), std::make_move_iterator(lst.end()));
+	if (!trains.empty()) {
+		auto res = TrainPenWidget::getPen(this, trains.front(), tr("批量设置运行线"),
+			tr("请为所选的车次设置运行线样式"));
+		if (!res.accepted)
+			return;
+		emit batchChangePen(std::move(trains), res.pen);
 	}
 }
 

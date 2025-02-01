@@ -171,6 +171,11 @@ void Train::setPen(const QPen& pen)
     _pen = pen;
 }
 
+void Train::setPenRaw(std::optional<QPen> pen)
+{
+    _pen = std::move(pen);
+}
+
 void Train::resetPen()
 {
     _pen.reset();

@@ -691,6 +691,12 @@ void TrainContext::commitAutoPenOrUndo(const std::deque<std::shared_ptr<Train>>&
 	refreshCurrentTrainWidgets();
 }
 
+void TrainContext::commitBatchChangeTrainPen(const std::deque<std::shared_ptr<Train>>& trains)
+{
+	// 2025.02.01: currently, the same as commitAutoPenOrUndo
+	commitAutoPenOrUndo(trains);
+}
+
 void TrainContext::actInterpolation(const QVector<std::shared_ptr<Train>>& trains, const QVector<std::shared_ptr<Train>>& data)
 {
 	mw->getUndoStack()->push(new qecmd::TimetableInterpolation(trains, data, this));
@@ -1536,6 +1542,11 @@ void TrainContext::actExchangeInterval()
 	dialog->open();
 }
 
+void TrainContext::batchChangeTrainPen(std::deque<std::shared_ptr<Train>> trains, std::optional<QPen> pen)
+{
+	mw->getUndoStack()->push(new qecmd::ChangeTrainPen(std::move(trains), pen, this));
+}
+
 void TrainContext::actAutoPenAll()
 {
 	std::deque<std::shared_ptr<Train>> trains{};
@@ -1869,6 +1880,30 @@ void qecmd::AutoTrainPen::redo()
 	cont->commitAutoPenOrUndo(_trains);
 }
 
+qecmd::ChangeTrainPen::ChangeTrainPen(std::deque<std::shared_ptr<Train>>&& trains, std::optional<QPen> pen, TrainContext* context, QUndoCommand* parent) :
+	QUndoCommand(QObject::tr("批量设置运行线样式: 影响%1车次").arg(trains.size()), parent),
+	_trains(std::move(trains)), _pens(_trains.size(), pen), cont(context)
+{
+}
+
+void qecmd::ChangeTrainPen::undo()
+{
+	commit();
+}
+
+void qecmd::ChangeTrainPen::redo()
+{
+	commit();
+}
+
+void qecmd::ChangeTrainPen::commit()
+{
+	for (size_t i = 0; i < _trains.size(); i++) {
+		std::swap(_trains.at(i)->penRawRef(), _pens.at(i));
+	}
+	cont->commitBatchChangeTrainPen(_trains);
+}
+
 void qecmd::TimetableInterpolation::undo()
 {
 	cont->commitInterpolation(trains, data);
@@ -2149,6 +2184,7 @@ namespace qecmd {
 		virtual void undo()override;
 		virtual void redo()override;
 	};
+
 }
 
 qecmd::RemoveTrainsSimple::RemoveTrainsSimple(const QList<std::shared_ptr<Train>>& trains,
