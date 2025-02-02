@@ -10,6 +10,7 @@ class Railway;
 
 class ConflictModel: public QStandardItemModel
 {
+    Q_OBJECT
     Diagram& diagram;
     std::shared_ptr<Railway> railway{};
     std::shared_ptr<const RailStation> station{};

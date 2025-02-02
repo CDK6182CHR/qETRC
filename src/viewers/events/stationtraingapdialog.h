@@ -23,6 +23,7 @@ class TrainFilterSelector;
  */
 class StationTrainGapModel: public QStandardItemModel
 {
+    Q_OBJECT
     Diagram& diagram;
     const std::shared_ptr<Railway> railway;
     const std::shared_ptr<RailStation> station;

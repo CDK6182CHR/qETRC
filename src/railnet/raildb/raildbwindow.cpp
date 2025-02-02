@@ -150,9 +150,9 @@ void RailDBWindow::onNaviRailChanged(std::shared_ptr<Railway> railway,
     editor->setRailway(railway);
 }
 
-#define _RAILDB_NOT_IMPLEMENTED do{  \
-QMessageBox::information(this,tr("线路数据库"), tr("此功能尚未实现！"));\
-}while(false)
+//#define _RAILDB_NOT_IMPLEMENTED do{  \
+//QMessageBox::information(this,tr("线路数据库"), tr("此功能尚未实现！"));\
+//}while(false)
 
 void RailDBWindow::onEditorRailNameChanged(std::shared_ptr<Railway> railway, const QString& name)
 {

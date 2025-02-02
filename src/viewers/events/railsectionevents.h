@@ -16,6 +16,7 @@
  */
 class RailSectionEventsModel: public QStandardItemModel
 {
+    Q_OBJECT
     Diagram& diagram;
     std::shared_ptr<Railway> railway;
     double y=0;

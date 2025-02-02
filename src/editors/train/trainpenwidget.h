@@ -18,6 +18,7 @@ class Train;
  */
 class TrainPenWidget : public QWidget
 {
+	Q_OBJECT
 	QCheckBox* m_ckAuto;
 	QDoubleSpinBox* m_spWidth;
 	PenStyleCombo* m_cbStyle;

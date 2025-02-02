@@ -18,9 +18,9 @@
 #include <QFileDialog>
 #include <QInputDialog>
 
-#define _RAILDB_NOT_IMPLEMENTED do{  \
-QMessageBox::information(this,tr("线路数据库"), tr("此功能尚未实现！"));\
-}while(false)
+//#define RAILDB_NOT_IMPLEMENTED do{  \
+//QMessageBox::information(this,tr("线路数据库"), tr("此功能尚未实现！"));\
+//}while(false)
 
 RailDBNavi::RailDBNavi(std::shared_ptr<RailDB> raildb, QWidget *parent):
     QWidget(parent), _raildb(raildb), model(new RailDBModel(raildb, this))

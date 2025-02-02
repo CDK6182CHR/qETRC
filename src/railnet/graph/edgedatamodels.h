@@ -5,6 +5,7 @@
 class RulerNodesModel:
         public QStandardItemModel
 {
+    Q_OBJECT
 public:
     enum {
         ColName=0,
@@ -22,6 +23,7 @@ public:
 class ForbidNodesModel:
         public QStandardItemModel
 {
+    Q_OBJECT
 public:
     enum{
         ColBegin=0,

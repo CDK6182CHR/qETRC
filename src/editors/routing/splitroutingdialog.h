@@ -12,6 +12,7 @@ class TrainCollection;
 
 class SplitRoutingModel :public QStandardItemModel
 {
+	Q_OBJECT
 	std::shared_ptr<Routing> m_routing;
 public:
 	enum Columns {

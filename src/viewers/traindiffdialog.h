@@ -19,6 +19,7 @@ class Diagram;
  */
 class TrainDiffModel: public QStandardItemModel
 {
+    Q_OBJECT
     Diagram& diagram;
     std::shared_ptr<Railway> railway;
     std::shared_ptr<Train> train1,train2;
@@ -68,6 +69,7 @@ class QTableView;
  */
 class TrainDiffDialog : public QDialog
 {
+    Q_OBJECT
     Diagram& diagram;
     TrainDiffModel*const model;
 

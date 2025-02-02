@@ -10,6 +10,7 @@ class Train;
  */
 class TrainListStdModel : public QEMoveableModel
 {
+	Q_OBJECT
 public:
 	enum Columns {
 		ColTrainName,

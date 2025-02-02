@@ -10,6 +10,7 @@ class QSpinBox;
  */
 class GeneralSpinDelegate : public QStyledItemDelegate
 {
+    Q_OBJECT
 public:
     explicit GeneralSpinDelegate(QObject *parent = nullptr);
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
@@ -46,6 +47,7 @@ protected:
 
 class TrainGapSpinDelegate: public GeneralSpinDelegate
 {
+    Q_OBJECT
 public:
     using GeneralSpinDelegate::GeneralSpinDelegate;
     virtual void setupSpin(QSpinBox* sp)const override;

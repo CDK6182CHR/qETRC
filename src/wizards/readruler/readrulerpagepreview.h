@@ -15,6 +15,7 @@ class QTableView;
 
 class ReadRulerPreviewModel: public QStandardItemModel
 {
+	Q_OBJECT
 	const ReadRulerReport& data;   // 引用Page里面的数据
 	const QVector<std::shared_ptr<RailInterval>>& intervals;   //按顺序维护的区间次序
 public:
@@ -40,6 +41,7 @@ public:
  */
 class ReadRulerDetailModel : public QStandardItemModel
 {
+	Q_OBJECT
 public:
 	enum {
 		ColTrainName = 0,
@@ -58,6 +60,7 @@ public:
 
 class ReadRulerSummaryModel : public QStandardItemModel
 {
+	Q_OBJECT
 public:
 	enum {
 		ColType = 0,

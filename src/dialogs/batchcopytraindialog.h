@@ -9,6 +9,7 @@
 class BatchCopyTrainModel:
         public QEMoveableModel
 {
+    Q_OBJECT
 public:
     enum{
         ColTrainName=0,

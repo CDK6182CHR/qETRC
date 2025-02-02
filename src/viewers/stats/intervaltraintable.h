@@ -11,6 +11,7 @@ class QLineEdit;
 class Diagram;
 class IntervalTrainModel: public QStandardItemModel
 {
+    Q_OBJECT
     IntervalTrainList _data;
 public:
     enum {

@@ -9,6 +9,7 @@ class Diagram;
 class RailSnapEventsModel:
     public QStandardItemModel
 {
+    Q_OBJECT
     Diagram& diagram;
     std::shared_ptr<Railway> railway;
     QTime time{};    //可以更改

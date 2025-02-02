@@ -10,6 +10,7 @@ class Ruler;
 class Railway;
 class TimeInterpPreviewModel: public QStandardItemModel
 {
+    Q_OBJECT
 public:
     enum {
         ColName=0,
@@ -27,6 +28,7 @@ public:
 
 class TimeInterpPagePreview : public QWizardPage
 {
+    Q_OBJECT
     TimeInterpPreviewModel* const model;
     QTableView* table;
 public:

@@ -15,6 +15,7 @@ struct AdapterStation;
 class StationTimetableSettledModel:
         public QStandardItemModel
 {
+    Q_OBJECT
     Diagram& diagram;
     std::shared_ptr<Railway> rail;
     std::shared_ptr<RailStation> station;
