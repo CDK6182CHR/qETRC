@@ -176,9 +176,11 @@ if(WIN32)
 	)
 endif()
 
-# translations
-qt_add_lupdate(qETRC TS_FILES tr/qETRC_zh.ts tr/qETRC_en.ts)
-qt_add_lrelease(qETRC TS_FILES tr/qETRC_zh.ts tr/qETRC_en.ts)
+# translations; seems only applicable for Qt6
+if (QT_VERSION_MAJOR GREATER 5)
+    qt_add_lupdate(qETRC TS_FILES tr/qETRC_zh.ts tr/qETRC_en.ts)
+    qt_add_lrelease(qETRC TS_FILES tr/qETRC_zh.ts tr/qETRC_en.ts)
+endif ()
 
 install(TARGETS qETRC
     BUNDLE DESTINATION .
