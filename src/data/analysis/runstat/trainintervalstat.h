@@ -27,7 +27,7 @@ class TrainIntervalStat
     bool _include_ends = false;   // 2024.05.03: whether to include stop time of first and last station
 public:
     TrainIntervalStat(const std::shared_ptr<const Train>& train=nullptr);
-    void setTrain(std::shared_ptr<const Train> train){this->train=train;}
+    void setTrain(std::shared_ptr<const Train> t) { this->train = t; }
 
     /**
      * 2024.05.03 note: the range includes both sides.

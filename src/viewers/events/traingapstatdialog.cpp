@@ -102,9 +102,9 @@ TrainGapSummaryModel::TrainGapSummaryModel(Diagram& diagram_,
     //refreshData();
 }
 
-void TrainGapSummaryModel::refreshData(const TrainFilterCore* filter)
+void TrainGapSummaryModel::refreshData(const TrainFilterCore* ff)
 {
-    this->filter = filter;
+    this->filter = ff;
     setupHeader();
     setupModel();
 }
@@ -144,7 +144,7 @@ void TrainGapSummaryModel::setupHeader()
     TrainGapAna ana(diagram, filter);
     for (auto _p = events.begin(); _p != events.end(); ++_p) {
         const RailStationEventList& lst = _p->second;
-        auto gaps = ana.calTrainGaps(lst, *filter, _p->first);
+        auto gaps = ana.calTrainGaps(lst, _p->first);
         TrainGapStatistics stat = ana.countTrainGaps(gaps, cutSecs);
         for (auto q = stat.begin(); q != stat.end(); ++q) {
             const typename TrainGap::GapTypesV2& tp = q->first;

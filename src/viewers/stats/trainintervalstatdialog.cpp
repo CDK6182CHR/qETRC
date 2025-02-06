@@ -108,9 +108,9 @@ int TrainIntervalStatDialog::actualEndIndex()const
     return endComboStartIndex + cbEnd->currentIndex();
 }
 
-void TrainIntervalStatDialog::setTrain(std::shared_ptr<Train> train)
+void TrainIntervalStatDialog::setTrain(std::shared_ptr<Train> t)
 {
-    this->train=train;
+    this->train=t;
     refreshForTrain();
 }
 

@@ -125,9 +125,9 @@ bool TrainInfoWidget::checkNotEditingTrain()
     return true;
 }
 
-void TrainInfoWidget::setTrain(std::shared_ptr<Train> train)
+void TrainInfoWidget::setTrain(std::shared_ptr<Train> t)
 {
-    this->train=train;
+    this->train = t;
     refreshData();
 }
 

@@ -42,12 +42,12 @@ StationTrainGapModel::StationTrainGapModel(Diagram& diagram,
         });
 }
 
-void StationTrainGapModel::refreshData(const TrainFilterCore* filter)
+void StationTrainGapModel::refreshData(const TrainFilterCore* ff)
 {
-    this->filter = filter;
+    this->filter = ff;
     //data = diagram.getTrainGaps(events, filter, station, singleLine);
     TrainGapAna ana(diagram, filter);
-    data = ana.calTrainGaps(events, *filter, station);
+    data = ana.calTrainGaps(events, station);
     stat = ana.countTrainGaps(data, _cutSecs);
     setupModel();
 }

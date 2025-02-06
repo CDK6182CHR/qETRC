@@ -8,6 +8,7 @@ set(qETRC_VERSION_PATCH 8)
 option(ENABLE_MSVC_PROFILE "Enable MSVC profiler" OFF)
 option(AUTO_INSTALL_SARibbon "Install SARibbon libraries" ON)
 option(AUTO_INSTALL_QWK "Install QWindowKit libraries, dependent by SARibbon" ON)
+option(QETRC_EXTRA_WARNING_INFO "use extra warning messages" ON)
 
 set(qETRC_VERSION "${qETRC_VERSION_MAJOR}.${qETRC_VERSION_MINOR}.${qETRC_VERSION_PATCH}")
 
@@ -159,6 +160,18 @@ if (MSVC)
     endif ()
 
 endif()
+
+if (QETRC_EXTRA_WARNING_INFO)
+    if (MSVC)
+        # Remove the automatically configured /W3 flag, as this would generate command-line warning...
+        string(REPLACE "/W3" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+        target_compile_options(qETRC PRIVATE /W4)
+    else ()
+        target_compile_options(qETRC PRIVATE -Wall -Wextra)
+    endif ()
+endif ()
+
+message(STATUS "Flags: ${CMAKE_CXX_FLAGS} -- ${CMAKE_CXX_FLAGS_INIT} -- ${CMAKE_CXX_FLAGS_DEBUG} -- ${CMAKE_CXX_FLAGS_RELEASE}")
 
 if (WIN32 AND (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
     message("disable console for Release buildings.")

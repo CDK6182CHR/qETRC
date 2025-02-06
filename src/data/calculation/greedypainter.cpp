@@ -202,7 +202,7 @@ typename GreedyPainter::RecurseReport
 	auto itr = _settledStops.find(st_to);
 	bool next_stop = ((itr != _settledStops.end()) || (st_to == _end && _localTerminal));
 	bool fixed_from = (_fixedStations.find(st_from.get()) != _fixedStations.end());
-	bool fixed_to = (_fixedStations.find(st_to.get()) != _fixedStations.end());
+	//bool fixed_to = (_fixedStations.find(st_to.get()) != _fixedStations.end());
 
 	int tot_delay = qeutil::secsTo(_tm, ev_start.time);
 
@@ -558,7 +558,7 @@ typename GreedyPainter::RecurseReport
 	const auto& ax_from = _railAxis.at(st_from);
 	const auto& ax_to = _railAxis.at(st_to);
 	auto fixed_from = (_fixedStations.find(st_from.get()) != _fixedStations.end());
-	auto fixed_to = (_fixedStations.find(st_from.get()) != _fixedStations.end());
+	//auto fixed_to = (_fixedStations.find(st_from.get()) != _fixedStations.end());
 
 	auto itr = _settledStops.find(st_to);
 	bool next_stop = ((itr != _settledStops.end()) || (st_to == _start && _localStarting));

@@ -23,12 +23,12 @@ class TrainGapAna
     Diagram& diagram;
     const TrainFilterCore* filter=nullptr;
 //    bool _singleLine=false;
-    int _cutSecs;
+    int _cutSecs = 24 * 3600;   // 2025.02.06: default value: seconds of a day (max possible value)
 public:
     TrainGapAna(Diagram& diagram);
     TrainGapAna(Diagram& diagram, const TrainFilterCore* filter);
 
-    void setFilter(const TrainFilterCore* filter) { this->filter = filter; }
+    void setFilter(const TrainFilterCore* f) { this->filter = f; }
 
 //    void setSingleLine(bool on){_singleLine=on;}
     void setCutSecs(int secs){_cutSecs=secs;}
@@ -47,7 +47,7 @@ public:
      * @return  列车间隔列表。
      */
     TrainGapList calTrainGaps(const RailStationEventList& events,
-        const TrainFilterCore& filter, std::shared_ptr<const RailStation> st)const;
+        std::shared_ptr<const RailStation> st)const;
 
     /**
      * 2021.09.08
@@ -64,7 +64,7 @@ private:
      * 如果找不到（极端情况），返回空。
      */
     std::shared_ptr<const RailStationEvent>
-        findLastEvent(const RailStationEventList& lst, const TrainFilterCore& filter,
+        findLastEvent(const RailStationEventList& lst,
             const Direction& dir,
             RailStationEvent::Positions pos)const;
 };

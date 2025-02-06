@@ -139,7 +139,7 @@ std::map<TrainGap::GapTypesV2, int> TrainGapAna::globalMinimal(
     auto events=diagram.stationEventsForRail(rail);
     for(auto _p=events.begin();_p!=events.end();++_p){
         const RailStationEventList& lst=_p->second;
-        auto gaps=calTrainGaps(lst, *filter,_p->first);
+        auto gaps=calTrainGaps(lst,_p->first);
         TrainGapStatistics stat=countTrainGaps(gaps, _cutSecs);
 
         for (auto q = stat.begin(); q != stat.end(); ++q) {
@@ -158,7 +158,7 @@ std::map<TrainGap::GapTypesV2, int> TrainGapAna::globalMinimal(
     return res;
 }
 
-TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, const TrainFilterCore &filter, std::shared_ptr<const RailStation> st) const
+TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, std::shared_ptr<const RailStation> st) const
 {
      // 此版本尝试使用内建的单双线数据。
      // 目前的思路是，考虑在单线基础上，筛选一下事件的相关性。
@@ -166,10 +166,10 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, const
 
      _gapdetail::EventStackTop stk(*st);
 
-     stk.downFormerLast = findLastEvent(events, filter, Direction::Down, RailStationEvent::Pre);
-     stk.downLatterLast = findLastEvent(events, filter, Direction::Down, RailStationEvent::Post);
-     stk.upFormerLast = findLastEvent(events, filter, Direction::Up, RailStationEvent::Post);
-     stk.upLatterLast = findLastEvent(events, filter, Direction::Up, RailStationEvent::Pre);
+     stk.downFormerLast = findLastEvent(events, Direction::Down, RailStationEvent::Pre);
+     stk.downLatterLast = findLastEvent(events, Direction::Down, RailStationEvent::Post);
+     stk.upFormerLast = findLastEvent(events, Direction::Up, RailStationEvent::Post);
+     stk.upLatterLast = findLastEvent(events, Direction::Up, RailStationEvent::Pre);
 
      // 当前站内车的情况。所有【到达】事件直接压进来。int位记录被踩了多少次。
      // 类似队列的结构：从back插入，从front删除，但不绝对禁止中间删除。
@@ -180,7 +180,7 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, const
      // 先预扫描一遍：把0点前进站没出站的存下来 （跨日停站的）
      for (auto _p = events.cbegin(); _p != events.cend(); ++_p) {
          const auto& p = *_p;
-         if (!filter.check(p->line->train()))continue;
+         if (!filter->check(p->line->train()))continue;
          if (p->type == TrainEventType::Arrive) {
              down_in.emplace_back(std::make_pair(p, 0));
          }
@@ -216,7 +216,7 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, const
      // 注意：pre/post是说绝对位置（里程小端和大端），former latter是说运行方向前后
      for (auto _p = events.cbegin(); _p != events.cend(); ++_p) {
          const auto& p = *_p;
-         if (!filter.check(p->line->train())) continue;
+         if (!filter->check(p->line->train())) continue;
 
          // 2023.09.21  新增条件isPreSingle().has_value()。
          // 原因是，目前我们规定运行线首站到达时刻和末站出发时刻不构成车站事件，
@@ -334,10 +334,10 @@ TrainGapStatistics TrainGapAna::countTrainGaps(const TrainGapList &gaps, int cut
 }
 
 
-std::shared_ptr<const RailStationEvent> TrainGapAna::findLastEvent(const RailStationEventList &lst, const TrainFilterCore &filter, const Direction &dir, RailStationEventBase::Positions pos) const
+std::shared_ptr<const RailStationEvent> TrainGapAna::findLastEvent(const RailStationEventList &lst, const Direction &dir, RailStationEventBase::Positions pos) const
 {
     for (auto p = lst.crbegin(); p != lst.crend(); ++p) {
-        if (!filter.check((*p)->line->train())) continue;
+        if (!filter->check((*p)->line->train())) continue;
         if ((*p)->line->dir() == dir && (*p)->pos & pos) {
             return *p;
         }
