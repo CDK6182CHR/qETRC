@@ -461,8 +461,17 @@ bool Routing::appendTrain(std::shared_ptr<Train> train, bool link)
     if (train->hasRouting())
         return false;
     _order.emplace_back(train, link);
-    auto it = _order.end(); --it;
+    auto it = std::prev(_order.end());
     train->setRouting(shared_from_this(), it);
+    return true;
+}
+
+bool Routing::insertTrain(std::shared_ptr<Train> train, bool link, CNodePtr where)
+{
+    if (train->hasRouting())
+        return false;
+    auto itr = _order.emplace(where, train, link);
+    train->setRouting(shared_from_this(), itr);
     return true;
 }
 

@@ -1646,10 +1646,33 @@ void TrainContext::actApplySplitTrain(std::shared_ptr<Train> train, QVector<std:
 	auto* stk = mw->getUndoStack();
 	stk->beginMacro(tr("拆分车次: %1").arg(train->trainName().full()));
 
-	stk->push(new qecmd::RemoveSingleTrain(this, mw->naviModel, train, idx));
+	// Process routing
+	std::optional<std::list<RoutingNode>::iterator> itr;
+	if (train->hasRouting()) {
+		itr = train->routingNode();
+	}
+
+	stk->push(new qecmd::RemoveSingleTrain(this, mw->naviModel, train, idx));  // This will set the corresponding routing to virtual
 	foreach(auto p, newTrains) {
 		diagram.applyBindOn(p);
 		stk->push(new qecmd::AddNewTrain(mw->naviModel, p));
+	}
+
+	if (itr) {
+		// Add the trains to the original routing
+		auto routing = train->routing().lock();
+		auto routing_cpy = std::make_shared<Routing>(*routing);  // copy
+		int idx = std::distance(routing->order().begin(), *itr);
+		bool link = (*itr)->link();
+		auto itr_cpy = routing_cpy->order().begin();
+		std::advance(itr_cpy, idx);
+		itr_cpy = routing_cpy->order().erase(itr_cpy);
+		
+		// Insert trains before the itr
+		foreach(auto p, newTrains) {
+			routing_cpy->insertTrain(p, link, itr_cpy);
+		}
+		stk->push(new qecmd::ChangeRoutingOrder(routing, routing_cpy, mw->contextRouting));
 	}
 
 	stk->endMacro();

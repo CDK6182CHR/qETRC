@@ -148,6 +148,11 @@ public:
     bool appendTrain(std::shared_ptr<Train> train, bool link);
 
     /**
+     * 2025.02.06  添加列车到指定位置。see also appendTrain.
+     */
+    bool insertTrain(std::shared_ptr<Train> train, bool link, CNodePtr where);
+
+    /**
      * 添加列车，用在交路编辑的提交页面，生成临时对象。
      * 只添加列车的引用到本类，不更新列车中对交路的引用。
      * 由外界保证合法性。

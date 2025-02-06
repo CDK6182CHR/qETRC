@@ -165,11 +165,17 @@ void MainWindow::removeTrain(std::shared_ptr<Train> train)
 		contextTrain->resetTrain();
 		focusOutTrain();
 	}
+	if (train->hasRouting()) {
+		contextRouting->refreshDataFor(train->routing().lock());
+	}
 }
 
 void MainWindow::undoRemoveTrain(std::shared_ptr<Train> train)
 {
 	addTrainLine(*train);
+	if (train->hasRouting()) {
+		contextRouting->refreshDataFor(train->routing().lock());
+	}
 }
 
 void MainWindow::onStationTableChanged(std::shared_ptr<Railway> rail, [[maybe_unused]] bool equiv)
@@ -2208,6 +2214,7 @@ void MainWindow::refreshAll()
 	contextRail->refreshAllData();
 	contextRuler->refreshAllData();
 	contextPage->refreshAllData();
+	contextRouting->refreshAllData();
 	updateWindowTitle();
 	auto end = std::chrono::system_clock::now();
 	showStatus(tr("全部刷新完毕  用时 %1 毫秒").arg((end - start) / std::chrono::milliseconds(1)));

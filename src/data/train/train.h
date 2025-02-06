@@ -386,8 +386,8 @@ public:
 
     inline std::weak_ptr<Routing> routing() { return _routing; }
     inline std::weak_ptr<const Routing> routing()const { return _routing; }
-    inline auto routingNode()const { return _routingNode; }
-    inline auto routingNode() { return _routingNode; }
+    inline auto& routingNode()const { return _routingNode; }   // 2025.02.06  FIX: reference type
+    inline auto& routingNode() { return _routingNode; }
 
     /**
      * 设置交路，同时设定Node指针（迭代器）

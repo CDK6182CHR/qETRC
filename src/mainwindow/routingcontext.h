@@ -75,6 +75,12 @@ private slots:
 public slots:
     void refreshData();
     void refreshAllData();
+
+    /**
+     * 2025.02.06  Refresh all the data for the given routing (including windows and the tool page data)
+     */
+    void refreshDataFor(std::shared_ptr<Routing> routing);
+
     void setRouting(std::shared_ptr<Routing> routing);
     void openRoutingEditWidget(std::shared_ptr<Routing> routing);
     void removeRoutingEditWidget(std::shared_ptr<Routing> routing);

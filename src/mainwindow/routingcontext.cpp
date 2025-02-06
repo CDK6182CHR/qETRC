@@ -315,6 +315,22 @@ void RoutingContext::actSplitRouting(std::shared_ptr<Routing> routing, std::vect
 void RoutingContext::refreshAllData()
 {
     refreshData();
+    // 2025.02.06: refresh also the docks
+    foreach(auto * w, routingEdits) {
+        w->refreshData();
+    }
+}
+
+void RoutingContext::refreshDataFor(std::shared_ptr<Routing> r)
+{
+    if (r == _routing) {
+        refreshData();
+    }
+    foreach(auto * w, routingEdits) {
+        if (w->getRouting() == r) {
+            w->refreshData();
+        }
+    }
 }
 
 void RoutingContext::setRouting(std::shared_ptr<Routing> routing)
