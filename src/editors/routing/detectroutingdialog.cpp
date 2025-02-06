@@ -61,7 +61,6 @@ void DetectRoutingDialog::onApply()
     text.append(tr("\n----------------\n详细报告：\n%2"));
     edOutput->setText(text.arg(tmp->orderString(),report));
     if(flag){
-        QString text;
         if (fromContext) {
             text = tr("提示：当前操作由【交路上下文工具栏】调起，当前操作直接应用。"
                 "如有问题，可以撤销。");

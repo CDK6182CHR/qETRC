@@ -21,12 +21,12 @@ void PathListReadModel::resetData(const std::vector<TrainPath *> &paths)
     endResetModel();
 }
 
-int PathListReadModel::rowCount(const QModelIndex &parent) const
+int PathListReadModel::rowCount([[maybe_unused]] const QModelIndex &parent) const
 {
     return _paths.size();
 }
 
-int PathListReadModel::columnCount(const QModelIndex &parent) const
+int PathListReadModel::columnCount([[maybe_unused]] const QModelIndex &parent) const
 {
     return ColMAX;
 }

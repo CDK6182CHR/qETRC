@@ -316,7 +316,7 @@ void TrainContext::initUI()
 
 			panel->addWidget(w1, SARibbonPannelItem::Medium);
 
-			auto* btn = new SARibbonToolButton();
+			btn = new SARibbonToolButton();
 			btn->setIcon(QEICN_add_path_to_train);
 			btn->setText(tr("添加"));
 			connect(btn, &SARibbonToolButton::clicked, this, &TrainContext::actAddPaths);
@@ -731,8 +731,8 @@ void TrainContext::actRemoveInterpolation()
 	QVector<std::shared_ptr<Train>> modified, data;
 	foreach(auto train, diagram.trains()) {
 		auto t = std::make_shared<Train>(*train);
-		bool flag = t->removeDetected();
-		if (flag) {
+		bool flag1 = t->removeDetected();
+		if (flag1) {
 			modified.push_back(train);
 			data.push_back(t);
 		}
@@ -1196,7 +1196,7 @@ void TrainContext::actDragTimeNonLocal(std::shared_ptr<Train> train, int station
 	mw->getUndoStack()->push(new qecmd::DragNonLocalTime(train, data, station_id, mod, this));
 }
 
-void TrainContext::afterChangeTrainPaths(std::shared_ptr<Train> train, const std::vector<TrainPath*>& paths)
+void TrainContext::afterChangeTrainPaths(std::shared_ptr<Train> train, [[maybe_unused]] const std::vector<TrainPath*>& paths)
 {
 	// rebind the train, and repaint train line
 	afterTimetableChanged(train);
@@ -1207,7 +1207,7 @@ void TrainContext::afterChangeTrainPaths(std::shared_ptr<Train> train, const std
 	// update path related data (currently nothing)
 }
 
-void TrainContext::afterChangeTrainPaths(std::shared_ptr<Train> train, const std::vector<qecmd::PathInfoInTrain>& paths)
+void TrainContext::afterChangeTrainPaths(std::shared_ptr<Train> train, [[maybe_unused]] const std::vector<qecmd::PathInfoInTrain>& paths)
 {
 	// rebind the train, and repaint train line
 	afterTimetableChanged(train);
@@ -1662,10 +1662,10 @@ void TrainContext::actApplySplitTrain(std::shared_ptr<Train> train, QVector<std:
 		// Add the trains to the original routing
 		auto routing = train->routing().lock();
 		auto routing_cpy = std::make_shared<Routing>(*routing);  // copy
-		int idx = std::distance(routing->order().begin(), *itr);
+		int rt_idx = std::distance(routing->order().begin(), *itr);
 		bool link = (*itr)->link();
 		auto itr_cpy = routing_cpy->order().begin();
-		std::advance(itr_cpy, idx);
+		std::advance(itr_cpy, rt_idx);
 		itr_cpy = routing_cpy->order().erase(itr_cpy);
 		
 		// Insert trains before the itr
@@ -2119,7 +2119,7 @@ bool qecmd::DragNonLocalTime::mergeWith(const QUndoCommand* other)
 
 qecmd::AssignPathsToTrain::AssignPathsToTrain(std::shared_ptr<Train> train, std::vector<TrainPath*>&& paths,
 	TrainContext* cont, QUndoCommand* parent):
-	QUndoCommand(QObject::tr("添加%1列车径路至%2").arg(paths.size()).arg(train->trainName().full())), 
+	QUndoCommand(QObject::tr("添加%1列车径路至%2").arg(paths.size()).arg(train->trainName().full()), parent), 
 	train(train), paths(std::move(paths)), cont(cont)
 {
 }

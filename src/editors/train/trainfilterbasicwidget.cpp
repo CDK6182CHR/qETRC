@@ -143,31 +143,31 @@ void TrainFilterBasicWidget::refreshData()
     refreshDataWith(this->_core);
 }
 
-void TrainFilterBasicWidget::refreshDataWith(const TrainFilterCore *_core)
+void TrainFilterBasicWidget::refreshDataWith(const TrainFilterCore *core)
 {
-    if (!_core){
+    if (!core){
         clearNotChecked();
         return;
     }
-    lstType->refreshTypesWithSelection(_core->types);
-    tabInclude->refreshData(_core->includes);
-    tabExclude->refreshData(_core->excludes);
-    lstRouting->refreshRoutingsWithSelection(std::make_pair(_core->routings, _core->selNullRouting));
-    tabStarting->refreshData(_core->startings);
-    tabTerminal->refreshData(_core->terminals);
+    lstType->refreshTypesWithSelection(core->types);
+    tabInclude->refreshData(core->includes);
+    tabExclude->refreshData(core->excludes);
+    lstRouting->refreshRoutingsWithSelection(std::make_pair(core->routings, core->selNullRouting));
+    tabStarting->refreshData(core->startings);
+    tabTerminal->refreshData(core->terminals);
 
-    ckType->setChecked(_core->useType);
-    ckInclude->setChecked(_core->useInclude);
-    ckExclude->setChecked(_core->useExclude);
-    ckRouting->setChecked(_core->useRouting);
-    ckStarting->setChecked(_core->useStarting);
-    ckTerminal->setChecked(_core->useTerminal);
+    ckType->setChecked(core->useType);
+    ckInclude->setChecked(core->useInclude);
+    ckExclude->setChecked(core->useExclude);
+    ckRouting->setChecked(core->useRouting);
+    ckStarting->setChecked(core->useStarting);
+    ckTerminal->setChecked(core->useTerminal);
 
-    ckShowOnly->setChecked(_core->showOnly);
-    ckInverse->setChecked(_core->useInverse);
+    ckShowOnly->setChecked(core->showOnly);
+    ckInverse->setChecked(core->useInverse);
     {
         int passen_id = 2;
-        switch (_core->passengerType)
+        switch (core->passengerType)
         {
         case TrainPassenger::False:passen_id = 1;
             break;

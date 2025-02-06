@@ -26,9 +26,9 @@ RulerContext::RulerContext(Diagram& diagram_, SARibbonContextCategory *context, 
     initUI();
 }
 
-void RulerContext::setRuler(std::shared_ptr<Ruler> ruler)
+void RulerContext::setRuler(std::shared_ptr<Ruler> r)
 {
-    this->ruler=ruler;
+    this->ruler=r;
     refreshData();
 }
 
@@ -138,67 +138,67 @@ void RulerContext::initUI()
     
 }
 
-void RulerContext::actChangeRulerData(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> nr)
+void RulerContext::actChangeRulerData(std::shared_ptr<Ruler> r, std::shared_ptr<Railway> nr)
 {
-    mw->getUndoStack()->push(new qecmd::UpdateRuler(ruler, nr, this));
+    mw->getUndoStack()->push(new qecmd::UpdateRuler(r, nr, this));
 }
 
-void RulerContext::commitRulerChange(std::shared_ptr<Ruler> ruler)
+void RulerContext::commitRulerChange(std::shared_ptr<Ruler> r)
 {
-    mw->getRailContext()->refreshRulerTable(ruler);
-    if (ruler->isOrdinateRuler()) {
-        emit ordinateRulerModified(ruler->railway());
+    mw->getRailContext()->refreshRulerTable(r);
+    if (r->isOrdinateRuler()) {
+        emit ordinateRulerModified(r->railway());
     }
 }
 
-void RulerContext::actChangeRulerName(std::shared_ptr<Ruler> ruler, const QString& name)
+void RulerContext::actChangeRulerName(std::shared_ptr<Ruler> r, const QString& name)
 {
-    mw->getUndoStack()->push(new qecmd::ChangeRulerName(ruler, name, this));
+    mw->getUndoStack()->push(new qecmd::ChangeRulerName(r, name, this));
 }
 
-void RulerContext::commitChangeRulerName(std::shared_ptr<Ruler> ruler)
+void RulerContext::commitChangeRulerName(std::shared_ptr<Ruler> r)
 {
-    if (ruler == this->ruler) {
+    if (r == this->ruler) {
         refreshData();
     }
-    mw->getRailContext()->onRulerNameChanged(ruler);
-    emit rulerNameChanged(ruler);
+    mw->getRailContext()->onRulerNameChanged(r);
+    emit rulerNameChanged(r);
 }
 
-void RulerContext::commitRemoveRuler(std::shared_ptr<Ruler> ruler, bool isord)
+void RulerContext::commitRemoveRuler(std::shared_ptr<Ruler> r, bool isord)
 {
     // 实施删除标尺：从线路中移除数据；退出当前面板；如果是ord则撤销ord
-    auto rail = ruler->railway();
+    auto rail = r->railway();
 
-    mw->getRailContext()->removeRulerAt(*(ruler->railway()), ruler->index(), isord);
-    mw->getRailContext()->removeRulerWidget(ruler);
+    mw->getRailContext()->removeRulerAt(*(r->railway()), r->index(), isord);
+    mw->getRailContext()->removeRulerWidget(r);
 
     if (isord) {
         //重新排图
         mw->updateRailwayDiagrams(rail);
     }
 
-    if(ruler==this->ruler)
+    if(r==this->ruler)
         emit focusOutRuler();
 
     // 2024.04.07: for greedy painter
     if (mw->greedyWidget) {
-        mw->greedyWidget->onRulerRemoved(ruler, rail);
+        mw->greedyWidget->onRulerRemoved(r, rail);
     }
 }
 
-void RulerContext::undoRemoveRuler(std::shared_ptr<Ruler> ruler, bool isord)
+void RulerContext::undoRemoveRuler(std::shared_ptr<Ruler> r, bool isord)
 {
     if (isord) {
-        mw->updateRailwayDiagrams(ruler->railway());
+        mw->updateRailwayDiagrams(r->railway());
     }
-    mw->getRailContext()->insertRulerAt(*(ruler->railway()), ruler, isord);
+    mw->getRailContext()->insertRulerAt(*(r->railway()), r, isord);
 }
 
-void RulerContext::actRemoveRulerNavi(std::shared_ptr<Ruler> ruler)
+void RulerContext::actRemoveRulerNavi(std::shared_ptr<Ruler> ruler1)
 {
-    auto r = ruler->clone();
-    mw->getUndoStack()->push(new qecmd::RemoveRuler(ruler, r, ruler->isOrdinateRuler(),
+    auto r = ruler1->clone();
+    mw->getUndoStack()->push(new qecmd::RemoveRuler(ruler1, r, ruler1->isOrdinateRuler(),
         this));
 }
 
@@ -240,22 +240,22 @@ void RulerContext::actFromSpeed()
     dialog->show();
 }
 
-void RulerContext::dulplicateRuler(std::shared_ptr<Ruler> ruler)
+void RulerContext::dulplicateRuler(std::shared_ptr<Ruler> r)
 {
-    if (!ruler)
+    if (!r)
         return;
-    auto rail = ruler->railway();
+    auto rail = r->railway();
 
     bool ok;
     auto name = QInputDialog::getText(mw, tr("创建标尺副本"), tr("现在创建基线[%1]中标尺[%2]的副本。"
-        "请输入新标尺名称。").arg(rail->name(), ruler->name()), QLineEdit::Normal,
-        ruler->name() + tr("_副本"), &ok);
+        "请输入新标尺名称。").arg(rail->name(), r->name()), QLineEdit::Normal,
+        r->name() + tr("_副本"), &ok);
     if (!ok)return;
     if (name.isEmpty() || rail->rulerNameExisted(name)) {
         QMessageBox::warning(mw, tr("错误"), tr("标尺名称为空或已存在！"));
         return;
     }
-    std::shared_ptr<Railway> data = ruler->clone();
+    std::shared_ptr<Railway> data = r->clone();
     data->getRuler(0)->setName(name);
 
     auto* stk = mw->getUndoStack();
@@ -266,14 +266,14 @@ void RulerContext::dulplicateRuler(std::shared_ptr<Ruler> ruler)
     stk->endMacro();
 }
 
-void RulerContext::mergeWith(std::shared_ptr<Ruler> ruler)
+void RulerContext::mergeWith(std::shared_ptr<Ruler> r)
 {
-    auto rail = ruler->railway();
+    auto rail = r->railway();
     // 现在：现场构造一个Dialog..
     auto* dialog = new QDialog(mw);
     dialog->setWindowTitle(tr("合并标尺"));
     auto* vlay = new QVBoxLayout(dialog);
-    auto* lab = new QLabel(tr("从本线路的下列标尺合并数据到当前标尺[%1]").arg(ruler->name()));
+    auto* lab = new QLabel(tr("从本线路的下列标尺合并数据到当前标尺[%1]").arg(r->name()));
     vlay->addWidget(lab);
     auto* cb = new RulerCombo(rail);
     vlay->addWidget(cb);
@@ -290,15 +290,15 @@ void RulerContext::mergeWith(std::shared_ptr<Ruler> ruler)
         qDebug() << "merge ruler cancled" << Qt::endl;
         return;
     }
-    else if (ref == ruler) {
+    else if (ref == r) {
         QMessageBox::warning(mw, tr("错误"), tr("源数据标尺和当前标尺重复，无需合并。"));
         return;
     }
-    auto data_r = ruler->clone();   // 更新在这个对象里面
+    auto data_r = r->clone();   // 更新在这个对象里面
     auto data = data_r->getRuler(0);
     
     data->mergeWith(*ref, ck->isChecked());
-    mw->getUndoStack()->push(new qecmd::UpdateRuler(ruler, data_r, this));
+    mw->getUndoStack()->push(new qecmd::UpdateRuler(r, data_r, this));
 
     // 清理掉dialog
     dialog->setParent(nullptr);

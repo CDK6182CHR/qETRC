@@ -178,8 +178,7 @@ const std::shared_ptr<const RailStation> Railway::stationByName(const StationNam
 std::shared_ptr<RailStation>
 Railway::stationByGeneralName(const StationName& name)
 {
-	auto p = stationByName(name);
-	if (p) 
+	if (auto p = stationByName(name))
 		return p;
 	const QList<StationName>& t = fieldMap.value(name.station());
 	for (const auto& p : t) {
@@ -193,8 +192,7 @@ Railway::stationByGeneralName(const StationName& name)
 const std::shared_ptr<const RailStation>
 Railway::stationByGeneralName(const StationName& name) const
 {
-	auto p = stationByName(name);
-	if (p)
+	if (auto p = stationByName(name))
 		return p;
 	const QList<StationName>& t = fieldMap.value(name.station());
 	for (const auto& p : t) {
@@ -605,14 +603,14 @@ void Railway::mergeCounter(const Railway& another)
 	//[对里程]的修正：使得零点和正里程一样
 	if (empty())return;
 	if (!_stations.at(0)->isUpVia()) {
-		int i = 0;
-		while (i < stationCount() && !_stations.at(i)->isUpVia())
-			i++;
-		if (i < stationCount()) {
-			double m0 = _stations.at(i)->mile;
-			for (int j = i; j < stationCount(); j++) {
-				if (_stations.at(j)->counter.has_value()) {
-					_stations.at(j)->counter.value() += m0;
+		int ii = 0;
+		while (ii < stationCount() && !_stations.at(ii)->isUpVia())
+			ii++;
+		if (ii < stationCount()) {
+			double m0 = _stations.at(ii)->mile;
+			for (int jj = ii; jj < stationCount(); jj++) {
+				if (_stations.at(jj)->counter.has_value()) {
+					_stations.at(jj)->counter.value() += m0;
 				}
 			}
 		}
@@ -633,13 +631,13 @@ void Railway::mergeCounter(const Railway& another)
         p1 && p2; p1=p1->nextInterval(),p2=p2->nextInterval()){
         // 天窗 按下标
 		//qDebug() << "merge intervals: " << *p1 << ", " << *p2;
-        for(int i=0;i<std::min(forbids().size(),another.forbids().size());i++){
-            p1->_forbidNodes.at(i)->operator=(*(p2->_forbidNodes.at(i)));
+        for(int m=0;m<std::min(forbids().size(),another.forbids().size());m++){
+            p1->_forbidNodes.at(m)->operator=(*(p2->_forbidNodes.at(m)));
         }
 
         // 标尺 按名称
-        for(int i=0;i<another._rulers.size();i++){
-            auto ruler=another._rulers.at(i);
+        for(int m=0;m<another._rulers.size();m++){
+            auto ruler=another._rulers.at(m);
             int idx;
             if (auto itr=rulerMap.find(ruler->name());itr!=rulerMap.end()){
                 idx=itr.value();

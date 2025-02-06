@@ -187,9 +187,9 @@ bool Routing::parseTrainName(TrainCollection& coll, const QString& t,
         return flag;
     }
 
-    if (int idx = trainNameIndexLinear(t); idx != -1) {
+    if (int idxt = trainNameIndexLinear(t); idxt != -1) {
         report.append(QObject::tr("[ERROR] 车次[%1]已存在于本交路第[%2]位，不予添加\n")
-            .arg(t).arg(idx + 1));
+            .arg(t).arg(idxt + 1));
     }
     else {
         auto train = coll.findFullName(t);

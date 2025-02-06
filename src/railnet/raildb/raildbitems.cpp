@@ -106,8 +106,8 @@ void navi::RailCategoryItem::insertCategoryAt(std::shared_ptr<RailCategory> cat,
     for (++p; p != _subcats.end(); ++p) {
         (*p)->setRow((*p)->row() + 1);
     }
-    for (auto& p : _railways) {
-        p->setRow(p->row() + 1);
+    for (auto& pr : _railways) {
+        pr->setRow(pr->row() + 1);
     }
 }
 
@@ -119,8 +119,8 @@ void navi::RailCategoryItem::removeCategoryAt(int i)
     for (; p != _subcats.end(); ++p) {
         (*p)->setRow((*p)->row() - 1);
     }
-    for (auto& p : _railways) {
-        p->setRow(p->row() - 1);
+    for (auto& pr : _railways) {
+        pr->setRow(pr->row() - 1);
     }
 }
 

@@ -1010,11 +1010,11 @@ bool Diagram::fromTrc(QTextStream& fin)
         else if (status == Status::Color) {
             auto t = line.split(",");
             if (t.size() == 4) {
-                auto train = _trainCollection.findFullName(t.at(0));
-                if (train) {
-                    QPen pen = train->pen();
+                auto trainc = _trainCollection.findFullName(t.at(0));
+                if (trainc) {
+                    QPen pen = trainc->pen();
                     pen.setColor(QColor(t.at(1).toInt(), t.at(2).toInt(), t.at(3).toInt()));
-                    train->setPen(pen);
+                    trainc->setPen(pen);
                 }
                 else {
                     TRC_WARNING << "Train not found for color: " << t.at(0) << Qt::endl;

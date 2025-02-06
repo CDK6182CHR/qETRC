@@ -113,12 +113,12 @@ void PathEdit::actApply()
 			tr("列车径路名为空或与既有重复"));
 		return;
 	}
-	auto data = std::make_unique<TrainPath>(edName->text());
-	data->setNote(edNote->toPlainText());
+	auto ad = std::make_unique<TrainPath>(edName->text());
+	ad->setNote(edNote->toPlainText());
 
-	model->appliedData(data.get());
+	model->appliedData(ad.get());
 
-	bool valid = data->checkIsValid();
+	bool valid = ad->checkIsValid();
 
 	if (!valid) {
 		auto res = QMessageBox::question(this, tr("注意"),
@@ -129,7 +129,7 @@ void PathEdit::actApply()
 		}
 	}
 
-	emit pathApplied(_path, data);
+	emit pathApplied(_path, ad);
 
 }
 

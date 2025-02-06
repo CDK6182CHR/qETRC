@@ -601,7 +601,7 @@ void MainWindow::initDockWidgets()
 		QUndoView* view = new QUndoView(undoStack);
 		undoView = view;
 		view->setCleanIcon(QEICN_undo_stack_clean);
-		auto* dock = new ads::CDockWidget(tr("历史记录"));
+		dock = new ads::CDockWidget(tr("历史记录"));
 		dock->setWidget(view);
 		undoDock = dock;
 		//area = manager->addDockWidget(ads::BottomDockWidgetArea, dock, area);

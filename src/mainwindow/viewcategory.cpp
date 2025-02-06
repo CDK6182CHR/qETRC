@@ -708,33 +708,33 @@ void ViewCategory::actRemoveFilter(TrainCollection& coll, int id)
     mw->getUndoStack()->push(new qecmd::RemoveTrainFilter(coll, id, this));
 }
 
-void ViewCategory::actUpdateFilter(PredefTrainFilterCore* filter, std::unique_ptr<PredefTrainFilterCore>& data)
+void ViewCategory::actUpdateFilter(PredefTrainFilterCore* f, std::unique_ptr<PredefTrainFilterCore>& data)
 {
     mw->getUndoStack()->push(new qecmd::UpdateTrainFilter(diagram.trainCollection(), 
-        filter, std::move(data), this));
+        f, std::move(data), this));
 }
 
-void ViewCategory::commitAddFilter(int place, const PredefTrainFilterCore* filter)
+void ViewCategory::commitAddFilter(int place, const PredefTrainFilterCore* f)
 {
     setupTrainFilterMenu();
     if (mw->filterManager) {
-        mw->filterManager->commitAddFilter(place, filter);
+        mw->filterManager->commitAddFilter(place, f);
     }
 }
 
-void ViewCategory::commitRemoveFilter(int id, const PredefTrainFilterCore* filter)
+void ViewCategory::commitRemoveFilter(int id, const PredefTrainFilterCore* f)
 {
     setupTrainFilterMenu();
     if (auto* a = mw->filterManager) {
-        a->commitRemoveFilter(id, filter);
+        a->commitRemoveFilter(id, f);
     }
 }
 
-void ViewCategory::commitUpdateFilter(PredefTrainFilterCore* filter)
+void ViewCategory::commitUpdateFilter(PredefTrainFilterCore* f)
 {
     setupTrainFilterMenu();   // in cases where name may changed
     if (auto* a = mw->filterManager) {
-        a->commitUpdateFilter(filter);
+        a->commitUpdateFilter(f);
     }
 }
 
@@ -901,9 +901,9 @@ qecmd::RemoveTrainFilter::RemoveTrainFilter(TrainCollection& coll, int id, ViewC
 
 void qecmd::RemoveTrainFilter::undo()
 {
-    auto* d = data.get();
+    auto* dd = data.get();
     coll.filters().insert(coll.filters().begin() + id, std::move(data));
-    cat->commitAddFilter(id, d);
+    cat->commitAddFilter(id, dd);
 }
 
 void qecmd::RemoveTrainFilter::redo()

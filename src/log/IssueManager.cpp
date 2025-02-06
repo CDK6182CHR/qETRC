@@ -13,12 +13,12 @@ IssueManager* IssueManager::get()
 	return _instance.get();
 }
 
-int IssueManager::rowCount(const QModelIndex& parent) const
+int IssueManager::rowCount([[maybe_unused]] const QModelIndex& parent) const
 {
 	return _issues.size();
 }
 
-int IssueManager::columnCount(const QModelIndex& parent) const
+int IssueManager::columnCount([[maybe_unused]] const QModelIndex& parent) const
 {
 	return ColMAX;
 }

@@ -35,11 +35,7 @@ TrainItem::TrainItem(Diagram& diagram, std::shared_ptr<TrainLine> line,
 
 QRectF TrainItem::boundingRect() const
 {
-    return QRectF();
-    if (pathItem)
-        return _bounding;
-    else
-        return QRectF();
+    return QRectF{};
 }
 
 void TrainItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)

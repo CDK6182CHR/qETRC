@@ -6,12 +6,12 @@ PathListModel::PathListModel(TrainPathCollection& pathcoll, QObject* parent):
 {
 }
 
-int PathListModel::rowCount(const QModelIndex& parent) const
+int PathListModel::rowCount([[maybe_unused]] const QModelIndex& parent) const
 {
 	return pathcoll.size();
 }
 
-int PathListModel::columnCount(const QModelIndex& parent) const
+int PathListModel::columnCount([[maybe_unused]] const QModelIndex& parent) const
 {
 	return ColMAX;
 }

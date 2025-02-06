@@ -19,7 +19,7 @@ TrainFilterCombo::~TrainFilterCombo()
 void TrainFilterCombo::onIndexChanged(int id)
 {
     const auto& it=itemData(id);
-    if (it.type() == QMetaType::Int){
+    if (it.type() == QMetaType::Int){   // For Qt6, we should use typeId(); However, for compatiblity with Qt5, keep type() for a moment
         // for Sys filters
         auto t=static_cast<PredefTrainFilterCore::SysFilterId>(it.toInt());
         auto* f=PredefTrainFilterCore::getSysFilter(t);

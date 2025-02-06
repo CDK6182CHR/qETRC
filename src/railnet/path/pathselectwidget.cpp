@@ -58,8 +58,8 @@ void PathSelectWidget::initUI()
             this,&PathSelectWidget::onSelectSeqChanged);
 
     int c=0;
-    for(int w:{100,80,80,200}){
-        seqTable->setColumnWidth(c++,w);
+    for(int wd:{100,80,80,200}){
+        seqTable->setColumnWidth(c++,wd);
     }
 
     sp->addWidget(w);
@@ -79,8 +79,8 @@ void PathSelectWidget::initUI()
     vlay->addWidget(adjTable);
 
     c=0;
-    for(int w:{100,80,80,60,60,60})
-        adjTable->setColumnWidth(c++,w);
+    for(int wd:{100,80,80,60,60,60})
+        adjTable->setColumnWidth(c++,wd);
 
     btn=new QPushButton(tr("添加至径路关键点表"));
     connect(btn,&QPushButton::clicked,this,&PathSelectWidget::addByAdjStationBtn);
@@ -102,8 +102,8 @@ void PathSelectWidget::initUI()
     vlay->addWidget(pathTable);
 
     c=0;
-    for(int w:{120,80,80,80}){
-        pathTable->setColumnWidth(c++,w);
+    for(int wd:{120,80,80,80}){
+        pathTable->setColumnWidth(c++,wd);
     }
 
     connect(pathTable,&QTableView::doubleClicked,

@@ -257,7 +257,7 @@ void PathContext::actClearTrains()
     mw->getUndoStack()->push(new qecmd::ClearTrainsFromPath(path, this));
 }
 
-void PathContext::afterPathTrainsChanged(TrainPath* path, const std::vector<std::weak_ptr<Train>>& trains)
+void PathContext::afterPathTrainsChanged([[maybe_unused]] TrainPath* path, const std::vector<std::weak_ptr<Train>>& trains)
 {
     // rebind and repaint trains
     auto* c = mw->getTrainContext();
@@ -270,7 +270,7 @@ void PathContext::afterPathTrainsChanged(TrainPath* path, const std::vector<std:
     // update path data (nothing to do for now)
 }
 
-void PathContext::afterPathTrainsChanged(TrainPath* path, const std::vector<qecmd::TrainInfoInPath>& data)
+void PathContext::afterPathTrainsChanged([[maybe_unused]] TrainPath* path, const std::vector<qecmd::TrainInfoInPath>& data)
 {
     // rebind and repaint trains
     auto* c = mw->getTrainContext();
@@ -283,7 +283,7 @@ void PathContext::afterPathTrainsChanged(TrainPath* path, const std::vector<qecm
     // update path data (nothing to do for now)
 }
 
-void PathContext::afterPathTrainsChanged(TrainPath* path, const QList<std::shared_ptr<Train>>& trains)
+void PathContext::afterPathTrainsChanged([[maybe_unused]] TrainPath* path, const QList<std::shared_ptr<Train>>& trains)
 {
     // rebind and repaint trains
     auto* c = mw->getTrainContext();
@@ -425,7 +425,7 @@ void qecmd::RemoveTrainsFromPath::redo()
 
 qecmd::AddTrainsToPath::AddTrainsToPath(TrainPath* path, QList<std::shared_ptr<Train>>&& trains_, 
     PathContext* cont, QUndoCommand* parent):
-    QUndoCommand(QObject::tr("添加%1列车到径路%2").arg(trains_.size()).arg(path->name())), 
+    QUndoCommand(QObject::tr("添加%1列车到径路%2").arg(trains_.size()).arg(path->name()), parent), 
     path(path), trains(std::move(trains_)), cont(cont)
 {
 }

@@ -125,6 +125,10 @@ public:
     TrainItem(Diagram& diagram, std::shared_ptr<TrainLine> line, Railway& railway, DiagramPage& page, double startY,
         QGraphicsItem* parent = nullptr);
 
+    /**
+     * 2025.02.06: This item itself contains nothing, so just return an empty rect.
+     * The actual rect is childrenBoundingRect.
+     */
     virtual QRectF boundingRect()const override;
 
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 

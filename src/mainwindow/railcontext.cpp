@@ -869,10 +869,10 @@ void RailContext::commitSaveTrackToTimetable()
 }
 
 
-void RailContext::removeRailwayAtU(int i)
+void RailContext::removeRailwayAtU(int idx)
 {
 	auto& dia = diagram;
-	auto rail = dia.railwayAt(i);
+	auto rail = dia.railwayAt(idx);
 
 	// 2023.08.22: re-bind affected trains (that bound by path)
 	std::vector<std::shared_ptr<Train>> affect_trains = diagram.trainCollection().affectedTrainsByRailInPath(rail);
@@ -884,10 +884,10 @@ void RailContext::removeRailwayAtU(int i)
 	// 2023.09.04: The rebind operation should be redone/undone AFTER the operation of removing railway.
 	// Thus, the macro is not suitable for this.
 	//mw->getUndoStack()->beginMacro(tr("删除线路: %1").arg(rail->name()));
-	auto* cmd = new qecmd::RemoveRailway(rail, i, this);
+	auto* cmd = new qecmd::RemoveRailway(rail, idx, this);
 	
 	// re-bind all the affected paths
-	auto* cmd_rebind = new qecmd::RebindTrainsByPaths(std::move(affect_trains), mw->contextTrain, cmd);
+	[[maybe_unused]] auto* cmd_rebind = new qecmd::RebindTrainsByPaths(std::move(affect_trains), mw->contextTrain, cmd);
 
 	// 注意这里只会删除一条线路
 	// 可能会涉及多个Page的删除！倒着来

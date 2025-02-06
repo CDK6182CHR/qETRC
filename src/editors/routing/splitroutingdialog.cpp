@@ -92,7 +92,7 @@ void SplitRoutingDialog::accept()
 	int last_index = 0;
 	QString last_name;
 
-	auto add_routing_func = [&](const QString& name, int new_idx, int last_idx, auto itr, auto itr2) {
+	auto add_routing_func = [&](const QString& name, int new_idx, int last_idx, auto itr) {
 		report.append(tr("新交路[%1] 首车次[%2] 共%3车次\n").arg(name, itr->name()).arg(new_idx - last_index));
 		res.emplace_back(SplitRoutingData{ .name = name, .idx_first = last_idx, .idx_last = new_idx });
 	};
@@ -120,7 +120,7 @@ void SplitRoutingDialog::accept()
 		else {
 			auto itr2 = itr;
 			std::advance(itr2, d.index - last_index);
-			add_routing_func(last_name, d.index, last_index, itr, itr2);
+			add_routing_func(last_name, d.index, last_index, itr);
 
 			itr = itr2;
 			last_index = d.index;
@@ -129,7 +129,7 @@ void SplitRoutingDialog::accept()
 	}
 
 	if (itr != m_routing->order().end()) {
-		add_routing_func(last_name, m_routing->count(), last_index, itr, m_routing->order().end());
+		add_routing_func(last_name, m_routing->count(), last_index, itr);
 	}
 
 	auto flag = QMessageBox::question(this, tr("交路拆分"), tr("交路拆分概要如下，是否继续？\n") + report);

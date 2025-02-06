@@ -189,7 +189,7 @@ void ReadRulerDetailModel::setupModel(std::shared_ptr<RailInterval> railint,
         if (useAverage) {
             // 均值模式，标记截断的数据
             auto& tpcnt = itrep.types.at(tp).count;
-            if (auto p = tpcnt.find(secreal); p == tpcnt.end()) {
+            if (auto p1 = tpcnt.find(secreal); p1 == tpcnt.end()) {
                 setItem(row, ColMark, new SI(tr("截断")));
             }
         }

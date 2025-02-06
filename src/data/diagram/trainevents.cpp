@@ -6,12 +6,12 @@
 #include "data/train/train.h"
 #include "util/utilfunc.h"
 
-bool StationEvent::operator<(const StationEvent& another) const
+bool StationEvent::operator<(const StationEvent& rhs) const
 {
-	if (time == another.time) {
-		return static_cast<int8_t>(type) < static_cast<int8_t>(another.type);
+	if (time == rhs.time) {
+		return static_cast<int8_t>(type) < static_cast<int8_t>(rhs.type);
 	}
-	return qeutil::timeCompare(time, another.time);
+	return qeutil::timeCompare(time, rhs.time);
 }
 
 //enum class TrainEventType :int8_t {
@@ -51,12 +51,12 @@ QString StationEvent::toString() const
 
 
 
-bool IntervalEvent::operator<(const IntervalEvent& another) const
+bool IntervalEvent::operator<(const IntervalEvent& rhs) const
 {
-	if (time == another.time) {
-		return static_cast<int8_t>(type) < static_cast<int8_t>(another.type);
+	if (time == rhs.time) {
+		return static_cast<int8_t>(type) < static_cast<int8_t>(rhs.type);
 	}
-	return qeutil::timeCompare(time, another.time);
+	return qeutil::timeCompare(time, rhs.time);
 }
 
 QString IntervalEvent::toString() const

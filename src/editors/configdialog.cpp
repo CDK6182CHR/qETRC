@@ -443,7 +443,7 @@ void ConfigDialog::initUI()
         form->addRow(tr("浮动交路连线"), ck);
         ckFloatLinkLine = ck;
 
-        auto* sp = new QSpinBox;
+        sp = new QSpinBox;
         sp->setRange(0, 100000);
         sp->setSingleStep(1);
         sp->setToolTip(tr("在浮动交路连线启用的情况下，设置第一条交路连线的高度"));

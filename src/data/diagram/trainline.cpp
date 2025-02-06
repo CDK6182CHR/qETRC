@@ -658,7 +658,6 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
         //麻烦在：可能出现一趟车站内停车，另一趟车通过但这里没有停点的情况
         if (ycond == 0 && (index != 0 || startLabel())) {
             //本站时刻表是重合的，那很简单，跟第一站写的那个一样
-            auto tme = pme->trainStation, the = phe->trainStation;
             int xcond = xComp(tme->arrive, the->arrive);
 
             if (xcond == 0) {
@@ -1476,7 +1475,7 @@ RailStationEventList
         // 2022.03.12修改规则：多段运行线交接点的，出发算后段、到达算前段
         // 实际上和普通运行线没区别了
         //if (startLabel() || !localFirst) {
-        if (true || !localFirst) {
+        if constexpr (true) {
             auto ts = p->trainStation;
             if (ts->isStopped()) {
                 //只要有停车，一律按到达出发处理

@@ -365,7 +365,7 @@ namespace navi {
 		PathItem(TrainPath* path, int row, PathListItem* parent);
 
 		// 通过 AbstractComponentItem 继承
-		virtual AbstractComponentItem* child(int i) override { return nullptr; }
+		virtual AbstractComponentItem* child([[maybe_unused]] int i) override { return nullptr; }
 		virtual int childCount() const override { return 0; }
 		virtual QString data(int i) const override;
 		virtual int type() const override { return Type; }

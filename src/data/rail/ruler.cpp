@@ -117,7 +117,6 @@ int Ruler::totalInterval(std::shared_ptr<RailStation> from,
     std::shared_ptr<RailStation> to, Direction _dir) const
 {
     auto p = from->dirNextInterval(_dir);
-    auto node = p->rulerNodeAt(_index);
     int res = 0;
     for (; p; p = p->nextInterval()) {
         auto node = p->rulerNodeAt(_index);

@@ -165,7 +165,9 @@ if (QETRC_EXTRA_WARNING_INFO)
     if (MSVC)
         # Remove the automatically configured /W3 flag, as this would generate command-line warning...
         string(REPLACE "/W3" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-        target_compile_options(qETRC PRIVATE /W4)
+
+        # C4458: declaration overwrites class member. This is rather common in this project, so disable this for now..
+        target_compile_options(qETRC PRIVATE /W4 /wd4458)
     else ()
         target_compile_options(qETRC PRIVATE -Wall -Wextra)
     endif ()
