@@ -41,7 +41,7 @@ std::shared_ptr<Train> SelectTrainCombo::dialogGetTrain(TrainCollection& coll_,
         res = cb->train();
     }
     dialog->setParent(nullptr);
-    delete dialog;
+    dialog->deleteLater();
     return res;
 }
 

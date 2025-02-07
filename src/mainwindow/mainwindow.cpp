@@ -1615,7 +1615,7 @@ void MainWindow::clearDiagramUnchecked()
 	for (auto p : diagramDocks) {
 		manager->removeDockWidget(p);
 		p->setParent(nullptr);
-		delete p;
+		p->deleteLater();   // 2025.02.07  use deleteLater(), instead of delete directly
 	}
 	diagramDocks.clear();
 	diagramWidgets.clear();
@@ -2468,7 +2468,7 @@ void MainWindow::removePageAt(int index)
 		focusOutPage();
 	}
 	manager->removeDockWidget(dock);
-	delete dock;
+	dock->deleteLater();
 }
 
 

@@ -46,7 +46,7 @@ std::shared_ptr<Railway> SelectRailwayCombo::dialogGetRailway(RailCategory& cat,
         res = cb->railway();
     }
     dialog->setParent(nullptr);
-    delete dialog;
+    dialog->deleteLater();
     return res;
 }
 

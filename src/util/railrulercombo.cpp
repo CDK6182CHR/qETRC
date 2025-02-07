@@ -41,7 +41,7 @@ std::shared_ptr<Ruler> RailRulerCombo::dialogGetRuler(RailCategory& cat_,
         res = cb->ruler();
     }
     dialog->setParent(nullptr);
-    delete dialog;
+    dialog->deleteLater();
     return res;
 }
 

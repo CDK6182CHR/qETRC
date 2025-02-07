@@ -58,6 +58,6 @@ QList<std::shared_ptr<Railway> > SelectRailwaysTable::dlgGetRailways(QWidget* pa
 		res = cb->selectedRailways();
 	}
 	dialog->setParent(nullptr);
-	delete dialog;
+	dialog->deleteLater();
 	return res;
 }

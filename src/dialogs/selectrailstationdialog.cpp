@@ -37,7 +37,7 @@ std::shared_ptr<RailStation> SelectRailStationDialog::getStation(
         res = dlg->station();
     }
     dlg->setParent(nullptr);
-    delete dlg;
+    dlg->deleteLater();
     return res;
 }
 

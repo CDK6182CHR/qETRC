@@ -59,7 +59,7 @@ int PageComboForRail::dlgGetPageIndex(Diagram &diagram, std::shared_ptr<Railway>
         res=cb->pageIndex();
     }
     dlg->setParent(nullptr);
-    delete dlg;
+    dlg->deleteLater();
     return res;
 }
 

@@ -60,7 +60,7 @@ SelectTrainStationsDialog::result_type
         res = dlg->getSelection();
     }
     dlg->setParent(nullptr);
-    delete dlg;
+    dlg->deleteLater();
     return res;
 }
 
