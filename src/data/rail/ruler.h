@@ -6,6 +6,7 @@
 
 //#include "rulernode.h"
 
+#include "abstractruler.h"
 #include "railintervaldata.hpp"
 
 class Railway;
@@ -18,7 +19,7 @@ class TrainAdapter;
  * 新增index，要求必须等于在QList中的坐标，采用这个去定位
  */
 class Ruler:
-        public RailIntervalData<RulerNode, Ruler>
+        public AbstractRuler, public RailIntervalData<RulerNode, Ruler>
 {
     QString _name;
 
