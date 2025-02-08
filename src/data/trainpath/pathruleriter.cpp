@@ -7,50 +7,79 @@
 #include "data/rail/ruler.h"
 #include "data/rail/rulernode.h"
 
-PathRulerIterator::PathRulerIterator():
+
+template<typename TyNode>
+PathRulerIteratorGen<TyNode>::PathRulerIteratorGen(TyPathRuler* ruler, size_t seg_index, std::shared_ptr<TyNode> cur_node):
+	m_ruler(ruler), m_seg_index(seg_index), m_cur_node(std::move(cur_node))
+{
+}
+
+template<typename TyNode>
+PathRulerIteratorGen<TyNode> PathRulerIteratorGen<TyNode>::makeBegin(TyPathRuler* ruler)
+{
+	PathRulerIteratorGen<TyNode> res(ruler, 0, {});
+	res.toSegFirstNode();
+	return res;
+}
+
+template<typename TyNode>
+PathRulerIteratorGen<TyNode> PathRulerIteratorGen<TyNode>::makeEnd(TyPathRuler* ruler)
+{
+	return PathRulerIteratorGen<TyNode>(ruler, ruler->segments().size(), {});
+}
+
+template<typename TyNode>
+PathRulerIteratorGen<TyNode>::PathRulerIteratorGen():
 	m_ruler(nullptr), m_seg_index(0), m_cur_node()
 {
 }
 
-PathRulerIterator& PathRulerIterator::operator++()
+template <typename TyNode>
+PathRulerIteratorGen<TyNode>& PathRulerIteratorGen<TyNode>::operator++()
 {
 	next();
 	return *this;
 }
 
-PathRulerIterator PathRulerIterator::operator++(int)
+template <typename TyNode>
+PathRulerIteratorGen<TyNode> PathRulerIteratorGen<TyNode>::operator++(int)
 {
 	auto tmp = *this;   // copy construct
 	next();
 	return tmp;
 }
 
-PathRulerIterator& PathRulerIterator::operator--()
+template <typename TyNode>
+PathRulerIteratorGen<TyNode>& PathRulerIteratorGen<TyNode>::operator--()
 {
 	prev();
 	return *this;
 }
 
-PathRulerIterator PathRulerIterator::operator--(int)
+template <typename TyNode>
+PathRulerIteratorGen<TyNode> PathRulerIteratorGen<TyNode>::operator--(int)
 {
 	auto tmp = *this;
 	prev();
 	return tmp;
 }
 
-bool PathRulerIterator::operator==(const PathRulerIterator& rhs) const
+template <typename TyNode>
+bool PathRulerIteratorGen<TyNode>::operator==(const PathRulerIteratorGen<TyNode>& rhs) const
 {
 	checkSameRuler(rhs);
 	return m_seg_index == rhs.m_seg_index && m_cur_node == rhs.m_cur_node;
 }
 
-bool PathRulerIterator::operator!=(const PathRulerIterator& rhs) const
+template <typename TyNode>
+bool PathRulerIteratorGen<TyNode>::operator!=(const PathRulerIteratorGen<TyNode>& rhs) const
 {
 	checkSameRuler(rhs);
 	return m_seg_index != rhs.m_seg_index || m_cur_node != rhs.m_cur_node;
 }
 
-void PathRulerIterator::next()
+template <typename TyNode>
+void PathRulerIteratorGen<TyNode>::next()
 {
 	auto& seg = m_ruler->segments().at(m_seg_index);
 	assert(!seg.ruler.expired());
@@ -68,7 +97,8 @@ void PathRulerIterator::next()
 	}
 }
 
-void PathRulerIterator::prev()
+template <typename TyNode>
+void PathRulerIteratorGen<TyNode>::prev()
 {
 	auto path = m_ruler->path().lock();
 	const auto& seg_start = path->segStartStation(m_seg_index);
@@ -83,7 +113,8 @@ void PathRulerIterator::prev()
 	}
 }
 
-void PathRulerIterator::toSegFirstNode()
+template <typename TyNode>
+void PathRulerIteratorGen<TyNode>::toSegFirstNode()
 {
 	if (m_seg_index >= m_ruler->segments().size()) {
 		// pass-the-end iterator
@@ -108,7 +139,8 @@ void PathRulerIterator::toSegFirstNode()
 	}
 }
 
-void PathRulerIterator::toSegLastNode()
+template <typename TyNode>
+void PathRulerIteratorGen<TyNode>::toSegLastNode()
 {
 	auto path = m_ruler->path().lock();
 	auto& pathseg = path->segments().at(m_seg_index);
@@ -119,7 +151,7 @@ void PathRulerIterator::toSegLastNode()
 	m_cur_node = cur_railint->getRulerNode(m_ruler->segments().at(m_seg_index).ruler.lock());
 }
 
-void PathRulerIterator::checkSameRuler(const PathRulerIterator& rhs)const
-{
-	assert(m_ruler == rhs.m_ruler);
-}
+
+template PathRulerIteratorGen<RulerNode>;
+template PathRulerIteratorGen<const RulerNode>;
+

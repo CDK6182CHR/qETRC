@@ -37,7 +37,17 @@ public:
 
 	bool valid()const { return m_valid; }
 
-	PathRulerIterator begin();
-	PathRulerIterator cbegin()const;
+	PathRulerConstIterator cbegin()const;
+	PathRulerMutableIterator begin();
+
+	PathRulerConstIterator cend()const;
+	PathRulerMutableIterator end();
+
+	PathRulerConstIterator begin()const {
+		return cbegin();
+	}
+	PathRulerConstIterator end()const {
+		return cend();
+	}
 	
 };
