@@ -137,4 +137,9 @@ public:
 	 * (where the Railway is not actually added)
 	 */
 	bool containsRailwayByName(const QString& name)const;
+
+	/**
+	 * 2025.02.08  Returns the station name of the first station of the segment given by the index.
+	 */
+	const StationName& segStartStation(size_t idx)const;
 };

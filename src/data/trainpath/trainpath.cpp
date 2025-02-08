@@ -201,3 +201,13 @@ bool TrainPath::containsRailwayByName(const QString& name) const
 	}
 	return false;
 }
+
+const StationName& TrainPath::segStartStation(size_t idx) const
+{
+	if (idx == 0) {
+		return _start_station;
+	}
+	else {
+		return _segments.at(idx - 1).end_station;
+	}
+}

@@ -7,6 +7,7 @@
 #include <QString>
 
 #include "pathrulerseg.h"
+#include "pathruleriter.h"
 
 class Ruler;
 class TrainPath;
@@ -32,6 +33,11 @@ public:
 	auto& segments()const { return m_segments; }
 	auto& segmentsRef() { return m_segments; }
 
+	auto& path()const { return m_path; }
+
 	bool valid()const { return m_valid; }
 
+	PathRulerIterator begin();
+	PathRulerIterator cbegin()const;
+	
 };
