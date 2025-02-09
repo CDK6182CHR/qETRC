@@ -2346,7 +2346,7 @@ void MainWindow::actSaveGraph()
 void MainWindow::actSaveGraphAs()
 {
 	QString res = QFileDialog::getSaveFileName(this, QObject::tr("另存为"), "",
-		tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)"));
+		tr("pyETRC运行图文件(*.pyetgr;*.json)\n所有文件(*.*)"));
 	if (res.isNull())
 		return;
 	auto start = std::chrono::system_clock::now();

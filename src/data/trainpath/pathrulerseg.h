@@ -2,8 +2,10 @@
 
 #include <memory>
 #include <QString>
+#include <QJsonObject>
 
 class Ruler;
+struct TrainPathSeg;
 
 /**
  * A segment of the ruler for a TrainPath, corresponding to the TrainPathSeg.
@@ -12,4 +14,14 @@ class Ruler;
 struct PathRulerSeg {
 	QString ruler_name;
 	std::weak_ptr<Ruler> ruler;
+
+	QString getRulerName()const;
+
+	explicit PathRulerSeg(std::shared_ptr<Ruler> ruler_);
+	PathRulerSeg(const QJsonObject& obj, const TrainPathSeg& pathseg);
+
+	void fromJson(const QJsonObject& obj, const TrainPathSeg& pathseg);
+	QJsonObject toJson()const;
+
+	bool checkIsValid()const;
 };

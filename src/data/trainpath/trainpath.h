@@ -3,6 +3,7 @@
 #include <memory>
 #include "trainpath.h"
 #include "trainpathseg.h"
+#include "pathruler.h"
 
 
 class RailCategory;
@@ -22,6 +23,8 @@ class TrainPath {
 	QString _note;
 	bool _valid;
 	std::vector<std::weak_ptr<Train>> _trains;
+
+	std::vector<std::shared_ptr<PathRuler>> _rulers;
 
 	friend class TrainPathCollection;
 
@@ -55,6 +58,9 @@ public:
 
 	auto& trains() { return _trains; }
 	auto& trains()const { return _trains; }
+
+	auto& rulers() { return _rulers; }
+	auto& rulers()const { return _rulers; }
 
 	std::vector<std::shared_ptr<Train>> trainsShared();
 
