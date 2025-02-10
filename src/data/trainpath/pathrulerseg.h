@@ -18,6 +18,7 @@ struct PathRulerSeg {
 	QString getRulerName()const;
 
 	explicit PathRulerSeg(std::shared_ptr<Ruler> ruler_);
+	explicit PathRulerSeg(const QString& name);
 	PathRulerSeg(const QJsonObject& obj, const TrainPathSeg& pathseg);
 
 	void fromJson(const QJsonObject& obj, const TrainPathSeg& pathseg);

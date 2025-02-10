@@ -34,12 +34,18 @@ public:
 
 	PathRuler(const QJsonObject& obj, const TrainPath& path, const RailCategory& cat);
 
+	/**
+	 * Ctor for empty ruler.
+	 */
+	explicit PathRuler(std::weak_ptr<TrainPath> path);
+
 	auto& segments()const { return m_segments; }
 	auto& segmentsRef() { return m_segments; }
 
 	auto& path()const { return m_path; }
 
 	bool valid()const { return m_valid; }
+	auto& name()const { return m_name; }
 
 	PathRulerConstIterator cbegin()const;
 	PathRulerMutableIterator begin();

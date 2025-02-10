@@ -14,6 +14,15 @@ PathRuler::PathRuler(const QJsonObject& obj, const TrainPath& path, const RailCa
 	fromJson(obj, path, cat);
 }
 
+PathRuler::PathRuler(std::weak_ptr<TrainPath> path):
+	m_path(path), m_name(), m_valid(false)
+{
+	auto ps = m_path.lock();
+	for (auto seg : ps->segments()) {
+		m_segments.emplace_back(PathRulerSeg(QString{}));   // initialized as empty ruler
+	}
+}
+
 PathRulerConstIterator PathRuler::cbegin() const
 {
 	return PathRulerConstIterator::makeBegin(this);

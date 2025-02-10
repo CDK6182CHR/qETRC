@@ -19,6 +19,11 @@ PathRulerSeg::PathRulerSeg(std::shared_ptr<Ruler> ruler_):
 {
 }
 
+PathRulerSeg::PathRulerSeg(const QString& name):
+    ruler_name(name), ruler()
+{
+}
+
 PathRulerSeg::PathRulerSeg(const QJsonObject& obj, const TrainPathSeg& pathseg)
 {
     fromJson(obj, pathseg);
