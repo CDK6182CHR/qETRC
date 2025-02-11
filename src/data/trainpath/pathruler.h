@@ -20,7 +20,7 @@ class RailCategory;
  */
 class PathRuler : public AbstractRuler
 {
-	std::weak_ptr<TrainPath> m_path;
+	TrainPath* m_path;
 	QString m_name;
 	std::vector<PathRulerSeg> m_segments;
 	bool m_valid;
@@ -30,14 +30,14 @@ public:
 	/**
 	 * Constructor provided for GUI construction. All data must be valid at this construction stage.
 	 */
-	PathRuler(std::weak_ptr<TrainPath> path, const QString& name, std::vector<PathRulerSeg> segments);
+	PathRuler(TrainPath* path, const QString& name, std::vector<PathRulerSeg> segments);
 
 	PathRuler(const QJsonObject& obj, const TrainPath& path, const RailCategory& cat);
 
 	/**
 	 * Ctor for empty ruler.
 	 */
-	explicit PathRuler(std::weak_ptr<TrainPath> path);
+	explicit PathRuler(TrainPath* path);
 
 	auto& segments()const { return m_segments; }
 	auto& segmentsRef() { return m_segments; }

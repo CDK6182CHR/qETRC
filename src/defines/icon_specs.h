@@ -233,6 +233,10 @@
 
 #define QEICN_change_path QE_RSC_ICON(exchange.png)   // 切换列车径路
 #define QEICN_edit_path QE_RSC_ICON(edit.png)   // 编辑 列车径路
+
+#define QEICN_edit_path_ruler QE_RSC_ICON(ruler.png)  // 编辑 列车径路标尺
+#define QEICN_add_path_ruler QE_RSC_ICON(add.png)     // 新建 列车径路标尺
+
 #define QEICN_path_trains QE_RSC_ICON(train.png)   // 列车表
 #define QEICN_path_add_trains QE_RSC_ICON(add.png)   // 添加列车到径路
 #define QEICN_path_clear_trains QE_STD_ICON(TabCloseButton)   // 清空列车

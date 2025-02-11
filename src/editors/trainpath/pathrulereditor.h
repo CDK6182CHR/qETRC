@@ -24,10 +24,16 @@ class PathRulerEditor: public QWidget {
 
 	/**
 	 * This is the ruler object that is managed by this editor.
-	 * Must not be null.
+	 * This may be null, for creating new object; or not-null, for modifying existing PathRuler.
 	 * This object is NOT shared with the model; the model stores a COPY of current this object.
 	 */
 	std::shared_ptr<PathRuler> m_ruler;
+
+	/**
+	 * Flag for whether the current ruler is existed one or newly created one.
+	 * Should be equal to bool(m_ruler) for now.
+	 */
+	bool m_existedRuler;
 
 	QTableView* m_table;
 	QLineEdit* m_edRulerName;
@@ -35,7 +41,16 @@ class PathRulerEditor: public QWidget {
 	QLabel* m_labValid;
 
 public:
+
+	/**
+	 * Constructor for existing PathRuler object
+	 */
 	PathRulerEditor(std::shared_ptr<PathRuler> ruler, QWidget* parent = nullptr);
+
+	/**
+	 * Constructor for creating new object
+	 */
+	PathRulerEditor(TrainPath* path, QWidget* parent = nullptr);
 
 	void refreshBasicData();
 	
@@ -46,4 +61,5 @@ private:
 
 public slots:
 	void refreshData();
+	void actApply();
 };

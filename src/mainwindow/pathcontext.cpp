@@ -20,6 +20,7 @@
 #include "data/train/train.h"
 #include "defines/icon_specs.h"
 #include "editors/trainpath/selectpathdialog.h"
+#include "editors/trainpath/pathrulereditor.h"
 
 
 PathContext::PathContext(Diagram &diagram, SARibbonContextCategory *cont,
@@ -85,6 +86,12 @@ void PathContext::initUI()
     connect(act,&QAction::triggered, this, &PathContext::actEditPath);
     panel->addLargeAction(act);
 
+    panel = page->addPannel(tr("径路标尺"));
+    act = mw->makeAction(QEICN_add_path_ruler, tr("新建标尺"), tr("新建径路标尺"));
+    act->setToolTip(tr("新建径路标尺\n通过手动选择各段线路的标尺，来新建列车径路标尺"));
+    connect(act, &QAction::triggered, this, &PathContext::actAddPathRuler);
+    panel->addLargeAction(act);
+
     panel = page->addPannel(tr("列车"));
 
     act = mw->makeAction(QEICN_path_trains, tr("列车表"), tr("径路列车表"));
@@ -137,6 +144,17 @@ void PathContext::actDuplicatePath()
 {
     int idx = diagram.pathCollection().pathIndex(path);
     mw->pathListWidget->actDuplicate(idx);
+}
+
+void PathContext::actAddPathRuler()
+{
+    auto* w = new PathRulerEditor(path, mw);
+    w->setWindowFlag(Qt::Dialog);
+    w->show();
+}
+
+void PathContext::actSwitchToPathRuler()
+{
 }
 
 void PathContext::actShowTrains()

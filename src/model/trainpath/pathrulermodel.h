@@ -27,7 +27,7 @@ class PathRulerModel : public QAbstractTableModel
 {
     Q_OBJECT
 	PathRuler m_ruler;
-    std::shared_ptr<TrainPath> m_path;
+    TrainPath* m_path;
     std::vector<PathRulerSegmentData> m_seg_data;
 
 public:

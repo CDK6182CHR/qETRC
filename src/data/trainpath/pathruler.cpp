@@ -4,7 +4,7 @@
 
 #include "trainpath.h"
 
-PathRuler::PathRuler(std::weak_ptr<TrainPath> path, const QString& name, std::vector<PathRulerSeg> segments):
+PathRuler::PathRuler(TrainPath* path, const QString& name, std::vector<PathRulerSeg> segments):
 	m_path(std::move(path)), m_name(name), m_segments(std::move(segments)), m_valid(true)
 {
 }
@@ -14,11 +14,10 @@ PathRuler::PathRuler(const QJsonObject& obj, const TrainPath& path, const RailCa
 	fromJson(obj, path, cat);
 }
 
-PathRuler::PathRuler(std::weak_ptr<TrainPath> path):
+PathRuler::PathRuler(TrainPath* path):
 	m_path(path), m_name(), m_valid(false)
 {
-	auto ps = m_path.lock();
-	for (auto seg : ps->segments()) {
+	for (auto seg : path->segments()) {
 		m_segments.emplace_back(PathRulerSeg(QString{}));   // initialized as empty ruler
 	}
 }

@@ -6,7 +6,7 @@
 #include "util/utilfunc.h"
 
 PathRulerModel::PathRulerModel(PathRuler ruler, QObject* parent):
-	QAbstractTableModel(parent), m_ruler(std::move(ruler)), m_path(m_ruler.path().lock())
+	QAbstractTableModel(parent), m_ruler(std::move(ruler)), m_path(m_ruler.path())
 {
 	computeSegmentData();
 }
@@ -27,14 +27,10 @@ QVariant PathRulerModel::data(const QModelIndex& index, int role) const
 		return {};
 	int row = index.row();
 	const auto& seg = m_ruler.segments().at(row);
-	if (m_ruler.path().expired()) {
-		qWarning() << "PathRulerModel::data: path has been expired";
-		return {};
-	}
 	const auto& pathseg = m_path->segments().at(row);
 
-	if (role == Qt::EditRole) {
-		switch (index.row())
+	if (role == Qt::EditRole || role == Qt::DisplayRole) {
+		switch (index.column())
 		{
 		case PathRulerModel::ColRailName: return pathseg.railwayName();
 			break;
@@ -64,6 +60,7 @@ QVariant PathRulerModel::data(const QModelIndex& index, int role) const
 			break;
 		}
 	}
+    return {};
 }
 
 bool PathRulerModel::setData(const QModelIndex& index, const QVariant& value, int role)
@@ -162,7 +159,7 @@ void PathRulerModel::setRuler(PathRuler ruler)
 {
 	beginResetModel();
 	m_ruler = std::move(ruler);
-	m_path = m_ruler.path().lock();
+	m_path = m_ruler.path();
 	computeSegmentData();
 	endResetModel();
 }

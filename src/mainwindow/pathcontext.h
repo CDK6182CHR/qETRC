@@ -55,6 +55,9 @@ private slots:
     void actRemovePath();
     void actDuplicatePath();
 
+    void actAddPathRuler();
+    void actSwitchToPathRuler();
+
     void actShowTrains();
     void actAddTrains();
 

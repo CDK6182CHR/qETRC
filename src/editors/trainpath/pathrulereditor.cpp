@@ -1,4 +1,4 @@
-#include "pathrulereditor.h"
+ï»¿#include "pathrulereditor.h"
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -15,22 +15,45 @@
 PathRulerEditor::PathRulerEditor(std::shared_ptr<PathRuler>  ruler, QWidget* parent):
 	QWidget(parent), 
 	m_model(new PathRulerModel(*ruler, this)),
-	m_ruler(std::move(ruler))
+	m_ruler(std::move(ruler)),
+	m_existedRuler(true)
 {
-	resize(800, 600);
+	setWindowTitle(tr("ç¼–è¾‘å¾„è·¯æ ‡å°º - %1").arg(m_ruler->name()));
 	initUI();
+	refreshBasicData();
+}
+
+PathRulerEditor::PathRulerEditor(TrainPath* path, QWidget* parent) :
+	QWidget(parent),
+	m_model(new PathRulerModel(PathRuler{ path }, this)),
+	m_ruler(),
+	m_existedRuler(false)
+{
+	setWindowTitle(tr("æ–°å»ºæ ‡å°º"));
+	initUI();
+	refreshBasicData();
 }
 
 void PathRulerEditor::refreshBasicData()
 {
-	m_edRulerName->setText(m_model->ruler().name());
+	if (m_ruler) {
+		m_edRulerName->setText(m_model->ruler().name());
+	}
 	m_edPathName->setText(m_model->path()->name());
+	if (m_model->path()->valid()) {
+		m_labValid->setText(tr("å¾„è·¯å¯ç”¨"));
+	}
+	else {
+		m_labValid->setText(tr("å¾„è·¯ä¸å¯ç”¨"));
+	}
 }
 
 void PathRulerEditor::refreshData()
 {
-	m_model->setRuler(*m_ruler);
-	refreshBasicData();
+	if (m_ruler) {
+		m_model->setRuler(*m_ruler);
+		refreshBasicData();
+	}
 }
 
 void PathRulerEditor::setRuler(std::shared_ptr<PathRuler>  ruler)
@@ -41,16 +64,19 @@ void PathRulerEditor::setRuler(std::shared_ptr<PathRuler>  ruler)
 
 void PathRulerEditor::initUI()
 {
+	resize(800, 600);
+	setAttribute(Qt::WA_DeleteOnClose);
+
 	auto* vlay = new QVBoxLayout(this);
-	auto* lab = new QLabel(tr("ÁÐ³µ¾¶Â·µÄ±ê³ßÊÇËùÉæ¼°µÄ¸÷¶ÎÏßÂ·±ê³ßµÄ·Ö¶Î×éºÏ¡£"
-		"ÇëÔÚÏÂ±íÖÐÑ¡ÔñÁÐ³µ¾¶Â·¸÷¶Î£¨segment£©Ëù¶ÔÓ¦µÄ±ê³ßÃû³Æ¡£"
-		"Èç¶ÔÓ¦ÏßÂ·ÎÞ±ê³ß»òÎÞËùÐè±ê³ß£¬Çë×ªÖÁÏßÂ·µÄ±ê³ß±à¼­Ìí¼Ó¶ÔÓ¦±ê³ß¡£"));
+	auto* lab = new QLabel(tr("åˆ—è½¦å¾„è·¯çš„æ ‡å°ºæ˜¯æ‰€æ¶‰åŠçš„å„æ®µçº¿è·¯æ ‡å°ºçš„åˆ†æ®µç»„åˆã€‚"
+		"è¯·åœ¨ä¸‹è¡¨ä¸­é€‰æ‹©åˆ—è½¦å¾„è·¯å„æ®µï¼ˆsegmentï¼‰æ‰€å¯¹åº”çš„æ ‡å°ºåç§°ã€‚"
+		"å¦‚å¯¹åº”çº¿è·¯æ— æ ‡å°ºæˆ–æ— æ‰€éœ€æ ‡å°ºï¼Œè¯·è½¬è‡³çº¿è·¯çš„æ ‡å°ºç¼–è¾‘æ·»åŠ å¯¹åº”æ ‡å°ºã€‚"));
 	lab->setWordWrap(true);
 	vlay->addWidget(lab);
 
 	auto* flay = new QFormLayout;
 	m_edRulerName = new QLineEdit;
-	flay->addRow(tr("±ê³ßÃû³Æ"), m_edRulerName);
+	flay->addRow(tr("æ ‡å°ºåç§°"), m_edRulerName);
 
 	auto* hlay = new QHBoxLayout;
 	m_edPathName = new QLineEdit;
@@ -58,7 +84,7 @@ void PathRulerEditor::initUI()
 	hlay->addWidget(m_edPathName);
 	m_labValid = new QLabel;
 	hlay->addWidget(m_labValid);
-	flay->addRow(tr("ËùÊô¾¶Â·"), hlay);
+	flay->addRow(tr("æ‰€å±žå¾„è·¯"), hlay);
 	vlay->addLayout(flay);
 
 	m_table = new QTableView;
@@ -66,9 +92,26 @@ void PathRulerEditor::initUI()
 	m_table->setModel(m_model);
 	{
 		int c = 0;
-		for (int w : {100, 100, 100, 40, 40, 120, 60, 50}) {
+		for (int w : {100, 100, 100, 40, 80, 120, 60, 50}) {
 			m_table->setColumnWidth(c++, w);
 		}
 	}
 	vlay->addWidget(m_table);
+
+	if (m_existedRuler) {
+		auto* g = new ButtonGroup<3>({ "ç¡®å®š", "è¿˜åŽŸ", "å–æ¶ˆ" });
+		vlay->addLayout(g);
+		g->connectAll(SIGNAL(clicked()), this,
+			{ SLOT(actApply()), SLOT(refreshData()), SLOT(close()) });
+	}
+	else {
+		auto* g = new ButtonGroup<2>({ "ç¡®å®š", "å–æ¶ˆ" });
+		vlay->addLayout(g);
+		g->connectAll(SIGNAL(clicked()), this, { SLOT(actApply()), SLOT(close()) });
+	}
+}
+
+void PathRulerEditor::actApply()
+{
+	// TODO
 }

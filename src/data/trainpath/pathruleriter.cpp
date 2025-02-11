@@ -85,7 +85,7 @@ void PathRulerIteratorGen<TyNode>::next()
 	assert(!seg.ruler.expired());
 	auto seg_ruler = seg.ruler.lock();
 
-	auto& pathseg = m_ruler->path().lock()->segments().at(m_seg_index);
+	auto& pathseg = m_ruler->path()->segments().at(m_seg_index);
 	if (pathseg.end_station == m_cur_node->toStationName()) {
 		// We should switch to next segment
 		++m_seg_index;
@@ -100,7 +100,7 @@ void PathRulerIteratorGen<TyNode>::next()
 template <typename TyNode>
 void PathRulerIteratorGen<TyNode>::prev()
 {
-	auto path = m_ruler->path().lock();
+	auto path = m_ruler->path();
 	const auto& seg_start = path->segStartStation(m_seg_index);
 	if (seg_start == m_cur_node->fromStationName()) {
 		// Switch to previous segment
@@ -122,7 +122,7 @@ void PathRulerIteratorGen<TyNode>::toSegFirstNode()
 	}
 	else {
 		// Find the first node of the segment
-		auto path = m_ruler->path().lock();
+		auto path = m_ruler->path();
 		auto& pathseg = path->segments().at(m_seg_index);
 		auto rail = pathseg.railway.lock();
 		std::shared_ptr<RailStation> start_st;
@@ -142,7 +142,7 @@ void PathRulerIteratorGen<TyNode>::toSegFirstNode()
 template <typename TyNode>
 void PathRulerIteratorGen<TyNode>::toSegLastNode()
 {
-	auto path = m_ruler->path().lock();
+	auto path = m_ruler->path();
 	auto& pathseg = path->segments().at(m_seg_index);
 	auto rail = pathseg.railway.lock();
 
