@@ -48,8 +48,11 @@ QVariant PathRulerModel::data(const QModelIndex& index, int role) const
 			if (!seg.ruler.expired()) {
 				auto segruler = seg.ruler.lock();
 				rulerIndex = segruler->index();
+				return role == Qt::EditRole ? QVariant{ rulerIndex } : QVariant{ segruler->name() };
 			}
-			return rulerIndex;
+			else {
+				return role == Qt::EditRole ? QVariant{ -1 } : QVariant{};
+			}
 		}
 			break;
 		case PathRulerModel::ColPassTime: return qeutil::secsToStringHour(m_seg_data.at(row).interval_seconds);

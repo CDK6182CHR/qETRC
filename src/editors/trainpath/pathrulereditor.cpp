@@ -8,6 +8,7 @@
 #include <QFormLayout>
 
 #include "model/trainpath/pathrulermodel.h"
+#include "model/trainpath/pathrulernamedelegate.h"
 #include "data/common/qesystem.h"
 #include "data/trainpath/trainpath.h"
 #include "util/buttongroup.hpp"
@@ -15,6 +16,7 @@
 PathRulerEditor::PathRulerEditor(std::shared_ptr<PathRuler>  ruler, QWidget* parent):
 	QWidget(parent), 
 	m_model(new PathRulerModel(*ruler, this)),
+	m_delRulerName(new PathRulerNameDelegate(m_model->path(), this)),
 	m_ruler(std::move(ruler)),
 	m_existedRuler(true)
 {
@@ -26,6 +28,7 @@ PathRulerEditor::PathRulerEditor(std::shared_ptr<PathRuler>  ruler, QWidget* par
 PathRulerEditor::PathRulerEditor(TrainPath* path, QWidget* parent) :
 	QWidget(parent),
 	m_model(new PathRulerModel(PathRuler{ path }, this)),
+	m_delRulerName(new PathRulerNameDelegate(m_model->path(), this)),
 	m_ruler(),
 	m_existedRuler(false)
 {
@@ -59,6 +62,7 @@ void PathRulerEditor::refreshData()
 void PathRulerEditor::setRuler(std::shared_ptr<PathRuler>  ruler)
 {
 	m_ruler = std::move(ruler);
+	m_delRulerName->setPath(m_ruler->path());
 	refreshData();
 }
 
@@ -89,7 +93,9 @@ void PathRulerEditor::initUI()
 
 	m_table = new QTableView;
 	m_table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+	m_table->setItemDelegateForColumn(PathRulerModel::ColRulerName, m_delRulerName);
 	m_table->setModel(m_model);
+	m_table->setEditTriggers(QTableView::AllEditTriggers);
 	{
 		int c = 0;
 		for (int w : {100, 100, 100, 40, 80, 120, 60, 50}) {

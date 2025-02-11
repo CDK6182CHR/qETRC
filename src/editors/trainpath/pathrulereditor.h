@@ -9,6 +9,7 @@ class PathRuler;
 class QTableView;
 class QLineEdit;
 class QLabel;
+class PathRulerNameDelegate;
 
 /**
  * 2025.02.10  Experimental 
@@ -21,6 +22,7 @@ class QLabel;
 class PathRulerEditor: public QWidget {
 	Q_OBJECT
 	PathRulerModel* m_model;
+	PathRulerNameDelegate* m_delRulerName;
 
 	/**
 	 * This is the ruler object that is managed by this editor.

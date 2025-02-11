@@ -150,6 +150,7 @@ void PathContext::actAddPathRuler()
 {
     auto* w = new PathRulerEditor(path, mw);
     w->setWindowFlag(Qt::Dialog);
+    w->setWindowModality(Qt::ApplicationModal);
     w->show();
 }
 
