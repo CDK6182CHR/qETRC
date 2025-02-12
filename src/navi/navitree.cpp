@@ -714,8 +714,7 @@ void qecmd::AddNewTrain::undo()
 
 void qecmd::AddNewTrain::redo()
 {
-
-               navi->commitAddTrain(train);
+    navi->commitAddTrain(train);
 }
 
 void qecmd::BatchAddTrain::undo()

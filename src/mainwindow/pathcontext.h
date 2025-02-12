@@ -14,6 +14,8 @@ class SARibbonContextCategory;
 class Diagram;
 class PathEdit;
 class PathListWidget;
+class PathRuler;
+
 namespace ads {
     class CDockWidget;
 }
@@ -102,6 +104,10 @@ public slots:
      * QList is an implicitly-shared class.
      */
     void addTrains(TrainPath* path, QList<std::shared_ptr<Train>> trains);
+
+    void insertRulerAt(TrainPath* path, int idx, std::shared_ptr<PathRuler> ruler);
+    void removeRulerAt(TrainPath* path, int idx);
+
 };
 
 namespace qecmd {
@@ -173,6 +179,16 @@ namespace qecmd {
             PathContext* cont, QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    class AddPathRuler : public QUndoCommand {
+        PathContext* m_cont;
+        std::shared_ptr<PathRuler> m_ruler;
+        int m_index;
+    public:
+        AddPathRuler(PathContext* context, std::shared_ptr<PathRuler> ruler, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
     };
 
 }

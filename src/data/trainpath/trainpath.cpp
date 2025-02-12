@@ -181,6 +181,27 @@ int TrainPath::getTrainIndex(std::shared_ptr<Train> train) const
     return -1;
 }
 
+int TrainPath::getRulerIndex(std::shared_ptr<PathRuler> ruler) const
+{
+	for (int i = 0; i < (int)_rulers.size(); i++) {
+		if (ruler == _rulers.at(i))
+			return i;
+	}
+	return -1;
+}
+
+bool TrainPath::rulerNameIsValid(const QString& name, std::shared_ptr<PathRuler> ignored) const
+{
+	if (name.isEmpty())
+		return false;
+	for (auto p : _rulers) {
+		if (p->name() == name && p != ignored) {
+			return false;
+		}
+	}
+	return true;
+}
+
 bool TrainPath::containsTrain(std::shared_ptr<Train> train) const
 {
     return getTrainIndex(train) != -1;

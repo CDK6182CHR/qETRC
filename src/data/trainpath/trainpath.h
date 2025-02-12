@@ -127,6 +127,10 @@ public:
 	 */
 	int getTrainIndex(std::shared_ptr<Train> train)const;
 
+	int getRulerIndex(std::shared_ptr<PathRuler> ruler)const;
+
+	bool rulerNameIsValid(const QString& name, std::shared_ptr<PathRuler> ignored)const;
+
     /**
      * Simple linear alg, calling getTrainIndex()
      */

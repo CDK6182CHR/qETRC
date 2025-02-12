@@ -15,6 +15,8 @@ class TrainPath;
 class QUndoStack;
 class DiagramNaviModel;
 class QMenu;
+class PathRuler;
+
 //#include <QMenu>
 //#include <QPoint>
 //#include <QUndoStack>
@@ -235,7 +237,7 @@ public slots:
     void actDulplicateTrain(std::shared_ptr<Train> origin);
 
     void actDulplicatePage(std::shared_ptr<DiagramPage> origin);
-    
+
 };
 
 

@@ -60,8 +60,13 @@ public:
 
 private:
 	void initUI();
+	bool checkAppliedDataValidity();
+
+signals:
+	void rulerAdded(std::shared_ptr<PathRuler> ruler);
 
 public slots:
 	void refreshData();
-	void actApply();
+	void actApplyAdd();
+	void actApplyModify();
 };

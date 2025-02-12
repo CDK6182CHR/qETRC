@@ -6,6 +6,7 @@
 #include "data/diagram/diagrampage.h"
 #include "data/rail/forbid.h"
 #include "data/rail/ruler.h"
+#include "data/trainpath/pathruler.h"
 
 navi::DiagramItem::DiagramItem(Diagram& diagram) :
 	AbstractComponentItem(0), _diagram(diagram),
@@ -521,6 +522,20 @@ void navi::PathListItem::onPathRemovedAt(int first, int last)
 navi::PathItem::PathItem(TrainPath* path, int row, PathListItem* parent):
     AbstractComponentItem(row, parent), _path(path)
 {
+    int subrow=0;
+    for (const auto& p: _path->rulers()) {
+        _rulerItems.emplace_back(std::make_unique<PathRulerItem>(p, subrow++, this));
+    }
+}
+
+navi::AbstractComponentItem *navi::PathItem::child(int i)
+{
+    return _rulerItems.at(i).get();
+}
+
+int navi::PathItem::childCount() const
+{
+    return static_cast<int>(_rulerItems.size());
 }
 
 QString navi::PathItem::data(int i) const
@@ -533,3 +548,39 @@ QString navi::PathItem::data(int i) const
     }
 }
 
+void navi::PathItem::onRulerInsertedAt(int place)
+{
+    auto p = std::next(_rulerItems.begin(), place);
+    p = _rulerItems.emplace(p, std::make_unique<PathRulerItem>(
+                                   _path->rulers().at(place), place, this));
+    for (++p; p!=_rulerItems.end(); ++p) {
+        (*p)->setRow((*p)->row()+1);
+    }
+}
+
+void navi::PathItem::onRulerRemovedAt(int place)
+{
+    auto p = std::next(_rulerItems.begin(), place);
+    p = _rulerItems.erase(p);
+
+    for(; p!=_rulerItems.end(); ++p) {
+        (*p)->rowRef()--;
+    }
+}
+
+
+navi::PathRulerItem::PathRulerItem(std::shared_ptr<PathRuler> ruler, int row, PathItem* parent):
+    AbstractComponentItem(row, parent),
+    _ruler(std::move(ruler))
+{
+}
+
+QString navi::PathRulerItem::data(int i) const
+{
+    switch (i) {
+    case ColItemName: return _ruler->name();
+    case ColItemNumber:;
+    case ColDescription:;
+    default: return {};
+    }
+}

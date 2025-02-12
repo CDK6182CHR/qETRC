@@ -125,3 +125,13 @@ std::vector<std::shared_ptr<Train>> TrainPathCollection::affectedTrainsByRailway
 	}
 	return std::vector<std::shared_ptr<Train>>(trainset.begin(), trainset.end());
 }
+
+int TrainPathCollection::getPathIndex(const TrainPath* path) const
+{
+	for (int i = 0; i < (int)_paths.size(); i++) {
+		if (_paths[i].get() == path) {
+			return i;
+		}
+	}
+	return -1;
+}

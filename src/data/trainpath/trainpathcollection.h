@@ -84,4 +84,6 @@ public:
 	 * 2023.08.23  returns the trains that belongs to the paths containing the given railway.
 	 */
 	std::vector<std::shared_ptr<Train>> affectedTrainsByRailway(std::shared_ptr<const Railway> railway)const;
+
+	int getPathIndex(const TrainPath* path)const;
 };

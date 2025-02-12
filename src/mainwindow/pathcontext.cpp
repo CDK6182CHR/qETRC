@@ -21,6 +21,7 @@
 #include "defines/icon_specs.h"
 #include "editors/trainpath/selectpathdialog.h"
 #include "editors/trainpath/pathrulereditor.h"
+#include "model/diagram/diagramnavimodel.h"
 
 
 PathContext::PathContext(Diagram &diagram, SARibbonContextCategory *cont,
@@ -151,6 +152,9 @@ void PathContext::actAddPathRuler()
     auto* w = new PathRulerEditor(path, mw);
     w->setWindowFlag(Qt::Dialog);
     w->setWindowModality(Qt::ApplicationModal);
+    connect(w, &PathRulerEditor::rulerAdded, [this](std::shared_ptr<PathRuler> ruler) {
+        mw->getUndoStack()->push(new qecmd::AddPathRuler(this, std::move(ruler)));
+        });
     w->show();
 }
 
@@ -337,6 +341,20 @@ void PathContext::addTrains(TrainPath* path, QList<std::shared_ptr<Train>> train
     mw->getUndoStack()->push(new qecmd::AddTrainsToPath(path, std::move(trains), this));
 }
 
+void PathContext::insertRulerAt(TrainPath* path, int idx, std::shared_ptr<PathRuler> ruler)
+{
+    auto p = std::next(path->rulers().begin(), idx);
+    path->rulers().insert(p, ruler);
+    mw->naviModel->onPathRulerInserted(path, idx);
+}
+
+void PathContext::removeRulerAt(TrainPath* path, int idx)
+{
+    auto p = std::next(path->rulers().begin(), idx);
+    path->rulers().erase(p);
+    mw->naviModel->onPathRulerRemoved(path, idx);
+}
+
 
 
 qecmd::UpdatePath::UpdatePath(TrainPath* path, std::unique_ptr<TrainPath>&& data_,
@@ -463,4 +481,21 @@ void qecmd::AddTrainsToPath::redo()
         path->addTrain(t);
     }
     cont->afterPathTrainsChanged(path, trains);
+}
+
+qecmd::AddPathRuler::AddPathRuler(PathContext* context, std::shared_ptr<PathRuler> ruler, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("新增径路标尺: %1").arg(ruler->name()), parent),
+    m_cont(context), m_ruler(std::move(ruler)),
+    m_index((int)m_ruler->path()->rulers().size())
+{
+}
+
+void qecmd::AddPathRuler::undo()
+{
+    m_cont->removeRulerAt(m_ruler->path(), m_index);
+}
+
+void qecmd::AddPathRuler::redo()
+{
+    m_cont->insertRulerAt(m_ruler->path(), m_index, m_ruler);
 }

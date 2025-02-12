@@ -22,6 +22,7 @@ class Forbid;
 class Train;
 class Routing;
 class TrainPath;
+class PathRuler;
 
 
 namespace navi {
@@ -354,23 +355,53 @@ namespace navi {
 		 */
 		void onPathInsertedAt(int first, int last);
 		void onPathRemovedAt(int first, int last);
+
+		auto* pathItemAt(int idx) { return _paths.at(idx).get(); }
 	};
 
 
+    class PathRulerItem;
 	class PathItem : public AbstractComponentItem
 	{
 		TrainPath* _path;
+        std::deque<std::unique_ptr<PathRulerItem>> _rulerItems;
 	public:
 		enum { Type = 13 };
 		PathItem(TrainPath* path, int row, PathListItem* parent);
 
 		// 通过 AbstractComponentItem 继承
-		virtual AbstractComponentItem* child([[maybe_unused]] int i) override { return nullptr; }
-		virtual int childCount() const override { return 0; }
+        virtual AbstractComponentItem* child(int i) override;
+        virtual int childCount() const override;
 		virtual QString data(int i) const override;
 		virtual int type() const override { return Type; }
 
+        /**
+         * 2025.02.12  Insert ruler at given place.
+         * No actual insertion taken place here; only for post-processing after insertion
+         */
+        void onRulerInsertedAt(int place);
+
+        void onRulerRemovedAt(int place);
+
 		auto* getPath() { return _path; }
 	};
+
+
+	class PathRulerItem : public AbstractComponentItem
+	{
+		std::shared_ptr<PathRuler> _ruler;
+	public:
+		enum { Type = 14 };
+		PathRulerItem(std::shared_ptr<PathRuler> ruler, int row, PathItem* parent);
+
+        // AbstractComponentItem interface
+    public:
+        AbstractComponentItem *child([[maybe_unused]] int i) override {return nullptr;};
+        int childCount() const override {return 0;}
+        QString data(int i) const override;
+        int type() const override {return Type;}
+
+        const auto& ruler() {return _ruler;}
+    };
 }
 

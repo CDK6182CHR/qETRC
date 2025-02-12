@@ -46,6 +46,7 @@ public:
 
 	bool valid()const { return m_valid; }
 	auto& name()const { return m_name; }
+	void setName(const QString& n) { m_name = n; }
 
 	PathRulerConstIterator cbegin()const;
 	PathRulerMutableIterator begin();

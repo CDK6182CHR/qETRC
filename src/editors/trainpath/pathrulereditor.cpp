@@ -6,6 +6,7 @@
 #include <QHeaderView>
 #include <QLineEdit>
 #include <QFormLayout>
+#include <QMessageBox>
 
 #include "model/trainpath/pathrulermodel.h"
 #include "model/trainpath/pathrulernamedelegate.h"
@@ -108,16 +109,43 @@ void PathRulerEditor::initUI()
 		auto* g = new ButtonGroup<3>({ "确定", "还原", "取消" });
 		vlay->addLayout(g);
 		g->connectAll(SIGNAL(clicked()), this,
-			{ SLOT(actApply()), SLOT(refreshData()), SLOT(close()) });
+			{ SLOT(actApplyModify()), SLOT(refreshData()), SLOT(close()) });
 	}
 	else {
 		auto* g = new ButtonGroup<2>({ "确定", "取消" });
 		vlay->addLayout(g);
-		g->connectAll(SIGNAL(clicked()), this, { SLOT(actApply()), SLOT(close()) });
+		g->connectAll(SIGNAL(clicked()), this, { SLOT(actApplyAdd()), SLOT(close()) });
 	}
 }
 
-void PathRulerEditor::actApply()
+bool PathRulerEditor::checkAppliedDataValidity()
+{
+	if (!m_model->path()->rulerNameIsValid(m_edRulerName->text(), m_ruler)) {
+		QMessageBox::warning(this, tr("错误"), tr("非法的标尺名称：标尺名不得与本径路已有标尺重复或者为空"));
+		return false;
+	}
+	for (int r = 0; r < m_model->rowCount({}); r++) {
+		int idx = m_model->data(m_model->index(r, PathRulerModel::ColRulerName, {}), Qt::EditRole).toInt();
+		if (idx < 0) {
+			QMessageBox::warning(this, tr("错误"), tr("第%1行：未选择标尺。"
+				"请保证每段线路都已选择非空的标尺。如果线路没有标尺，请转至线路工具页面添加。").arg(r));
+			return false;
+		}
+	}
+	return true;
+}
+
+void PathRulerEditor::actApplyAdd()
+{
+	if (!checkAppliedDataValidity())
+		return;
+	auto ruler = std::make_shared<PathRuler>(m_model->ruler());   // copy construct
+	ruler->setName(m_edRulerName->text());
+	emit rulerAdded(ruler);
+	close();
+}
+
+void PathRulerEditor::actApplyModify()
 {
 	// TODO
 }

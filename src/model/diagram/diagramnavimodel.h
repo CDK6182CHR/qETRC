@@ -170,6 +170,13 @@ public slots:
         const QModelIndex& bottomRight, const QVector<int>& roles);
 
     /**
+     * Called AFTER ruler inserted for a train path.
+     */
+    void onPathRulerInserted(const TrainPath* path, int idx);
+
+    void onPathRulerRemoved(const TrainPath* path, int idx);
+
+    /**
      * 刷新交路部分。当列车导入时调用。
      * Train那个分类由TrainListModel触发更新；交路这个需要单独。
      */
