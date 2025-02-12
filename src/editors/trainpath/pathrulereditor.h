@@ -64,6 +64,7 @@ private:
 
 signals:
 	void rulerAdded(std::shared_ptr<PathRuler> ruler);
+	void rulerModified(std::shared_ptr<PathRuler> ruler, std::shared_ptr<PathRuler> newruler);
 
 public slots:
 	void refreshData();

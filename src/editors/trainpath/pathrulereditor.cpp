@@ -99,7 +99,7 @@ void PathRulerEditor::initUI()
 	m_table->setEditTriggers(QTableView::AllEditTriggers);
 	{
 		int c = 0;
-		for (int w : {100, 100, 100, 40, 80, 120, 60, 50}) {
+		for (int w : {100, 100, 100, 40, 80, 150, 70, 70}) {
 			m_table->setColumnWidth(c++, w);
 		}
 	}
@@ -147,5 +147,10 @@ void PathRulerEditor::actApplyAdd()
 
 void PathRulerEditor::actApplyModify()
 {
-	// TODO
+	if (!checkAppliedDataValidity())
+		return;
+	auto newruler = std::make_shared<PathRuler>(m_model->ruler());   // copy
+	newruler->setName(m_edRulerName->text());
+	emit rulerModified(m_ruler, newruler);
+	close();
 }

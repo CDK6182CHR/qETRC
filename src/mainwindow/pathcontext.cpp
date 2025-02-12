@@ -355,6 +355,14 @@ void PathContext::removeRulerAt(TrainPath* path, int idx)
     mw->naviModel->onPathRulerRemoved(path, idx);
 }
 
+void PathContext::actEditPathRuler(std::shared_ptr<PathRuler> ruler)
+{
+    auto* w = new PathRulerEditor(std::move(ruler), mw);
+    w->setWindowFlag(Qt::Dialog, true);
+    w->setWindowModality(Qt::ApplicationModal);
+    w->show();
+}
+
 
 
 qecmd::UpdatePath::UpdatePath(TrainPath* path, std::unique_ptr<TrainPath>&& data_,
@@ -498,4 +506,28 @@ void qecmd::AddPathRuler::undo()
 void qecmd::AddPathRuler::redo()
 {
     m_cont->insertRulerAt(m_ruler->path(), m_index, m_ruler);
+}
+
+qecmd::RemovePathRuler::RemovePathRuler(PathContext* context, std::shared_ptr<PathRuler> ruler, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("删除列车径路标尺: %1").arg(ruler->name()), parent),
+    m_cont(context),
+    m_ruler(std::move(ruler)), m_index(m_ruler->path()->getRulerIndex(m_ruler))
+{
+}
+
+void qecmd::RemovePathRuler::undo()
+{
+    m_cont->insertRulerAt(m_ruler->path(), m_index, m_ruler);
+}
+
+void qecmd::RemovePathRuler::redo()
+{
+    m_cont->removeRulerAt(m_ruler->path(), m_index);
+}
+
+qecmd::UpdatePathRuler::UpdatePathRuler(PathContext* context, std::shared_ptr<PathRuler> ruler, 
+    std::shared_ptr<PathRuler> data, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("更新列车径路标尺: %1").arg(ruler->name()), parent),
+    m_ruler(std::move(ruler)), m_data(std::move(data))
+{
 }

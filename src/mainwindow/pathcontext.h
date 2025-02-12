@@ -108,6 +108,14 @@ public slots:
     void insertRulerAt(TrainPath* path, int idx, std::shared_ptr<PathRuler> ruler);
     void removeRulerAt(TrainPath* path, int idx);
 
+    void actEditPathRuler(std::shared_ptr<PathRuler> ruler);
+    void actRemovePathRuler(std::shared_ptr<PathRuler> ruler);
+    void actDuplicatePathRuler(std::shared_ptr<PathRuler> ruler);
+
+    /**
+     * Called after the PathRuler is updated (this is actually performed in the cmd)
+     */
+    void onPathRulerUpdated(std::shared_ptr<PathRuler> ruler);
 };
 
 namespace qecmd {
@@ -187,6 +195,26 @@ namespace qecmd {
         int m_index;
     public:
         AddPathRuler(PathContext* context, std::shared_ptr<PathRuler> ruler, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
+    class RemovePathRuler : public QUndoCommand {
+        PathContext* m_cont;
+        std::shared_ptr<PathRuler> m_ruler;
+        int m_index;
+    public:
+        RemovePathRuler(PathContext* context, std::shared_ptr<PathRuler> ruler, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
+    class UpdatePathRuler : public QUndoCommand {
+        PathContext* m_cont;
+        std::shared_ptr<PathRuler> m_ruler, m_data;
+    public:
+        UpdatePathRuler(PathContext* context, std::shared_ptr<PathRuler> ruler, std::shared_ptr<PathRuler> data,
+            QUndoCommand* parent = nullptr);
         void undo()override;
         void redo()override;
     };

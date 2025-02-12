@@ -70,13 +70,18 @@ QJsonObject TrainPath::toJson() const
 			arrtrain.append(t.lock()->trainName().full());
 		}
 	}
+	QJsonArray arrrulers;
+	for (const auto& r : _rulers) {
+		arrrulers.append(r->toJson());
+	}
 	return QJsonObject{
 		{"name", _name},
 		{"note", _note},
 		{"start_station", _start_station.toSingleLiteral()},
 		{"valid",_valid},
 		{"segments", arr},
-		{"trains", arrtrain}
+		{"trains", arrtrain},
+		{"rulers", arrrulers},
 	};
 }
 

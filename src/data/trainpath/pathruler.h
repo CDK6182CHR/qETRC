@@ -68,4 +68,9 @@ public:
 	 * Check the validity of current PathRuler object.
 	 */
 	void checkIsValid();
+
+	/**
+	 * Swap all data with the given object. For current impl, using just default assginment is enough.
+	 */
+	void swapWith(PathRuler& rhs);
 };

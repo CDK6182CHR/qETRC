@@ -77,3 +77,10 @@ void PathRuler::checkIsValid()
 		}
 	}
 }
+
+void PathRuler::swapWith(PathRuler& rhs)
+{
+	auto tmp = std::move(rhs);
+	rhs = std::move(*this);
+	operator=(std::move(tmp));
+}

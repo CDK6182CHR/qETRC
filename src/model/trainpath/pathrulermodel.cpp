@@ -11,12 +11,12 @@ PathRulerModel::PathRulerModel(PathRuler ruler, QObject* parent):
 	computeSegmentData();
 }
 
-int PathRulerModel::rowCount(const QModelIndex& parent) const
+int PathRulerModel::rowCount([[maybe_unused]] const QModelIndex& parent) const
 {
 	return (int) m_ruler.segments().size();
 }
 
-int PathRulerModel::columnCount(const QModelIndex& parent) const
+int PathRulerModel::columnCount([[maybe_unused]] const QModelIndex& parent) const
 {
 	return ColMAX;
 }
@@ -82,6 +82,7 @@ bool PathRulerModel::setData(const QModelIndex& index, const QVariant& value, in
 				auto rail = m_path->segments().at(index.row()).railway.lock();
 				m_ruler.segmentsRef().at(index.row()).ruler = rail->getRuler(ruler_index);
 			}
+			onRowRulerUpdated(index.row());
 			return true;
 		}
 		}
@@ -137,25 +138,37 @@ void PathRulerModel::computeSegmentData()
 {
 	m_seg_data.clear();
 	for (size_t i = 0; i < m_ruler.segments().size(); i++) {
-		const auto& rulerseg = m_ruler.segments().at(i);
-		const auto& pathseg = m_path->segments().at(i);
-
-		if (!m_path->valid() || rulerseg.ruler.expired()) {
-			m_seg_data.emplace_back(PathRulerSegmentData{ .valid = false });
-		}
-		else {
-			auto segruler = rulerseg.ruler.lock();
-			auto rail = pathseg.railway.lock();
-			int tot_interval = segruler->totalInterval(
-				rail->stationByName(m_path->segStartStation(i)), 
-				rail->stationByName(pathseg.end_station), pathseg.dir);
-			double speed = 0;
-			if (tot_interval) {
-				speed = pathseg.mile / tot_interval * 3600;   // km/h
-			}
-			m_seg_data.emplace_back(PathRulerSegmentData{ .valid = true, .interval_seconds = tot_interval, .run_peed = speed });
-		}
+		m_seg_data.emplace_back(computeSegmentDataRow(i));
 	}
+}
+
+PathRulerSegmentData PathRulerModel::computeSegmentDataRow(int i)
+{
+	const auto& rulerseg = m_ruler.segments().at(i);
+	const auto& pathseg = m_path->segments().at(i);
+
+	if (!m_path->valid() || rulerseg.ruler.expired()) {
+		return PathRulerSegmentData{ .valid = false };
+	}
+	else {
+		auto segruler = rulerseg.ruler.lock();
+		auto rail = pathseg.railway.lock();
+		int tot_interval = segruler->totalInterval(
+			rail->stationByName(m_path->segStartStation(i)),
+			rail->stationByName(pathseg.end_station), pathseg.dir);
+		double speed = 0;
+		if (tot_interval) {
+			speed = pathseg.mile / tot_interval * 3600;   // km/h
+		}
+		return PathRulerSegmentData{ .valid = true, .interval_seconds = tot_interval, .run_peed = speed };
+	}
+}
+
+void PathRulerModel::onRowRulerUpdated(int idx)
+{
+	m_seg_data[idx] = computeSegmentDataRow(idx);
+	emit dataChanged(index(idx, ColPassTime), index(idx, ColRunSpeed),
+		QList<int>{Qt::DisplayRole, Qt::EditRole});
 }
 
 void PathRulerModel::setRuler(PathRuler ruler)
@@ -166,4 +179,5 @@ void PathRulerModel::setRuler(PathRuler ruler)
 	computeSegmentData();
 	endResetModel();
 }
+
 

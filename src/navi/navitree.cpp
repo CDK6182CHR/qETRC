@@ -23,7 +23,7 @@ NaviTree::NaviTree(DiagramNaviModel* model_, QUndoStack* undo, QWidget* parent) 
     meTrainList(new QMenu(this)), mePage(new QMenu(this)), meTrain(new QMenu(this)),
     meRailway(new QMenu(this)), meRuler(new QMenu(this)), meForbid(new QMenu(this)),
     meRouting(new QMenu(this)),meRoutingList(new QMenu(this)),
-    mePath(new QMenu(this)), mePathList(new QMenu(this)),
+    mePath(new QMenu(this)), mePathList(new QMenu(this)), mePathRuler(new QMenu(this)),
     _model(model_), _undo(undo)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -147,6 +147,11 @@ void NaviTree::initContextMenus()
     mePath->addAction(tr("编辑列车径路"), this, &NaviTree::onEditPathContext);
     mePath->addAction(tr("删除列车径路"), this, &NaviTree::onRemovePathContext);
     mePath->addAction(tr("创建列车径路副本"), this, &NaviTree::onDuplicatePathContext);
+
+    //PathRuler
+    mePathList->addAction(tr("编辑列车径路标尺"), this, &NaviTree::onEditPathRuler);
+    mePathList->addAction(tr("删除列车径路标尺"), this, &NaviTree::onRemovePathRuler);
+    mePathList->addAction(tr("创建列车径路标尺副本"), this, &NaviTree::onDuplicatePathRuler);
 }
 
 NaviTree::ACI* NaviTree::getItem(const QModelIndex& idx)
@@ -393,6 +398,36 @@ void NaviTree::onDuplicatePathContext()
     }
 }
 
+void NaviTree::onEditPathRuler()
+{
+    const auto& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::PathRulerItem::Type) {
+        auto* it = static_cast<navi::PathRulerItem*>(item);
+        emit editPathRulerNavi(it->ruler());
+    }
+}
+
+void NaviTree::onRemovePathRuler()
+{
+    const auto& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::PathRulerItem::Type) {
+        auto* it = static_cast<navi::PathRulerItem*>(item);
+        emit removePathRulerNavi(it->ruler());
+    }
+}
+
+void NaviTree::onDuplicatePathRuler()
+{
+    const auto& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::PathRulerItem::Type) {
+        auto* it = static_cast<navi::PathRulerItem*>(item);
+        emit duplicatePathRulerNavi(it->ruler());
+    }
+}
+
 void NaviTree::actAddRailway()
 {
     const QString name = _model->diagram().validRailwayName(tr("新线路"));
@@ -607,6 +642,8 @@ void NaviTree::onDoubleClicked(const QModelIndex& index)
         emit activatePageAt(item->row()); break;
     case navi::PathItem::Type:
         emit editPathNavi(index.row()); break;
+    case navi::PathRulerItem::Type:
+        emit editPathRulerNavi(static_cast<navi::PathRulerItem*>(item)->ruler()); break;
     }
 }
 
@@ -672,6 +709,7 @@ void NaviTree::showContextMenu(const QPoint& pos)
     case navi::RoutingListItem::Type:meRoutingList->popup(p); break;
     case navi::PathListItem::Type: mePathList->popup(p); break;
     case navi::PathItem::Type: mePath->popup(p); break;
+    case navi::PathRulerItem::Type: mePathRuler->popup(p); break;
     }
     
 }

@@ -17,8 +17,8 @@ void PathRulerNameDelegate::setPath(const TrainPath* path)
 	m_path = path;
 }
 
-QWidget* PathRulerNameDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, 
-	const QModelIndex& index) const
+QWidget* PathRulerNameDelegate::createEditor(QWidget* parent, [[maybe_unused]] const QStyleOptionViewItem& option,
+	[[maybe_unused]] const QModelIndex& index) const
 {
 	auto* w = new QComboBox(parent);
 	return w;
@@ -34,6 +34,7 @@ void PathRulerNameDelegate::setEditorData(QWidget* editor, const QModelIndex& in
 	foreach(auto r, rail->rulers()) {
 		w->addItem(r->name());
 	}
+	w->setCurrentIndex(index.data(Qt::EditRole).toInt());
 }
 
 void PathRulerNameDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const

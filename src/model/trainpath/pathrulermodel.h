@@ -61,7 +61,11 @@ public:
 
 private:
     void computeSegmentData();
+    PathRulerSegmentData computeSegmentDataRow(int idx);
 
 public slots:
     void setRuler(PathRuler ruler);
+
+private slots:
+    void onRowRulerUpdated(int idx);
 };
