@@ -1522,6 +1522,12 @@ void MainWindow::initToolbar()
 			contextPath, &PathContext::removePath);
 		connect(pathListWidget, &PathListWidget::emptyPathAdded,
 			contextPath, &PathContext::openPathEdit);
+		connect(naviView, &NaviTree::editPathRulerNavi,
+			contextPath, &PathContext::actEditPathRuler);
+		connect(naviView, &NaviTree::removePathRulerNavi,
+			contextPath, &PathContext::actRemovePathRuler);
+		connect(naviView, &NaviTree::duplicatePathRulerNavi,
+			contextPath, &PathContext::actDuplicatePathRuler);
 	}
 
 	// context: DB

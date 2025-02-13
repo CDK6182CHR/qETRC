@@ -5,13 +5,14 @@
 #include "trainpath.h"
 
 PathRuler::PathRuler(TrainPath* path, const QString& name, std::vector<PathRulerSeg> segments):
-	m_path(std::move(path)), m_name(name), m_segments(std::move(segments)), m_valid(true)
+	m_path(path), m_name(name), m_segments(std::move(segments)), m_valid(true)
 {
 }
 
-PathRuler::PathRuler(const QJsonObject& obj, const TrainPath& path, const RailCategory& cat)
+PathRuler::PathRuler(const QJsonObject& obj, TrainPath* path, const RailCategory& cat):
+	m_path(path)
 {
-	fromJson(obj, path, cat);
+	fromJson(obj, *path, cat);
 }
 
 PathRuler::PathRuler(TrainPath* path):

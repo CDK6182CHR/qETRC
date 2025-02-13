@@ -5,6 +5,9 @@
 #include <QLabel>
 #include <QApplication>
 #include <QStyle>
+#include <QInputDialog>
+#include <QMessageBox>
+
 #include <SARibbonContextCategory.h>
 #include <SARibbonLineEdit.h>
 #include <SARibbonMenu.h>
@@ -360,7 +363,38 @@ void PathContext::actEditPathRuler(std::shared_ptr<PathRuler> ruler)
     auto* w = new PathRulerEditor(std::move(ruler), mw);
     w->setWindowFlag(Qt::Dialog, true);
     w->setWindowModality(Qt::ApplicationModal);
+    connect(w, &PathRulerEditor::rulerModified,
+        [this](std::shared_ptr<PathRuler> ruler, std::shared_ptr<PathRuler> data) {
+            mw->getUndoStack()->push(new qecmd::UpdatePathRuler(this, std::move(ruler), std::move(data)));
+        });
     w->show();
+}
+
+void PathContext::actRemovePathRuler(std::shared_ptr<PathRuler> ruler)
+{
+    mw->getUndoStack()->push(new qecmd::RemovePathRuler(this, ruler));
+}
+
+void PathContext::actDuplicatePathRuler(std::shared_ptr<PathRuler> ruler)
+{
+    bool ok;
+    auto newName = QInputDialog::getText(mw, tr("径路标尺副本"),
+        tr("请输入新的列车径路标尺名称"), QLineEdit::Normal, ruler->name() + tr("_副本"), &ok);
+    if (!ok)
+        return;
+    if (!ruler->path()->rulerNameIsValid(newName, {})) {
+        QMessageBox::warning(mw, tr("错误"), tr("列车径路标尺名称为空或已存在，无法创建副本"));
+        return;
+    }
+
+    auto newRuler = std::make_shared<PathRuler>(*ruler);   // copy
+    newRuler->setName(newName);
+    mw->getUndoStack()->push(new qecmd::AddPathRuler(this, std::move(newRuler)));
+}
+
+void PathContext::onPathRulerUpdated(std::shared_ptr<PathRuler> ruler)
+{
+    // Seems nothing to do for now
 }
 
 
@@ -528,6 +562,18 @@ void qecmd::RemovePathRuler::redo()
 qecmd::UpdatePathRuler::UpdatePathRuler(PathContext* context, std::shared_ptr<PathRuler> ruler, 
     std::shared_ptr<PathRuler> data, QUndoCommand* parent):
     QUndoCommand(QObject::tr("更新列车径路标尺: %1").arg(ruler->name()), parent),
-    m_ruler(std::move(ruler)), m_data(std::move(data))
+    m_cont(context), m_ruler(std::move(ruler)), m_data(std::move(data))
 {
+}
+
+void qecmd::UpdatePathRuler::undo()
+{
+    m_ruler->swapWith(*m_data);
+    m_cont->onPathRulerUpdated(m_ruler);
+}
+
+void qecmd::UpdatePathRuler::redo()
+{
+    m_ruler->swapWith(*m_data);
+    m_cont->onPathRulerUpdated(m_ruler);
 }

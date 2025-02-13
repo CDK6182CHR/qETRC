@@ -149,9 +149,9 @@ void NaviTree::initContextMenus()
     mePath->addAction(tr("创建列车径路副本"), this, &NaviTree::onDuplicatePathContext);
 
     //PathRuler
-    mePathList->addAction(tr("编辑列车径路标尺"), this, &NaviTree::onEditPathRuler);
-    mePathList->addAction(tr("删除列车径路标尺"), this, &NaviTree::onRemovePathRuler);
-    mePathList->addAction(tr("创建列车径路标尺副本"), this, &NaviTree::onDuplicatePathRuler);
+    mePathRuler->addAction(tr("编辑列车径路标尺"), this, &NaviTree::onEditPathRuler);
+    mePathRuler->addAction(tr("删除列车径路标尺"), this, &NaviTree::onRemovePathRuler);
+    mePathRuler->addAction(tr("创建列车径路标尺副本"), this, &NaviTree::onDuplicatePathRuler);
 }
 
 NaviTree::ACI* NaviTree::getItem(const QModelIndex& idx)

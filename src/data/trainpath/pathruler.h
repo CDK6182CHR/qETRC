@@ -32,12 +32,18 @@ public:
 	 */
 	PathRuler(TrainPath* path, const QString& name, std::vector<PathRulerSeg> segments);
 
-	PathRuler(const QJsonObject& obj, const TrainPath& path, const RailCategory& cat);
+	PathRuler(const QJsonObject& obj, TrainPath* path, const RailCategory& cat);
 
 	/**
 	 * Ctor for empty ruler.
 	 */
 	explicit PathRuler(TrainPath* path);
+
+	PathRuler(const PathRuler&) = default;
+	PathRuler(PathRuler&&)noexcept = default;	
+	
+	PathRuler& operator=(const PathRuler&) = default;
+	PathRuler& operator=(PathRuler&&)noexcept = default;
 
 	auto& segments()const { return m_segments; }
 	auto& segmentsRef() { return m_segments; }

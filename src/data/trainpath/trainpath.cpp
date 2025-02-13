@@ -49,7 +49,7 @@ void TrainPath::fromJson(const QJsonObject& obj, const RailCategory& cat, TrainC
 
 	const auto& arrrulers = obj.value("rulers").toArray();
 	for (const auto& a : arrrulers) {
-		_rulers.emplace_back(std::make_shared<PathRuler>(a.toObject(), *this, cat));
+		_rulers.emplace_back(std::make_shared<PathRuler>(a.toObject(), this, cat));
 	}
 
 	checkIsValid();
