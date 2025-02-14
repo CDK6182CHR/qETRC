@@ -49,8 +49,10 @@ class ConfigDialog : public QDialog
     QCheckBox* ckShowRuler, * ckShowMile, * ckShowCount; 
     QCheckBox* ckTransparent, * ckInverseColor;
     QPushButton* btnGridColor, * btnTextColor, * btnBgColor;
+    QPushButton* btnRailFont, * btnTrainFont;
 
     QColor gridColor, textColor, bgColor;
+    QFont railFont, trainFont;
     
 
 public:
@@ -94,6 +96,10 @@ private slots:
     void actTextColor();
 
     void actBgColor();
+
+    void actRailFont();
+
+    void actTrainFont();
 
     void informTransparent();
 

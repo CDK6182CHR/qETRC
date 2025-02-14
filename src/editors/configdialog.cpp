@@ -19,6 +19,7 @@
 #include <QApplication>
 #include <QStyle>
 #include <QDesktopServices>
+#include <QFontDialog>
 
 ConfigDialog::ConfigDialog(Config &cfg,bool forDefault_, QWidget *parent):
     QDialog(parent),_cfg(cfg),forDefault(forDefault_),page(nullptr)
@@ -353,15 +354,21 @@ void ConfigDialog::initUI()
 
         btn = new QPushButton;
         btnTextColor = btn;
+        auto* chlay = new QHBoxLayout;
+        chlay->addWidget(btn);
         connect(btn, &QPushButton::clicked, this, &ConfigDialog::actTextColor);
-        form->addRow(tr("字体颜色"), btn);
+        btn = new QPushButton(tr("设置字体"));
+        chlay->addWidget(btn);
+        btnRailFont = btn;
+        connect(btn, &QPushButton::clicked, this, &ConfigDialog::actRailFont);
+        form->addRow(tr("字体颜色"), chlay);
 
         btn = new QPushButton;
         btnBgColor = btn;
         connect(btn, &QPushButton::clicked, this, &ConfigDialog::actBgColor);
         form->addRow(tr("背景颜色"), btn);
 
-        auto* chlay = new QHBoxLayout;
+        chlay = new QHBoxLayout;
         ckInverseColor = new QCheckBox(tr("启用反色"));
         chlay->addWidget(ckInverseColor);
 
@@ -423,6 +430,10 @@ void ConfigDialog::initUI()
         sp->setRange(0,10000);
         form->addRow(tr("标签层级高度"),sp);
         spStepHeight=sp;
+
+        btnTrainFont = new QPushButton(tr("设置字体"));
+        form->addRow(tr("标签字体"), btnTrainFont);
+        connect(btnTrainFont, &QPushButton::clicked, this, &ConfigDialog::actTrainFont);
 
         gb->setLayout(form);
         vlay->addWidget(gb);
@@ -557,6 +568,9 @@ void ConfigDialog::refreshData()
         "QPushButton { background-color: rgb(%1, %2, %3); }").arg(bgColor.red())
         .arg(bgColor.green()).arg(bgColor.blue()));
 
+    trainFont = _cfg.train_font;
+    railFont = _cfg.rail_font;
+
     //空间轴
     SET_VALUE(sdScaleYdist, pixels_per_km);
     SET_VALUE(sdScaleYsec, seconds_per_pix_y);
@@ -646,6 +660,8 @@ void ConfigDialog::actApply()
     cnew.grid_color = gridColor;
     cnew.text_color = textColor;
     cnew.background_color = bgColor;
+    cnew.rail_font = railFont;
+    cnew.train_font = trainFont;
 
     //空间轴
     GET_VALUE(sdScaleYdist, pixels_per_km);
@@ -762,6 +778,24 @@ void ConfigDialog::actBgColor()
             "QPushButton { background-color: rgb(%1, %2, %3); }").arg(bgColor.red())
             .arg(bgColor.green()).arg(bgColor.blue()));
     }
+}
+
+void ConfigDialog::actRailFont()
+{
+    bool ok;
+    auto font = QFontDialog::getFont(&ok, railFont, this, tr("线路字体"));
+    if (!ok)
+        return;
+    railFont = font;
+}
+
+void ConfigDialog::actTrainFont()
+{
+    bool ok;
+    auto font = QFontDialog::getFont(&ok, trainFont, this, tr("车次字体"));
+    if (!ok)
+        return;
+    trainFont = font;
 }
 
 void ConfigDialog::informTransparent()

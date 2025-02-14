@@ -724,7 +724,7 @@ void TrainItem::setPathItem(const QString& trainName)
     }
 
     //跨界点标记
-    QFont font;
+    QFont font = config().train_font;
     bool calculated = false;
     double sw = -1, sh = -1;    //item宽度
     for (auto p : spanLeft) {
@@ -900,6 +900,7 @@ QGraphicsSimpleTextItem* TrainItem::setStartEndLabelText(const QString& text, co
 {
     auto* item = new QGraphicsSimpleTextItem(text, this);
     item->setBrush(color);
+    item->setFont(config().train_font);
     if (spanItemWidth < 0) {
         //没设置过
         const auto& t = item->boundingRect();

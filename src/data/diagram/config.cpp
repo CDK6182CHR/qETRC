@@ -77,6 +77,12 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
     grid_color = QColor(obj.value("grid_color").toString("#AAAA7F"));
     text_color = QColor(obj.value("text_color").toString("#0000FF"));
     background_color = QColor(obj.value("background_color").toString("#FFFFFF"));
+    if (obj.contains("rail_font")) {
+        rail_font.fromString(obj.value("rail_font").toString());
+    }
+    if (obj.contains("train_font")) {
+        train_font.fromString(obj.value("train_font").toString());
+    }
     FROM_OBJ(inverse_color, Bool);
 
     FROM_OBJ_NAME(default_passenger_width, default_keche_width, Double);
@@ -212,6 +218,8 @@ QJsonObject Config::toJson() const
     obj.insert("grid_color", grid_color.name());
     obj.insert("text_color", text_color.name());
     obj.insert("background_color", background_color.name());
+    obj.insert("rail_font", rail_font.toString());
+    obj.insert("train_font", train_font.toString());
     obj.insert("margins", margins.toJson());
     QJsonArray ns;
     for (auto p = not_show_types.begin(); p != not_show_types.end(); ++p) {

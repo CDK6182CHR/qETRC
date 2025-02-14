@@ -326,14 +326,14 @@ void DiagramWidget::paintToFile(QPainter& painter, const QString& title, const Q
     marginItems.bottom->setY(0);
     nowItem->setPos(0, 0);
     painter.setPen(QPen(config().text_color_masked()));
-    QFont font;
-    font.setPixelSize(40);
+    QFont font = config().rail_font;
+    font.setPointSize(font.pointSize() * 4);
     font.setBold(true);
     painter.setFont(font);
 
     painter.drawText(config().totalLeftMargin(), 80, title);
 
-    font.setPixelSize(20);
+    font.setPointSize(config().rail_font.pointSize() * 2);
     font.setBold(false);
     painter.setFont(font);
 
@@ -896,13 +896,13 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     double rect_start_y = start_y - margins.title_row_height - margins.first_row_append;
 
 
-    QFont nowFont;
-    nowFont.setPointSize(12);
+    QFont nowFont = cfg.rail_font;
+    nowFont.setPointSize((int)std::round(cfg.rail_font.pointSize() * 1.4));
     nowItem = scene()->addSimpleText(" ", nowFont);
     nowItem->setBrush(textColor);
     nowItem->setZValue(16);
 
-    QFont textFont;
+    QFont textFont = config().rail_font;
     //textFont.setBold(true);
 
     if (cfg.show_ruler_bar || cfg.show_mile_bar) {
@@ -1225,12 +1225,12 @@ void DiagramWidget::setVLines(double width, int hour_count,
         scene()->height() - 35, QPen(grd_color, 2)
     ));
 
-    QFont font;
-    font.setPixelSize(20);
+    QFont font = config().rail_font;
+    font.setPointSize(font.pointSize() * 2);
     //font.setBold(true);
 
-    QFont fontmin;
-    fontmin.setPixelSize(12);
+    QFont fontmin = config().rail_font;
+    fontmin.setPointSize((int)std::round(fontmin.pointSize() * 1.4));
     //fontmin.setBold(true);
 
     for (int i = 0; i < hour_count + 1; i++) {
