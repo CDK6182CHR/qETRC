@@ -1355,21 +1355,24 @@ void DiagramWidget::paintTrainLine(std::shared_ptr<TrainLine> line)
 QGraphicsSimpleTextItem* DiagramWidget::addLeftTableText(const char* str, 
     const QFont& textFont, double start_x, double start_y, double width, double height, const QColor& textColor)
 {
-    return addLeftTableText(QObject::tr(str), textFont, start_x, start_y, width, height, textColor);
+    return addLeftTableText(tr(str), textFont, start_x, start_y, width, height, textColor);
 }
 
 QGraphicsSimpleTextItem* DiagramWidget::addLeftTableText(const QString& str, 
     const QFont& textFont, double start_x, double start_y, double width, double height, const QColor& textColor)
 {
     auto* text = scene()->addSimpleText(str);
-    QFont font(textFont);   //copy
+    //QFont font(textFont);   //copy
+    text->setBrush(textColor);
+    text->setFont(textFont);   // 2025.02.16: we must set the font BEFORE computing the width
     double width1 = text->boundingRect().width();
     if (width1 > width) {
-        int stretch = 100 * width / width1;   //int div
+        int stretch = std::floor(100 * (width) / width1);
+        QFont font(textFont);
         font.setStretch(stretch);
+        text->setFont(font);
     }
-    text->setFont(font);
-    text->setBrush(textColor);
+
     const auto& r = text->boundingRect();
     text->setX(start_x + (width - r.width()) / 2);
     text->setY(start_y + (height - r.height()) / 2);
@@ -1382,14 +1385,16 @@ QGraphicsSimpleTextItem* DiagramWidget::addStationTableText(const QString& str,
     //start_x += margins.left_white;
 
     auto* text = scene()->addSimpleText(str);
-    QFont font(textFont);   //copy
+    text->setFont(textFont);
+    text->setBrush(textColor);
     double width1 = text->boundingRect().width();
     if (width1 > width) {
-        int stretch = 100 * width / width1;   //int div
+        int stretch = 100 * std::round(width / width1); 
+        QFont font(textFont);   //copy
         font.setStretch(stretch);
+        text->setFont(font);
     }
-    text->setFont(font);
-    text->setBrush(textColor);
+
     const auto& r = text->boundingRect();
     text->setX(start_x + (width - r.width()) / 2);
     text->setY(center_y-r.height()/2);
@@ -1426,6 +1431,7 @@ QGraphicsSimpleTextItem* DiagramWidget::alignedTextItem(const QString& text,
 {
     auto* textItem = scene()->addSimpleText(text, baseFont);
     textItem->setBrush(textColor);
+    textItem->setFont(baseFont);
     textItem->setY(center_y - textItem->boundingRect().height() / 2);
     double textWidth = textItem->boundingRect().width();
     QFont font(baseFont);
