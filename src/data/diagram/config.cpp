@@ -83,6 +83,16 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
     if (obj.contains("train_font")) {
         train_font.fromString(obj.value("train_font").toString());
     }
+
+    // time font: default size to be 2 times of the rail_font
+    if (obj.contains("time_font")) {
+        time_font.fromString(obj.value("time_font").toString());
+    }
+    else {
+        time_font = rail_font;  // copy
+        time_font.setPointSize(rail_font.pointSize() * 2);
+    }
+
     FROM_OBJ(inverse_color, Bool);
 
     FROM_OBJ_NAME(default_passenger_width, default_keche_width, Double);
@@ -220,6 +230,7 @@ QJsonObject Config::toJson() const
     obj.insert("background_color", background_color.name());
     obj.insert("rail_font", rail_font.toString());
     obj.insert("train_font", train_font.toString());
+    obj.insert("time_font", time_font.toString());
     obj.insert("margins", margins.toJson());
     QJsonArray ns;
     for (auto p = not_show_types.begin(); p != not_show_types.end(); ++p) {

@@ -1225,12 +1225,11 @@ void DiagramWidget::setVLines(double width, int hour_count,
         scene()->height() - 35, QPen(grd_color, 2)
     ));
 
-    QFont font = config().rail_font;
-    font.setPointSize(font.pointSize() * 2);
+    QFont font = config().time_font;
     //font.setBold(true);
 
-    QFont fontmin = config().rail_font;
-    fontmin.setPointSize((int)std::round(fontmin.pointSize() * 1.4));
+    QFont fontmin = config().time_font;
+    fontmin.setPointSize((int)std::round(fontmin.pointSize() * 0.75));
     //fontmin.setBold(true);
 
     for (int i = 0; i < hour_count + 1; i++) {

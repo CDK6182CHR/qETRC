@@ -91,7 +91,7 @@ struct Config
         grid_color=QColor(170,170,127),  // #AAAA7F
         text_color=QColor(0,0,255);      // #0000FF
     QColor background_color = QColor(255, 255, 255);   // 2024.06.24 experimental
-    QFont rail_font = QFont{}, train_font = QFont{};
+    QFont rail_font = QFont{}, train_font = QFont{}, time_font = QFont{};
     bool inverse_color = false;   // inverse ALL specified colors
     
     // 默认客车和货车线宽，好像也没用了

@@ -362,6 +362,10 @@ void ConfigDialog::initUI()
         btnRailFont = btn;
         connect(btn, &QPushButton::clicked, this, &ConfigDialog::actRailFont);
         form->addRow(tr("字体颜色"), chlay);
+        btn = new QPushButton(tr("设置字体"));
+        connect(btn, &QPushButton::clicked, this, &ConfigDialog::actTimeFont);
+        form->addRow(tr("时间轴字体"), btn);
+        btnTimeFont = btn;
 
         btn = new QPushButton;
         btnBgColor = btn;
@@ -570,6 +574,7 @@ void ConfigDialog::refreshData()
 
     trainFont = _cfg.train_font;
     railFont = _cfg.rail_font;
+    timeFont = _cfg.time_font;
 
     //空间轴
     SET_VALUE(sdScaleYdist, pixels_per_km);
@@ -662,6 +667,7 @@ void ConfigDialog::actApply()
     cnew.background_color = bgColor;
     cnew.rail_font = railFont;
     cnew.train_font = trainFont;
+    cnew.time_font = timeFont;
 
     //空间轴
     GET_VALUE(sdScaleYdist, pixels_per_km);
@@ -796,6 +802,15 @@ void ConfigDialog::actTrainFont()
     if (!ok)
         return;
     trainFont = font;
+}
+
+void ConfigDialog::actTimeFont()
+{
+    bool ok;
+    auto font = QFontDialog::getFont(&ok, timeFont, this, tr("时间轴字体"));
+    if (!ok)
+        return;
+    timeFont = font;
 }
 
 void ConfigDialog::informTransparent()
