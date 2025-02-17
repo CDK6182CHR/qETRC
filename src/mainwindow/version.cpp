@@ -4,14 +4,14 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.7.7";
-const std::string_view DATE = "20250201";
-const int RELEASE_CODE = 61;
+const std::string_view LAST_VERSION = "V1.7.8";
+const std::string_view DATE = "20250217";
+const int RELEASE_CODE = 62;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 新增拆分车次、合并车次功能。
-2. 新增批量设置列车运行线样式、批量取消自动运行线功能。
-3. 细节问题修复。)";
+const std::string_view UPDATE_LOG = R"(1. 新增拆分车次的交路自动处理。
+2. 新增运行图字体自定义。
+3. 新增“列车径路标尺”数据类型。)";
 }
