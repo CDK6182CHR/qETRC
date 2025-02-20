@@ -327,13 +327,16 @@ void DiagramWidget::paintToFile(QPainter& painter, const QString& title, const Q
     nowItem->setPos(0, 0);
     painter.setPen(QPen(config().text_color_masked()));
     QFont font = config().rail_font;
-    font.setPointSize(font.pointSize() * 4);
+    //font.setPixelSize(font.pixelSize() * 4);
+    font.setPixelSize(40);
     font.setBold(true);
     painter.setFont(font);
 
     painter.drawText(config().totalLeftMargin(), 80, title);
 
-    font.setPointSize(config().rail_font.pointSize() * 2);
+    // 2025.02.20: for some unknown reason, the relative size does not work. We just remain the direct size value...
+    //font.setPixelSize(config().rail_font.pixelSize() * 2);
+    font.setPixelSize(20);
     font.setBold(false);
     painter.setFont(font);
 

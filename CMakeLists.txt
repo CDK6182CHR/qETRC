@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 set(qETRC_VERSION_MAJOR 1)
 set(qETRC_VERSION_MINOR 7)
-set(qETRC_VERSION_PATCH 9)
+set(qETRC_VERSION_PATCH 10)
 #set(qETRC_RELEASE_CODE 40)
 
 option(ENABLE_MSVC_PROFILE "Enable MSVC profiler" OFF)
