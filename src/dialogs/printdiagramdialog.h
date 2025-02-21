@@ -3,6 +3,7 @@
 
 class QTextEdit;
 class QLineEdit;
+class QSpinBox;
 class DiagramPage;
 class DiagramWidget;
 
@@ -19,6 +20,7 @@ class PrintDiagramDialog:
     const std::shared_ptr<DiagramPage> page;
     QLineEdit* edName;
     QTextEdit* edNote;
+    QSpinBox* spHours;
 public:
     PrintDiagramDialog(DiagramWidget* dw_,QWidget* parent);
 
@@ -27,6 +29,7 @@ private:
 
 private slots:
     void onSavePdf();
+    void onSavePdfMultiPage();
     void onSavePng();
 };
 

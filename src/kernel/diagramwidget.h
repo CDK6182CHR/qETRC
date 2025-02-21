@@ -132,6 +132,9 @@ public:
      */
     void toPdfAsync(const QString& filename, const QString& title, const QString& note, QWidget* parent);
 
+    void toPdfAsyncMultiPage(const QString& filename, const QString& title, const QString& note, QWidget* parent, 
+        int hours_per_page);
+
     bool toPng(const QString& filename, const QString& title, const QString& note);
 
     

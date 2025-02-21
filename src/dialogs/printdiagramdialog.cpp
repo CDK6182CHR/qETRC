@@ -10,6 +10,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QTextEdit>
+#include <QSpinBox>
 
 PrintDiagramDialog::PrintDiagramDialog(DiagramWidget *dw_, QWidget *parent):
     QDialog(parent),dw(dw_),page(dw_->page())
@@ -36,14 +37,22 @@ void PrintDiagramDialog::initUI()
     form->addRow(tr("运行图标题"),edName);
     vlay->addLayout(form);
 
+    auto* chlay = new QHBoxLayout;
+    spHours = new QSpinBox;
+    spHours->setRange(1, 24);
+    spHours->setValue(4);
+    chlay->addWidget(spHours);
+    chlay->addWidget(new QLabel(tr("仅用于分页PDF")));
+    form->addRow(tr("每页小时数"), chlay);
+
     vlay->addWidget(new QLabel(tr("运行图备注：")));
     edNote=new QTextEdit;
     edNote->setPlainText(page->note());
     vlay->addWidget(edNote);
 
-    auto* g=new ButtonGroup<3>({"输出PDF","输出PNG","取消"});
+    auto* g=new ButtonGroup<4>({"输出PDF", "输出分页PDF", "输出PNG","取消"});
     g->connectAll(SIGNAL(clicked()),this,{
-                      SLOT(onSavePdf()),SLOT(onSavePng()),SLOT(close())
+                      SLOT(onSavePdf()), SLOT(onSavePdfMultiPage()), SLOT(onSavePng()),SLOT(close())
                   });
     vlay->addLayout(g);
     setLayout(vlay);
@@ -68,6 +77,15 @@ void PrintDiagramDialog::onSavePdf()
     // 2024.04.10: async impl
     dw->toPdfAsync(fn, edName->text(), edNote->toPlainText(), this);
 #endif
+}
+
+void PrintDiagramDialog::onSavePdfMultiPage()
+{
+    QString fn = QFileDialog::getSaveFileName(this, tr("导出分页PDF"), edName->text(),
+        tr("PDF文档 (*.pdf)"));
+    if (fn.isEmpty())
+        return;
+    dw->toPdfAsyncMultiPage(fn, edName->text(), edNote->toPlainText(), this, spHours->value());
 }
 
 void PrintDiagramDialog::onSavePng()

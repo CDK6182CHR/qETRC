@@ -192,6 +192,8 @@ bool DiagramWidget::toPdf(const QString& filename, const QString& title, const Q
     painter.scale(printer.width() / scene()->width(), printer.width() / scene()->width());
 
     paintToFile(painter, title, note);
+    painter.end();
+
     auto end = std::chrono::system_clock::now();
     emit showNewStatus(tr("导出PDF  用时%1毫秒").arg((end - start) / 1ms));
     return true;
@@ -239,6 +241,7 @@ void DiagramWidget::toPdfAsync(const QString& filename, const QString& title, co
         //https://blog.csdn.net/weixin_44084447/article/details/123119101
         QMetaObject::invokeMethod(d, [this, &painter, &title, &note]() {
             paintToFile(painter, title, note);
+            painter.end();
             }, Qt::BlockingQueuedConnection);  // to make sure local variables valid, here must use BlockingQueuedConnection
 
         return 0;     
@@ -318,6 +321,135 @@ void DiagramWidget::toPdfAsync(const QString& filename, const QString& title, co
 #endif
 }
 
+void DiagramWidget::toPdfAsyncMultiPage(const QString& filename, const QString& title, const QString& note, QWidget* parent, 
+    int hours_per_page)
+{
+#if ! defined(QT_PRINTSUPPORT_LIB)
+    Q_UNUSED(filename);
+    Q_UNUSED(title);
+    Q_UNUSED(note)
+        QMessageBox::warning(this, tr("错误"), tr("由于当前平台不支持QtPrintSupport, "
+            "无法使用导出PDF功能。请考虑使用导出PNG功能。"));
+    return;
+#else
+    using namespace std::chrono_literals;
+    auto start = std::chrono::system_clock::now();
+
+    auto page_cpy = _page->clone();
+    auto* w = new DiagramWidget(_diagram, page_cpy, this);   // Tmp page
+    //w->setHidden(true);
+
+    // 2024.04.11: we should capture values since this kernel is executed in async.
+    auto* task = new QEProgressThread([filename, title, note, hours_per_page, this, w](QEProgressThread* d)->int {
+        //d->setLabelText(tr("正在初始化printer"));
+        QPrinter printer(QPrinter::HighResolution);
+        printer.setOutputFormat(QPrinter::PdfFormat);
+        printer.setOutputFileName(filename);
+        constexpr double note_apdx = 80;
+        //pd->setValue(1);
+
+        int total_hours = _page->config().end_hour - _page->config().start_hour;
+        if (total_hours < 0)
+            total_hours += 24;
+
+        int total_pages = (total_hours - 1) / hours_per_page + 1;   // Int div
+        qInfo() << "total pages: " << total_pages;
+
+        QPainter painter;
+
+        for (int ip = 0; ip < total_pages; ip++) {
+            int start_hour = (_page->config().start_hour + ip * hours_per_page) % 24;
+            int end_hour = (start_hour + hours_per_page) % 24;
+
+            w->page()->configRef().start_hour = start_hour;
+            w->page()->configRef().end_hour = end_hour;
+            //w->paintGraph();
+
+            QMetaObject::invokeMethod(d, [w]() {
+                w->paintGraph();
+                }, Qt::BlockingQueuedConnection);
+
+            if (ip == 0) {
+                QSize size(w->scene()->width(), w->scene()->height() + 100 + note_apdx);
+                QPageSize pageSize(size);
+                printer.setPageSize(pageSize);
+
+                painter.begin(&printer);
+                painter.scale(printer.width() / w->scene()->width(), printer.width() / w->scene()->width());
+
+                if (!painter.isActive()) {
+                    return 1;
+                }
+            }
+
+            painter.fillRect(QRect(0, 0, printer.width(), printer.height()), w->config().background_color_masked());
+            //painter.setBackground(config().background_color_masked());
+
+            //d->setLabelText(tr("正在进行绘图操作"));
+            //https://blog.csdn.net/weixin_44084447/article/details/123119101
+            QMetaObject::invokeMethod(d, [w, &painter, &title, &note]() {
+                w->paintToFile(painter, title, note);
+                }, Qt::BlockingQueuedConnection);  // to make sure local variables valid, here must use BlockingQueuedConnection
+
+            if (ip < total_pages - 1) {
+                printer.newPage();
+            }
+        }
+        return 0;
+        },   // end of kernel
+        parent);
+
+    parent->setAttribute(Qt::WA_DeleteOnClose, false);   // for safety, disable auto delete!
+
+    task->progressDialog()->setWindowTitle(tr("导出分页PDF"));
+    task->progressDialog()->setLabelText(tr("正在分页导出运行图\n请不要删除此运行图页面"));
+    //task->progressDialog()->setWindowModality(Qt::WindowModal);
+    task->progressDialog()->setMinimumDuration(500);
+    task->progressDialog()->setRange(0, 30);
+    task->progressDialog()->setValue(0);
+    task->progressDialog()->setCancelButton(nullptr);
+
+    auto* timer = new QTimer(task);
+    timer->setInterval(1000);
+    timer->callOnTimeout([task]() {
+        if (auto v = task->progressDialog()->value(); v <= 28) {
+            task->setValue(v + 1);
+        }
+        });
+    timer->start();
+
+    connect(task, &QThread::finished, [this, start, task, filename, parent, w]() {
+        if (task->returnCode() == 0) {
+            // succ
+            auto end = std::chrono::system_clock::now();
+            emit showNewStatus(tr("导出分页PDF  用时%1毫秒").arg((end - start) / 1ms));
+            QMetaObject::invokeMethod(this,
+                [this, filename]() {
+                    QMessageBox::information(this, tr("提示"),
+                        tr("已成功导出至PDF文件：\n%1").arg(filename));
+                });
+        }
+        else {
+            QMetaObject::invokeMethod(this,
+                [this, filename]() {
+                    QMessageBox::warning(this, tr("错误"),
+                        tr("导出失败，可能因为文件占用"));
+                });
+        }
+        task->deleteLater();
+        w->deleteLater();
+        if (parent->isHidden()) {   // It should be safe as this slot is handled in event loop?
+            parent->deleteLater();
+        }
+        else {
+            parent->setAttribute(Qt::WA_DeleteOnClose);
+        }
+        });
+
+    task->start();
+#endif
+}
+
 void DiagramWidget::paintToFile(QPainter& painter, const QString& title, const QString& note)
 {
     marginItems.left->setX(0);
@@ -351,7 +483,7 @@ void DiagramWidget::paintToFile(QPainter& painter, const QString& title, const Q
     painter.drawText(scene()->width() - 400, scene()->height() + 100 + 40, mark);
     painter.setRenderHint(QPainter::Antialiasing);
     scene()->render(&painter, QRectF(0, 100, scene()->width(), scene()->height()));
-    painter.end();
+    //painter.end();
 
     updateDistanceAxis();
     updateTimeAxis();
@@ -564,6 +696,7 @@ bool DiagramWidget::toPng(const QString& filename, const QString& title, const Q
     QPainter painter;
     painter.begin(&image);
     paintToFile(painter, title, note);
+    painter.end();
     bool flag= image.save(filename);
     if (flag) {
         auto end = std::chrono::system_clock::now();
