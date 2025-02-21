@@ -1226,6 +1226,7 @@ bool TrainItem::addLinkLine(const QString& trainName)
 
     if (!label_text.isEmpty()) {
         linkLabelItem = new QGraphicsSimpleTextItem(label_text, this);
+        linkLabelItem->setFont(config().train_font);
         linkLabelItem->setBrush(labelColor());
 
         // 对于不跨界的连线，其有效范围由文字和连线中范围大的决定

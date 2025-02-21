@@ -2341,7 +2341,11 @@ void MainWindow::actSaveGraph()
 	else {
 		using namespace std::chrono_literals;
 		auto start = std::chrono::system_clock::now();
-		_diagram.save();
+		bool flag = _diagram.save();
+		if (!flag) {
+			QMessageBox::warning(this, tr("错误"), tr("保存文件失败，请检查目录是否存在、文件是否可写等。"));
+			return;
+		}
 		markUnchanged();
 		undoStack->setClean();
 		auto end = std::chrono::system_clock::now();
@@ -2365,6 +2369,9 @@ void MainWindow::actSaveGraphAs()
 		updateWindowTitle();
 		auto end = std::chrono::system_clock::now();
 		showStatus(tr("保存成功  用时%1毫秒").arg((end - start) / 1ms));
+	}
+	else {
+		QMessageBox::warning(this, tr("错误"), tr("保存文件失败，请检查目录是否存在、文件是否可写等。"));
 	}
 }
 
