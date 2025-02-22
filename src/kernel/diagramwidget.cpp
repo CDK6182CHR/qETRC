@@ -360,6 +360,9 @@ void DiagramWidget::toPdfAsyncMultiPage(const QString& filename, const QString& 
         for (int ip = 0; ip < total_pages; ip++) {
             int start_hour = (_page->config().start_hour + ip * hours_per_page) % 24;
             int end_hour = (start_hour + hours_per_page) % 24;
+            if (ip == total_pages - 1) {
+                end_hour = this->config().end_hour;
+            }
 
             w->page()->configRef().start_hour = start_hour;
             w->page()->configRef().end_hour = end_hour;
