@@ -40,7 +40,7 @@ void PrintDiagramDialog::initUI()
     auto* chlay = new QHBoxLayout;
     spHours = new QSpinBox;
     spHours->setRange(1, 24);
-    spHours->setValue(4);
+    spHours->setValue(6);
     chlay->addWidget(spHours);
     chlay->addWidget(new QLabel(tr("仅用于分页PDF")));
     form->addRow(tr("每页小时数"), chlay);

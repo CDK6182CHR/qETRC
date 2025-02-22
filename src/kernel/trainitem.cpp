@@ -1224,7 +1224,10 @@ bool TrainItem::addLinkLine(const QString& trainName)
     // 2024.02.26: add (optional) link label
     auto label_text = linkLineLabelText(trainName, rout.get());
 
-    if (!label_text.isEmpty()) {
+    double width = config().diagramWidth();
+
+    // 2025.02.22  add condition xpre <= width: do not create the label for the link lines out of the boundary.
+    if (!label_text.isEmpty() && xpre <= width) {
         linkLabelItem = new QGraphicsSimpleTextItem(label_text, this);
         linkLabelItem->setFont(config().train_font);
         linkLabelItem->setBrush(labelColor());
@@ -1238,7 +1241,6 @@ bool TrainItem::addLinkLine(const QString& trainName)
     // 2024.02.22: determine the height of the link line
     double height = linkLineHeight(rs.get(), xpre_eff, xcur);
 
-    double width = config().diagramWidth();
     double y = _railway.yValueFromCoeff(rs->y_coeff.value(), config()) + start_y;
     QPen pen = trainPen();
     pen.setColor(linkLineColor());

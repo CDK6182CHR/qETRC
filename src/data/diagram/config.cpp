@@ -61,6 +61,13 @@ static inline void read_enum(EnumType& var, const QJsonObject& obj, const char* 
 #define FROM_OBJ_ENUM(_var) read_enum(_var, obj, #_var)
 
 
+QFont Config::default_font_double_size()
+{
+    QFont font;
+    font.setPointSize(font.pointSize() * 2);
+    return font;
+}
+
 bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
 {
     if (obj.empty())

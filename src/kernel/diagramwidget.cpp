@@ -387,8 +387,8 @@ void DiagramWidget::toPdfAsyncMultiPage(const QString& filename, const QString& 
 
             //d->setLabelText(tr("正在进行绘图操作"));
             //https://blog.csdn.net/weixin_44084447/article/details/123119101
-            QMetaObject::invokeMethod(d, [w, &painter, &title, &note]() {
-                w->paintToFile(painter, title, note);
+            QMetaObject::invokeMethod(d, [w, &painter, &title, &note, ip, total_pages]() {
+                w->paintToFile(painter, title, note, tr("页面 %1/%2").arg(ip + 1).arg(total_pages));
                 }, Qt::BlockingQueuedConnection);  // to make sure local variables valid, here must use BlockingQueuedConnection
 
             if (ip < total_pages - 1) {
@@ -450,7 +450,7 @@ void DiagramWidget::toPdfAsyncMultiPage(const QString& filename, const QString& 
 #endif
 }
 
-void DiagramWidget::paintToFile(QPainter& painter, const QString& title, const QString& note)
+void DiagramWidget::paintToFile(QPainter& painter, const QString& title, const QString& note, const QString& page_mark)
 {
     marginItems.left->setX(0);
     marginItems.right->setX(0);
@@ -479,7 +479,7 @@ void DiagramWidget::paintToFile(QPainter& painter, const QString& title, const Q
         painter.drawText(config().totalLeftMargin(), scene()->height() + 100 + 40, s);
     }
 
-    QString mark = tr("由 %1_%2 导出").arg(qespec::TITLE.data()).arg(qespec::VERSION.data());
+    QString mark = tr("由 %1_%2 导出   %3").arg(qespec::TITLE.data()).arg(qespec::VERSION.data()).arg(page_mark);
     painter.drawText(scene()->width() - 400, scene()->height() + 100 + 40, mark);
     painter.setRenderHint(QPainter::Antialiasing);
     scene()->render(&painter, QRectF(0, 100, scene()->width(), scene()->height()));

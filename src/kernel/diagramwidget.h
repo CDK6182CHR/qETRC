@@ -419,7 +419,7 @@ public slots:
      * 输出PDF和PNG的公共操作
      * 2024.04.10: refactor to public slots (previous private function) for multi-threaded impl.
      */
-     void paintToFile(QPainter& painter, const QString& title, const QString& note);
+    void paintToFile(QPainter& painter, const QString& title, const QString& note, const QString& page_mark = {});
 
 };
 

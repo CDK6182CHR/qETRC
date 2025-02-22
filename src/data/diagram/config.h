@@ -76,6 +76,8 @@ struct Config
         Floor,
     };
 
+    static QFont default_font_double_size();
+
     /**
      * 2023.06.23  whether current object is transparent. If true, the data are not read.
      */
@@ -91,7 +93,7 @@ struct Config
         grid_color=QColor(170,170,127),  // #AAAA7F
         text_color=QColor(0,0,255);      // #0000FF
     QColor background_color = QColor(255, 255, 255);   // 2024.06.24 experimental
-    QFont rail_font = QFont{}, train_font = QFont{}, time_font = QFont{};
+    QFont rail_font = QFont{}, train_font = QFont{}, time_font = default_font_double_size();
     bool inverse_color = false;   // inverse ALL specified colors
     
     // 默认客车和货车线宽，好像也没用了
