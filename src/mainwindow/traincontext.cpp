@@ -374,7 +374,7 @@ void TrainContext::initUI()
 		connect(act, &QAction::triggered, this, &TrainContext::actSplitTrain);
 		panel->addMediumAction(act);
 
-		act = mw->makeAction(QEICN_merge_trains, tr("合并车次-context"));
+		act = mw->makeAction(QEICN_merge_trains, tr("合并车次"), tr("合并车次-context"));
 		act->setToolTip(tr("合并车次\n将所选的一组列车按顺序合并为一个新车次"));
 		connect(act, &QAction::triggered, this, &TrainContext::actMergeTrains);
 		panel->addMediumAction(act);
