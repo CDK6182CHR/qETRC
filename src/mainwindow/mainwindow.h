@@ -114,7 +114,7 @@ class MainWindow : public SARibbonMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() = default;
 
     /**
      * 2022.02.07  这个接口尽量不要用
@@ -491,6 +491,8 @@ private slots:
     void actRibbonConfig();
 
     void onRibbonConfigChanged(bool theme_changed);
+
+    void actDiagramOption();
 
 public slots:
 

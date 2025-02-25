@@ -4,7 +4,7 @@
 
 class Diagram;
 class QSpinBox;
-class Config;
+struct Config;
 
 class DiagramOptionDialog : public QDialog
 {

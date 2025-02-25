@@ -1,4 +1,4 @@
-#include "diagramoptiondialog.h"
+ï»¿#include "diagramoptiondialog.h"
 
 #include <QVBoxLayout>
 #include <QFormLayout>
@@ -13,33 +13,34 @@ DiagramOptionDialog::DiagramOptionDialog(Diagram& diagram, QWidget* parent) :
 	m_diagram(diagram)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
-	setWindowTitle(tr("ÔËÐÐÍ¼Ñ¡Ïî"));
-	resize(600, 600);
+	setWindowTitle(tr("è¿è¡Œå›¾é€‰é¡¹"));
+	//resize(600, 600);
 	initUI();
 }
 
 void DiagramOptionDialog::initUI()
 {
 	auto* vlay = new QVBoxLayout(this);
-	auto* lab = new QLabel(tr("¹ØÓÚÔËÐÐÍ¼ÏÔÊ¾µÄ¸ü¶àÏ¸½ÚÉèÖÃ£¬ÇëÒÆ²½¡°ÔËÐÐÍ¼ÏÔÊ¾ÉèÖÃ¡±¡£"
-		"´Ë´¦ËùÌá¹©µÄÉèÖÃÏî²»½öÉæ¼°ÔËÐÐÍ¼µÄÏÔÊ¾£¬Ò²Éæ¼°ÔËÐÐÍ¼Êý¾ÝµÄ¼ÆËã£¬Òò´Ëµ¥ÁÐ³öÀ´¡£"));
+	auto* lab = new QLabel(tr("å…³äºŽè¿è¡Œå›¾æ˜¾ç¤ºçš„æ›´å¤šç»†èŠ‚è®¾ç½®ï¼Œè¯·ç§»æ­¥â€œè¿è¡Œå›¾æ˜¾ç¤ºè®¾ç½®â€ã€‚"
+		"æ­¤å¤„æ‰€æä¾›çš„è®¾ç½®é¡¹ä¸ä»…æ¶‰åŠè¿è¡Œå›¾çš„æ˜¾ç¤ºï¼Œä¹Ÿæ¶‰åŠè¿è¡Œå›¾æ•°æ®çš„è®¡ç®—ï¼Œå› æ­¤å•åˆ—å‡ºæ¥ã€‚"));
 	lab->setWordWrap(true);
 	vlay->addWidget(lab);
 
 	auto* flay = new QFormLayout;
 	m_spPassedStations = new QSpinBox;
 	m_spPassedStations->setRange(0, 100000000);
-	flay->addRow(tr("×î´ó¿çÔ½Õ¾Êý"), m_spPassedStations);
-	m_spPassedStations->setToolTip(tr("×î´ó¿çÔ½Õ¾Êý\n"
-		"´ËÑ¡ÏîÖ¸³ö×Ô¶¯°²ÅÅÁÐ³µÔËÐÐÏßÊ±£¬Ã¿ÌõÔËÐÐÏßÄÚ×î´óÔÊÐíµÄÁ¬Ðø·ÇÆÌ»­Õ¾µãÊý¡£ÈôÁ¬ÐøÎ´ÆÌ»­µÄÕ¾Êý³¬¹ý´ËÊýÖµ£¬"
-		"ÔòÔËÐÐÏß½«±»¶Ï¿ª¡£"
-		"¶ÔÓÚÊ±¿Ì±í²»ÍêÕûµÄÔËÐÐÍ¼£¨Ê±¿Ì±íÉÏ²»Í£³µµÄ³µÕ¾±»Ê¡ÂÔ£©£¬Ó¦½«´ËÊýÖµÉèÖÃµÃ³ä·Ö´ó£¬ÒÔ±ÜÃâ·ÇÔ¤ÆÚµÄÔËÐÐÏßÖÐ¶Ï»ò²»ÍêÕû¡£"));
+	flay->addRow(tr("æœ€å¤§è·¨è¶Šç«™æ•°"), m_spPassedStations);
+	m_spPassedStations->setToolTip(tr("æœ€å¤§è·¨è¶Šç«™æ•°\n"
+		"æ­¤é€‰é¡¹æŒ‡å‡ºè‡ªåŠ¨å®‰æŽ’åˆ—è½¦è¿è¡Œçº¿æ—¶ï¼Œæ¯æ¡è¿è¡Œçº¿å†…æœ€å¤§å…è®¸çš„è¿žç»­éžé“ºç”»ç«™ç‚¹æ•°ã€‚è‹¥è¿žç»­æœªé“ºç”»çš„ç«™æ•°è¶…è¿‡æ­¤æ•°å€¼ï¼Œ"
+		"åˆ™è¿è¡Œçº¿å°†è¢«æ–­å¼€ã€‚"
+		"å¯¹äºŽæ—¶åˆ»è¡¨ä¸å®Œæ•´çš„è¿è¡Œå›¾ï¼ˆæ—¶åˆ»è¡¨ä¸Šä¸åœè½¦çš„è½¦ç«™è¢«çœç•¥ï¼‰ï¼Œåº”å°†æ­¤æ•°å€¼è®¾ç½®å¾—å……åˆ†å¤§ï¼Œä»¥é¿å…éžé¢„æœŸçš„è¿è¡Œçº¿ä¸­æ–­æˆ–ä¸å®Œæ•´ã€‚"));
 
 	vlay->addLayout(flay);
 
 	auto* box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal);
 	connect(box, &QDialogButtonBox::accepted, this, &DiagramOptionDialog::accept);
 	connect(box, &QDialogButtonBox::rejected, this, &DiagramOptionDialog::reject);
+	vlay->addWidget(box);
 }
 
 void DiagramOptionDialog::accept()

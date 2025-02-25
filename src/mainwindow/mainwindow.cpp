@@ -69,7 +69,7 @@
 #include <dialogs/changestationnamedialog.h>
 #include "data/train/routing.h"
 
-#include <model/rail/railstationmodel.h>
+#include "model/rail/railstationmodel.h"
 #include "dialogs/locatedialog.h"
 #include "wizards/timeinterp/timeinterpwizard.h"
 #include "railnet/raildb/raildbnavi.h"
@@ -88,7 +88,7 @@
 #include "log/IssueManager.h"
 #include "defines/icon_specs.h"
 #include "editors/ribbonconfigdialog.h"
-
+#include "editors/diagramoptiondialog.h"
 
 MainWindow::MainWindow(QWidget* parent)
 	: SARibbonMainWindow(parent, true),
@@ -123,11 +123,6 @@ MainWindow::MainWindow(QWidget* parent)
 		std::chrono::microseconds::period::den;
 	qInfo() << "MainWindow init consumes: " << secs << Qt::endl;
 	showStatus(tr("主窗口初始化用时: %1 秒").arg(secs));
-}
-
-MainWindow::~MainWindow()
-{
-
 }
 
 void MainWindow::initUI()
@@ -910,6 +905,12 @@ void MainWindow::initToolbar()
 		connect(act, SIGNAL(triggered()), naviView, SLOT(addNewPage()));
         panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
+
+		panel = cat->addPannel(tr("设置"));
+		act = makeAction(QEICN_diagram_option, tr("运行图选项"));
+		act->setToolTip(tr("运行图选项\n包含与运行图计算相关的基本设置项"));
+		connect(act, &QAction::triggered, this, &MainWindow::actDiagramOption);
+		panel->addLargeAction(act);
 
 		panel = cat->addPannel(tr("更新"));
 		act = makeAction(QEICN_global_refresh, tr("刷新"));
@@ -1984,6 +1985,15 @@ void MainWindow::onRibbonConfigChanged(bool theme_changed)
 	}
 }
 
+void MainWindow::actDiagramOption()
+{
+	auto* d = new DiagramOptionDialog(_diagram, this);
+	connect(d, &DiagramOptionDialog::passedStationChanged, [this](int old_value, int new_value) {
+		undoStack->push(new qecmd::ChangePassedStation(old_value, new_value, this));
+		});
+	d->open();
+}
+
 void MainWindow::updateWindowTitle()
 {
 	QString filename = _diagram.filename();
@@ -2197,6 +2207,7 @@ void MainWindow::commitPassedStationChange(int n)
 	_diagram.config().max_passed_stations = n;
 	_diagram.rebindAllTrains();
 	trainListWidget->getModel()->updateAllMileSpeed();
+	spPassedStations->setValue(n);
 	updateAllDiagrams();
 }
 

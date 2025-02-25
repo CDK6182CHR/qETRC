@@ -52,6 +52,7 @@
 #define QEICN_issue_widget QE_STD_ICON(MessageBoxCritical)  // 问题窗口
 #define QEICN_add_diagram_page QE_RSC_ICON(add.png)   // 添加运行图页面
 
+#define QEICN_diagram_option QE_RSC_ICON(config.png)      // 运行图选项
 #define QEICN_global_refresh QE_STD_ICON(BrowserReload)   // 刷新
 #define QEICN_rename_station QE_RSC_ICON(brush.png)   // 更改站名
 
