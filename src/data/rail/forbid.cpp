@@ -2,6 +2,9 @@
 #include "forbid.h"
 #include <QDebug>
 #include <QJsonArray>
+#include <QFile>
+#include <QTextStream>
+#include "util/utilfunc.h"
 
 Forbid::Forbid(std::weak_ptr<Railway> railway, bool different, int index) :
     RailIntervalData<ForbidNode, Forbid>(railway, different, index),
@@ -50,6 +53,72 @@ void Forbid::_show() const
             '\t' << p->durationMin() <<
             Qt::endl;
     }
+}
+
+bool Forbid::toCsv(const QString& filename) const
+{
+    QFile file(filename);
+    file.open(QFile::WriteOnly);
+    if (!file.isOpen()) {
+        qWarning() << "Open file " << filename << " failed";
+        return false;
+    }
+    QTextStream sout(&file);
+
+    // 发站，到站，起始，结束
+    for (auto it = firstDownNode(); it; it = it->nextNodeCirc()) {
+        sout << it->fromStationName().toSingleLiteral() << ","
+            << it->toStationName().toSingleLiteral() << ","
+            << it->beginTime.toString("hh:mm") << ","
+            << it->endTime.toString("hh:mm") << "\n";
+    }
+    file.close();
+    return true;
+}
+
+int Forbid::fromCsv(const QString& filename)
+{
+    QFile file(filename);
+    file.open(QFile::ReadOnly);
+    if (!file.isOpen()) {
+        qWarning() << "Open file " << filename << " failed";
+        return 0;
+    }
+    QTextStream sin(&file);
+
+    int cnt = 0;
+    int n = 0;
+    while (!sin.atEnd()) {
+        QString line = sin.readLine();
+        n++;
+        if (line.isEmpty()) continue;
+
+        auto sp = line.split(",");
+        if (sp.size() != 4) {
+            qWarning() << "Invalid row data " << sp;
+            if (sp.size() < 4) continue;
+        }
+
+        const auto& from = sp[0], & to = sp[1];
+        auto node = this->getNode(from, to);
+        if (!node) {
+            qWarning() << "Invalid interval " << from << " -> " << to;
+        }
+        else {
+            QTime bt = qeutil::parseTime(sp[2]);
+            QTime et = qeutil::parseTime(sp[3]);
+            if (bt.isValid() && et.isValid()) {
+                node->beginTime = bt;
+                node->endTime = et;
+                cnt++;
+            }
+            else {
+                qWarning() << "Invalid time encountered at row " << n << ": " << line;
+            }
+        }
+    }
+    file.close();
+    return cnt;
 }
 
 std::shared_ptr<Railway> Forbid::clone() const

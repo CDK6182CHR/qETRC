@@ -307,6 +307,13 @@ public slots:
      * 2023.08.22  the processing of import railways is moved from NaviTree to here.
      */
     void actImportRailways(QList<std::shared_ptr<Railway>>& rails);
+
+    /**
+     * 2025.02.28  Export forbid data to csv file. Called by the navi view.
+     */
+    void actExportForbidCsv(std::shared_ptr<Forbid> forbid);
+
+    void actImportForbidCsv(std::shared_ptr<Forbid> forbid);
 };
 
 

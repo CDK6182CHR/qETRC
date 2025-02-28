@@ -72,6 +72,10 @@ public:
 
     void _show()const;
 
+    bool toCsv(const QString& filename)const;
+
+    int fromCsv(const QString& filename);
+
     std::shared_ptr<Railway> clone()const;
 
     /**

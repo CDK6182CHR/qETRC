@@ -27,6 +27,7 @@
 #include <DockManager.h>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QFileDialog>
 #include "model/diagram/diagramnavimodel.h"
 #include <SARibbonLineEdit.h>
 #include <SARibbonComboBox.h>
@@ -942,6 +943,42 @@ void RailContext::actImportRailways(QList<std::shared_ptr<Railway>>& rails)
 	}
 
 	mw->getUndoStack()->push(cmd);
+}
+
+void RailContext::actExportForbidCsv(std::shared_ptr<Forbid> forbid)
+{
+	QString filename = QFileDialog::getSaveFileName(mw, tr("导出天窗数据"),
+		{}, tr("CSV文件 (*.csv); 所有文件 (*)"));
+	if (filename.isEmpty())
+		return;
+
+	bool flag = forbid->toCsv(filename);
+	if (flag) {
+		mw->showStatus(tr("导出天窗数据成功"));
+	}
+	else {
+		QMessageBox::warning(mw, tr("错误"), tr("导出天窗数据失败，请检查目录或文件"));
+	}
+}
+
+void RailContext::actImportForbidCsv(std::shared_ptr<Forbid> forbid)
+{
+	QString filename = QFileDialog::getOpenFileName(mw, tr("导入天窗数据"), {},
+		tr("CSV文件 (*.csv); 所有文件 (*)"));
+	if (filename.isEmpty())
+		return;
+
+	auto data = forbid->clone();
+	int count = data->forbids().front()->fromCsv(filename);
+	mw->getUndoStack()->push(new qecmd::UpdateForbidData(forbid, data, this));
+	
+	if (count) {
+		QMessageBox::information(mw, tr("导入天窗数据"), tr("成功导入%1条数据").arg(count));
+	}
+	else {
+		QMessageBox::information(mw, tr("导入天窗数据"), tr("未能导入数据，可能是文件打开失败或不存在有效数据。"
+			"“输出”面板可能提供更多信息。"));
+	}
 }
 
 
