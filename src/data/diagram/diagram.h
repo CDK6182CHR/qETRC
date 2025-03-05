@@ -4,6 +4,7 @@
 #include <QList>
 #include <QString>
 #include "config.h"
+#include "diagramoptions.h"
 #include "data/train/traincollection.h"
 #include "data/diagram/trainline.h"    // for: alias
 #include "data/rail/railcategory.h"
@@ -70,6 +71,7 @@ class Diagram
     RailCategory _railcat;
     TrainCollection _trainCollection;
     Config _config, _defaultConfig;
+    DiagramOptions _options;
     QString _filename;
     QString _version, _note;
     int _releaseCode = 0;
@@ -173,6 +175,8 @@ public:
     inline int releaseCode()const { return _releaseCode; }
     inline const QString& note()const { return _note; }
     inline void setNote(const QString& n) { _note = n; }
+    inline auto& options() { return _options; }
+    inline auto& options()const { return _options; }
 
     inline std::shared_ptr<Railway> railwayAt(int i) { return _railcat.railways().at(i); }
 

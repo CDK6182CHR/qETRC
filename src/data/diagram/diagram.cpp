@@ -1406,6 +1406,12 @@ bool Diagram::fromJson(const QJsonObject& obj)
         //缺配置信息，使用默认值
         _config = _defaultConfig;
     }
+
+    flag = _options.fromJson(obj.value("options").toObject());
+    if (!flag) {
+        _options.fromJson(obj.value("config").toObject());
+    }
+
     _note = obj.value("markdown").toString();
     _version = obj.value("qetrc_version").toString();
     _releaseCode = obj.value("qetrc_release").toInt(qespec::RELEASE_CODE);
@@ -1475,6 +1481,7 @@ QJsonObject Diagram::toJson() const
     QJsonObject objconfig = _config.toJson();
     _trainCollection.typeManager().toJson(objconfig);
     obj.insert("config", objconfig);
+    obj.insert("options", _options.toJson());
     obj.insert("markdown", _note);
     obj.insert("qetrc_version", qespec::VERSION.data());
     obj.insert("qetrc_release", qespec::RELEASE_CODE);
