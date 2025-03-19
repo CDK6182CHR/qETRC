@@ -23,7 +23,7 @@ void Diagram::addRailway(std::shared_ptr<Railway> rail)
     // 2023.08.21: for path
     _pathcoll.checkValidForRailway(_railcat, rail.get());
     foreach(auto p, trains()) {
-        p->bindToRailway(rail, _config);
+        p->bindToRailway(rail, _options);
     }
 }
 
@@ -39,7 +39,7 @@ void Diagram::insertRailwayAt(int i, std::shared_ptr<Railway> rail)
     _pathcoll.checkValidForRailway(_railcat, rail.get());
 
     foreach(auto p, trains()) {
-        p->bindToRailway(rail, _config);
+        p->bindToRailway(rail, _options);
     }
 }
 
@@ -72,7 +72,7 @@ void Diagram::updateRailway(std::shared_ptr<Railway> r)
         }
     }
     foreach (const auto& p, _trainCollection.trains()){
-        p->updateBoundRailway(r, _config);
+        p->updateBoundRailway(r, _options);
     }
 }
 
@@ -80,7 +80,7 @@ void Diagram::updateTrain(std::shared_ptr<Train> t)
 {
     if (t->paths().empty()) {
         foreach(const auto & r, railways()) {
-            t->updateBoundRailway(r, _config);
+            t->updateBoundRailway(r, _options);
         }
     }
     else {
@@ -192,7 +192,7 @@ void Diagram::applyBindOn(TrainCollection& coll)
 {
     foreach (auto p , railways()) {
         for (auto t : coll.trains()) {
-            t->bindToRailway(p, _config);
+            t->bindToRailway(p, _options);
         }
     }
 }
@@ -200,7 +200,7 @@ void Diagram::applyBindOn(TrainCollection& coll)
 void Diagram::applyBindOn(std::shared_ptr<Train> train)
 {
     foreach (auto p, railways()) {
-        train->bindToRailway(p, _config);
+        train->bindToRailway(p, _options);
     }
 }
 
@@ -260,7 +260,7 @@ void Diagram::rebindAllTrains()
         if (t->paths().empty()) {
             t->clearBoundRailways();
             foreach(auto p, railways()) {
-                t->bindToRailway(p, _config);
+                t->bindToRailway(p, _options);
             }
         }
         else {
@@ -821,7 +821,7 @@ void Diagram::bindAllTrains()
     foreach(auto t, _trainCollection.trains()) {
         if (t->paths().empty()) {
             foreach(auto p, railways()) {
-                t->bindToRailway(p, _config);
+                t->bindToRailway(p, _options);
             }
         }
         else {

@@ -363,7 +363,7 @@ void MainWindow::checkPagesValidity()
 void MainWindow::actChangePassedStations()
 {
 	int n = spPassedStations->value();
-	int old = _diagram.config().max_passed_stations;
+	int old = _diagram.options().max_passed_stations;
 	if (n != old) {
 		undoStack->push(new qecmd::ChangePassedStation(old, n, this));
 	}
@@ -1690,7 +1690,7 @@ void MainWindow::endResetGraph()
 	catView->refreshTypeGroup();
 	catView->refreshFilters();
 
-	spPassedStations->setValue(_diagram.config().max_passed_stations);
+	spPassedStations->setValue(_diagram.options().max_passed_stations);
 
 	// 2023.12.30  predef train filter
 	if (filterManager) {
@@ -2204,7 +2204,7 @@ void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
 
 void MainWindow::commitPassedStationChange(int n)
 {
-	_diagram.config().max_passed_stations = n;
+	_diagram.options().max_passed_stations = n;
 	_diagram.rebindAllTrains();
 	trainListWidget->getModel()->updateAllMileSpeed();
 	spPassedStations->setValue(n);

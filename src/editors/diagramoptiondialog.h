@@ -17,6 +17,7 @@ public:
 
 private:
 	void initUI();
+	void setData();
 
 signals:
 	void passedStationChanged(int old_passed_stations, int new_passed_stations);

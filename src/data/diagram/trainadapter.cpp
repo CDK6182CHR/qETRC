@@ -3,7 +3,7 @@
 
 //#include "kernel/trainitem.h"
 #include "util/utilfunc.h"
-#include "config.h"
+#include "diagramoptions.h"
 #include "data/rail/rulernode.h"
 #include "data/rail/ruler.h"
 #include "data/train/train.h"
@@ -19,10 +19,10 @@ TrainAdapter::TrainAdapter(std::weak_ptr<Train> train,
 
 
 TrainAdapter::TrainAdapter(std::weak_ptr<Train> train,
-    std::weak_ptr<Railway> railway, const Config& config):
+    std::weak_ptr<Railway> railway, const DiagramOptions& options):
     _railway(railway),_train(train)
 {
-	autoLines(config);
+	autoLines(options);
 }
 
 
@@ -309,7 +309,7 @@ int TrainAdapter::timetableInterpolationSimple()
 
 //#define LINE_DBG_PRINT_COND train()->trainName().full() == "1001"
 
-void TrainAdapter::autoLines(const Config& config)
+void TrainAdapter::autoLines(const DiagramOptions& options)
 {
 	//命名规则：前缀r表示rail，t表示train
     auto& table = train()->timetable();
@@ -385,9 +385,9 @@ void TrainAdapter::autoLines(const Config& config)
 				// 所以多加一个判定。rlast==rcur时实质上假定stationsBetween()==0。
 
 				// !rlast  此前已经有过绑定
-				if (tpass > config.max_passed_stations ||
+				if (tpass > options.max_passed_stations ||
 					(rlast != rcur && rail->stationsBetween(rlast, rcur) + tpass >
-						config.max_passed_stations)) {
+						options.max_passed_stations)) {
 					//跨越区间数量超限，截断运行线
 					if (loccnt >= 2) {
 						_lines.append(line);

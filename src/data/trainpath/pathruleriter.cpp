@@ -152,6 +152,6 @@ void PathRulerIteratorGen<TyNode>::toSegLastNode()
 }
 
 
-template PathRulerIteratorGen<RulerNode>;
-template PathRulerIteratorGen<const RulerNode>;
+template class PathRulerIteratorGen<RulerNode>;
+template class PathRulerIteratorGen<const RulerNode>;
 

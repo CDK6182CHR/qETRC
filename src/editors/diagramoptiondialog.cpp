@@ -16,6 +16,7 @@ DiagramOptionDialog::DiagramOptionDialog(Diagram& diagram, QWidget* parent) :
 	setWindowTitle(tr("运行图选项"));
 	//resize(600, 600);
 	initUI();
+	setData();
 }
 
 void DiagramOptionDialog::initUI()
@@ -43,10 +44,15 @@ void DiagramOptionDialog::initUI()
 	vlay->addWidget(box);
 }
 
+void DiagramOptionDialog::setData()
+{
+	m_spPassedStations->setValue(m_diagram.options().max_passed_stations);
+}
+
 void DiagramOptionDialog::accept()
 {
-	if (m_spPassedStations->value() != m_diagram.config().max_passed_stations) {
-		emit passedStationChanged(m_diagram.config().max_passed_stations, m_spPassedStations->value());
+	if (m_spPassedStations->value() != m_diagram.options().max_passed_stations) {
+		emit passedStationChanged(m_diagram.options().max_passed_stations, m_spPassedStations->value());
 	}
 	QDialog::accept();
 }

@@ -132,8 +132,9 @@ struct Config
 
     /**
      * 自动安排TrainItem配置时，最多允许间隔的站数。超过将分成两个Item
+     * 2025.03.05: moved to DiagramOptions
      */
-    int max_passed_stations = 3;
+    //int max_passed_stations = 3;
 
     bool avoid_cover = true;
     int base_label_height = 15;

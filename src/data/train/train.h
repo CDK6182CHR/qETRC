@@ -13,6 +13,7 @@ class RailStation;
 class Railway;
 class QJsonObject;
 struct Config;
+struct DiagramOptions;
 class RailCategory;
 
 
@@ -254,7 +255,7 @@ public:
      * 注意：如果已经绑定到同一条线路，不做任何事
      * （在这里调用TrainAdapter构造函数）
      */
-    std::shared_ptr<TrainAdapter> bindToRailway(std::shared_ptr<Railway> railway, const Config& config);
+    std::shared_ptr<TrainAdapter> bindToRailway(std::shared_ptr<Railway> railway, const DiagramOptions& options);
 
     /**
      * 一次性清除所有绑定数据
@@ -266,7 +267,7 @@ public:
      * 即使已经绑定到同一条线路，也会撤销再重来 （转移构造）
      * 2023.08.25: change return value to void
      */
-    void updateBoundRailway(std::shared_ptr<Railway> railway, const Config& config);
+    void updateBoundRailway(std::shared_ptr<Railway> railway, const DiagramOptions& options);
 
     /**
      * @brief unbindToRailway

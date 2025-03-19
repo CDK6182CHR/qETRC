@@ -8,6 +8,11 @@
  */
 struct DiagramOptions 
 {
+
+	/**
+	 * For bind train to railways automatically. Split the trainline if the passed station count
+	 * is greater than this value.
+	 */
 	int max_passed_stations = 3;
 	
 	DiagramOptions() = default;

@@ -7,6 +7,7 @@
 
 class TrainCollection;
 struct Config;
+struct DiagramOptions;
 class TrainPath;
 
 /**
@@ -40,7 +41,7 @@ public:
      * @param config  暂时不保存，只用来生成信息
      */
     TrainAdapter(std::weak_ptr<Train> train, std::weak_ptr<Railway> railway,
-                 const Config& config);
+                 const DiagramOptions& options);
     TrainAdapter(const TrainAdapter&) = delete;
     TrainAdapter(TrainAdapter&&) = default;
 
@@ -164,7 +165,7 @@ private:
      * @brief autoLines
      * 自动生成运行线数据  包括原来的bindToRail()功能
      */
-    void autoLines(const Config& config);
+    void autoLines(const DiagramOptions& options);
 
     /**
      * Return the relative position of the station comparing to the mile range (specified by segment).

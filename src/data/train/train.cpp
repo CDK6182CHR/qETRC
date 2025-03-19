@@ -285,7 +285,7 @@ void Train::bindWithPath()
     invalidateTempData();
 }
 
-std::shared_ptr<TrainAdapter> Train::bindToRailway(std::shared_ptr<Railway> railway, const Config& config)
+std::shared_ptr<TrainAdapter> Train::bindToRailway(std::shared_ptr<Railway> railway, const DiagramOptions& options)
 {
     if (!_paths.empty()) {
         //qInfo() << "Train " << trainName().full() << " should be bound using TrainPath (not implemented)";
@@ -301,7 +301,7 @@ std::shared_ptr<TrainAdapter> Train::bindToRailway(std::shared_ptr<Railway> rail
             return *p;
         }
     }
-    auto adp = std::make_shared<TrainAdapter>(shared_from_this(), railway, config);
+    auto adp = std::make_shared<TrainAdapter>(shared_from_this(), railway, options);
     if (!adp->isNull()) {
         _adapters.append(adp);
         invalidateTempData();
@@ -311,7 +311,7 @@ std::shared_ptr<TrainAdapter> Train::bindToRailway(std::shared_ptr<Railway> rail
 }
 
 
-void Train::updateBoundRailway(std::shared_ptr<Railway> railway, const Config& config)
+void Train::updateBoundRailway(std::shared_ptr<Railway> railway, const DiagramOptions& options)
 {
     if (!_paths.empty()) {
         // 2023.08.25: no operation here (not sure)
@@ -321,7 +321,7 @@ void Train::updateBoundRailway(std::shared_ptr<Railway> railway, const Config& c
     //2021.06.24  基于Adapter新的实现
     //2021.07.04  TrainLine里面有Adapter的引用。不要move assign，直接删了重来好了
     unbindToRailway(railway);
-    bindToRailway(railway, config);
+    bindToRailway(railway, options);
 }
 
 void Train::unbindToRailway(std::shared_ptr<const Railway> railway)

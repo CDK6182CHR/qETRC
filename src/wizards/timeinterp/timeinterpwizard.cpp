@@ -35,7 +35,7 @@ void TimeInterpWizard::accept()
         auto t = std::make_shared<Train>(*train);   // copy construct
         auto rail = pgTrain->cbRuler->railway();
         auto ruler = pgTrain->cbRuler->ruler();
-        t->bindToRailway(rail,diagram.config());
+        t->bindToRailway(rail,diagram.options());
         auto adp = t->adapterFor(*rail);
         if (adp) {
             adp->timetableInterpolation(ruler, pgTrain->ckToStart->isChecked(),
