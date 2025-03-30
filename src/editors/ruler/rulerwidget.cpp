@@ -201,7 +201,7 @@ void RulerWidget::batchSetStop()
     bool ok;
     int res = QInputDialog::getInt(this,
         tr("批量设置停车附加"),
-        tr("将所选%1行的停车附加时分全部设置为（秒）：").arg(sel.size()), 120, 0, 100000, 10, &ok);
+        tr("将所选%1行的停车附加时分全部设置为（秒）：").arg(rows.size()), 120, 0, 100000, 10, &ok);
     if (!ok)return;
 
     for(int row:rows) {
