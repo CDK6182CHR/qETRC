@@ -314,6 +314,10 @@ public slots:
     void actExportForbidCsv(std::shared_ptr<Forbid> forbid);
 
     void actImportForbidCsv(std::shared_ptr<Forbid> forbid);
+
+    void actExportCurrentRailwayCsv();
+
+    void actExportRailwayCsv(std::shared_ptr<Railway> rail = {});
 };
 
 

@@ -265,6 +265,11 @@ void RailContext::initUI()
 	panel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &RailContext::actDulplicateRailway);
 
+	act = mw->addAction(QEICN_export_railway_csv, tr("导出CSV"), tr("导出基线CSV"));
+	act->setToolTip(tr("导出CSV\n导出基线数据到CSV"));
+	panel->addLargeAction(act);
+	connect(act, &QAction::triggered, this, &RailContext::actExportCurrentRailwayCsv);
+
 	act = mw->makeAction(QEICN_close_rail_context, tr("关闭面板"), tr("关闭基线面板"));
 	connect(act, &QAction::triggered, mw, &MainWindow::focusOutRailway);
 	act->setToolTip(tr("关闭面板\n关闭当前的基线上下文工具栏页面。"));
@@ -982,6 +987,34 @@ void RailContext::actImportForbidCsv(std::shared_ptr<Forbid> forbid)
 	else {
 		QMessageBox::information(mw, tr("导入天窗数据"), tr("未能导入数据，可能是文件打开失败或不存在有效数据。"
 			"“输出”面板可能提供更多信息。"));
+	}
+}
+
+void RailContext::actExportCurrentRailwayCsv()
+{
+	actExportRailwayCsv(railway);
+}
+
+void RailContext::actExportRailwayCsv(std::shared_ptr<Railway> rail)
+{
+	if (!rail)
+		rail = railway;
+	if (!rail) {
+		qWarning() << "actExportRailwayCsv: EMPTY RAILWAY";
+		return;
+	}
+
+	QString filename = QFileDialog::getSaveFileName(mw, tr("导出基线数据"),
+		QString("%1").arg(rail->name()), tr("CSV文件 (*.csv);\n所有文件 (*)"));
+	if (filename.isEmpty())
+		return;
+
+	bool flag = rail->toCsv(filename);
+	if (flag) {
+		mw->showStatus(tr("导出基线数据成功"));
+	}
+	else {
+		QMessageBox::warning(mw, tr("错误"), tr("导出基线数据失败，请检查目录或文件"));
 	}
 }
 

@@ -197,6 +197,7 @@
 #define QEICN_create_page_from_rail QE_RSC_ICON(diagram.png)   // 快速创建单线路运行图页面
 #define QEICN_del_railway QE_STD_ICON(TrashIcon)   // 删除基线
 #define QEICN_copy_railway QE_RSC_ICON(copy.png)   // 创建基线副本
+#define QEICN_export_railway_csv QE_RSC_ICON(copy.png)  // 导出基线CSV
 #define QEICN_close_rail_context QE_STD_ICON(DialogCloseButton)  // 关闭基线面板
 
 ///////// 工具栏 标尺管理 (9) /////////

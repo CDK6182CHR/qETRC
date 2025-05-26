@@ -658,6 +658,17 @@ public:
      */
     std::optional<StationName> possibleBoundStationName(const StationName& name)const;
 
+    /**
+     * Export data to CSV file. Returns whether succeeded.
+     */
+    bool toCsv(const QString& filename)const;
+
+    /**
+     * Import data from CSV file. Returns number of stations imported.
+     * This is not used for now; for safety, we would like to import this only to the editing widget for now!
+     */
+    //int fromCsv(const QString& filename);
+
 private:
     /**
      * 维护nameMap和fieldMap
