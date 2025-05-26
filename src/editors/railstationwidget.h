@@ -100,12 +100,15 @@ signals:
 
     void railNoteChanged(std::shared_ptr<Railway> railway, const RailInfoNote& data);
 
+    void exportCsv(std::shared_ptr<Railway> rail);
+
 private slots:
     void actApply();
     void actCancel();
     void markChanged();
     void actNote();
-    
+    void actExportCsv();
+    void actImportCsv();
 };
 
 

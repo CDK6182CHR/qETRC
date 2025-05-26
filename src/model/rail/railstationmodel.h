@@ -83,6 +83,12 @@ public:
      */
     bool applyChange();
 
+    /**
+     * 2025.05.26  Experimental: load data from CSV. Does NOT commit the data.
+     * returns: number of stations loaded.
+     */
+    int fromCsv(const QString& filename, QString& report);
+
 signals:
 
     /**

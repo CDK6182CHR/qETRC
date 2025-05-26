@@ -19,6 +19,7 @@
 #include <QLabel>
 #include <QScroller>
 #include <QAction>
+#include <QFileDialog>
 
 
 RailStationWidget::RailStationWidget(RailCategory& cat_, bool inplace, QWidget* parent) :
@@ -125,10 +126,10 @@ void RailStationWidget::initUI()
 
 	vlay->addWidget(ctable);
 
-	auto* g = new ButtonGroup<3>({ "确定","还原","备注" });
+	auto* g = new ButtonGroup<5>({ "确定","还原","备注", "导入CSV", "导出CSV"});
 	g->setMinimumWidth(50);
 	g->connectAll(SIGNAL(clicked()), this, { SLOT(actApply()),SLOT(actCancel()),
-		SLOT(actNote()) });
+		SLOT(actNote()), SLOT(actImportCsv()), SLOT(actExportCsv())});
 	vlay->addLayout(g);
 	
 	setLayout(vlay);
@@ -150,6 +151,42 @@ void RailStationWidget::actNote()
     connect(dia,&RailNoteDialog::railNoteChanged,
             this,&RailStationWidget::railNoteChanged);
     dia->open();
+}
+
+void RailStationWidget::actExportCsv()
+{
+	emit exportCsv(railway);
+}
+
+void RailStationWidget::actImportCsv()
+{
+	auto flag = QMessageBox::question(this, tr("导入基线数据"),
+		tr("此操作从指定的逗号分隔值 (CSV) 文件中读取基线数据。请注意：\n"
+			"1. 所读取的文件格式可以参照导出的CSV文件的格式。\n"
+			"2. 读取数据将覆盖现有基线编辑表中的数据。\n"
+			"3. 此操作仅将数据读入基线编辑的表格中，并不应用更改。请自行检查数据，并提交更改。\n"
+			"4. 请保证输入数据的有效性，否则可能导致无法预料的后果。\n"
+			"是否确认继续操作？"
+		)
+	);
+	if (flag != QMessageBox::Yes)
+		return;
+
+	QString filename = QFileDialog::getOpenFileName(this, tr("导入基线数据"),
+		QString(), tr("CSV文件 (*.csv);\n所有文件 (*)"));
+	if (filename.isEmpty())
+		return;
+
+	QString report;
+	int cnt = model->fromCsv(filename, report);
+
+	if (report.isEmpty()) {
+		QMessageBox::information(this, tr("提示"), tr("成功导入%1行数据。请检查数据后手动确认提交，以应用更改。").arg(cnt));
+	}
+	else {
+		QMessageBox::information(this, tr("提示"), tr("成功导入%1条数据。有下列报告信息。查看“输出”窗口可能有更多提示。\n%2")
+			.arg(cnt).arg(report));
+	}
 }
 
 void RailStationWidget::actApply()
