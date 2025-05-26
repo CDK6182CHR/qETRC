@@ -45,6 +45,9 @@ signals:
      */
     void forbidShowToggled(std::shared_ptr<Forbid> forbid, Direction dir);
 
+    void importCsv(std::shared_ptr<Forbid> forbid);
+    void exportCsv(std::shared_ptr<Forbid> forbid);
+
 public slots:
     void refreshBasicData();
     void refreshData();
@@ -69,7 +72,8 @@ private slots:
 
     void onContextMenu(const QPoint& pos);
     
-
+    void actExportCsv();
+    void actImportCsv();
 };
 
 
@@ -92,6 +96,10 @@ signals:
      * 指定方向的天窗是否显示变化。发射前确保是变了的；cmd只管反转
      */
     void forbidShowToggled(std::shared_ptr<Forbid> forbid, Direction dir);
+    
+    void importCsv(std::shared_ptr<Forbid>);
+    void exportCsv(std::shared_ptr<Forbid>);
+
 public slots:
     void refreshData(std::shared_ptr<Forbid> forbid);
     void refreshBasicData(std::shared_ptr<Forbid> forbid);

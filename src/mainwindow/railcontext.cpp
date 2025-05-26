@@ -413,6 +413,10 @@ ForbidTabWidget* RailContext::getOpenForbidWidget(std::shared_ptr<Railway> railw
 			this, &RailContext::actUpdadteForbidData);
 		connect(rw, &ForbidTabWidget::forbidShowToggled,
 			this, &RailContext::actToggleForbidShow);
+		connect(rw, &ForbidTabWidget::importCsv,
+			this, &RailContext::actImportForbidCsv);
+		connect(rw, &ForbidTabWidget::exportCsv,
+			this, &RailContext::actExportForbidCsv);
 		mw->forbidMenu->addAction(dock->toggleViewAction());
 		mw->getManager()->addDockWidgetFloating(dock);
 		return rw;
@@ -948,7 +952,7 @@ void RailContext::actImportRailways(QList<std::shared_ptr<Railway>>& rails)
 void RailContext::actExportForbidCsv(std::shared_ptr<Forbid> forbid)
 {
 	QString filename = QFileDialog::getSaveFileName(mw, tr("导出天窗数据"),
-		{}, tr("CSV文件 (*.csv); 所有文件 (*)"));
+		QString("%2_%1天窗").arg(forbid->name(), forbid->railway()->name()), tr("CSV文件 (*.csv);\n所有文件 (*)"));
 	if (filename.isEmpty())
 		return;
 
@@ -964,7 +968,7 @@ void RailContext::actExportForbidCsv(std::shared_ptr<Forbid> forbid)
 void RailContext::actImportForbidCsv(std::shared_ptr<Forbid> forbid)
 {
 	QString filename = QFileDialog::getOpenFileName(mw, tr("导入天窗数据"), {},
-		tr("CSV文件 (*.csv); 所有文件 (*)"));
+		tr("CSV文件 (*.csv);\n所有文件 (*)"));
 	if (filename.isEmpty())
 		return;
 

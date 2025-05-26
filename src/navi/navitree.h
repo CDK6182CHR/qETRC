@@ -127,6 +127,9 @@ signals:
      */
     void importRailways(QList<std::shared_ptr<Railway>>&);
 
+    void exportForbidToCsv(std::shared_ptr<Forbid>);
+    void importForbidFromCsv(std::shared_ptr<Forbid>);
+
 private slots:
     void showContextMenu(const QPoint& pos);
     
@@ -161,6 +164,10 @@ private slots:
     void onMergeRulerContext();
 
     void onEditForbidContext();
+
+    void onExportForbidCsvContext();
+
+    void onImportForbidCsvContext();
 
     void onEditRoutingContext();
 

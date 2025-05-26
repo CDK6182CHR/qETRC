@@ -123,6 +123,8 @@ void NaviTree::initContextMenus()
     //Forbid
     act = meForbid->addAction(tr("编辑天窗"));
     connect(act, SIGNAL(triggered()), this, SLOT(onEditForbidContext()));
+    meForbid->addAction(tr("导出数据到CSV"), this, &NaviTree::onExportForbidCsvContext);
+    meForbid->addAction(tr("自CSV导入数据"), this, &NaviTree::onImportForbidCsvContext);
 
     //Routing
     act = meRouting->addAction(tr("编辑交路"));
@@ -321,6 +323,24 @@ void NaviTree::onEditForbidContext()
     if (item && item->type() == navi::ForbidItem::Type) {
         emit editForbid(static_cast<navi::ForbidItem*>(item)->forbid(),
             static_cast<navi::ForbidItem*>(item)->railway());
+    }
+}
+
+void NaviTree::onExportForbidCsvContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::ForbidItem::Type) {
+        emit exportForbidToCsv(static_cast<navi::ForbidItem*>(item)->forbid());
+    }
+}
+
+void NaviTree::onImportForbidCsvContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::ForbidItem::Type) {
+        emit importForbidFromCsv(static_cast<navi::ForbidItem*>(item)->forbid());
     }
 }
 

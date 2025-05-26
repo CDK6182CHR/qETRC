@@ -349,7 +349,7 @@ void DiagramWidget::toPdfAsyncMultiPage(const QString& filename, const QString& 
         //pd->setValue(1);
 
         int total_hours = _page->config().end_hour - _page->config().start_hour;
-        if (total_hours < 0)
+        if (total_hours <= 0)
             total_hours += 24;
 
         int total_pages = (total_hours - 1) / hours_per_page + 1;   // Int div

@@ -1463,6 +1463,10 @@ void MainWindow::initToolbar()
 			naviView, &NaviTree::actDulplicateRailway);
 		connect(naviView, &NaviTree::importRailways,
 			contextRail, &RailContext::actImportRailways);
+		connect(naviView, &NaviTree::exportForbidToCsv,
+			contextRail, &RailContext::actExportForbidCsv);
+		connect(naviView, &NaviTree::importForbidFromCsv,
+			contextRail, &RailContext::actImportForbidCsv);
 	}
 
 	//context: ruler 9

@@ -76,8 +76,8 @@ void ForbidWidget::initUI()
     table->setColumnWidth(2, 80);
     table->setColumnWidth(3, 80);
 
-    auto* g=new ButtonGroup<2>({"确定","还原"});
-    g->connectAll(SIGNAL(clicked()),this,{SLOT(onApply()),SLOT(refreshData())});
+    auto* g=new ButtonGroup<4>({"确定","还原","导入CSV","导出CSV"});
+    g->connectAll(SIGNAL(clicked()),this,{SLOT(onApply()),SLOT(refreshData()),SLOT(actImportCsv()), SLOT(actExportCsv())});
     vlay->addLayout(g);
 }
 
@@ -216,6 +216,16 @@ void ForbidWidget::onContextMenu(const QPoint& pos)
     context->popup(p);
 }
 
+void ForbidWidget::actExportCsv()
+{
+    emit exportCsv(forbid);
+}
+
+void ForbidWidget::actImportCsv()
+{
+    emit importCsv(forbid);
+}
+
 ForbidTabWidget::ForbidTabWidget(std::shared_ptr<Railway> railway_, bool commitInPlace,
                                  QWidget *parent):
     QTabWidget(parent), railway(railway_), inplace(commitInPlace)
@@ -233,6 +243,10 @@ void ForbidTabWidget::addForbidTab(std::shared_ptr<Forbid> forbid)
             this, &ForbidTabWidget::forbidChanged);
     connect(w, &ForbidWidget::forbidShowToggled,
             this,&ForbidTabWidget::forbidShowToggled);
+    connect(w, &ForbidWidget::exportCsv,
+        this, &ForbidTabWidget::exportCsv);
+    connect(w, &ForbidWidget::importCsv,
+        this, &ForbidTabWidget::importCsv);
 }
 
 void ForbidTabWidget::updateAllRailIntervals(std::shared_ptr<Railway> railway, bool equiv)
