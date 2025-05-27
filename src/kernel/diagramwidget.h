@@ -217,7 +217,7 @@ private:
      * @brief pyETRC.GraphicsWidget._initHLines()
      * 绘制水平线
      */
-    void setHLines(std::shared_ptr<Railway> rail, double start_y,
+    void setHLines(int idx, std::shared_ptr<Railway> rail, double start_y,
         double width, QList<QGraphicsItem*>& leftItems, QList<QGraphicsItem*>& rightItems);
 
     /**

@@ -324,6 +324,11 @@ void ConfigDialog::initUI()
         ck->setToolTip(tr("控制运行图右侧的[客货对数]栏是否显示"));
         form->addRow(tr("客货对数栏"), ck);
 
+        ck = new QCheckBox(tr("隐藏非顶线路的侧栏表头"));
+        ckHideNonFirstSideHeader = ck;
+        ck->setToolTip(tr("隐藏非顶线路（同一运行图页面中不是第一条线路的其他线路）的侧边栏（延长公里、客货对数等）的表头"));
+        form->addRow(tr("侧边栏表头"), ck);
+
         gb->setLayout(form);
         vlay->addWidget(gb);
     }
@@ -584,6 +589,7 @@ void ConfigDialog::refreshData()
     SET_CHECK(ckShowRuler, show_ruler_bar);
     SET_CHECK(ckShowMile, show_mile_bar);
     SET_CHECK(ckShowCount, show_count_bar);
+    SET_CHECK(ckHideNonFirstSideHeader, hide_non_first_side_header);
 
     //透明模式
     if (!forDefault) {
@@ -677,6 +683,7 @@ void ConfigDialog::actApply()
     GET_CHECK(ckShowRuler, show_ruler_bar);
     GET_CHECK(ckShowMile, show_mile_bar);
     GET_CHECK(ckShowCount, show_count_bar);
+    GET_CHECK(ckHideNonFirstSideHeader, hide_non_first_side_header);
 
     //运行线控制
     GET_VALUE(spValidWidth, valid_width);

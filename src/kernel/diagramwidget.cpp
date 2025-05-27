@@ -107,7 +107,7 @@ void DiagramWidget::paintGraph()
     for (int i = 0;i<_page->railwayCount();i++) {
         auto p = _page->railways().at(i);
         _page->startYs().append(ystart);
-        setHLines(p, ystart, width, leftItems, rightItems);
+        setHLines(i, p, ystart, width, leftItems, rightItems);
         scene()->addRect(cfg.totalLeftMargin(), ystart, width, p->diagramHeight(cfg), gridColor);
         railYRanges.append(qMakePair(ystart, ystart + p->diagramHeight(cfg)));
         ystart += p->diagramHeight(cfg) + margins.gap_between_railways;
@@ -996,7 +996,7 @@ void DiagramWidget::contextMenuEvent(QContextMenuEvent* e)
     }
 }
 
-void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, double width,
+void DiagramWidget::setHLines(int idx, std::shared_ptr<Railway> rail, double start_y, double width,
     QList<QGraphicsItem*>& leftItems, QList<QGraphicsItem*>& rightItems)
 {
     const Config& cfg = config();
@@ -1032,8 +1032,14 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
     QPen defaultPen(gridColor, cfg.default_grid_width),
         boldPen(gridColor, cfg.bold_grid_width);
 
-    double rect_start_y = start_y - margins.title_row_height - margins.first_row_append;
+    bool show_side_header = (idx == 0 || !cfg.hide_non_first_side_header);
+    double title_extra_height = margins.title_row_height;
 
+    if (!show_side_header) {
+        title_extra_height = 0;
+    }
+
+    double rect_start_y = start_y - title_extra_height - margins.first_row_append;
 
     QFont nowFont = cfg.rail_font;
     nowFont.setPointSize((int)std::round(cfg.rail_font.pointSize() * 1.4));
@@ -1048,19 +1054,21 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
         auto* rulerRect = scene()->addRect(
             margins.left_white, rect_start_y,
             cfg.leftTitleRectWidth(),
-            height + margins.title_row_height + margins.first_row_append * 2,
+            height + title_extra_height + margins.first_row_append * 2,
             defaultPen
         );
         leftItems.append(rulerRect);
 
         //表头下横分界线
-        leftItems.append(scene()->addLine(
-            margins.left_white,
-            rect_start_y + margins.title_row_height,
-            cfg.leftTitleRectWidth() + margins.left_white,
-            rect_start_y + margins.title_row_height,
-            defaultPen
-        ));
+        if (show_side_header) {
+            leftItems.append(scene()->addLine(
+                margins.left_white,
+                rect_start_y + margins.title_row_height,
+                cfg.leftTitleRectWidth() + margins.left_white,
+                rect_start_y + margins.title_row_height,
+                defaultPen
+            ));
+        }
 
         if (cfg.show_mile_bar && cfg.show_ruler_bar) {
             //标尺栏纵向界限
@@ -1076,49 +1084,52 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
 
         if (cfg.show_ruler_bar) {
 
-            //标尺栏横向界限
-            leftItems.append(scene()->addLine(
-                margins.left_white,
-                rect_start_y + margins.title_row_height / 2.0,
-                margins.ruler_label_width + margins.left_white,
-                rect_start_y + margins.title_row_height / 2.0,
-                defaultPen
-            ));
+            if (show_side_header) {
+                //标尺栏横向界限
+                leftItems.append(scene()->addLine(
+                    margins.left_white,
+                    rect_start_y + margins.title_row_height / 2.0,
+                    margins.ruler_label_width + margins.left_white,
+                    rect_start_y + margins.title_row_height / 2.0,
+                    defaultPen
+                ));
 
-            QString s0 = rail->ordinate() ? tr("排图标尺") : tr("区间距离");
-            leftItems.append(addLeftTableText(
-                s0, textFont, margins.left_white, rect_start_y, margins.ruler_label_width, margins.title_row_height / 2.0,
-                textColor
-            ));
+                QString s0 = rail->ordinate() ? tr("排图标尺") : tr("区间距离");
+                leftItems.append(addLeftTableText(
+                    s0, textFont, margins.left_white, rect_start_y, margins.ruler_label_width, margins.title_row_height / 2.0,
+                    textColor
+                ));
 
-            leftItems.append(addLeftTableText(
-                tr("下行"), textFont, margins.left_white, rect_start_y + margins.title_row_height / 2.0,
-                margins.ruler_label_width / 2.0, margins.title_row_height / 2.0, textColor
-            ));
+                leftItems.append(addLeftTableText(
+                    tr("下行"), textFont, margins.left_white, rect_start_y + margins.title_row_height / 2.0,
+                    margins.ruler_label_width / 2.0, margins.title_row_height / 2.0, textColor
+                ));
 
-            leftItems.append(addLeftTableText(
-                tr("上行"), textFont, margins.left_white+ margins.ruler_label_width / 2.0,
-                rect_start_y + margins.title_row_height / 2.0, margins.ruler_label_width / 2.0,
-                margins.title_row_height / 2.0, textColor
-            ));
+                leftItems.append(addLeftTableText(
+                    tr("上行"), textFont, margins.left_white + margins.ruler_label_width / 2.0,
+                    rect_start_y + margins.title_row_height / 2.0, margins.ruler_label_width / 2.0,
+                    margins.title_row_height / 2.0, textColor
+                ));
+            }
 
             //改为无条件上下行分开标注
             leftItems.append(scene()->addLine(
                 margins.ruler_label_width / 2.0 + margins.left_white,
-                rect_start_y + margins.title_row_height / 2.0,
+                rect_start_y + title_extra_height / 2.0,
                 margins.ruler_label_width / 2.0 + margins.left_white,
                 start_y + height + margins.first_row_append,
                 defaultPen
             ));
         }
 
-        if (cfg.show_mile_bar) {
-            leftItems.append(addLeftTableText(
-                tr("延长公里"), textFont, cfg.mileBarX(), rect_start_y,
-                margins.mile_label_width, margins.title_row_height, textColor
-            ));
+        if (show_side_header) {
+            if (cfg.show_mile_bar) {
+                leftItems.append(addLeftTableText(
+                    tr("延长公里"), textFont, cfg.mileBarX(), rect_start_y,
+                    margins.mile_label_width, margins.title_row_height, textColor
+                ));
+            }
         }
-
     }
 
     if (cfg.show_count_bar) {
@@ -1126,54 +1137,57 @@ void DiagramWidget::setHLines(std::shared_ptr<Railway> rail, double start_y, dou
             scene()->width() - margins.right_white - margins.count_label_width,
             rect_start_y,
             margins.count_label_width,
-            height + margins.title_row_height + margins.first_row_append * 2,
+            height + title_extra_height + margins.first_row_append * 2,
             defaultPen
         );
         rightItems.append(countRect);
 
         // 右侧
-        rightItems.append(scene()->addLine(
-            scene()->width() - margins.count_label_width - margins.right_white,
-            rect_start_y + margins.title_row_height / 2.0,
-            scene()->width() - margins.right_white,
-            rect_start_y + margins.title_row_height / 2.0,
-            defaultPen
-        ));
+        if (show_side_header) {
+            rightItems.append(scene()->addLine(
+                scene()->width() - margins.count_label_width - margins.right_white,
+                rect_start_y + margins.title_row_height / 2.0,
+                scene()->width() - margins.right_white,
+                rect_start_y + margins.title_row_height / 2.0,
+                defaultPen
+            ));
 
-        rightItems.append(scene()->addLine(
-            scene()->width() - margins.right_white - margins.count_label_width,
-            rect_start_y + margins.title_row_height,
-            scene()->width() - margins.right_white,
-            rect_start_y + margins.title_row_height,
-            defaultPen
-        ));
+            rightItems.append(scene()->addLine(
+                scene()->width() - margins.right_white - margins.count_label_width,
+                rect_start_y + margins.title_row_height,
+                scene()->width() - margins.right_white,
+                rect_start_y + margins.title_row_height,
+                defaultPen
+            ));
+        }
 
         rightItems.append(scene()->addLine(
             scene()->width() - margins.right_white - margins.count_label_width / 2.0,
-            rect_start_y + margins.title_row_height / 2.0,
+            rect_start_y + title_extra_height / 2.0,
             scene()->width() - margins.right_white - margins.count_label_width / 2.0,
             start_y + height + margins.first_row_append,
             defaultPen
         ));
 
-        rightItems.append(addLeftTableText(tr("客货对数"),
-            textFont, scene()->width() - margins.right_white - margins.count_label_width,
-            rect_start_y, margins.count_label_width,
-            margins.title_row_height / 2.0, textColor
-        ));
+        if (show_side_header) {
+            rightItems.append(addLeftTableText(tr("客货对数"),
+                textFont, scene()->width() - margins.right_white - margins.count_label_width,
+                rect_start_y, margins.count_label_width,
+                margins.title_row_height / 2.0, textColor
+            ));
 
-        rightItems.append(addLeftTableText(tr("下行"),
-            textFont, scene()->width() - margins.right_white - margins.count_label_width,
-            rect_start_y + margins.title_row_height / 2.0,
-            margins.count_label_width / 2.0, margins.title_row_height / 2.0, textColor
-        ));
+            rightItems.append(addLeftTableText(tr("下行"),
+                textFont, scene()->width() - margins.right_white - margins.count_label_width,
+                rect_start_y + margins.title_row_height / 2.0,
+                margins.count_label_width / 2.0, margins.title_row_height / 2.0, textColor
+            ));
 
-        rightItems.append(addLeftTableText(tr("上行"),
-            textFont, scene()->width() - margins.right_white - margins.count_label_width / 2.0,
-            rect_start_y + margins.title_row_height / 2.0,
-            margins.count_label_width / 2.0, margins.title_row_height / 2.0, textColor
-        ));
-
+            rightItems.append(addLeftTableText(tr("上行"),
+                textFont, scene()->width() - margins.right_white - margins.count_label_width / 2.0,
+                rect_start_y + margins.title_row_height / 2.0,
+                margins.count_label_width / 2.0, margins.title_row_height / 2.0, textColor
+            ));
+        }
     }
     
 

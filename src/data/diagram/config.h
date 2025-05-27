@@ -172,6 +172,7 @@ struct Config
     bool show_ruler_bar = true,
         show_mile_bar = true,
         show_count_bar = true;
+    bool hide_non_first_side_header = true;
 
     MarginConfig margins{};
 

@@ -157,6 +157,7 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
     FROM_OBJ(show_mile_bar, Bool);
     FROM_OBJ(show_ruler_bar, Bool);
     FROM_OBJ(show_count_bar, Bool);
+    FROM_OBJ(hide_non_first_side_header, Bool);
 
     margins.fromJson(obj.value("margins").toObject());
 
@@ -228,6 +229,7 @@ QJsonObject Config::toJson() const
         TO_OBJ(show_mile_bar)
         TO_OBJ(show_ruler_bar)
         TO_OBJ(show_count_bar)
+        TO_OBJ(hide_non_first_side_header)
         TO_OBJ(transparent_config)
     };
     obj.insert("grid_color", grid_color.name());
