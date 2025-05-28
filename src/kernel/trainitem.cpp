@@ -574,6 +574,12 @@ void TrainItem::setLine()
     // 2024.02.28  for link line mode: we should determine the existence of linkLine BEFORE adding start item..
     if (config().show_link_line == 2)
         hasLinkLine = addLinkLine(trainName);
+    else {
+        // 2025.05.28: we must init hasLinkLine in this case because this is used in setStart/EndItem function
+        // (at the guard statements at the beginning)
+        const auto& t = train();
+        hasLinkLine = t->hasRouting() && train()->routing().lock()->preLinkedOnRailway(*t, _railway);
+    }
 
     if (glb_has_start_label && _line->startLabel() && startInRange) {
         setStartItem(trainName, labelPen);

@@ -1008,30 +1008,6 @@ void DiagramWidget::setHLines(int idx, std::shared_ptr<Railway> rail, double sta
 
     double height = rail->diagramHeight(cfg);   //注意这只是当前线路的高度
 
-    auto* rectLeft = scene()->addRect(0,
-        start_y - margins.title_row_height - margins.first_row_append,
-        cfg.leftRectWidth() + margins.left_white,
-        height + 2 * margins.first_row_append + margins.title_row_height
-    );
-    rectLeft->setBrush(QBrush(brushColor));
-    rectLeft->setPen(QPen(Qt::transparent));
-    rectLeft->setZValue(-1);
-    leftItems.append(rectLeft);
-
-    auto* rectRight = scene()->addRect(
-        scene()->width() - cfg.rightRectWidth() - margins.right_white,
-        start_y - margins.title_row_height - margins.first_row_append,
-        cfg.rightRectWidth(),
-        height + 2 * margins.first_row_append + margins.title_row_height
-    );
-    rectRight->setBrush(brushColor);
-    rectRight->setPen(QPen(Qt::transparent));
-    rightItems.append(rectRight);
-
-    const QColor& gridColor = cfg.grid_color_masked();
-    QPen defaultPen(gridColor, cfg.default_grid_width),
-        boldPen(gridColor, cfg.bold_grid_width);
-
     bool show_side_header = (idx == 0 || !cfg.hide_non_first_side_header);
     double title_extra_height = margins.title_row_height;
 
@@ -1040,6 +1016,30 @@ void DiagramWidget::setHLines(int idx, std::shared_ptr<Railway> rail, double sta
     }
 
     double rect_start_y = start_y - title_extra_height - margins.first_row_append;
+
+    auto* rectLeft = scene()->addRect(0,
+        rect_start_y,
+        cfg.leftRectWidth() + margins.left_white,
+        height + 2 * margins.first_row_append + title_extra_height
+    );
+    rectLeft->setBrush(QBrush(brushColor));
+    rectLeft->setPen(QPen(Qt::transparent));
+    rectLeft->setZValue(-1);
+    leftItems.append(rectLeft);
+
+    auto* rectRight = scene()->addRect(
+        scene()->width() - cfg.rightRectWidth() - margins.right_white,
+        rect_start_y,
+        cfg.rightRectWidth(),
+        height + 2 * margins.first_row_append + title_extra_height
+    );
+    rectRight->setBrush(brushColor);
+    rectRight->setPen(QPen(Qt::transparent));
+    rightItems.append(rectRight);
+
+    const QColor& gridColor = cfg.grid_color_masked();
+    QPen defaultPen(gridColor, cfg.default_grid_width),
+        boldPen(gridColor, cfg.bold_grid_width);
 
     QFont nowFont = cfg.rail_font;
     nowFont.setPointSize((int)std::round(cfg.rail_font.pointSize() * 1.4));
