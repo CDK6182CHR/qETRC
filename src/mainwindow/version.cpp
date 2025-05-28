@@ -4,13 +4,15 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.7.10";
-const std::string_view DATE = "20250222";
-const int RELEASE_CODE = 64;
+const std::string_view LAST_VERSION = "V1.7.11";
+const std::string_view DATE = "20250528";
+const int RELEASE_CODE = 65;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 新增运行图分页输出功能，支持按时间轴分页输出PDF运行图。
-2. 修复若干问题。)";
+const std::string_view UPDATE_LOG = R"(1. 新增天窗数据的CSV格式输入/输出。
+2. 新增基线数据（仅限站表）的CSV格式输入/输出。
+3. 新增多线路运行图页面中隐藏非顶部线路的侧边栏表头选项。
+4. 新增“运行图选项”页面。)";
 }
