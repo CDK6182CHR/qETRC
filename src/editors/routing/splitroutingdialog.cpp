@@ -32,15 +32,21 @@ void SplitRoutingModel::refreshData()
 	setRowCount(m_routing->count());
 	int i = 0;
 	for (auto itr = m_routing->order().begin(); itr != m_routing->order().end(); ++itr, ++i) {
-		setItem(i, ColTrainName, qeutil::makeReadOnlyItem(itr->train()->trainName().full()));
+		setItem(i, ColTrainName, qeutil::makeReadOnlyItem(itr->name()));
 		auto* it = qeutil::makeCheckItem();
 		it->setEditable(false);
 		it->setCheckState(qeutil::boolToCheckState(itr->isVirtual()));
 		it->setCheckable(false);
 		setItem(i, ColVirtual, it);
 
-		setItem(i, ColStarting, qeutil::makeReadOnlyItem(itr->train()->starting().toSingleLiteral()));
-		setItem(i, ColTerminal, qeutil::makeReadOnlyItem(itr->train()->terminal().toSingleLiteral()));
+		if (itr->isVirtual()) {
+			setItem(i, ColStarting, qeutil::makeReadOnlyItem(itr->virtualStarting()));
+			setItem(i, ColTerminal, qeutil::makeReadOnlyItem(itr->virtualTerminal()));
+		}
+		else {
+			setItem(i, ColStarting, qeutil::makeReadOnlyItem(itr->train()->starting().toSingleLiteral()));
+			setItem(i, ColTerminal, qeutil::makeReadOnlyItem(itr->train()->terminal().toSingleLiteral()));
+		}
 
 		it = qeutil::makeCheckItem();
 		it->setCheckable(false);
