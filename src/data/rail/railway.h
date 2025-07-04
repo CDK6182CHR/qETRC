@@ -641,8 +641,9 @@ public:
     /**
      * 2022.09.11 检查区间负里程问题。返回第一个负里程区间。
      * 如果没有，返回空
+     * 2025.07.04: changed to non-positive interval; we now require all interval to have POSITIVE (not zero) milage.
      */
-    std::shared_ptr<const RailInterval> firstNegativeInterval()const;
+    std::shared_ptr<const RailInterval> firstNonPositiveInterval()const;
 
     /**
      * 返回第一个非法的全站名序号，用于启动检查。

@@ -2048,10 +2048,10 @@ bool MainWindow::checkOpenFile()
 			level = 2;
 		}
 
-		auto it = rail->firstNegativeInterval();
+		auto it = rail->firstNonPositiveInterval();
 		if (it) {
 			text.append(
-				tr("[ERROR] 线路[%1]存在非法区间：区间[%2]里程[%3] km为负值。\n")
+				tr("[ERROR] 线路[%1]存在非法区间：区间[%2]里程[%3] km为负值或为0。\n")
 				.arg(rail->name(), it->toString()).arg(it->mile())
 			);
 			level = 2;

@@ -164,11 +164,11 @@ bool RailStationModel::checkRailway(std::shared_ptr<Railway> rail)
         return false;
     }
 
-    //主要是检查每个区间里程非负
+    //主要是检查每个区间里程非负；2025.07.04: we now require the interval mile to be positive (zero is invalid!!)
     for (auto p = rail->firstDownInterval(); p; p = rail->nextIntervalCirc(p)) {
-        if (p->mile() < 0) {
+        if (p->mile() <= 0) {
             QMessageBox::warning(par, tr("错误"),
-                tr("区间距离为负数，请重新设置里程！\n%1->%2区间，里程%3。")
+                tr("区间距离为负数或为0，请重新设置里程！\n%1->%2区间，里程%3。")
                 .arg(p->fromStationNameLit()).arg(p->toStationNameLit()).arg(p->mile()));
             return false;
         }
