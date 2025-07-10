@@ -1262,7 +1262,7 @@ void TrainContext::showBasicWidget(std::shared_ptr<Train> train)
 	int idx = getBasicWidgetIndex(train);
 	if (idx == -1) {
 		//创建
-		auto* w = new BasicTrainWidget(diagram.trainCollection(), false);
+		auto* w = new BasicTrainWidget(diagram.trainCollection(), diagram.railCategory(), false);
 		w->setTrain(train);
 		auto* dock = new ads::CDockWidget(tr("时刻表编辑 - %1").arg(train->trainName().full()));
 		dock->setWidget(w);
@@ -1296,7 +1296,7 @@ void TrainContext::showEditWidget(std::shared_ptr<Train> train)
 	int idx = getEditWidgetIndex(train);
 	if (idx == -1) {
 		//创建
-		auto* w = new EditTrainWidget(diagram.trainCollection(), train);
+		auto* w = new EditTrainWidget(diagram.trainCollection(), diagram.railCategory(), train);
 		auto* dock = new ads::CDockWidget(tr("列车编辑 - %1").arg(train->trainName().full()));
 		connect(w, &QWidget::windowTitleChanged, dock, &ads::CDockWidget::setWindowTitle);
 		w->setTrain(train);

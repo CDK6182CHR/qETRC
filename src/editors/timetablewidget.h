@@ -3,6 +3,8 @@
 #include <util/qecontrolledtable.h>
 
 class TimetableStdModel;
+class RailStation;
+
 /**
  * @brief The TimetableWidget class
  * 2022.04.10
@@ -18,9 +20,24 @@ public:
     TimetableWidget(bool commitInPlace, QWidget* parent=nullptr);
     void refreshData();
     auto* model(){return _model;}
+
 private:
     void initUI();
 private slots:
     void copyToDepart();
     void copyToArrive();
+
+public slots:
+
+    /**
+     * Append rows to the table.
+     * All rows are automatically set-up using the methods provided by the model.
+     */
+    void appendRows(int rows);
+    
+    /**
+     * 2025.07.10: Append the stations to the end of the timetable.
+     * The stations are selected from railway.
+     */
+	void appendStations(const QList<std::shared_ptr<const RailStation>>& stations);
 };

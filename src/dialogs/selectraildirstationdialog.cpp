@@ -1,10 +1,11 @@
-#include "selectraildirstationdialog.h"
+ï»¿#include "selectraildirstationdialog.h"
 
 #include <QTableView>
 #include <QFormLayout>
 #include <QLabel>
 #include <QHeaderView>
 #include <QDialogButtonBox>
+#include <QMessageBox>
 
 #include "util/selectrailwaycombo.h"
 #include "model/rail/railstationmodel.h"
@@ -57,8 +58,8 @@ SelectRailDirStationDialog::Result SelectRailDirStationDialog::dlgGetStations(Ra
 
 void SelectRailDirStationDialog::initUI(const QString& prompt)
 {
-	setWindowTitle(tr("Ñ¡ÔñÏßÂ·³µÕ¾"));
-	resize(800, 600);
+	setWindowTitle(tr("é€‰æ‹©çº¿è·¯è½¦ç«™"));
+	resize(600, 600);
 
 	auto* vlay = new QVBoxLayout(this);
 	auto* form = new QFormLayout;
@@ -70,14 +71,14 @@ void SelectRailDirStationDialog::initUI(const QString& prompt)
 	}
 
 	m_cbRail = new SelectRailwayCombo(m_cat, this);
-	form->addRow(tr("ÏßÂ·"), m_cbRail);
+	form->addRow(tr("çº¿è·¯"), m_cbRail);
 
-	m_radioDireciton = new RadioButtonGroup<2>({ "ÏÂĞĞ", "ÉÏĞĞ" }, this);
-	form->addRow(tr("ÔËĞĞ·½Ïò"), m_radioDireciton);
-	m_radioDireciton->get(0)->setChecked(true); // Ä¬ÈÏÏÂĞĞ
+	m_radioDireciton = new RadioButtonGroup<2>({ "ä¸‹è¡Œ", "ä¸Šè¡Œ" }, this);
+	form->addRow(tr("è¿è¡Œæ–¹å‘"), m_radioDireciton);
+	m_radioDireciton->get(0)->setChecked(true); // é»˜è®¤ä¸‹è¡Œ
 	vlay->addLayout(form);
 
-	auto* lab2 = new QLabel(tr("ÇëÔÚÏÂ±íÖĞÑ¡Ôñ³µÕ¾£¬¿É¶àÑ¡¡£"));
+	auto* lab2 = new QLabel(tr("è¯·åœ¨ä¸‹è¡¨ä¸­é€‰æ‹©è½¦ç«™ï¼Œå¯å¤šé€‰ã€‚"));
 	vlay->addWidget(lab2);
 
 	m_model = new RailStationModel(false, this);
@@ -98,8 +99,11 @@ void SelectRailDirStationDialog::initUI(const QString& prompt)
 		QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
 	vlay->addWidget(box);
 
+	// We do not use signals here, leave for future...
 	connect(box, &QDialogButtonBox::accepted, this, &SelectRailDirStationDialog::accept);
 	connect(box, &QDialogButtonBox::rejected, this, &SelectRailDirStationDialog::reject);
+
+	setupTable();
 }
 
 void SelectRailDirStationDialog::setupTable()
@@ -112,4 +116,14 @@ void SelectRailDirStationDialog::setupTable()
 	else {
 		m_model->setRowCount(0);
 	}
+}
+
+void SelectRailDirStationDialog::accept()
+{
+	auto sel = m_table->selectionModel()->selectedRows();
+	if (sel.isEmpty()) {
+		QMessageBox::warning(this, tr("é”™è¯¯"), tr("æœªé€‰æ‹©è½¦ç«™ã€‚è¯·åœ¨è¡¨ä¸­é€‰æ‹©è½¦ç«™ï¼Œç„¶åå†ç¡®è®¤ã€‚"));
+		return;
+	}
+	QDialog::accept();
 }

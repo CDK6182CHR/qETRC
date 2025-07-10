@@ -1,15 +1,17 @@
-#pragma once
+ï»¿#pragma once
 
 #include <memory>
 #include <QDialog>
 
 #include "util/buttongroup.hpp"
+#include "data/common/direction.h"
 
 class RailStationModel;
 class QTableView;
 class SelectRailwayCombo;
 class RailCategory;
 class RailStation;
+class Railway;
 
 /**
  * Dialog for selecting railway stations for selected direction (up/down).
@@ -19,7 +21,7 @@ class RailStation;
  */
 class SelectRailDirStationDialog : public QDialog
 {
-	Q_OBJECT;
+	Q_OBJECT
 	RailCategory& m_cat;
 	SelectRailwayCombo* m_cbRail;
 	RailStationModel* m_model;
@@ -32,7 +34,7 @@ public:
 	/**
 	 * Returns the list of currently selected stations.
 	 */
-	QList<std::shared_ptr<const RailStation>> selectedStations();
+	QList<std::shared_ptr<const RailStation>> selectedStations(); 
 
 	struct Result {
 		bool valid;
@@ -46,7 +48,7 @@ public:
 	 * Empty if nothing selected.
 	 */
 	static Result dlgGetStations(RailCategory& cat, QWidget* parent,
-		const QString& title = tr("Ñ¡ÔñÏßÂ·³µÕ¾"), const QString& prompt = {});
+		const QString& title = tr("é€‰æ‹©çº¿è·¯è½¦ç«™"), const QString& prompt = {});
 
 private:
 	void initUI(const QString& prompt);
@@ -57,4 +59,7 @@ private slots:
 	 * Setup the table according to current data in m_cbRail and m_radioDirection.
 	 */
 	void setupTable();
+
+public slots:
+	void accept()override;
 };

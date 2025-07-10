@@ -26,14 +26,15 @@
 #include <data/train/routing.h>
 #include <defines/icon_specs.h>
 #include <util/selecttraincombo.h>
+#include "dialogs/selectraildirstationdialog.h"
 
 #include "timetablewidget.h"
 
 
-EditTrainWidget::EditTrainWidget(TrainCollection &coll,
+EditTrainWidget::EditTrainWidget(TrainCollection &coll, RailCategory& cat,
                                  std::shared_ptr<Train> train,
                                  QWidget *parent):
-    QWidget(parent),coll(coll),_train(train),
+    QWidget(parent),coll(coll), _cat(cat), _train(train),
     ctable(new TimetableWidget(false,this))
 {
     initUI();
@@ -206,10 +207,10 @@ void EditTrainWidget::initUI()
     table=ctable->table();
     vlay->addWidget(ctable);
 
-    auto* h=new ButtonGroup<3>({"确定","还原","删除车次"});
+    auto* h=new ButtonGroup<4>({"确定","还原", "导入站表", "删除车次"});
     vlay->addLayout(h);
     h->connectAll(SIGNAL(clicked()),this,
-                  {SLOT(actApply()),SLOT(actCancel()),SLOT(actRemove())});
+                  {SLOT(actApply()),SLOT(actCancel()), SLOT(actImportRailStations()),SLOT(actRemove())});
 
 }
 
@@ -307,4 +308,13 @@ void EditTrainWidget::onTrainFullNameUpdate()
     TrainName tn(edTrainName->text());
     edDownName->setText(tn.down());
     edUpName->setText(tn.up());
+}
+
+void EditTrainWidget::actImportRailStations()
+{
+	auto res = SelectRailDirStationDialog::dlgGetStations(_cat, this, tr("导入站表"),
+		tr("请从本运行图中的线路站表选择要导入本车次时刻表的车站。导入后请检查数据，手动确认提交。"));
+    if (!res.valid)
+        return;
+    ctable->appendStations(res.stations);
 }

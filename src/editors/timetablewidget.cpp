@@ -6,6 +6,7 @@
 #include <QHeaderView>
 #include <data/common/qesystem.h>
 #include <model/delegate/qetimedelegate.h>
+#include <data/rail/railstation.h>
 
 TimetableWidget::TimetableWidget(bool commitInPlace, QWidget *parent):
     QEControlledTable(parent), _model(new TimetableStdModel(commitInPlace, this))
@@ -54,4 +55,19 @@ void TimetableWidget::copyToDepart()
 void TimetableWidget::copyToArrive()
 {
     _model->copyToArrive(table()->currentIndex().row());
+}
+
+void TimetableWidget::appendRows(int rows)
+{
+    _model->insertRows(table()->model()->rowCount(), rows);
+}
+
+void TimetableWidget::appendStations(const QList<std::shared_ptr<const RailStation>>& stations)
+{
+	if (stations.isEmpty()) return;
+	int startRow = table()->model()->rowCount();
+	_model->insertRows(startRow, stations.size());
+	for (int i = 0; i < stations.size(); ++i) {
+		_model->item(startRow + i, TimetableStdModel::ColName)->setText(stations[i]->name.toSingleLiteral());
+	}
 }
