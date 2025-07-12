@@ -468,11 +468,18 @@ void RulerPaintModel::onEndAtThisChanged()
 
 void RulerPaintModel::onRowEditDataChanged(int row)
 {
-    if (row <= _anchorRow && (row < startRow||startRow==-1))
+    // 2025.07.12: For start or end row changed, we always update from the anchor row (i.e., update all data).
+    // The calculation should not be very slow, according to our observations...
+    bool startOrEndChanged = false;
+    if (row <= _anchorRow && (row < startRow || startRow == -1)) {
+        startOrEndChanged = true;
         setStartRow(row);
-    if (row >= _anchorRow && row > endRow)
+    }
+    if (row >= _anchorRow && row > endRow) {
+        startOrEndChanged = true;
         setEndRow(row);
-    updateFromRow(row);
+    }
+    updateFromRow(startOrEndChanged ? _anchorRow : row);
     if (page->instaneous()) {
         paintTrain();
     }
