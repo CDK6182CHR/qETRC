@@ -141,7 +141,8 @@
 ///////// 工具栏 列车审阅 (6) /////////
 
 #define QEICN_change_train QE_RSC_ICON(exchange.png)   // 切换列车
-#define QEICN_train_line QE_RSC_ICON(trainline.png)   // 高亮列车运行线
+#define QEICN_show_train_line QE_RSC_ICON(trainline.png)   // 显示列车运行线
+#define QEICN_train_line QE_RSC_ICON(line-manage.png)   // 高亮列车运行线
 #define QEICN_train_events QE_RSC_ICON(clock.png)    // 列车事件表
 #define QEICN_train_line_list QE_RSC_ICON(line-manage.png)   // 运行线一览
 #define QEICN_ruler_diff QE_RSC_ICON(ruler.png)   // 标尺对照

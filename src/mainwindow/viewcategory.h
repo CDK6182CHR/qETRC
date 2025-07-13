@@ -70,7 +70,7 @@ public:
      * seealso: commitTrainsShow
      * 区别在于不更新TrainList的显示状态。
      */
-    void commitSingleTrainShow(const QList<std::shared_ptr<TrainLine>>& lines, bool show);
+    void commitSingleTrainShow(std::shared_ptr<Train> train, const QList<std::shared_ptr<TrainLine>>& lines, bool show);
 
     /**
      * 执行由显示类型设置变化发起的列车显示情况变化。

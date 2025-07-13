@@ -109,7 +109,14 @@ void TrainContext::initUI()
 			panel->addWidget(w, SARibbonPannelItem::Large);
 		}
 
-		auto* act = mw->makeAction(QEICN_train_line, tr("运行线"), tr("高亮列车运行线"));
+		auto* act = mw->makeAction(QEICN_show_train_line, tr("显示运行线"), tr("显示列车运行线"));
+		act->setToolTip(tr("显示列车运行线\n切换列车运行线的显示状态"));
+		panel->addLargeAction(act);
+		btnShown = panel->actionToRibbonToolButton(act);
+		btnShown->setCheckable(true);
+		connect(act, &QAction::triggered, this, &TrainContext::actToggleTrainLineShown);
+
+		act = mw->makeAction(QEICN_train_line, tr("高亮运行线"), tr("高亮列车运行线"));
 		act->setToolTip(tr("高亮列车运行线\n在所有运行图窗口中，高亮本次列车运行线"));
 		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actShowTrainLine()));
@@ -1245,6 +1252,14 @@ void TrainContext::afterTrainsReboundByPath(const std::vector<std::shared_ptr<Tr
 	}
 }
 
+void TrainContext::actToggleTrainLineShown(bool checked)
+{
+	if (!train)
+		return;
+
+	mw->getViewCategory()->actChangeSingleTrainShow(train, checked);
+}
+
 void TrainContext::actShowTrainLine()
 {
 	//强制显示列车运行线。如果已经全部显示了也没关系，没有任何效果
@@ -1449,6 +1464,9 @@ void TrainContext::refreshData()
 		edName->setText(train->trainName().full());
 		edStart->setText(train->starting().toSingleLiteral());
 		edEnd->setText(train->terminal().toSingleLiteral());
+
+		btnShown->setChecked(train->isShow());
+
 		if (train->hasRouting()) {
 			edRouting->setText(train->routing().lock()->name());
 			btnToRouting->setEnabled(true);
@@ -1708,6 +1726,13 @@ void TrainContext::actMergeTrains()
 			stk->endMacro();
 		});
 	dlg->open();
+}
+
+void TrainContext::updateTrainShownStatus(std::shared_ptr<Train> train)
+{
+	if (train == this->train) {
+		btnShown->setChecked(train->isShow());
+	}
 }
 
 void TrainContext::actDulplicateTrain()

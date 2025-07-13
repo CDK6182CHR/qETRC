@@ -1,6 +1,7 @@
 ﻿#ifndef QETRC_MOBILE_2
 #include "viewcategory.h"
 #include "mainwindow.h"
+#include "traincontext.h"
 #include "data/diagram/trainadapter.h"
 #include "editors/configdialog.h"
 #include "editors/typeconfigdialog.h"
@@ -55,8 +56,9 @@ void ViewCategory::commitTrainsShowByFilter(const QVector<std::shared_ptr<TrainL
     onTrainShowChanged();
 }
 
-void ViewCategory::commitSingleTrainShow(const QList<std::shared_ptr<TrainLine>>& lines, bool show)
+void ViewCategory::commitSingleTrainShow(std::shared_ptr<Train> train, const QList<std::shared_ptr<TrainLine>>& lines, bool show)
 {
+    mw->getTrainContext()->updateTrainShownStatus(train);
     for (auto line : lines) {
         line->setIsShow(show);
         setTrainShow(line, show);
@@ -793,13 +795,13 @@ qecmd::ChangeSingleTrainShow::ChangeSingleTrainShow(std::shared_ptr<Train> train
 void qecmd::ChangeSingleTrainShow::undo()
 {
     train->setIsShow(!show);
-    cat->commitSingleTrainShow(lines, !show);
+    cat->commitSingleTrainShow(train, lines, !show);
 }
 
 void qecmd::ChangeSingleTrainShow::redo()
 {
     train->setIsShow(show);
-    cat->commitSingleTrainShow(lines, show);
+    cat->commitSingleTrainShow(train, lines, show);
 }
 
 qecmd::ChangeTypeSet::ChangeTypeSet(TypeManager& manager_, 

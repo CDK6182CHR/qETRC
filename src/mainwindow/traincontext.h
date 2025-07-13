@@ -106,6 +106,7 @@ class TrainContext : public QObject
     MainWindow* const mw;
 
     SARibbonLineEdit* edName, * edStart, * edEnd, * edRouting;
+    SARibbonToolButton* btnShown;
 
     //后缀m表示可修改的控件
     SARibbonLineEdit *edNamem,*edStartm,*edEndm;
@@ -420,8 +421,15 @@ public slots:
 
     void actMergeTrains();
 
+    /**
+     * Update the train shown status if the train is current train
+     */
+    void updateTrainShownStatus(std::shared_ptr<Train> train);
+
 private slots:
     void showTrainEvents();
+
+    void actToggleTrainLineShown(bool checked);
 
     void actShowTrainLine();
 
