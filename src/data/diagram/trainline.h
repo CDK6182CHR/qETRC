@@ -17,6 +17,7 @@ class Railway;
 class StationName;
 class TrainStation;
 class Train;
+class TrainTime;
 
 
 /**
@@ -160,7 +161,7 @@ public:
      * 采用和`listLineEvents`类似的框架。
      * 2022.09.11: withIntMeet参数暂时被忽略。
      */
-    DiagnosisList diagnoseLine(const TrainCollection& coll, bool withIntMeet)const;
+    DiagnosisList diagnoseLine(const TrainCollection& coll, bool withIntMeet, int period_hour)const;
 
     inline const AdapterStation* lastStation()const {
         return _stations.empty() ? nullptr : &(_stations.back());
@@ -304,7 +305,7 @@ private:
      * @brief listStationEvents
      * 列出每个站的到开时刻，这个很简单
      */
-    void listStationEvents(LineEventList& res)const;
+    void listStationEvents(LineEventList& res, int period_hours)const;
 
     /**
      * @brief detectPassStations  推定区间通过站时刻
@@ -312,7 +313,7 @@ private:
      * @param index  区间左端点下标，即插入位置
      * @param itr 区间左端点 迭代器
      */
-    void detectPassStations(LineEventList& res, int index, ConstAdaPtr itr)const;
+    void detectPassStations(LineEventList& res, int index, ConstAdaPtr itr, int period_hours)const;
 
     /**
      * 2023.02.01  see also detestPassStations
@@ -488,15 +489,15 @@ private:
      * 单车次问题诊断，即自己时刻表直接能看出的问题
      * 停时过长以及天窗冲突
      */
-    void diagnoseSelf(DiagnosisList& res)const;
+    void diagnoseSelf(DiagnosisList& res, int period_hour)const;
 
     /**
      * 在各个小区间依次判定  注意需要推定各个中间站的通过时刻
      */
-    void diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr cur)const;
+    void diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr cur, int period_hours)const;
 
     void diagnoForbid(DiagnosisList& res, std::shared_ptr<const RailInterval> railint,
-        const QTime& in, const QTime& out)const;
+        const TrainTime& in, const TrainTime& out, int period_hours)const;
 
     /**
      * 时刻插值的具体实现，由Adapter转发过来。

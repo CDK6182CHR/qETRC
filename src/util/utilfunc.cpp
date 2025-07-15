@@ -37,10 +37,32 @@ QTime qeutil::parseTime(const QString& tm)
 	return QTime();
 }
 
+TrainTime qeutil::parseTrainTime(const QString& tm)
+{
+	int sub[3]{ 0,0,0 };
+	int j = 0;
+	for (int i = 0; i < tm.length() && j < 3; ++i) {
+		const QChar& ch = tm.at(i);
+		if (ch == ':')++j;
+		else if (ch.isDigit())
+			sub[j] = sub[j] * 10 + ch.digitValue();
+	}
+	if (j == 1 || j == 2)
+		return TrainTime(sub[0], sub[1], sub[2]);
+	return TrainTime{};
+}
+
 int qeutil::secsToStrict(const QTime& tm1, const QTime& tm2, int addDays)
 {
 	int secs = tm1.secsTo(tm2);
 	secs += addDays * 3600 * 24;
+	return secs;
+}
+
+int qeutil::secsToStrict(const TrainTime& tm1, const TrainTime& tm2, int addDays, int period)
+{
+	int secs = tm1.secsTo(tm2);
+	secs += addDays * 3600 * period;
 	return secs;
 }
 
@@ -55,6 +77,11 @@ QString qeutil::secsToString(int secs)
 QString qeutil::secsToString(const QTime& tm1, const QTime& tm2)
 {
 	return secsToString(secsTo(tm1, tm2));
+}
+
+QString qeutil::secsToString(const TrainTime& tm1, const TrainTime& tm2, int period)
+{
+	return secsToString(secsTo(tm1, tm2, period));
 }
 
 QString qeutil::secsToStringWithEmpty(int secs)
@@ -151,15 +178,33 @@ bool qeutil::timeInRange(const QTime& left, const QTime& right, const QTime& t)
 	return false;
 }
 
-
-bool qeutil::timeRangeIntersected(const QTime& start1, const QTime& end1, const QTime& start2,
-	const QTime& end2)
+bool qeutil::timeInRange(const TrainTime& left, const TrainTime& right, const TrainTime& t, int period)
 {
-	int xm1 = start1.msecsSinceStartOfDay(), xm2 = end1.msecsSinceStartOfDay();
-	int xh1 = start2.msecsSinceStartOfDay(), xh2 = end2.msecsSinceStartOfDay();
+	int secsOfPeriod = 3600 * period;
+	int tleft = left.secondsSinceStart(), tright = right.secondsSinceStart();
+	int tt = t.secondsSinceStart();
+
+	if (tright < tleft)
+		tright += secsOfPeriod;
+	if (tleft <= tt && tt <= tright)
+		return true;
+	//考虑一次平移
+	tt += secsOfPeriod;
+	if (tleft <= tt && tt <= tright)
+		return true;
+	return false;
+}
+
+
+bool qeutil::timeRangeIntersected(const TrainTime& start1, const TrainTime& end1, const TrainTime& start2,
+	const TrainTime& end2, int period_hours)
+{
+	int periodSecs = period_hours * 3600;
+	int xm1 = start1.secondsSinceStart(), xm2 = end1.secondsSinceStart();
+	int xh1 = start2.secondsSinceStart(), xh2 = end2.secondsSinceStart();
 	bool flag1 = (xm2 < xm1), flag2 = (xh2 < xh1);
-	if (flag1)xm2 += msecsOfADay;
-	if (flag2)xh2 += msecsOfADay;
+	if (flag1)xm2 += periodSecs;
+	if (flag2)xh2 += periodSecs;
 	bool res1 = (std::max(xm1, xh1) <= std::min(xm2, xh2));   //不另加PBC下的比较
 	if (res1 || flag1 == flag2) {
 		// 如果都加了或者都没加PBC，这就是结果
@@ -167,10 +212,10 @@ bool qeutil::timeRangeIntersected(const QTime& start1, const QTime& end1, const 
 	}
 	//如果只有一边加了PBC，那么应考虑把另一边也加上PBC再试试
 	if (flag1) {
-		xh1 += msecsOfADay; xh2 += msecsOfADay;
+		xh1 += periodSecs; xh2 += periodSecs;
 	}
 	else {
-		xm1 += msecsOfADay; xm2 += msecsOfADay;
+		xm1 += periodSecs; xm2 += periodSecs;
 	}
 	return (std::max(xm1, xh1) <= std::min(xm2, xh2));
 }

@@ -6,6 +6,8 @@
 #include <QList>
 #include <QtLogging>
 
+#include "data/common/traintime.h"
+
 class QWidget;
 class QStandardItemModel;
 class QModelIndex;
@@ -19,7 +21,9 @@ namespace qeutil{
  * @brief parseTimeHMS 按照hh:mm:ss格式解析时间数据
  * 如果不能解析，返回默认构造的
  */
-QTime parseTime(const QString& tm);
+[[deprecated]] QTime parseTime(const QString& tm);
+
+TrainTime parseTrainTime(const QString& tm);
 
 /**
  * 返回tm1->tm2的秒数，考虑PBC
@@ -29,10 +33,17 @@ inline int secsTo(const QTime& tm1, const QTime& tm2) {
 	return secs < 0 ? secs + 24 * 3600 : secs;
 }
 
+inline int secsTo(const TrainTime& tm1, const TrainTime& tm2, int period) {
+	int secs = tm1.secsTo(tm2);
+	return secs < 0 ? secs + period * 3600 : secs;
+}
+
 /**
  * 2023.02.12  此版本准确考虑跨日问题。
  */
 int secsToStrict(const QTime& tm1, const QTime& tm2, int addDays);
+
+int secsToStrict(const TrainTime& tm1, const TrainTime& tm2, int addDays, int period);
 
 /**
  * 返回时间的中文字符串表示：xx分 或者 xx分xx秒
@@ -46,6 +57,8 @@ QString secsToString(int secs);
 QString secsToStringWithEmpty(int secs);
 
 QString secsToString(const QTime& tm1, const QTime& tm2);
+
+QString secsToString(const TrainTime& tm1, const TrainTime& tm2, int period);
 
 /**
  * 返回 hh:mm:ss格式的时间字符串表示
@@ -88,12 +101,14 @@ static constexpr int msecsOfADay = 24 * 3600 * 1000;
  */
 bool timeInRange(const QTime& left, const QTime& right, const QTime& t);
 
+bool timeInRange(const TrainTime& left, const TrainTime& right, const TrainTime& t, int period);
+
 /**
  * 两个时间范围是否存在交叉。包含边界。
  * seealso: TrainStation::stopRangeIntersected
  */
-bool timeRangeIntersected(const QTime& start1, const QTime& end1, const QTime& start2,
-	const QTime& end2);
+bool timeRangeIntersected(const TrainTime& start1, const TrainTime& end1, const TrainTime& start2,
+	const TrainTime& end2, int period_hours);
 
 /**
  * 两个时间范围是否存在交叉。Excl后缀表示不含边界

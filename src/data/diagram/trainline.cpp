@@ -131,12 +131,12 @@ LineEventList TrainLine::listLineEvents(const TrainCollection& coll) const
     return res;
 }
 
-DiagnosisList TrainLine::diagnoseLine(const TrainCollection& coll, bool withIntMeet) const
+DiagnosisList TrainLine::diagnoseLine(const TrainCollection& coll, bool withIntMeet, int period_hour) const
 {
     Q_UNUSED(withIntMeet);
     DiagnosisList res;
     
-    diagnoseSelf(res);
+    diagnoseSelf(res, period_hour);
 
     foreach(auto t, coll.trains()) {
         if (t != train()) {
@@ -204,7 +204,7 @@ double TrainLine::totalMile() const
         _stations.front().railStation.lock()->mile);
 }
 
-void TrainLine::listStationEvents(LineEventList& res) const
+void TrainLine::listStationEvents(LineEventList& res, int period_hours) const
 {
     int i = 0;
     auto p = _stations.begin();
@@ -245,7 +245,7 @@ void TrainLine::listStationEvents(LineEventList& res) const
             }
         }
     }
-    detectPassStations(res, 0, p);
+    detectPassStations(res, 0, p, period_hours);
     auto lastIter = _stations.end(); --lastIter;
 
     //中间站的判断
@@ -267,7 +267,7 @@ void TrainLine::listStationEvents(LineEventList& res) const
                 TrainEventType::SettledPass, ts->arrive, rs, std::nullopt
             ));
         }
-        detectPassStations(res, i, p);
+        detectPassStations(res, i, p, period_hours);
     }
 
     //最后一站，判断是不是终到站
@@ -295,13 +295,13 @@ void TrainLine::listStationEvents(LineEventList& res) const
     }
 }
 
-void TrainLine::diagnoseSelf(DiagnosisList& res) const
+void TrainLine::diagnoseSelf(DiagnosisList& res, int period_hour) const
 {
     ConstAdaPtr pr = _stations.begin();
     for (auto p = _stations.begin(); p != _stations.end(); pr = p, ++p) {
         // 上一区间问题  注意这里暂时判定为本站的问题
         if (p != pr) {
-            diagnoInterval(res, pr, p);
+            diagnoInterval(res, pr, p, period_hour);
             int secs = qeutil::secsTo(pr->trainStation->depart, p->trainStation->arrive);
             if (secs > 20 * 3600) {
                 res.push_back(DiagnosisIssue(DiagnosisType::StopTooLong2,
@@ -336,13 +336,13 @@ void TrainLine::diagnoseSelf(DiagnosisList& res) const
     }
 }
 
-void TrainLine::diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr cur) const
+void TrainLine::diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr cur, int period_hours) const
 {
     auto rprev = prev->railStation.lock(), rcur = cur->railStation.lock();
     auto tprev = prev->trainStation, tcur = cur->trainStation;
     if (rprev->dirAdjacent(dir()) == rcur) {
         // 没有中间站
-        diagnoForbid(res, rprev->dirNextInterval(dir()), tprev->depart, tcur->arrive);
+        diagnoForbid(res, rprev->dirNextInterval(dir()), tprev->depart, tcur->arrive, period_hours);
     }
     else {
         // 中间站一个个来搞
@@ -364,9 +364,9 @@ void TrainLine::diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr
                 auto ri = p->toStation();
                 double dyi = ri->y_coeff.value() - rprev->y_coeff.value();
                 int dsi = dyi * scale;
-                QTime tm = tprev->depart.addSecs(dsi);
+                QTime tm = tprev->depart.addSecs(dsi, period_hours);
 
-                diagnoForbid(res, p, tm_prev, tm);
+                diagnoForbid(res, p, tm_prev, tm, period_hours);
 
                 if (p->toStation() == rcur) {
                     break;
@@ -387,7 +387,7 @@ void TrainLine::diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr
 }
 
 void TrainLine::diagnoForbid(DiagnosisList& res, std::shared_ptr<const RailInterval> railint,
-    const QTime& in, const QTime& out) const
+    const TrainTime& in, const TrainTime& out, int period_hours) const
 {
     const auto& rail = _adapter.railway();
     if (rail->forbids().size() != Forbid::FORBID_COUNT) {
@@ -398,20 +398,20 @@ void TrainLine::diagnoForbid(DiagnosisList& res, std::shared_ptr<const RailInter
         auto n = railint->getForbidNode(f);
         if (!n->isNull()) {
             if (qeutil::timeRangeIntersected(n->beginTime, n->endTime,
-                in, out)) {
+                in, out, period_hours)) {
                 res.push_back(DiagnosisIssue(DiagnosisType::CollidForbid,
                     qeutil::Error, railint, shared_from_this(),
                     out, railint->toStation()->mile,
                     QObject::tr("与天窗[%1]冲突，"
                         "天窗时间是[%2-%3]，区间运行时间（可能包含推定）是[%4-%5]。")
                     .arg(f->name(), n->beginTime.toString("hh:mm"), n->endTime.toString("hh:mm"),
-                        in.toString("hh:mm:ss"), out.toString("hh:mm:ss"))));
+                        in.toString(TrainTime::HMS), out.toString(TrainTime::HMS))));
             }
         }
     }
 }
 
-void TrainLine::detectPassStations(LineEventList& res, int index, ConstAdaPtr itr) const
+void TrainLine::detectPassStations(LineEventList& res, int index, ConstAdaPtr itr, int period_hours) const
 {
     ConstAdaPtr right = std::next(itr);
     if (right == _stations.end())return;
@@ -439,7 +439,7 @@ void TrainLine::detectPassStations(LineEventList& res, int index, ConstAdaPtr it
         double dsif = ds * rate;
         int dsi = int(std::round(dsif));
         res[index].emplace(StationEvent(
-            TrainEventType::CalculatedPass, ts0->depart.addSecs(dsi),
+            TrainEventType::CalculatedPass, ts0->depart.addSecs(dsi, period_hours),
             rsi, std::nullopt, QObject::tr("推算")
         ));
     }

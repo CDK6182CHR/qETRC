@@ -12,6 +12,7 @@
 #include <QFlags>
 
 #include "data/common/stationname.h"
+#include "data/common/traintime.h"
 
 /**
  * 注：目前支持在（绑定到相同线路的）不同车次间移动时不出问题。
@@ -44,7 +45,7 @@ public:
     Q_DECLARE_FLAGS(Flags, Flag);
 
     StationName name;
-    QTime arrive,depart;
+    TrainTime arrive,depart;
     bool business;    //是否办理业务
     QString track;
     QString note;
@@ -57,8 +58,8 @@ public:
 
     static constexpr int msecsOfADay = 24 * 3600 * 1000;
     
-    TrainStation(const StationName& name_, const QTime& arrive_,
-        const QTime& depart_, bool business_ = true,
+    TrainStation(const StationName& name_, const TrainTime& arrive_,
+        const TrainTime& depart_, bool business_ = true,
         const QString& track_ = "", const QString& note_="");
     explicit TrainStation(const QJsonObject& obj);
 
@@ -78,12 +79,12 @@ public:
      * 注意周期边界条件的消歧约定。
      * @param msecs  要判定的时间，以毫秒数表示
      */
-    bool timeInStoppedRange(int msecs)const;
+    bool timeInStoppedRange(int secs, int period_hour)const;
 
     /**
      * 判断两车站停车时间是否存在交集。注意PBC约定
      */
-    bool stopRangeIntersected(const TrainStation& another)const;
+    bool stopRangeIntersected(const TrainStation& another, int period_hour)const;
 
     /**
      * 停车时间的字符串表示：x分，或者x分x秒

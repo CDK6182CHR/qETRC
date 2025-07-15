@@ -67,11 +67,15 @@ void TimetableStdModel::setupModel()
         setItem(row, ColName, itname);
 
         auto* it=new SI;
-        it->setData(p->arrive,Qt::EditRole);
+        QVariant v1;
+		v1.setValue(p->arrive);
+        it->setData(v1,Qt::EditRole);
         setItem(row,ColArrive,it);
 
         it=new SI;
-        it->setData(p->depart,Qt::EditRole);
+        QVariant v2;
+		v2.setValue(p->depart); 
+        it->setData(v2,Qt::EditRole);
         setItem(row,ColDepart,it);
 
         it=makeCheckItem();
@@ -246,11 +250,15 @@ void TimetableConstModel::setupModel()
         setItem(row, ColName, itname);
 
         auto* it = new SI;
-        it->setData(p->arrive, Qt::EditRole);
+        QVariant v1;
+        v1.setValue(p->arrive);
+        it->setData(v1, Qt::EditRole);
         setItem(row, ColArrive, it);
 
         it = new SI;
-        it->setData(p->depart, Qt::EditRole);
+        QVariant v2;
+        v2.setValue(p->depart);
+        it->setData(v2, Qt::EditRole);
         setItem(row, ColDepart, it);
 
         it = makeCheckItem();

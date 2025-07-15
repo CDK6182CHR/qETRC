@@ -5,11 +5,11 @@
 #include <QTableView>
 #include <QHeaderView>
 #include <data/common/qesystem.h>
-#include <model/delegate/qetimedelegate.h>
+#include <model/delegate/traintimedelegate.h>
 #include <data/rail/railstation.h>
 
-TimetableWidget::TimetableWidget(bool commitInPlace, QWidget *parent):
-    QEControlledTable(parent), _model(new TimetableStdModel(commitInPlace, this))
+TimetableWidget::TimetableWidget(bool commitInPlace, const DiagramOptions& ops, QWidget *parent):
+    QEControlledTable(parent), _options(ops), _model(new TimetableStdModel(commitInPlace, this))
 {
     initUI();
 }
@@ -25,7 +25,7 @@ void TimetableWidget::initUI()
     table()->setEditTriggers(QTableView::AllEditTriggers);
     table()->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     table()->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
-    auto* dele=new QETimeDelegate(this);
+    auto* dele=new TrainTimeDelegate(_options, this);
     table()->setItemDelegateForColumn(TimetableStdModel::ColArrive,dele);
     table()->setItemDelegateForColumn(TimetableStdModel::ColDepart,dele);
 

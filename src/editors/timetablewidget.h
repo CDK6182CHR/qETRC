@@ -4,6 +4,7 @@
 
 class TimetableStdModel;
 class RailStation;
+struct DiagramOptions;
 
 /**
  * @brief The TimetableWidget class
@@ -15,9 +16,10 @@ class RailStation;
 class TimetableWidget : public QEControlledTable
 {
     Q_OBJECT
+    const DiagramOptions& _options;
     TimetableStdModel* const _model;
 public:
-    TimetableWidget(bool commitInPlace, QWidget* parent=nullptr);
+    TimetableWidget(bool commitInPlace, const DiagramOptions& ops, QWidget* parent=nullptr);
     void refreshData();
     auto* model(){return _model;}
 

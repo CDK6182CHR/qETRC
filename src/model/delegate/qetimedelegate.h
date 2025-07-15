@@ -8,7 +8,7 @@ class QTimeEdit;
  * @brief The QETimeDelegate class
  * 标准的时间编辑Delegate，包括显示格式的设置
  */
-class QETimeDelegate : public QStyledItemDelegate
+class [[deprecated]] QETimeDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
     QString _format;
@@ -34,7 +34,7 @@ private slots:
 /**
  * 采用TimeDataRole来保存数据；DisplayRole来展示数据。
  */
-class TimeQuickDelegate :public QStyledItemDelegate
+class [[deprecated]]  TimeQuickDelegate :public QStyledItemDelegate
 {
     Q_OBJECT;
     QString _format;

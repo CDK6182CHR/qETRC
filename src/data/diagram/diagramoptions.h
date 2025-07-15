@@ -14,6 +14,12 @@ struct DiagramOptions
 	 * is greater than this value.
 	 */
 	int max_passed_stations = 3;
+
+	/**
+	 * Period (hours) for the train diagrams. 
+	 * Default 24, for a full day.
+	 */
+	int period_hours = 24;
 	
 	DiagramOptions() = default;
 	DiagramOptions(const QJsonObject& obj);
