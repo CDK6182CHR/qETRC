@@ -110,10 +110,10 @@ void TrainContext::initUI()
 		}
 
 		auto* act = mw->makeAction(QEICN_show_train_line, tr("显示运行线"), tr("显示列车运行线"));
+		act->setCheckable(true);
 		act->setToolTip(tr("显示列车运行线\n切换列车运行线的显示状态"));
 		panel->addLargeAction(act);
 		btnShown = panel->actionToRibbonToolButton(act);
-		btnShown->setCheckable(true);
 		connect(act, &QAction::triggered, this, &TrainContext::actToggleTrainLineShown);
 
 		act = mw->makeAction(QEICN_train_line, tr("高亮运行线"), tr("高亮列车运行线"));

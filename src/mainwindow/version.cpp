@@ -4,15 +4,15 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.7.11";
-const std::string_view DATE = "20250528";
-const int RELEASE_CODE = 65;
+const std::string_view LAST_VERSION = "V1.7.12";
+const std::string_view DATE = "20250715";
+const int RELEASE_CODE = 66;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 新增天窗数据的CSV格式输入/输出。
-2. 新增基线数据（仅限站表）的CSV格式输入/输出。
-3. 新增多线路运行图页面中隐藏非顶部线路的侧边栏表头选项。
-4. 新增“运行图选项”页面。)";
+const std::string_view UPDATE_LOG = R"(1. 新增列车编辑、时刻表编辑中导入线路站表的功能。
+2. 新增工具栏“列车编辑”中切换列车运行线显示与否的按钮。
+3. 禁止里程为0的线路区间以避免某些极端情况的问题。
+4. 其他问题修复。)";
 }
