@@ -59,10 +59,10 @@ void StationEventAxis::insertEvent(std::shared_ptr<RailStationEvent> ev)
 
 std::shared_ptr<RailStationEvent> StationEventAxis::conflictEvent(
 	const RailStationEventBase& ev,
-	const GapConstraints& constraint, bool singleLine) const
+	const GapConstraints& constraint, bool singleLine, int period_hours) const
 {
 	int bound = constraint.correlationRange();
-	QTime leftBound = ev.time.addSecs(-bound), rightBound = ev.time.addSecs(bound);
+	TrainTime leftBound = ev.time.addSecs(-bound, period_hours), rightBound = ev.time.addSecs(bound, period_hours);
 	// upper_bound 正好与reverse_iterator配合使用
 	auto citr = std::upper_bound(begin(), end(), ev.time,
 		RailStationEvent::PtrTimeComparator());

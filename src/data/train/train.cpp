@@ -491,19 +491,19 @@ Direction Train::stationDirection(ConstStationPtr station)
 }
 #endif
 
-Train Train::translation(TrainName name, int sec)
+Train Train::translation(TrainName name, int sec, int period_hours)
 {
     Train train(*this);   //copy construct
     train.setTrainName(name);
     for(auto& p:train._timetable){
-        p.arrive=p.arrive.addSecs(sec);
-        p.depart=p.depart.addSecs(sec);
+        p.arrive=p.arrive.addSecs(sec, period_hours);
+        p.depart=p.depart.addSecs(sec, period_hours);
     }
     return train;
 }
 
 void Train::adjustTimetable(int startIndex, int endIndex, bool includeFirst,
-                            bool includeLast, int secs)
+                            bool includeLast, int secs, int period_hours)
 {
     if (!indexValid(startIndex) || !indexValid(endIndex) || startIndex > endIndex) {
         qDebug() << "Train::adjustTimetable: WARNING: invalid index: "
@@ -515,10 +515,10 @@ void Train::adjustTimetable(int startIndex, int endIndex, bool includeFirst,
     for (auto p = itstart; p != std::next(itend); ++p) {
         if(includeFirst || p!=itstart){
             //调整到达时刻
-            p->arrive = p->arrive.addSecs(secs);
+            p->arrive = p->arrive.addSecs(secs, period_hours);
         }
         if (includeLast || p != itend) {
-            p->depart = p->depart.addSecs(secs);
+            p->depart = p->depart.addSecs(secs, period_hours);
         }
     }
 }

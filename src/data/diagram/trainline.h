@@ -154,7 +154,7 @@ public:
      * @brief listLineEvents 列出本运行线事件表
      * 遍历其他所有运行线获取数据。
      */
-    LineEventList listLineEvents(const TrainCollection& coll)const;
+    LineEventList listLineEvents(const TrainCollection& coll, int period_hours)const;
 
     /**
      * 列车运行情况诊断，判断可能存在的问题。
@@ -226,19 +226,19 @@ public:
      * 包含推定。到达、出发要拆开，因此返回QList
      */
     RailStationEventList
-           stationEventFromRail(std::shared_ptr<const RailStation> rail)const;
+           stationEventFromRail(std::shared_ptr<const RailStation> rail, int period_hours)const;
 
     /**
      * 计算通过指定纵坐标处的时刻；如果运行线不经过该点，返回空
      * 如果指定纵坐标恰好是某一车站，则以【左区间】为准，
      * 即下行列车到达时刻、上行列车出发时刻。
      */
-    std::optional<QTime> sectionTime(double y)const;
+    std::optional<TrainTime> sectionTime(double y, int period_hours)const;
 
     /**
      * 返回指定时刻列车的运行状态。
      */
-    SnapEventList getSnapEvents(const QTime& time)const;
+    SnapEventList getSnapEvents(const TrainTime& time, int period_hours)const;
 
     /**
      * 所给站是否是始发站。seealso `hasStartAppend`
@@ -319,28 +319,28 @@ private:
      * 2023.02.01  see also detestPassStations
      * For generating new timetable for the passed stations.
      */
-    std::list<TrainStation> detectPassStationTimes(ConstAdaPtr itr)const;
+    std::list<TrainStation> detectPassStationTimes(ConstAdaPtr itr, int period_hours)const;
 
     /**
      * @brief eventsWithSameDir  同向列车事件表：越行、待避、共线
      * @param another  已知同向的另一段列车运行线
      */
-    void eventsWithSameDir(LineEventList& res, const TrainLine& another, const Train& antrain)const;
+    void eventsWithSameDir(LineEventList& res, const TrainLine& another, const Train& antrain, int period_hours)const;
 
     /**
      * @brief eventsWithCounter 反向列车事件表：主要是交会
      * 反向列车用反向迭代器，这样保证y的方向是单向变化的
      */
-    void eventsWithCounter(LineEventList& res, const TrainLine& another, const Train& antrain)const;
+    void eventsWithCounter(LineEventList& res, const TrainLine& another, const Train& antrain, int period_hours)const;
 
-    void diagnoWithSameDir(DiagnosisList& res, const TrainLine& another, const Train& antrain)const;
+    void diagnoWithSameDir(DiagnosisList& res, const TrainLine& another, const Train& antrain, int period_hours)const;
 
     /**
      * @brief eventsWithCounter 反向列车事件表：主要是交会
      * 反向列车用反向迭代器，这样保证y的方向是单向变化的
      * 2022.09.11新增逻辑：区间会车仅在单线区间才输出警告。
      */
-    void diagnoWithCounter(DiagnosisList& res, const TrainLine& another, const Train& antrain)const;
+    void diagnoWithCounter(DiagnosisList& res, const TrainLine& another, const Train& antrain, int period_hours)const;
 
     /**
      * @brief 当前运行线的y最小值，等于首站或者末站（取决于行别）的y值
@@ -371,7 +371,7 @@ private:
      * 如果tm1在tm2之前，返回-1.
      * 注意周期边界条件PBC下的歧义性。总是采取使得tm1, tm2距离绝对值最小的理解来消除歧义
      */
-    int xComp(const QTime& tm1, const QTime& tm2)const;
+    int xComp(const TrainTime& tm1, const TrainTime& tm2, int period_hours)const;
 
     /**
      * @brief sameDirStep 同向的条件下，依据y坐标比较情况和行别，判定谁该进一步。
@@ -412,30 +412,30 @@ private:
      * @return 目标站的时刻，以【毫秒数】表示！！
      */
     //template <typename BidirIter>
-    int getPreviousPassedTime(ConstAdaPtr st, std::shared_ptr<RailStation> target)const;
+    int getPreviousPassedTime(ConstAdaPtr st, std::shared_ptr<RailStation> target, int period_hours)const;
     
 
     int getPreviousPassedTime(std::deque<AdapterStation>::const_reverse_iterator st,
-        std::shared_ptr<RailStation> target)const; 
+        std::shared_ptr<RailStation> target, int period_hours)const;
 
     /**
      * @brief findIntervalIntersectionSameDIr 判断同向区间交点。
      * 解析几何方法判定交点是否存在，用斜率判断是越行还是待避。
      * @return 如果存在合法交点，返回交点的里程、时刻以及类型；否则返回std::nullopt
      */
-    std::optional<std::tuple<double, QTime, TrainEventType>>
+    std::optional<std::tuple<double, TrainTime, TrainEventType>>
         findIntervalIntersectionSameDir(ConstAdaPtr mylast, ConstAdaPtr mythis,
-            ConstAdaPtr hislast, ConstAdaPtr histhis)const;
+            ConstAdaPtr hislast, ConstAdaPtr histhis, int period_hours)const;
 
     /**
      * @brief findIntervalIntersectionCounter 判断对向区间交点。
      * 基本照抄同向的；但是只需要判定是否有交叉。
      * 代码重复比较多。但为了避免在.h文件里搞一大堆代码，似乎只能这样
      */
-    std::optional<std::tuple<double, QTime, TrainEventType>>
+    std::optional<std::tuple<double, TrainTime, TrainEventType>>
         findIntervalIntersectionCounter(ConstAdaPtr mylast, ConstAdaPtr mythis,
             std::deque<AdapterStation>::const_reverse_iterator hislast,
-            std::deque<AdapterStation>::const_reverse_iterator histhis)const;
+            std::deque<AdapterStation>::const_reverse_iterator histhis, int period_hours)const;
 
     /**
      * 封装添加区间事件的操作，相比简单的添加，主要是增加了区间的判断。
@@ -444,7 +444,7 @@ private:
      * index: 要插入的目标位置
      * 注意搜索按照里程搜。这样可以保证被搜索序列递增 （用户设置线路数据时，添加强制检查）
      */
-    void addIntervalEvent(LineEventList& res, int index, TrainEventType type, const QTime& time,
+    void addIntervalEvent(LineEventList& res, int index, TrainEventType type, const TrainTime& time,
         const AdapterStation& former, const AdapterStation& latter,
         std::reference_wrapper<const Train> another, double mile,
         const QString& note = "")const;
@@ -457,7 +457,7 @@ private:
     SnapEvent::pos_t compressSnapInterval(ConstAdaPtr former, ConstAdaPtr latter,
         double mile)const;
 
-    double snapEventMile(ConstAdaPtr former, ConstAdaPtr latter, const QTime& time)const;
+    double snapEventMile(ConstAdaPtr former, ConstAdaPtr latter, const TrainTime& time)const;
 
     /**
      * 判定st所示站是否在mile所示里程的运行方向前方或相等，即下行时里程比它小、上行时里程比它大
@@ -507,9 +507,9 @@ private:
      * 暂定新推定的时刻直接进行绑定。
      */
     void timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool toBegin,
-        bool toEnd, int precision);
+        bool toEnd, int precision, int period_hours);
 
-    int timetableInterpolationSimple();
+    int timetableInterpolationSimple(int period_hours);
 
 };
 

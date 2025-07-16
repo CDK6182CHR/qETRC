@@ -60,7 +60,7 @@ public:
     std::shared_ptr<RailStationEvent>
         conflictEvent(const RailStationEventBase& ev,
                       const GapConstraints& constraint,
-                      bool singleLine) const;
+                      bool singleLine, int period_hours) const;
 
 private:
 

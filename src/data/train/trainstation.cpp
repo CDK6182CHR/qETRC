@@ -23,12 +23,12 @@ void TrainStation::fromJson(const QJsonObject &obj)
     //arrive=QTime::fromString(obj.value("ddsj").toString(),"hh:mm:ss");
     arrive = qeutil::parseTrainTime(obj.value("ddsj").toString());
     if(arrive.isNull()){
-        arrive=QTime::fromString(obj.value("ddsj").toString(),"hh:mm");
+        arrive=TrainTime::fromString(obj.value("ddsj").toString());
     }
     //depart=QTime::fromString(obj.value("cfsj").toString(),"hh:mm:ss");
-    depart = qeutil::parseTime(obj.value("cfsj").toString());
+    depart = qeutil::parseTrainTime(obj.value("cfsj").toString());
     if(depart.isNull()){
-        depart=QTime::fromString(obj.value("cfsj").toString(),"hh:mm");
+        depart=TrainTime::fromString(obj.value("cfsj").toString());
     }
     business = obj.value("business").toBool(false);   // 2023.01.13: default false
     track = obj.value("track").toString();

@@ -137,12 +137,12 @@ void TrainAdapter::bindTrainByPath(std::shared_ptr<Train> train, const TrainPath
 	}
 }
 
-AdapterEventList TrainAdapter::listAdapterEvents(const TrainCollection& coll) const
+AdapterEventList TrainAdapter::listAdapterEvents(const TrainCollection& coll, int period_hours) const
 {
 	AdapterEventList res;
 	for (auto p : _lines) {
 		//res.append(p->listLineEvents(coll));
-		auto&& t = p->listLineEvents(coll);
+		auto&& t = p->listLineEvents(coll, period_hours);
 		res.append(t);
 	}
 	return res;
@@ -253,7 +253,7 @@ int TrainAdapter::adapterStationCount() const
 }
 
 void TrainAdapter::timetableInterpolation(std::shared_ptr<const Ruler> ruler, 
-	bool toRailStart, bool toRailEnd, int prec)
+	bool toRailStart, bool toRailEnd, int prec, int period_hours)
 {
 	for (int i = 0; i < _lines.size(); i++) {
 		auto line = _lines.at(i);
@@ -266,7 +266,7 @@ void TrainAdapter::timetableInterpolation(std::shared_ptr<const Ruler> ruler,
             toEnd = ((line->dir() == Direction::Down && toRailEnd) ||
                 (line->dir() == Direction::Up && toRailStart));
 		}
-		line->timetaleInterpolation(ruler, toBegin, toEnd, prec);
+		line->timetaleInterpolation(ruler, toBegin, toEnd, prec, period_hours);
 	}
 }
 
@@ -298,11 +298,11 @@ double TrainAdapter::relativeError(std::shared_ptr<const Ruler> ruler) const
 	return static_cast<double>(error_time) / this_time;
 }
 
-int TrainAdapter::timetableInterpolationSimple()
+int TrainAdapter::timetableInterpolationSimple(int period_hours)
 {
 	int cnt = 0;
 	foreach(const auto & line, _lines) {
-		cnt += line->timetableInterpolationSimple();
+		cnt += line->timetableInterpolationSimple(period_hours);
 	}
 	return cnt;
 }

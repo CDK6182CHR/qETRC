@@ -10,11 +10,10 @@
 #include <QFlags>
 #include <variant>
 #include <type_traits>
-#include <QTime>
 #include <optional>
 
-#include <data/common/direction.h>
-
+#include "data/common/direction.h"
+#include "data/common/traintime.h"
 
 /**
  * @brief The TrainEventType pyETRC.GraphicsWidget.TrainEventType
@@ -58,12 +57,12 @@ namespace qeutil {
  */
 struct StationEvent {
     TrainEventType type;
-    QTime time;
+    TrainTime time;
     std::weak_ptr<const RailStation> station;
     std::optional<std::reference_wrapper<const Train>> another;
     QString note;
     StationEvent(TrainEventType type_,
-                 const QTime& time_, std::weak_ptr<const RailStation> station_,
+                 const TrainTime& time_, std::weak_ptr<const RailStation> station_,
                  std::optional<std::reference_wrapper<const Train>> another_,
                  const QString& note_=""):
         type(type_),time(time_),station(station_),another(another_),note(note_){}
@@ -93,25 +92,25 @@ struct RailStationEventBase {
     Q_DECLARE_FLAGS(Positions, Position);
 
     TrainEventType type;
-    QTime time;
+    TrainTime time;
     Positions pos;
     Direction dir;
 
     RailStationEventBase(TrainEventType type_,
-        const QTime& time_, Positions pos_, Direction dir_):
+        const TrainTime& time_, Positions pos_, Direction dir_):
         type(type_),time(time_),pos(pos_),dir(dir_){}
 
 
     struct PtrTimeComparator {
         bool operator()(const std::shared_ptr<const RailStationEventBase>& ev1,
             const std::shared_ptr<const RailStationEventBase>& ev2)const {
-            return ev1->time.msecsSinceStartOfDay() < ev2->time.msecsSinceStartOfDay();
+            return ev1->time < ev2->time;
         }
-        bool operator()(const QTime& tm, const std::shared_ptr<const RailStationEventBase>& ev2)const {
-            return tm.msecsSinceStartOfDay() < ev2->time.msecsSinceStartOfDay();
+        bool operator()(const TrainTime& tm, const std::shared_ptr<const RailStationEventBase>& ev2)const {
+            return tm < ev2->time;
         }
-        bool operator()(const std::shared_ptr<const RailStationEventBase>& ev1, const QTime& tm)const {
-            return ev1->time.msecsSinceStartOfDay() < tm.msecsSinceStartOfDay();
+        bool operator()(const std::shared_ptr<const RailStationEventBase>& ev1, const TrainTime& tm)const {
+            return ev1->time < tm;
         }
     };
 
@@ -158,7 +157,7 @@ struct RailStationEvent: public RailStationEventBase {
     QString note;
     
     RailStationEvent(TrainEventType type_,
-        const QTime& time_, std::weak_ptr<const RailStation> station_,
+        const TrainTime& time_, std::weak_ptr<const RailStation> station_,
         std::shared_ptr<const TrainLine> line_,
         Positions pos_, const QString& note_ = "");
 
@@ -181,12 +180,12 @@ struct AdapterStation;
  */
 struct IntervalEvent{
     TrainEventType type;
-    QTime time;
+    TrainTime time;
     std::shared_ptr<const RailStation> former, latter;
     std::reference_wrapper<const Train> another;
     double mile;
     QString note;
-    IntervalEvent(TrainEventType type_, const QTime& time_,
+    IntervalEvent(TrainEventType type_, const TrainTime& time_,
         std::shared_ptr<const RailStation> former_,
         std::shared_ptr<const RailStation> latter_,
         std::reference_wrapper<const Train> another_,
@@ -311,13 +310,13 @@ struct DiagnosisIssue {
     QString description;
 
     // 2022.09.11: add mile and time info
-    QTime time;
+    TrainTime time;
     double mile;
         
     DiagnosisIssue(DiagnosisType type_,
         qeutil::DiagnosisLevel level_,
         pos_t pos_, std::shared_ptr<const TrainLine> line_, 
-        QTime time_, double mile_,
+        TrainTime time_, double mile_,
         const QString& description_ ):
         type(type_),level(level_),pos(pos_),line(line_),time(time_),mile(mile_),
         description(description_){}

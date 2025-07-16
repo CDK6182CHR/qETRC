@@ -78,7 +78,7 @@ public:
     operator QTime()const;
 
     static TrainTime fromQTime(const QTime& t);
-    TrainTime(const QTime& qtm);
+    explicit TrainTime(const QTime& qtm);
 
 private:
     explicit TrainTime(int secsSinceStart);

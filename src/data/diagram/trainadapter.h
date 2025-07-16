@@ -88,7 +88,7 @@ public:
      * @brief listAdapterEvents 列出本次列车在本线的事件表
      * 逐段运行线计算。实际上只是个转发
      */
-    AdapterEventList listAdapterEvents(const TrainCollection& coll)const;
+    AdapterEventList listAdapterEvents(const TrainCollection& coll, int period_hours)const;
 
     /**
      * 返回最后一个绑定的车站。
@@ -145,7 +145,7 @@ public:
      * toStart, toEnd是指线路的首站末站。
      */
     void timetableInterpolation(std::shared_ptr<const Ruler> ruler, 
-        bool toRailStart, bool toRailEnd, int prec);
+        bool toRailStart, bool toRailEnd, int prec, int period_hours);
 
     /**
      * 用于时刻插值的相对误差计算。
@@ -157,7 +157,7 @@ public:
      * 同样要求已绑定到线路，且直接修改this指向对象。
      * @return 新插入车站个数
      */
-    int timetableInterpolationSimple();
+    int timetableInterpolationSimple(int period_hours);
 
 private:
 

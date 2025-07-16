@@ -30,13 +30,13 @@ bool GreedyPainter::paint(const TrainName& trainName)
 	backoffCount = 0;
 
 	// 首站的处理
-	QTime tm_arr = _anchorTime, tm_dep = _anchorTime;
+	TrainTime tm_arr = _anchorTime, tm_dep = _anchorTime;
 	if (auto itr = _settledStops.find(_anchor); itr != _settledStops.end()) {
 		if (_anchorAsArrive) {
-			tm_dep = _anchorTime.addSecs(itr->second);
+			tm_dep = _anchorTime.addSecs(itr->second, diagram.options().period_hours);
 		}
 		else {
-			tm_arr = _anchorTime.addSecs(-itr->second);
+			tm_arr = _anchorTime.addSecs(-itr->second, diagram.options().period_hours);
 		}
 	}
 
@@ -61,7 +61,7 @@ bool GreedyPainter::paint(const TrainName& trainName)
 		auto railint = _anchor->dirNextInterval(_dir);
 		try {
 			rep_fwd = calForward(_anchor, railint, _anchorTime,
-				(_anchor == _start && _localStarting) || anchor_stop);
+				(_anchor == _start && _localStarting) || anchor_stop, diagram.options().period_hours);
 		}
 		catch (const BackoffExeed&) {
 			addLog(std::make_unique<CalculationLogSimple>(CalculationLogAbstract::BadTermination));
@@ -73,7 +73,7 @@ bool GreedyPainter::paint(const TrainName& trainName)
 		auto railint_bak = _anchor->dirPrevInterval(_dir);
 		try {
 			rep_back = calBackward(_anchor, railint_bak, tm_arr,
-				(_anchor == _end && _localTerminal) || anchor_stop);
+				(_anchor == _end && _localTerminal) || anchor_stop, diagram.options().period_hours);
 		}
 		catch (const BackoffExeed&) {
 			addLog(std::make_unique<CalculationLogSimple>(CalculationLogAbstract::BadTermination));
@@ -156,7 +156,7 @@ return {RecurseStatus::FixedStation, delay_secs};
 
 typename GreedyPainter::RecurseReport
 	GreedyPainter::calForward(std::shared_ptr<const RailStation> st_from, 
-		std::shared_ptr<const RailInterval> railint, const QTime& _tm, bool stop)
+		std::shared_ptr<const RailInterval> railint, const TrainTime& _tm, bool stop, int period_hours)
 {
 
 	// 注意以后的出发时间以这里面的为准！
@@ -168,7 +168,7 @@ typename GreedyPainter::RecurseReport
 		// 2023.12.20  对于锚点站，只有作为到达时刻时，才需要在这里加时间
 		if (st_from != _anchor || _anchorAsArrive) {
 			if (auto itr = _settledStops.find(st_from); itr != _settledStops.end()) {
-				ev_start.time = ev_start.time.addSecs(itr->second);
+				ev_start.time = ev_start.time.addSecs(itr->second, period_hours);
 				addLog(std::make_unique<CalculationLogBasic>(
 					CalculationLogAbstract::SetStop, st_from, ev_start.time,
 					CalculationLogAbstract::Depart
@@ -228,7 +228,7 @@ typename GreedyPainter::RecurseReport
 		}
 
 		// 出发时刻检测
-		auto ev_conf = ax_from.conflictEvent(ev_start, _constraints, railint->isSingleRail());
+		auto ev_conf = ax_from.conflictEvent(ev_start, _constraints, railint->isSingleRail(), period_hours);
 		if (ev_conf) {
 			// 出发时刻冲突
 			// 2023.10.17: 对于起始站停车时间被固定的，也只能回溯; 2024.02.09: 改到下面的分支里面。
@@ -260,7 +260,7 @@ typename GreedyPainter::RecurseReport
 					auto type = TrainGap::gapTypeBetween(*ev_conf, ev_start, railint->isSingleRail());
 					qDebug() << "左冲突：" << ev_conf->toString() << Qt::endl;
 					int gap_min = _constraints.maxConstraint(*type);
-					auto trial_tm = ev_conf->time.addSecs(gap_min);
+					auto trial_tm = ev_conf->time.addSecs(gap_min, period_hours);
 
 					if (fixed_from) {
 						int delay_secs = qeutil::secsTo(ev_start.time, trial_tm);
@@ -294,7 +294,7 @@ typename GreedyPainter::RecurseReport
 		}
 
 		// 区间天窗冲突
-		auto tm_to = ev_start.time.addSecs(int_secs);
+		auto tm_to = ev_start.time.addSecs(int_secs, period_hours);
 		bool forbid_conf = false;
 		for (auto forbid : _usedForbids) {
 			auto fbdnode = railint->getForbidNode(forbid);
@@ -339,7 +339,7 @@ typename GreedyPainter::RecurseReport
 			}
 			else if (rep.type == IntervalConflictReport::LeftConflict) {
 				// 左冲突
-				auto tm_trial = rep.conflictEvent->time.addSecs(-int_secs);
+				auto tm_trial = rep.conflictEvent->time.addSecs(-int_secs, period_hours);
 				if (fixed_from) {
 					int delay_secs = qeutil::secsTo(ev_start.time, tm_trial);
 					FWD_FIXED_POP_AND_RETURN
@@ -368,7 +368,7 @@ typename GreedyPainter::RecurseReport
 				}
 				else {
 					tot_delay += 1;
-					ev_start.time = ev_start.time.addSecs(1);
+					ev_start.time = ev_start.time.addSecs(1, period_hours);
 				}
 			}
 
@@ -385,16 +385,16 @@ typename GreedyPainter::RecurseReport
 
 		// 后站 首先检测是否能通过
 
-		tm_to = ev_start.time.addSecs(int_secs);
+		tm_to = ev_start.time.addSecs(int_secs, period_hours);
 		RailStationEventBase ev_stop(TrainEventType::SettledPass, tm_to, qeutil::dirFormerPos(_dir), _dir);
-		auto to_conf = ax_to.conflictEvent(ev_stop, _constraints, railint->isSingleRail());
+		auto to_conf = ax_to.conflictEvent(ev_stop, _constraints, railint->isSingleRail(), period_hours);
 		if (!to_try_stop && !next_stop && !to_conf) {
 			addLog(std::make_unique<CalculationLogBasic>(
 				CalculationLogAbstract::Predicted, st_to, tm_to,
 				CalculationLogAbstract::Arrive
 				));
 			_train->appendStation(st_to->name, tm_to, tm_to, false);
-			auto ret = calForward(st_to, railint->nextInterval(), tm_to, false);
+			auto ret = calForward(st_to, railint->nextInterval(), tm_to, false, period_hours);
 			if (ret.status == RecurseStatus::Ok) return ret;   // safe to return it directly
 		}
 
@@ -408,10 +408,10 @@ typename GreedyPainter::RecurseReport
 		// 下面：后站需要停车的情况。注意根据递归基本约定，
 		// 此时后站尚未入栈
 		//int_secs += node->stop; // 2022.03.19：现在不用再加，因为前面加过了
-		tm_to = ev_start.time.addSecs(int_secs);
+		tm_to = ev_start.time.addSecs(int_secs, period_hours);
 		ev_stop.time = tm_to;
 		ev_stop.type = TrainEventType::Arrive;
-		to_conf = ax_to.conflictEvent(ev_stop, _constraints, railint->isSingleRail());
+		to_conf = ax_to.conflictEvent(ev_stop, _constraints, railint->isSingleRail(), period_hours);
 
 		// 只要尝试过一次原时刻停车了，不论结果如何，下一轮都优先考虑通过
 		to_try_stop = false;
@@ -423,7 +423,7 @@ typename GreedyPainter::RecurseReport
 				CalculationLogAbstract::Arrive
 				));
 			_train->appendStation(st_to->name, tm_to, tm_to, false);
-			auto ret = calForward(st_to, railint->nextInterval(), tm_to, true);
+			auto ret = calForward(st_to, railint->nextInterval(), tm_to, true, period_hours);
 			if (ret.status == RecurseStatus::Ok) {
 				return ret;
 			}
@@ -437,7 +437,7 @@ typename GreedyPainter::RecurseReport
 				if (!fixed_from) {
 					//_train->timetable().pop_back();
 					to_try_stop = false;
-					ev_start.time = ev_start.time.addSecs(ret.delay_seconds_hint);
+					ev_start.time = ev_start.time.addSecs(ret.delay_seconds_hint, period_hours);
 					tot_delay += ret.delay_seconds_hint;
 				}
 				else {
@@ -465,7 +465,7 @@ typename GreedyPainter::RecurseReport
 			TrainGap::GapTypesV2 type;
 			if (qeutil::timeCompare(tm_to, to_conf->time)) {
 				// 右冲突事件，设置出发时间使得到达时间为冲突时刻的时间
-				auto trial_tm = to_conf->time.addSecs(-int_secs);
+				auto trial_tm = to_conf->time.addSecs(-int_secs, period_hours);
 				if (fixed_from) {
 					int delay_secs = qeutil::secsTo(ev_start.time, trial_tm);
 					if (st_from != _anchor)
@@ -483,8 +483,8 @@ typename GreedyPainter::RecurseReport
 				type = *TrainGap::gapTypeBetween(*to_conf, ev_stop, railint->isSingleRail());
 				int gap_min = _constraints.maxConstraint(type);   
 
-				QTime trial_arr = to_conf->time.addSecs(gap_min);
-				QTime trial_dep = trial_arr.addSecs(-int_secs);
+				TrainTime trial_arr = to_conf->time.addSecs(gap_min, period_hours);
+				TrainTime trial_dep = trial_arr.addSecs(-int_secs, period_hours);
 
 				if (fixed_from) {
 					if (st_from != _anchor)
@@ -512,7 +512,7 @@ return {RecurseStatus::FixedStation, delay_secs}; \
 
 typename GreedyPainter::RecurseReport
 	GreedyPainter::calBackward(std::shared_ptr<const RailStation> st_from, std::shared_ptr<const RailInterval> railint, 
-		const QTime& _tm, bool stop)
+		const TrainTime& _tm, bool stop, int period_hours)
 {
 	// 反向推线，代码基本从正向复制。
 	// 注意现在的from/to按照推线的观点看，与railint的from/to恰好相反。
@@ -527,7 +527,7 @@ typename GreedyPainter::RecurseReport
 		// 注意这里正推和反推不一样。这是因为最开始paint()中对锚点时刻的设定不同。
 		if (st_from != _anchor) {
 			if (auto itr = _settledStops.find(st_from); itr != _settledStops.end()) {
-				ev_arrive.time = ev_arrive.time.addSecs(-itr->second);
+				ev_arrive.time = ev_arrive.time.addSecs(-itr->second, period_hours);
 				addLog(std::make_unique<CalculationLogBasic>(
 					CalculationLogAbstract::SetStop, st_from, ev_arrive.time,
 					CalculationLogAbstract::Arrive
@@ -587,7 +587,7 @@ typename GreedyPainter::RecurseReport
 		}
 
 		// 到达时刻（反向出发）检测
-		auto ev_conf = ax_from.conflictEvent(ev_arrive, _constraints, railint->isSingleRail());
+		auto ev_conf = ax_from.conflictEvent(ev_arrive, _constraints, railint->isSingleRail(), period_hours);
 		if (ev_conf) {
 			// 反向出发时刻冲突
 			// 注意：anchor站也回溯
@@ -619,7 +619,7 @@ typename GreedyPainter::RecurseReport
 					// 反向右冲突事件，将时刻弄到与当前不冲突的地方
 					auto type = TrainGap::gapTypeBetween(ev_arrive, *ev_conf, railint->isSingleRail());
 					int gap_min = _constraints.maxConstraint(*type);   
-					auto trial_tm = ev_conf->time.addSecs(-gap_min);
+					auto trial_tm = ev_conf->time.addSecs(-gap_min, period_hours);
 					int delay_secs = qeutil::secsTo(trial_tm, ev_arrive.time);
 					if (fixed_from) {
 						if (st_from != _anchor) _train->timetable().pop_front();
@@ -654,7 +654,7 @@ typename GreedyPainter::RecurseReport
 
 		bool forbid_conf = false;
 		// 区间天窗冲突
-		auto tm_dep = ev_arrive.time.addSecs(-int_secs);
+		auto tm_dep = ev_arrive.time.addSecs(-int_secs, period_hours);
 		for (auto forbid : _usedForbids) {
 			auto fbdnode = railint->getForbidNode(forbid);
 			if (!fbdnode->isNull()) {
@@ -701,7 +701,7 @@ typename GreedyPainter::RecurseReport
 			}
 			else if (rep.type == IntervalConflictReport::LeftConflict) {
 				// 左冲突
-				auto tm_trial = rep.conflictEvent->time.addSecs(int_secs);
+				auto tm_trial = rep.conflictEvent->time.addSecs(int_secs, period_hours);
 				int delay_secs = qeutil::secsTo(tm_trial, ev_arrive.time);
 				if (fixed_from) {
 					if (st_from != _anchor) _train->timetable().pop_front();
@@ -731,7 +731,7 @@ typename GreedyPainter::RecurseReport
 				}
 				else {
 					tot_delay += 1;   // 2024.02.10: it should be plus?
-					ev_arrive.time = ev_arrive.time.addSecs(-1);
+					ev_arrive.time = ev_arrive.time.addSecs(-1, period_hours);
 				}
 			}
 
@@ -748,16 +748,16 @@ typename GreedyPainter::RecurseReport
 
 		// 后站 首先检测是否能通过
 
-		tm_dep = ev_arrive.time.addSecs(-int_secs);
+		tm_dep = ev_arrive.time.addSecs(-int_secs, period_hours);
 		RailStationEventBase ev_depart(TrainEventType::SettledPass, tm_dep, qeutil::dirLatterPos(_dir), _dir);
-		auto to_conf = ax_to.conflictEvent(ev_depart, _constraints, railint->isSingleRail());
+		auto to_conf = ax_to.conflictEvent(ev_depart, _constraints, railint->isSingleRail(), period_hours);
 		if (!to_try_stop && !next_stop && !to_conf) {
 			addLog(std::make_unique<CalculationLogBasic>(
 				CalculationLogAbstract::Predicted, st_to, tm_dep,
 				CalculationLogAbstract::Depart
 				));
 			_train->prependStation(st_to->name, tm_dep, tm_dep, false);
-			auto ret = calBackward(st_to, railint->prevInterval(), tm_dep, false);
+			auto ret = calBackward(st_to, railint->prevInterval(), tm_dep, false, period_hours);
 			if (ret.status == RecurseStatus::Ok) return ret;
 		}
 
@@ -771,10 +771,10 @@ typename GreedyPainter::RecurseReport
 		// 下面：后站需要停车的情况。注意根据递归基本约定，
 		// 此时后站尚未入栈
 		//int_secs += node->stop; // 2022.03.19：现在不用再加，因为前面加过了
-		tm_dep = ev_arrive.time.addSecs(-int_secs);
+		tm_dep = ev_arrive.time.addSecs(-int_secs, period_hours);
 		ev_depart.time = tm_dep;
 		ev_depart.type = TrainEventType::Depart;
-		to_conf = ax_to.conflictEvent(ev_depart, _constraints, railint->isSingleRail());
+		to_conf = ax_to.conflictEvent(ev_depart, _constraints, railint->isSingleRail(), period_hours);
 
 		// 只要尝试过一次原时刻停车了，不论结果如何，下一轮都优先考虑通过
 		to_try_stop = false;
@@ -786,14 +786,14 @@ typename GreedyPainter::RecurseReport
 				CalculationLogAbstract::Depart
 				));
 			_train->prependStation(st_to->name, tm_dep, tm_dep, false);
-			auto ret = calBackward(st_to, railint->prevInterval(), tm_dep, true);
+			auto ret = calBackward(st_to, railint->prevInterval(), tm_dep, true, period_hours);
 			if (ret.status == RecurseStatus::Ok) {
 				return ret;
 			}
 			else if (ret.status == RecurseStatus::FixedStation) {
 				if (!fixed_from) {
 					tot_delay += ret.delay_seconds_hint;
-					ev_arrive.time = ev_arrive.time.addSecs(-ret.delay_seconds_hint);
+					ev_arrive.time = ev_arrive.time.addSecs(-ret.delay_seconds_hint, period_hours);
 					to_try_stop = false;
 				}
 				else {
@@ -821,7 +821,7 @@ typename GreedyPainter::RecurseReport
 			TrainGap::GapTypesV2 type;
 			if (qeutil::timeCompare(to_conf->time, tm_dep)) {
 				// 反向左冲突事件，设置出发时间使得到达时间为冲突时刻的时间
-				auto tm_trial = to_conf->time.addSecs(int_secs);
+				auto tm_trial = to_conf->time.addSecs(int_secs, period_hours);
 				int delay_secs = qeutil::secsTo(tm_trial, ev_arrive.time);
 				if (fixed_from) {
 					BACK_FIXED_POP_AND_RETURN
@@ -836,8 +836,8 @@ typename GreedyPainter::RecurseReport
 				// 反向右冲突事件，将时刻弄到与当前不冲突的地方
 				type = *TrainGap::gapTypeBetween(ev_depart, *to_conf, railint->isSingleRail());
 				int gap_min = _constraints.maxConstraint(type);  
-				QTime trial_dep = to_conf->time.addSecs(-gap_min);
-				QTime trial_arr = trial_dep.addSecs(int_secs);
+				TrainTime trial_dep = to_conf->time.addSecs(-gap_min, period_hours);
+				TrainTime trial_arr = trial_dep.addSecs(int_secs, period_hours);
 				int delay_secs = qeutil::secsTo(trial_arr, ev_arrive.time);
 				if (fixed_from) {
 					BACK_FIXED_POP_AND_RETURN

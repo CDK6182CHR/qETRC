@@ -100,7 +100,7 @@ bool TrainLine::endAtThis() const
     return !isNull() && train()->isTerminalStation(_stations.back().trainStation->name);
 }
 
-LineEventList TrainLine::listLineEvents(const TrainCollection& coll) const
+LineEventList TrainLine::listLineEvents(const TrainCollection& coll, int period_hours) const
 {
     LineEventList res;
     res.reserve(static_cast<int>(_stations.size()));
@@ -109,7 +109,7 @@ LineEventList TrainLine::listLineEvents(const TrainCollection& coll) const
     }
 
     //车站到开时刻
-    listStationEvents(res);
+    listStationEvents(res, period_hours);
 
     //与其他列车的互作用
     for (auto t : coll.trains()) {
@@ -119,10 +119,10 @@ LineEventList TrainLine::listLineEvents(const TrainCollection& coll) const
             if (_adapter.isInSameRailway(*adp)) {
                 for (auto line : adp->lines()) {
                     if (line->dir() == dir()) {
-                        eventsWithSameDir(res, *line, *t);
+                        eventsWithSameDir(res, *line, *t, period_hours);
                     }
                     else {
-                        eventsWithCounter(res, *line, *t);
+                        eventsWithCounter(res, *line, *t, period_hours);
                     }
                 }
             }
@@ -144,12 +144,12 @@ DiagnosisList TrainLine::diagnoseLine(const TrainCollection& coll, bool withIntM
                 if (_adapter.isInSameRailway(*adp)) {
                     foreach(auto line, adp->lines()) {
                         if (line->dir() == dir()) {
-                            diagnoWithSameDir(res, *line, *t);
+                            diagnoWithSameDir(res, *line, *t, period_hour);
                         }
                         else if (true) {
                             // 2022.09.11: 暂时忽略withIntMeet参数。
                             // 但这可能是个可以优化的点，留着以后看。
-                            diagnoWithCounter(res, *line, *t);
+                            diagnoWithCounter(res, *line, *t, period_hour);
                         }
                     }
                 }
@@ -163,9 +163,9 @@ int TrainLine::totalSecs() const
 {
     if (isNull())
         return 0;
-    const QTime& first = startLabel() ? _stations.front().trainStation->arrive :
+    const TrainTime& first = startLabel() ? _stations.front().trainStation->arrive :
         _stations.front().trainStation->depart;
-    const QTime& last = _stations.back().trainStation->depart;
+    const TrainTime& last = _stations.back().trainStation->depart;
     int secs = first.secsTo(last);
     if (secs <= 0)
         secs += 24 * 3600;
@@ -357,14 +357,14 @@ void TrainLine::diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr
         }
         else {
             double scale = ds / dy;
-            QTime tm_prev = tprev->depart;
+            TrainTime tm_prev = tprev->depart;
             auto p = rprev->dirNextInterval(dir());
             for (;
                 p; p = p->nextInterval()) {
                 auto ri = p->toStation();
                 double dyi = ri->y_coeff.value() - rprev->y_coeff.value();
                 int dsi = dyi * scale;
-                QTime tm = tprev->depart.addSecs(dsi, period_hours);
+                TrainTime tm = tprev->depart.addSecs(dsi, period_hours);
 
                 diagnoForbid(res, p, tm_prev, tm, period_hours);
 
@@ -404,7 +404,7 @@ void TrainLine::diagnoForbid(DiagnosisList& res, std::shared_ptr<const RailInter
                     out, railint->toStation()->mile,
                     QObject::tr("与天窗[%1]冲突，"
                         "天窗时间是[%2-%3]，区间运行时间（可能包含推定）是[%4-%5]。")
-                    .arg(f->name(), n->beginTime.toString("hh:mm"), n->endTime.toString("hh:mm"),
+                    .arg(f->name(), n->beginTime.toString(TrainTime::HM), n->endTime.toString(TrainTime::HM),
                         in.toString(TrainTime::HMS), out.toString(TrainTime::HMS))));
             }
         }
@@ -445,7 +445,7 @@ void TrainLine::detectPassStations(LineEventList& res, int index, ConstAdaPtr it
     }
 }
 
-std::list<TrainStation> TrainLine::detectPassStationTimes(ConstAdaPtr itr) const
+std::list<TrainStation> TrainLine::detectPassStationTimes(ConstAdaPtr itr, int period_hours) const
 {
     std::list<TrainStation> res;
     ConstAdaPtr right = std::next(itr); 
@@ -473,14 +473,14 @@ std::list<TrainStation> TrainLine::detectPassStationTimes(ConstAdaPtr itr) const
         double rate = (yi - y0) / dy;
         double dsif = ds * rate;
         int dsi = int(std::round(dsif));
-        const auto& tm = ts0->depart.addSecs(dsi);
+        const auto& tm = ts0->depart.addSecs(dsi, period_hours);
         res.emplace_back(rsi->name, tm, tm, false, "", QObject::tr("推定"));
     }
     return res;
 }
 
 void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another, 
-    const Train& antrain) const
+    const Train& antrain, int period_hours) const
 {
     //注意：间隔12小时的站内事件判定可能会有问题！可能要先判定交集
     if (std::max(yMin(), another.yMin()) >= std::min(yMax(), another.yMax())) {
@@ -506,7 +506,7 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
         //}
         //先判定上一个区间有没有发生什么事情。注意此时两个都必定是直线段
         if (pme != mylast && phe != hislast) {
-            auto pint = findIntervalIntersectionSameDir(mylast, pme, hislast, phe);
+            auto pint = findIntervalIntersectionSameDir(mylast, pme, hislast, phe, period_hours);
             if (pint.has_value()) {
                 addIntervalEvent(res, index - 1, std::get<2>(pint.value()), std::get<1>(pint.value()),
                     *mylast, *pme, std::cref(antrain), std::get<0>(pint.value()),
@@ -520,9 +520,9 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
         //麻烦在：可能出现一趟车站内停车，另一趟车通过但这里没有停点的情况
         if (ycond == 0 && (index!=0||startLabel())) {
             //本站时刻表是重合的，那很简单，跟第一站写的那个一样
-            if (tme->stopRangeIntersected(*the)) {
-                int xlast = xComp(tme->arrive, the->arrive);
-                int xcond = xComp(tme->depart, the->depart);
+            if (tme->stopRangeIntersected(*the, period_hours)) {
+                int xlast = xComp(tme->arrive, the->arrive, period_hours);
+                int xcond = xComp(tme->depart, the->depart, period_hours);
                 if (xcond == xlast) {
                     //到开比较情况一致，只有重合需要说明一下
                     if (xcond == 0) {
@@ -562,8 +562,8 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
                 (ycond < 0 && dir() == Direction::Up)) {
                 //本次列车领先，推定出在前面那个站有无交叉
                 if (pme != _stations.begin()) {
-                    int passedTime = getPreviousPassedTime(pme, rhe);
-                    if (the->timeInStoppedRange(passedTime)&&
+                    int passedTime = getPreviousPassedTime(pme, rhe, period_hours);
+                    if (the->timeInStoppedRange(passedTime, period_hours)&&
                         !another.isStartingOrTerminal(phe)) {
                         //本次列车在上一站踩了它  改成站内事件
                         //res[index - 1].emplace(IntervalEvent(
@@ -574,7 +574,7 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
                         //));
                         res[index - 1].emplace(StationEvent(
                             TrainEventType::OverTaking,
-                            QTime::fromMSecsSinceStartOfDay(passedTime),
+                            TrainTime::fromSecondsSinceStart(passedTime),
                             rhe, std::cref(antrain), QObject::tr("推定")
                         ));
                         //qDebug() << ycond;
@@ -588,11 +588,11 @@ void TrainLine::eventsWithSameDir(LineEventList& res, const TrainLine& another,
             else if (!isStartingOrTerminal(pme)) {
                 //本次列车落后，推定对方在本次列车这个站
                 if (phe != another._stations.begin() && (index != 0 || startLabel())) {
-                    int passedTime = getPreviousPassedTime(phe, rme);
-                    if (tme->timeInStoppedRange(passedTime)) {
+                    int passedTime = getPreviousPassedTime(phe, rme, period_hours);
+                    if (tme->timeInStoppedRange(passedTime, period_hours)) {
                         //本次列车在本站被踩
                         res[index].emplace(StationEvent(
-                            TrainEventType::Avoid, QTime::fromMSecsSinceStartOfDay(passedTime),
+                            TrainEventType::Avoid, TrainTime::fromSecondsSinceStart(passedTime),
                             rme, std::cref(antrain), QObject::tr("推定")
                         ));
                     }
@@ -615,7 +615,7 @@ qDebug() << "INTERVAL: [" << mylast->trainStation->name << " - "\
 << " - " << phe->trainStation->name << "] @ " << antrain.trainName().full();\
 }while(false)
 
-void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, const Train& antrain) const
+void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, const Train& antrain, int period_hours) const
 {
     //!!注意counter的xcond意义和同向的不同
     if (std::max(yMin(), another.yMin()) >= std::min(yMax(), another.yMax())) {
@@ -645,7 +645,7 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
 
         //先判定上一个区间有没有发生什么事情。注意此时两个都必定是直线段
         if (pme != _stations.begin() && phe != another._stations.rbegin()) {
-            auto pint = findIntervalIntersectionCounter(mylast, pme, hislast, phe);
+            auto pint = findIntervalIntersectionCounter(mylast, pme, hislast, phe, period_hours);
             if (pint.has_value()) {
                 addIntervalEvent(res, index - 1, std::get<2>(pint.value()), std::get<1>(pint.value()),
                     *mylast, *pme, std::cref(antrain), std::get<0>(pint.value()));
@@ -658,7 +658,7 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
         //麻烦在：可能出现一趟车站内停车，另一趟车通过但这里没有停点的情况
         if (ycond == 0 && (index != 0 || startLabel())) {
             //本站时刻表是重合的，那很简单，跟第一站写的那个一样
-            int xcond = xComp(tme->arrive, the->arrive);
+            int xcond = xComp(tme->arrive, the->arrive, period_hours);
 
             if (xcond == 0) {
                 //同时到站，直接判定会车
@@ -669,7 +669,7 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
             }
             else if (xcond < 0) {
                 //他来的时候我还没走，发生会车
-                if (xComp(the->arrive, tme->depart) <= 0) {
+                if (xComp(the->arrive, tme->depart, period_hours) <= 0) {
                     //会车时刻：他到达的时刻
                     res[index].emplace(StationEvent(
                         TrainEventType::Meet, the->arrive, pme->railStation, std::cref(antrain)
@@ -678,7 +678,7 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
             }
             else {  //xcond > 0
                 //我到的时候他还没走
-                if (xComp(tme->arrive, the->depart) <= 0) {
+                if (xComp(tme->arrive, the->depart, period_hours) <= 0) {
                     //会车时刻：我到达的时刻
                     res[index].emplace(StationEvent(
                         TrainEventType::Meet, tme->arrive, pme->railStation, std::cref(antrain)
@@ -693,8 +693,8 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
                 //注意单向站。判断一下对方那个站是不是本次列车方向也经过的
                 if (rhe->isDirectionVia(dir())) {
                     if (pme!=_stations.begin()) {
-                        int passedTime = getPreviousPassedTime(pme, rhe);
-                        if (the->timeInStoppedRange(passedTime)) {
+                        int passedTime = getPreviousPassedTime(pme, rhe, period_hours);
+                        if (the->timeInStoppedRange(passedTime, period_hours)) {
                             //新增ycond!=ylast条件，保证这个区间内前后关系变了
                             //本次列车在上一站踩了它
                             //res[index - 1].emplace(IntervalEvent(
@@ -705,7 +705,7 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
                             //));
                             res[index - 1].emplace(StationEvent(
                                 TrainEventType::Meet,
-                                QTime::fromMSecsSinceStartOfDay(passedTime),
+                                TrainTime::fromSecondsSinceStart(passedTime),
                                 rhe, std::cref(antrain), QObject::tr("推定")
                             ));
                         }
@@ -726,11 +726,11 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
                 //本次列车落后，推定对方在本次列车这个站
                 if (rme->isDirectionVia(another.dir())&& (index != 0 || startLabel())) {
                     if (phe != another._stations.rbegin()) {
-                        int passedTime = getPreviousPassedTime(phe, rme);
-                        if (tme->timeInStoppedRange(passedTime)) {
+                        int passedTime = getPreviousPassedTime(phe, rme, period_hours);
+                        if (tme->timeInStoppedRange(passedTime, period_hours)) {
                             //本次列车在本站被踩
                             res[index].emplace(StationEvent(
-                                TrainEventType::Meet, QTime::fromMSecsSinceStartOfDay(passedTime),
+                                TrainEventType::Meet, TrainTime::fromSecondsSinceStart(passedTime),
                                 rme, std::cref(antrain), QObject::tr("推定")
                             ));
                         }
@@ -749,7 +749,7 @@ void TrainLine::eventsWithCounter(LineEventList& res, const TrainLine& another, 
     }
 }
 
-void TrainLine::diagnoWithSameDir(DiagnosisList& res, const TrainLine& another, const Train& antrain) const
+void TrainLine::diagnoWithSameDir(DiagnosisList& res, const TrainLine& another, const Train& antrain, int period_hours) const
 {
     if (std::max(yMin(), another.yMin()) >= std::min(yMax(), another.yMax())) {
         //提前终止条件，y范围根本不相交，不用搞
@@ -764,7 +764,7 @@ void TrainLine::diagnoWithSameDir(DiagnosisList& res, const TrainLine& another, 
         int ycond = yComp(pme, phe);
         //先判定上一个区间有没有发生什么事情。注意此时两个都必定是直线段
         if (pme != mylast && phe != hislast) {
-            auto pint = findIntervalIntersectionSameDir(mylast, pme, hislast, phe);
+            auto pint = findIntervalIntersectionSameDir(mylast, pme, hislast, phe, period_hours);
             if (pint.has_value()) {
                 //区间越行  
                 auto pos = compressSnapInterval(mylast, pme, std::get<0>(*pint));
@@ -773,7 +773,7 @@ void TrainLine::diagnoWithSameDir(DiagnosisList& res, const TrainLine& another, 
                     std::get<1>(*pint), std::get<0>(*pint),
                     QObject::tr("在里程[%1]，时刻"
                         "[%2]与车次[%3]发生[%4]").arg(std::get<0>(*pint)).arg(
-                            std::get<1>(*pint).toString("hh:mm:ss"),
+                            std::get<1>(*pint).toString(TrainTime::HMS),
                             antrain.trainName().full(),
                             qeutil::eventTypeString(std::get<2>(*pint)))));
             }
@@ -793,7 +793,7 @@ void TrainLine::diagnoWithSameDir(DiagnosisList& res, const TrainLine& another, 
     }
 }
 
-void TrainLine::diagnoWithCounter(DiagnosisList& res, const TrainLine& another, const Train& antrain) const
+void TrainLine::diagnoWithCounter(DiagnosisList& res, const TrainLine& another, const Train& antrain, int period_hours) const
 {
     //!!注意counter的xcond意义和同向的不同
     if (std::max(yMin(), another.yMin()) >= std::min(yMax(), another.yMax())) {
@@ -814,7 +814,7 @@ void TrainLine::diagnoWithCounter(DiagnosisList& res, const TrainLine& another, 
 
         //先判定上一个区间有没有发生什么事情。注意此时两个都必定是直线段
         if (pme != _stations.begin() && phe != another._stations.rbegin()) {
-            auto pint = findIntervalIntersectionCounter(mylast, pme, hislast, phe);
+            auto pint = findIntervalIntersectionCounter(mylast, pme, hislast, phe, period_hours);
             // 区间会车
             if (pint.has_value()) {
                 auto pos = compressSnapInterval(mylast, pme, std::get<0>(*pint));
@@ -826,7 +826,7 @@ void TrainLine::diagnoWithCounter(DiagnosisList& res, const TrainLine& another, 
                             pos, shared_from_this(), std::get<1>(*pint), std::get<0>(*pint),
                             QObject::tr("在单线区间[%5] 里程标[%1]，时刻[%2]与"
                                 "车次[%3]发生[%4]事件").arg(std::get<0>(*pint))
-                            .arg(std::get<1>(*pint).toString("hh:mm:ss"), antrain.trainName().full(),
+                            .arg(std::get<1>(*pint).toString(TrainTime::HMS), antrain.trainName().full(),
                                 qeutil::eventTypeString(std::get<2>(*pint)),railint->toString())
                         ));
                     }
@@ -869,57 +869,58 @@ double TrainLine::yMax() const
 }
 
 
-int TrainLine::xComp(const QTime& tm1, const QTime& tm2) const
+int TrainLine::xComp(const TrainTime& tm1, const TrainTime& tm2, int period_hours) const
 {
-    int x1 = tm1.msecsSinceStartOfDay(), x2 = tm2.msecsSinceStartOfDay();
+    int x1 = tm1.secondsSinceStart(), x2 = tm2.secondsSinceStart();
     int res = 0;
     if (x1 < x2)
         res = -1;
     else if (x1 > x2)
         res = +1;
     //PBC条件：选择两者之间间隔较小的结果
-    if (std::abs(x1 - x2) > 24 * 3600 * 1000 / 2) {
+    if (std::abs(x1 - x2) > period_hours * 3600 / 2) {
         return -res;
     }
     return res;
 }
 
-int TrainLine::getPreviousPassedTime(ConstAdaPtr st, std::shared_ptr<RailStation> target) const
+int TrainLine::getPreviousPassedTime(ConstAdaPtr st, std::shared_ptr<RailStation> target, int period_hours) const
 {
-    static constexpr int msecsOfADay = 24 * 3600 * 1000;
+    int periodSecs = period_hours * 3600;
     auto prev = std::prev(st);
     double y0 = prev->railStation.lock()->y_coeff.value();
     double yn = st->railStation.lock()->y_coeff.value();
     double yi = target->y_coeff.value();
 
-    int x0 = prev->trainStation->depart.msecsSinceStartOfDay();
-    int xn = st->trainStation->arrive.msecsSinceStartOfDay();
+    int x0 = prev->trainStation->depart.secondsSinceStart();
+    int xn = st->trainStation->arrive.secondsSinceStart();
 
-    if (xn < x0) xn += msecsOfADay;
-    return int(std::round((yi - y0) / (yn - y0) * (xn - x0) + x0)) % msecsOfADay;
+    if (xn < x0) xn += periodSecs;
+    return int(std::round((yi - y0) / (yn - y0) * (xn - x0) + x0)) % periodSecs;
 }
 
 int TrainLine::getPreviousPassedTime(std::deque<AdapterStation>::const_reverse_iterator st,
-    std::shared_ptr<RailStation> target) const
+    std::shared_ptr<RailStation> target, int period_hours) const
 {
-    static constexpr int msecsOfADay = 24 * 3600 * 1000;
+    int periodSecs = period_hours * 3600;
     auto prev = std::prev(st);
     double y0 = prev->railStation.lock()->y_coeff.value();
     double yn = st->railStation.lock()->y_coeff.value();
     double yi = target->y_coeff.value();
 
-    int x0 = prev->trainStation->arrive.msecsSinceStartOfDay();
-    int xn = st->trainStation->depart.msecsSinceStartOfDay();
+    int x0 = prev->trainStation->arrive.secondsSinceStart();
+    int xn = st->trainStation->depart.secondsSinceStart();
 
-    if (x0 < xn) x0 += msecsOfADay;    //反迭代器，应该保证 x0 >= xn !
-    return int(std::round((yi - y0) / (yn - y0) * (xn - x0) + x0)) % msecsOfADay;
+    if (x0 < xn) x0 += periodSecs;    //反迭代器，应该保证 x0 >= xn !
+    return int(std::round((yi - y0) / (yn - y0) * (xn - x0) + x0)) % periodSecs;
 }
 
 
-std::optional<std::tuple<double, QTime, TrainEventType>>
+std::optional<std::tuple<double, TrainTime, TrainEventType>>
     TrainLine::findIntervalIntersectionSameDir(ConstAdaPtr mylast, ConstAdaPtr mythis, 
-        ConstAdaPtr hislast, ConstAdaPtr histhis) const
+        ConstAdaPtr hislast, ConstAdaPtr histhis, int period_hours) const
 {
+    int periodSecs = period_hours * 3600;
     auto rm1 = mylast->railStation.lock(), rm2 = mythis->railStation.lock();
     auto rh1 = hislast->railStation.lock(), rh2 = histhis->railStation.lock();
 
@@ -928,16 +929,14 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
     double yh1 = rh1->y_coeff.value(), yh2 = rh2->y_coeff.value();
 
     //x值，按照msecs表示
-    double xm1 = mylast->trainStation->depart.msecsSinceStartOfDay(),
-        xm2 = mythis->trainStation->arrive.msecsSinceStartOfDay();
-    double xh1 = hislast->trainStation->depart.msecsSinceStartOfDay(),
-        xh2 = histhis->trainStation->arrive.msecsSinceStartOfDay();
-
-    static constexpr int msecsOfADay = 24 * 3600 * 1000;
+    double xm1 = mylast->trainStation->depart.secondsSinceStart(),
+        xm2 = mythis->trainStation->arrive.secondsSinceStart();
+    double xh1 = hislast->trainStation->depart.secondsSinceStart(),
+        xh2 = histhis->trainStation->arrive.secondsSinceStart();
 
     //x的表示：如果后一个时刻小于前一个时刻，加上一天。
-    if (xm2 < xm1)xm2 += msecsOfADay;
-    if (xh2 < xh1)xh2 += msecsOfADay;
+    if (xm2 < xm1)xm2 += periodSecs;
+    if (xh2 < xh1)xh2 += periodSecs;
 
     //剪枝：首先判定x坐标不交叉条件，直接再见
     if (std::max(xm1, xh1) > std::min(xm2, xh2)) {
@@ -983,7 +982,7 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
                 tm_msec = xh1;
                 mile = rh1->mile;
             }
-            return std::make_tuple(mile, QTime::fromMSecsSinceStartOfDay(tm_msec % msecsOfADay),
+            return std::make_tuple(mile, TrainTime::fromSecondsSinceStart(tm_msec % periodSecs),
                 TrainEventType::Coincidence);
         }
         else {
@@ -1021,7 +1020,7 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
         else {
             mile = (rm2->mile - rm1->mile) * (yinter - ym1) / (ym2 - ym1) + rm1->mile;
         }
-        QTime&& tm = QTime::fromMSecsSinceStartOfDay(int(round(xinter)) % msecsOfADay);
+        TrainTime&& tm = TrainTime::fromSecondsSinceStart(int(round(xinter)) % periodSecs);
         if (b1 == 0 || std::abs((ym2 - ym1) / (xm2 - xm1)) >
             std::abs((yh2 - yh1) / (xh2 - xh1))) {
             //本次列车的斜率绝对值比对方来的大，是越行
@@ -1036,10 +1035,10 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
         return std::nullopt;
 }
 
-std::optional<std::tuple<double, QTime, TrainEventType>> 
+std::optional<std::tuple<double, TrainTime, TrainEventType>> 
     TrainLine::findIntervalIntersectionCounter(ConstAdaPtr mylast, ConstAdaPtr mythis, 
         std::deque<AdapterStation>::const_reverse_iterator hislast, 
-        std::deque<AdapterStation>::const_reverse_iterator histhis) const
+        std::deque<AdapterStation>::const_reverse_iterator histhis, int period_hours) const
 {
     auto rm1 = mylast->railStation.lock(), rm2 = mythis->railStation.lock();
     auto rh1 = hislast->railStation.lock(), rh2 = histhis->railStation.lock();
@@ -1049,21 +1048,21 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
     double yh1 = rh1->y_coeff.value(), yh2 = rh2->y_coeff.value();
 
     //x值，按照msecs表示
-    double xm1 = mylast->trainStation->depart.msecsSinceStartOfDay(),
-        xm2 = mythis->trainStation->arrive.msecsSinceStartOfDay();
+    double xm1 = mylast->trainStation->depart.secondsSinceStart(),
+        xm2 = mythis->trainStation->arrive.secondsSinceStart();
     //注意：对向车用的是反迭代器！
-    double xh1 = hislast->trainStation->arrive.msecsSinceStartOfDay(),
-        xh2 = histhis->trainStation->depart.msecsSinceStartOfDay();
+    double xh1 = hislast->trainStation->arrive.secondsSinceStart(),
+        xh2 = histhis->trainStation->depart.secondsSinceStart();
 
-    static constexpr int msecsOfADay = 24 * 3600 * 1000;
+    int periodSecs = period_hours * 3600;
 
     //x的表示：如果后一个时刻小于前一个时刻，加上一天。
     if (xm2 < xm1) {
-        xm2 += msecsOfADay;
+        xm2 += periodSecs;
     }
         
     if (xh1 < xh2) {
-        xh1 += msecsOfADay;
+        xh1 += periodSecs;
     }
 
     //以下有：xh1 >= xh2
@@ -1117,7 +1116,7 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
                 tm_msec = xh1;
                 mile = rh1->mile;
             }
-            return std::make_tuple(mile, QTime::fromMSecsSinceStartOfDay(tm_msec % msecsOfADay),
+            return std::make_tuple(mile, TrainTime::fromSecondsSinceStart(tm_msec % periodSecs),
                 TrainEventType::Coincidence);
         }
         else {
@@ -1154,7 +1153,7 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
         else {
             mile = (rm2->mile - rm1->mile) * (yinter - ym1) / (ym2 - ym1) + rm1->mile;
         }
-        QTime&& tm = QTime::fromMSecsSinceStartOfDay(int(round(xinter)) % msecsOfADay);
+        TrainTime&& tm = TrainTime::fromSecondsSinceStart(int(round(xinter)) % periodSecs);
         return std::make_tuple(mile, tm, TrainEventType::Meet);
     }
     else
@@ -1162,7 +1161,7 @@ std::optional<std::tuple<double, QTime, TrainEventType>>
 }
 
 void TrainLine::addIntervalEvent(LineEventList& res, int index, TrainEventType type,
-    const QTime& time, const AdapterStation& former, 
+    const TrainTime& time, const AdapterStation& former, 
     const AdapterStation& latter, 
     std::reference_wrapper<const Train> another, double mile, const QString& note) const
 {
@@ -1230,12 +1229,12 @@ SnapEvent::pos_t
     }
 }
 
-double TrainLine::snapEventMile(ConstAdaPtr former, ConstAdaPtr latter, const QTime& time) const
+double TrainLine::snapEventMile(ConstAdaPtr former, ConstAdaPtr latter, const TrainTime& time) const
 {
     auto rfor = former->railStation.lock(), rlat = latter->railStation.lock();
 
     //先算出里程
-    const QTime& t0 = former->trainStation->depart, tn = latter->trainStation->arrive;
+    const TrainTime& t0 = former->trainStation->depart, &tn = latter->trainStation->arrive;
     double mile0 = rfor->mile, milen = rlat->mile;
     int ds = qeutil::secsTo(t0, tn);
     return mile0 +
@@ -1461,7 +1460,7 @@ const AdapterStation* TrainLine::stationByTrainLinear(Train::ConstStationPtr st)
 }
 
 RailStationEventList
-    TrainLine::stationEventFromRail(std::shared_ptr<const RailStation> rail) const
+    TrainLine::stationEventFromRail(std::shared_ptr<const RailStation> rail, int period_hours) const
 {
     if (isNull())return {};
     auto last = std::prev(_stations.end());
@@ -1525,14 +1524,14 @@ RailStationEventList
         if (!std::isnan(dsif) && !std::isinf(dsif)) {
             int dsi = int(std::round(dsif));
             return { std::make_shared<RailStationEvent>(TrainEventType::CalculatedPass,
-                p0->trainStation->depart.addSecs(dsi), rail, shared_from_this(),
+                p0->trainStation->depart.addSecs(dsi, period_hours), rail, shared_from_this(),
                 RailStationEvent::Both, QObject::tr("推算")) };
         }
     }
     return {};
 }
 
-std::optional<QTime> TrainLine::sectionTime(double y) const
+std::optional<TrainTime> TrainLine::sectionTime(double y, int period_hours) const
 {
     auto p = stationFromYCoeff(y);
     if (p == _stations.end())
@@ -1553,12 +1552,12 @@ std::optional<QTime> TrainLine::sectionTime(double y) const
         // 2025.01.14: we should consider PBC!
         int dsn = qeutil::secsTo(q->trainStation->depart, p->trainStation->arrive);
         int dsi = std::round((y - y0) / (yn - y0) * dsn);
-        return q->trainStation->depart.addSecs(dsi);
+        return q->trainStation->depart.addSecs(dsi, period_hours);
     }
     return std::nullopt;
 }
 
-SnapEventList TrainLine::getSnapEvents(const QTime& time) const
+SnapEventList TrainLine::getSnapEvents(const TrainTime& time, int period_hours) const
 {
     SnapEventList res;
     auto pr = _stations.begin();  //上一站迭代器
@@ -1576,7 +1575,7 @@ SnapEventList TrainLine::getSnapEvents(const QTime& time) const
                     QObject::tr("推算") : ""));
             }
         }
-        if (p->trainStation->timeInStoppedRange(time.msecsSinceStartOfDay())) {
+        if (p->trainStation->timeInStoppedRange(time.secondsSinceStart(), period_hours)) {
             //恰好在站内
             res.append(SnapEvent(shared_from_this(), p->railStation.lock()->mile,
                 p->railStation.lock(), p->trainStation->isStopped()));
@@ -1595,7 +1594,7 @@ static int round_secs(int secs, int prec)
 }
 
 void TrainLine::timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool toBegin,
-    bool toEnd, int precision)
+    bool toEnd, int precision, int period_hours)
 {
     if (isNull())return;
 
@@ -1615,13 +1614,13 @@ void TrainLine::timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool t
                 continue;
             }
             // 现在区间标尺一定有效
-            QTime startTime = pr->trainStation->depart;
+            TrainTime startTime = pr->trainStation->depart;
             int std_start = rpr->dirNextInterval(dir())->getRulerNode(*ruler)->start;
             int std_stop = rp->dirPrevInterval(dir())->getRulerNode(*ruler)->stop;
             int real_pass = secs;
             if (isStartingStation(pr) || pr->trainStation->isStopped()) {
                 real_pass -= std_start;
-                startTime = startTime.addSecs(std_start);
+                startTime = startTime.addSecs(std_start, period_hours);
             }
             if (isTerminalStation(p) || p->trainStation->isStopped())
                 real_pass -= std_stop;
@@ -1639,7 +1638,7 @@ void TrainLine::timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool t
             while ((to_deter = itr->railStation.lock()->dirAdjacent(dir())) != rp) {
                 accum_std_secs += to_deter->dirPrevInterval(dir())
                     ->getRulerNode(*ruler)->interval;
-                QTime tm = startTime.addSecs(int(round_secs(accum_std_secs * rate,precision)));
+                TrainTime tm = startTime.addSecs(int(round_secs(accum_std_secs * rate,precision)), period_hours);
                 // 插入时刻表车站
                 auto train_itr = train()->timetable().emplace(std::next(itr->trainStation),
                     to_deter->name, tm, tm, false, "", QObject::tr("推定"));
@@ -1653,7 +1652,7 @@ void TrainLine::timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool t
         // 向前做外插操作，注意需要截止于（可能出现的）始发站
         auto to_deter=_stations.begin()
             ->railStation.lock()->dirPrevAdjacent(dir());
-        QTime refTime = _stations.begin()->trainStation->arrive;
+        TrainTime refTime = _stations.begin()->trainStation->arrive;
         int acc_std_secs = 0;   // 保存正数，方便修约
         while (to_deter) {
             auto node = to_deter->dirNextInterval(dir())->getRulerNode(*ruler);
@@ -1665,7 +1664,7 @@ void TrainLine::timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool t
             bool is_starting = train()->isStartingStation(to_deter->name);
             if (is_starting)
                 acc_std_secs += node->start;
-            QTime tm = refTime.addSecs(-round_secs(acc_std_secs, precision));
+            TrainTime tm = refTime.addSecs(-round_secs(acc_std_secs, precision), period_hours);
             auto train_itr=train()->timetable().emplace(_stations.begin()->trainStation,
                 to_deter->name, tm, tm, is_starting, "", QObject::tr("推定"));
             _stations.emplace_front(train_itr, to_deter);
@@ -1677,7 +1676,7 @@ void TrainLine::timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool t
         // 向后做外插
         // last迭代器要始终保持有效
         auto to_deter = last->railStation.lock()->dirAdjacent(dir());
-        QTime refTime = last->trainStation->depart;
+        TrainTime refTime = last->trainStation->depart;
         int acc_std_secs = 0;
         while (to_deter) {
             auto node = to_deter->dirPrevInterval(dir())->getRulerNode(*ruler);
@@ -1689,7 +1688,7 @@ void TrainLine::timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool t
             if (is_terminal) {
                 acc_std_secs += node->stop;
             }
-            QTime tm = refTime.addSecs(round_secs(acc_std_secs, precision));
+            TrainTime tm = refTime.addSecs(round_secs(acc_std_secs, precision), period_hours);
             auto train_itr = train()->timetable().emplace(
                 std::next(last->trainStation), to_deter->name,
                 tm, tm, is_terminal, "", QObject::tr("推定"));
@@ -1701,11 +1700,11 @@ void TrainLine::timetaleInterpolation(std::shared_ptr<const Ruler> ruler, bool t
     }
 }
 
-int TrainLine::timetableInterpolationSimple()
+int TrainLine::timetableInterpolationSimple(int period_hours)
 {
     int count = 0;
     for (auto itr = _stations.begin(); itr != _stations.end(); ++itr) {
-        auto stations = detectPassStationTimes(itr);
+        auto stations = detectPassStationTimes(itr, period_hours);
         if (stations.empty())continue;
         count += stations.size();
         // 现在std::next(itr)肯定存在

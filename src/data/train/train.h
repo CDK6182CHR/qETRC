@@ -318,14 +318,14 @@ public:
     /**
      * Train.translation()  使用给定车次平移
      */
-    Train translation(TrainName name, int sec);
+    Train translation(TrainName name, int sec, int period_hours);
 
     /**
      * pyETRC.Train.setStationDeltaTime()
      * 调整指定范围车站的时刻表，前移或后移指定的秒数。
      */
     void adjustTimetable(int startIndex, int endIndex,
-        bool includeFirst, bool includeLast, int secs);
+        bool includeFirst, bool includeLast, int secs, int period_hours);
 
     /**
      * Train.delNonLocal()

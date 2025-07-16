@@ -36,7 +36,7 @@ public:
     IntervalConflictReport
         intervalConflicted(
             std::shared_ptr<const RailStation> from, std::shared_ptr<const RailStation> to, Direction dir,
-            const QTime& tm_start, int secs, bool singleLine, bool backward)const;
+            const TrainTime& tm_start, int secs, bool singleLine, bool backward, int period_hours)const;
 
 private:
 
@@ -54,7 +54,7 @@ private:
      * 表明搜索已经超过必要范围，可以停止
      */
     std::pair<std::shared_ptr<RailStationEvent>, bool>
-        isConflictedWith(const QTime& tm_start, const QTime& tm_to, Direction dir, 
+        isConflictedWith(const TrainTime& tm_start, const TrainTime& tm_to, Direction dir, 
             std::shared_ptr<RailStationEvent> ev_ex_start, const StationEventAxis& axis_to, bool singleLine)const;
 };
 

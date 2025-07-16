@@ -31,9 +31,9 @@ bool StationEvent::operator<(const StationEvent& rhs) const
 QString StationEvent::toString() const
 {
 	auto st = station.lock();
-	auto s = QString::asprintf("%.3lf km. ", st->mile);
-	s += time.toString(" hh:mm:ss ");
-	s += QString(" [") + st->name.toSingleLiteral() + QString("] 站 ");
+	auto s = QString::asprintf("%.3lf km.  ", st->mile);
+	s += time.toString(TrainTime::HMS);
+	s += QString("  [") + st->name.toSingleLiteral() + QString("] 站 ");
 	switch (type) {
 	case TrainEventType::Arrive: return s + "到达";
 	case TrainEventType::Depart:return s + "发车";
@@ -61,9 +61,9 @@ bool IntervalEvent::operator<(const IntervalEvent& rhs) const
 
 QString IntervalEvent::toString() const
 {
-	auto s = QString::asprintf("%.3lf km. ", mile);
-	s += time.toString(" hh:mm:ss ");
-	s += QString(" [") + former->name.toSingleLiteral() + " - "
+	auto s = QString::asprintf("%.3lf km.  ", mile);
+	s += time.toString(TrainTime::HMS);
+	s += QString("  [") + former->name.toSingleLiteral() + " - "
 		+ latter->name.toSingleLiteral() + QString("] 区间 ");
 	switch (type) {
 	case TrainEventType::Meet:return s + "会 " + another.get().trainName().full();
@@ -127,7 +127,7 @@ TrainEventType qeutil::latterEventType(bool isStop)
 	return isStop ? TrainEventType::Depart : TrainEventType::SettledPass;
 }
 
-RailStationEvent::RailStationEvent(TrainEventType type_, const QTime& time_, 
+RailStationEvent::RailStationEvent(TrainEventType type_, const TrainTime& time_, 
 	std::weak_ptr<const RailStation> station_, std::shared_ptr<const TrainLine> line_,
 	Positions pos_, const QString& note_):
 	RailStationEventBase(type_,time_,pos_,line_->dir()),
@@ -147,7 +147,7 @@ QString RailStationEventBase::posString() const
 
 QString RailStationEvent::toString() const
 {
-	return QStringLiteral("%1 %2 %3").arg(time.toString("hh:mm:ss "))
+	return QStringLiteral("%1 %2 %3 ").arg(time.toString(TrainTime::HMS))
 		.arg(line->train()->trainName().full())
 		.arg(qeutil::eventTypeString(type));
 }

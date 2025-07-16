@@ -31,7 +31,7 @@ class GreedyPainter
 	std::shared_ptr<const RailStation> _anchor, _start, _end;
 	bool _localStarting, _localTerminal, _anchorAsArrive;
 	Direction _dir;
-	QTime _anchorTime;
+	TrainTime _anchorTime;
 	std::map<std::shared_ptr<const RailStation>, int> _settledStops;
 	std::set<const RailStation*> _fixedStations;
 
@@ -70,7 +70,7 @@ public:
 	void setLocalStarting(bool on) { _localStarting = on; }
 	void setLocalTerminal(bool on) { _localTerminal = on; }
 	void setDir(Direction d) { _dir = d; }
-	void setAnchorTime(const QTime& t) { _anchorTime = t; }
+	void setAnchorTime(const TrainTime& t) { _anchorTime = t; }
 	void setMaxBackoffTimes(int t) { _maxBackoffTimes = t; }
 	void setAnchorAsArrive(bool on) { _anchorAsArrive = on; }
 	auto& constraints() { return _constraints; }
@@ -122,8 +122,10 @@ private:
 	 * -----
 	 * 2024.08.07  添加区间前站参数 st_from。用于在递归终止前，处理最后一站的图定停车时间。
 	 */
-	RecurseReport calForward(std::shared_ptr<const RailStation> st_from, std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
+	RecurseReport calForward(std::shared_ptr<const RailStation> st_from, std::shared_ptr<const RailInterval> railint,
+		const TrainTime& tm, bool stop, int period_hours);
 
-	RecurseReport calBackward(std::shared_ptr<const RailStation> st_from, std::shared_ptr<const RailInterval> railint, const QTime& tm, bool stop);
+	RecurseReport calBackward(std::shared_ptr<const RailStation> st_from, std::shared_ptr<const RailInterval> railint, 
+		const TrainTime& tm, bool stop, int period_hours);
 };
 

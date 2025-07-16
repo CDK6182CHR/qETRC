@@ -112,38 +112,38 @@ void TrainTime::addSecondsInplace(int s)
 
 TrainTime TrainTime::addHours(int h, int period)const
 {
-    TrainTime res(m_secs + h * 3600);
+    TrainTime res = fromSecondsSinceStart(m_secs + h * 3600);
 	res.refineHour(period);
     return res;
 }
 
 TrainTime TrainTime::addMins(int m, int period)const
 {
-    TrainTime res(m_secs + m * 60);
+    TrainTime res = fromSecondsSinceStart(m_secs + m * 60);
     res.refineHour(period);
     return res;
 }
 
 TrainTime TrainTime::addSecs(int s, int period)const
 {
-    TrainTime res(m_secs + s);
+    TrainTime res = fromSecondsSinceStart(m_secs + s);
     res.refineHour(period);
     return res;
 }
 
 TrainTime TrainTime::addHoursUnrefined(int h) const
 {
-    return TrainTime(m_secs + h * 3600);
+    return fromSecondsSinceStart(m_secs + h * 3600);
 }
 
 TrainTime TrainTime::addMinsUnrefined(int m) const
 {
-    return TrainTime(m_secs + m * 60);
+    return fromSecondsSinceStart(m_secs + m * 60);
 }
 
 TrainTime TrainTime::addSecsUnrefined(int s) const
 {
-    return TrainTime(m_secs + s);
+    return fromSecondsSinceStart(m_secs + s);
 }
 
 int TrainTime::secsTo(const TrainTime& rhs) const

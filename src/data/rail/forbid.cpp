@@ -48,8 +48,8 @@ void Forbid::_show() const
     qDebug() << "Forbid index " << index() << Qt::endl;
     for (auto p = firstDownNode(); p; p = p->nextNodeCirc()) {
         qDebug() << p->railInterval() << '\t' <<
-            p->beginTime.toString("hh:mm") << " -- " <<
-            p->endTime.toString("hh:mm") <<
+            p->beginTime.toString(TrainTime::HM) << " -- " <<
+            p->endTime.toString(TrainTime::HM) <<
             '\t' << p->durationMin() <<
             Qt::endl;
     }
@@ -69,8 +69,8 @@ bool Forbid::toCsv(const QString& filename) const
     for (auto it = firstDownNode(); it; it = it->nextNodeCirc()) {
         sout << it->fromStationName().toSingleLiteral() << ","
             << it->toStationName().toSingleLiteral() << ","
-            << it->beginTime.toString("hh:mm") << ","
-            << it->endTime.toString("hh:mm") << "\n";
+            << it->beginTime.toString(TrainTime::HM) << ","
+            << it->endTime.toString(TrainTime::HM) << "\n";
     }
     file.close();
     return true;
@@ -105,9 +105,9 @@ int Forbid::fromCsv(const QString& filename)
             qWarning() << "Invalid interval " << from << " -> " << to;
         }
         else {
-            QTime bt = qeutil::parseTime(sp[2]);
-            QTime et = qeutil::parseTime(sp[3]);
-            if (bt.isValid() && et.isValid()) {
+            TrainTime bt = qeutil::parseTrainTime(sp[2]);
+            TrainTime et = qeutil::parseTrainTime(sp[3]);
+            if (!bt.isNull() && !et.isNull()) {
                 node->beginTime = bt;
                 node->endTime = et;
                 cnt++;
@@ -144,8 +144,8 @@ void Forbid::swap(Forbid& other)
     std::swap(upShow, other.upShow);
 }
 
-ForbidNode::ForbidNode(Forbid& forbid, RailInterval& railint, const QTime& beginTime_ ,
-    const QTime& endTime_) :
+ForbidNode::ForbidNode(Forbid& forbid, RailInterval& railint, const TrainTime& beginTime_ ,
+    const TrainTime& endTime_) :
     RailIntervalNode<ForbidNode, Forbid>(forbid, railint),beginTime(beginTime_),
     endTime(endTime_)
 {
@@ -154,8 +154,8 @@ ForbidNode::ForbidNode(Forbid& forbid, RailInterval& railint, const QTime& begin
 
 void ForbidNode::fromJson(const QJsonObject& obj)
 {
-    beginTime = QTime::fromString(obj.value("begin").toString(), "hh:mm");
-    endTime = QTime::fromString(obj.value("end").toString(), "hh:mm");
+    beginTime = TrainTime::fromString(obj.value("begin").toString());
+    endTime = TrainTime::fromString(obj.value("end").toString());
 }
 
 QJsonObject ForbidNode::toJson() const
@@ -163,8 +163,8 @@ QJsonObject ForbidNode::toJson() const
     return QJsonObject({
         {"fazhan",railInterval().fromStationNameLit()},
         {"daozhan",railInterval().toStationNameLit()},
-        {"begin",beginTime.toString("hh:mm")},
-        {"end",endTime.toString("hh:mm")}
+        {"begin",beginTime.toString(TrainTime::HM)},
+        {"end",endTime.toString(TrainTime::HM)}
         });
 }
 

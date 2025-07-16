@@ -3,10 +3,10 @@
  * 初期和pyETRC行为一致：总是有且仅有两套天窗
  */
 #pragma once
-#include <QTime>
+
 #include <QJsonObject>
 #include "railintervaldata.hpp"
-
+#include "data/common/traintime.h"
 class Forbid;
 
 
@@ -14,9 +14,9 @@ class ForbidNode:
         public RailIntervalNode<ForbidNode,Forbid>
 {
 public:
-    QTime beginTime, endTime;
-    ForbidNode(Forbid& forbid, RailInterval& railint, const QTime& beginTime_ = QTime(),
-        const QTime& endTime_ = QTime());
+    TrainTime beginTime, endTime;
+    ForbidNode(Forbid& forbid, RailInterval& railint, const TrainTime& beginTime_ = TrainTime(),
+        const TrainTime& endTime_ = TrainTime());
 
     void fromJson(const QJsonObject& obj);
     QJsonObject toJson()const;

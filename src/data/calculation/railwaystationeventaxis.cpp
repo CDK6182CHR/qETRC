@@ -3,16 +3,16 @@
 #include <QDebug>
 
 IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_ptr<const RailStation> from, 
-    std::shared_ptr<const RailStation> to, Direction dir, const QTime& tm_start, 
-    int secs, bool singleLine, bool backward) const
+    std::shared_ptr<const RailStation> to, Direction dir, const TrainTime& tm_start, 
+    int secs, bool singleLine, bool backward, int period_hours) const
 {
     auto& ax_from = this->at(from);
     auto& ax_to = this->at(to);
-    QTime tm_to = tm_start.addSecs(secs);
+    TrainTime tm_to = tm_start.addSecs(secs, period_hours);
 
     // 搜索范围界限
-    QTime leftBound = tm_start.addSecs(-secs * INTERVAL_SEARCH_SCALE);
-    QTime rightBound = tm_start.addSecs(secs * INTERVAL_SEARCH_SCALE);
+    TrainTime leftBound = tm_start.addSecs(-secs * INTERVAL_SEARCH_SCALE, period_hours);
+    TrainTime rightBound = tm_start.addSecs(secs * INTERVAL_SEARCH_SCALE, period_hours);
 
     // 这里使用UpperBound，相等的放到左边处理
     // 相等的要特殊处理一下，主要是不能直接break。除了区间共线外，不必相等的在这里不构成冲突。
@@ -107,7 +107,7 @@ IntervalConflictReport RailwayStationEventAxis::intervalConflicted(std::shared_p
 
 std::pair<std::shared_ptr<RailStationEvent>, bool>
 RailwayStationEventAxis::isConflictedWith(
-    const QTime& tm_start, const QTime& tm_to, Direction dir,
+    const TrainTime& tm_start, const TrainTime& tm_to, Direction dir,
     std::shared_ptr<RailStationEvent> ev_ex_start, const StationEventAxis& axis_to,
     bool singleLine) const
 {
