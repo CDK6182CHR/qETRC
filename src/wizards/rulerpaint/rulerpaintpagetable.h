@@ -3,7 +3,6 @@
 #include <QStandardItemModel>
 #include <memory>
 #include <utility>
-#include <QTime>
 
 #include "util/buttongroup.hpp"
 #include "data/train/train.h"
@@ -82,9 +81,9 @@ public:
      */
     int getStationRow(std::shared_ptr<const RailStation> st)const;
 
-    QTime getRowArrive(int row)const;
+    TrainTime getRowArrive(int row)const;
 
-    QTime getRowDepart(int row)const;
+    TrainTime getRowDepart(int row)const;
 
     /**
      * @brief A simple linear search for current version
@@ -93,8 +92,8 @@ public:
 
     // 2024.02.12  make public
     int getStopSecs(int row)const;
-    QTime getArrive(int row)const;
-    QTime getDepart(int row)const;
+    TrainTime getArrive(int row)const;
+    TrainTime getDepart(int row)const;
 
 private:
 
@@ -146,13 +145,15 @@ private:
     /// <param name="tm">循环的时间，input/output</param>
     /// <returns>是否能够终止循环</returns>
     bool calRowTime(int r, int dr, bool prev_stopped, bool cur_stopped,
-        QTime& tm);
+        TrainTime& tm);
 
     /**
      * @brief toTrain
      * 将表格中信息填写到新建车次中
      */
     std::shared_ptr<Train> toTrain()const;
+
+    int periodHours()const;
 
 signals:
     /**
@@ -178,7 +179,7 @@ public slots:
 
     void onEndChanged(int i);
 
-    void onAnchorTimeChanged(const QTime& tm);
+    void onAnchorTimeChanged(const TrainTime& tm);
 
     /**
      * @brief onAnchorTypeChanged
@@ -229,7 +230,7 @@ class Railway;
 class Ruler;
 class Train;
 class QCheckBox;
-class QTimeEdit;
+class TrainTimeEdit;
 class QComboBox;
 class QLineEdit;
 class QTableView;
@@ -255,7 +256,7 @@ class RulerPaintPageTable : public QWizardPage
     std::shared_ptr<Ruler> ruler{};
     int anchorRow=-1;
 
-    QTimeEdit* edAnTime;
+    TrainTimeEdit* edAnTime;
     RadioButtonGroup<2>* gpAnType;
     ButtonGroup<3,QHBoxLayout,QCheckBox>* gpChecks;
     QComboBox* cbStart,*cbEnd;
@@ -271,6 +272,7 @@ public:
     virtual void initializePage() override;
 
     auto* getModel() { return model; }
+    auto& getDiagram() { return diagram; }
 
     bool anchorAsArrive()const{
         return gpAnType->get(0)->isChecked();
@@ -285,14 +287,14 @@ public:
      */
     bool instaneous()const;
 
-    QTime anchorTime()const;
+    TrainTime anchorTime()const;
 
     /**
      * 从外部来调整锚点时间，触发相应的后续操作，只能在初始化完成后调用。
      * 入参是到达和出发时刻，内部来调整anchor时刻以及该行的停时。
      * 主要是由Wizard调用，进入本页面时，利用前面可能的信息。
      */
-    void setAnchorTime(const QTime& arr,const QTime& dep);
+    void setAnchorTime(const TrainTime& arr,const TrainTime& dep);
 
     /**
      * 设置参考车次（只用来展示原来的时刻表；不保存）

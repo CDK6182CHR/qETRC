@@ -55,7 +55,7 @@ void ConflictModel::setupModel(std::shared_ptr<Railway> railway_,
 
             setItem(row, ColDir, new SI(DirFunc::dirToString(line->dir())));
             setItem(row, ColTrainName, new SI(train->trainName().full()));
-            setItem(row, ColTime, new SI(ev.time.toString("hh:mm:ss")));
+            setItem(row, ColTime, new SI(ev.time.toString(TrainTime::HMS)));
             setItem(row, ColEvent, new SI(qeutil::eventTypeString(ev.type)));
             setItem(row, ColPos, new SI(ev.posString()));
             setItem(row, ColType, new SI(train->type()->name()));

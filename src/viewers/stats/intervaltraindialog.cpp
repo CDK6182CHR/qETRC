@@ -22,7 +22,7 @@ IntervalTrainDialog::IntervalTrainDialog(Diagram &diagram, QWidget *parent):
     QDialog(parent),
     diagram(diagram),filter(new TrainFilterSelector(diagram.trainCollection(),this)),
     counter(diagram.trainCollection()),
-    table(new IntervalTrainTable(this))
+    table(new IntervalTrainTable(diagram.options(), this))
 {
     setAttribute(Qt::WA_DeleteOnClose);
     initUI();

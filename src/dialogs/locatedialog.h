@@ -5,7 +5,7 @@
 struct TrainStationBounding;
 class QDoubleSpinBox;
 class RailStation;
-class QTimeEdit;
+class TrainTimeEdit;
 class Railway;
 class PageComboForRail;
 class Diagram;
@@ -27,7 +27,7 @@ class LocateDialog : public QDialog
     QComboBox* cbStation;
     PageComboForRail* cbPage;
     QDoubleSpinBox* spMile;
-    QTimeEdit* edTime;
+    TrainTimeEdit* edTime;
 public:
     LocateDialog(Diagram& diagram, QWidget* parent=nullptr);
     void refreshData();   // 刷新线路表，车站表，运行图表
@@ -35,9 +35,9 @@ private:
     void initUI();
     using QDialog::show;
 signals:
-    void locateOnMile(int pageIndex, std::shared_ptr<const Railway>, double mile, const QTime& time);
+    void locateOnMile(int pageIndex, std::shared_ptr<const Railway>, double mile, const TrainTime& time);
     void locateOnStation(int pageIndex, std::shared_ptr<Railway>,
-                         std::shared_ptr<RailStation>, const QTime& time);
+                         std::shared_ptr<RailStation>, const TrainTime& time);
 private slots:
     void onRailwayChanged(std::shared_ptr<Railway> railway);
     void onRdStationToggled(bool on);
@@ -47,7 +47,7 @@ public slots:
      * @brief showDialog  刷新数据后显示
      */
     void showDialog();
-    void locateToRail(std::shared_ptr<const Railway> rail, double mile, const QTime& time);
+    void locateToRail(std::shared_ptr<const Railway> rail, double mile, const TrainTime& time);
 };
 
 
@@ -64,7 +64,7 @@ class LocateBoundingDialog:
     QVector<TrainStationBounding> boudingList{};
     QComboBox* cbBound;
     PageComboForRail* cbPage;
-    QTimeEdit* edTime;
+    TrainTimeEdit* edTime;
 public:
     LocateBoundingDialog(Diagram& diagram, QWidget* parent=nullptr);
 
@@ -72,13 +72,13 @@ public:
      * 设置好数据，然后显示对话框。
      */
     void showForStation(const QVector<TrainStationBounding>& boudingList,
-                        const QTime& tm);
+                        const TrainTime& tm);
 private:
     void initUI();
     using QDialog::show;
 signals:
     void locateOnStation(int pageIndex, std::shared_ptr<const Railway>,
-                         std::shared_ptr<const RailStation>, const QTime& time);
+                         std::shared_ptr<const RailStation>, const TrainTime& time);
 private slots:
     void onApply();
     void onBoundComboChanged(int i);

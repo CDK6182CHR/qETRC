@@ -224,7 +224,7 @@ void DiagramCompareDialog::openTimetable(std::shared_ptr<TrainDifference> diff)
 
 void DiagramCompareDialog::showTrainTimetable(std::shared_ptr<const Train> train)
 {
-    auto* w = new TrainTimetablePlane();
+    auto* w = new TrainTimetablePlane(diagram.options());
     w->setWindowFlag(Qt::Dialog);
     w->setTrain(train);
     w->resize(700, 800);

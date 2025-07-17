@@ -16,7 +16,7 @@
 #include "model/delegate/qedelegate.h"
 #include "model/delegate/generalspindelegate.h"
 #include "model/delegate/postivespindelegate.h"
-#include "model/delegate/qetimedelegate.h"
+#include "model/delegate/traintimedelegate.h"
 #include "model/delegate/timeintervaldelegate.h"
 #include "data/calculation/greedypainter.h"
 #include "data/diagram/diagram.h"
@@ -570,7 +570,7 @@ void GreedyPaintPagePaint::initUI()
         new PostiveSpinDelegate(1, this));
     table->setItemDelegateForColumn(GreedyPaintConfigModel::ColSecond,
         new PostiveSpinDelegate(10, this));   // 2024.01.12  remove the constraint on seconds
-    auto* tmdele = new QETimeDelegate(this);
+    auto* tmdele = new TrainTimeDelegate(diagram.options(), this);
     table->setItemDelegateForColumn(GreedyPaintConfigModel::ColArrive,tmdele);
     table->setItemDelegateForColumn(GreedyPaintConfigModel::ColDepart,tmdele);
     table->setItemDelegateForColumn(GreedyPaintConfigModel::ColActualStop,

@@ -39,7 +39,7 @@ void TimeInterpWizard::accept()
         auto adp = t->adapterFor(*rail);
         if (adp) {
             adp->timetableInterpolation(ruler, pgTrain->ckToStart->isChecked(),
-                pgTrain->ckToEnd->isChecked(), pgTrain->cbPrec->currentData().toInt());
+                pgTrain->ckToEnd->isChecked(), pgTrain->cbPrec->currentData().toInt(), diagram.options().period_hours);
             if (t->timetable().size() > train->timetable().size()) {
                 // 有数据修改实施
                 modified.push_back(train);

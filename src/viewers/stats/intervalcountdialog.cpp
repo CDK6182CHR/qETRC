@@ -218,7 +218,7 @@ void IntervalCountDialog::onDoubleClicked()
     if (i < 0)return;
 
     if (detailTable == nullptr) {
-        detailTable = new IntervalTrainTable(this);
+        detailTable = new IntervalTrainTable(diagram.options(), this);
         detailTable->setWindowFlag(Qt::Dialog);
         detailTable->resize(700, 700);
     }

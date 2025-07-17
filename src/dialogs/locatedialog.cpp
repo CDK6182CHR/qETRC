@@ -6,14 +6,14 @@
 #include <QFormLayout>
 #include <QLabel>
 #include <QRadioButton>
-#include <QTimeEdit>
 #include <QVBoxLayout>
 #include <QMessageBox>
 
-#include <util/selectrailwaycombo.h>
+#include "util/selectrailwaycombo.h"
+#include "util/traintimeedit.h"
 #include "data/diagram/diagram.h"
 
-#include <util/pagecomboforrail.h>
+#include "util/pagecomboforrail.h"
 #include "data/diagram/stationbinding.h"
 #include "data/rail/railway.h"
 
@@ -62,8 +62,9 @@ void LocateDialog::initUI()
     spMile->setEnabled(false);
     flay->addRow(rd,spMile);
 
-    edTime=new QTimeEdit;
-    edTime->setDisplayFormat("hh:mm:ss");
+    edTime=new TrainTimeEdit;
+	edTime->setFormat(TrainTime::HMS);
+    edTime->setMaxHours(diagram.options().period_hours);
     flay->addRow(tr("定位时刻"),edTime);
 
     cbPage=new PageComboForRail(diagram);
@@ -109,7 +110,7 @@ void LocateDialog::onApplied()
     done(Accepted);
 }
 
-void LocateDialog::locateToRail(std::shared_ptr<const Railway> rail, double mile, const QTime& time)
+void LocateDialog::locateToRail(std::shared_ptr<const Railway> rail, double mile, const TrainTime& time)
 {
     refreshData();
     cbRailway->setRailway(rail);
@@ -144,7 +145,7 @@ LocateBoundingDialog::LocateBoundingDialog(Diagram &diagram, QWidget *parent):
 }
 
 void LocateBoundingDialog::showForStation(const QVector<TrainStationBounding> &boudingList_,
-                                          const QTime &tm)
+                                          const TrainTime &tm)
 {
     this->boudingList=boudingList_;
     // 先把无效的弄掉
@@ -184,7 +185,9 @@ void LocateBoundingDialog::initUI()
         this, qOverload<int>(&LocateBoundingDialog::onBoundComboChanged));
     cbPage=new PageComboForRail(diagram);
     flay->addRow(tr("运行图页面"),cbPage);
-    edTime=new QTimeEdit;
+    edTime=new TrainTimeEdit;
+	edTime->setFormat(TrainTime::HMS);
+    edTime->setMaxHours(diagram.options().period_hours);
     flay->addRow(tr("定位时刻"),edTime);
     vlay->addLayout(flay);
 

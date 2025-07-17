@@ -6,7 +6,7 @@
 #include "data/train/train.h"
 
 ModifyTimetableDialog::ModifyTimetableDialog(const DiagramOptions& ops, std::shared_ptr<Train> train_, QWidget* parent) :
-	QDialog(parent), _ops(ops), train(train_), table(new TrainTimetablePlane)
+	QDialog(parent), _ops(ops), train(train_), table(new TrainTimetablePlane(ops))
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	setWindowTitle(tr("时刻表微调 - %1").arg(train->trainName().full()));

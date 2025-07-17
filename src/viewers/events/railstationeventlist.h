@@ -49,7 +49,7 @@ public:
     void setupModel();
     const auto& getData()const { return lst; }
     std::shared_ptr<const Train> trainForRow(int row)const;
-    QTime timeForRow(int row)const;
+    TrainTime timeForRow(int row)const;
 };
 
 class RailStationEventListDialog : public QDialog
@@ -91,7 +91,7 @@ private:
 
 signals:
     void locateOnEvent(int pageIndex, std::shared_ptr<const Railway>,
-        std::shared_ptr<const RailStation>, const QTime&);
+        std::shared_ptr<const RailStation>, const TrainTime&);
 
 private slots:
 

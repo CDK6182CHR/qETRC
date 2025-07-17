@@ -81,9 +81,9 @@ std::shared_ptr<const Train> RailStationEventListModel::trainForRow(int row) con
 		item(row, ColTrainName)->data(qeutil::TrainRole));
 }
 
-QTime RailStationEventListModel::timeForRow(int row) const
+TrainTime RailStationEventListModel::timeForRow(int row) const
 {
-	return item(row, ColTime)->data(qeutil::TimeDataRole).toTime();
+	return qvariant_cast<TrainTime>(item(row, ColTime)->data(qeutil::TimeDataRole));
 }
 
 RailStationEventListDialog::RailStationEventListDialog(Diagram& diagram, const std::shared_ptr<Railway>& rail, const std::shared_ptr<RailStation>& station, QWidget* parent) : QDialog(parent),
