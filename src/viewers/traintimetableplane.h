@@ -5,6 +5,7 @@
 #include "model/train/timetablestdmodel.h"
 
 class QTableView;
+struct DiagramOptions;
 
 /**
  * @brief The TrainTimetablePlane class
@@ -14,10 +15,11 @@ class QTableView;
 class TrainTimetablePlane : public QTableView
 {
     Q_OBJECT;
+    const DiagramOptions& _ops;
     std::shared_ptr<const Train> train{};
     TimetableConstModel*const model;
 public:
-    explicit TrainTimetablePlane(QWidget *parent = nullptr);
+    explicit TrainTimetablePlane(const DiagramOptions& ops, QWidget *parent = nullptr);
 
     void setTrain(std::shared_ptr<const Train> train_);
 

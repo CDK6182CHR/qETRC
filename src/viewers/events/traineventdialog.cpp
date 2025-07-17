@@ -7,7 +7,7 @@
 #include "util/dialogadapter.h"
 #include "model/delegate/qedelegate.h"
 #include "model/delegate/generaldoublespindelegate.h"
-#include "model/delegate/qetimedelegate.h"
+#include "model/delegate/traintimedelegate.h"
 #include "util/pagecomboforrail.h"
 #include "data/diagram/diagram.h"
 #include "data/common/qesystem.h"
@@ -54,9 +54,9 @@ bool TrainEventModel::exportToCsv(const QString& filename)
 	return true;
 }
 
-QTime TrainEventModel::timeForRow(int row) const
+TrainTime TrainEventModel::timeForRow(int row) const
 {
-	return item(row, ColTime)->data(Qt::EditRole).toTime();
+	return qvariant_cast<TrainTime>(item(row, ColTime)->data(Qt::EditRole));
 }
 
 std::shared_ptr<Railway> TrainEventModel::railForRow(int row) const
@@ -150,7 +150,7 @@ void TrainEventModel::setStationRow(int row,std::shared_ptr<TrainAdapter> adp, c
 	setItem(row, ColRail, it);
 
 	it = new SI();
-	it->setData(t.time, Qt::EditRole);
+	it->setData(QVariant::fromValue(t.time), Qt::EditRole);
 	setItem(row, ColTime, it);
 
 	auto rst = t.station.lock();
@@ -176,7 +176,7 @@ void TrainEventModel::setIntervalRow(int row, std::shared_ptr<TrainAdapter> adp,
 	it->setData(v, qeutil::RailwayRole);
 	setItem(row, ColRail, it);
 	it = new SI;
-	it->setData(t.time, Qt::EditRole);
+	it->setData(QVariant::fromValue(t.time), Qt::EditRole);
 	setItem(row, ColTime, it);
 	setItem(row, ColPlace, new SI(tr("%1-%2")
         .arg(t.former->name.toSingleLiteral(),t.latter->name.toSingleLiteral())));
@@ -194,7 +194,7 @@ void TrainEventModel::exportStationRow(QTextStream& s, std::shared_ptr<TrainAdap
 	// 车次  线名  时间  地点  里程  事件  客体  备注
 	auto st = e.station.lock();
 	s << adp->train()->trainName().full() << "," << adp->railway()->name() << ",";
-	s << e.time.toString("hh:mm:ss") << ","
+	s << e.time.toString(TrainTime::HMS) << ","
 		<< st->name.toSingleLiteral() << ","
 		<< st->mile << ","
 		<< qeutil::eventTypeString(e.type) << ",";
@@ -210,7 +210,7 @@ void TrainEventModel::exportIntervalRow(QTextStream& s, std::shared_ptr<TrainAda
 	// 车次  线名  时间  地点  里程  事件  客体  备注
 	s << adp->train()->trainName().full() << ","
 		<< adp->railway()->name() << ","
-		<< e.time.toString("hh:mm:ss") << ","
+		<< e.time.toString(TrainTime::HMS) << ","
 		<< tr("%1-%2").arg(e.former->name.toSingleLiteral(), e.latter->name.toSingleLiteral()) << ","
 		<< e.mile << ","
 		<< qeutil::eventTypeString(e.type) << ","
@@ -242,7 +242,7 @@ void TrainEventDialog::initUI()
 	table->setItemDelegateForColumn(TrainEventModel::ColMile,
 		new GeneralDoubleSpinDelegate(this));
 	table->setItemDelegateForColumn(TrainEventModel::ColTime,
-		new QETimeDelegate(this));
+		new TrainTimeDelegate(diagram.options(), this));
 	table->resizeColumnsToContents();
 	table->horizontalHeader()->setSortIndicatorShown(true);
 

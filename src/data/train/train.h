@@ -192,15 +192,15 @@ public:
     const auto& adapters()const { return _adapters; }
 
     void appendStation(const StationName& name,
-                       const QTime& arrive,
-                       const QTime& depart,
+                       const TrainTime& arrive,
+                       const TrainTime& depart,
                        bool business=true,
                        const QString& track="",
                        const QString& note="");
 
     void prependStation(const StationName& name,
-        const QTime& arrive,
-        const QTime& depart,
+        const TrainTime& arrive,
+        const TrainTime& depart,
         bool business = true,
         const QString& track = "",
         const QString& note = "");

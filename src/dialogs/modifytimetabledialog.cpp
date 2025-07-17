@@ -5,8 +5,8 @@
 #include "util/utilfunc.h"
 #include "data/train/train.h"
 
-ModifyTimetableDialog::ModifyTimetableDialog(std::shared_ptr<Train> train_, QWidget* parent) :
-	QDialog(parent), train(train_), table(new TrainTimetablePlane)
+ModifyTimetableDialog::ModifyTimetableDialog(const DiagramOptions& ops, std::shared_ptr<Train> train_, QWidget* parent) :
+	QDialog(parent), _ops(ops), train(train_), table(new TrainTimetablePlane)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	setWindowTitle(tr("时刻表微调 - %1").arg(train->trainName().full()));
@@ -76,7 +76,8 @@ void ModifyTimetableDialog::onApply()
 	int start = std::min_element(sel.begin(), sel.end(), qeutil::ltIndexRow)->row();
 	int end = std::max_element(sel.begin(), sel.end(), qeutil::ltIndexRow)->row();
 	auto t = std::make_shared<Train>(*train);    //copy construct
-	t->adjustTimetable(start, end, ckFirst->isChecked(), ckLast->isChecked(), secs);
+	t->adjustTimetable(start, end, ckFirst->isChecked(),
+		ckLast->isChecked(), secs, _ops.period_hours);
 	emit trainUpdated(train, t);
 	done(QDialog::Accepted);
 }

@@ -1,12 +1,12 @@
 ﻿#include "intervaltraintable.h"
 
 #include <QHeaderView>
-#include <data/common/qesystem.h>
-#include <util/utilfunc.h>
-#include <data/train/train.h>
-#include <data/train/traintype.h>
-#include <model/delegate/timeintervaldelegate.h>
-#include <model/delegate/qetimedelegate.h>
+#include "data/common/qesystem.h"
+#include "util/utilfunc.h"
+#include "data/train/train.h"
+#include "data/train/traintype.h"
+#include "model/delegate/timeintervaldelegate.h"
+#include "model/delegate/traintimedelegate.h"
 
 IntervalTrainModel::IntervalTrainModel(QWidget *parent):
     QStandardItemModel(parent)
@@ -38,11 +38,11 @@ void IntervalTrainModel::setupModel()
         setItem(i, ColToStation, new SI(info.to->name.toSingleLiteral()));
 
         it = new SI;
-        it->setData(info.from->depart, Qt::EditRole);
+        it->setData(QVariant::fromValue(info.from->depart), Qt::EditRole);
         setItem(i,ColFromTime,it);
         
         it = new SI;
-        it->setData(info.to->arrive, Qt::EditRole);
+        it->setData(QVariant::fromValue(info.to->arrive), Qt::EditRole);
         setItem(i,ColToTime,it);
 
         int secs=qeutil::secsToStrict(info.from->depart,info.to->arrive,info.addDays);
@@ -67,8 +67,8 @@ void IntervalTrainModel::resetData(const IntervalTrainList& data_)
 }
 
 
-IntervalTrainTable::IntervalTrainTable(QWidget *parent):
-    model(new IntervalTrainModel(parent))
+IntervalTrainTable::IntervalTrainTable(const DiagramOptions& ops, QWidget *parent):
+    _ops(ops), model(new IntervalTrainModel(parent))
 {
     initUI();
 }
@@ -89,7 +89,7 @@ void IntervalTrainTable::initUI()
         }
     }
     
-    auto* time_del = new QETimeDelegate(this);
+    auto* time_del = new TrainTimeDelegate(_ops, this);
     setItemDelegateForColumn(IntervalTrainModel::ColFromTime, time_del);
     setItemDelegateForColumn(IntervalTrainModel::ColToTime, time_del);
     setItemDelegateForColumn(IntervalTrainModel::ColTime, new TimeIntervalDelegateHour(this));

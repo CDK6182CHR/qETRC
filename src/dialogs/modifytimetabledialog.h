@@ -10,6 +10,7 @@ class Train;
 class QSpinBox;
 class QTableView;
 class QCheckBox;
+struct DiagramOptions;
 
 /**
  * @brief The ModifyTimetableDialog class
@@ -19,6 +20,7 @@ class QCheckBox;
 class ModifyTimetableDialog : public QDialog
 {
     Q_OBJECT;
+	const DiagramOptions& _ops;
     const std::shared_ptr<Train> train;
     TrainTimetablePlane*const table;
 
@@ -27,7 +29,7 @@ class ModifyTimetableDialog : public QDialog
     QCheckBox* ckFirst,*ckLast;
 
 public:
-    ModifyTimetableDialog(std::shared_ptr<Train> train_, QWidget* parent=nullptr);
+    ModifyTimetableDialog(const DiagramOptions& ops, std::shared_ptr<Train> train_, QWidget* parent=nullptr);
 private:
     void initUI();
 signals:

@@ -75,29 +75,29 @@ std::list<TrainStation>::iterator TimetableQuickModel::trainStationForRow(int ro
         item(row, ColName)->data(qeutil::TrainStationRole));
 }
 
-QTime TimetableQuickModel::arriveTimeForRow(int row) const
+TrainTime TimetableQuickModel::arriveTimeForRow(int row) const
 {
     if (row % 2 != 0)row--;
-    return item(row, ColTime)->data(qeutil::TimeDataRole).toTime();
+    return qvariant_cast<TrainTime>(item(row, ColTime)->data(qeutil::TimeDataRole));
 }
 
-QTime TimetableQuickModel::departTimeForRow(int row) const
+TrainTime TimetableQuickModel::departTimeForRow(int row) const
 {
     if (row % 2 == 0)row++;
-    return item(row, ColTime)->data(qeutil::TimeDataRole).toTime();
+    return qvariant_cast<TrainTime>(item(row, ColTime)->data(qeutil::TimeDataRole));
 }
 
-void TimetableQuickModel::setTimeItem(int row, const QTime &tm)
+void TimetableQuickModel::setTimeItem(int row, const TrainTime &tm)
 {
-    auto* it = new QStandardItem(tm.toString("hh:mm:ss"));
-    it->setData(tm, qeutil::TimeDataRole);
+    auto* it = new QStandardItem(tm.toString(TrainTime::HMS));
+    it->setData(QVariant::fromValue(tm), qeutil::TimeDataRole);
     setItem(row,ColTime,it);
 }
 
-void TimetableQuickModel::setTimeItem(int row, const QTime& tm, const QString& text)
+void TimetableQuickModel::setTimeItem(int row, const TrainTime& tm, const QString& text)
 {
     auto* it = new QStandardItem(text);
-    it->setData(tm, qeutil::TimeDataRole);
+    it->setData(QVariant::fromValue(tm), qeutil::TimeDataRole);
     setItem(row, ColTime, it);
 }
 
@@ -254,7 +254,7 @@ void TimetableQuickEditableModel::onStationTimeChanged(int row)
     //st.arrive = item(row, ColTime)->data(qeutil::TimeDataRole).toTime();
     //st.depart = item(row + 1, ColTime)->data(qeutil::TimeDataRole).toTime();
     //st.updateStopFlag();
-    const auto& tm = item(row, ColTime)->data(qeutil::TimeDataRole).toTime();;
+    const auto& tm = qvariant_cast<TrainTime>(item(row, ColTime)->data(qeutil::TimeDataRole));
 
     //注意：如果编辑的是非停车站有数据的那个点，那么认为另一个点跟着动了。
     if (p->flag & TrainStation::Stopped) {

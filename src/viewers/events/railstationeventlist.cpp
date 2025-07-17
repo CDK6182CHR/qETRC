@@ -53,8 +53,8 @@ void RailStationEventListModel::setupModel()
 		v.setValue(train);
 		it->setData(v, qeutil::TrainRole);
 		setItem(i, ColTrainName, it);
-		it = new SI(ev.time.toString("hh:mm:ss"));
-		it->setData(ev.time, qeutil::TimeDataRole);
+		it = new SI(ev.time.toString(TrainTime::HMS));
+		it->setData(QVariant::fromValue(ev.time), qeutil::TimeDataRole);
 		setItem(i, ColTime, it);
 		setItem(i, ColEventType, new SI(qeutil::eventTypeString(ev.type)));
 		setItem(i, ColPos, new SI(ev.posString()));

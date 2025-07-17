@@ -72,7 +72,7 @@ void DiagramWidget::paintGraph()
     updating = true;
     clearGraph();
     // 2022.02.07：更改页面设置后，这个可能会变
-    startTime = QTime(config().start_hour, 0, 0);
+    startTime = TrainTime(config().start_hour, 0, 0);
     _selectedTrain = nullptr;
     emit showNewStatus(QString("正在铺画运行图"));
 
@@ -1681,7 +1681,7 @@ void DiagramWidget::zoomOut()
 }
 
 void DiagramWidget::locateToStation(std::shared_ptr<const Railway> railway, 
-    std::shared_ptr<const RailStation> station, const QTime& tm)
+    std::shared_ptr<const RailStation> station, const TrainTime& tm)
 {
     double x = calXFromStart(tm) ;
     if (x > config().diagramWidth()) {
@@ -1693,12 +1693,12 @@ void DiagramWidget::locateToStation(std::shared_ptr<const Railway> railway,
     double y = _page->railwayStartY(*railway) +
         railway->yValueFromCoeff(station->y_coeff.value(), config());
     QString text = tr("线路：%1\n车站：%2\n时刻：%3")
-        .arg(railway->name(), station->name.toSingleLiteral(), tm.toString("hh:mm:ss"));
+        .arg(railway->name(), station->name.toSingleLiteral(), tm.toString(TrainTime::HMS));
     centerOn(x, y);
     showPosTip(mapToGlobal(mapFromScene(x, y)), text);
 }
 
-void DiagramWidget::locateToMile(std::shared_ptr<const Railway> railway, double mile, const QTime& tm)
+void DiagramWidget::locateToMile(std::shared_ptr<const Railway> railway, double mile, const TrainTime& tm)
 {
     Railway::SectionInfo info = railway->getSectionInfo(mile);
     if (!info.has_value()) {
@@ -1715,7 +1715,7 @@ void DiagramWidget::locateToMile(std::shared_ptr<const Railway> railway, double 
     }
     x += config().totalLeftMargin();
     QString text = tr("线路：%1\n里程标：%2 km\n时刻：%3")
-        .arg(railway->name(), QString::number(mile, 'f', 3), tm.toString("hh:mm:ss"));
+        .arg(railway->name(), QString::number(mile, 'f', 3), tm.toString(TrainTime::HMS));
     centerOn(x, y);
     showPosTip(mapToGlobal(mapFromScene(x, y)), text);
 }
@@ -1819,7 +1819,7 @@ void DiagramWidget::addForbidNode(std::shared_ptr<Forbid> forbid,
     }
 }
 
-double DiagramWidget::calXFromStart(const QTime& time) const
+double DiagramWidget::calXFromStart(const TrainTime& time) const
 {
     int sec = startTime.secsTo(time);
     if (sec < 0)
@@ -1849,12 +1849,12 @@ void DiagramWidget::stationToolTip(std::deque<AdapterStation>::const_iterator st
     QString text = tr("%1 在 %2 站 ").arg(line.train()->trainName().full())
         .arg(st->trainStation->name.toSingleLiteral());
     if (st->trainStation->isStopped()) {
-        text += tr("%1/%2 停车 %3").arg(st->trainStation->arrive.toString("hh:mm:ss"))
-            .arg(st->trainStation->depart.toString("hh:mm:ss"))
+        text += tr("%1/%2 停车 %3").arg(st->trainStation->arrive.toString(TrainTime::HMS))
+            .arg(st->trainStation->depart.toString(TrainTime::HMS))
             .arg(st->trainStation->stopString());
     }
     else {
-        text += tr("%1/...").arg(st->trainStation->arrive.toString("hh:mm:ss"));
+        text += tr("%1/...").arg(st->trainStation->arrive.toString(TrainTime::HMS));
     }
     setToolTip(text);
 }
@@ -1871,8 +1871,8 @@ void DiagramWidget::intervalToolTip(std::deque<AdapterStation>::const_iterator f
         .arg(line.train()->trainName().full())
         .arg(ts1->name.toSingleLiteral())
         .arg(ts2->name.toSingleLiteral())
-        .arg(ts1->depart.toString("hh:mm:ss"))
-        .arg(ts2->arrive.toString("hh:mm:ss"))
+        .arg(ts1->depart.toString(TrainTime::HMS))
+        .arg(ts2->arrive.toString(TrainTime::HMS))
         .arg(qeutil::secsToString(sec))
         .arg(mile, 0, 'f', 3)
         .arg(spd, 0, 'f', 3);

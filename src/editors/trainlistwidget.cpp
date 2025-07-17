@@ -491,8 +491,8 @@ void TrainListWidget::exportTrainTimetable(const QList<std::shared_ptr<Train>>& 
 		for (const auto& st : train->timetable()) {
 			sout << train->trainName().full() << ',' <<
 				st.name.toSingleLiteral() << ',' <<
-				st.arrive.toString("hh:mm:ss") << ',' <<
-				st.depart.toString("hh:mm:ss") << ',' <<
+				st.arrive.toString(TrainTime::HMS) << ',' <<
+				st.depart.toString(TrainTime::HMS) << ',' <<
 				st.track << ',' <<
 				st.note << '\n';
 		}

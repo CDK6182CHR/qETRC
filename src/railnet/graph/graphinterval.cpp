@@ -12,8 +12,8 @@ GraphForbidNode::GraphForbidNode(const ForbidNode &node):
 
 void GraphForbidNode::exportToNode(ForbidNode &node) const
 {
-    node.beginTime=beginTime;
-    node.endTime=endTime;
+    node.beginTime = TrainTime::fromQTime(beginTime);
+    node.endTime =   TrainTime::fromQTime(endTime);
 }
 
 GraphRulerNode::GraphRulerNode(const RulerNode &node):

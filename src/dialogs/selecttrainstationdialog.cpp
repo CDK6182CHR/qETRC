@@ -7,15 +7,15 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QDialogButtonBox>
-#include <util/selecttraincombo.h>
-#include <data/common/qesystem.h>
-#include <util/utilfunc.h>
-#include <data/train/train.h>
-#include <model/delegate/qetimedelegate.h>
+#include "util/selecttraincombo.h"
+#include "data/common/qesystem.h"
+#include "util/utilfunc.h"
+#include "data/train/train.h"
+#include "model/delegate/traintimedelegate.h"
 
-SelectTrainStationsDialog::SelectTrainStationsDialog(TrainCollection& coll,
+SelectTrainStationsDialog::SelectTrainStationsDialog(TrainCollection& coll, const DiagramOptions& ops,
                                                      QWidget *parent):
-    QDialog(parent), coll(coll), model(new TimetableStdModel(true, this))
+    QDialog(parent), coll(coll), _ops(ops), model(new TimetableStdModel(true, this))
 {
     setAttribute(Qt::WA_DeleteOnClose);
     resize(700,600);
@@ -49,9 +49,9 @@ void SelectTrainStationsDialog::refreshData()
 }
 
 SelectTrainStationsDialog::result_type
-    SelectTrainStationsDialog::dlgGetStation(TrainCollection &coll, QWidget *parent)
+    SelectTrainStationsDialog::dlgGetStation(TrainCollection &coll, const DiagramOptions& ops, QWidget *parent)
 {
-    auto* dlg=new SelectTrainStationsDialog(coll, parent);
+    auto* dlg=new SelectTrainStationsDialog(coll, ops, parent);
     dlg->setAttribute(Qt::WA_DeleteOnClose, false);
 
     auto flag = dlg->exec();
@@ -83,7 +83,7 @@ void SelectTrainStationsDialog::initUI()
             table->setColumnWidth(c++, w);
         }
     }
-    auto* dele = new QETimeDelegate(this);
+    auto* dele = new TrainTimeDelegate(_ops, this);
     table->setItemDelegateForColumn(TimetableStdModel::ColArrive, dele);
     table->setItemDelegateForColumn(TimetableStdModel::ColDepart, dele);
     table->setEditTriggers(QTableView::NoEditTriggers);

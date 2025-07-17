@@ -2,16 +2,16 @@
 
 #include <QWidget>
 #include <QStandardItemModel>
-#include <util/buttongroup.hpp>
-#include <data/common/direction.h>
+#include "util/buttongroup.hpp"
+#include "data/common/direction.h"
+#include "data/common/traintime.h"
 #include <set>
 #include <map>
 #include <QPointer>
-#include <QTime>
 
 class QTableView;
 class Train;
-class QTimeEdit;
+class TrainTimeEdit;
 class QCheckBox;
 class QLineEdit;
 class GreedyPainter;
@@ -93,8 +93,8 @@ public:
 
     // 2024.02.12  add  for info widget
     int actualStopSecsForRow(int row)const;
-    QTime arriveTimeForRow(int row)const;
-    QTime departTimeForRow(int row)const;
+    TrainTime arriveTimeForRow(int row)const;
+    TrainTime departTimeForRow(int row)const;
     bool fixedForRow(int row)const;
 
 private:
@@ -157,7 +157,7 @@ class GreedyPaintPagePaint : public QWidget
     //暂不支持高级铺画目标
     //QCheckBox* ckAdv;
 
-    QTimeEdit* edAnchorTime;
+    TrainTimeEdit* edAnchorTime;
     RadioButtonGroup<2>* gpDir, * gpAnchorRole;
     QCheckBox* ckStarting, * ckTerminal, * ckInstaneous, * ckTop;
     QTableView* table;

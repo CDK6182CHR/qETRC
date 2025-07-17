@@ -56,6 +56,7 @@ void TrainTimeEdit::stepBy(int steps)
     // We cannot use selectCurrentSection() here, because the section indicated by the
     // cursor may changed after stepping (if the number of digits changed, etc)
     selectSection(sec);
+    emit timeChanged(m_time);
 }
 
 bool TrainTimeEdit::focusNextPrevChild(bool next)
@@ -118,8 +119,11 @@ QAbstractSpinBox::StepEnabled TrainTimeEdit::stepEnabled() const
 
 void TrainTimeEdit::setTime(const TrainTime& tm)
 {
-    m_time = tm;
-    updateTime();
+    if (tm != m_time) {
+        m_time = tm;
+        updateTime();
+        emit timeChanged(m_time);
+    }
 }
 
 void TrainTimeEdit::updateTime()

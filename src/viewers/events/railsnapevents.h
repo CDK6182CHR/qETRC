@@ -12,7 +12,7 @@ class RailSnapEventsModel:
     Q_OBJECT
     Diagram& diagram;
     std::shared_ptr<Railway> railway;
-    QTime time{};    //可以更改
+    TrainTime time{};    //可以更改
     SnapEventList lst{};
 public:
     enum{
@@ -31,14 +31,14 @@ public:
     };
     RailSnapEventsModel(Diagram& diagram_, std::shared_ptr<Railway> railway_,
                         QObject* parent=nullptr);
-    void setTime(const QTime& time);
+    void setTime(const TrainTime& time);
     double mileForRow(int row)const;
 private:
     void setupModel();
 };
 
 
-class QTimeEdit;
+class TrainTimeEdit;
 class QTableView;
 
 class RailSnapEventsDialog : public QDialog
@@ -48,7 +48,7 @@ class RailSnapEventsDialog : public QDialog
     std::shared_ptr<Railway> railway;
     RailSnapEventsModel* model;
 
-    QTimeEdit *timeEdit;
+    TrainTimeEdit *timeEdit;
     QTableView *table;
 public:
     RailSnapEventsDialog(Diagram& diagram_,std::shared_ptr<Railway> railway_,
@@ -57,7 +57,7 @@ private:
     void initUI();
 signals:
     void locateToEvent(int pageIndex, std::shared_ptr<const Railway>, double mile,
-        const QTime&);
+        const TrainTime&);
 private slots:
     void updateData();
     void toCsv();

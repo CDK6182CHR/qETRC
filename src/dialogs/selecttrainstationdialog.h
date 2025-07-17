@@ -12,6 +12,9 @@ class TrainStation;
 class TimetableStdModel;
 class QTableView;
 class Train;
+struct DiagramOptions;
+
+
 /**
  * @brief The SelectTrainStationDialog class
  * 2022.11.06  选择时刻表中信息，用于导入停站时长。
@@ -24,11 +27,12 @@ class SelectTrainStationsDialog : public QDialog
 {
     Q_OBJECT
     TrainCollection& coll;
+    const DiagramOptions& _ops;
     SelectTrainCombo* cbTrain;
     QTableView* table;
     TimetableStdModel* const model;
 
-    SelectTrainStationsDialog(TrainCollection& coll, QWidget* parent=nullptr);
+    SelectTrainStationsDialog(TrainCollection& coll, const DiagramOptions& ops, QWidget* parent=nullptr);
 
 public:
     using result_type=std::vector<std::list<TrainStation>::iterator>;
@@ -37,7 +41,7 @@ public:
     void refreshData();
 
     static result_type
-        dlgGetStation(TrainCollection& coll, QWidget* parent);
+        dlgGetStation(TrainCollection& coll, const DiagramOptions& ops, QWidget* parent);
 
 signals:
 //    void applied(const result_type&);

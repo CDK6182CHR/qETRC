@@ -11,10 +11,10 @@
 #include "data/train/train.h"
 #include "data/train/traintype.h"
 #include "data/diagram/diagram.h"
+#include "util/traintimeedit.h"
 
 #include <QLabel>
 #include <QTableView>
-#include <QTimeEdit>
 #include <QHeaderView>
 #include <QAction>
 #include <QScroller>
@@ -31,7 +31,7 @@ RailSnapEventsModel::RailSnapEventsModel(Diagram &diagram_,
                               });
 }
 
-void RailSnapEventsModel::setTime(const QTime &time)
+void RailSnapEventsModel::setTime(const TrainTime &time)
 {
     this->time=time;
     lst=diagram.getSnapEvents(railway,time);
@@ -101,8 +101,9 @@ void RailSnapEventsDialog::initUI()
     auto* vlay=new QVBoxLayout;
     auto* hlay=new QHBoxLayout;
     hlay->addWidget(new QLabel("时刻"));
-    timeEdit=new QTimeEdit;
-    timeEdit->setDisplayFormat("hh:mm:ss");
+    timeEdit=new TrainTimeEdit;
+    timeEdit->setMaxHours(diagram.options().period_hours);
+    timeEdit->setFormat(TrainTime::HMS);
     hlay->addWidget(timeEdit);
     hlay->addStretch(1);
     auto* btn=new QPushButton(tr("确定"));
@@ -133,7 +134,7 @@ void RailSnapEventsDialog::initUI()
 
 void RailSnapEventsDialog::updateData()
 {
-    const QTime& tm=timeEdit->time();
+    const TrainTime& tm=timeEdit->time();
     model->setTime(tm);
     table->resizeColumnsToContents();
 }

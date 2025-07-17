@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QStandardItemModel>
 
-#include <data/diagram/trainevents.h>
+#include "data/diagram/trainevents.h"
 
 struct IntervalEvent;
 struct StationEvent;
@@ -52,7 +52,7 @@ public:
 
     bool exportToCsv(const QString& filename);
 
-    QTime timeForRow(int row)const;
+    TrainTime timeForRow(int row)const;
     std::shared_ptr<Railway> railForRow(int row)const;
     double mileForRow(int row)const;
 
@@ -91,7 +91,7 @@ public:
 
 signals:
     void locateToEvent(int pageIndex, std::shared_ptr<const Railway> railway,
-        double mile, const QTime&);
+        double mile, const TrainTime&);
 
 private slots:
     void exportETRC();

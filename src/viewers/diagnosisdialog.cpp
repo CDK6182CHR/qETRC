@@ -35,7 +35,7 @@ void DiagnosisModel::setupModel()
         const auto& iss = lst.at(i);
         auto train = iss.line->train();
         setItem(i, ColTrainName, new SI(train->trainName().full()));
-        setItem(i, ColTime, new SI(iss.time.toString("hh:mm:ss")));
+        setItem(i, ColTime, new SI(iss.time.toString(TrainTime::HMS)));
         setItem(i, ColMile, new SI(QString::number(iss.mile, 'f', 3)));
         setItem(i, ColRailway, new SI(iss.line->railway()->name()));
         setItem(i, ColPos, new SI(iss.posString()));

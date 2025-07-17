@@ -9,6 +9,8 @@ class QTableView;
 class QCheckBox;
 class QLineEdit;
 class Diagram;
+struct DiagramOptions;
+
 class IntervalTrainModel: public QStandardItemModel
 {
     Q_OBJECT
@@ -43,9 +45,10 @@ public:
  */
 class IntervalTrainTable : public QTableView
 {
+    const DiagramOptions& _ops;
     IntervalTrainModel* const model;
 public:
-    IntervalTrainTable(QWidget* parent=nullptr);
+    IntervalTrainTable(const DiagramOptions& ops, QWidget* parent=nullptr);
     auto* getModel(){return model;}
 private:
     void initUI();

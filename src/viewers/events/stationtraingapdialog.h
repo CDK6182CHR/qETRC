@@ -118,10 +118,10 @@ public:
         QWidget* parent = nullptr);
 private:
     void initUI();
-    void locateToTime(const QTime& tm);
+    void locateToTime(const TrainTime& tm);
 signals:
     void locateToEvent(int pageIndex, std::shared_ptr<const Railway>, std::shared_ptr<const RailStation>,
-        const QTime& time);
+        const TrainTime& time);
 private slots:
     void actToCsv();
     void actStatistics();

@@ -418,7 +418,7 @@ public:
 
 #endif
 
-    using SectionEventList = std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>>;
+    using SectionEventList = std::vector<std::pair<std::shared_ptr<TrainLine>, TrainTime>>;
 
     /**
      * 2021.08.05  区间某个位置的事件表  
@@ -427,7 +427,7 @@ public:
     SectionEventList
         sectionEvents(std::shared_ptr<Railway> railway, double y)const;
 
-    SnapEventList getSnapEvents(std::shared_ptr<Railway> railway, const QTime& time)const;
+    SnapEventList getSnapEvents(std::shared_ptr<Railway> railway, const TrainTime& time)const;
 
     /**
      * @brief rulerFromMultiTrains  pyETRC.graph.rulerFromMultiTrains() 标尺综合

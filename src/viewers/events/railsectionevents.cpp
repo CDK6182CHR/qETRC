@@ -12,7 +12,7 @@
 #include <QMessageBox>
 #include <QAction>
 #include <QScroller>
-#include "model/delegate/qetimedelegate.h"
+#include "model/delegate/traintimedelegate.h"
 #include "util/pagecomboforrail.h"
 #include "data/common/qesystem.h"
 #include "data/train/train.h"
@@ -55,7 +55,7 @@ void RailSectionEventsModel::setupModel()
         auto train = line->train();
         setItem(i, ColTrainName, new SI(train->trainName().full()));
         auto* it = new SI;
-        it->setData(p.second, Qt::EditRole);
+        it->setData(QVariant::fromValue(p.second), Qt::EditRole);
         setItem(i, ColTime, it);
         setItem(i, ColType, new SI(train->type()->name()));
         setItem(i, ColDir, new SI(DirFunc::dirToString(line->dir())));
@@ -130,7 +130,7 @@ void RailSectionEventsDialog::initUI()
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->setEditTriggers(QTableView::NoEditTriggers);
     table->setItemDelegateForColumn(RailSectionEventsModel::ColTime,
-        new QETimeDelegate(this));
+        new TrainTimeDelegate(diagram.options(), this));
     QScroller::grabGesture(table,QScroller::TouchGesture);
 
     connect(table->horizontalHeader(),SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),

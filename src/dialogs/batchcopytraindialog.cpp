@@ -12,7 +12,7 @@
 #include <QMessageBox>
 #include "data/common/qesystem.h"
 #include "data/diagram/diagram.h"
-#include "model/delegate/qetimedelegate.h"
+#include "model/delegate/traintimedelegate.h"
 #include "util/utilfunc.h"
 #include "data/train/train.h"
 
@@ -116,7 +116,7 @@ void BatchCopyTrainDialog::initUI()
     table->setEditTriggers(QTableView::AllEditTriggers);
     table->setModel(model);
     table->setItemDelegateForColumn(BatchCopyTrainModel::ColStartTime,
-        new QETimeDelegate(this));
+        new TrainTimeDelegate(diagram.options(), this));
     vlay->addWidget(ctab);
 
     auto* g = new ButtonGroup<2>({ "应用","关闭" });
@@ -153,7 +153,7 @@ void BatchCopyTrainDialog::onApply()
             const QTime& tm = model->item(i, BatchCopyTrainModel::ColStartTime)->
                 data(Qt::EditRole).toTime();
             auto nt = std::make_shared<Train>(train->translation(name,
-                qeutil::secsTo(reftime, tm)));
+                qeutil::secsTo(reftime, tm), diagram.options().period_hours));
             diagram.updateTrain(nt);
             trains.append(nt);
             names.insert(name);

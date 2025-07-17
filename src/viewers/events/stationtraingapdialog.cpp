@@ -74,9 +74,9 @@ void StationTrainGapModel::setupModel()
         setItem(i, ColPeriod, it);
         setItem(i, ColPos, new SI(TrainGap::prefixPosToString(ev.type)));
         setItem(i, ColLeftTrain, new SI(ev.left->line->train()->trainName().full()));
-        setItem(i, ColLeftTime, new SI(ev.left->time.toString("hh:mm:ss")));
+        setItem(i, ColLeftTime, new SI(ev.left->time.toString(TrainTime::HMS)));
         setItem(i, ColRightTrain, new SI(ev.right->line->train()->trainName().full()));
-        setItem(i, ColRightTime, new SI(ev.right->time.toString("hh:mm:ss")));
+        setItem(i, ColRightTime, new SI(ev.right->time.toString(TrainTime::HMS)));
         it = new SI;
         it->setData(ev.num, Qt::EditRole);
         setItem(i, ColNumber, it);

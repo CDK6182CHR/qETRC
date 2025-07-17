@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include <QDialog>
+
+#include "data/common/traintime.h"
 #include "model/general/qemoveablemodel.h"
 
 class TrainCollection;
@@ -8,6 +10,9 @@ class QTableView;
 class Train;
 class QBitArray;
 class TrainStation;
+struct DiagramOptions;
+
+
 class CorrectTimetableModel: public QEMoveableModel
 {
     Q_OBJECT
@@ -75,8 +80,8 @@ private:
      */
     void calculateDurations(int row);
 
-    QTime rowArrive(int row)const;
-    QTime rowDepart(int row)const;
+    TrainTime rowArrive(int row)const;
+    TrainTime rowDepart(int row)const;
 
     void calculateSelectedRows(const QBitArray& rows);
     void calculateAllRows();
@@ -103,6 +108,7 @@ class QCheckBox;
 class CorrectTimetableDialog : public QDialog
 {
     Q_OBJECT;
+    const DiagramOptions& _ops;
     std::shared_ptr<Train> train;
     SelectTrainCombo* cbTrain;
     CorrectTimetableModel* const model;
@@ -111,7 +117,7 @@ class CorrectTimetableDialog : public QDialog
     bool informEdit = true;
 public:
     CorrectTimetableDialog(
-         std::shared_ptr<Train> train, QWidget* parent=nullptr);
+         const DiagramOptions& ops, std::shared_ptr<Train> train, QWidget* parent=nullptr);
 private:
     void initUI();
 signals:

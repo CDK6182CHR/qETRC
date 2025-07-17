@@ -17,6 +17,7 @@ class TrainCollection;
 class TimetableWidget;
 class QToolButton;
 class RailCategory;
+struct DiagramOptions;
 
 /**
  * @brief The EditTrainWidget class
@@ -30,6 +31,7 @@ class EditTrainWidget : public QWidget
     Q_OBJECT
     TrainCollection& coll;
     RailCategory& _cat;
+    const DiagramOptions& _ops;
     std::shared_ptr<Train> _train;
 
     QLineEdit* edTrainName,*edDownName,*edUpName;
@@ -53,7 +55,7 @@ class EditTrainWidget : public QWidget
 public:
 
 	// 2025.07.10: add RailCategory reference (test only), for importing rail stations
-    explicit EditTrainWidget(TrainCollection& coll, RailCategory& cat, std::shared_ptr<Train> train,
+    explicit EditTrainWidget(TrainCollection& coll, RailCategory& cat, const DiagramOptions& ops, std::shared_ptr<Train> train,
                              QWidget *parent = nullptr);
     auto train(){return _train;}
     void setTrain(const std::shared_ptr<Train>& train);

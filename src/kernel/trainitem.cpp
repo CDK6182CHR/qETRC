@@ -456,7 +456,7 @@ bool TrainItem::dragBegin(const QPointF& pos, PaintStationPointItem* point, bool
 
 #endif
 
-QTime TrainItem::posToTime(const QPointF& pos) const
+TrainTime TrainItem::posToTime(const QPointF& pos) const
 {
     return calTimeByXFromStart(pos.x() - start_x);
 }
@@ -476,7 +476,7 @@ const QString& TrainItem::dragPointString() const
     }
 }
 
-QTime TrainItem::draggedOldTime() const
+TrainTime TrainItem::draggedOldTime() const
 {
     switch (_dragPoint)
     {
@@ -494,7 +494,7 @@ QTime TrainItem::draggedOldTime() const
     }
 }
 
-void TrainItem::doDrag(const QTime& tm, bool shift)
+void TrainItem::doDrag(const TrainTime& tm, bool shift)
 {
     if (!_onDragging) {
         qDebug() << "TrainItem::doDrag: ERROR: unexpected status" << Qt::endl;
@@ -510,23 +510,23 @@ void TrainItem::doDrag(const QTime& tm, bool shift)
         if (_dragTrans == DragTranslationType::Forward) {
             if (_dragPoint == StationPoint::Arrive) {
                 _draggedStation->trainStation->depart =
-                    _draggedStation->trainStation->depart.addSecs(secs);
+                    _draggedStation->trainStation->depart.addSecs(secs, _diagram.options().period_hours);
             }
             auto itr = std::next(_draggedStation->trainStation);
             for (; itr != train()->timetable().end(); ++itr) {
-                itr->arrive = itr->arrive.addSecs(secs);
-                itr->depart = itr->depart.addSecs(secs);
+                itr->arrive = itr->arrive.addSecs(secs, _diagram.options().period_hours);
+                itr->depart = itr->depart.addSecs(secs, _diagram.options().period_hours);
             }
         }
         else if (_dragTrans == DragTranslationType::Backward) {
             if (_dragPoint == StationPoint::Depart) {
                 _draggedStation->trainStation->arrive =
-                    _draggedStation->trainStation->arrive.addSecs(secs);
+                    _draggedStation->trainStation->arrive.addSecs(secs, _diagram.options().period_hours);
             }
             auto itr = std::make_reverse_iterator(_draggedStation->trainStation);
             for (; itr != train()->timetable().rend(); ++itr) {
-                itr->arrive = itr->arrive.addSecs(secs);
-                itr->depart = itr->depart.addSecs(secs);
+                itr->arrive = itr->arrive.addSecs(secs, _diagram.options().period_hours);
+                itr->depart = itr->depart.addSecs(secs, _diagram.options().period_hours);
             }
         }
         
@@ -916,7 +916,7 @@ QGraphicsSimpleTextItem* TrainItem::setStartEndLabelText(const QString& text, co
     return item;
 }
 
-double TrainItem::calXFromStart(const QTime& time) const
+double TrainItem::calXFromStart(const TrainTime& time) const
 {
     int sec = startTime.secsTo(time);
     if (sec < 0) 
@@ -924,10 +924,10 @@ double TrainItem::calXFromStart(const QTime& time) const
     return sec / config().seconds_per_pix;
 }
 
-QTime TrainItem::calTimeByXFromStart(double x_from_start) const
+TrainTime TrainItem::calTimeByXFromStart(double x_from_start) const
 {
     int sec = (int)std::round(x_from_start * config().seconds_per_pix);
-    return startTime.addSecs(sec);
+    return startTime.addSecs(sec, _diagram.options().period_hours);
 }
 
 double TrainItem::getOutGraph(double xin, double yin, double xout, double yout, 
@@ -1161,7 +1161,7 @@ void TrainItem::hideLinkLine()
     }
 }
 
-void TrainItem::markArriveTime(double x, double y, const QTime& tm)
+void TrainItem::markArriveTime(double x, double y, const TrainTime& tm)
 {
     //到达时刻：下行标右上，下行标右下
     int m = tm.minute();
@@ -1181,7 +1181,7 @@ void TrainItem::markArriveTime(double x, double y, const QTime& tm)
     markLabels.append(item);
 }
 
-void TrainItem::markDepartTime(double x, double y, const QTime& tm)
+void TrainItem::markDepartTime(double x, double y, const TrainTime& tm)
 {
     //出发时刻 下行标左下，上行标左上
     int m = tm.minute();
@@ -1217,8 +1217,8 @@ bool TrainItem::addLinkLine(const QString& trainName)
         return false;
     }
     // 到这里：已经判断好了绘制条件
-    const QTime& last_tm = last->depart;
-    const QTime& first_tm = first->arrive;
+    const TrainTime& last_tm = last->depart;
+    const TrainTime& first_tm = first->arrive;
     //2021.10.09修改：这里必须限制Railway。有可能始发站绑定到了多条线路。
     auto rs = train()->boundStartingAtRail(_railway);
     double xcur = calXFromStart(first_tm);
@@ -1391,7 +1391,7 @@ QGraphicsPathItem* TrainItem::drawLinkLine(double x1, double x2, double y, doubl
     return new QGraphicsPathItem(path.path(), this);
 }
 
-double TrainItem::timeDistancePbc(double x, const QTime& tm) const
+double TrainItem::timeDistancePbc(double x, const TrainTime& tm) const
 {
     double tm_x = calXFromStart(tm) + start_x;
     double width = config().diagramWidth();
@@ -1405,7 +1405,7 @@ double TrainItem::timeDistancePbc(double x, const QTime& tm) const
     return x - tm_x;
 }
 
-void TrainItem::doDragSingle(const QTime& tm)
+void TrainItem::doDragSingle(const TrainTime& tm)
 {
     switch (_dragPoint)
     {

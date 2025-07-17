@@ -15,6 +15,7 @@ class QUndoStack;
 class Railway;
 class RailStation;
 class QMenu;
+struct DiagramOptions;
 
 /**
  * @brief The TimetableQuickWidget class
@@ -23,6 +24,7 @@ class QMenu;
 class TimetableQuickWidget : public QWidget
 {
     Q_OBJECT
+    const DiagramOptions& _ops;
     std::shared_ptr<Train> train;
     TimetableQuickEditableModel* const model;
 
@@ -32,7 +34,7 @@ class TimetableQuickWidget : public QWidget
     LocateBoundingDialog* dlgLocate=nullptr;
     QMenu* meContext;
 public:
-    explicit TimetableQuickWidget(QUndoStack* undo_, QWidget *parent = nullptr);
+    explicit TimetableQuickWidget(const DiagramOptions& ops, QUndoStack* undo_, QWidget *parent = nullptr);
     auto getTrain(){return train;}
     auto getModel() { return model; }
     void setReadonly();

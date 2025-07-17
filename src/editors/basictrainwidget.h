@@ -9,6 +9,7 @@ class TimetableWidget;
 class TimetableStdModel;
 class QTableView;
 class RailCategory;
+struct DiagramOptions;
 
 /**
  * @brief The BasicTrainWidget class
@@ -20,12 +21,14 @@ class BasicTrainWidget : public QWidget
     Q_OBJECT;
     TrainCollection& coll;
     RailCategory& _cat;
+    const DiagramOptions& _ops;
+
     std::shared_ptr<Train> _train;
     const bool commitInPlace;
     TimetableWidget* ctable;
     QTableView* table;
 public:
-    explicit BasicTrainWidget(TrainCollection &coll_, RailCategory& cat, bool commitInPlace_,
+    explicit BasicTrainWidget(TrainCollection &coll_, RailCategory& cat, const DiagramOptions& ops, bool commitInPlace_,
                               QWidget *parent = nullptr);
 
     auto train(){return _train;}

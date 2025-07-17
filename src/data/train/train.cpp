@@ -160,7 +160,7 @@ bool Train::autoPen() const
 }
 
 void Train::appendStation(const StationName &name,
-                          const QTime &arrive, const QTime &depart,
+                          const TrainTime &arrive, const TrainTime &depart,
                           bool business, const QString &track, const QString &note)
 {
     _timetable.emplace_back(name, arrive, depart, business, track, note);
@@ -182,7 +182,7 @@ void Train::resetPen()
 }
 
 void Train::prependStation(const StationName& name, 
-    const QTime& arrive, const QTime& depart,
+    const TrainTime& arrive, const TrainTime& depart,
     bool business, const QString& track, const QString& note)
 {
     _timetable.emplace_front(name, arrive, depart, business, track, note);
@@ -1217,8 +1217,8 @@ std::shared_ptr<Train> Train::fromTrf(const QString& filename)
             QString track;
             if (t.size() >= 6)
                 track = t.at(5);
-            train->appendStation(t.at(0), qeutil::parseTime(t.at(1)),
-                qeutil::parseTime(t.at(2)), business, track);
+            train->appendStation(t.at(0), qeutil::parseTrainTime(t.at(1)),
+                qeutil::parseTrainTime(t.at(2)), business, track);
         }
         else {
             TRC_WARNING << "Invalid train station line: " << line << Qt::endl;

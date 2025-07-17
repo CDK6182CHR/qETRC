@@ -756,7 +756,7 @@ void TrainContext::actRemoveInterpolation()
 }
 
 void TrainContext::locateToBoundStation(const QVector<TrainStationBounding>& boudings, 
-	const QTime& time)
+	const TrainTime& time)
 {
 	// 入参已经保证非空
 	if (boudings.size() == 1) {
@@ -1047,9 +1047,9 @@ void TrainContext::actImportTrainFromCsv()
 
 		// 现在：新读取的时刻添加到toAddTrain所示对象中
 		QString stationName = splitted.at(1);
-		QTime arrive = qeutil::parseTime(splitted.at(2));
-		QTime depart = qeutil::parseTime(splitted.at(3));
-		if (!arrive.isValid() || !depart.isValid())
+		TrainTime arrive = qeutil::parseTrainTime(splitted.at(2));
+		TrainTime depart = qeutil::parseTrainTime(splitted.at(3));
+		if (arrive.isNull() || depart.isNull())
 			continue;
 		QString track, note;
 		if (splitted.size() >= 5)
@@ -1173,7 +1173,7 @@ void TrainContext::actSimpleInterpolation()
 		diagram.updateTrain(tab);
 		auto nadp = tab->adapterFor(*rail);
 
-		int cnt = nadp->timetableInterpolationSimple();
+		int cnt = nadp->timetableInterpolationSimple(diagram.options().period_hours);
 		if (cnt) {
 			mw->getUndoStack()->push(new qecmd::TimetableInterpolationSimple(train, tab, this,
 				rail.get()));
@@ -1277,7 +1277,7 @@ void TrainContext::showBasicWidget(std::shared_ptr<Train> train)
 	int idx = getBasicWidgetIndex(train);
 	if (idx == -1) {
 		//创建
-		auto* w = new BasicTrainWidget(diagram.trainCollection(), diagram.railCategory(), false);
+		auto* w = new BasicTrainWidget(diagram.trainCollection(), diagram.railCategory(), diagram.options(), false);
 		w->setTrain(train);
 		auto* dock = new ads::CDockWidget(tr("时刻表编辑 - %1").arg(train->trainName().full()));
 		dock->setWidget(w);
@@ -1311,7 +1311,7 @@ void TrainContext::showEditWidget(std::shared_ptr<Train> train)
 	int idx = getEditWidgetIndex(train);
 	if (idx == -1) {
 		//创建
-		auto* w = new EditTrainWidget(diagram.trainCollection(), diagram.railCategory(), train);
+		auto* w = new EditTrainWidget(diagram.trainCollection(), diagram.railCategory(), diagram.options(), train);
 		auto* dock = new ads::CDockWidget(tr("列车编辑 - %1").arg(train->trainName().full()));
 		connect(w, &QWidget::windowTitleChanged, dock, &ads::CDockWidget::setWindowTitle);
 		w->setTrain(train);
@@ -1608,7 +1608,7 @@ void TrainContext::actAdjustTimetable()
 		QMessageBox::warning(mw, tr("错误"), tr("时刻表调整：当前没有选中车次！"));
 		return;
 	}
-	auto* dialog = new ModifyTimetableDialog(train, mw);
+	auto* dialog = new ModifyTimetableDialog(diagram.options(), train, mw);
 	connect(dialog, &ModifyTimetableDialog::trainUpdated,
 		this, &TrainContext::onTrainTimetableChanged);
 	dialog->show();
@@ -1641,7 +1641,7 @@ void TrainContext::refreshCurrentTrainWidgets()
 void TrainContext::actCorrection()
 {
 	if (!train)return;
-	auto* dlg = new CorrectTimetableDialog(train, mw);
+	auto* dlg = new CorrectTimetableDialog(diagram.options(), train, mw);
 	connect(dlg, &CorrectTimetableDialog::correctionApplied,
 		this, &TrainContext::onTrainTimetableChanged);
 	dlg->show();

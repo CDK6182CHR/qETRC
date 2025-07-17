@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 #include <QGraphicsItem>
-#include <QTime>
 #include <Qt>
 
+#include "data/common/traintime.h"
 #include "data/diagram/diagrampage.h"
 #include "data/train/stationpoint.h"
 
@@ -43,7 +43,7 @@ class TrainItem : public QGraphicsItem
     bool _startAtThis, _endAtThis;
 
     QPointF startPoint, endPoint;
-    QTime startTime;
+    TrainTime startTime;
 
     QRectF _bounding;
 
@@ -192,7 +192,7 @@ public:
      * 2023.05.30  for drag move event: return the time corresponding to the pos by simply calculation.
      * PBC is implicitly considered.
      */
-    QTime posToTime(const QPointF& pos)const;
+    TrainTime posToTime(const QPointF& pos)const;
 
     const QString& dragPointString()const;
 
@@ -200,12 +200,12 @@ public:
 
     bool isOnDragging()const { return _onDragging; }
 
-    QTime draggedOldTime()const;
+    TrainTime draggedOldTime()const;
 
     /**
      * Commit the drag, then set to non-dragging mode.
      */
-    void doDrag(const QTime& tm, bool shift);
+    void doDrag(const TrainTime& tm, bool shift);
 
 private:
     
@@ -235,13 +235,13 @@ private:
      * @brief 计算时刻对应的横坐标数值（相对于起始点）
      * 注意：规定返回总是正值。
      */
-    double calXFromStart(const QTime& time)const;
+    double calXFromStart(const TrainTime& time)const;
 
     /**
      * 2023.05.30  the inverse operation of calXFromStart: 
      * Compute the time corresponding to the given x (with start_x extracted)
      */
-    QTime calTimeByXFromStart(double x_from_start)const;
+    TrainTime calTimeByXFromStart(double x_from_start)const;
 
     /**
      * @brief 出图操作  运行线右越界
@@ -299,9 +299,9 @@ private:
      * 特别说明对折返的处理：无终止标签的最后一站只标记到点，无起始标签的第一站只标记开点
      * 如果折返站没有停点，行为未定义 （标出来的结果是不对的）
      */
-    void markArriveTime(double x, double y, const QTime& tm);
+    void markArriveTime(double x, double y, const TrainTime& tm);
 
-    void markDepartTime(double x, double y, const QTime& tm);
+    void markDepartTime(double x, double y, const TrainTime& tm);
 
     /**
      * @brief addLinkLine
@@ -348,12 +348,12 @@ private:
      * The sign is reserved, which is defined as:  x - tm 
      * MIND: if the distance is quite large, then the result may be not reliable.
      */
-    double timeDistancePbc(double x, const QTime& tm)const;
+    double timeDistancePbc(double x, const TrainTime& tm)const;
 
     /**
      * Do time drag for the operated single point
      */
-    void doDragSingle(const QTime& tm);
+    void doDragSingle(const TrainTime& tm);
 };
 
 

@@ -25,13 +25,13 @@ void TrainCompareModel::refreshData()
 		const auto& t = diff->stations.at(i);
 		if (t.station1.has_value()) {
 			setItem(i, ColName1, new SI(t.station1.value()->name.toSingleLiteral()));
-			setItem(i, ColArrive1, new SI(t.station1.value()->arrive.toString("hh:mm:ss")));
-			setItem(i, ColDepart1, new SI(t.station1.value()->depart.toString("hh:mm:ss")));
+			setItem(i, ColArrive1, new SI(t.station1.value()->arrive.toString(TrainTime::HMS)));
+			setItem(i, ColDepart1, new SI(t.station1.value()->depart.toString(TrainTime::HMS)));
 		}
 		if (t.station2.has_value()) {
 			setItem(i, ColName2, new SI(t.station2.value()->name.toSingleLiteral()));
-			setItem(i, ColArrive2, new SI(t.station2.value()->arrive.toString("hh:mm:ss")));
-			setItem(i, ColDepart2, new SI(t.station2.value()->depart.toString("hh:mm:ss")));
+			setItem(i, ColArrive2, new SI(t.station2.value()->arrive.toString(TrainTime::HMS)));
+			setItem(i, ColDepart2, new SI(t.station2.value()->depart.toString(TrainTime::HMS)));
 		}
 		if (t.type == StationDiff::Unchanged) {
 			// nothing todo ..

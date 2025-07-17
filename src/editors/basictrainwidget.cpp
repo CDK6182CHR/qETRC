@@ -14,9 +14,9 @@
 #include <QHeaderView>
 
 
-BasicTrainWidget::BasicTrainWidget(TrainCollection &coll_,RailCategory& cat, bool commitInPlace_,
+BasicTrainWidget::BasicTrainWidget(TrainCollection &coll_,RailCategory& cat, const DiagramOptions& ops, bool commitInPlace_,
     QWidget *parent) : QWidget(parent),
-    coll(coll_), _cat(cat),
+    coll(coll_), _cat(cat), _ops(ops),
     commitInPlace(commitInPlace_)
 {
     initUI();
@@ -49,7 +49,7 @@ void BasicTrainWidget::initUI()
 {
     auto* vlay = new QVBoxLayout;
 
-    ctable = new TimetableWidget(commitInPlace, this);
+    ctable = new TimetableWidget(commitInPlace, _ops, this);
     table = ctable->table();
     //暂时只搞一个table
     vlay->addWidget(ctable);

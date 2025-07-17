@@ -92,7 +92,7 @@ TrainEventList Diagram::listTrainEvents(const Train& train) const
 {
     TrainEventList res;
     foreach (auto p , train.adapters()) {
-        res.push_back(qMakePair(p, p->listAdapterEvents(_trainCollection)));
+        res.push_back(qMakePair(p, p->listAdapterEvents(_trainCollection, _options.period_hours)));
     }
     return res;
 }
@@ -106,7 +106,7 @@ DiagnosisList Diagram::diagnoseTrain(const Train& train, bool withIntMeet,
     foreach(auto adp, train.adapters()) {
         if (!railway || adp->railway() == railway) {
             foreach(auto line, adp->lines()) {
-                auto sub = line->diagnoseLine(_trainCollection, withIntMeet);
+                auto sub = line->diagnoseLine(_trainCollection, withIntMeet, _options.period_hours);
                 if (filtByRange) {
                     foreach(auto ev, sub) {
                         if (ev.inRange(start,end)) {
@@ -361,7 +361,7 @@ RailStationEventList
         foreach (auto adp , train->adapters()) {
             if (adp->isInSameRailway(railway)) {
                 foreach (auto line , adp->lines()) {
-                    const auto& lst = line->stationEventFromRail(st);
+                    const auto& lst = line->stationEventFromRail(st, _options.period_hours);
                     for (auto p = lst.begin(); p != lst.end(); ++p) {
                         res.push_back(*p);
                     }
@@ -402,14 +402,14 @@ RailwayStationEventAxis Diagram::stationEventAxisForRail(std::shared_ptr<Railway
     return res;
 }
 
-std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>> Diagram::sectionEvents(std::shared_ptr<Railway> railway, double y) const
+std::vector<std::pair<std::shared_ptr<TrainLine>, TrainTime>> Diagram::sectionEvents(std::shared_ptr<Railway> railway, double y) const
 {
     SectionEventList res;
     foreach (auto train , _trainCollection.trains()) {
         foreach (auto adp , train->adapters()) {
             if (adp->isInSameRailway(railway)) {
                 foreach (auto line , adp->lines()) {
-                    auto t = line->sectionTime(y);
+                    auto t = line->sectionTime(y, _options.period_hours);
                     if (t.has_value()) {
                         res.emplace_back(line, t.value());
                     }
@@ -417,7 +417,7 @@ std::vector<std::pair<std::shared_ptr<TrainLine>, QTime>> Diagram::sectionEvents
             }
         }
     }
-    using PR = std::pair<std::shared_ptr<TrainLine>, QTime>;
+    using PR = std::pair<std::shared_ptr<TrainLine>, TrainTime>;
     std::sort(res.begin(), res.end(), [](const PR& p1, const PR& p2) {
         return p1.second< p2.second;
         });
@@ -738,14 +738,14 @@ TrainGapList Diagram::getTrainGapsSingle(const RailStationEventList& events,
 #endif 
 
 
-SnapEventList Diagram::getSnapEvents(std::shared_ptr<Railway> railway, const QTime& time) const
+SnapEventList Diagram::getSnapEvents(std::shared_ptr<Railway> railway, const TrainTime& time) const
 {
     SnapEventList res;
     foreach (auto train , _trainCollection.trains()) {
         foreach (auto adp , train->adapters()) {
             if (adp->isInSameRailway(railway)) {
                 foreach (auto line , adp->lines()) {
-                    res.append(line->getSnapEvents(time));
+                    res.append(line->getSnapEvents(time, _options.period_hours));
                 }
             }
         }
@@ -975,8 +975,8 @@ bool Diagram::fromTrc(QTextStream& fin)
                 //at(9)是天窗信息
                 auto s = t.at(9).split("-");
                 if (s.size() >= 2) {
-                    QTime start = qeutil::parseTime(s.at(0)),
-                        end = qeutil::parseTime(s.at(1));
+                    TrainTime start = qeutil::parseTrainTime(s.at(0)),
+                        end = qeutil::parseTrainTime(s.at(1));
                     auto forbid = railway->firstForbid();
                     auto node = railway->firstUpInterval()->getForbidNode(forbid);
                     node->beginTime = start;
@@ -1000,8 +1000,8 @@ bool Diagram::fromTrc(QTextStream& fin)
                 QString track;
                 if (t.size() >= 6)
                     track = t.at(5);
-                train->appendStation(t.at(0), qeutil::parseTime(t.at(1)),
-                    qeutil::parseTime(t.at(2)), business, track);
+                train->appendStation(t.at(0), qeutil::parseTrainTime(t.at(1)),
+                    qeutil::parseTrainTime(t.at(2)), business, track);
             }
             else {
                 TRC_WARNING << "Invalid train station line: " << line << Qt::endl;
@@ -1538,8 +1538,8 @@ bool Diagram::toTrc(const QString& filename, std::shared_ptr<Railway> rail, bool
                 // 2024.03.17: n may be null, because the interval may be invalid. 
                 // For example, the previous station may be up-only, thus the interval is invalid.
                 // since ETRC does not support single-direction stations, we just ignore this case.
-                fout << n->beginTime.toString("hh:mm") << "-" <<
-                    n->endTime.toString("hh:mm");
+                fout << n->beginTime.toString(TrainTime::HM) << "-" <<
+                    n->endTime.toString(TrainTime::HM);
             }
         }
         fout << Qt::endl;

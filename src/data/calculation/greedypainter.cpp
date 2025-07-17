@@ -330,7 +330,7 @@ typename GreedyPainter::RecurseReport
 		// 区间运行冲突
 
 		auto rep = _railAxis.intervalConflicted(st_from, st_to, _dir, ev_start.time, 
-			int_secs, railint->isSingleRail(), false);
+			int_secs, railint->isSingleRail(), false, period_hours);
 		if (rep.type != IntervalConflictReport::NoConflict) {
 			// 存在冲突
 			if (!stop && st_from != _anchor) {
@@ -691,7 +691,7 @@ typename GreedyPainter::RecurseReport
 		// 区间运行冲突  注意区间的判定按照正向运行的逻辑传参
 
 		auto rep = _railAxis.intervalConflicted(st_to, st_from, _dir, tm_dep, int_secs, 
-			railint->isSingleRail(), true);
+			railint->isSingleRail(), true, period_hours);
 		if (rep.type != IntervalConflictReport::NoConflict) {
 			// 存在冲突
 			if (!stop) {

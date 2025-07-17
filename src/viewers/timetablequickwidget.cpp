@@ -10,12 +10,13 @@
 #include <QMenu>
 #include <QScroller>
 
-#include <data/common/qesystem.h>
+#include "data/common/qesystem.h"
 #include "data/train/train.h"
 #include "dialogs/locatedialog.h"
+#include "model/delegate/traintimedelegate.h"
 
-TimetableQuickWidget::TimetableQuickWidget(QUndoStack* undo_, QWidget *parent):
-    QWidget(parent),
+TimetableQuickWidget::TimetableQuickWidget(const DiagramOptions& ops, QUndoStack* undo_, QWidget *parent):
+    QWidget(parent), _ops(ops),
     model(new TimetableQuickEditableModel(undo_,this))
 {
     initUI();
@@ -56,7 +57,7 @@ void TimetableQuickWidget::initUI()
     table->verticalHeader()->hide();
     table->setModel(model);
     table->setItemDelegateForColumn(TimetableQuickModel::ColTime,
-        new TimeQuickDelegate(this));
+        new TrainTimeQuickDelegate(_ops, this));
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     {
         int c = 0;

@@ -123,11 +123,11 @@ void SplitTrainModel::refreshData()
         it->setEditable(false);
         setItem(n, ColName, it);
 
-        it=new SI(itr->arrive.toString("hh:mm:ss"));
+        it=new SI(itr->arrive.toString(TrainTime::HMS));
         it->setEditable(false);
         setItem(n, ColArrive, it);
 
-        it=new SI(itr->arrive.toString("hh:mm:ss"));
+        it=new SI(itr->arrive.toString(TrainTime::HMS));
         it->setEditable(false);
         setItem(n, ColDepart, it);
 

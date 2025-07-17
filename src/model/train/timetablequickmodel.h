@@ -49,12 +49,12 @@ public:
      */
     std::list<TrainStation>::iterator trainStationForRow(int row)const;
 
-    QTime arriveTimeForRow(int row)const;
-    QTime departTimeForRow(int row)const;
+    TrainTime arriveTimeForRow(int row)const;
+    TrainTime departTimeForRow(int row)const;
 
 protected:
-    void setTimeItem(int row,const QTime& tm);
-    void setTimeItem(int row,const QTime& tm,const QString& text);
+    void setTimeItem(int row,const TrainTime& tm);
+    void setTimeItem(int row,const TrainTime& tm,const QString& text);
 
     void setupModel();
     void setStationColor(int row, const QColor& color);

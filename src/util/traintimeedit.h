@@ -54,6 +54,9 @@ private:
     Section firstSection()const;
     Section lastSection()const;
 
+signals:
+    void timeChanged(const TrainTime& time);
+
 public slots:
     void updateTime();
 

@@ -31,11 +31,11 @@
 #include "timetablewidget.h"
 
 
-EditTrainWidget::EditTrainWidget(TrainCollection &coll, RailCategory& cat,
+EditTrainWidget::EditTrainWidget(TrainCollection &coll, RailCategory& cat, const DiagramOptions& ops,
                                  std::shared_ptr<Train> train,
                                  QWidget *parent):
-    QWidget(parent),coll(coll), _cat(cat), _train(train),
-    ctable(new TimetableWidget(false,this))
+    QWidget(parent),coll(coll), _cat(cat), _ops(ops), _train(train),
+    ctable(new TimetableWidget(false, _ops, this))
 {
     initUI();
     setTrain(train);

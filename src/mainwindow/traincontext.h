@@ -312,7 +312,7 @@ public slots:
      * 代替quickWidget处理定位问题：显示对话框
      */
     void locateToBoundStation(const QVector<TrainStationBounding>& boudings,
-        const QTime& time);
+        const TrainTime& time);
 
     /**
      * 自动营业站  代理MainWindow的东西

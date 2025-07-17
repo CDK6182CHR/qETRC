@@ -4,6 +4,7 @@
 #pragma once
 
 #include "data/common/direction.h"
+#include "data/common/traintime.h"
 
 class RailInterval;
 class RulerNode;
@@ -13,6 +14,8 @@ class ForbidNode;
 /**
  * @brief The GraphForbidNode struct
  * 天窗  暂定直接按照下标来合并
+ * 2025.07.17: For current version, we use QTime to express the time range in forbid.
+ * This is because the time period is an attribute of Diagram, which is not avaiable in DB.
  */
 struct GraphForbidNode{
     QTime beginTime,endTime;

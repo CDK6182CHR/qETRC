@@ -3,19 +3,19 @@
 #include <QHeaderView>
 
 #include "data/common/qesystem.h"
-#include "model/delegate/qetimedelegate.h"
+#include "model/delegate/traintimedelegate.h"
 #include "data/train/train.h"
 
-TrainTimetablePlane::TrainTimetablePlane(QWidget *parent) :
-    QTableView(parent), model(new TimetableConstModel(this))
+TrainTimetablePlane::TrainTimetablePlane(const DiagramOptions& ops, QWidget *parent) :
+    QTableView(parent), _ops(ops), model(new TimetableConstModel(this))
 {
     setModel(model);
     verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     setEditTriggers(QTableView::NoEditTriggers);
     setItemDelegateForColumn(TimetableStdModel::ColArrive,
-        new QETimeDelegate(this));
+        new TrainTimeDelegate(_ops, this));
     setItemDelegateForColumn(TimetableStdModel::ColDepart,
-        new QETimeDelegate(this));
+        new TrainTimeDelegate(_ops, this));
 }
 
 void TrainTimetablePlane::setTrain(std::shared_ptr<const Train> train_)

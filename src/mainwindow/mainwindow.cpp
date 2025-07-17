@@ -713,7 +713,7 @@ void MainWindow::initDockWidgets()
 
 	// 速览时刻
 	if constexpr (true) {
-		auto* w = new TimetableQuickWidget(undoStack);
+		auto* w = new TimetableQuickWidget(_diagram.options(), undoStack);
 		dock = new ads::CDockWidget(tr("速览时刻"));
 		dock->setWidget(w);
 		timetableQuickWidget = w;
@@ -1928,7 +1928,7 @@ void MainWindow::initLocateDialog()
 		this, &MainWindow::locateDiagramOnStation);
 }
 
-void MainWindow::locateToRailMile(std::shared_ptr<const Railway> rail, double mile, const QTime& time)
+void MainWindow::locateToRailMile(std::shared_ptr<const Railway> rail, double mile, const TrainTime& time)
 {
 	if (!locateDialog) {
 		initLocateDialog();
@@ -2654,7 +2654,7 @@ void MainWindow::saveDefaultConfig()
 	_diagram.saveDefaultConfigs();
 }
 
-void MainWindow::locateDiagramOnMile(int pageIndex, std::shared_ptr<const Railway> railway, double mile, const QTime& time)
+void MainWindow::locateDiagramOnMile(int pageIndex, std::shared_ptr<const Railway> railway, double mile, const TrainTime& time)
 {
 	if (pageIndex < 0) {
 		QMessageBox::warning(this, tr("错误"), tr("线路[%1]没有包含在任何运行图中，"
@@ -2667,7 +2667,7 @@ void MainWindow::locateDiagramOnMile(int pageIndex, std::shared_ptr<const Railwa
 }
 
 void MainWindow::locateDiagramOnStation(int pageIndex, std::shared_ptr<const Railway> railway,
-	std::shared_ptr<const RailStation> station, const QTime& time)
+	std::shared_ptr<const RailStation> station, const TrainTime& time)
 {
 	if (pageIndex < 0) {
 		QMessageBox::warning(this, tr("错误"), tr("线路[%1]没有包含在任何运行图中，"

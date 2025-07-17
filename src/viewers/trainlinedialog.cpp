@@ -147,8 +147,8 @@ void TrainLineDetailModel::setTrainRow(int row, Train::ConstStationPtr st, bool 
     //tr("列车站名"),tr("到点"),tr("开点"),tr("股道"),
     using SI=QStandardItem;
     setItem(row,ColTrainStation,new SI(st->name.toSingleLiteral()));
-    setItem(row,ColArrive,new SI(st->arrive.toString("hh:mm:ss")));
-    setItem(row,ColDepart,new SI(st->depart.toString("hh:mm:ss")));
+    setItem(row,ColArrive,new SI(st->arrive.toString(TrainTime::HMS)));
+    setItem(row,ColDepart,new SI(st->depart.toString(TrainTime::HMS)));
     setItem(row,ColTrack,new SI(st->track));
     QBrush brush;
     if(bound)

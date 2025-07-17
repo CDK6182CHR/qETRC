@@ -5,25 +5,25 @@
 #include <QLineEdit>
 #include <QTableView>
 #include <QHeaderView>
-#include <QTimeEdit>
 #include <QMessageBox>
 #include <QLabel>
 #include <QTextBrowser>
 
-#include <data/train/trainname.h>
-#include <data/common/qesystem.h>
-#include <data/rail/ruler.h>
-#include <data/rail/rulernode.h>
-#include <model/delegate/qedelegate.h>
-#include <model/delegate/generalspindelegate.h>
-#include <model/delegate/postivespindelegate.h>
-#include <model/delegate/qetimedelegate.h>
-#include <model/delegate/timeintervaldelegate.h>
-#include <data/calculation/greedypainter.h>
-#include <data/diagram/diagram.h>
-#include <data/train/train.h>
-#include <dialogs/selecttrainstationdialog.h>
-#include <dialogs/batchaddstopdialog.h>
+#include "data/train/trainname.h"
+#include "data/common/qesystem.h"
+#include "data/rail/ruler.h"
+#include "data/rail/rulernode.h"
+#include "model/delegate/qedelegate.h"
+#include "model/delegate/generalspindelegate.h"
+#include "model/delegate/postivespindelegate.h"
+#include "model/delegate/qetimedelegate.h"
+#include "model/delegate/timeintervaldelegate.h"
+#include "data/calculation/greedypainter.h"
+#include "data/diagram/diagram.h"
+#include "data/train/train.h"
+#include "dialogs/selecttrainstationdialog.h"
+#include "dialogs/batchaddstopdialog.h"
+#include "util/traintimeedit.h"
 
 
 GreedyPaintConfigModel::GreedyPaintConfigModel(QWidget* parent):
@@ -174,14 +174,14 @@ int GreedyPaintConfigModel::actualStopSecsForRow(int row) const
     return item(row, ColActualStop)->data(Qt::EditRole).toInt();
 }
 
-QTime GreedyPaintConfigModel::arriveTimeForRow(int row) const
+TrainTime GreedyPaintConfigModel::arriveTimeForRow(int row) const
 {
-    return item(row, ColArrive)->data(Qt::EditRole).toTime();
+    return qvariant_cast<TrainTime>(item(row, ColArrive)->data(Qt::EditRole));
 }
 
-QTime GreedyPaintConfigModel::departTimeForRow(int row) const
+TrainTime GreedyPaintConfigModel::departTimeForRow(int row) const
 {
-    return item(row, ColDepart)->data(Qt::EditRole).toTime();
+    return qvariant_cast<TrainTime>(item(row, ColDepart)->data(Qt::EditRole));
 }
 
 bool GreedyPaintConfigModel::fixedForRow(int row) const
@@ -219,8 +219,8 @@ void GreedyPaintConfigModel::setTimetable(std::shared_ptr<Train> train)
     int row = rowForStation(train->timetable().front().name);
     for (const auto& st:train->timetable()) {
         item(row, ColActualStop)->setData(st.stopSec(), Qt::EditRole);
-        item(row, ColArrive)->setData(st.arrive, Qt::EditRole);
-        item(row, ColDepart)->setData(st.depart, Qt::EditRole);
+        item(row, ColArrive)->setData(QVariant::fromValue(st.arrive), Qt::EditRole);
+        item(row, ColDepart)->setData(QVariant::fromValue(st.depart), Qt::EditRole);
         row++;
     }
 }
@@ -499,9 +499,10 @@ void GreedyPaintPagePaint::initUI()
     flay->addRow(tr("车次"), gpDir);
 
     auto* hlay=new QHBoxLayout;
-    edAnchorTime=new QTimeEdit;
+    edAnchorTime=new TrainTimeEdit;
+	edAnchorTime->setFormat(TrainTime::HMS);
     edAnchorTime->setWrapping(true);
-    edAnchorTime->setDisplayFormat("hh:mm:ss");
+    edAnchorTime->setFormat(TrainTime::HMS);
     hlay->addWidget(edAnchorTime);
     gpAnchorRole = new RadioButtonGroup<2>({ "作为到达时刻","作为出发时刻" }, this);
     gpAnchorRole->get(0)->setChecked(true);
@@ -516,7 +517,7 @@ void GreedyPaintPagePaint::initUI()
     hlay->addWidget(btn);
 
     flay->addRow(tr("锚点时刻"),hlay);
-    connect(edAnchorTime, &QTimeEdit::timeChanged, this, &GreedyPaintPagePaint::paintTmpTrain);
+    connect(edAnchorTime, &TrainTimeEdit::timeChanged, this, &GreedyPaintPagePaint::paintTmpTrain);
     connect(gpAnchorRole->get(0), &QRadioButton::toggled, this, &GreedyPaintPagePaint::paintTmpTrain);
 
     ckStarting = new QCheckBox(tr("在本段运行线始发"));
@@ -808,7 +809,7 @@ void GreedyPaintPagePaint::actLoadStopTime()
             "是否确认？"));
     if (p != QMessageBox::Yes)
         return;
-    auto res = SelectTrainStationsDialog::dlgGetStation(diagram.trainCollection(), this);
+    auto res = SelectTrainStationsDialog::dlgGetStation(diagram.trainCollection(), diagram.options(), this);
     bool anyUpdate = false;
     std::map<std::shared_ptr<const RailStation>, int> stopsecs;
     for (const auto& t : res) {

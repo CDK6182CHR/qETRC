@@ -4,7 +4,7 @@
 #include "util/utilfunc.h"
 #include "util/buttongroup.hpp"
 #include "data/common/qesystem.h"
-#include "model/delegate/qetimedelegate.h"
+#include "model/delegate/traintimedelegate.h"
 
 #include <QLabel>
 #include <QTableView>
@@ -15,8 +15,8 @@
 #include <QMessageBox>
 #include <stdexcept>
 
-#include <util/selecttraincombo.h>
-#include <data/algo/timetablecorrector.h>
+#include "util/selecttraincombo.h"
+#include "data/algo/timetablecorrector.h"
 
 CorrectTimetableModel::CorrectTimetableModel(std::shared_ptr<Train> train, QObject *parent):
     QEMoveableModel(parent),train(train)
@@ -194,10 +194,10 @@ void CorrectTimetableModel::setupModel()
         setItem(row, ColName, it);
 
         it = new SI;
-        it->setData(p->arrive, Qt::EditRole);
+        it->setData(QVariant::fromValue(p->arrive), Qt::EditRole);
         setItem(row, ColArrive, it);
         it = new SI;
-        it->setData(p->depart, Qt::EditRole);
+        it->setData(QVariant::fromValue(p->depart), Qt::EditRole);
         setItem(row, ColDepart, it);
 
         it=makeCheckItem();
@@ -238,14 +238,14 @@ void CorrectTimetableModel::calculateDurations(int row)
     }
 }
 
-QTime CorrectTimetableModel::rowArrive(int row) const
+TrainTime CorrectTimetableModel::rowArrive(int row) const
 {
-    return item(row, ColArrive)->data(Qt::EditRole).toTime();
+    return qvariant_cast<TrainTime>(item(row, ColArrive)->data(Qt::EditRole));
 }
 
-QTime CorrectTimetableModel::rowDepart(int row) const
+TrainTime CorrectTimetableModel::rowDepart(int row) const
 {
-    return item(row, ColDepart)->data(Qt::EditRole).toTime();
+    return qvariant_cast<TrainTime>(item(row, ColDepart)->data(Qt::EditRole));
 }
 
 void CorrectTimetableModel::calculateSelectedRows(const QBitArray &rows)
@@ -319,8 +319,8 @@ void CorrectTimetableModel::onDataChanged(const QModelIndex& topLeft, const QMod
 }
 
 CorrectTimetableDialog::CorrectTimetableDialog(
-                 std::shared_ptr<Train> train, QWidget *parent):
-    QDialog(parent),train(train), model(new CorrectTimetableModel(train,this))
+                 const DiagramOptions& ops, std::shared_ptr<Train> train, QWidget *parent):
+    QDialog(parent), _ops(ops), train(train), model(new CorrectTimetableModel(train,this))
 {
     resize(700,800);
     setWindowTitle(tr("时刻表修正 - %1").arg(train->trainName().full()));
@@ -370,7 +370,7 @@ void CorrectTimetableDialog::initUI()
     table->setEditTriggers(QTableView::NoEditTriggers);
     table->setSelectionMode(QTableView::ExtendedSelection);
     vlay->addWidget(table);
-    auto* dele = new QETimeDelegate(this);
+    auto* dele = new TrainTimeDelegate(_ops, this);
     table->setItemDelegateForColumn(CorrectTimetableModel::ColArrive, dele);
     table->setItemDelegateForColumn(CorrectTimetableModel::ColDepart, dele);
 

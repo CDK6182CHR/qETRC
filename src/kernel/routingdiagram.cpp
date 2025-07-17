@@ -144,7 +144,7 @@ void RoutingDiagram::paintDiagram()
         dir_down = (endPoint.y()>startPoint.y());
 
         // 始发站时刻标签
-        textItem=scene()->addSimpleText(train->timetable().front().arrive.toString("hh:mm"));
+        textItem=scene()->addSimpleText(train->timetable().front().arrive.toString(TrainTime::HM));
         h=textItem->boundingRect().height();
         // 始发时刻标在右侧，终到时刻标在左侧
         int scale=(dir_down.value()?1:0);
@@ -152,7 +152,7 @@ void RoutingDiagram::paintDiagram()
         textItem->setY(startPoint.y()-scale*h);
         _adjustTimeItem(textItem,-2*scale+1);
         //终到时刻
-        textItem=scene()->addSimpleText(train->timetable().back().depart.toString("hh:mm"));
+        textItem=scene()->addSimpleText(train->timetable().back().depart.toString(TrainTime::HM));
         rect=textItem->boundingRect();
         w=rect.width();h=rect.height();
         textItem->setX(endPoint.x()-w);

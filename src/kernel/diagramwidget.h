@@ -3,9 +3,9 @@
 #include <memory>
 #include <QGraphicsView>
 #include <QString>
-#include <QTime>
 #include <deque>
 #include "data/common/direction.h"
+#include "data/common/traintime.h"
 #include "data/diagram/trainline.h"
 #include "data/common/qeglobal.h"
 
@@ -74,7 +74,7 @@ class DiagramWidget : public QGraphicsView
 
     bool updating = false;
 
-    QTime startTime;
+    TrainTime startTime;
 
     QMenu* contextMenu = nullptr;
 
@@ -308,7 +308,7 @@ private:
     void addForbidNode(std::shared_ptr<Forbid> forbid, std::shared_ptr<ForbidNode> node,
         const QBrush& brush, const QPen& pen, double startY);
 
-    double calXFromStart(const QTime& time)const;
+    double calXFromStart(const TrainTime& time)const;
 
     /**
      * 指定位置的TrainItem，如果没有，返回空、
@@ -405,9 +405,9 @@ public slots:
      * 定位到指定线路的指定车站
      */
     void locateToStation(std::shared_ptr<const Railway> railway,
-        std::shared_ptr<const RailStation> station, const QTime& tm);
+        std::shared_ptr<const RailStation> station, const TrainTime& tm);
 
-    void locateToMile(std::shared_ptr<const Railway> railway, double mile, const QTime& tm);
+    void locateToMile(std::shared_ptr<const Railway> railway, double mile, const TrainTime& tm);
 
     /**
      * 2024.02.12  add the info widget into scene.

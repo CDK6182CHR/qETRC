@@ -120,8 +120,8 @@ std::shared_ptr<Train> TimetableStdModel::getTimetableTrain()
         }
         t->appendStation(
             StationName::fromSingleLiteral(name),
-            qvariant_cast<QTime>(item(i, ColArrive)->data(Qt::EditRole)),
-            qvariant_cast<QTime>(item(i, ColDepart)->data(Qt::EditRole)),
+            qvariant_cast<TrainTime>(item(i, ColArrive)->data(Qt::EditRole)),
+            qvariant_cast<TrainTime>(item(i, ColDepart)->data(Qt::EditRole)),
             item(i, ColBusiness)->checkState() == Qt::Checked,
             item(i, ColTrack)->text(),
             item(i, ColNote)->text()

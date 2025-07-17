@@ -42,9 +42,9 @@ void StationTimetableSettledModel::setupModel()
         setItem(i,ColTrainName,new SI(train->trainName().full()));
         setItem(i,ColStationName,new SI(p.second->trainStation->name.toSingleLiteral()));
         setItem(i,ColArrive,new SI(p.second->trainStation->arrive
-                                   .toString("hh:mm:ss")));
+                                   .toString(TrainTime::HMS)));
         setItem(i,ColDepart,new SI(p.second->trainStation->depart
-                                   .toString("hh:mm:ss")));
+                                   .toString(TrainTime::HMS)));
         setItem(i,ColType,new SI(train->type()->name()));
         QString stop;
         if(train->isStartingStation(p.second))
