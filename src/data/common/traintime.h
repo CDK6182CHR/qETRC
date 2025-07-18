@@ -73,12 +73,12 @@ public:
      */
     int secsTo(const TrainTime& rhs)const;
 
-    // For compatible with QTime (only before finishing...)
+    // For compatible with QTime (only explicit function calls for safety)
     QTime toQTime()const;
-    operator QTime()const;
+    //operator QTime()const;
 
     static TrainTime fromQTime(const QTime& t);
-    explicit TrainTime(const QTime& qtm);
+    //explicit TrainTime(const QTime& qtm);
 
 private:
     explicit TrainTime(int secsSinceStart);

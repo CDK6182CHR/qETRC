@@ -36,7 +36,7 @@ public:
     RailSectionEventsModel(Diagram& diagram_, std::shared_ptr<Railway> rail,
                            QObject* parent=nullptr);
     void setY(double y);
-    QTime timeForRow(int row)const;
+    TrainTime timeForRow(int row)const;
 
 private:
     void setupModel();
@@ -65,7 +65,7 @@ private:
     void initUI();
 signals:
     void locateToEvent(int pageIndex, std::shared_ptr<const Railway>, double mile,
-        const QTime&);
+        const TrainTime&);
 private slots:
 
     /**

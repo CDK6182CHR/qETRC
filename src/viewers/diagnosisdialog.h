@@ -39,7 +39,7 @@ public:
 private:
     void setupModel();
 signals:
-    void locateToRailMile(std::shared_ptr<const Railway> rail, double mile, const QTime& tm);
+    void locateToRailMile(std::shared_ptr<const Railway> rail, double mile, const TrainTime& tm);
 public slots:
     void setupForTrain(std::shared_ptr<Train> train, 
                        std::shared_ptr<Railway> railway,

@@ -78,7 +78,7 @@ private:
     bool isConflict(const RailStationEventBase& left,
                     const RailStationEventBase& right,
                     const GapConstraints& constraint,
-                    bool singleLine) const;
+                    bool singleLine, int period_hour) const;
 
 
 };

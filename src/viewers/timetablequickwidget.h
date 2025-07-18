@@ -16,6 +16,7 @@ class Railway;
 class RailStation;
 class QMenu;
 struct DiagramOptions;
+class TrainTime;
 
 /**
  * @brief The TimetableQuickWidget class
@@ -47,7 +48,7 @@ signals:
      * 只能发送信号出去，暂定给TrainContext处理
      */
     void locateToBoundStation(const TrainStationBoundingList& bound,
-        const QTime& time);
+        const TrainTime& time);
 
 private slots:
     void onStopOnlyChanged(bool on);

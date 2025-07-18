@@ -71,13 +71,13 @@ std::shared_ptr<RailStationEvent> StationEventAxis::conflictEvent(
 	if (leftBound > ev.time) {
 		// 发生左跨日情况
 		for (auto ritr = std::make_reverse_iterator(citr); ritr != rend(); ++ritr) {
-			if (isConflict(**ritr, ev, constraint, singleLine))
+			if (isConflict(**ritr, ev, constraint, singleLine, period_hours))
 				return *ritr;
 		}
 		for (auto ritr = rbegin(); ritr != rend(); ++ritr) {
 			if ((*ritr)->time < leftBound)
 				break;
-			if (isConflict(**ritr, ev, constraint, singleLine))
+			if (isConflict(**ritr, ev, constraint, singleLine, period_hours))
 				return *ritr;
 		}
 	}
@@ -85,7 +85,7 @@ std::shared_ptr<RailStationEvent> StationEventAxis::conflictEvent(
 		// 不发生左跨日
 		for (auto ritr = std::make_reverse_iterator(citr);
 			ritr != rend() && (*ritr)->time >= leftBound; ++ritr) {
-			if (isConflict(**ritr, ev, constraint, singleLine))
+			if (isConflict(**ritr, ev, constraint, singleLine, period_hours))
 				return *ritr;
 		}
 	}
@@ -94,17 +94,17 @@ std::shared_ptr<RailStationEvent> StationEventAxis::conflictEvent(
 	if (rightBound < ev.time) {
 		// 右跨日
 		for (auto itr = citr; itr != end(); ++itr) {
-			if (isConflict(ev, **itr, constraint, singleLine))
+			if (isConflict(ev, **itr, constraint, singleLine, period_hours))
 				return *itr;
 		}
 		for (auto itr = begin(); itr != end() && (*itr)->time <= rightBound; ++itr) {
-			if (isConflict(ev, **itr, constraint, singleLine))
+			if (isConflict(ev, **itr, constraint, singleLine, period_hours))
 				return *itr;
 		}
 	}
 	else {
 		for (auto itr = citr; itr != end() && (*itr)->time <= rightBound; ++itr) {
-			if (isConflict(ev, **itr, constraint, singleLine)) {
+			if (isConflict(ev, **itr, constraint, singleLine, period_hours)) {
 				return *itr;
 			}
 		}
@@ -115,13 +115,13 @@ std::shared_ptr<RailStationEvent> StationEventAxis::conflictEvent(
 bool StationEventAxis::isConflict(const RailStationEventBase& left,
 	const RailStationEventBase& right,
 	const GapConstraints& constraint,
-	bool singleLine) const
+	bool singleLine, int period_hour) const
 {
 	auto gap_type = TrainGap::gapTypeBetween(left, right, singleLine);
 	if (gap_type.has_value()) {
 		// 构成相干事件，检查间隔是否符合要求。
 		// 注意约定正好相等的情况是符合要求（不冲突）的
-		int secs = qeutil::secsTo(left.time, right.time);
+		int secs = qeutil::secsTo(left.time, right.time, period_hour);
 		//if (secs < constraint.at(*gap_type)) {
 		//	return true;
 		//}

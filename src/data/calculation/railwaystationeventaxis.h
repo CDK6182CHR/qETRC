@@ -55,6 +55,6 @@ private:
      */
     std::pair<std::shared_ptr<RailStationEvent>, bool>
         isConflictedWith(const TrainTime& tm_start, const TrainTime& tm_to, Direction dir, 
-            std::shared_ptr<RailStationEvent> ev_ex_start, const StationEventAxis& axis_to, bool singleLine)const;
+            std::shared_ptr<RailStationEvent> ev_ex_start, const StationEventAxis& axis_to, bool singleLine, int period_hours)const;
 };
 

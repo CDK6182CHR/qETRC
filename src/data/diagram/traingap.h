@@ -52,6 +52,7 @@ struct TrainGap{
     GapTypesV2 type;   
 
     int num;   //数字特征：被踩次数。其他情况直接不使用。
+    int period_hours;
 
     /**
      * 此版本会根据附加情况计算类型
@@ -62,15 +63,15 @@ struct TrainGap{
      * 在贪心推线设置约束时可能需要注意一下判定逻辑。（例如）通发间隔，既包含同侧的，也包含对侧的。
      */
     TrainGap(std::shared_ptr<const RailStationEvent> left_,
-        std::shared_ptr<const RailStationEvent> right_);
+        std::shared_ptr<const RailStationEvent> right_, int period_hours);
 
     /**
      * trivial的构造函数；直接指定完整的Type，主要用于待避类的构造
      */
     TrainGap(std::shared_ptr<const RailStationEvent> left_,
         std::shared_ptr<const RailStationEvent> right_,GapTypesV2 type_,
-        int num_):
-        left(left_),right(right_),type(type_),num(num_){}
+        int num_, int period_hours_):
+        left(left_),right(right_),type(type_),num(num_),period_hours(period_hours_){}
 
     RailStationEvent::Positions position()const;
     int secs()const;

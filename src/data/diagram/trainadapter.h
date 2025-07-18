@@ -150,7 +150,7 @@ public:
     /**
      * 用于时刻插值的相对误差计算。
      */
-    double relativeError(std::shared_ptr<const Ruler> ruler)const;
+    double relativeError(std::shared_ptr<const Ruler> ruler, int period_hours)const;
 
     /**
      * 推定通过站时刻 但使用事件表算法

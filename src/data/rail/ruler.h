@@ -80,7 +80,7 @@ public:
      * 是从TrainAdapter里面直接读的区间
      */
     int fromSingleTrain(std::shared_ptr<const TrainAdapter> adp,
-        int start, int stop);
+        int start, int stop, int period_hours);
 
     /**
      * 2022.04.10

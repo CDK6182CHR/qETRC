@@ -12,6 +12,7 @@ class Diagram;
 class QComboBox;
 class QRadioButton;
 class SelectRailwayCombo;
+class TrainTime;
 
 
 /**

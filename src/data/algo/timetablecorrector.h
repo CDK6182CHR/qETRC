@@ -19,12 +19,12 @@ public:
      * @brief autoCorrect
      * 主函数：返回是否有修改。
      */
-    static bool autoCorrect(std::shared_ptr<Train> train);
+    static bool autoCorrect(std::shared_ptr<Train> train, int period_hours);
 
     /**
      * 加上catch的相对安全版本
      */
-    static bool autoCorrectSafe(std::shared_ptr<Train> train);
+    static bool autoCorrectSafe(std::shared_ptr<Train> train, int period_hours);
 
 private:
 
@@ -34,7 +34,7 @@ private:
      * 一次查错循环，返回是否修改了时刻表。
      * 暂定直接翻译Python代码
      */
-    static bool correctCycle(std::shared_ptr<Train> train);
+    static bool correctCycle(std::shared_ptr<Train> train, int period_hours);
 
     /**
      * 判定是否是相邻区间。要比较保守的判定（不确定倾向于否）。阈值暂定30分钟。

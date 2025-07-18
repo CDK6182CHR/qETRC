@@ -4,24 +4,24 @@
 #include <util/utilfunc.h>
 #include <stdexcept>
 
-bool TimetableCorrector::autoCorrect(std::shared_ptr<Train> train)
+bool TimetableCorrector::autoCorrect(std::shared_ptr<Train> train, int period_hours)
 {
     int i;
     for(i=0;i<120;i++){
-        bool flag = correctCycle(train);
+        bool flag = correctCycle(train, period_hours);
         if(!flag)
             break;
     }
     return i>0;
 }
 
-bool TimetableCorrector::autoCorrectSafe(std::shared_ptr<Train> train)
+bool TimetableCorrector::autoCorrectSafe(std::shared_ptr<Train> train, int period_hours)
 {
     int i;
     for (i = 0; i < 120; i++) {
         bool flag = false;
         try {
-            flag = correctCycle(train);
+            flag = correctCycle(train, period_hours);
         }
         catch (const std::exception& e) {
             qDebug() << "TimetableCorrector::autoCorrectSafe: exception: " << e.what() << Qt::endl;
@@ -34,7 +34,7 @@ bool TimetableCorrector::autoCorrectSafe(std::shared_ptr<Train> train)
     return i > 0;
 }
 
-bool TimetableCorrector::correctCycle(std::shared_ptr<Train> train)
+bool TimetableCorrector::correctCycle(std::shared_ptr<Train> train, int period_hours)
 {
     if (train->empty()){
         return false;
@@ -48,7 +48,7 @@ bool TimetableCorrector::correctCycle(std::shared_ptr<Train> train)
         i+=1;
         const auto& dep = timelist.at(i).depart;
         const auto& arr = timelist.at(i+1).arrive;
-        int sec=qeutil::secsTo(dep,arr);
+        int sec=qeutil::secsTo(dep, arr, period_hours);
         if (unsolved){
             /*
             # 2019.03.18新增逻辑。上一区间存在未解决的问题，很有可能是本站是始发站造成的。
@@ -61,7 +61,7 @@ bool TimetableCorrector::correctCycle(std::shared_ptr<Train> train)
             for (int t=i+1;t<(int)timelist.size();t++){
                 const auto& last_dep = timelist[t-1].depart;
                 const auto& this_arr = timelist[t].arrive;
-                int sec1 = qeutil::secsTo(last_dep, this_arr);
+                int sec1 = qeutil::secsTo(last_dep, this_arr, period_hours);
                 if (!neighbourInterval(sec1)){
                     break;
                 }else{
@@ -70,7 +70,7 @@ bool TimetableCorrector::correctCycle(std::shared_ptr<Train> train)
             }
             const auto& origin_first = timelist.at(0).arrive;
             const auto& before_first = timelist.at(move_end).depart;
-            int sec2=qeutil::secsTo(before_first, origin_first);
+            int sec2=qeutil::secsTo(before_first, origin_first, period_hours);
             if (train->starting().generalEqual(timelist[i].name) ||
                     neighbourInterval(sec2)){
                 qDebug()<<"整体搬迁到首部 "<<train->trainName().full()<<" "<<
@@ -108,9 +108,9 @@ bool TimetableCorrector::correctCycle(std::shared_ptr<Train> train)
                 while (t>1){
                     t-=1;
                     int int_try_before = qeutil::secsTo(timelist.at(t-1).depart,
-                                                        timelist.at(t).arrive);
+                                                        timelist.at(t).arrive, period_hours);
                     int int_try_after = qeutil::secsTo(timelist.at(t).depart,
-                                                       timelist.at(t+1).arrive);
+                                                       timelist.at(t+1).arrive, period_hours);
                     if (!errorInterval(int_try_before) && !errorInterval(int_try_after)){
                         qDebug()<<"结点上浮 "<<train->trainName().full()<<" "<<
                                   timelist.at(i).name.toSingleLiteral()<<" "<<
@@ -139,7 +139,7 @@ bool TimetableCorrector::correctCycle(std::shared_ptr<Train> train)
             // 当前站与后一站的时间间隔超出合理阈值，将当前站往下沉
             int interval_before;
             if (i>0){
-                interval_before = qeutil::secsTo(timelist.at(i-1).depart, timelist.at(i).arrive);
+                interval_before = qeutil::secsTo(timelist.at(i-1).depart, timelist.at(i).arrive, period_hours);
             }else{
                 interval_before = -1;
             }
@@ -150,7 +150,7 @@ bool TimetableCorrector::correctCycle(std::shared_ptr<Train> train)
                 j++;
                 int int_try_next;
                 if (j<(int)timelist.size()-1){
-                    int_try_next=qeutil::secsTo(dep, timelist.at(j+1).arrive);
+                    int_try_next=qeutil::secsTo(dep, timelist.at(j+1).arrive, period_hours);
                 }else{
                     int_try_next=1;
                 }
@@ -160,7 +160,7 @@ bool TimetableCorrector::correctCycle(std::shared_ptr<Train> train)
                     # 这部分待定，可能考虑删去。试一下再说。
                     */
                     int int_try_before=qeutil::secsTo(timelist.at(j).depart,
-                                                      timelist.at(i).arrive);
+                                                      timelist.at(i).arrive, period_hours);
                     if (int_try_before<interval_before || interval_before == -1){
                         qDebug()<<"detect error change "<<
                                   train->trainName().full()<<" "<<

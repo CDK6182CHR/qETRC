@@ -148,7 +148,7 @@ void Ruler::swap(Ruler& other)
     std::swap(_name, other._name);
 }
 
-int Ruler::fromSingleTrain(std::shared_ptr<const TrainAdapter> adp, int start, int stop)
+int Ruler::fromSingleTrain(std::shared_ptr<const TrainAdapter> adp, int start, int stop, int period_hours)
 {
     int cnt = 0;
     for (auto line : adp->lines()) {
@@ -163,7 +163,7 @@ int Ruler::fromSingleTrain(std::shared_ptr<const TrainAdapter> adp, int start, i
                 //近邻区间存在  更新Node
                 auto node = it->getRulerNode(*this);
                 int real = qeutil::secsTo(pr->trainStation->depart, 
-                    p->trainStation->arrive);
+                    p->trainStation->arrive, period_hours);
                 if (pr->trainStation->isStopped() ||
                     line->isStartingStation(pr)) {
                     real -= start;

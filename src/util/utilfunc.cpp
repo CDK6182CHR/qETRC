@@ -220,14 +220,15 @@ bool qeutil::timeRangeIntersected(const TrainTime& start1, const TrainTime& end1
 	return (std::max(xm1, xh1) <= std::min(xm2, xh2));
 }
 
-bool qeutil::timeRangeIntersectedExcl(const QTime& start1, const QTime& end1, const QTime& start2,
-	const QTime& end2)
+bool qeutil::timeRangeIntersectedExcl(const TrainTime& start1, const TrainTime& end1, const TrainTime& start2,
+	const TrainTime& end2, int period_hours)
 {
-	int xm1 = start1.msecsSinceStartOfDay(), xm2 = end1.msecsSinceStartOfDay();
-	int xh1 = start2.msecsSinceStartOfDay(), xh2 = end2.msecsSinceStartOfDay();
+	int periodSecs = period_hours * 3600;
+	int xm1 = start1.secondsSinceStart(), xm2 = end1.secondsSinceStart();
+	int xh1 = start2.secondsSinceStart(), xh2 = end2.secondsSinceStart();
 	bool flag1 = (xm2 < xm1), flag2 = (xh2 < xh1);
-	if (flag1)xm2 += msecsOfADay;
-	if (flag2)xh2 += msecsOfADay;
+	if (flag1)xm2 += period_hours;
+	if (flag2)xh2 += period_hours;
 	bool res1 = (std::max(xm1, xh1) < std::min(xm2, xh2));   //不另加PBC下的比较
 	if (res1 || flag1 == flag2) {
 		// 如果都加了或者都没加PBC，这就是结果
@@ -235,10 +236,10 @@ bool qeutil::timeRangeIntersectedExcl(const QTime& start1, const QTime& end1, co
 	}
 	//如果只有一边加了PBC，那么应考虑把另一边也加上PBC再试试
 	if (flag1) {
-		xh1 += msecsOfADay; xh2 += msecsOfADay;
+		xh1 += periodSecs; xh2 += periodSecs;
 	}
 	else {
-		xm1 += msecsOfADay; xm2 += msecsOfADay;
+		xm1 += periodSecs; xm2 += periodSecs;
 	}
 	return (std::max(xm1, xh1) < std::min(xm2, xh2));
 }
@@ -306,24 +307,24 @@ QString qeutil::timeToStringNullable(const QTime& tm, const QString& fmt)
 }
 
 
-bool qeutil::timeCompare(const QTime& tm1, const QTime& tm2)
+bool qeutil::timeCompare(const TrainTime& tm1, const TrainTime& tm2, int period_hours)
 {
-	static constexpr int secsOfADay = 3600 * 24;
+	int periodSecs = 3600 * period_hours;
 	int secs = tm1.secsTo(tm2);
 	bool res = (secs > 0);
-	if (std::abs(secs) > secsOfADay / 2)
+	if (std::abs(secs) > periodSecs / 2)
 		return !res;
 	return res;
 }
 
 
-bool qeutil::timeCrossed(const QTime& start1, const QTime& start2,
-	const QTime& end1, const QTime& end2)
+bool qeutil::timeCrossed(const TrainTime& start1, const TrainTime& start2,
+	const TrainTime& end1, const TrainTime& end2, int period_hours)
 {
 	if (start1 == start2 && end1 == end2)
 		return true;
 	else
-		return timeCompare(start1, start2) != timeCompare(end1, end2)
+		return timeCompare(start1, start2, period_hours) != timeCompare(end1, end2, period_hours)
 			&& ((start1 != start2) == (end1 != end2));
 }
 

@@ -8,6 +8,8 @@
 class RailCategory;
 class Train;
 class TrainStation;
+struct DiagramOptions;
+
 /**
  * @brief The TrainIntervalStat class
  * 2023.01.24  For the train interval running stat,
@@ -18,6 +20,7 @@ class TrainStation;
  */
 class TrainIntervalStat
 {
+    const DiagramOptions& _ops;
     TrainLineNet net;
 
     std::shared_ptr<const Train> train;
@@ -26,7 +29,7 @@ class TrainIntervalStat
     std::list<TrainStation>::const_iterator _startIter,_endIter;
     bool _include_ends = false;   // 2024.05.03: whether to include stop time of first and last station
 public:
-    TrainIntervalStat(const std::shared_ptr<const Train>& train=nullptr);
+    TrainIntervalStat(const DiagramOptions& ops, const std::shared_ptr<const Train>& train=nullptr);
     void setTrain(std::shared_ptr<const Train> t) { this->train = t; }
 
     /**

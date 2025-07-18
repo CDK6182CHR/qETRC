@@ -161,6 +161,7 @@ TrainTime TrainTime::fromQTime(const QTime& t)
 	return TrainTime(t.hour(), t.minute(), t.second());
 }
 
+#if 0
 TrainTime::TrainTime(const QTime& qtm):
 	m_secs(qtm.msecsSinceStartOfDay() / 1000)
 {
@@ -170,6 +171,7 @@ TrainTime::operator QTime() const
 {
     return toQTime();
 }
+#endif
 
 TrainTime::TrainTime(int secsSinceStart) :
     m_secs(secsSinceStart)

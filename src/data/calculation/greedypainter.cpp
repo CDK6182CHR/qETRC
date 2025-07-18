@@ -129,11 +129,11 @@ namespace _greedypaint_detail {
 	class RecurseLogger {
 		GreedyPainter* painter;
 		const RailInterval* railint;
-		const QTime& tm;
+		const TrainTime& tm;
 		bool stop, isBack;
 	public:
 		RecurseLogger(GreedyPainter* painter, const RailInterval* railint,
-			const QTime& tm, bool stop, bool isBack) :
+			const TrainTime& tm, bool stop, bool isBack) :
 			painter(painter), railint(railint), tm(tm), stop(stop), isBack(isBack)
 		{
 			painter->addLog(std::make_unique<CalculationLogSub>(
@@ -204,7 +204,7 @@ typename GreedyPainter::RecurseReport
 	bool fixed_from = (_fixedStations.find(st_from.get()) != _fixedStations.end());
 	//bool fixed_to = (_fixedStations.find(st_to.get()) != _fixedStations.end());
 
-	int tot_delay = qeutil::secsTo(_tm, ev_start.time);
+	int tot_delay = qeutil::secsTo(_tm, ev_start.time, period_hours);
 
 	// 这个Flag标记to站是否要尝试停车。
 	// 在第一次通过to站发现停车间隔冲突时，需尝试是否要在后站停车；
@@ -239,14 +239,14 @@ typename GreedyPainter::RecurseReport
 			}
 			else {
 				// 调整出发时刻为使得满足条件
-				if (qeutil::timeCompare(ev_start.time, ev_conf->time)) {
+				if (qeutil::timeCompare(ev_start.time, ev_conf->time, period_hours)) {
 					// 右冲突事件
 					if (fixed_from) {
-						int delay_secs = qeutil::secsTo(ev_start.time, ev_conf->time);
+						int delay_secs = qeutil::secsTo(ev_start.time, ev_conf->time, period_hours);
 						FWD_FIXED_POP_AND_RETURN
 					}
 					else {
-						tot_delay += qeutil::secsTo(ev_start.time, ev_conf->time);
+						tot_delay += qeutil::secsTo(ev_start.time, ev_conf->time, period_hours);
 						ev_start.time = ev_conf->time;
 						addLog(std::make_unique<CalculationLogGap>(CalculationLogAbstract::GapConflict,
 							st_from, ev_start.time, CalculationLogAbstract::Depart,
@@ -263,11 +263,11 @@ typename GreedyPainter::RecurseReport
 					auto trial_tm = ev_conf->time.addSecs(gap_min, period_hours);
 
 					if (fixed_from) {
-						int delay_secs = qeutil::secsTo(ev_start.time, trial_tm);
+						int delay_secs = qeutil::secsTo(ev_start.time, trial_tm, period_hours);
 						FWD_FIXED_POP_AND_RETURN
 					}
 					else {
-						tot_delay += qeutil::secsTo(ev_start.time, trial_tm);
+						tot_delay += qeutil::secsTo(ev_start.time, trial_tm, period_hours);
 						ev_start.time = trial_tm;
 						addLog(std::make_unique<CalculationLogGap>(
 							CalculationLogAbstract::GapConflict, st_from, ev_start.time,
@@ -300,18 +300,18 @@ typename GreedyPainter::RecurseReport
 			auto fbdnode = railint->getForbidNode(forbid);
 			if (!fbdnode->isNull()) {
 				if (qeutil::timeRangeIntersectedExcl(fbdnode->beginTime, fbdnode->endTime, 
-					ev_start.time, tm_to)) {
+					ev_start.time, tm_to, period_hours)) {
 					// 发生天窗冲突
 					if (!stop && st_from != _anchor) {
 						_train->timetable().pop_back();
 						return {RecurseStatus::RequireStop};
 					}
 					else if (fixed_from) {
-						int delay_secs = qeutil::secsTo(ev_start.time, fbdnode->endTime);
+						int delay_secs = qeutil::secsTo(ev_start.time, fbdnode->endTime, period_hours);
 						FWD_FIXED_POP_AND_RETURN
 					}
 					else {
-						tot_delay += qeutil::secsTo(ev_start.time, fbdnode->endTime);
+						tot_delay += qeutil::secsTo(ev_start.time, fbdnode->endTime, period_hours);
 						ev_start.time = fbdnode->endTime;
 						addLog(std::make_unique<CalculationLogForbid>(st_from, ev_start.time,
 							CalculationLogAbstract::Depart, railint, forbid));
@@ -341,22 +341,22 @@ typename GreedyPainter::RecurseReport
 				// 左冲突
 				auto tm_trial = rep.conflictEvent->time.addSecs(-int_secs, period_hours);
 				if (fixed_from) {
-					int delay_secs = qeutil::secsTo(ev_start.time, tm_trial);
+					int delay_secs = qeutil::secsTo(ev_start.time, tm_trial, period_hours);
 					FWD_FIXED_POP_AND_RETURN
 				}
 				else {
-					tot_delay += qeutil::secsTo(ev_start.time, tm_trial);
+					tot_delay += qeutil::secsTo(ev_start.time, tm_trial, period_hours);
 					ev_start.time = tm_trial;
 				}
 			}
 			else if (rep.type == IntervalConflictReport::RightConflict) {
 				// 右冲突
 				if (fixed_from) {
-					int delay_secs = qeutil::secsTo(ev_start.time, rep.conflictEvent->time);
+					int delay_secs = qeutil::secsTo(ev_start.time, rep.conflictEvent->time, period_hours);
 					FWD_FIXED_POP_AND_RETURN
 				}
 				else {
-					tot_delay += qeutil::secsTo(ev_start.time, rep.conflictEvent->time);
+					tot_delay += qeutil::secsTo(ev_start.time, rep.conflictEvent->time, period_hours);
 					ev_start.time = rep.conflictEvent->time;
 				}
 			}
@@ -463,17 +463,17 @@ typename GreedyPainter::RecurseReport
 
 			int_secs -= node->stop;
 			TrainGap::GapTypesV2 type;
-			if (qeutil::timeCompare(tm_to, to_conf->time)) {
+			if (qeutil::timeCompare(tm_to, to_conf->time, period_hours)) {
 				// 右冲突事件，设置出发时间使得到达时间为冲突时刻的时间
 				auto trial_tm = to_conf->time.addSecs(-int_secs, period_hours);
 				if (fixed_from) {
-					int delay_secs = qeutil::secsTo(ev_start.time, trial_tm);
+					int delay_secs = qeutil::secsTo(ev_start.time, trial_tm, period_hours);
 					if (st_from != _anchor)
 						_train->timetable().pop_back();
 					return { RecurseStatus::FixedStation, delay_secs };
 				}
 				else {
-					tot_delay += qeutil::secsTo(ev_start.time, trial_tm);
+					tot_delay += qeutil::secsTo(ev_start.time, trial_tm, period_hours);
 					ev_start.time = trial_tm;
 					type = *TrainGap::gapTypeBetween(ev_stop, *to_conf, railint->isSingleRail());
 				}
@@ -489,11 +489,11 @@ typename GreedyPainter::RecurseReport
 				if (fixed_from) {
 					if (st_from != _anchor)
 						_train->timetable().pop_back();
-					int delay_secs = qeutil::secsTo(ev_start.time, trial_dep);
+					int delay_secs = qeutil::secsTo(ev_start.time, trial_dep, period_hours);
 					return {RecurseStatus::FixedStation, delay_secs}; 
 				}
 				else {
-				tot_delay += qeutil::secsTo(ev_start.time, trial_dep);
+				tot_delay += qeutil::secsTo(ev_start.time, trial_dep, period_hours);
 				ev_start.time = trial_dep;
 				}
 			}
@@ -563,7 +563,7 @@ typename GreedyPainter::RecurseReport
 	auto itr = _settledStops.find(st_to);
 	bool next_stop = ((itr != _settledStops.end()) || (st_to == _start && _localStarting));
 
-	int tot_delay = qeutil::secsTo(ev_arrive.time, _tm);
+	int tot_delay = qeutil::secsTo(ev_arrive.time, _tm, period_hours);
 
 	// 这个Flag标记to站是否要尝试停车。
 	// 在第一次通过to站发现停车间隔冲突时，需尝试是否要在后站停车；
@@ -599,9 +599,9 @@ typename GreedyPainter::RecurseReport
 			}
 			else {
 				// 调整出发时刻为使得满足条件
-				if (qeutil::timeCompare(ev_conf->time, ev_arrive.time)) {
+				if (qeutil::timeCompare(ev_conf->time, ev_arrive.time, period_hours)) {
 					// 反向左冲突，原来右冲突
-					int delay_secs = qeutil::secsTo(ev_conf->time, ev_arrive.time);
+					int delay_secs = qeutil::secsTo(ev_conf->time, ev_arrive.time, period_hours);
 					if (fixed_from) {
 						BACK_FIXED_POP_AND_RETURN
 					}
@@ -620,7 +620,7 @@ typename GreedyPainter::RecurseReport
 					auto type = TrainGap::gapTypeBetween(ev_arrive, *ev_conf, railint->isSingleRail());
 					int gap_min = _constraints.maxConstraint(*type);   
 					auto trial_tm = ev_conf->time.addSecs(-gap_min, period_hours);
-					int delay_secs = qeutil::secsTo(trial_tm, ev_arrive.time);
+					int delay_secs = qeutil::secsTo(trial_tm, ev_arrive.time, period_hours);
 					if (fixed_from) {
 						if (st_from != _anchor) _train->timetable().pop_front();
 						return { RecurseStatus::FixedStation, delay_secs };
@@ -659,7 +659,7 @@ typename GreedyPainter::RecurseReport
 			auto fbdnode = railint->getForbidNode(forbid);
 			if (!fbdnode->isNull()) {
 				if (qeutil::timeRangeIntersectedExcl(fbdnode->beginTime, fbdnode->endTime,
-					tm_dep, ev_arrive.time)) {
+					tm_dep, ev_arrive.time, period_hours)) {
 					// 发生天窗冲突
 					if (!stop) {
 						if(st_from!=_anchor)
@@ -669,11 +669,11 @@ typename GreedyPainter::RecurseReport
 					else if (fixed_from) {
 						if (st_from != _anchor)
 							_train->timetable().pop_front();
-						int delay_secs = qeutil::secsTo(fbdnode->beginTime, ev_arrive.time);
+						int delay_secs = qeutil::secsTo(fbdnode->beginTime, ev_arrive.time, period_hours);
 						return { RecurseStatus::FixedStation, delay_secs };
 					}
 					else {
-						tot_delay += qeutil::secsTo(fbdnode->beginTime, ev_arrive.time);
+						tot_delay += qeutil::secsTo(fbdnode->beginTime, ev_arrive.time, period_hours);
 						ev_arrive.time = fbdnode->beginTime;
 						addLog(std::make_unique<CalculationLogForbid>(st_from, ev_arrive.time,
 							CalculationLogAbstract::Arrive,  railint, forbid));
@@ -702,7 +702,7 @@ typename GreedyPainter::RecurseReport
 			else if (rep.type == IntervalConflictReport::LeftConflict) {
 				// 左冲突
 				auto tm_trial = rep.conflictEvent->time.addSecs(int_secs, period_hours);
-				int delay_secs = qeutil::secsTo(tm_trial, ev_arrive.time);
+				int delay_secs = qeutil::secsTo(tm_trial, ev_arrive.time, period_hours);
 				if (fixed_from) {
 					if (st_from != _anchor) _train->timetable().pop_front();
 					return { RecurseStatus::FixedStation, delay_secs };
@@ -714,7 +714,7 @@ typename GreedyPainter::RecurseReport
 			}
 			else if (rep.type == IntervalConflictReport::RightConflict) {
 				// 右冲突
-				int delay_secs = qeutil::secsTo(rep.conflictEvent->time, ev_arrive.time);
+				int delay_secs = qeutil::secsTo(rep.conflictEvent->time, ev_arrive.time, period_hours);
 				if (fixed_from) {
 					BACK_FIXED_POP_AND_RETURN
 				}
@@ -819,10 +819,10 @@ typename GreedyPainter::RecurseReport
 
 			int_secs -= node->start;
 			TrainGap::GapTypesV2 type;
-			if (qeutil::timeCompare(to_conf->time, tm_dep)) {
+			if (qeutil::timeCompare(to_conf->time, tm_dep, period_hours)) {
 				// 反向左冲突事件，设置出发时间使得到达时间为冲突时刻的时间
 				auto tm_trial = to_conf->time.addSecs(int_secs, period_hours);
-				int delay_secs = qeutil::secsTo(tm_trial, ev_arrive.time);
+				int delay_secs = qeutil::secsTo(tm_trial, ev_arrive.time, period_hours);
 				if (fixed_from) {
 					BACK_FIXED_POP_AND_RETURN
 				}
@@ -838,7 +838,7 @@ typename GreedyPainter::RecurseReport
 				int gap_min = _constraints.maxConstraint(type);  
 				TrainTime trial_dep = to_conf->time.addSecs(-gap_min, period_hours);
 				TrainTime trial_arr = trial_dep.addSecs(int_secs, period_hours);
-				int delay_secs = qeutil::secsTo(trial_arr, ev_arrive.time);
+				int delay_secs = qeutil::secsTo(trial_arr, ev_arrive.time, period_hours);
 				if (fixed_from) {
 					BACK_FIXED_POP_AND_RETURN
 				}

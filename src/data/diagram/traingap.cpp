@@ -5,8 +5,8 @@
 #include <initializer_list>
 
 TrainGap::TrainGap(std::shared_ptr<const RailStationEvent> left_, 
-    std::shared_ptr<const RailStationEvent> right_) :
-    left(left_), right(right_), type(NoAppend), num(0)
+    std::shared_ptr<const RailStationEvent> right_, int period_hours_) :
+    left(left_), right(right_), type(NoAppend), num(0), period_hours(period_hours_)
 {
     if (left->hasAppend())
         type |= LeftAppend;
@@ -27,7 +27,7 @@ RailStationEvent::Positions TrainGap::position() const
 
 int TrainGap::secs() const
 {
-    return qeutil::secsTo(left->time, right->time);
+    return qeutil::secsTo(left->time, right->time, period_hours);
 }
 
 Direction TrainGap::leftDir() const

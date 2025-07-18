@@ -10,6 +10,8 @@ class QCheckBox;
 class TrainFilterCore;
 class TrainFilterSelector;
 class QTableView;
+class TrainTime;
+
 class TrainGapStatModel:public QStandardItemModel
 {
     Q_OBJECT
@@ -115,7 +117,7 @@ private:
     void initUI();
 signals:
     void locateOnEvent(int pageIndex, std::shared_ptr<const Railway>,
-        std::shared_ptr<const RailStation>, const QTime&);  // 只用来转发
+        std::shared_ptr<const RailStation>, const TrainTime&);  // 只用来转发
 private slots:
     void toCsv();
     void onDoubleClicked(const QModelIndex& idx);

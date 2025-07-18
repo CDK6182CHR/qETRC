@@ -270,7 +270,7 @@ void TrainAdapter::timetableInterpolation(std::shared_ptr<const Ruler> ruler,
 	}
 }
 
-double TrainAdapter::relativeError(std::shared_ptr<const Ruler> ruler) const
+double TrainAdapter::relativeError(std::shared_ptr<const Ruler> ruler, int period_hours) const
 {
 	int this_time = 0, error_time = 0;
 	foreach(auto line, _lines) {
@@ -279,7 +279,7 @@ double TrainAdapter::relativeError(std::shared_ptr<const Ruler> ruler) const
 		auto p = std::next(pr);
 		for (; p != line->stations().end(); pr = p, ++p) {
 			int secs_real = qeutil::secsTo(pr->trainStation->depart, 
-				p->trainStation->arrive);
+				p->trainStation->arrive, period_hours);
 			int secs_std = ruler->totalInterval(pr->railStation.lock(), p->railStation.lock(),
 				line->dir());
 			if (secs_std == -1)continue;

@@ -1,11 +1,12 @@
 #include "trainintervalstat.h"
 #include "data/train/train.h"
 #include "util/utilfunc.h"
+#include "data/diagram/diagramoptions.h"
 
 #include <QObject>
 
-TrainIntervalStat::TrainIntervalStat(const std::shared_ptr<const Train>& train):
-    train(train)
+TrainIntervalStat::TrainIntervalStat(const DiagramOptions& ops, const std::shared_ptr<const Train>& train):
+    _ops(ops), train(train)
 {
 
 }
@@ -50,7 +51,7 @@ void TrainIntervalStat::computeTrainPart(TrainIntervalStatResult &res)
 
     // loop invariant: each time the loop processes the interval ENDED at itr
     for (int i=0;i<res.settledStationsCount-1;i++){
-        int intervalSecs=qeutil::secsTo(itr_last->depart, itr->arrive);
+        int intervalSecs=qeutil::secsTo(itr_last->depart, itr->arrive, _ops.period_hours);
         runSecs+=intervalSecs;
 
         if (i<res.settledStationsCount-2 || _include_ends){

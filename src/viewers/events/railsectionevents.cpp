@@ -37,9 +37,9 @@ void RailSectionEventsModel::setY(double y)
     setupModel();
 }
 
-QTime RailSectionEventsModel::timeForRow(int row) const
+TrainTime RailSectionEventsModel::timeForRow(int row) const
 {
-    return item(row, ColTime)->data(Qt::EditRole).toTime();
+    return qvariant_cast<TrainTime>(item(row, ColTime)->data(Qt::EditRole));
 }
 
 void RailSectionEventsModel::setupModel()
