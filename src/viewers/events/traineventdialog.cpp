@@ -80,7 +80,7 @@ void TrainEventModel::exportToCsvBatch(QTextStream& s, const TrainEventList& evl
 			auto pst = st.stEvents.begin();
 			auto pit = st.itEvents.begin();
 			while (pst != st.stEvents.end() && pit != st.itEvents.end()) {
-				if (qeutil::timeCompare(pit->time, pst->time)) {
+				if (qeutil::timeCompare(pit->time, pst->time, diagram.options().period_hours)) {
 					// setIntervalRow(row++, adp, *(pit++));
 					exportIntervalRow(s, adp, *(pit++));
 				}
@@ -124,7 +124,7 @@ void TrainEventModel::setupModel()
 			auto pst = st.stEvents.begin();
 			auto pit = st.itEvents.begin();
 			while (pst != st.stEvents.end() && pit != st.itEvents.end()) {
-				if (qeutil::timeCompare(pit->time, pst->time))
+				if (qeutil::timeCompare(pit->time, pst->time, diagram.options().period_hours))
 					setIntervalRow(row++, adp, *(pit++));
 				else
 					setStationRow(row++, adp, *(pst++));

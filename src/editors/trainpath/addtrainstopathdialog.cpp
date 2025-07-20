@@ -11,8 +11,8 @@
 #include <QHeaderView>
 #include <QMessageBox>
 
-AddTrainsToPathDialog::AddTrainsToPathDialog(TrainCollection &coll, TrainPath *path, QWidget *parent):
-    QDialog(parent), coll(coll), path(path), model(new TrainListReadModel(this))
+AddTrainsToPathDialog::AddTrainsToPathDialog(const DiagramOptions& ops, TrainCollection &coll, TrainPath *path, QWidget *parent):
+    QDialog(parent), _ops(ops), coll(coll), path(path), model(new TrainListReadModel(ops, this))
 {
     setAttribute(Qt::WA_DeleteOnClose);
     initUI();

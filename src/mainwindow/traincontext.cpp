@@ -845,7 +845,7 @@ void TrainContext::actAutoCorrectionBat(const QList<std::shared_ptr<Train>>& tra
 
 	foreach(auto train, trainRange) {
 		auto t = std::make_shared<Train>(*train);
-		bool flag = TimetableCorrector::autoCorrectSafe(t);
+		bool flag = TimetableCorrector::autoCorrectSafe(t, diagram.options().period_hours);
 		if (flag) {
 			//qDebug() << "Auto correct " << train->trainName().full()<<" "<< train.get() << Qt::endl;
 			//qDebug() << "Data at: " << t.get();

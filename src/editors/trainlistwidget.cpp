@@ -22,9 +22,9 @@
 #include <data/diagram/trainline.h>
 #include <editors/train/trainpenwidget.h>
 
-TrainListWidget::TrainListWidget(TrainCollection& coll_, QUndoStack* undo, QWidget* parent):
-    QWidget(parent), coll(coll_),_undo(undo),
-    table(new QTableView),editSearch(new QLineEdit), model(new TrainListModel(coll_,undo,this))
+TrainListWidget::TrainListWidget(const DiagramOptions& ops, TrainCollection& coll_, QUndoStack* undo, QWidget* parent):
+    QWidget(parent), _ops(ops), coll(coll_),_undo(undo),
+    table(new QTableView),editSearch(new QLineEdit), model(new TrainListModel(_ops, coll_, undo, this))
 {
 	initUI();
 }

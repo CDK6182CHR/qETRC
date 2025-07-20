@@ -60,12 +60,16 @@ struct StationEvent {
     TrainTime time;
     std::weak_ptr<const RailStation> station;
     std::optional<std::reference_wrapper<const Train>> another;
+    int period_hours;
     QString note;
-    StationEvent(TrainEventType type_,
-                 const TrainTime& time_, std::weak_ptr<const RailStation> station_,
-                 std::optional<std::reference_wrapper<const Train>> another_,
-                 const QString& note_=""):
-        type(type_),time(time_),station(station_),another(another_),note(note_){}
+	StationEvent(TrainEventType type_,
+		const TrainTime& time_, std::weak_ptr<const RailStation> station_,
+		std::optional<std::reference_wrapper<const Train>> another_,
+		int period_hours,
+		const QString& note_ = "") :
+		type(type_), time(time_), station(station_), another(another_), period_hours(period_hours), note(note_) 
+    {
+	}
 
     //StationEvent(StationEvent&&)noexcept = default;
     //StationEvent(const StationEvent&) = default;
@@ -122,7 +126,7 @@ struct RailStationEventBase {
     QString posString()const;
     static QString posToString(const Positions& pos);
 
-    int secsTo(const RailStationEventBase& rhs)const;
+    int secsTo(const RailStationEventBase& rhs, int period_hours)const;
 
 };
 
@@ -184,15 +188,16 @@ struct IntervalEvent{
     std::shared_ptr<const RailStation> former, latter;
     std::reference_wrapper<const Train> another;
     double mile;
+    int period_hours;
     QString note;
     IntervalEvent(TrainEventType type_, const TrainTime& time_,
         std::shared_ptr<const RailStation> former_,
         std::shared_ptr<const RailStation> latter_,
         std::reference_wrapper<const Train> another_,
-        double mile_, const QString& note_ = ""
+        double mile_, int period_hours_, const QString& note_ = ""
     ) :
         type(type_), time(time_), former(former_), latter(latter_),
-        another(another_), mile(mile_), note(note_) 
+        another(another_), mile(mile_), period_hours(period_hours_), note(note_) 
     {
     }
 

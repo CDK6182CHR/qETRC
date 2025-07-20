@@ -472,22 +472,22 @@ public:
 
     double localMile();
 
-    int localSecs();
+    int localSecs(int period_hours);
 
-    int localRunSecs();
+    int localRunSecs(int period_hours);
 
-    std::pair<int, int> localRunStaySecs();
+    std::pair<int, int> localRunStaySecs(int period_hours);
 
     /**
      * 本线旅速，快速计算（仅用TrainLine收尾数据）  km/h
      * 用于TrainListTable
      */
-    double localTraverseSpeed();
+    double localTraverseSpeed(int period_hours);
 
     /**
      * 本线技术速度 （忽略停车时长）
      */
-    double localTechSpeed();
+    double localTechSpeed(int period_hours);
 
     /**
      * 数据改变 （例如线路数据变化）
@@ -564,7 +564,7 @@ public:
      * @brief pyETRC.Train.totalMinTime
      * 终到站时间减去始发站时间
      */
-    int totalMinSecs()const;
+    int totalMinSecs(int period_hours)const;
 
     /**
      * 列车类型指针的引用，用于更改列车类型的undo/redo操作
@@ -620,8 +620,10 @@ public:
     static bool ltShow(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
     static bool ltType(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
     static bool ltMile(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
-    static bool ltTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
-    static bool ltTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
+
+    // 2025.07.20: Remove these two functions because we now need period_hours for calculations; use lambda expressions directly
+    //static bool ltTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
+    //static bool ltTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
 
     static bool gtName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
     static bool gtStarting(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
@@ -629,8 +631,8 @@ public:
     static bool gtShow(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
     static bool gtType(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2);
     static bool gtMile(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
-    static bool gtTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
-    static bool gtTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
+    //static bool gtTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
+    //static bool gtTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2);
 
     /**
      * 2022.05.14

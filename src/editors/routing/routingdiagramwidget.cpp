@@ -62,8 +62,8 @@ void RoutingStationModel::getData(QMap<StationName, double> &yvalues)
 
 
 
-RoutingDiagramWidget::RoutingDiagramWidget(std::shared_ptr<Routing> routing_, QWidget *parent):
-    QSplitter(parent),routing(routing_),routingDiagram(new RoutingDiagram(routing_)),
+RoutingDiagramWidget::RoutingDiagramWidget(const DiagramOptions& ops, std::shared_ptr<Routing> routing_, QWidget *parent):
+    QSplitter(parent), _ops(ops), routing(routing_), routingDiagram(new RoutingDiagram(_ops, routing_)),
     model(new RoutingStationModel(this))
 {
     connect(routingDiagram,&RoutingDiagram::diagramRepainted,

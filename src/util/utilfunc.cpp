@@ -301,9 +301,9 @@ QString qeutil::msgTypeToString(QtMsgType type)
 	}
 }
 
-QString qeutil::timeToStringNullable(const QTime& tm, const QString& fmt)
+QString qeutil::timeToStringNullable(const TrainTime& tm, TrainTime::TimeFormat fmt)
 {
-	return tm.isValid() ? tm.toString(fmt) : QTime(0, 0).toString();
+	return !tm.isNull() ? tm.toString(fmt) : TrainTime(0, 0).toString(fmt);
 }
 
 

@@ -182,7 +182,7 @@ public:
      * 其中停车时间不计算始发终到；折返的车，不计算首站。
      * 返回：运行时间，停车时间。逐个区间扫描。
      */
-    std::pair<int, int> runStaySecs()const;
+    std::pair<int, int> runStaySecs(int period_hours)const;
 
     /**
      * 本运行线总里程，终点减起点的绝对值
@@ -446,7 +446,7 @@ private:
      */
     void addIntervalEvent(LineEventList& res, int index, TrainEventType type, const TrainTime& time,
         const AdapterStation& former, const AdapterStation& latter,
-        std::reference_wrapper<const Train> another, double mile,
+        std::reference_wrapper<const Train> another, double mile, int period_hours,
         const QString& note = "")const;
 
     /**
@@ -457,7 +457,7 @@ private:
     SnapEvent::pos_t compressSnapInterval(ConstAdaPtr former, ConstAdaPtr latter,
         double mile)const;
 
-    double snapEventMile(ConstAdaPtr former, ConstAdaPtr latter, const TrainTime& time)const;
+    double snapEventMile(ConstAdaPtr former, ConstAdaPtr latter, const TrainTime& time, int period_hours)const;
 
     /**
      * 判定st所示站是否在mile所示里程的运行方向前方或相等，即下行时里程比它小、上行时里程比它大

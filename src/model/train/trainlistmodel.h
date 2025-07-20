@@ -9,7 +9,7 @@ class Train;
 class TrainCollection;
 
 struct Config;
-
+struct DiagramOptions;
 
 
 
@@ -23,6 +23,7 @@ class TrainListModel : public QAbstractTableModel
 {
     Q_OBJECT
 
+    const DiagramOptions& _ops;
     TrainCollection& coll;
     QUndoStack*const _undo;
 
@@ -40,7 +41,7 @@ class TrainListModel : public QAbstractTableModel
 public:
     friend class TrainListWidget;
 
-    TrainListModel(TrainCollection& coll,QUndoStack* undo, QObject* parent);
+    TrainListModel(const DiagramOptions& ops, TrainCollection& coll,QUndoStack* undo, QObject* parent);
 
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual int columnCount(const QModelIndex &parent) const override;

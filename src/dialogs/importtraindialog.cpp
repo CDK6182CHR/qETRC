@@ -31,7 +31,7 @@ void ImportTrainDialog::initUI()
 {
     auto* hlay = new QHBoxLayout;
     auto* sp = new QSplitter(Qt::Horizontal);
-    widget = new TrainListWidget(other, nullptr);
+    widget = new TrainListWidget(diagram.options(), other, nullptr);
 	sp->addWidget(widget);
 
     auto* w = new QWidget;

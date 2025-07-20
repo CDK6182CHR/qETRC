@@ -4,12 +4,13 @@
 #include <memory>
 #include <QMap>
 
-#include <data/common/stationname.h>
+#include "data/common/stationname.h"
 
 class RoutingNode;
-
-
+class TrainTime;
 class Routing;
+struct DiagramOptions;
+
 /**
  * @brief The RoutingDiagram class
  * pyETRC.CircuitDiagram   交路图
@@ -18,7 +19,9 @@ class Routing;
  */
 class RoutingDiagram : public QGraphicsView
 {
-    Q_OBJECT
+    Q_OBJECT;
+
+    const DiagramOptions& _ops;
     std::shared_ptr<Routing> routing;
     bool _multiDayByTimetable=false;
     QMap<StationName,double> userDefinedYValues,stationYValues;
@@ -42,7 +45,7 @@ class RoutingDiagram : public QGraphicsView
     };
     QVector<RoutingLine> data;
 public:
-    RoutingDiagram(std::shared_ptr<Routing> routing_, QWidget* parent=nullptr);
+    RoutingDiagram(const DiagramOptions& ops, std::shared_ptr<Routing> routing_, QWidget* parent=nullptr);
     bool outPixel(const QString& filename)const;
     bool outVector(const QString& filename);
     const auto& getSizes()const{return sizes;}
@@ -55,7 +58,7 @@ private:
     void _setVLines();
     void _setHLines();
     void _addStationLine(const StationName& name, double y);
-    QPointF _posCalculate(const StationName& name, int day, const QTime& tm);
+    QPointF _posCalculate(const StationName& name, int day, const TrainTime& tm);
     void _adjustTrainNameItem(QGraphicsSimpleTextItem* textItem,
                               const QPointF& startPoint, const QPointF& endPoint);
     void _adjustTimeItem(QGraphicsSimpleTextItem* textItem, int scale);

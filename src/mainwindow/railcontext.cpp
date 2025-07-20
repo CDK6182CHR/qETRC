@@ -409,7 +409,7 @@ ForbidTabWidget* RailContext::getOpenForbidWidget(std::shared_ptr<Railway> railw
 	int i = forbidWidgetIndex(railway);
 	if (i == -1) {
 		//创建
-		auto* rw = new ForbidTabWidget(railway, false);
+		auto* rw = new ForbidTabWidget(diagram.options(), railway, false);
 		auto* dock = new ads::CDockWidget(tr("天窗编辑 - %1").arg(railway->name()));
 		dock->setWidget(rw);
 		forbidWidgets.append(rw);

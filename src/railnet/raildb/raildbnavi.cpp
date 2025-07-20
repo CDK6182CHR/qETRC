@@ -9,6 +9,7 @@
 #include "data/rail/ruler.h"
 #include "data/diagram/diagram.h"
 #include "util/buttongroup.hpp"
+#include "default_options.h"
 
 #include <QTreeView>
 #include <QVBoxLayout>
@@ -272,7 +273,7 @@ void RailDBNavi::actForbid()
 {
     auto rail = currentRailway();
     if (!rail)return;
-    auto* w = new ForbidTabWidget(rail, false, this);
+    auto* w = new ForbidTabWidget(defaultDiagramOptionsForDB, rail, false, this);
     w->resize(600, 600);
     w->setWindowTitle(tr("天窗编辑 - %1").arg(rail->name()));
     w->setAttribute(Qt::WA_DeleteOnClose);

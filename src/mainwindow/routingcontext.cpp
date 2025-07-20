@@ -276,7 +276,7 @@ void RoutingContext::openRoutingDiagramWidget(std::shared_ptr<Routing> routing)
             .arg(routing->name(), report));
         return;
     }
-    auto* d = new RoutingDiagramWidget(routing);
+    auto* d = new RoutingDiagramWidget(_diagram.options(), routing);
     auto* dock = new ads::CDockWidget(d->windowTitle());
     dock->setWidget(d);
     diagramWidgets.push_back(d);

@@ -11,8 +11,8 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 
-PathTrainsDialog::PathTrainsDialog(TrainCollection &coll, TrainPath *path, QWidget *parent):
-    QDialog(parent), coll(coll), path(path), model(new TrainListReadModel(this))
+PathTrainsDialog::PathTrainsDialog(const DiagramOptions& ops, TrainCollection &coll, TrainPath *path, QWidget *parent):
+    QDialog(parent), _ops(ops), coll(coll), path(path), model(new TrainListReadModel(_ops, this))
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("径路列车表 - %1").arg(path->name()));

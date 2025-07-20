@@ -3,13 +3,13 @@
 
 
 #include <memory>
-#include <QTime>
 #include <set>
 #include <list>
 #include <optional>
 #include <QColor>
 #include "data/common/direction.h"
 #include "data/common/stationname.h"
+#include "data/common/traintime.h"
 
 class TrainStation;
 class TrainLine;
@@ -26,7 +26,7 @@ struct TrackItem{
     };
     QString title;
     StationName stationName;
-    QTime beginTime,endTime;
+    TrainTime beginTime,endTime;
     StayType type;
     /**
      * @brief line
@@ -43,8 +43,8 @@ struct TrackItem{
      */
     train_st_t trainStation1,trainStation2;
 
-    TrackItem(const QString& title, const StationName& stationName, const QTime& beginTime,
-              const QTime& endTime, StayType type, std::shared_ptr<TrainLine> line,
+    TrackItem(const QString& title, const StationName& stationName, const TrainTime& beginTime,
+              const TrainTime& endTime, StayType type, std::shared_ptr<TrainLine> line,
               QString specTrack,const train_st_t& st1,
               const train_st_t& st2=std::nullopt);
 
@@ -56,7 +56,7 @@ struct TrackItem{
     /**
      * 占用股道的时间。主要是考虑通过列车需延拓至1分钟。
      */
-    std::pair<QTime, QTime> occpiedRange()const;
+    std::pair<TrainTime, TrainTime> occpiedRange(int period_hours)const;
 
 };
 
@@ -65,15 +65,15 @@ struct TrackItem{
  * fromLeft: 不认item的起始时刻，而是以0点起始；toRight: 以2359为终止。
  */
 struct TrackOccupy {
-    static const QTime LEFT, RIGHT;
+    static const TrainTime LEFT, RIGHT;
     std::shared_ptr<TrackItem> item;
     bool fromLeft, toRight;
     TrackOccupy(const std::shared_ptr<TrackItem> item, bool fromLeft = false,
         bool toRight = false):
         item(item),fromLeft(fromLeft),toRight(toRight){}
-    const QTime& fromTime()const;
-    const QTime& toTime()const;
-    std::pair<QTime,QTime> occupiedRange()const;
+    const TrainTime& fromTime()const;
+    const TrainTime& toTime()const;
+    std::pair<TrainTime,TrainTime> occupiedRange(int period_hours)const;
 
     // 注意：按照终止时间排序！！
     struct Comparator {
@@ -81,10 +81,10 @@ struct TrackOccupy {
         bool operator()(const TrackOccupy& occ1, const TrackOccupy& occ2)const {
             return occ1.toTime() < occ2.toTime();
         }
-        bool operator()(const TrackOccupy& occ, const QTime& other)const {
+        bool operator()(const TrackOccupy& occ, const TrainTime& other)const {
             return occ.toTime() < other;
         }
-        bool operator()(const QTime& tm, const TrackOccupy& occ)const {
+        bool operator()(const TrainTime& tm, const TrackOccupy& occ)const {
             return tm < occ.toTime();
         }
     };
@@ -110,12 +110,12 @@ public:
      * 注意，这里不考虑间隔时间，即是：间隔时间应该已经被考虑在tm1, tm2中。
      * 如果没有，返回一个end()。
      */
-    const_iterator occupiedInRange(const QTime& tm1, const QTime& tm2)const;
+    const_iterator occupiedInRange(const TrainTime& tm1, const TrainTime& tm2, int period_hours)const;
 
     /**
      * 返回指定时段是否占用。
      */
-    bool isOccupied(const QTime& tm1, const QTime& tm2)const;
+    bool isOccupied(const TrainTime& tm1, const TrainTime& tm2, int period_hours)const;
 
     /**
      * 考虑单线冲突检测时需要用到；
@@ -125,7 +125,7 @@ public:
      */
     const_iterator conflictItem(const std::shared_ptr<TrackItem>& item,
                                 int sameSplitSecs,
-                                int oppsiteSplitSecs)const;
+                                int oppsiteSplitSecs, int period_hours)const;
 
     /**
      * 判定指定车次停靠范围能否放进当前股道。需考虑间隔。
@@ -133,13 +133,13 @@ public:
      */
     bool isIdleFor(const std::shared_ptr<TrackItem>& item,
                    int sameSplitSecs,
-                   int oppsiteSplitSecs)const;
+                   int oppsiteSplitSecs, int period_hours)const;
 
     /**
      * 已知双线模式下的判空操作.. 不需要考虑间隔类型，更简单
      */
     bool isIdleForDouble(const std::shared_ptr<TrackItem>& item,
-                   int sameSplitMinu)const;
+                   int sameSplitMinu, int period_hours)const;
 
-    void addItem(const std::shared_ptr<TrackItem>& item);
+    void addItem(const std::shared_ptr<TrackItem>& item, int period_hours);
 };

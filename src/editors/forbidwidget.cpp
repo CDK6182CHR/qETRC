@@ -1,11 +1,12 @@
 ﻿#include "forbidwidget.h"
 
 
-#include "model/delegate/qetimedelegate.h"
+#include "model/delegate/traintimedelegate.h"
 #include "data/common/qesystem.h"
 #include "util/buttongroup.hpp"
 #include "model/rail/forbidmodel.h"
 #include "data/rail/forbid.h"
+#include "data/diagram/diagramoptions.h"
 
 #include <QCheckBox>
 #include <QFormLayout>
@@ -15,8 +16,8 @@
 #include <QMenu>
 #include <QMessageBox>
 
-ForbidWidget::ForbidWidget(std::shared_ptr<Forbid> forbid_,bool commitInPlace, QWidget *parent):
-    QWidget(parent),forbid(forbid_),model(new ForbidModel(forbid,this)),inplace(commitInPlace)
+ForbidWidget::ForbidWidget(const DiagramOptions& ops, std::shared_ptr<Forbid> forbid_,bool commitInPlace, QWidget *parent):
+    QWidget(parent), _ops(ops), forbid(forbid_),model(new ForbidModel(forbid,this)),inplace(commitInPlace)
 {
     initUI();
     refreshBasicData();
@@ -65,9 +66,9 @@ void ForbidWidget::initUI()
     table->resizeColumnToContents(ForbidModel::ColInterval);
     table->setEditTriggers(QTableView::AllEditTriggers);
     table->setItemDelegateForColumn(ForbidModel::ColStart,
-                                    new QETimeDelegate(this,"hh:mm"));
+                                    new TrainTimeDelegate(_ops, this, TrainTime::HM));
     table->setItemDelegateForColumn(ForbidModel::ColEnd,
-                                    new QETimeDelegate(this,"hh:mm"));
+                                    new TrainTimeDelegate(_ops, this, TrainTime::HM));
     vlay->addWidget(table);
     initContextMenu();
 
@@ -226,9 +227,9 @@ void ForbidWidget::actImportCsv()
     emit importCsv(forbid);
 }
 
-ForbidTabWidget::ForbidTabWidget(std::shared_ptr<Railway> railway_, bool commitInPlace,
+ForbidTabWidget::ForbidTabWidget(const DiagramOptions& ops, std::shared_ptr<Railway> railway_, bool commitInPlace,
                                  QWidget *parent):
-    QTabWidget(parent), railway(railway_), inplace(commitInPlace)
+    QTabWidget(parent), _ops(ops), railway(railway_), inplace(commitInPlace)
 {
     for(int i=0;i<Forbid::FORBID_COUNT;i++){
         addForbidTab(railway->getForbid(i));
@@ -237,7 +238,7 @@ ForbidTabWidget::ForbidTabWidget(std::shared_ptr<Railway> railway_, bool commitI
 
 void ForbidTabWidget::addForbidTab(std::shared_ptr<Forbid> forbid)
 {
-    auto* w=new ForbidWidget(forbid, inplace);
+    auto* w=new ForbidWidget(_ops, forbid, inplace);
     addTab(w, forbid->name());
     connect(w, &ForbidWidget::forbidChanged,
             this, &ForbidTabWidget::forbidChanged);

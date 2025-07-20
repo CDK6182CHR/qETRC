@@ -6,6 +6,8 @@
 #include "util/selecttraincombo.h"
 #include "util/qecontrolledtable.h"
 
+class TrainTime;
+
 class BatchCopyTrainModel:
         public QEMoveableModel
 {
@@ -18,7 +20,7 @@ public:
     };
     BatchCopyTrainModel(QObject* parent=nullptr);
 
-    void addRow(const QString& trainName, const QTime& time);
+    void addRow(const QString& trainName, const TrainTime& time);
 
 protected:
     virtual void setupNewRow(int row) override;
@@ -26,7 +28,7 @@ protected:
 
 class QLineEdit;
 class QSpinBox;
-class QTimeEdit;
+class TrainTimeEdit;
 class Diagram;
 class Train;
 
@@ -47,7 +49,7 @@ class BatchCopyTrainDialog : public QDialog
     BatchCopyTrainModel* const model;
     QTableView *table;
     QLineEdit* edFormat, *edRef;
-    QTimeEdit* edStartTime;
+    TrainTimeEdit* edStartTime;
     QSpinBox* spStartNumber, *spCount, *spMin, *spSec;
 
 public:

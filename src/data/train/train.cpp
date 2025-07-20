@@ -808,19 +808,19 @@ double Train::localMile()
     return res;
 }
 
-int Train::localSecs() 
+int Train::localSecs(int period_hours) 
 {
-    auto&& t = localRunStaySecs();
+    auto&& t = localRunStaySecs(period_hours);
     return t.first + t.second;
 }
 
-std::pair<int, int> Train::localRunStaySecs()
+std::pair<int, int> Train::localRunStaySecs(int period_hours)
 {
     if (_locRunSecs.has_value())
         return std::make_pair(_locRunSecs.value(), _locStaySecs.value());
     int run = 0, stay = 0;
     for (auto p : _adapters) {
-        auto d = p->runStaySecs();
+        auto d = p->runStaySecs(period_hours);
         run += d.first;
         stay += d.second;
     }
@@ -829,22 +829,22 @@ std::pair<int, int> Train::localRunStaySecs()
     return std::make_pair(run, stay);
 }
 
-int Train::localRunSecs()
+int Train::localRunSecs(int period_hours)
 {
-    return localRunStaySecs().first;
+    return localRunStaySecs(period_hours).first;
 }
 
-double Train::localTraverseSpeed() 
+double Train::localTraverseSpeed(int period_hours)
 {
     double mile = localMile();
-    int secs = localSecs();
+    int secs = localSecs(period_hours);
     //secs如果是0则得inf，C++中不会出问题
     return mile / secs * 3600;  
 }
 
-double Train::localTechSpeed()
+double Train::localTechSpeed(int period_hours)
 {
-    return localMile() / localRunSecs() * 3600;
+    return localMile() / localRunSecs(period_hours) * 3600;
 }
 
 void Train::invalidateTempData()
@@ -972,10 +972,10 @@ int Train::deltaDays(bool byTimetable) const
     }
 }
 
-int Train::totalMinSecs() const
+int Train::totalMinSecs(int period_hours) const
 {
     if(empty()) return 0;
-    return qeutil::secsTo(_timetable.front().arrive,_timetable.back().depart);
+    return qeutil::secsTo(_timetable.front().arrive,_timetable.back().depart, period_hours);
 }
 
 void Train::refreshStationFlags()
@@ -1121,15 +1121,15 @@ bool Train::ltShow(const std::shared_ptr<const Train>& t1, const std::shared_ptr
     return t1->isShow() < t2->isShow();
 }
 
-bool Train::ltTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
-{
-    return t1->localTraverseSpeed() < t2->localTraverseSpeed();
-}
-
-bool Train::ltTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
-{
-    return t1->localTechSpeed() < t2->localTechSpeed();
-}
+//bool Train::ltTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
+//{
+//    return t1->localTraverseSpeed() < t2->localTraverseSpeed();
+//}
+//
+//bool Train::ltTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
+//{
+//    return t1->localTechSpeed() < t2->localTechSpeed();
+//}
 
 bool Train::ltMile(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
 {
@@ -1166,15 +1166,15 @@ bool Train::gtType(const std::shared_ptr<const Train>& t1, const std::shared_ptr
     return t1->type()->name() > t2->type()->name();
 }
 
-bool Train::gtTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
-{
-    return t1->localTraverseSpeed() > t2->localTraverseSpeed();
-}
-
-bool Train::gtTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
-{
-    return t1->localTechSpeed() > t2->localTechSpeed();
-}
+//bool Train::gtTravSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
+//{
+//    return t1->localTraverseSpeed() > t2->localTraverseSpeed();
+//}
+//
+//bool Train::gtTechSpeed(const std::shared_ptr<Train>& t1, const std::shared_ptr<Train>& t2)
+//{
+//    return t1->localTechSpeed() > t2->localTechSpeed();
+//}
 
 #define TRC_WARNING qDebug()<<"Train::fromTrf: WARNING: "
 

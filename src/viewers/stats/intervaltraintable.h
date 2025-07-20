@@ -13,7 +13,8 @@ struct DiagramOptions;
 
 class IntervalTrainModel: public QStandardItemModel
 {
-    Q_OBJECT
+    Q_OBJECT;
+    const DiagramOptions& _ops;
     IntervalTrainList _data;
 public:
     enum {
@@ -28,7 +29,7 @@ public:
         ColTerminal,
         ColMAX
     };
-    IntervalTrainModel(QWidget* parent=nullptr);
+    IntervalTrainModel(const DiagramOptions& ops, QWidget* parent=nullptr);
     void refreshData();
     void setupModel();
     void resetData(IntervalTrainList&& data_);

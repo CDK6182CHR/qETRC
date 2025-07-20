@@ -11,7 +11,7 @@ bool StationEvent::operator<(const StationEvent& rhs) const
 	if (time == rhs.time) {
 		return static_cast<int8_t>(type) < static_cast<int8_t>(rhs.type);
 	}
-	return qeutil::timeCompare(time, rhs.time);
+	return qeutil::timeCompare(time, rhs.time, period_hours);
 }
 
 //enum class TrainEventType :int8_t {
@@ -56,7 +56,7 @@ bool IntervalEvent::operator<(const IntervalEvent& rhs) const
 	if (time == rhs.time) {
 		return static_cast<int8_t>(type) < static_cast<int8_t>(rhs.type);
 	}
-	return qeutil::timeCompare(time, rhs.time);
+	return qeutil::timeCompare(time, rhs.time, period_hours);
 }
 
 QString IntervalEvent::toString() const
@@ -163,9 +163,9 @@ QString RailStationEventBase::posToString(const Positions& pos)
 	}
 }
 
-int RailStationEventBase::secsTo(const RailStationEventBase& rhs) const
+int RailStationEventBase::secsTo(const RailStationEventBase& rhs, int period_hours) const
 {
-	return qeutil::secsTo(time, rhs.time);
+	return qeutil::secsTo(time, rhs.time, period_hours);
 }
 
 bool RailStationEventBase::hasAppend() const

@@ -18,7 +18,7 @@ QString CalculationLogAbstract::objectString() const
 
 
 CalculationLogStation::CalculationLogStation(Reason reason, std::shared_ptr<const RailStation> station, 
-    const QTime time, ModifiedField field):
+    const TrainTime time, ModifiedField field):
     CalculationLogAbstract(reason),_station(station),_time(time),_field(field)
 {
 }
@@ -29,7 +29,7 @@ QString CalculationLogStation::toString() const
     QString res=QObject::tr("[%1] 将[%2]站[%3]时刻设置为[%4]").arg(reasonString(),
                                                             _station->name.toSingleLiteral(),
                                                             fieldString(),
-                                                            _time.toString("hh:mm:ss"));
+                                                            _time.toString(TrainTime::HMS));
     if (QString obj=objectString();!obj.isEmpty()){
         res.append(QObject::tr(" (对象: %1)").arg(obj));
     }
@@ -57,7 +57,7 @@ QString CalculationLogBasic::reasonString() const
     }
 }
 
-CalculationLogGap::CalculationLogGap(Reason reason, std::shared_ptr<const RailStation> station, const QTime time,
+CalculationLogGap::CalculationLogGap(Reason reason, std::shared_ptr<const RailStation> station, const TrainTime& time,
     ModifiedField field, TrainGap::GapTypesV2 gapType, std::shared_ptr<const RailStation> conflictStation,
     std::shared_ptr<RailStationEvent> event_) :
     CalculationLogStation(reason, station, time, field), _gapType(gapType), _conflictStation(conflictStation),
@@ -82,7 +82,7 @@ QString CalculationLogGap::objectString() const
 }
 
 CalculationLogInterval::CalculationLogInterval(Reason reason, std::shared_ptr<const RailStation> station, 
-    const QTime time, ModifiedField field, IntervalConflictReport::ConflictType type,
+    const TrainTime& time, ModifiedField field, IntervalConflictReport::ConflictType type,
     std::shared_ptr<const RailInterval> railint, std::shared_ptr<const TrainLine> line):
     CalculationLogStation(reason,station,time,field),_type(type),_railint(railint),_line(line)
 {
@@ -106,7 +106,7 @@ QString CalculationLogInterval::objectString() const
     else return "";
 }
 
-CalculationLogForbid::CalculationLogForbid(std::shared_ptr<const RailStation> station, const QTime& time, 
+CalculationLogForbid::CalculationLogForbid(std::shared_ptr<const RailStation> station, const TrainTime& time, 
     ModifiedField field, std::shared_ptr<const RailInterval> railint, std::shared_ptr<Forbid> forbid):
     CalculationLogStation(ForbidConflict,station,time,field),_railint(railint), _forbid(forbid)
 {
@@ -123,7 +123,7 @@ QString CalculationLogForbid::reasonString() const
 }
 
 CalculationLogBackoff::CalculationLogBackoff(std::shared_ptr<const RailStation> station, 
-    const QTime time, ModifiedField field, int _count):
+    const TrainTime time, ModifiedField field, int _count):
     CalculationLogStation(Backoff,station,time,field),count(_count)
 {
 }
@@ -190,5 +190,5 @@ QString CalculationLogSub::reasonString() const
 QString CalculationLogSub::toString() const
 {
     return QObject::tr("[%1] 区间=(%2) 起始时刻=%3 stop=%4").arg(reasonString(), railint->toString(),
-        time.toString("hh:mm:ss")).arg(stop);
+        time.toString(TrainTime::HMS)).arg(stop);
 }

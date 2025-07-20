@@ -2,14 +2,15 @@
 
 #include "data/train/train.h"
 #include "data/train/traintype.h"
+#include "data/diagram/diagramoptions.h"
 
-TrainListReadModel::TrainListReadModel(QObject *parent):
-    QAbstractTableModel(parent)
+TrainListReadModel::TrainListReadModel(const DiagramOptions& ops, QObject *parent):
+	QAbstractTableModel(parent), _ops(ops)
 {
 }
 
-TrainListReadModel::TrainListReadModel(const QList<std::shared_ptr<Train>> &trains, QObject *parent):
-    QAbstractTableModel(parent), _trains(trains)
+TrainListReadModel::TrainListReadModel(const DiagramOptions& ops, const QList<std::shared_ptr<Train>> &trains, QObject *parent):
+    QAbstractTableModel(parent), _ops(ops), _trains(trains)
 {
 
 }
@@ -38,7 +39,7 @@ QVariant TrainListReadModel::data(const QModelIndex &index, int role) const
         case ColTerminal:return t->terminal().toSingleLiteral();
         case ColType:return t->type()->name();
         case ColMile:return QString::number(t->localMile(), 'f', 3);
-        case ColSpeed:return QString::number(t->localTraverseSpeed(), 'f', 3);
+        case ColSpeed:return QString::number(t->localTraverseSpeed(_ops.period_hours), 'f', 3);
         }
     }
     else if (role == Qt::CheckStateRole) {
@@ -61,7 +62,12 @@ void TrainListReadModel::sort(int column, Qt::SortOrder order)
         case ColType:std::stable_sort(lst.begin(), lst.end(), &Train::ltType); break;
         case ColShow:std::stable_sort(lst.begin(), lst.end(), &Train::ltShow); break;
         case ColMile:std::stable_sort(lst.begin(), lst.end(), &Train::ltMile); break;
-        case ColSpeed:std::stable_sort(lst.begin(), lst.end(), &Train::ltTravSpeed); break;
+        case ColSpeed:std::stable_sort(lst.begin(), lst.end(),
+            [this](std::shared_ptr<Train> t1, std::shared_ptr<Train> t2)->bool {
+                return t1->localTraverseSpeed(_ops.period_hours) <
+                    t2->localTraverseSpeed(_ops.period_hours);
+            }
+        ); break;
         default:break;
         }
     }
@@ -73,7 +79,12 @@ void TrainListReadModel::sort(int column, Qt::SortOrder order)
         case ColType:std::stable_sort(lst.begin(), lst.end(), &Train::gtType); break;
         case ColShow:std::stable_sort(lst.begin(), lst.end(), &Train::gtShow); break;
         case ColMile:std::stable_sort(lst.begin(), lst.end(), &Train::gtMile); break;
-        case ColSpeed:std::stable_sort(lst.begin(), lst.end(), &Train::gtTravSpeed); break;
+        case ColSpeed:std::stable_sort(lst.begin(), lst.end(),
+            [this](std::shared_ptr<Train> t1, std::shared_ptr<Train> t2)->bool {
+                return t1->localTraverseSpeed(_ops.period_hours) >
+                    t2->localTraverseSpeed(_ops.period_hours);
+            }
+        ); break;
         default:break;
         }
     }

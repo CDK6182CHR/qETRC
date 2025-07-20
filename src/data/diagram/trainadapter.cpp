@@ -170,11 +170,11 @@ int TrainAdapter::totalSecs() const
 	return res;
 }
 
-std::pair<int,int> TrainAdapter::runStaySecs() const
+std::pair<int,int> TrainAdapter::runStaySecs(int period_hours) const
 {
 	int run = 0, stay = 0;
 	for (auto p : _lines) {
-		auto&& d = p->runStaySecs();
+		auto&& d = p->runStaySecs(period_hours);
 		run += d.first;
 		stay += d.second;
 	}

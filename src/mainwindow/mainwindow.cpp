@@ -611,7 +611,7 @@ void MainWindow::initDockWidgets()
 
 	//列车管理
 	if constexpr (true) {
-		auto* tw = new TrainListWidget(_diagram.trainCollection(), undoStack);
+		auto* tw = new TrainListWidget(_diagram.options(), _diagram.trainCollection(), undoStack);
 		dock = new ads::CDockWidget(tr("列车管理"));
 		trainListWidget = tw;
 		trainListDock = dock;

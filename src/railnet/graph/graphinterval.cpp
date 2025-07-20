@@ -5,7 +5,7 @@
 
 
 GraphForbidNode::GraphForbidNode(const ForbidNode &node):
-    beginTime(node.beginTime),endTime(node.endTime)
+    beginTime(node.beginTime.toQTime()),endTime(node.endTime.toQTime())
 {
 
 }

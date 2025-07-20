@@ -7,6 +7,8 @@ class TrainListReadModel;
 class TrainPath;
 class TrainCollection;
 class Train;
+struct DiagramOptions;
+
 /**
  * @brief The AddTrainsToPathDialog class
  * 2023.08.26  Add trains to a single path.
@@ -14,7 +16,8 @@ class Train;
  */
 class AddTrainsToPathDialog : public QDialog
 {
-    Q_OBJECT
+    Q_OBJECT;
+    const DiagramOptions& _ops;
     TrainCollection& coll;
     TrainPath* path;
 
@@ -22,7 +25,7 @@ class AddTrainsToPathDialog : public QDialog
     QTableView* table;
 
 public:
-    AddTrainsToPathDialog(TrainCollection& coll, TrainPath* path, QWidget* parent=nullptr);
+    AddTrainsToPathDialog(const DiagramOptions& ops, TrainCollection& coll, TrainPath* path, QWidget* parent=nullptr);
     void refreshData();
 
 signals:

@@ -12,12 +12,13 @@ namespace _gapdetail {
      * 对每一个新来的事件，判定上一个与之相关的是哪个事件。
      */
     struct EventStackTop {
+        const DiagramOptions& _ops;
         const std::optional<bool> preSingle, postSingle;
         std::shared_ptr<const RailStationEvent>
             downFormerLast, downLatterLast, upFormerLast, upLatterLast;
 
-        EventStackTop(const RailStation& st):
-            preSingle(st.isPreSingle()),postSingle(st.isPostSingle()){}
+        EventStackTop(const DiagramOptions& ops, const RailStation& st):
+            _ops(ops), preSingle(st.isPreSingle()),postSingle(st.isPostSingle()){}
 
         void updateStack(const std::shared_ptr<const RailStationEvent>& ev);
 
@@ -63,8 +64,8 @@ namespace _gapdetail {
     {
         // 如果不是单线，则只能是同向那个；如果单线，则返回两个中较新的那个。
         if (*preSingle) {
-            int secs1 = downFormerLast->secsTo(ev),
-                secs2 = upLatterLast->secsTo(ev);
+            int secs1 = downFormerLast->secsTo(ev, _ops.period_hours),
+                secs2 = upLatterLast->secsTo(ev, _ops.period_hours);
             if (secs1 == secs2) [[unlikely]] {
                 // 相同时优先返回同方向的
                 return ev.dir == Direction::Down ? downFormerLast : upLatterLast;
@@ -82,8 +83,8 @@ namespace _gapdetail {
     std::shared_ptr<const RailStationEvent> EventStackTop::postRelatedEvent(const RailStationEvent& ev)const
     {
         if (*postSingle) {
-            int secs1 = downLatterLast->secsTo(ev),
-                secs2 = upFormerLast->secsTo(ev);
+            int secs1 = downLatterLast->secsTo(ev, _ops.period_hours),
+                secs2 = upFormerLast->secsTo(ev, _ops.period_hours);
             if (secs1 == secs2) [[unlikely]] {
                 return ev.dir == Direction::Down ? downLatterLast : upFormerLast;
             }
@@ -164,7 +165,7 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, std::
      // 目前的思路是，考虑在单线基础上，筛选一下事件的相关性。
      TrainGapList res;
 
-     _gapdetail::EventStackTop stk(*st);
+     _gapdetail::EventStackTop stk(diagram.options(), *st);
 
      stk.downFormerLast = findLastEvent(events, Direction::Down, RailStationEvent::Pre);
      stk.downLatterLast = findLastEvent(events, Direction::Down, RailStationEvent::Post);
@@ -231,12 +232,12 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, std::
              // 既然遇到了一个，那么last一定不是空
              // 2022.09.10: 如果出现Pre，那么pre应该是存在的，这么直接*应该不会遭起
              auto lastRelated = stk.preRelatedEvent(*p);
-             res.emplace_back(std::make_shared<TrainGap>(lastRelated, p));
+             res.emplace_back(std::make_shared<TrainGap>(lastRelated, p, diagram.options().period_hours));
              // 2023.06.14: for counter ??
              // 暂时是不行的。因为目前的事件/间隔分析里强烈依赖了站前/站后的标记。
              auto lastCounter = stk.preCounterEvent(*p);
              if (lastCounter && lastCounter != lastRelated) {
-                 res.emplace_back(std::make_shared<TrainGap>(lastCounter, p));
+                 res.emplace_back(std::make_shared<TrainGap>(lastCounter, p, diagram.options().period_hours));
              }
          }
          if (st->isPostSingle().has_value() && (p->pos & RailStationEvent::Post)) {
@@ -244,11 +245,11 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, std::
              if (!(p->pos & RailStationEvent::Pre)) {
                  // 这个条件是针对通通的情况，防止重复
                  auto lastRelated = stk.postRelatedEvent(*p);
-                 res.emplace_back(std::make_shared<TrainGap>(lastRelated, p));
+                 res.emplace_back(std::make_shared<TrainGap>(lastRelated, p, diagram.options().period_hours));
                  // 2023.06.14: for counter ??
                  auto lastCounter = stk.postCounterEvent(*p);
                  if (lastCounter &&lastCounter != lastRelated) {
-                     res.emplace_back(std::make_shared<TrainGap>(lastCounter, p));
+                     res.emplace_back(std::make_shared<TrainGap>(lastCounter, p, diagram.options().period_hours));
                  }
              }
          }
@@ -267,7 +268,7 @@ TrainGapList TrainGapAna::calTrainGaps(const RailStationEventList &events, std::
                      if (itr->second) {
                          // 存在被踩情况
                          res.emplace_back(std::make_shared<TrainGap>(
-                             itr->first, p, TrainGap::Avoid, itr->second));
+                             itr->first, p, TrainGap::Avoid, itr->second, diagram.options().period_hours));
                      }
                      pitr = down_in.erase(itr);
                      break;

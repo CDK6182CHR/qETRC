@@ -32,7 +32,7 @@ private:
     void _initYAxis(double width,const QPen& defaultPen,const QPen& boldPen);
     void _addTrains();
     void _addTrainRect(const TrackOccupy& to, double start_y);
-    double _calXValue(const QTime& tm)const;
+    double _calXValue(const TrainTime& tm)const;
 public slots:
     void setXScale(int value);
     void repaintDiagram();

@@ -5,6 +5,7 @@
 #include <memory>
 
 class Train;
+struct DiagramOptions;
 
 /**
  * @brief The TrainListStdModel class
@@ -15,6 +16,7 @@ class Train;
 class TrainListReadModel : public QAbstractTableModel
 {
     Q_OBJECT;
+    const DiagramOptions& _ops;
     QList<std::shared_ptr<Train>> _trains{};
 public:
     enum {
@@ -27,8 +29,8 @@ public:
         ColSpeed,
         ColMAX
     };
-    explicit TrainListReadModel(QObject *parent = nullptr);
-    explicit TrainListReadModel(const QList<std::shared_ptr<Train>>& trains,
+    explicit TrainListReadModel(const DiagramOptions& ops, QObject *parent = nullptr);
+    explicit TrainListReadModel(const DiagramOptions& ops, const QList<std::shared_ptr<Train>>& trains,
                                 QObject* parent=nullptr);
     const auto& trains()const {return _trains;}
 

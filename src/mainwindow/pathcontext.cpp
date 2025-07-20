@@ -167,7 +167,7 @@ void PathContext::actSwitchToPathRuler()
 
 void PathContext::actShowTrains()
 {
-    auto* d = new PathTrainsDialog(diagram.trainCollection(), path, mw);
+    auto* d = new PathTrainsDialog(diagram.options(), diagram.trainCollection(), path, mw);
     connect(d, &PathTrainsDialog::actAdd, this, &PathContext::actAddTrains);
     connect(d, &PathTrainsDialog::removeTrains, this, &PathContext::actRemoveTrains);
     d->open();
@@ -175,7 +175,7 @@ void PathContext::actShowTrains()
 
 void PathContext::actAddTrains()
 {
-    auto* w = new AddTrainsToPathDialog(diagram.trainCollection(), path, mw);
+    auto* w = new AddTrainsToPathDialog(diagram.options(), diagram.trainCollection(), path, mw);
     connect(w, &AddTrainsToPathDialog::trainsAdded,
         this, &PathContext::addTrains);
     w->open();

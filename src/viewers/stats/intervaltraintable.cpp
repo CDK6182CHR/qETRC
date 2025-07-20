@@ -7,9 +7,11 @@
 #include "data/train/traintype.h"
 #include "model/delegate/timeintervaldelegate.h"
 #include "model/delegate/traintimedelegate.h"
+#include "data/diagram/diagramoptions.h"
 
-IntervalTrainModel::IntervalTrainModel(QWidget *parent):
-    QStandardItemModel(parent)
+
+IntervalTrainModel::IntervalTrainModel(const DiagramOptions& ops, QWidget *parent):
+    QStandardItemModel(parent), _ops(ops)
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({
@@ -45,7 +47,7 @@ void IntervalTrainModel::setupModel()
         it->setData(QVariant::fromValue(info.to->arrive), Qt::EditRole);
         setItem(i,ColToTime,it);
 
-        int secs=qeutil::secsToStrict(info.from->depart,info.to->arrive,info.addDays);
+        int secs=qeutil::secsToStrict(info.from->depart,info.to->arrive,info.addDays, _ops.period_hours);
         it = new SI;
         it->setData(secs, Qt::EditRole);
         setItem(i, ColTime, it);
@@ -68,7 +70,7 @@ void IntervalTrainModel::resetData(const IntervalTrainList& data_)
 
 
 IntervalTrainTable::IntervalTrainTable(const DiagramOptions& ops, QWidget *parent):
-    _ops(ops), model(new IntervalTrainModel(parent))
+    _ops(ops), model(new IntervalTrainModel(_ops, parent))
 {
     initUI();
 }

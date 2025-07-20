@@ -7,6 +7,8 @@ class QTableView;
 class TrainListReadModel;
 class TrainCollection;
 class TrainPath;
+struct DiagramOptions;
+
 /**
  * @brief The PathTrainsDialog class
  * 2023.08.24  The dialog for viewing and removing trains that belong to a path.
@@ -14,14 +16,15 @@ class TrainPath;
  */
 class PathTrainsDialog : public QDialog
 {
-    Q_OBJECT
+    Q_OBJECT;
+    const DiagramOptions& _ops;
     TrainCollection& coll;
     TrainPath* path;
 
     TrainListReadModel* model;
     QTableView* table;
 public:
-    PathTrainsDialog(TrainCollection& coll, TrainPath* path, QWidget* parent=nullptr);
+    PathTrainsDialog(const DiagramOptions& ops, TrainCollection& coll, TrainPath* path, QWidget* parent=nullptr);
     void refreshData();
 
 private:

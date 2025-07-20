@@ -3,6 +3,7 @@
 #include "data/rail/rail.h"
 #include "data/train/train.h"
 #include "data/diagram/trainadapter.h"
+#include "data/diagram/diagramoptions.h"
 
 #include <QDialogButtonBox>
 #include <QFormLayout>
@@ -10,9 +11,9 @@
 #include <QMessageBox>
 #include <QSpinBox>
 
-RulerFromTrainDialog::RulerFromTrainDialog(TrainCollection& coll_,
+RulerFromTrainDialog::RulerFromTrainDialog(DiagramOptions& ops, TrainCollection& coll_,
     std::shared_ptr<Ruler> ruler_, QWidget* parent) :
-    QDialog(parent), coll(coll_), ruler(ruler_)
+    QDialog(parent), _ops(ops), coll(coll_), ruler(ruler_)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("单车次标尺提取 - %1").arg(ruler->name()));
@@ -71,7 +72,7 @@ void RulerFromTrainDialog::onApply()
         return;
     }
     auto r = ruler->clone();
-    int cnt = ruler->fromSingleTrain(adp, spStart->value(), spStop->value());
+    int cnt = ruler->fromSingleTrain(adp, spStart->value(), spStop->value(), _ops.period_hours);
     if (cnt) {
         QMessageBox::information(this, tr("提示"),
             tr("成功从指定车次中读取到%1个区间的标尺数据。").arg(cnt));

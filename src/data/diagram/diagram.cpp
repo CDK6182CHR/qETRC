@@ -783,7 +783,7 @@ ReadRulerReport Diagram::rulerFromMultiTrains(std::shared_ptr<Railway> railway,
                     if ((itr = res.find(it)) != res.end()) {
                         //此区间是要计算的区间
                         int secs = qeutil::secsTo(pr->trainStation->depart,
-                            p->trainStation->arrive);
+                            p->trainStation->arrive, _options.period_hours);
                         auto att = line->getIntervalAttachType(pr, p);
                         itr->second.raw.emplace(train, std::make_pair(secs, att));
                     }
@@ -1564,8 +1564,8 @@ bool Diagram::toTrc(const QString& filename, std::shared_ptr<Railway> rail, bool
         fout << train->terminal().toSingleLiteral() << Qt::endl;
         for (const auto& t : train->timetable()) {
             //站名，到点，开点，true, NA, track
-            fout << t.name.toSingleLiteral() << "," << qeutil::timeToStringNullable(t.arrive, "hh:mm:ss") << ","
-                << qeutil::timeToStringNullable(t.depart, "hh:mm:ss") << ",true,NA," << t.track << Qt::endl;
+            fout << t.name.toSingleLiteral() << "," << qeutil::timeToStringNullable(t.arrive, TrainTime::HMS) << ","
+                << qeutil::timeToStringNullable(t.depart, TrainTime::HMS) << ",true,NA," << t.track << Qt::endl;
         }
     }
 

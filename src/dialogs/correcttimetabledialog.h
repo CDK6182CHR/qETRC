@@ -16,6 +16,7 @@ struct DiagramOptions;
 class CorrectTimetableModel: public QEMoveableModel
 {
     Q_OBJECT
+    const DiagramOptions& _ops;
     std::shared_ptr<Train> train;
 public:
     enum {
@@ -29,7 +30,7 @@ public:
         ColNote,
         ColMAX
     };
-    CorrectTimetableModel(std::shared_ptr<Train> train, QObject* parent=nullptr);
+    CorrectTimetableModel(const DiagramOptions& ops, std::shared_ptr<Train> train, QObject* parent=nullptr);
     void refreshData();
     //void setTrain(std::shared_ptr<Train> train);
 

@@ -11,6 +11,7 @@ class QEControlledTable;
 class QTableView;
 class RoutingDiagram;
 class Routing;
+struct DiagramOptions;
 
 class RoutingStationModel: public QEMoveableModel
 {
@@ -38,7 +39,8 @@ public:
  */
 class RoutingDiagramWidget : public QSplitter
 {
-    Q_OBJECT
+    Q_OBJECT;
+    const DiagramOptions& _ops;
     std::shared_ptr<Routing> routing;
     RoutingDiagram*const routingDiagram;
     RoutingStationModel* const model;
@@ -47,7 +49,7 @@ class RoutingDiagramWidget : public QSplitter
 
     QCheckBox* ckTimetable;
 public:
-    RoutingDiagramWidget(std::shared_ptr<Routing> routing_, QWidget* parent=nullptr);
+    RoutingDiagramWidget(const DiagramOptions& ops, std::shared_ptr<Routing> routing_, QWidget* parent=nullptr);
 private:
     void initUI();
 private slots:

@@ -99,7 +99,7 @@ public:
     const AdapterStation* firstStation()const;
 
     int totalSecs()const;
-    std::pair<int, int> runStaySecs()const;
+    std::pair<int, int> runStaySecs(int period_hours)const;
     double totalMile()const;
 
     /**

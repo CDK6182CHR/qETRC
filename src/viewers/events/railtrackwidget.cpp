@@ -169,7 +169,7 @@ RailTrackWidget::RailTrackWidget(Diagram &diagram, std::shared_ptr<Railway> rail
                  std::shared_ptr<RailStation> station, QWidget *parent):
     QSplitter(parent), diagram(diagram), railway(railway), station(station),
     events(diagram.stationTrainsSettled(railway,station)),
-    data(events,station->tracks)
+    data(diagram.options(), events,station->tracks)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(Qt::Dialog);

@@ -1,8 +1,10 @@
 ﻿#pragma once
-#include <QTime>
+
 #include <memory>
-#include <data/diagram/traingap.h>
+
 #include "intervalconflictreport.h"
+#include "data/common/traintime.h"
+#include "data/diagram/traingap.h"
 
 class RailStation;
 
@@ -59,12 +61,12 @@ class CalculationLogStation:
 {
 protected:
     std::shared_ptr<const RailStation> _station;
-    QTime _time;
+    TrainTime _time;
     ModifiedField _field;
 
 public:
     CalculationLogStation(Reason reason, std::shared_ptr<const RailStation> station,
-        const QTime time, ModifiedField field);
+        const TrainTime time, ModifiedField field);
 
     auto station()const{return _station;}
     const auto& time()const{return _time;}
@@ -92,7 +94,7 @@ class CalculationLogGap: public CalculationLogStation {
     std::shared_ptr<RailStationEvent> _event;
 public:
     CalculationLogGap(Reason reason, std::shared_ptr<const RailStation> station,
-        const QTime time, ModifiedField field, typename TrainGap::GapTypesV2 gapType,
+        const TrainTime& time, ModifiedField field, typename TrainGap::GapTypesV2 gapType,
         std::shared_ptr<const RailStation> conflictStation,
         std::shared_ptr<RailStationEvent> event_);
     virtual QString reasonString()const override;
@@ -106,7 +108,7 @@ class CalculationLogInterval : public CalculationLogStation {
     std::shared_ptr<const TrainLine> _line;
 public:
     CalculationLogInterval(Reason reason, std::shared_ptr<const RailStation> station,
-        const QTime time, ModifiedField field, IntervalConflictReport::ConflictType type, 
+        const TrainTime& time, ModifiedField field, IntervalConflictReport::ConflictType type, 
         std::shared_ptr<const RailInterval> railint, std::shared_ptr<const TrainLine> line);
     virtual QString reasonString()const override;
     virtual QString objectString()const override;
@@ -119,7 +121,7 @@ class CalculationLogForbid : public CalculationLogStation {
     std::shared_ptr<Forbid> _forbid;
 public:
     CalculationLogForbid(std::shared_ptr<const RailStation> station,
-        const QTime& time, ModifiedField field, std::shared_ptr<const RailInterval> railint, std::shared_ptr<Forbid> forbid);
+        const TrainTime& time, ModifiedField field, std::shared_ptr<const RailInterval> railint, std::shared_ptr<Forbid> forbid);
 
     virtual QString reasonString()const override;
 };
@@ -130,7 +132,7 @@ class CalculationLogBackoff :public CalculationLogStation
     int count;
 public:
     CalculationLogBackoff(std::shared_ptr<const RailStation> station,
-        const QTime time, ModifiedField field, int _count);
+        const TrainTime time, ModifiedField field, int _count);
     virtual QString reasonString()const override;
 };
 
@@ -152,11 +154,11 @@ class RailInterval;
 class CalculationLogSub :public CalculationLogAbstract
 {
     const RailInterval* railint;
-    QTime time;
+    TrainTime time;
     bool stop;
     bool isBack;
 public:
-    CalculationLogSub(Reason reason, const RailInterval* railint, const QTime& time,
+    CalculationLogSub(Reason reason, const RailInterval* railint, const TrainTime& time,
         bool stop,bool isBack):
         CalculationLogAbstract(reason),
         railint(railint),time(time),stop(stop),isBack(isBack){}

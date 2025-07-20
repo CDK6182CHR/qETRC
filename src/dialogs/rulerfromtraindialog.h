@@ -10,7 +10,7 @@ class Ruler;
 class TrainCollection;
 class QSpinBox;
 class Railway; 
-
+struct DiagramOptions;
 
 /**
  * @brief The RulerFromTrainDialog class
@@ -19,13 +19,14 @@ class Railway;
 class RulerFromTrainDialog : public QDialog
 {
     Q_OBJECT;
+    const DiagramOptions& _ops;
     TrainCollection& coll;
     std::shared_ptr<Ruler> ruler;
 
     SelectTrainCombo* cbTrain;
     QSpinBox* spStart,*spStop;
 public:
-    RulerFromTrainDialog(TrainCollection& coll_, std::shared_ptr<Ruler> ruler_,
+    RulerFromTrainDialog(DiagramOptions& ops, TrainCollection& coll_, std::shared_ptr<Ruler> ruler_,
                          QWidget* parent=nullptr);
 signals:
     void rulerUpdated(std::shared_ptr<Ruler> ruler, std::shared_ptr<Railway> newruler);

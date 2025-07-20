@@ -6,7 +6,6 @@
 #include <QLineEdit>
 #include <QSet>
 #include <QSpinBox>
-#include <QTimeEdit>
 #include <QTableView>
 #include <QHeaderView>
 #include <QMessageBox>
@@ -15,6 +14,7 @@
 #include "model/delegate/traintimedelegate.h"
 #include "util/utilfunc.h"
 #include "data/train/train.h"
+#include "util/traintimeedit.h"
 
 BatchCopyTrainModel::BatchCopyTrainModel(QObject* parent) :
     QEMoveableModel(parent)
@@ -23,13 +23,13 @@ BatchCopyTrainModel::BatchCopyTrainModel(QObject* parent) :
     setHorizontalHeaderLabels({ tr("车次"),tr("首站时刻") });
 }
 
-void BatchCopyTrainModel::addRow(const QString& trainName, const QTime& time)
+void BatchCopyTrainModel::addRow(const QString& trainName, const TrainTime& time)
 {
     int row = rowCount();
     insertRow(row);
     setupNewRow(row);
     item(row, ColTrainName)->setText(trainName);
-    item(row, ColStartTime)->setData(time, Qt::EditRole);
+    item(row, ColStartTime)->setData(QVariant::fromValue(time), Qt::EditRole);
 }
 
 void BatchCopyTrainModel::setupNewRow(int row)
@@ -73,10 +73,11 @@ void BatchCopyTrainDialog::initUI()
     spStartNumber->setRange(0, 100000000);
     flay->addRow(tr("起始编号"), spStartNumber);
 
-    edStartTime = new QTimeEdit;
+    edStartTime = new TrainTimeEdit;
+	edStartTime->setMaxHours(diagram.options().period_hours);
+    edStartTime->setFormat(TrainTime::HMS);
     edStartTime->setToolTip(tr("阵列中第一个车次的首站时刻。"));
     edStartTime->setWrapping(true);
-    edStartTime->setDisplayFormat("hh:mm:ss");
     flay->addRow(tr("起始时刻"), edStartTime);
 
     auto* chlay = new QHBoxLayout;
@@ -142,7 +143,7 @@ void BatchCopyTrainDialog::onApply()
             tr("请先选择一个时刻表非空的原型列车！"));
         return;
     }
-    const QTime& reftime = train->firstStation()->arrive;
+    const TrainTime& reftime = train->firstStation()->arrive;
 
     QVector<std::shared_ptr<Train>> trains;
     QList<int> invalidRows;
@@ -150,10 +151,10 @@ void BatchCopyTrainDialog::onApply()
     for (int i = 0; i < model->rowCount(); i++) {
         const QString& name = model->item(i, BatchCopyTrainModel::ColTrainName)->text();
         if (coll.trainNameIsValid(name, {}) && !names.contains(name)) {
-            const QTime& tm = model->item(i, BatchCopyTrainModel::ColStartTime)->
-                data(Qt::EditRole).toTime();
+            const TrainTime& tm = qvariant_cast<TrainTime>(model->item(i, BatchCopyTrainModel::ColStartTime)->
+                data(Qt::EditRole));
             auto nt = std::make_shared<Train>(train->translation(name,
-                qeutil::secsTo(reftime, tm), diagram.options().period_hours));
+                qeutil::secsTo(reftime, tm, diagram.options().period_hours), diagram.options().period_hours));
             diagram.updateTrain(nt);
             trains.append(nt);
             names.insert(name);
@@ -188,11 +189,11 @@ void BatchCopyTrainDialog::onGenerateArray()
     auto&& fmt = edFormat->text();
     int num = spStartNumber->value();
     int count = spCount->value();
-    QTime tm = edStartTime->time();
+    TrainTime tm = edStartTime->time();
     int ds = spMin->value() * 60 + spSec->value();
     for (int i = 0; i < count; i++) {
         model->addRow(fmt.arg(num), tm);
-        tm = tm.addSecs(ds);
+        tm = tm.addSecs(ds, diagram.options().period_hours);
         num += 2;
     }
 }

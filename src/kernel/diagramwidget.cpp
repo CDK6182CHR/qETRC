@@ -1863,7 +1863,7 @@ void DiagramWidget::intervalToolTip(std::deque<AdapterStation>::const_iterator f
     std::deque<AdapterStation>::const_iterator latter, const TrainLine& line)
 {
     const auto& ts1 = former->trainStation, & ts2 = latter->trainStation;
-    int sec = qeutil::secsTo(ts1->depart, ts2->arrive);
+    int sec = qeutil::secsTo(ts1->depart, ts2->arrive, _diagram.options().period_hours);
     double mile = std::abs(latter->railStation.lock()->mile -
         former->railStation.lock()->mile);
     double spd = mile / sec * 3600;

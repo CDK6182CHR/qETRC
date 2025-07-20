@@ -8,13 +8,14 @@
 #include <optional>
 #include "data/train/train.h"
 #include "mainwindow/version.h"
+#include "data/diagram/diagramoptions.h"
 
 #ifdef QT_PRINTSUPPORT_LIB
 #include <QPrinter>
 #endif
 
-RoutingDiagram::RoutingDiagram(std::shared_ptr<Routing> routing_, QWidget *parent):
-    QGraphicsView(parent),routing(routing_)
+RoutingDiagram::RoutingDiagram(const DiagramOptions& ops, std::shared_ptr<Routing> routing_, QWidget *parent):
+    QGraphicsView(parent), _ops(ops), routing(routing_)
 {
     setScene(new QGraphicsScene(this));
     setAlignment(Qt::AlignLeft | Qt::AlignTop);
@@ -64,7 +65,7 @@ bool RoutingDiagram::transData()
     }
     data.clear();
     int currentDay=0;
-    QTime last_time(0,0,0);
+    TrainTime last_time(0,0,0);
     for(auto p=routing->order().begin();p!=routing->order().end();++p){
         if(p->isVirtual()){
             qDebug()<<"RoutingDiagram::transData: WARNING: INVALID virtual node "<<
@@ -197,7 +198,7 @@ void RoutingDiagram::_setHLines()
         }
         if(!stationYValues.contains(bottomStation)){
             // 对于大于30分钟的，排列在异侧。否则认为是出库一类的小交路，排列在同侧（都是顶部）
-            if (d.end_day-d.start_day > 1 || train->totalMinSecs()>=1800 ){
+            if (d.end_day-d.start_day > 1 || train->totalMinSecs(_ops.period_hours)>=1800 ){
                 //安排在异侧
                 stationYValues.insert(bottomStation,bottomNext);
                 bottomNext -= sizes.stationDistance;
@@ -224,12 +225,12 @@ void RoutingDiagram::_addStationLine(const StationName &name, double y)
     textItem1->setPos(sizes.left-rect.width()-5, y-rect.height()/2);
 }
 
-QPointF RoutingDiagram::_posCalculate(const StationName &name, int day, const QTime &tm)
+QPointF RoutingDiagram::_posCalculate(const StationName &name, int day, const TrainTime &tm)
 {
     double y=stationYValues.value(name);
     double x=sizes.left;
     x+=day*sizes.dayWidth;
-    int sec=tm.msecsSinceStartOfDay()/1000;
+    int sec = tm.secondsSinceStart();
     x+=sec/(3600.0*24)*sizes.dayWidth;
     return QPointF(x,y);
 }

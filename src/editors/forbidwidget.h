@@ -12,6 +12,7 @@ class QTableView;
 class QCheckBox;
 class QSpinBox;
 class QMenu;
+struct DiagramOptions;
 
 /**
  * @brief The ForbidWidget class
@@ -21,6 +22,7 @@ class QMenu;
 class ForbidWidget : public QWidget
 {
     Q_OBJECT;
+	const DiagramOptions& _ops;
     const std::shared_ptr<Forbid> forbid;
     ForbidModel*const model;
     QCheckBox* ckDown,*ckUp;
@@ -32,7 +34,7 @@ class ForbidWidget : public QWidget
     bool updating=false;
 
 public:
-    explicit ForbidWidget(std::shared_ptr<Forbid> forbid, bool commitInPlace, QWidget *parent = nullptr);
+    explicit ForbidWidget(const DiagramOptions& ops, std::shared_ptr<Forbid> forbid, bool commitInPlace, QWidget *parent = nullptr);
     auto* getModel(){return model;}
     auto getForbid(){return forbid;}
 
@@ -82,10 +84,11 @@ class ForbidTabWidget:
         public QTabWidget
 {
     Q_OBJECT;
+    const DiagramOptions& _ops;
     const std::shared_ptr<Railway> railway;
     bool inplace;
 public:
-    ForbidTabWidget(std::shared_ptr<Railway> railway,bool commitInPlace, QWidget* parent=nullptr);
+    ForbidTabWidget(const DiagramOptions& ops, std::shared_ptr<Railway> railway,bool commitInPlace, QWidget* parent=nullptr);
     auto getRailway(){return railway;}
 private:
     void addForbidTab(std::shared_ptr<Forbid> forbid);

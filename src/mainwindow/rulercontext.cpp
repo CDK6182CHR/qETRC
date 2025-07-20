@@ -225,7 +225,7 @@ void RulerContext::actReadFromSingleTrain()
 {
     if (!ruler)
         return;
-    auto* dialog = new RulerFromTrainDialog(diagram.trainCollection(), ruler, mw);
+    auto* dialog = new RulerFromTrainDialog(diagram.options(), diagram.trainCollection(), ruler, mw);
     connect(dialog, &RulerFromTrainDialog::rulerUpdated,
         this, &RulerContext::actChangeRulerData);
     dialog->show();

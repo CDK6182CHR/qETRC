@@ -17,9 +17,10 @@
 
 #include "util/selecttraincombo.h"
 #include "data/algo/timetablecorrector.h"
+#include "data/diagram/diagramoptions.h"
 
-CorrectTimetableModel::CorrectTimetableModel(std::shared_ptr<Train> train, QObject *parent):
-    QEMoveableModel(parent),train(train)
+CorrectTimetableModel::CorrectTimetableModel(const DiagramOptions& ops, std::shared_ptr<Train> train, QObject *parent):
+    QEMoveableModel(parent), _ops(ops), train(train)
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({
@@ -214,10 +215,10 @@ void CorrectTimetableModel::setupModel()
 void CorrectTimetableModel::calculateDurations(int row)
 {
     using SI = QStandardItem;
-    const QTime& arr = rowArrive(row), & dep = rowDepart(row);
+    const TrainTime& arr = rowArrive(row), & dep = rowDepart(row);
 
     // 停时
-    int secs = qeutil::secsTo(arr, dep);
+    int secs = qeutil::secsTo(arr, dep, _ops.period_hours);
     auto* it = new SI(qeutil::secsToStringWithEmpty(secs));
     if (secs > 12 * 3600) {
         it->setBackground(QColor(255, 0, 0, 150));
@@ -225,8 +226,8 @@ void CorrectTimetableModel::calculateDurations(int row)
     setItem(row, ColStopDuration, it);
 
     if (row > 0) {
-        const QTime& last = rowDepart(row - 1);
-        secs = qeutil::secsTo(last, arr);
+        const TrainTime& last = rowDepart(row - 1);
+        secs = qeutil::secsTo(last, arr, _ops.period_hours);
         it = new SI(qeutil::secsToString(secs));
         if (secs > 12 * 3600) {
             it->setBackground(QColor(255, 0, 0, 150));
@@ -320,7 +321,7 @@ void CorrectTimetableModel::onDataChanged(const QModelIndex& topLeft, const QMod
 
 CorrectTimetableDialog::CorrectTimetableDialog(
                  const DiagramOptions& ops, std::shared_ptr<Train> train, QWidget *parent):
-    QDialog(parent), _ops(ops), train(train), model(new CorrectTimetableModel(train,this))
+    QDialog(parent), _ops(ops), train(train), model(new CorrectTimetableModel(_ops, train, this))
 {
     resize(700,800);
     setWindowTitle(tr("时刻表修正 - %1").arg(train->trainName().full()));
@@ -421,7 +422,7 @@ void CorrectTimetableDialog::autoCorrect()
 
     auto nt=model->appliedTrain();
     //try{
-        bool flag=TimetableCorrector::autoCorrect(nt);
+        bool flag=TimetableCorrector::autoCorrect(nt, _ops.period_hours);
         if (flag){
             model->setTrain(nt);
             QMessageBox::information(this,tr("提示"),tr("自动更正执行成功，已更新表格"));

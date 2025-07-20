@@ -18,7 +18,7 @@ class TrainListModel;
 class QTableView;
 class QLineEdit;
 class TrainType;
-
+struct DiagramOptions;
 
 /**
  * @brief The TrainListWidget class
@@ -33,8 +33,9 @@ class TrainType;
  */
 class TrainListWidget : public QWidget
 {
-    Q_OBJECT
+    Q_OBJECT;
 
+    const DiagramOptions& _ops;
     TrainCollection& coll;
     QUndoStack* const _undo;
     QTableView* table;
@@ -42,7 +43,7 @@ class TrainListWidget : public QWidget
     TrainListModel* model;
 
 public:
-    explicit TrainListWidget(TrainCollection& coll_, QUndoStack* undo, QWidget *parent_ = nullptr);
+    explicit TrainListWidget(const DiagramOptions& ops,  TrainCollection& coll_, QUndoStack* undo, QWidget *parent_ = nullptr);
 
     /**
      * 刷新数据。

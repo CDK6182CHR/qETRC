@@ -4,6 +4,7 @@
 #include "data/train/train.h"
 #include "data/diagram/trainline.h"
 #include "data/train/traintype.h"
+#include "data/diagram/diagramoptions.h"
 
 
 TrackDiagram::TrackDiagram(TrackDiagramData &data, QWidget* parent):
@@ -108,7 +109,7 @@ void TrackDiagram::_addTrains()
 
 void TrackDiagram::_addTrainRect(const TrackOccupy& to, double start_y)
 {
-	auto [begTime, endTime] = to.occupiedRange();
+	auto [begTime, endTime] = to.occupiedRange(_data.diagramOptions().period_hours);
 	double begin_x = _calXValue(begTime), end_x = _calXValue(endTime);
 	auto train = to.item->line->train();
 	const QColor& color = train->type()->pen().color();
@@ -118,9 +119,9 @@ void TrackDiagram::_addTrainRect(const TrackOccupy& to, double start_y)
 	rect->setToolTip(to.item->toString());
 }
 
-double TrackDiagram::_calXValue(const QTime& tm) const
+double TrackDiagram::_calXValue(const TrainTime& tm) const
 {
-	return margins.left + tm.msecsSinceStartOfDay() / 1000 / seconds_per_pix;
+	return margins.left + tm.secondsSinceStart() / seconds_per_pix;
 }
 
 void TrackDiagram::setXScale(int value)

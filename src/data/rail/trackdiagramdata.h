@@ -3,6 +3,8 @@
 #include "railtrack.h"
 #include <map>
 
+struct DiagramOptions;
+
 /**
  * @brief The TrackGroup class
  * 一组股道 （上行，或下行，或单线）的集合。包含查找、判定等算法。
@@ -24,10 +26,10 @@ public:
      * 已知双线，添加车次。只管添加Track对象，不管命名。
      */
     void autoAddDouble(std::shared_ptr<TrackItem> item, bool ignoreMainTrack,
-                       int sameSplitMinu);
+                       int sameSplitMinu, int period_hours);
 
     void autoAddSingle(std::shared_ptr<TrackItem> item, bool ignoreMainTrack,
-                       int sameSplitSecs, int oppsiteSplitSecs);
+                       int sameSplitSecs, int oppsiteSplitSecs, int period_hours);
 
     void clear();
 
@@ -69,6 +71,7 @@ class TrackDiagramData
 {
     using events_t=std::vector<std::pair<std::shared_ptr<TrainLine>,
         const AdapterStation*>>;
+    const DiagramOptions& _ops;
     const events_t& data;
     QVector<std::shared_ptr<TrackItem>> items;
     QList<QString> initTrackOrder;
@@ -86,7 +89,7 @@ class TrackDiagramData
 
 public:
 
-    TrackDiagramData(const events_t& data, const QList<QString>& initTrackOrder);
+    TrackDiagramData(const DiagramOptions& ops, const events_t& data, const QList<QString>& initTrackOrder);
 
     bool doubleLine()const{return _doubleLine;}
     int trackCount()const{return trackOrder.size();}
@@ -98,6 +101,7 @@ public:
      */
     std::shared_ptr<Track> trackByName(const QString& name)const;
 
+    auto& diagramOptions()const { return _ops; }
     void refreshData();
     bool manual()const{return _manual;}
     void setDoubleLine(bool on){_doubleLine=on;}
@@ -124,8 +128,8 @@ private:
         std::map<events_t::value_type, const Train*>& preTrainMap
         );
 
-    void _addPassTrain(std::shared_ptr<TrackItem> item);
-    void _addStopTrain(std::shared_ptr<TrackItem> item);
+    void _addPassTrain(std::shared_ptr<TrackItem> item, int period_hours);
+    void _addStopTrain(std::shared_ptr<TrackItem> item, int period_hours);
 
     void _autoTrackNames();
     void _autoTrackOrder();

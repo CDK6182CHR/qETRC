@@ -3,10 +3,11 @@
 #include "data/train/train.h"
 #include "data/train/routing.h"
 #include "data/diagram/trainline.h"
+#include "data/diagram/diagramoptions.h"
 
-TrackDiagramData::TrackDiagramData(const events_t& data,
+TrackDiagramData::TrackDiagramData(const DiagramOptions& ops, const events_t& data,
     const QList<QString>& initTrackOrder) :
-    data(data), initTrackOrder(initTrackOrder)
+    _ops(ops), data(data), initTrackOrder(initTrackOrder)
 {
     //self._parseInitTrackOrder(init_tracks)
     _makeList();
@@ -73,10 +74,10 @@ void TrackDiagramData::_makeList()
     // 第二轮处理：铺画  跨日的处理暂时不要表达在数据上
     foreach(auto it, items) {
         if (it->isStopped()) {
-            _addStopTrain(it);
+            _addStopTrain(it, _ops.period_hours);
         }
         else {
-            _addPassTrain(it);
+            _addPassTrain(it, _ops.period_hours);
         }
     }
     _autoTrackNames();
@@ -142,63 +143,63 @@ void TrackDiagramData::convertItem(events_t::const_reference pa,
     }
 }
 
-void TrackDiagramData::_addPassTrain(std::shared_ptr<TrackItem> item)
+void TrackDiagramData::_addPassTrain(std::shared_ptr<TrackItem> item, int period_hours)
 {
     if (_manual && !item->specTrack.isEmpty()) {
         // 手动铺画
         auto track = singleTracks.trackByName(item->specTrack);
-        if (auto itr = track->conflictItem(item, _sameSplitSecs, _oppositeSiteSplitSecs);
+        if (auto itr = track->conflictItem(item, _sameSplitSecs, _oppositeSiteSplitSecs, _ops.period_hours);
             itr != track->cend()) {
             // 发生冲突，提出警告，但不进行任何别的操作
             msg.push_back(QObject::tr("通过时刻冲突：尝试添加[%1] [%2] 至股道 [%3]，"
-                "但与 [%4]冲突。").arg(item->title, item->beginTime.toString("hh:mm:ss"),
+                "但与 [%4]冲突。").arg(item->title, item->beginTime.toString(TrainTime::HMS),
                     item->specTrack, itr->item->title));
         }
-        track->addItem(item);
+        track->addItem(item, _ops.period_hours);
     }
     else if (_doubleLine) {
         // 经典模式：双线铺画  通过列车不会忽略正线
         if (item->dir == Direction::Down) {
-            downTracks.autoAddDouble(item, false, _sameSplitSecs);
+            downTracks.autoAddDouble(item, false, _sameSplitSecs, period_hours);
         }
         else {
-            upTracks.autoAddDouble(item, false, _sameSplitSecs);
+            upTracks.autoAddDouble(item, false, _sameSplitSecs, period_hours);
         }
     }
     else {
         // 单线模式
-        singleTracks.autoAddSingle(item, false, _sameSplitSecs, _oppositeSiteSplitSecs);
+        singleTracks.autoAddSingle(item, false, _sameSplitSecs, _oppositeSiteSplitSecs, period_hours);
     }
 }
 
-void TrackDiagramData::_addStopTrain(std::shared_ptr<TrackItem> item)
+void TrackDiagramData::_addStopTrain(std::shared_ptr<TrackItem> item, int period_hours)
 {
     if (_manual && !item->specTrack.isEmpty()) {
         // 手动
         auto track = singleTracks.trackByName(item->specTrack);
-        if (auto itr = track->conflictItem(item, _sameSplitSecs, _oppositeSiteSplitSecs);
+        if (auto itr = track->conflictItem(item, _sameSplitSecs, _oppositeSiteSplitSecs, _ops.period_hours);
             itr != track->cend()) {
             // 发生冲突，提出警告，但不进行任何别的操作
             msg.push_back(QObject::tr("停车时刻冲突：尝试添加[%1] [%2]-[%3] 至股道 [%3]，"
-                "但与 [%4]冲突。").arg(item->title, item->beginTime.toString("hh:mm:ss"),
-                    item->endTime.toString("hh:mm:ss"),
+                "但与 [%4]冲突。").arg(item->title, item->beginTime.toString(TrainTime::HMS),
+                    item->endTime.toString(TrainTime::HMS),
                     item->specTrack, itr->item->title));
         }
-        track->addItem(item);
+        track->addItem(item, _ops.period_hours);
     }
     else if (_doubleLine) {
         // 双线
         if (item->dir == Direction::Down) {
-            downTracks.autoAddDouble(item, !_allowMainStay, _sameSplitSecs);
+            downTracks.autoAddDouble(item, !_allowMainStay, _sameSplitSecs, period_hours);
         }
         else {
-            upTracks.autoAddDouble(item, !_allowMainStay, _sameSplitSecs);
+            upTracks.autoAddDouble(item, !_allowMainStay, _sameSplitSecs, period_hours);
         }
     }
     else {
         // 单线
         singleTracks.autoAddSingle(item, !_allowMainStay,
-            _sameSplitSecs, _oppositeSiteSplitSecs);
+            _sameSplitSecs, _oppositeSiteSplitSecs, period_hours);
     }
 }
 
@@ -275,7 +276,7 @@ std::shared_ptr<Track> TrackGroup::trackByName(const QString& name)
 }
 
 void TrackGroup::autoAddDouble(std::shared_ptr<TrackItem> item, bool ignoreMainTrack,
-    int sameSplitSecs)
+    int sameSplitSecs, int period_hours)
 {
     auto p = _tracks.begin();
     if (ignoreMainTrack) {
@@ -283,7 +284,7 @@ void TrackGroup::autoAddDouble(std::shared_ptr<TrackItem> item, bool ignoreMainT
         p = std::next(_tracks.begin());
     }
     for (; p != _tracks.end(); ++p) {
-        if ((*p)->isIdleForDouble(item, sameSplitSecs)) {
+        if ((*p)->isIdleForDouble(item, sameSplitSecs, period_hours)) {
             break;
         }
     }
@@ -291,11 +292,11 @@ void TrackGroup::autoAddDouble(std::shared_ptr<TrackItem> item, bool ignoreMainT
         _tracks.push_back(std::make_shared<Track>());
         p = std::prev(_tracks.end());
     }
-    (*p)->addItem(item);
+    (*p)->addItem(item, period_hours);
 }
 
 void TrackGroup::autoAddSingle(std::shared_ptr<TrackItem> item, bool ignoreMainTrack,
-    int sameSplitSecs, int oppsiteSplitSecs)
+    int sameSplitSecs, int oppsiteSplitSecs, int period_hours)
 {
 //    qDebug()<<"autoAddSingle: "<<DirFunc::dirToString(item->dir)<<", "
 //        <<item->title<<Qt::endl;
@@ -308,7 +309,7 @@ void TrackGroup::autoAddSingle(std::shared_ptr<TrackItem> item, bool ignoreMainT
         //if (item->type == TrackItem::Link) {
         //    qDebug() << "Link type " << item->toString();
         //}
-        if ((*p)->isIdleFor(item, sameSplitSecs, oppsiteSplitSecs)) {
+        if ((*p)->isIdleFor(item, sameSplitSecs, oppsiteSplitSecs, period_hours)) {
             break;
         }
     }
@@ -316,7 +317,7 @@ void TrackGroup::autoAddSingle(std::shared_ptr<TrackItem> item, bool ignoreMainT
         _tracks.push_back(std::make_shared<Track>());
         p = std::prev(_tracks.end());
     }
-    (*p)->addItem(item);
+    (*p)->addItem(item, period_hours);
 }
 
 void TrackGroup::clear()

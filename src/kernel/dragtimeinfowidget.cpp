@@ -2,7 +2,7 @@
 
 #include <QLabel>
 #include <QVBoxLayout>
-#include <QTime>
+#include "data/common/traintime.h"
 
 DragTimeInfoWidget::DragTimeInfoWidget(QWidget* parent):
     QFrame(parent)
@@ -11,7 +11,7 @@ DragTimeInfoWidget::DragTimeInfoWidget(QWidget* parent):
 }
 
 void DragTimeInfoWidget::showInfo(bool shift, const QString &trainName, const QString &stationName,
-                                  const QString &pointName, const QTime &oldTime, const QTime &newTime)
+                                  const QString &pointName, const TrainTime &oldTime, const TrainTime &newTime)
 {
     QString html_base{};
     if (shift) {
@@ -33,7 +33,7 @@ void DragTimeInfoWidget::showInfo(bool shift, const QString &trainName, const QS
     }
 
     auto html=html_base.arg(trainName, stationName, pointName,
-        oldTime.toString("hh:mm:ss"), newTime.toString("hh:mm:ss"));
+        oldTime.toString(TrainTime::HMS), newTime.toString(TrainTime::HMS));
 
     labMain->setText(html);
 
