@@ -201,7 +201,7 @@ void PageContext::actPrint()
 
 void PageContext::actConfig()
 {
-    auto* dlg = new ConfigDialog(page->configRef(), page, mw);
+    auto* dlg = new ConfigDialog(page->configRef(), diagram.options().period_hours, page, mw);
     connect(dlg, &ConfigDialog::onPageConfigApplied,
         mw->getViewCategory(), &ViewCategory::onActPageConfigApplied);
     dlg->show();

@@ -3,8 +3,9 @@
 #include "util/utilfunc.h"
 #include "model/delegate/qedelegate.h"
 #include "data/diagram/trainadapter.h"
+#include "data/diagram/diagramoptions.h"
 
-TimetableQuickModel::TimetableQuickModel(QObject *parent) : QStandardItemModel(parent)
+TimetableQuickModel::TimetableQuickModel(const DiagramOptions& ops, QObject *parent) : QStandardItemModel(parent), _ops(ops)
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({tr("站名"),tr("时刻"),tr("停时股道")});
@@ -160,7 +161,7 @@ void TimetableQuickModel::setStationStopCol(const TrainStation& station, int row
     QColor color(Qt::blue);
     if (station.isStopped()) {
         //停车的情况
-        setItem(row, ColNote, NESI(qeutil::secsToString(station.stopSec())));
+        setItem(row, ColNote, NESI(qeutil::secsToString(station.stopSec(_ops.period_hours))));
     }
     // 2022.06.08修改始发终到站的判定规则，同时要求必须是时刻表首末站。
     else if (train->isStartingStation(&station)) {
@@ -209,8 +210,8 @@ void TimetableQuickModel::setTrain(std::shared_ptr<Train> train)
     setupModel();
 }
 
-TimetableQuickEditableModel::TimetableQuickEditableModel(QUndoStack* undo_, QObject* parent):
-    TimetableQuickModel(parent),_undo(undo_)
+TimetableQuickEditableModel::TimetableQuickEditableModel(const DiagramOptions& ops, QUndoStack* undo_, QObject* parent):
+    TimetableQuickModel(ops, parent),_undo(undo_)
 {
     connect(this, &QStandardItemModel::dataChanged,
         this, &TimetableQuickEditableModel::onDataChanged);

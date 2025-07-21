@@ -2,6 +2,8 @@
 #include <QStandardItemModel>
 #include "railnet.h"
 
+struct DiagramOptions;
+
 class RulerNodesModel:
         public QStandardItemModel
 {
@@ -23,7 +25,8 @@ public:
 class ForbidNodesModel:
         public QStandardItemModel
 {
-    Q_OBJECT
+    Q_OBJECT;
+    const DiagramOptions& _ops;
 public:
     enum{
         ColBegin=0,
@@ -31,6 +34,6 @@ public:
         ColDuration,
         ColMAX
     };
-    ForbidNodesModel(QObject* parent=nullptr);
+    ForbidNodesModel(const DiagramOptions& ops, QObject* parent=nullptr);
     void setupModel(std::shared_ptr<RailNet::edge> ed);
 };

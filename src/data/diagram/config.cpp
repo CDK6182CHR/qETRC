@@ -247,10 +247,16 @@ QJsonObject Config::toJson() const
     return obj;
 }
 
-double Config::diagramWidth() const
+void Config::refineHours(int period_hours)
+{
+    start_hour %= period_hours;
+	end_hour %= period_hours;
+}
+
+double Config::diagramWidth(int period_hours) const
 {
     int he = end_hour;
-    if (he <= start_hour)he += 24;
+    if (he <= start_hour)he += period_hours;
     return (he - start_hour) * 3600.0 / seconds_per_pix;
 }
 

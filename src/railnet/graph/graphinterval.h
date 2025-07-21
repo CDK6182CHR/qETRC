@@ -1,5 +1,4 @@
 ﻿#include <QString>
-#include <QTime>
 #include <QVector>
 #pragma once
 
@@ -14,11 +13,11 @@ class ForbidNode;
 /**
  * @brief The GraphForbidNode struct
  * 天窗  暂定直接按照下标来合并
- * 2025.07.17: For current version, we use QTime to express the time range in forbid.
- * This is because the time period is an attribute of Diagram, which is not avaiable in DB.
+ * 2025.07.21: Changed: QTime -> TrainTime.
+ * The period hours is left default for the rail-db.
  */
 struct GraphForbidNode{
-    QTime beginTime,endTime;
+    TrainTime beginTime,endTime;
     GraphForbidNode(const ForbidNode& node);
     void exportToNode(ForbidNode& node)const;
 };

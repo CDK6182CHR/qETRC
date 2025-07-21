@@ -162,11 +162,11 @@ const AdapterStation* TrainAdapter::firstStation() const
 	return _lines.first()->firstStation();
 }
 
-int TrainAdapter::totalSecs() const
+int TrainAdapter::totalSecs(int period_hours) const
 {
 	int res = 0;
 	for (auto p : _lines)
-		res += p->totalSecs();
+		res += p->totalSecs(period_hours);
 	return res;
 }
 

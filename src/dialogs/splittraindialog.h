@@ -8,10 +8,12 @@ class QTableView;
 class TrainCollection;
 class TrainName;
 class QCheckBox;
+struct DiagramOptions;
 
 class SplitTrainModel: public QStandardItemModel
 {
-    Q_OBJECT
+    Q_OBJECT;
+    const DiagramOptions& _ops;
     std::shared_ptr<Train> _train;
 public:
     enum Columns {
@@ -24,7 +26,7 @@ public:
         ColMAX
     };
 
-    SplitTrainModel(std::shared_ptr<Train> train, QObject* parent=nullptr);
+    SplitTrainModel(const DiagramOptions& ops, std::shared_ptr<Train> train, QObject* parent=nullptr);
 
     /**
      * Process the data in the table, and generate the new trains.
@@ -53,13 +55,14 @@ private:
 class SplitTrainDialog : public QDialog
 {
     Q_OBJECT;
+    const DiagramOptions& m_ops;
     TrainCollection& m_coll;
     std::shared_ptr<Train> m_train;
     SplitTrainModel* m_model;
     QTableView* m_table;
     QCheckBox* m_ckCrossTerminal;
 public:
-    SplitTrainDialog(TrainCollection& coll, std::shared_ptr<Train> train, QWidget* parent=nullptr);
+    SplitTrainDialog(const DiagramOptions& ops, TrainCollection& coll, std::shared_ptr<Train> train, QWidget* parent=nullptr);
 
     void accept()override;
     void reject()override;

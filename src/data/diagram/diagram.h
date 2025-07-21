@@ -458,6 +458,10 @@ public:
      */
     QVector<int> pageIndexWithRail(std::shared_ptr<const Railway> railway)const;
 
+    /**
+     * 2025.07.21  Experimental: set period hours, and refine all related configurations.
+     */
+    void setPeriodHours(int hours);
 
 private:
     void bindAllTrains();

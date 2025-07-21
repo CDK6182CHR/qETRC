@@ -722,7 +722,7 @@ void RulerPaintPageTable::loadStopTime()
     auto res=SelectTrainStationsDialog::dlgGetStation(diagram.trainCollection(), diagram.options(),
                                                       this);
     for (const auto& t : res) {
-        model->setStationStopSecs(t->name, t->stopSec());
+        model->setStationStopSecs(t->name, t->stopSec(diagram.options().period_hours));
     }
 }
 

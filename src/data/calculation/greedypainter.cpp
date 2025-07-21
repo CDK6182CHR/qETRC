@@ -213,7 +213,7 @@ typename GreedyPainter::RecurseReport
 
 	while (true) {
 		qDebug() << railint->toString() << "  delay: " << tot_delay << ", " << tot_delay / 3600. << Qt::endl;
-		if (tot_delay >= 24 * 3600) {
+		if (tot_delay >= diagram.options().period_hours * 3600) {
 			// 没有可排的线位
 			if (st_from != _anchor)
 				_train->timetable().pop_back();
@@ -572,7 +572,7 @@ typename GreedyPainter::RecurseReport
 
 	while (true) {
 		qDebug() << railint->toString() << "  delay: " << tot_delay << ", " << tot_delay / 3600. << Qt::endl;
-		if (tot_delay >= 24 * 3600) {
+		if (tot_delay >= diagram.options().period_hours * 3600) {
 			// 没有可排的线位
 			if (st_from != _anchor)
 				_train->timetable().pop_front();

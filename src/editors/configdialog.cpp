@@ -21,7 +21,7 @@
 #include <QDesktopServices>
 #include <QFontDialog>
 
-ConfigDialog::ConfigDialog(Config &cfg,bool forDefault_, QWidget *parent):
+ConfigDialog::ConfigDialog(Config &cfg, int period_hours, bool forDefault_, QWidget *parent):
     QDialog(parent),_cfg(cfg),forDefault(forDefault_),page(nullptr)
 {
     setAttribute(Qt::WA_DeleteOnClose);
@@ -30,20 +30,20 @@ ConfigDialog::ConfigDialog(Config &cfg,bool forDefault_, QWidget *parent):
     }
     else
         setWindowTitle(tr("运行图显示设置"));
-    initUI();
+    initUI(period_hours);
     refreshData();
 }
 
-ConfigDialog::ConfigDialog(Config& cfg, const std::shared_ptr<DiagramPage>& page, QWidget* parent):
+ConfigDialog::ConfigDialog(Config& cfg, int period_hours, const std::shared_ptr<DiagramPage>& page, QWidget* parent):
     QDialog(parent),_cfg(cfg),forDefault(false),page(page)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("运行图显示设置 - %1").arg(page->name()));
-    initUI();
+    initUI(period_hours);
     refreshData();
 }
 
-void ConfigDialog::initUI()
+void ConfigDialog::initUI(int period_hours)
 {
     resize(650, 700);
     auto* hlay=new QHBoxLayout;
@@ -82,13 +82,13 @@ void ConfigDialog::initUI()
         form=new QFormLayout;
 
         sp=new QSpinBox;
-        sp->setRange(0,24);
+        sp->setRange(0, period_hours);
         spStartHour=sp;
         sp->setToolTip(tr("运行图起始的时刻，整点小时"));
         form->addRow(tr("起始时刻"),sp);
 
         sp=new QSpinBox;
-        sp->setRange(0,24);
+        sp->setRange(0, period_hours);
         sp->setToolTip(tr("运行图结束的时刻，整点小时"));
         form->addRow(tr("结束时刻"),sp);
         spEndHour=sp;

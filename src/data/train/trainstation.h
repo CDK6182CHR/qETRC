@@ -54,8 +54,6 @@ public:
      * 要确保准确，必须先调用Train::updateStationFlags
      */
     Flags flag = NoFlag;
-
-    static constexpr int msecsOfADay = 24 * 3600 * 1000;
     
     TrainStation(const StationName& name_, const TrainTime& arrive_,
         const TrainTime& depart_, bool business_ = true,
@@ -69,7 +67,7 @@ public:
         return arrive != depart;
     }
     
-    int stopSec()const;
+    int stopSec(int period_hours)const;
 
     static bool nameEqual(const TrainStation& t1, const TrainStation& t2);
 
@@ -88,7 +86,7 @@ public:
     /**
      * 停车时间的字符串表示：x分，或者x分x秒
      */
-    QString stopString()const;
+    QString stopString(int period_hurs)const;
 
     bool operator==(const TrainStation& other)const;
 

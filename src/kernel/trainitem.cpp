@@ -343,12 +343,15 @@ void TrainItem::clearLinkInfo()
     auto& linksStart = _page.dirLinks(_line->firstRailStation().get(), dir());
 
     // note: the layer >= 0 check is performed inside the function.
-    linksStart.delOccupation(linkLayer.layer, train().get(), linkLayer.x_pre, linkLayer.x_cur, config().fullWidth());
-    linksStart.delOccupation(startLayer.layer, train().get(), startLayer.x_pre, startLayer.x_cur, config().fullWidth());
+    linksStart.delOccupation(linkLayer.layer, train().get(), linkLayer.x_pre, linkLayer.x_cur, 
+        config().fullWidth(_diagram.options().period_hours));
+    linksStart.delOccupation(startLayer.layer, train().get(), startLayer.x_pre, startLayer.x_cur, 
+        config().fullWidth(_diagram.options().period_hours));
 
     if (endLayer.layer >= 0) {
         auto& linksEnd = _page.dirLinks(_line->lastRailStation().get(), dir());
-        linksEnd.delOccupation(endLayer.layer, train().get(), endLayer.x_pre, endLayer.x_cur, config().fullWidth());
+        linksEnd.delOccupation(endLayer.layer, train().get(), endLayer.x_pre, endLayer.x_cur, 
+            config().fullWidth(_diagram.options().period_hours));
     }
 }
 
@@ -593,7 +596,7 @@ void TrainItem::setLine()
 void TrainItem::setPathItem(const QString& trainName)
 {
     //和图幅有关的数值
-    double width = config().diagramWidth();
+    double width = config().diagramWidth(_diagram.options().period_hours);
 
     bool started = false;    //是否已经开始铺画
     double ylast = -1, xlast = -1;
@@ -920,7 +923,7 @@ double TrainItem::calXFromStart(const TrainTime& time) const
 {
     int sec = startTime.secsTo(time);
     if (sec < 0) 
-        sec += 24 * 3600;
+        sec += _diagram.options().period_hours * 3600;
     return sec / config().seconds_per_pix;
 }
 
@@ -934,8 +937,8 @@ double TrainItem::getOutGraph(double xin, double yin, double xout, double yout,
     QEMultiLinePath& path)
 {
     // Note, that xout may be out of graph or actually in graph (in this case, xout < xin)
-    double fullwidth = config().fullWidth();
-    double width = config().diagramWidth();
+    double fullwidth = config().fullWidth(_diagram.options().period_hours);
+    double width = config().diagramWidth(_diagram.options().period_hours);
     double xright = xout < xin ? xout + fullwidth: xout;
     double yp = yin + (width - xin) * (yout - yin) / (xright - xin);
     QPointF pout(start_x + width, start_y + yp);
@@ -945,7 +948,7 @@ double TrainItem::getOutGraph(double xin, double yin, double xout, double yout,
 
 double TrainItem::getInGraph(double xout, double yout, double xin, double yin, QEMultiLinePath& path)
 {
-    double fullwidth = config().fullWidth();
+    double fullwidth = config().fullWidth(_diagram.options().period_hours);
     double xleft = xout - fullwidth;
     double yp = yout - xleft * (yin - yout) / (xin - xleft);  //入图点纵坐标
     QPointF pin(start_x, yp + start_y);
@@ -984,7 +987,7 @@ double TrainItem::determineStartLabelHeight()
         //    qDebug() << "hit break point";
         //}
 
-        double width = config().diagramWidth();
+        double width = config().diagramWidth(_diagram.options().period_hours);
         // 2024.03.01: link-style train name marker
         double left_marg = config().totalLeftMargin();
         startLayer.x_pre = std::max(x - wl - left_marg, 0.);
@@ -1022,7 +1025,7 @@ double TrainItem::determineEndLabelHeight()
     auto rst = _line->lastRailStation();
 
     if (config().train_name_mark_style == Config::TrainNameMarkStyle::Link) {
-        double width = config().diagramWidth();
+        double width = config().diagramWidth(_diagram.options().period_hours);
         // 2024.03.01: link-style train name marker
         double left_marg = config().totalLeftMargin();
         endLayer.x_pre = std::max(x - wl - left_marg, 0.);
@@ -1076,7 +1079,7 @@ void TrainItem::setStretchedFont(QFont& font, QGraphicsSimpleTextItem* item, dou
 void TrainItem::addTimeMarks()
 {
     auto lastIter = std::prev(_line->stations().end());
-    auto width = config().diagramWidth();
+    auto width = config().diagramWidth(_diagram.options().period_hours);
     for (auto p = _line->stations().begin(); p != _line->stations().end(); ++p) {
         auto ts = p->trainStation;
         auto rs = p->railStation.lock();
@@ -1110,7 +1113,7 @@ void TrainItem::hideTimeMarks()
 
 void TrainItem::addStationPoints()
 {
-    auto width = config().diagramWidth();
+    auto width = config().diagramWidth(_diagram.options().period_hours);
     for (auto p = _line->stations().begin(); p != _line->stations().end(); ++p) {
         auto ts = p->trainStation;
         auto rs = p->railStation.lock();
@@ -1230,7 +1233,7 @@ bool TrainItem::addLinkLine(const QString& trainName)
     // 2024.02.26: add (optional) link label
     auto label_text = linkLineLabelText(trainName, rout.get());
 
-    double width = config().diagramWidth();
+    double width = config().diagramWidth(_diagram.options().period_hours);
 
     // 2025.02.22  add condition xpre <= width: do not create the label for the link lines out of the boundary.
     if (!label_text.isEmpty() && xpre <= width) {
@@ -1315,7 +1318,7 @@ QString TrainItem::linkLineLabelText(const QString& trainName, const Routing* ro
 
 int TrainItem::linkLineLayer(const RailStation* rs, int xleft, int xright)const
 {
-    const double tot_width = config().fullWidth();
+    const double tot_width = config().fullWidth(_diagram.options().period_hours);
     auto& labels = dir() == Direction::Down ? _page.overLinks(rs) : _page.belowLinks(rs);
 
     return labels.addOccupation(RouteLinkOccupy(this->train().get(), xleft, xright), tot_width);
@@ -1323,7 +1326,7 @@ int TrainItem::linkLineLayer(const RailStation* rs, int xleft, int xright)const
 
 int TrainItem::linkLineLayerEnd(const RailStation* rs, int xleft, int xright) const
 {
-    const double tot_width = config().fullWidth();
+    const double tot_width = config().fullWidth(_diagram.options().period_hours);
     auto& labels = dir() == Direction::Down ? _page.belowLinks(rs) : _page.overLinks(rs);
 
     return labels.addOccupation(RouteLinkOccupy(this->train().get(), xleft, xright), tot_width);
@@ -1394,7 +1397,7 @@ QGraphicsPathItem* TrainItem::drawLinkLine(double x1, double x2, double y, doubl
 double TrainItem::timeDistancePbc(double x, const TrainTime& tm) const
 {
     double tm_x = calXFromStart(tm) + start_x;
-    double width = config().diagramWidth();
+    double width = config().diagramWidth(_diagram.options().period_hours);
     while (tm_x - x > width) {
         x += width;
     }

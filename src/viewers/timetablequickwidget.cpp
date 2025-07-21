@@ -17,7 +17,7 @@
 
 TimetableQuickWidget::TimetableQuickWidget(const DiagramOptions& ops, QUndoStack* undo_, QWidget *parent):
     QWidget(parent), _ops(ops),
-    model(new TimetableQuickEditableModel(undo_,this))
+    model(new TimetableQuickEditableModel(ops, undo_, this))
 {
     initUI();
     QScroller::grabGesture(table, QScroller::TouchGesture);

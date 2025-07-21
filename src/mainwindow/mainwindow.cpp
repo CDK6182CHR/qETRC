@@ -1995,6 +1995,15 @@ void MainWindow::actDiagramOption()
 	connect(d, &DiagramOptionDialog::passedStationChanged, [this](int old_value, int new_value) {
 		undoStack->push(new qecmd::ChangePassedStation(old_value, new_value, this));
 		});
+
+	// 2025.07.21: currently, this option is not undoable
+	connect(d, &DiagramOptionDialog::periodHoursChanged, [this]([[maybe_unused]] int old_val, int new_val) {
+		//undoStack->push(new qecmd::ChangePeriodHours(_diagram, this, old_val, new_val));
+		_diagram.setPeriodHours(new_val);
+		refreshAll();
+		undoStack->clear();
+		changed = true;  
+		});
 	d->open();
 }
 

@@ -7,7 +7,7 @@
 #include "data/train/train.h"
 
 TrainTimetablePlane::TrainTimetablePlane(const DiagramOptions& ops, QWidget *parent) :
-    QTableView(parent), _ops(ops), model(new TimetableConstModel(this))
+    QTableView(parent), _ops(ops), model(new TimetableConstModel(ops, this))
 {
     setModel(model);
     verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);

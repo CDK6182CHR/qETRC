@@ -1,9 +1,11 @@
 ﻿#include "forbidmodel.h"
 #include "util/utilfunc.h"
 #include "data/rail/forbid.h"
+#include "data/diagram/diagramoptions.h"
 
-ForbidModel::ForbidModel(std::shared_ptr<Forbid> forbid_, QObject *parent):
-    IntervalDataModel(forbid_->railway(),parent),forbid(forbid_)
+
+ForbidModel::ForbidModel(const DiagramOptions& ops, std::shared_ptr<Forbid> forbid_, QObject *parent):
+    IntervalDataModel(forbid_->railway(),parent), _ops(ops), forbid(forbid_)
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({
@@ -66,7 +68,7 @@ void ForbidModel::setupRow(int row, std::shared_ptr<RailInterval> railint)
     it->setData(QVariant::fromValue(tm),Qt::EditRole);
     setItem(row,ColEnd,it);
 
-    it=new SI(qeutil::minsToStringHM(node->durationMin()));
+    it=new SI(qeutil::minsToStringHM(node->durationMin(_ops.period_hours)));
     it->setEditable(false);
     setItem(row,ColLength,it);
 }

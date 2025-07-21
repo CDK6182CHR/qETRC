@@ -57,11 +57,11 @@ QJsonObject TrainStation::toJson() const
     return res;
 }
 
-int TrainStation::stopSec() const
+int TrainStation::stopSec(int period_hours) const
 {
 	int s = arrive.secsTo(depart);
     if (s < 0){
-        s += 24 * 3600;
+        s += period_hours * 3600;
     }
 	return s;
 }
@@ -109,9 +109,9 @@ bool TrainStation::stopRangeIntersected(const TrainStation& another, int period_
     return (std::max(xm1, xh1) <= std::min(xm2, xh2));
 }
 
-QString TrainStation::stopString() const
+QString TrainStation::stopString(int period_hours) const
 {
-    return qeutil::secsToString(stopSec());
+    return qeutil::secsToString(stopSec(period_hours));
 }
 
 bool TrainStation::operator==(const TrainStation& other) const

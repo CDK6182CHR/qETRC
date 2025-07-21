@@ -400,7 +400,7 @@ void ViewCategory::actShowConfig()
             "此提示在程序每次运行期间，展示一次。"));
         informConfig = false;
     }
-    auto* dialog = new ConfigDialog(diagram.config(), false, mw);
+    auto* dialog = new ConfigDialog(diagram.config(), diagram.options().period_hours, false, mw);
     connect(dialog, &ConfigDialog::onConfigApplied, this,
         &ViewCategory::onActConfigApplied);
     dialog->open();
@@ -408,7 +408,7 @@ void ViewCategory::actShowConfig()
 
 void ViewCategory::actShowDefaultConfig()
 {
-    auto* dialog = new ConfigDialog(diagram.defaultConfig(), true, mw);
+    auto* dialog = new ConfigDialog(diagram.defaultConfig(), diagram.options().period_hours, true, mw);
     connect(dialog, &ConfigDialog::onConfigApplied, this,
         &ViewCategory::onActConfigApplied);
     dialog->open();
@@ -477,8 +477,11 @@ void ViewCategory::actApplyDefaultConfig()
     auto flag = QMessageBox::question(mw, tr("提示"), tr("使用系统默认设置：将系统默认设置"
         "应用到当前运行图设置。是否确认？"));
     if (flag == QMessageBox::Yes) {
+        Config newConfig = diagram.defaultConfig();   // copy construct
+        newConfig.refineHours(diagram.options().period_hours);   // 2025.07.21: update this
+
         mw->getUndoStack()->push(new qecmd::ChangeConfig(diagram.config(),
-            diagram.defaultConfig(), true, false, this));
+            newConfig, true, false, this));
     }
 }
 

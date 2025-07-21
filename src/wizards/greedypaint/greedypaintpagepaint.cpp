@@ -26,8 +26,8 @@
 #include "util/traintimeedit.h"
 
 
-GreedyPaintConfigModel::GreedyPaintConfigModel(QWidget* parent):
-    QStandardItemModel(parent)
+GreedyPaintConfigModel::GreedyPaintConfigModel(const DiagramOptions& ops, QWidget* parent):
+    QStandardItemModel(parent), _ops(ops)
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({ tr("站名"),tr("锚"),tr("起"),tr("止"),tr("停分"),tr("停秒"),tr("固定"),
@@ -218,7 +218,7 @@ void GreedyPaintConfigModel::setTimetable(std::shared_ptr<Train> train)
         return;
     int row = rowForStation(train->timetable().front().name);
     for (const auto& st:train->timetable()) {
-        item(row, ColActualStop)->setData(st.stopSec(), Qt::EditRole);
+        item(row, ColActualStop)->setData(st.stopSec(_ops.period_hours), Qt::EditRole);
         item(row, ColArrive)->setData(QVariant::fromValue(st.arrive), Qt::EditRole);
         item(row, ColDepart)->setData(QVariant::fromValue(st.depart), Qt::EditRole);
         row++;
@@ -471,7 +471,7 @@ GreedyPaintPagePaint::GreedyPaintPagePaint(Diagram &diagram_,
                                            GreedyPainter &painter_,
                                            QWidget *parent):
     QWidget(parent),diagram(diagram_),painter(painter_),
-    _model(new GreedyPaintConfigModel(this))
+    _model(new GreedyPaintConfigModel(diagram.options(), this))
 {
     initUI();
     connect(_model, &GreedyPaintConfigModel::startStationChanged,
@@ -813,7 +813,7 @@ void GreedyPaintPagePaint::actLoadStopTime()
     bool anyUpdate = false;
     std::map<std::shared_ptr<const RailStation>, int> stopsecs;
     for (const auto& t : res) {
-        int secs = t->stopSec();
+        int secs = t->stopSec(diagram.options().period_hours);
         if (auto railst = painter.railway()->stationByGeneralName(t->name)) {
             stopsecs[railst] = secs;
             anyUpdate = true;

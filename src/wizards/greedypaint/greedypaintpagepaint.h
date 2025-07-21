@@ -23,11 +23,13 @@ class DiagramWidget;
 class Train;
 struct AdapterStation;
 class PaintStationInfoWidget;
+struct DiagramOptions;
 
 
 class GreedyPaintConfigModel : public QStandardItemModel
 {
     Q_OBJECT;
+    const DiagramOptions& _ops;
     std::shared_ptr<Ruler> _ruler;
     int _startRow = -1, _endRow = -1, _anchorRow = -1;
     int _availableFirstRow = 0, _availableLastRow = 0;
@@ -46,7 +48,7 @@ public:
         ColDepart,
         ColMAX
     };
-    GreedyPaintConfigModel(QWidget* parent = nullptr);
+    GreedyPaintConfigModel(const DiagramOptions& ops, QWidget* parent = nullptr);
 
     auto ruler() { return _ruler; }
     void setRuler(std::shared_ptr<Ruler> ruler);

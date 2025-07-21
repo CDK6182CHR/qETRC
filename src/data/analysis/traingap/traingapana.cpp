@@ -123,13 +123,13 @@ namespace _gapdetail {
 }
 
 TrainGapAna::TrainGapAna(Diagram &diagram, const TrainFilterCore *filter):
-    diagram(diagram), filter(filter)
+    diagram(diagram), filter(filter), _cutSecs(diagram.options().period_hours * 3600)
 {
 
 }
 
 TrainGapAna::TrainGapAna(Diagram& diagram):
-    diagram(diagram)
+	diagram(diagram), _cutSecs(diagram.options().period_hours * 3600)
 {
 }
 

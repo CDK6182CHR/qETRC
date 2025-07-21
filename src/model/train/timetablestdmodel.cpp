@@ -89,9 +89,9 @@ void TimetableStdModel::setupModel()
         //停时那一列，有没有都要弄个不可编辑的Item在那里
         it = new SI;
         it->setEditable(false);
-        int sec=p->stopSec();
+        int sec=p->stopSec(_ops.period_hours);
         if(sec){
-            it->setText(p->stopString());
+            it->setText(p->stopString(_ops.period_hours));
         }
         setItem(row, ColStopTime, it);
 
@@ -213,8 +213,8 @@ void TimetableStdModel::actApply()
     emit timetableChanged(_train, t);
 }
 
-TimetableConstModel::TimetableConstModel(QObject* parent):
-    QStandardItemModel(parent)
+TimetableConstModel::TimetableConstModel(const DiagramOptions& ops, QObject* parent):
+    QStandardItemModel(parent), _ops(ops)
 {
     setHorizontalHeaderLabels({
     tr("站名"),tr("到点"),tr("开点"),tr("营业"),tr("股道"),tr("备注"),tr("停时")
@@ -270,9 +270,9 @@ void TimetableConstModel::setupModel()
         setItem(row, ColNote, new SI(p->note));
 
         //停时那一列，如果没有就不设置Item!
-        int sec = p->stopSec();
+        int sec = p->stopSec(_ops.period_hours);
         if (sec) {
-            it = new SI(p->stopString());
+            it = new SI(p->stopString(_ops.period_hours));
             it->setEditable(false);
             setItem(row, ColStopTime, it);
         }

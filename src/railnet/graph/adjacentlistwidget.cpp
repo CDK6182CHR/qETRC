@@ -3,21 +3,22 @@
 #include "model/delegate/qedelegate.h"
 #include "adjacentlistmodel.h"
 
-#include <QLabel>
-#include <QTableView>
-#include <QVBoxLayout>
-#include <QHeaderView>
-#include <data/common/qesystem.h>
-#include <model/delegate/generaldoublespindelegate.h>
-#include <model/delegate/qetimedelegate.h>
-#include <model/delegate/timeintervaldelegate.h>
+#include "QLabel"
+#include "QTableView"
+#include "QVBoxLayout"
+#include "QHeaderView"
+#include "data/common/qesystem.h"
+#include "model/delegate/generaldoublespindelegate.h"
+#include "model/delegate/traintimedelegate.h"
+#include "model/delegate/timeintervaldelegate.h"
+#include "railnet/raildb/default_options.h"
 
 
 AdjacentListWidget::AdjacentListWidget(const RailNet &net, QWidget *parent):
     QWidget(parent),mdIn(new AdjacentListModel(net,this)),
     mdOut(new AdjacentListModel(net,this)),
     mdRuler(new RulerNodesModel(this)),
-    mdForbid(new ForbidNodesModel(this))
+    mdForbid(new ForbidNodesModel(defaultDiagramOptionsForDB, this))
 {
     initUI();
     connect(this,&AdjacentListWidget::currentEdgeChanged,
@@ -63,7 +64,7 @@ void AdjacentListWidget::initUI()
     tbForbid->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     tbForbid->setEditTriggers(QTableView::NoEditTriggers);
     tbForbid->setModel(mdForbid);
-    auto* dele2=new QETimeDelegate(this,"hh:mm");
+    auto* dele2=new TrainTimeDelegate(defaultDiagramOptionsForDB, this, TrainTime::HM);
     tbForbid->setItemDelegateForColumn(ForbidNodesModel::ColBegin,dele2);
     tbForbid->setItemDelegateForColumn(ForbidNodesModel::ColEnd,dele2);
     vlay->addWidget(new QLabel(tr("当前边天窗表：")));

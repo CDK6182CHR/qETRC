@@ -284,6 +284,11 @@ public:
     std::vector<std::shared_ptr<Train>>
         affectedTrainsByRailInPath(std::shared_ptr<const Railway> rail);
 
+    /**
+     * 2025.07.21  Refine the timetable according to the period hours.
+     */
+    void refineTimetables(int period_hours);
+
 private:
     /**
      * @brief addMapInfo

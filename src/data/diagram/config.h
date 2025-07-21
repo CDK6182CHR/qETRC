@@ -183,16 +183,18 @@ struct Config
     bool fromJson(const QJsonObject& obj, bool ignore_transparent);
     QJsonObject toJson()const;
 
+    void refineHours(int period_hours);
+
     /**
      * 图幅总宽度 （第一至最后的时间线之间的距离）
      */
-    double diagramWidth()const;
+    double diagramWidth(int period_hours)const;
 
     /**
      * 24小时的完整图幅宽度 （0点至24点时间线总宽度）
      */
-    inline double fullWidth()const {
-        return 24 * 3600.0 / seconds_per_pix;
+    inline double fullWidth(int period_hours)const {
+        return period_hours * 3600.0 / seconds_per_pix;
     }
 
     /**

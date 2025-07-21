@@ -32,7 +32,7 @@ void TrackDiagram::paintDiagram()
 	QColor gridColor(0, 255, 0);
 	QPen defaultPen(gridColor, 1);
 	QPen boldPen(gridColor, 2);
-	double width = 24 * 3600 / seconds_per_pix;
+	double width = _data.diagramOptions().period_hours * 3600 / seconds_per_pix;
 	double height = _data.trackCount() * row_height;
 	scene()->setSceneRect(0, 0, margins.left + margins.right + width,
 		margins.top + margins.bottom + height);
@@ -50,7 +50,7 @@ void TrackDiagram::_initXAxis(double width, double height, const QColor& gridCol
 	scene()->addLine(margins.left - 15, 35, width + margins.left + 15, 35, pen_hour);
 	scene()->addLine(margins.left - 15, margins.top + height + 15,
 		width + margins.left + 15, margins.top + height + 15, pen_hour);
-	for (int i = 0; i <= 24; i++) {
+	for (int i = 0; i <= _data.diagramOptions().period_hours; i++) {
 		double x = margins.left + i * 3600 / seconds_per_pix;
 		int hour = i;
 		auto* textItem = scene()->addSimpleText(QString::number(hour));
@@ -61,7 +61,7 @@ void TrackDiagram::_initXAxis(double width, double height, const QColor& gridCol
 		textItem->setY(scene()->height() - 30);
 		textItem->setBrush(gridColor);
 
-		if (i == 24) break;
+		if (i == _data.diagramOptions().period_hours) break;
 
 		// 小时线 ..
 		if (i != 0) {

@@ -159,7 +159,7 @@ DiagnosisList TrainLine::diagnoseLine(const TrainCollection& coll, bool withIntM
     return res;
 }
 
-int TrainLine::totalSecs() const
+int TrainLine::totalSecs(int period_hours) const
 {
     if (isNull())
         return 0;
@@ -168,7 +168,7 @@ int TrainLine::totalSecs() const
     const TrainTime& last = _stations.back().trainStation->depart;
     int secs = first.secsTo(last);
     if (secs <= 0)
-        secs += 24 * 3600;
+        secs += period_hours * 3600;
     return secs;
 }
 
@@ -183,14 +183,14 @@ std::pair<int, int> TrainLine::runStaySecs(int period_hours) const
     int run = 0, stay = 0;
     auto p = _stations.begin();
     if (!isStartingStation(p) && startLabel()) {
-        stay += p->trainStation->stopSec();
+        stay += p->trainStation->stopSec(period_hours);
     }
     auto p0 = p; ++p;
     for (; p != _stations.end(); ++p) {
         //run
         run += qeutil::secsTo(p0->trainStation->depart, p->trainStation->arrive, period_hours);
         if (!isTerminalStation(p))
-            stay += p->trainStation->stopSec();
+            stay += p->trainStation->stopSec(period_hours);
         p0 = p;
     }
     return std::make_pair(run, stay);
@@ -429,7 +429,7 @@ void TrainLine::detectPassStations(LineEventList& res, int index, ConstAdaPtr it
     double y0 = rs0->y_coeff.value(), yn = rsn->y_coeff.value();
     double dy = yn - y0;
     int ds = ts0->depart.secsTo(tsn->arrive);   //区间时间，秒数
-    if (ds <= 0)ds += 24 * 3600;
+    if (ds <= 0)ds += period_hours * 3600;
     if (y0 == yn) {
         //这个情况很吊诡，应该不会存在。安全起见，特殊处理
         return;
@@ -464,7 +464,7 @@ std::list<TrainStation> TrainLine::detectPassStationTimes(ConstAdaPtr itr, int p
     double y0 = rs0->y_coeff.value(), yn = rsn->y_coeff.value();
     double dy = yn - y0;
     int ds = ts0->depart.secsTo(tsn->arrive);   //区间时间，秒数
-    if (ds <= 0)ds += 24 * 3600;
+    if (ds <= 0)ds += period_hours * 3600;
     if (y0 == yn) {
         //这个情况很吊诡，应该不会存在。安全起见，特殊处理
         return res;

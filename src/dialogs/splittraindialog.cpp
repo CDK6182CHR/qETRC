@@ -14,9 +14,10 @@
 #include "data/train/train.h"
 #include "data/train/traincollection.h"
 #include "util/utilfunc.h"
+#include "data/diagram/diagramoptions.h"
 
-SplitTrainModel::SplitTrainModel(std::shared_ptr<Train> train, QObject *parent):
-    QStandardItemModel(parent), _train(train)
+SplitTrainModel::SplitTrainModel(const DiagramOptions& ops, std::shared_ptr<Train> train, QObject *parent):
+    QStandardItemModel(parent), _ops(ops), _train(train)
 {
     setHorizontalHeaderLabels({
         tr("站名"), tr("到点"), tr("开点"), tr("营业"), tr("停时"),
@@ -136,7 +137,7 @@ void SplitTrainModel::refreshData()
         it->setCheckable(false);
         setItem(n, ColBusiness, it);
 
-        it=new SI(itr->stopString());
+        it=new SI(itr->stopString(_ops.period_hours));
         it->setEditable(false);
         setItem(n, ColStopTime, it);
 
@@ -177,10 +178,10 @@ std::shared_ptr<Train> SplitTrainModel::createTrain(TrainCollection& coll, QWidg
     return nt;
 }
 
-SplitTrainDialog::SplitTrainDialog(TrainCollection& coll, std::shared_ptr<Train> train, QWidget* parent):
-    QDialog(parent),
+SplitTrainDialog::SplitTrainDialog(const DiagramOptions& ops, TrainCollection& coll, std::shared_ptr<Train> train, QWidget* parent):
+    QDialog(parent), m_ops(ops),
     m_coll(coll), m_train(train),
-    m_model(new SplitTrainModel(train, this))
+    m_model(new SplitTrainModel(m_ops, train, this))
 {
     setWindowTitle(tr("拆分车次 - %1").arg(train->trainName().full()));
     initUI();

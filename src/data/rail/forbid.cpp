@@ -50,7 +50,7 @@ void Forbid::_show() const
         qDebug() << p->railInterval() << '\t' <<
             p->beginTime.toString(TrainTime::HM) << " -- " <<
             p->endTime.toString(TrainTime::HM) <<
-            '\t' << p->durationMin() <<
+            //'\t' << p->durationMin() <<  // <- 2025.07.21: remove this because we do not want to pass `period_hours` ...
             Qt::endl;
     }
 }
@@ -175,16 +175,16 @@ ForbidNode& ForbidNode::operator=(const ForbidNode& other)
     return *this;
 }
 
-int ForbidNode::durationSec() const
+int ForbidNode::durationSec(int period_hours) const
 {
     int x = beginTime.secsTo(endTime);
-    if (x < 0) x += 24 * 3600;
+    if (x < 0) x += period_hours * 3600;
     return x;
 }
 
-int ForbidNode::durationMin() const
+int ForbidNode::durationMin(int period_hours) const
 {
-    return durationSec() / 60;
+    return durationSec(period_hours) / 60;
 }
 
 void ForbidNode::swap(ForbidNode& other)

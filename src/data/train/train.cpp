@@ -1094,6 +1094,14 @@ bool Train::removeNonBound()
     return flag;
 }
 
+void Train::refineTimetable(int period_hours)
+{
+	for (auto& p : _timetable) {
+        p.arrive.refineHour(period_hours);
+		p.depart.refineHour(period_hours);
+	}
+}
+
 void Train::clear()
 {
     _timetable.clear();

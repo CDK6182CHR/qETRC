@@ -3,6 +3,7 @@
 
 #include "kernel/diagramwidget.h"
 #include "data/diagram/diagrampage.h"
+#include "data/diagram/diagram.h"
 
 #include <QFileDialog>
 #include <QFormLayout>
@@ -39,7 +40,7 @@ void PrintDiagramDialog::initUI()
 
     auto* chlay = new QHBoxLayout;
     spHours = new QSpinBox;
-    spHours->setRange(1, 24);
+    spHours->setRange(1, dw->diagram().options().period_hours);
     spHours->setValue(6);
     chlay->addWidget(spHours);
     chlay->addWidget(new QLabel(tr("仅用于分页PDF")));

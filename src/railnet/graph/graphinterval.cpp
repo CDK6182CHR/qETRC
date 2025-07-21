@@ -5,15 +5,15 @@
 
 
 GraphForbidNode::GraphForbidNode(const ForbidNode &node):
-    beginTime(node.beginTime.toQTime()),endTime(node.endTime.toQTime())
+    beginTime(node.beginTime),endTime(node.endTime)
 {
 
 }
 
 void GraphForbidNode::exportToNode(ForbidNode &node) const
 {
-    node.beginTime = TrainTime::fromQTime(beginTime);
-    node.endTime =   TrainTime::fromQTime(endTime);
+    node.beginTime = beginTime;
+    node.endTime =   endTime;
 }
 
 GraphRulerNode::GraphRulerNode(const RulerNode &node):

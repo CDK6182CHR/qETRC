@@ -46,7 +46,7 @@ void TrainIntervalStat::computeTrainPart(TrainIntervalStatResult &res)
     // 2024.05.03  for first station
     if (_include_ends && _startIter->isStopped()) {
         stopCount++;
-        stopSecs += _startIter->stopSec();
+        stopSecs += _startIter->stopSec(_ops.period_hours);
     }
 
     // loop invariant: each time the loop processes the interval ENDED at itr
@@ -58,7 +58,7 @@ void TrainIntervalStat::computeTrainPart(TrainIntervalStatResult &res)
             // not last
             if (itr->isStopped()){
                 stopCount++;
-                stopSecs+=itr->stopSec();
+                stopSecs+=itr->stopSec(_ops.period_hours);
             }
         }
 

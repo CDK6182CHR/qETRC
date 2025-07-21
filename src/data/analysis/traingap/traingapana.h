@@ -23,7 +23,7 @@ class TrainGapAna
     Diagram& diagram;
     const TrainFilterCore* filter=nullptr;
 //    bool _singleLine=false;
-    int _cutSecs = 24 * 3600;   // 2025.02.06: default value: seconds of a day (max possible value)
+    int _cutSecs;   // 2025.02.06: default value: seconds of a day (max possible value)
 public:
     TrainGapAna(Diagram& diagram);
     TrainGapAna(Diagram& diagram, const TrainFilterCore* filter);

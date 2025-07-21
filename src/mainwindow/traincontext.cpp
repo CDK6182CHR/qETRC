@@ -1651,7 +1651,7 @@ void TrainContext::actSplitTrain()
 {
 	if (!train)
 		return;
-	auto* dialog = new SplitTrainDialog(diagram.trainCollection(), train, mw);
+	auto* dialog = new SplitTrainDialog(diagram.options(), diagram.trainCollection(), train, mw);
 	connect(dialog, &SplitTrainDialog::splitApplied, this, &TrainContext::actApplySplitTrain);
 	dialog->open();
 }

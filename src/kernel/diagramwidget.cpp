@@ -81,7 +81,7 @@ void DiagramWidget::paintGraph()
     const auto& margins = cfg.margins;
     int hstart = cfg.start_hour, hend = cfg.end_hour;
     if (hend <= hstart)
-        hend += 24;
+        hend += _diagram.options().period_hours;
     int hour_count = hend - hstart;    //区间数量
     //width = hour_count * (3600 / UIDict["seconds_per_pix"])
     double width = hour_count * (3600.0 / cfg.seconds_per_pix);
@@ -350,7 +350,7 @@ void DiagramWidget::toPdfAsyncMultiPage(const QString& filename, const QString& 
 
         int total_hours = _page->config().end_hour - _page->config().start_hour;
         if (total_hours <= 0)
-            total_hours += 24;
+            total_hours += _diagram.options().period_hours;
 
         int total_pages = (total_hours - 1) / hours_per_page + 1;   // Int div
         qInfo() << "total pages: " << total_pages;
@@ -358,8 +358,8 @@ void DiagramWidget::toPdfAsyncMultiPage(const QString& filename, const QString& 
         QPainter painter;
 
         for (int ip = 0; ip < total_pages; ip++) {
-            int start_hour = (_page->config().start_hour + ip * hours_per_page) % 24;
-            int end_hour = (start_hour + hours_per_page) % 24;
+            int start_hour = (_page->config().start_hour + ip * hours_per_page) % _diagram.options().period_hours;
+            int end_hour = (start_hour + hours_per_page) % _diagram.options().period_hours;
             if (ip == total_pages - 1) {
                 end_hour = this->config().end_hour;
             }
@@ -1387,7 +1387,7 @@ void DiagramWidget::setVLines(double width, int hour_count,
 
     for (int i = 0; i < hour_count + 1; i++) {
         double x = config().totalLeftMargin() + i * 3600 / config().seconds_per_pix;
-        int hour = (i + config().start_hour) % 24;
+        int hour = (i + config().start_hour) % _diagram.options().period_hours;
         auto* textItem1 = addTimeAxisMark(hour, font, grd_color, x);
         textItem1->setY(30 - textItem1->boundingRect().height());
         topItems.append(textItem1);
@@ -1684,7 +1684,7 @@ void DiagramWidget::locateToStation(std::shared_ptr<const Railway> railway,
     std::shared_ptr<const RailStation> station, const TrainTime& tm)
 {
     double x = calXFromStart(tm) ;
-    if (x > config().diagramWidth()) {
+    if (x > config().diagramWidth(_diagram.options().period_hours)) {
         QMessageBox::warning(this, tr("错误"), tr("无法定位到所给时刻，"
             "可能因为所给时刻不在铺画范围内。"));
         return;
@@ -1708,7 +1708,7 @@ void DiagramWidget::locateToMile(std::shared_ptr<const Railway> railway, double 
     }
     double y = railway->yValueFromCoeff(std::get<0>(info.value()), config()) + _page->railwayStartY(*railway);
     double x = calXFromStart(tm);
-    if (x > config().diagramWidth()) {
+    if (x > config().diagramWidth(_diagram.options().period_hours)) {
         QMessageBox::warning(this, tr("错误"), tr("无法定位到所给时刻，"
             "可能因为所给时刻不在铺画范围内。"));
         return;
@@ -1791,7 +1791,7 @@ void DiagramWidget::addForbidNode(std::shared_ptr<Forbid> forbid,
     //保证y1<=y2  方便搞方框
     double xstart = calXFromStart(node->beginTime),
         xend = calXFromStart(node->endTime);
-    double width = config().diagramWidth();    //图形总宽度
+    double width = config().diagramWidth(_diagram.options().period_hours);    //图形总宽度
     if (xstart == xend)   //莫得数据，再见
         return;
     else if (xstart < xend) {
@@ -1823,7 +1823,7 @@ double DiagramWidget::calXFromStart(const TrainTime& time) const
 {
     int sec = startTime.secsTo(time);
     if (sec < 0)
-        sec += 24 * 3600;
+        sec += _diagram.options().period_hours * 3600;
     return sec / config().seconds_per_pix;
 }
 
@@ -1851,7 +1851,7 @@ void DiagramWidget::stationToolTip(std::deque<AdapterStation>::const_iterator st
     if (st->trainStation->isStopped()) {
         text += tr("%1/%2 停车 %3").arg(st->trainStation->arrive.toString(TrainTime::HMS))
             .arg(st->trainStation->depart.toString(TrainTime::HMS))
-            .arg(st->trainStation->stopString());
+            .arg(st->trainStation->stopString(_diagram.options().period_hours));
     }
     else {
         text += tr("%1/...").arg(st->trainStation->arrive.toString(TrainTime::HMS));

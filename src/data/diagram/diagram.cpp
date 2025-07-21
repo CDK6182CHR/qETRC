@@ -816,6 +816,20 @@ QVector<int> Diagram::pageIndexWithRail(std::shared_ptr<const Railway> railway)c
     return res;
 }
 
+void Diagram::setPeriodHours(int hours)
+{
+    _options.period_hours = hours;
+    _trainCollection.refineTimetables(hours);
+
+    // For the config class
+    _config.refineHours(hours);
+    
+    // For the configs in pages
+	foreach(auto page, _pages) {
+        page->configRef().refineHours(hours);
+	}
+}
+
 void Diagram::bindAllTrains()
 {
     foreach(auto t, _trainCollection.trains()) {

@@ -610,6 +610,11 @@ public:
     */
     bool removeNonBound();
 
+    /**
+     * 2025.07.21  Refine timetable according to given period_hours.
+     */
+    void refineTimetable(int period_hours);
+
     void clear();
 
 

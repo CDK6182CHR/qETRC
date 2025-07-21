@@ -10,6 +10,7 @@
 #include "data/diagram/stationbinding.h"
 
 class Train;
+struct DiagramOptions;
 
 /**
  * @brief The TimetableQuickModel class
@@ -17,7 +18,8 @@ class Train;
  */
 class TimetableQuickModel : public QStandardItemModel
 {
-    Q_OBJECT
+    Q_OBJECT;
+	const DiagramOptions& _ops;
 protected:
     std::shared_ptr<Train> train;
     bool updating = false;
@@ -30,7 +32,7 @@ public:
         ColMAX
     };
 
-    explicit TimetableQuickModel(QObject *parent = nullptr);
+    explicit TimetableQuickModel(const DiagramOptions& ops, QObject *parent = nullptr);
     auto getTrain(){return train;}
 
     /**
@@ -100,7 +102,7 @@ class TimetableQuickEditableModel :public TimetableQuickModel
     Q_OBJECT
     QUndoStack* const _undo;
 public:
-    explicit TimetableQuickEditableModel(QUndoStack* undo_, QObject* parent = nullptr);
+    explicit TimetableQuickEditableModel(const DiagramOptions& ops, QUndoStack* undo_, QObject* parent = nullptr);
 
 private:
 

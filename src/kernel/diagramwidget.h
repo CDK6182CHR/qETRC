@@ -103,6 +103,8 @@ public:
     DiagramWidget(Diagram& daigram, std::shared_ptr<DiagramPage> page, QWidget* parent = nullptr);
     ~DiagramWidget()noexcept;
 
+    auto& diagram()const { return _diagram; }
+
     /**
      * @brief autoPaintGraph
      * 由系统调用的自动铺画运行图过程。如果设置为不自动铺画，就不执行任何操作

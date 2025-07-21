@@ -1,5 +1,7 @@
 ﻿#include "edgedatamodels.h"
 #include "util/utilfunc.h"
+#include "data/diagram/diagramoptions.h"
+
 
 RulerNodesModel::RulerNodesModel(QObject *parent):
     QStandardItemModel(parent)
@@ -40,8 +42,8 @@ void RulerNodesModel::setupModel(std::shared_ptr<RailNet::edge> ed)
 
 
 
-ForbidNodesModel::ForbidNodesModel(QObject *parent):
-    QStandardItemModel(parent)
+ForbidNodesModel::ForbidNodesModel(const DiagramOptions& ops, QObject *parent):
+	QStandardItemModel(parent), _ops(ops)
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({tr("开始"),tr("结束"),tr("时长")});
@@ -58,12 +60,12 @@ void ForbidNodesModel::setupModel(std::shared_ptr<RailNet::edge> ed)
     for(int i=0;i<rowCount();i++){
         const auto& n=ed->data.forbidNodes.at(i);
         auto* it=new SI;
-        it->setData(n.beginTime,Qt::EditRole);
+        it->setData(QVariant::fromValue(n.beginTime), Qt::EditRole);
         setItem(i,ColBegin,it);
         it=new SI;
-        it->setData(n.endTime,Qt::EditRole);
+        it->setData(QVariant::fromValue(n.endTime), Qt::EditRole);
         setItem(i,ColEnd,it);
         setItem(i,ColDuration,new SI(qeutil::minsToStringHM(
-                    qeutil::secsTo(n.beginTime,n.endTime)/60)));
+                    qeutil::secsTo(n.beginTime, n.endTime, _ops.period_hours)/60)));
     }
 }

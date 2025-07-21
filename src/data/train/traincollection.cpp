@@ -442,6 +442,13 @@ std::vector<std::shared_ptr<Train>> TrainCollection::affectedTrainsByRailInPath(
 	return res;
 }
 
+void TrainCollection::refineTimetables(int period_hours)
+{
+	foreach(auto p, _trains) {
+		p->refineTimetable(period_hours);
+	}
+}
+
 
 void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 {

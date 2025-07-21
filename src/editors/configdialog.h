@@ -56,8 +56,10 @@ class ConfigDialog : public QDialog
     
 
 public:
-    ConfigDialog(Config& cfg,bool forDefault_, QWidget* parent=nullptr);
-    ConfigDialog(Config& cfg, const std::shared_ptr<DiagramPage>& page,
+
+    // 2025.07.21: Add period_hours in arguments. Currently, this is only used in initialization, thus not stored.
+    ConfigDialog(Config& cfg, int period_hours, bool forDefault_, QWidget* parent=nullptr);
+    ConfigDialog(Config& cfg, int period_hours, const std::shared_ptr<DiagramPage>& page,
         QWidget* parent = nullptr);
     auto& config(){return _cfg;}
 
@@ -74,7 +76,7 @@ signals:
         std::shared_ptr<DiagramPage>page);
 
 private:
-    void initUI();
+    void initUI(int period_hours);
     void setDisabledWidgetsForMarkStyle(int idx);
 
 private slots:

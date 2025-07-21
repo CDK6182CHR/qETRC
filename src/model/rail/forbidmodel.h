@@ -1,10 +1,12 @@
 ﻿#pragma once
 #include "intervaldatamodel.h"
 
+struct DiagramOptions;
 
 class ForbidModel : public IntervalDataModel
 {
     Q_OBJECT;
+    const DiagramOptions& _ops;
     const std::shared_ptr<Forbid> forbid;
 public:
     enum{
@@ -14,7 +16,7 @@ public:
         ColLength,
         ColMAX
     };
-    explicit ForbidModel(std::shared_ptr<Forbid> forbid_, QObject *parent = nullptr);
+    explicit ForbidModel(const DiagramOptions& ops, std::shared_ptr<Forbid> forbid_, QObject *parent = nullptr);
     void refreshData();
     std::shared_ptr<Railway> appliedForbid();
 protected:

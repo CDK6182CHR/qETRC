@@ -95,6 +95,7 @@ public slots:
 class TimetableConstModel :public QStandardItemModel
 {
     Q_OBJECT;
+    const DiagramOptions& _ops;
     std::shared_ptr<const Train> _train{};
 public:
     enum Columns {
@@ -108,7 +109,7 @@ public:
         ColMAX
     };
 
-    explicit TimetableConstModel(QObject* parent = nullptr);
+    explicit TimetableConstModel(const DiagramOptions& ops, QObject* parent = nullptr);
 
     auto train() { return _train; }
     void setTrain(std::shared_ptr<const Train> train);

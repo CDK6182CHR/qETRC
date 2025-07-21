@@ -30,9 +30,9 @@ public:
      * 天窗时长，以秒为单位
      * 这是为了方便API。原则上，天窗时长总是为整数分钟。
      */
-    int durationSec()const;
+    int durationSec(int period_hours)const;
 
-    int durationMin()const;
+    int durationMin(int period_hours)const;
 
     inline bool isNull()const { 
         return beginTime.isNull() || endTime.isNull() || beginTime == endTime; 

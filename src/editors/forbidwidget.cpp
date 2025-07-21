@@ -17,7 +17,7 @@
 #include <QMessageBox>
 
 ForbidWidget::ForbidWidget(const DiagramOptions& ops, std::shared_ptr<Forbid> forbid_,bool commitInPlace, QWidget *parent):
-    QWidget(parent), _ops(ops), forbid(forbid_),model(new ForbidModel(forbid,this)),inplace(commitInPlace)
+    QWidget(parent), _ops(ops), forbid(forbid_),model(new ForbidModel(ops, forbid, this)),inplace(commitInPlace)
 {
     initUI();
     refreshBasicData();

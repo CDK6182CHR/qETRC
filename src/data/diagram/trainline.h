@@ -175,7 +175,7 @@ public:
      * 假定总时长小于24小时。
      * 存在折返的列车，不计首站停时。
      */
-    int totalSecs()const;
+    int totalSecs(int period_hours)const;
 
     /**
      * 运行时间和停车时间
