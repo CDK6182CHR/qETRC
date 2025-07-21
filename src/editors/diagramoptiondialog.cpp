@@ -40,7 +40,7 @@ void DiagramOptionDialog::initUI()
 		"对于时刻表不完整的运行图（时刻表上不停车的车站被省略），应将此数值设置得充分大，以避免非预期的运行线中断或不完整。"));
 
 	m_spPeriodHours = new QSpinBox;
-	m_spPeriodHours->setRange(1, 100000000);
+	m_spPeriodHours->setRange(1, 32767);   // The maximal value is actually meaningless...
 	flay->addRow(tr("周期小时数"), m_spPeriodHours);
 	m_spPeriodHours->setToolTip(tr("周期小时数\n"
 		"此选项指出运行图的周期长度（小时）。\n"

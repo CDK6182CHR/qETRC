@@ -27,6 +27,9 @@ RailStationEvent::Positions TrainGap::position() const
 
 int TrainGap::secs() const
 {
+    // 2025.07.21: special: if left and right are the same event, this means they are splitted by a whole period
+    if (left == right)
+		return period_hours * 3600;
     return qeutil::secsTo(left->time, right->time, period_hours);
 }
 
