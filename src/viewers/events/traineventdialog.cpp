@@ -70,7 +70,7 @@ double TrainEventModel::mileForRow(int row) const
 	return item(row, ColMile)->data(Qt::EditRole).toDouble();
 }
 
-void TrainEventModel::exportToCsvBatch(QTextStream& s, const TrainEventList& evlst)
+void TrainEventModel::exportToCsvBatch(QTextStream& s, const TrainEventList& evlst, int period_hours)
 {
 	for (auto p = evlst.begin(); p != evlst.end(); ++p) {
 		auto adp = p->first;
@@ -80,7 +80,7 @@ void TrainEventModel::exportToCsvBatch(QTextStream& s, const TrainEventList& evl
 			auto pst = st.stEvents.begin();
 			auto pit = st.itEvents.begin();
 			while (pst != st.stEvents.end() && pit != st.itEvents.end()) {
-				if (qeutil::timeCompare(pit->time, pst->time, diagram.options().period_hours)) {
+				if (qeutil::timeCompare(pit->time, pst->time, period_hours)) {
 					// setIntervalRow(row++, adp, *(pit++));
 					exportIntervalRow(s, adp, *(pit++));
 				}

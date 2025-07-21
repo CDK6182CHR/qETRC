@@ -12,8 +12,8 @@
 #include <QHeaderView>
 
 
-RoutingMileModel::RoutingMileModel(std::shared_ptr<Routing> routing, QObject *parent):
-    QStandardItemModel(parent), m_routing(routing)
+RoutingMileModel::RoutingMileModel(const DiagramOptions& ops, std::shared_ptr<Routing> routing, QObject *parent):
+    QStandardItemModel(parent), m_ops(ops), m_routing(routing)
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({
@@ -48,7 +48,7 @@ void RoutingMileModel::setupModel()
             setItem(r,ColStarting,new SI(itr->train()->starting().toSingleLiteral()));
             setItem(r,ColTerminal,new SI(itr->train()->terminal().toSingleLiteral()));
 
-            TrainIntervalStat stat{itr->train()};
+            TrainIntervalStat stat{m_ops, itr->train()};
             stat.setRange(0, itr->train()->stationCount() - 1);
             auto res = stat.compute();
             if (res.railResults.isValid) {
@@ -74,8 +74,8 @@ void RoutingMileModel::setupModel()
     }
 }
 
-RoutingMileDialog::RoutingMileDialog(std::shared_ptr<Routing> routing, QWidget *parent):
-    QDialog(parent), m_routing(routing), m_model(new RoutingMileModel(routing, this))
+RoutingMileDialog::RoutingMileDialog(const DiagramOptions& ops, std::shared_ptr<Routing> routing, QWidget *parent):
+    QDialog(parent), m_ops(ops), m_routing(routing), m_model(new RoutingMileModel(m_ops, routing, this))
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("交路里程 - %1").arg(m_routing->name()));

@@ -15,7 +15,7 @@
 
 SelectTrainStationsDialog::SelectTrainStationsDialog(TrainCollection& coll, const DiagramOptions& ops,
                                                      QWidget *parent):
-    QDialog(parent), coll(coll), _ops(ops), model(new TimetableStdModel(true, this))
+    QDialog(parent), coll(coll), _ops(ops), model(new TimetableStdModel(_ops, true, this))
 {
     setAttribute(Qt::WA_DeleteOnClose);
     resize(700,600);

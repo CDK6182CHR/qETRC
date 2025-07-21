@@ -6,6 +6,7 @@
 class Ruler;
 class TrainAdapter;
 class Train;
+struct DiagramOptions;
 
 /**
  * @brief The RulerRefModel class
@@ -17,6 +18,7 @@ class RulerRefModel:
         public QStandardItemModel
 {
     Q_OBJECT;
+    const DiagramOptions& _ops;
     std::shared_ptr<Train> train;
     std::shared_ptr<TrainAdapter> adp{};
     std::shared_ptr<Ruler> ruler{};
@@ -35,7 +37,7 @@ public:
         ColMAX
     };
 
-    RulerRefModel(std::shared_ptr<Train> train_,
+    RulerRefModel(const DiagramOptions& ops, std::shared_ptr<Train> train_,
                   QObject* parent=nullptr);
     
 public slots:
@@ -68,6 +70,7 @@ class QTableView;
 class RulerRefDialog : public QDialog
 {
     Q_OBJECT;
+	const DiagramOptions& _ops;
     std::shared_ptr<Train> train;
     RulerRefModel* const model;
     
@@ -75,7 +78,7 @@ class RulerRefDialog : public QDialog
     QTableView* table;
     bool updating = false;
 public:
-    RulerRefDialog(std::shared_ptr<Train> train_, QWidget* parent = nullptr);
+    RulerRefDialog(const DiagramOptions& ops, std::shared_ptr<Train> train_, QWidget* parent = nullptr);
 private:
     void initUI();
 private slots:

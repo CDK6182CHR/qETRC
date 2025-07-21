@@ -5,9 +5,10 @@
 #include "util/utilfunc.h"
 #include "data/train/train.h"
 #include "util/utilfunc.h"
+#include "data/diagram/diagramoptions.h"
 
-TimetableStdModel::TimetableStdModel(bool inplace, QWidget *parent):
-    QEMoveableModel(parent), commitInPlace(inplace)
+TimetableStdModel::TimetableStdModel(const DiagramOptions& ops, bool inplace, QWidget *parent):
+    QEMoveableModel(parent), _ops(ops), commitInPlace(inplace)
 {
     connect(this, &QStandardItemModel::dataChanged, this, &TimetableStdModel::onDataChanged);
     setHorizontalHeaderLabels({
@@ -31,11 +32,11 @@ void TimetableStdModel::setupNewRow(int row)
     using SI=QStandardItem;
     setItem(row,ColName,new SI);
     auto* it=new SI;
-    it->setData(QTime(),Qt::EditRole);
+    it->setData(QVariant::fromValue(TrainTime{}), Qt::EditRole);
     setItem(row,ColArrive,it);
 
     it=new SI;
-    it->setData(QTime(),Qt::EditRole);
+    it->setData(QVariant::fromValue(TrainTime{}),Qt::EditRole);
     setItem(row,ColDepart,it);
 
     setItem(row,ColBusiness,makeCheckItem());
@@ -132,12 +133,12 @@ std::shared_ptr<Train> TimetableStdModel::getTimetableTrain()
 
 void TimetableStdModel::updateRowStopTime(int row)
 {
-    const QTime& arr = qvariant_cast<QTime>(item(row, ColArrive)->data(Qt::EditRole));
-    const QTime& dep = qvariant_cast<QTime>(item(row, ColDepart)->data(Qt::EditRole));
+    const TrainTime& arr = qvariant_cast<TrainTime>(item(row, ColArrive)->data(Qt::EditRole));
+    const TrainTime& dep = qvariant_cast<TrainTime>(item(row, ColDepart)->data(Qt::EditRole));
     auto* it = item(row, ColStopTime);
 
     if (arr != dep) {
-        it->setText(qeutil::secsToString(arr, dep));
+        it->setText(qeutil::secsToString(arr, dep, _ops.period_hours));
     }
     else {
         it->setText("");

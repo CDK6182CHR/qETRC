@@ -15,7 +15,7 @@
 
 TrainIntervalStatDialog::TrainIntervalStatDialog(Diagram& diagram,
                                                  QWidget *parent):
-    QDialog(parent),diagram(diagram),stat()
+    QDialog(parent),diagram(diagram),stat(diagram.options())
 {
     setWindowTitle(tr("列车区间运行统计"));
     resize(600,800);

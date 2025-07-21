@@ -119,7 +119,7 @@ void RulerPaintWizard::cleanupPage(int id)
 
 void RulerPaintWizard::initUI()
 {
-    pgStart=new RulerPaintPageStart(diagram.trainCollection());
+    pgStart=new RulerPaintPageStart(diagram.options(), diagram.trainCollection());
     addPage(pgStart);
     pgStation = new RulerPaintPageStation(diagram.railCategory());
     connect(pgStation, &RulerPaintPageStation::railwayChanged,

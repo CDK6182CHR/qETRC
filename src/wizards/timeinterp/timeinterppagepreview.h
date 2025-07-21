@@ -8,9 +8,12 @@ class QTableView;
 class Train;
 class Ruler;
 class Railway;
+struct DiagramOptions;
+
 class TimeInterpPreviewModel: public QStandardItemModel
 {
-    Q_OBJECT
+    Q_OBJECT;
+    const DiagramOptions& _ops;
 public:
     enum {
         ColName=0,
@@ -20,7 +23,7 @@ public:
         ColError,
         ColMAX
     };
-    TimeInterpPreviewModel(QObject* parent=nullptr);
+    TimeInterpPreviewModel(const DiagramOptions& ops, QObject* parent=nullptr);
     void setupModel(std::shared_ptr<Railway> railway,
                     std::shared_ptr<Ruler> ruler,
                     const QVector<std::shared_ptr<Train>> trains);
@@ -28,11 +31,12 @@ public:
 
 class TimeInterpPagePreview : public QWizardPage
 {
-    Q_OBJECT
+    Q_OBJECT;
+    const DiagramOptions& _ops;
     TimeInterpPreviewModel* const model;
     QTableView* table;
 public:
-    TimeInterpPagePreview(QWidget* parent=nullptr);
+    TimeInterpPagePreview(const DiagramOptions& ops, QWidget* parent=nullptr);
     void setupData(std::shared_ptr<Railway> railway,
                    std::shared_ptr<Ruler> ruler,
                    const QVector<std::shared_ptr<Train>> trains);

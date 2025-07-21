@@ -22,7 +22,7 @@ void TimeInterpWizard::initUI()
 {
     pgTrain=new TimeInterpPageTrain(diagram);
     addPage(pgTrain);
-    pgPreview=new TimeInterpPagePreview();
+    pgPreview=new TimeInterpPagePreview(diagram.options());
     addPage(pgPreview);
 }
 

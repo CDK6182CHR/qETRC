@@ -24,7 +24,7 @@ ConflictModel::ConflictModel(Diagram &diagram_, QObject *parent):
 }
 
 void ConflictModel::setupModel(std::shared_ptr<Railway> railway_, 
-    std::shared_ptr<const RailStation> station_, const QTime& arrive_, const QTime& depart_)
+    std::shared_ptr<const RailStation> station_, const TrainTime& arrive_, const TrainTime& depart_)
 {
     //显示条件：到达前20分钟，出发后60分钟；
     //标红条件：到达前10分钟，出发后10分钟。
@@ -37,8 +37,10 @@ void ConflictModel::setupModel(std::shared_ptr<Railway> railway_,
         return;
     }
 
-    QTime showLeft = arrive.addSecs(-1200), showRight = depart.addSecs(3600);
-    QTime redLeft = arrive.addSecs(-600), redRight = depart.addSecs(600);
+    TrainTime showLeft = arrive.addSecs(-1200, diagram.options().period_hours), 
+        showRight = depart.addSecs(3600, diagram.options().period_hours);
+    TrainTime redLeft = arrive.addSecs(-600, diagram.options().period_hours), 
+        redRight = depart.addSecs(600, diagram.options().period_hours);
 
     auto lst = diagram.stationEvents(railway, station);
 
@@ -50,7 +52,7 @@ void ConflictModel::setupModel(std::shared_ptr<Railway> railway_,
         auto line = (*p)->line;
         auto train = line->train();
         const auto& ev = **p;
-        if (qeutil::timeInRange(showLeft, showRight, ev.time)) {
+        if (qeutil::timeInRange(showLeft, showRight, ev.time, diagram.options().period_hours)) {
             insertRow(row);
 
             setItem(row, ColDir, new SI(DirFunc::dirToString(line->dir())));
@@ -60,7 +62,7 @@ void ConflictModel::setupModel(std::shared_ptr<Railway> railway_,
             setItem(row, ColPos, new SI(ev.posString()));
             setItem(row, ColType, new SI(train->type()->name()));
 
-            if (qeutil::timeInRange(redLeft, redRight, ev.time)) {
+            if (qeutil::timeInRange(redLeft, redRight, ev.time, diagram.options().period_hours)) {
                 for (int c = 0; c < ColMAX; c++) {
                     item(row, c)->setData(QColor(Qt::red), Qt::ForegroundRole);
                 }
@@ -82,7 +84,7 @@ ConflictDialog::ConflictDialog(Diagram &diagram_, QWidget *parent):
 }
 
 void ConflictDialog::setData(std::shared_ptr<Railway> railway_, 
-    std::shared_ptr<const RailStation> station_, const QTime& arrive_, const QTime& depart_)
+    std::shared_ptr<const RailStation> station_, const TrainTime& arrive_, const TrainTime& depart_)
 {
     railway = railway_;
     station = station_;
@@ -91,8 +93,8 @@ void ConflictDialog::setData(std::shared_ptr<Railway> railway_,
     model->setupModel(railway, station, arrive, depart);
     table->resizeColumnsToContents();
     edName->setText(station->name.toSingleLiteral());
-    edArrive->setText(arrive.toString(QStringLiteral("hh:mm:ss")));
-    edDepart->setText(depart.toString(QStringLiteral("hh:mm:ss")));
+    edArrive->setText(arrive.toString(TrainTime::HMS));
+    edDepart->setText(depart.toString(TrainTime::HMS));
     setWindowTitle(tr("冲突检查 - %1").arg(station->name.toSingleLiteral()));
 }
 

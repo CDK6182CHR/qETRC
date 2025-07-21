@@ -6,6 +6,7 @@
 #include "data/train/train.h"
 #include "data/rail/railway.h"
 #include "util/utilfunc.h"
+#include "data/diagram/diagramoptions.h"
 
 #include <QLabel>
 #include <QSplitter>
@@ -14,8 +15,8 @@
 #include <QHeaderView>
 #include <QScroller>
 
-TrainLineListModel::TrainLineListModel(std::shared_ptr<Train> train_, QObject *parent):
-    QStandardItemModel(parent), train(train_)
+TrainLineListModel::TrainLineListModel(const DiagramOptions& ops, std::shared_ptr<Train> train_, QObject *parent):
+    QStandardItemModel(parent), _ops(ops), train(train_)
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({
@@ -61,7 +62,7 @@ void TrainLineListModel::setupModel()
             setItem(row,ColStationCount,new SI(QString::number(line->count())));
 
             double mile=line->totalMile();
-            int sec=line->runStaySecs().first;
+            int sec=line->runStaySecs(_ops.period_hours).first;
             double spd=mile/sec*3600.0;
 
             setItem(row,ColMile,new SI(QString::number(mile,'f',3)));
@@ -175,8 +176,8 @@ void TrainLineDetailModel::setRailwayRow(int row, std::shared_ptr<const RailStat
     }
 }
 
-TrainLineDialog::TrainLineDialog(std::shared_ptr<Train> train_, QWidget* parent):
-    QDialog(parent), train(train_),mdList(new TrainLineListModel(train_,this)),
+TrainLineDialog::TrainLineDialog(const DiagramOptions& ops, std::shared_ptr<Train> train_, QWidget* parent):
+    QDialog(parent), _ops(ops), train(train_),mdList(new TrainLineListModel(_ops, train_,this)),
     mdDetail(new TrainLineDetailModel(this))
 {
     setAttribute(Qt::WA_DeleteOnClose);

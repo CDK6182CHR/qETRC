@@ -99,7 +99,7 @@ void RoutingContext::initUI()
     act->setToolTip(tr("里程表\n显示当前交路的各车次总里程及交路累计里程（若可得）。"));
     connect(act, &QAction::triggered, [this]() {
         if (!_routing) return;
-        auto* d = new RoutingMileDialog(routing(), mw);
+        auto* d = new RoutingMileDialog(_diagram.options(), routing(), mw);
         d->open();
         });
     panel->addLargeAction(act);
@@ -343,7 +343,7 @@ void RoutingContext::openRoutingEditWidget(std::shared_ptr<Routing> routing)
 {
     int i = getRoutingWidgetIndex(routing);
     if (i == -1) {
-        auto* w = new RoutingEdit(_diagram.trainCollection(), routing);
+        auto* w = new RoutingEdit(_diagram.options(), _diagram.trainCollection(), routing);
         auto* dock = new ads::CDockWidget(tr("交路编辑 - %1").arg(routing->name()));
         dock->setWidget(w);
         connect(w, &RoutingEdit::closeDock, this, &RoutingContext::removeRoutingEdit);

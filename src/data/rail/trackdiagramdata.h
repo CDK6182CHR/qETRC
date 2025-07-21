@@ -20,7 +20,7 @@ public:
      */
     std::shared_ptr<Track> trackByName(const QString& name);
 
-    std::shared_ptr<Track> idleTrack(const QTime& tm1,const QTime& tm2, bool ignoreMainTrack);
+    std::shared_ptr<Track> idleTrack(const TrainTime& tm1,const TrainTime& tm2, bool ignoreMainTrack);
 
     /**
      * 已知双线，添加车次。只管添加Track对象，不管命名。

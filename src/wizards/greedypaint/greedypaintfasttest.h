@@ -6,7 +6,7 @@
 #ifdef QETRC_GREEDYPAINT_TEST
 
 class QSpinBox;
-class QTimeEdit;
+class TrainTimeEdit;
 class QLineEdit;
 class RailRulerCombo;
 class QTextBrowser;
@@ -22,7 +22,7 @@ class GreedyPaintFastTest : public QDialog
     Diagram& diagram;
     RailRulerCombo* cbRuler;
     QLineEdit* edTrainName;
-    QTimeEdit* edTime;
+    TrainTimeEdit* edTime;
     QSpinBox* spInt,*spBack;
     QCheckBox* ckDown,*ckSingle,*ckStarting,*ckTerminal,*ckForbid;
     QTextBrowser* txtOut;

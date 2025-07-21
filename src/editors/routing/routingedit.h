@@ -13,6 +13,7 @@ class QLineEdit;
 class TrainCollection;
 class QToolButton;
 struct SplitRoutingData;
+struct DiagramOptions;
 
 /**
  * @brief The RoutingEdit class
@@ -22,6 +23,7 @@ struct SplitRoutingData;
 class RoutingEdit : public QWidget
 {
     Q_OBJECT;
+    const DiagramOptions& _ops;
     TrainCollection& coll;
     std::shared_ptr<Routing> routing;
     RoutingEditModel* const model;
@@ -32,7 +34,7 @@ class RoutingEdit : public QWidget
     QToolButton* btnSync;
     AddRoutingNodeDialog* dlgAdd = nullptr;
 public:
-    explicit RoutingEdit(TrainCollection& coll_, std::shared_ptr<Routing> routing_, QWidget *parent = nullptr);
+    explicit RoutingEdit(const DiagramOptions& ops, TrainCollection& coll_, std::shared_ptr<Routing> routing_, QWidget *parent = nullptr);
     auto getRouting(){return routing;}
     auto* getModel(){return model;}
     virtual bool event(QEvent* e)override;

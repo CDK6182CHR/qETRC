@@ -370,12 +370,12 @@ bool RulerPaintModel::calRowTime(int r, int dr, bool prev_stopped, bool cur_stop
     int col1 = (dr == 1 ? ColArrive : ColDepart);
     int col2 = (dr == 1 ? ColDepart : ColArrive);
 
-    flag1 = (item(r, col1)->data(Qt::EditRole).toTime() == tm);
+    flag1 = (qvariant_cast<TrainTime>( item(r, col1)->data(Qt::EditRole)) == tm);
     if (!flag1) {
         item(r, col1)->setData(QVariant::fromValue(tm), Qt::EditRole);
     }
     tm = tm.addSecs(dr * getStopSecs(r), page->getDiagram().options().period_hours);
-    flag2 = (item(r, col2)->data(Qt::EditRole).toTime() == tm);
+    flag2 = (qvariant_cast<TrainTime>(item(r, col2)->data(Qt::EditRole)) == tm);
     if (!flag2) {
         item(r, col2)->setData(QVariant::fromValue(tm), Qt::EditRole);
     }
@@ -570,7 +570,7 @@ TrainTime RulerPaintPageTable::anchorTime() const
 
 void RulerPaintPageTable::setAnchorTime(const TrainTime &arr, const TrainTime &dep)
 {
-    int stopsec=qeutil::secsTo(arr,dep);
+    int stopsec = qeutil::secsTo(arr, dep, diagram.options().period_hours);
     if(anchorAsArrive()){
         edAnTime->setTime(arr);
     }else{

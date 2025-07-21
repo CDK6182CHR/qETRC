@@ -17,7 +17,7 @@ QWidget* TrainTimeDelegate::createEditor(QWidget* parent,
     Q_UNUSED(option);
     Q_UNUSED(index);
     auto* ed = new TrainTimeEdit(parent);
-    connect(ed, SIGNAL(timeChanged(QTime)), this, SLOT(onTimeChanged()));
+    connect(ed, SIGNAL(timeChanged(TrainTime)), this, SLOT(onTimeChanged()));
     setupEditor(ed);
     return ed;
 }
@@ -67,7 +67,7 @@ QWidget* TrainTimeQuickDelegate::createEditor(QWidget* parent, const QStyleOptio
     Q_UNUSED(option);
     Q_UNUSED(index);
     auto* ed = new TrainTimeEdit(parent);
-    connect(ed, SIGNAL(timeChanged(QTime)), this, SLOT(onTimeChanged()));
+    connect(ed, SIGNAL(timeChanged(TrainTime)), this, SLOT(onTimeChanged()));
     setupEditor(ed);
     return ed;
 }

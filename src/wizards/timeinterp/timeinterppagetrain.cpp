@@ -17,7 +17,7 @@
 
 TimeInterpPageTrain::TimeInterpPageTrain(Diagram &diagram, QWidget *parent):
     QWizardPage(parent), diagram(diagram),
-    model(new TrainListReadModel(diagram.trainCollection().trains(),this))
+    model(new TrainListReadModel(diagram.options(), diagram.trainCollection().trains(),this))
 {
     setTitle(tr("选项"));
     initUI();

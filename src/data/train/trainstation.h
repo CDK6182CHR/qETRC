@@ -7,7 +7,6 @@
 #include <memory>
 #include <utility>
 
-#include <QTime>
 #include <QDebug>
 #include <QFlags>
 

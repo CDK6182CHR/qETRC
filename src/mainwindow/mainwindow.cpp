@@ -694,7 +694,7 @@ void MainWindow::initDockWidgets()
 
 	// 速览信息
 	if constexpr (true) {
-		auto* w = new TrainInfoWidget();
+		auto* w = new TrainInfoWidget(_diagram.options());
 		dock = new ads::CDockWidget(tr("速览信息"));
 		dock->setWidget(w);
 		trainInfoWidget = w;

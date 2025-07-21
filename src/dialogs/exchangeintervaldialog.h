@@ -8,13 +8,15 @@ class Train;
 class TrainCollection;
 class QTableView;
 class QCheckBox;
+struct DiagramOptions;
 
 /**
  * @brief 区间换线 交换两车次指定区间的运行线
  */
 class ExchangeIntervalDialog : public QDialog
 {
-    Q_OBJECT
+    Q_OBJECT;
+    const DiagramOptions& _ops;
     TrainCollection& coll;
     std::shared_ptr<Train> train1, train2{};
     TimetableStdModel*const model1,*model2;
@@ -23,7 +25,7 @@ class ExchangeIntervalDialog : public QDialog
     QCheckBox *ckExStart,*ckExEnd;
     QTableView *table1,*table2;
 public:
-    ExchangeIntervalDialog(TrainCollection& coll_,
+    ExchangeIntervalDialog(const DiagramOptions& ops, TrainCollection& coll_,
                            std::shared_ptr<Train> train1,
                            QWidget* parent=nullptr);
 private:

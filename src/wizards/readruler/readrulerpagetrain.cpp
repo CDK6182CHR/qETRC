@@ -60,7 +60,7 @@ void ReadRulerPageTrain::initUI()
     vlay->addLayout(g);
     auto* hlay=new QHBoxLayout;
     tbUnsel=new QTableView;
-    mdUnsel=new TrainListReadModel(coll.trains(), this);
+    mdUnsel=new TrainListReadModel(diagram.options(), coll.trains(), this);
     tbUnsel->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     tbUnsel->setModel(mdUnsel);
     hlay->addWidget(tbUnsel);
@@ -77,7 +77,7 @@ void ReadRulerPageTrain::initUI()
     cv->connectAll(SIGNAL(clicked()),this,{SLOT(select()),SLOT(deselect())});
 
     tbSel=new QTableView;
-    mdSel=new TrainListReadModel(this);
+    mdSel=new TrainListReadModel(diagram.options(), this);
     tbSel->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     tbSel->setModel(mdSel);
     tbSel->setSelectionBehavior(QTableView::SelectRows);

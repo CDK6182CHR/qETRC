@@ -9,7 +9,7 @@
 #include <data/rail/railstation.h>
 
 TimetableWidget::TimetableWidget(bool commitInPlace, const DiagramOptions& ops, QWidget *parent):
-    QEControlledTable(parent), _options(ops), _model(new TimetableStdModel(commitInPlace, this))
+    QEControlledTable(parent), _options(ops), _model(new TimetableStdModel(_options, commitInPlace, this))
 {
     initUI();
 }

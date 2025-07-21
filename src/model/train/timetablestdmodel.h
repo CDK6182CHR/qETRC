@@ -4,6 +4,8 @@
 #include "model/general/qemoveablemodel.h"
 
 class Train;
+struct DiagramOptions;
+
 /**
  * @brief The TimetableStdModel class
  * 列车时刻表的模型；用于原来的当前列车编辑页面。
@@ -14,6 +16,7 @@ class Train;
 class TimetableStdModel : public QEMoveableModel
 {
     Q_OBJECT;
+    const DiagramOptions& _ops;
     std::shared_ptr<Train> _train{};
 
     /**
@@ -34,7 +37,7 @@ public:
         ColMAX
     };
 
-    explicit TimetableStdModel(bool inplace, QWidget *parent = nullptr);
+    explicit TimetableStdModel(const DiagramOptions& ops, bool inplace, QWidget *parent = nullptr);
 
     auto train(){return _train;}
     void setTrain(std::shared_ptr<Train> train);

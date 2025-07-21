@@ -7,6 +7,7 @@ class RailStation;
 class TrainStation;
 class TrainLine;
 class Train;
+struct DiagramOptions;
 
 /**
  * @brief The TrainLineListModel class
@@ -16,6 +17,7 @@ class TrainLineListModel:
         public QStandardItemModel
 {
     Q_OBJECT;
+    const DiagramOptions& _ops;
     std::shared_ptr<Train> train;
 public:
     enum{
@@ -30,7 +32,7 @@ public:
         ColSpeed,
         ColMAX
     };
-    TrainLineListModel(std::shared_ptr<Train> train_, QObject* parent=nullptr);
+    TrainLineListModel(const DiagramOptions& ops, std::shared_ptr<Train> train_, QObject* parent=nullptr);
 private:
     void setupModel();
 signals:
@@ -74,6 +76,7 @@ class QTableView;
 class TrainLineDialog : public QDialog
 {
     Q_OBJECT;
+	const DiagramOptions& _ops;
     std::shared_ptr<Train> train;
 
     TrainLineListModel*const mdList;
@@ -82,7 +85,7 @@ class TrainLineDialog : public QDialog
     QTableView* tbList, * tbDetail;
 
 public:
-    TrainLineDialog(std::shared_ptr<Train> train_, QWidget* parent = nullptr);
+    TrainLineDialog(const DiagramOptions& ops, std::shared_ptr<Train> train_, QWidget* parent = nullptr);
 
 private:
     void initUI();

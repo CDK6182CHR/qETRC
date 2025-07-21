@@ -11,6 +11,7 @@ class SelectTrainCombo;
 class QTableView;
 class QStackedWidget;
 class QLineEdit;
+struct DiagramOptions;
 
 /**
  * @brief The RulerPaintPageStart class
@@ -20,6 +21,7 @@ class QLineEdit;
 class RulerPaintPageStart : public QWizardPage
 {
     Q_OBJECT;
+    const DiagramOptions& _ops;
     TrainCollection& coll;
 
     /**
@@ -55,7 +57,7 @@ public:
         Append,
         Modify
     };
-    RulerPaintPageStart(TrainCollection& coll_, QWidget* parent=nullptr);
+    RulerPaintPageStart(const DiagramOptions& ops, TrainCollection& coll_, QWidget* parent=nullptr);
 
     /**
      * @brief validatePage

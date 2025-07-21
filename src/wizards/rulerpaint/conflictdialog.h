@@ -1,8 +1,9 @@
 ﻿#pragma once
 #include <QDialog>
-#include <QTime>
 #include <QStandardItemModel>
 #include <memory>
+
+#include "data/common/traintime.h"
 
 class RailStation;
 class Diagram;
@@ -14,7 +15,7 @@ class ConflictModel: public QStandardItemModel
     Diagram& diagram;
     std::shared_ptr<Railway> railway{};
     std::shared_ptr<const RailStation> station{};
-    QTime arrive{},depart{};
+    TrainTime arrive{},depart{};
 public:
 
     enum {
@@ -35,7 +36,7 @@ public:
      */
     void setupModel(std::shared_ptr<Railway> railway_, 
         std::shared_ptr<const RailStation> station_,
-                    const QTime& arrive_,const QTime& depart_);
+                    const TrainTime& arrive_,const TrainTime& depart_);
 };
 
 class QLineEdit;
@@ -52,7 +53,7 @@ class ConflictDialog : public QDialog
     Diagram& diagram;
     std::shared_ptr<Railway> railway{};
     std::shared_ptr<const RailStation> station{};
-    QTime arrive{},depart{};
+    TrainTime arrive{},depart{};
     ConflictModel*const model;
 
     QLineEdit* edName, * edArrive, * edDepart;
@@ -61,7 +62,7 @@ public:
     ConflictDialog(Diagram& diagram_, QWidget* parent=nullptr);
     void setData(std::shared_ptr<Railway> railway_,
         std::shared_ptr<const RailStation> station_,
-                 const QTime& arrive_,const QTime& depart_);
+                 const TrainTime& arrive_,const TrainTime& depart_);
     auto* getModel(){return model;}
 
 private:

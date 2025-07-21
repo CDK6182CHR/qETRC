@@ -6,7 +6,6 @@
 #include <QVBoxLayout>
 #include <QFormLayout>
 #include <QCheckBox>
-#include <QTime>
 #include <QApplication>
 #include <QStyle>
 
@@ -77,7 +76,7 @@ void PaintStationInfoWidget::initUI(const QString& trainName)
 }
 
 void PaintStationInfoWidget::onDataChanged(const QString& trainName, int stop_secs_set, int stop_secs_real, bool fix, 
-	const QTime& arr, const QTime& dep)
+	const TrainTime& arr, const TrainTime& dep)
 {
 	labTitle->setText(tr("正在铺画 <font size=5>%1</font>次  "
 		"<font size=5>%2</font> 站").arg(trainName, _station->name.toSingleLiteral()));
@@ -91,12 +90,12 @@ void PaintStationInfoWidget::onDataChanged(const QString& trainName, int stop_se
 	}
 	if (stop_secs_real) {
 		labStop->setText(tr("<font size=5>%1/%2</font>  停车 <font size=5>%3</font>").arg(
-			arr.toString("hh:mm:ss"), dep.toString("hh:mm:ss"), qeutil::secsToString(stop_secs_real)
+			arr.toString(TrainTime::HMS), dep.toString(TrainTime::HMS), qeutil::secsToString(stop_secs_real)
 		));
 	}
 	else {
 		labStop->setText(tr("<font size=5>%1/...</font>").arg(
-			arr.toString("hh:mm:ss")
+			arr.toString(TrainTime::HMS)
 		));
 	}
 }

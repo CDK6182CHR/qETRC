@@ -13,8 +13,8 @@
 #include "util/utilfunc.h"
 #include "data/train/train.h"
 
-RulerPaintPageStart::RulerPaintPageStart(TrainCollection &coll_, QWidget *parent):
-    QWizardPage(parent),coll(coll_),model(new TimetableStdModel(false,this))
+RulerPaintPageStart::RulerPaintPageStart(const DiagramOptions& ops, TrainCollection &coll_, QWidget *parent):
+    QWizardPage(parent), _ops(ops), coll(coll_),model(new TimetableStdModel(_ops, false,this))
 {
     initUI();
 }

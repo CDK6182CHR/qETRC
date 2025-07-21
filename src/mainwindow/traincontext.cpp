@@ -1146,7 +1146,7 @@ void TrainContext::batchExportTrainEvents(const QList<std::shared_ptr<Train>>& t
 
 	foreach(auto train, trains) {
 		TrainEventList evlst = diagram.listTrainEvents(*train);
-		TrainEventModel::exportToCsvBatch(s, evlst);
+		TrainEventModel::exportToCsvBatch(s, evlst, diagram.options().period_hours);
 	}
 
 	file.close();
@@ -1539,7 +1539,7 @@ void TrainContext::actRemoveTrainFromEdit(std::shared_ptr<Train> train)
 
 void TrainContext::actShowTrainLineDialog()
 {
-	auto* dialog = new TrainLineDialog(train, mw);
+	auto* dialog = new TrainLineDialog(diagram.options(), train, mw);
 	dialog->show();
 }
 
@@ -1549,7 +1549,7 @@ void TrainContext::actRulerRef()
 		QMessageBox::warning(mw, tr("错误"), tr("标尺对照：当前没有选中车次！"));
 		return;
 	}
-	auto* dialog = new RulerRefDialog(train, mw);
+	auto* dialog = new RulerRefDialog(diagram.options(), train, mw);
 	dialog->open();
 }
 
@@ -1559,7 +1559,7 @@ void TrainContext::actExchangeInterval()
 		QMessageBox::warning(mw, tr("错误"), tr("区间换线：当前没有选中车次！"));
 		return;
 	}
-	auto* dialog = new ExchangeIntervalDialog(diagram.trainCollection(), train, mw);
+	auto* dialog = new ExchangeIntervalDialog(diagram.options(), diagram.trainCollection(), train, mw);
 	connect(dialog, &ExchangeIntervalDialog::exchangeApplied,
 		this, &TrainContext::actApplyExchangeInterval);
 	dialog->open();

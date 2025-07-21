@@ -19,8 +19,9 @@
 #include "util/utilfunc.h"
 #include "util/dialogadapter.h"
 #include "defines/icon_specs.h"
+#include "data/diagram/diagramoptions.h"
 
-TrainInfoWidget::TrainInfoWidget(QWidget *parent) : QScrollArea(parent)
+TrainInfoWidget::TrainInfoWidget(const DiagramOptions& ops, QWidget *parent) : QScrollArea(parent), _ops(ops)
 {
     setWindowTitle(tr("速览信息"));
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -169,7 +170,7 @@ void TrainInfoWidget::refreshData()
         // use zero-initialized res    
     }
     else {
-        TrainIntervalStat stat{ train };
+        TrainIntervalStat stat{ _ops, train };
         stat.setIncludeEnds(true);   // 2024.05.03
         stat.setRange(0, train->stationCount() - 1);
         res = stat.compute();
@@ -189,7 +190,7 @@ void TrainInfoWidget::refreshData()
     }
 
     double mile=train->localMile();
-    auto [run,stay]=train->localRunStaySecs();
+    auto [run,stay]=train->localRunStaySecs(_ops.period_hours);
 
     edMile->setText(tr("%1 km").arg(QString::number(mile,'f',3)));
     edTime->setText(qeutil::secsToStringHour(run+stay));
@@ -267,7 +268,7 @@ void TrainInfoWidget::toText()
         edTotSpeed->text(), edTotTechSpeed->text()));
 
     double mile=train->localMile();
-    auto [run,stay]=train->localRunStaySecs();
+    auto [run,stay]=train->localRunStaySecs(_ops.period_hours);
 
     text.append(tr("铺画里程：%1 km\n").arg(QString::number(mile,'f',3)));
     text.append(tr("铺画运行时间：") + qeutil::secsToStringHour(run+stay)+'\n');

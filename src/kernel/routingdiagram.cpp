@@ -1,5 +1,4 @@
 ﻿#include "routingdiagram.h"
-#include <QTime>
 #include <QGraphicsLineItem>
 #include <QMessageBox>
 #include "data/train/routing.h"

@@ -9,6 +9,8 @@ class QTextBrowser;
 class QLineEdit;
 class Train;
 class Routing;
+struct DiagramOptions;
+
 /**
  * @brief The TrainInfoWidget class
  * pyETRC.TrainInfoWidget  列车信息（速览信息）
@@ -16,7 +18,8 @@ class Routing;
  */
 class TrainInfoWidget : public QScrollArea
 {
-    Q_OBJECT
+    Q_OBJECT;
+    const DiagramOptions& _ops;
     std::shared_ptr<Train> train{};
 
     QLineEdit* edName,*edNameDir,*edStartEnd,*edType,*edPassen;
@@ -30,7 +33,7 @@ class TrainInfoWidget : public QScrollArea
 
     QFormLayout* flay;
 public:
-    explicit TrainInfoWidget(QWidget *parent = nullptr);
+    explicit TrainInfoWidget(const DiagramOptions& ops, QWidget *parent = nullptr);
     auto getTrain(){return train;}
 signals:
     void editTrain(std::shared_ptr<Train> train);

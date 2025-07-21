@@ -2,28 +2,29 @@
 
 #ifdef QETRC_GREEDYPAINT_TEST
 
+#include <chrono>
 #include <QCheckBox>
 #include <QFormLayout>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QSpinBox>
 #include <QTextBrowser>
-#include <QTimeEdit>
 #include <QVBoxLayout>
 #include <QTableView>
 #include <QHeaderView>
 
-#include <util/buttongroup.hpp>
-#include <util/railrulercombo.h>
-#include <util/selectrailwaycombo.h>
-#include <data/diagram/diagram.h>
-#include <data/train/trainname.h>
-#include <data/train/train.h>
-#include <data/common/qesystem.h>
-#include <model/rail/gapconstraintmodel.h>
-#include <data/gapset/crset.h>
-#include <model/delegate/generalspindelegate.h>
-#include <chrono>
+#include "util/buttongroup.hpp"
+#include "util/railrulercombo.h"
+#include "util/selectrailwaycombo.h"
+#include "data/diagram/diagram.h"
+#include "data/train/trainname.h"
+#include "data/train/train.h"
+#include "data/common/qesystem.h"
+#include "model/rail/gapconstraintmodel.h"
+#include "data/gapset/crset.h"
+#include "model/delegate/generalspindelegate.h"
+#include "util/traintimeedit.h"
+
 
 GreedyPaintFastTest::GreedyPaintFastTest(Diagram& diagram_, QWidget *parent):
     QDialog(parent),diagram(diagram_), painter(diagram_),
@@ -54,8 +55,9 @@ void GreedyPaintFastTest::initUI()
     edTrainName=new QLineEdit;
     flay->addRow(tr("车次"), edTrainName);
 
-    edTime=new QTimeEdit;
-    edTime->setDisplayFormat("hh:mm:ss");
+    edTime=new TrainTimeEdit;
+    edTime->setFormat(TrainTime::HMS);
+    edTime->setMaxHours(diagram.options().period_hours);
     flay->addRow(tr("锚点时刻"),edTime);
 
     spInt=new QSpinBox;

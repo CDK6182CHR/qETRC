@@ -6,6 +6,7 @@
 
 class Routing;
 class QTableView;
+struct DiagramOptions;
 
 /**
  * @brief The RoutingMileModel class is provided for showing the mile
@@ -16,7 +17,8 @@ class QTableView;
  */
 class RoutingMileModel: public QStandardItemModel
 {
-    Q_OBJECT
+    Q_OBJECT;
+    const DiagramOptions& m_ops;
     std::shared_ptr<Routing> m_routing;
 public:
     enum Cols {
@@ -29,18 +31,19 @@ public:
         ColAccMile,
         ColMAX
     };
-    RoutingMileModel(std::shared_ptr<Routing> routing, QObject* parent=nullptr);
+    RoutingMileModel(const DiagramOptions& ops, std::shared_ptr<Routing> routing, QObject* parent=nullptr);
     void setupModel();
 };
 
 class RoutingMileDialog : public QDialog
 {
-    Q_OBJECT
+    Q_OBJECT;
+    const DiagramOptions& m_ops;
     std::shared_ptr<Routing> m_routing;
     RoutingMileModel* m_model;
     QTableView* m_table;
 public:
-    RoutingMileDialog(std::shared_ptr<Routing> routing, QWidget* parent=nullptr);
+    RoutingMileDialog(const DiagramOptions& ops, std::shared_ptr<Routing> routing, QWidget* parent=nullptr);
 private:
     void initUI();
 };

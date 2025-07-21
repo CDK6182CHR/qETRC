@@ -15,10 +15,10 @@
 #include "data/train/train.h"
 #include <util/selecttraincombo.h>
 
-ExchangeIntervalDialog::ExchangeIntervalDialog(TrainCollection &coll_,
+ExchangeIntervalDialog::ExchangeIntervalDialog(const DiagramOptions& ops, TrainCollection &coll_,
                        std::shared_ptr<Train> train1_, QWidget *parent):
-    QDialog(parent),coll(coll_),train1(train1_),
-    model1(new TimetableStdModel(false,this)),model2(new TimetableStdModel(false,this))
+    QDialog(parent), _ops(ops), coll(coll_),train1(train1_),
+    model1(new TimetableStdModel(_ops, false,this)),model2(new TimetableStdModel(_ops, false,this))
 {
     setWindowTitle(tr("区间换线 - %1").arg(train1->trainName().full()));
     resize(800,800);

@@ -7,11 +7,12 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 
-#include <data/common/qesystem.h>
+#include "data/common/qesystem.h"
 #include "model/delegate/generaldoublespindelegate.h"
+#include "data/diagram/diagramoptions.h"
 
-TimeInterpPreviewModel::TimeInterpPreviewModel(QObject *parent):
-    QStandardItemModel(parent)
+TimeInterpPreviewModel::TimeInterpPreviewModel(const DiagramOptions& ops, QObject *parent):
+	QStandardItemModel(parent), _ops(ops)
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({tr("车次"),tr("类型"),tr("始发"),tr("终到"),tr("相对误差")});
@@ -38,7 +39,7 @@ void TimeInterpPreviewModel::setupModel(std::shared_ptr<Railway> railway,
             it->setData(0,Qt::EditRole);
         }
         else{
-            double er=adp->relativeError(ruler);
+            double er=adp->relativeError(ruler, _ops.period_hours);
             it->setData(er, Qt::EditRole);
             color=Qt::yellow;
             color.setAlphaF(er);
@@ -49,8 +50,8 @@ void TimeInterpPreviewModel::setupModel(std::shared_ptr<Railway> railway,
     }
 }
 
-TimeInterpPagePreview::TimeInterpPagePreview(QWidget *parent):
-    QWizardPage(parent),model(new TimeInterpPreviewModel(this))
+TimeInterpPagePreview::TimeInterpPagePreview(const DiagramOptions& ops, QWidget *parent):
+    QWizardPage(parent), _ops(ops), model(new TimeInterpPreviewModel(_ops, this))
 {
     setTitle(tr("确认"));
     initUI();

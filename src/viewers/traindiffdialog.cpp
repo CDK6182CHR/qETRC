@@ -113,7 +113,7 @@ void TrainDiffModel::setTrainMap(std::shared_ptr<Train> train, intermap_t& imap)
                     == p->railStation.lock()) {
                     auto railint = pr->railStation.lock()->dirNextInterval(line->dir());
                     int secs = qeutil::secsTo(pr->trainStation->depart,
-                        p->trainStation->arrive);
+                        p->trainStation->arrive, diagram.options().period_hours);
                     imap.emplace(railint,
                         std::make_pair(secs, line->appStringShort(pr, p)));
                 }

@@ -22,8 +22,8 @@
 #include "splitroutingdialog.h"
 #include "viewers/routingmiledialog.h"
 
-RoutingEdit::RoutingEdit(TrainCollection& coll_, std::shared_ptr<Routing> routing_, QWidget *parent) :
-    QWidget(parent),coll(coll_), routing(routing_),model(new RoutingEditModel(routing,this))
+RoutingEdit::RoutingEdit(const DiagramOptions& ops, TrainCollection& coll_, std::shared_ptr<Routing> routing_, QWidget *parent) :
+    QWidget(parent), _ops(ops), coll(coll_), routing(routing_),model(new RoutingEditModel(routing,this))
 {
     initUI();
     refreshData();
@@ -260,7 +260,7 @@ void RoutingEdit::actSplit()
 void RoutingEdit::actMile()
 {
     if (!routing) return;
-    auto* d = new RoutingMileDialog(routing, this);
+    auto* d = new RoutingMileDialog(_ops, routing, this);
     d->open();
 }
 

@@ -13,9 +13,10 @@
 #include "data/train/train.h"
 #include "data/rail/ruler.h"
 #include "data/rail/rulernode.h"
+#include "data/diagram/diagramoptions.h"
 
-RulerRefModel::RulerRefModel(std::shared_ptr<Train> train_, QObject *parent):
-    QStandardItemModel(parent),train(train_)
+RulerRefModel::RulerRefModel(const DiagramOptions& ops, std::shared_ptr<Train> train_, QObject *parent):
+    QStandardItemModel(parent), _ops(ops), train(train_)
 {
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({
@@ -41,7 +42,7 @@ void RulerRefModel::setupModel()
             setItem(row, ColInterval, new SI(its));
 
             //先填写运行数据部分
-            int secs = qeutil::secsTo(pr->trainStation->depart, p->trainStation->arrive);
+            int secs = qeutil::secsTo(pr->trainStation->depart, p->trainStation->arrive, _ops.period_hours);
             double mile = std::fabs(p->railStation.lock()->mile -
                 pr->railStation.lock()->mile);
             double spd = mile / secs * 3600.0;
@@ -144,8 +145,8 @@ void RulerRefModel::setRulerIndex(int i)
     setupModel();
 }
 
-RulerRefDialog::RulerRefDialog(std::shared_ptr<Train> train_, QWidget* parent):
-    QDialog(parent),train(train_),model(new RulerRefModel(train_,this))
+RulerRefDialog::RulerRefDialog(const DiagramOptions& ops, std::shared_ptr<Train> train_, QWidget* parent):
+    QDialog(parent), _ops(ops), train(train_), model(new RulerRefModel(_ops, train_, this))
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("标尺对照 - %1").arg(train->trainName().full()));

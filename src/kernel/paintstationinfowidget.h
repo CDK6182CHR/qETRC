@@ -5,7 +5,7 @@
 class QLabel;
 class QSpinBox;
 class RailStation;
-class QTime;
+class TrainTime;
 class QCheckBox;
 class DiagramWidget;
 
@@ -42,7 +42,7 @@ signals:
 	void fixStatusChanged(int id, bool on);
 	void widgetClosed();
 public slots:
-	void onDataChanged(const QString& trainName, int stop_secs_set, int stop_secs_real, bool fix, const QTime& arr, const QTime& dep);
+	void onDataChanged(const QString& trainName, int stop_secs_set, int stop_secs_real, bool fix, const TrainTime& arr, const TrainTime& dep);
 private slots:
 	void actStopTimeSettingChanged();
 	void actFixChanged();
