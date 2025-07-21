@@ -93,14 +93,10 @@ bool ltIndexRow(const QModelIndex& idx1,const QModelIndex& idx2);
 */
 std::set<int> indexRows(const QList<QModelIndex>& lst);
 
-static constexpr int msecsOfADay = 24 * 3600 * 1000;
-
 /**
  * 判断是否满足： left <= t <= right
  * 注意PBC
  */
-bool timeInRange(const QTime& left, const QTime& right, const QTime& t);
-
 bool timeInRange(const TrainTime& left, const TrainTime& right, const TrainTime& t, int period);
 
 /**

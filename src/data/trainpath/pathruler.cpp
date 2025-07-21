@@ -57,7 +57,7 @@ QJsonObject PathRuler::toJson() const
 	};
 }
 
-void PathRuler::fromJson(const QJsonObject& obj, const TrainPath& path, const RailCategory& cat)
+void PathRuler::fromJson(const QJsonObject& obj, const TrainPath& path, [[maybe_unused]] const RailCategory& cat)
 {
 	m_name = obj.value("name").toString();
 	const auto& arr = obj.value("segments").toArray();

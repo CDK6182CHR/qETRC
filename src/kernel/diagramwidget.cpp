@@ -1890,7 +1890,13 @@ void DiagramWidget::updateTimeAxis()
     nowItem->setY(ps.y());
     QPoint p1(0, height());
     auto ps1 = mapToScene(p1);
-    marginItems.bottom->setY(ps1.y() - scene()->height() - 27);
+
+    // 2025.07.21: For horizontal scroll bar not shown case, shift the lower items slightly
+    int extra_height = 0;
+    if (!horizontalScrollBar()->isVisible()) {
+        extra_height = horizontalScrollBar()->height();
+    }
+    marginItems.bottom->setY(ps1.y() - scene()->height() - 27 + extra_height);
 }
 
 void DiagramWidget::updateDistanceAxis()

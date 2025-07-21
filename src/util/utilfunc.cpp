@@ -162,22 +162,6 @@ std::set<int> qeutil::indexRows(const QList<QModelIndex>& lst)
 	return ret;
 }
 
-bool qeutil::timeInRange(const QTime& left, const QTime& right, const QTime& t)
-{
-	int tleft = left.msecsSinceStartOfDay(), tright = right.msecsSinceStartOfDay();
-	int tt = t.msecsSinceStartOfDay();
-	
-	if (tright < tleft)
-		tright += msecsOfADay;
-	if (tleft <= tt && tt <= tright)
-		return true;
-	//考虑一次平移
-	tt += msecsOfADay;
-	if (tleft <= tt && tt <= tright)
-		return true;
-	return false;
-}
-
 bool qeutil::timeInRange(const TrainTime& left, const TrainTime& right, const TrainTime& t, int period)
 {
 	int secsOfPeriod = 3600 * period;
