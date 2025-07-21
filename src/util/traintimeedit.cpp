@@ -2,6 +2,7 @@
 
 #include <QLineEdit>
 #include <QFocusEvent>
+#include <QStyleOptionSpinBox>
 
 TrainTimeEdit::TrainTimeEdit(QWidget* parent) :
     QAbstractSpinBox(parent)
@@ -124,6 +125,19 @@ void TrainTimeEdit::setTime(const TrainTime& tm)
         updateTime();
         emit timeChanged(m_time);
     }
+}
+
+QSize TrainTimeEdit::sizeHint() const
+{
+    int h = lineEdit()->sizeHint().height();
+    QString s = TrainTime(m_maxHours, 0, 0).toString(m_format) + ' ';
+    QFontMetrics fm = lineEdit()->fontMetrics();
+    int w = fm.horizontalAdvance(s);
+    QSize hint(w + 3, h);
+    QStyleOptionSpinBox opt;
+    initStyleOption(&opt);
+    hint = style()->sizeFromContents(QStyle::CT_SpinBox, &opt, hint, this);
+    return hint;
 }
 
 void TrainTimeEdit::updateTime()

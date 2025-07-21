@@ -45,6 +45,8 @@ public:
     void setTime(const TrainTime& tm);
     auto& time()const { return m_time; }
 
+    QSize sizeHint()const override;
+
 protected:
     bool focusNextPrevChild(bool next)override;
 
