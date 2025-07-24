@@ -4,12 +4,12 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.7.13";
-const std::string_view DATE = "20250721";
-const int RELEASE_CODE = 67;
+const std::string_view LAST_VERSION = "V1.8.0";
+const std::string_view DATE = "20250724";
+const int RELEASE_CODE = 68;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(新增周期小时数设置项，支持设置非24小时循环的运行图。详见ReleaseNote。)";
+const std::string_view UPDATE_LOG = R"(优化时刻编辑控件的一些细节。)";
 }
