@@ -67,6 +67,7 @@ bool TrainTimeEdit::focusNextPrevChild(bool next)
         if (sec == SecondSection || (m_format == TrainTime::HM && sec == MinuteSection))
             return QAbstractSpinBox::focusNextPrevChild(next);   // Find next widget
         else {
+            updateTime();
             selectSection(static_cast<Section>(sec + 1));
             return true;
         }
@@ -77,6 +78,7 @@ bool TrainTimeEdit::focusNextPrevChild(bool next)
             return QAbstractSpinBox::focusNextPrevChild(next);
         }
         else {
+            updateTime();
             selectSection(static_cast<Section>(sec - 1));
             return true;
         }
@@ -92,6 +94,12 @@ void TrainTimeEdit::focusInEvent(QFocusEvent* e)
         selectSection(lastSection());
 }
 
+void TrainTimeEdit::focusOutEvent(QFocusEvent* e)
+{
+    updateTime();
+	QAbstractSpinBox::focusOutEvent(e);
+}
+
 TrainTimeEdit::Section TrainTimeEdit::lastSection() const
 {
     switch (m_format) {
@@ -101,6 +109,74 @@ TrainTimeEdit::Section TrainTimeEdit::lastSection() const
         qWarning() << "Invalid format";
         return HourSection;
     }
+}
+
+TrainTimeEdit::Section TrainTimeEdit::positionToSection(int pos) const
+{
+#if 1
+
+    const QString& txt = lineEdit()->text();
+    int sec_idx = 0;
+    for (int i = 0; i < txt.length() && i < pos; i++) {
+        if (txt.at(i) == ':') {
+            sec_idx++;
+        }
+    }
+    assert(sec_idx <= static_cast<int>(lastSection()));
+    return static_cast<Section>(sec_idx);
+#else
+    // 2025.07.24: This is not safe, because we sometimes get non-standard length during input
+    int tot_len = lineEdit()->text().length();
+
+    if (m_format == TrainTime::HMS) {
+        if (tot_len - pos < 2) {
+            return SecondSection;
+        }
+        else if (tot_len - pos < 5) {
+            return MinuteSection;
+        }
+        else {
+            return HourSection;
+        }
+    }
+    else {
+        // HM format
+        if (tot_len - pos < 2) {
+            return MinuteSection;
+        }
+        else {
+            return HourSection;
+        }
+    }
+#endif
+}
+
+static int integer_digits_dec(int val)
+{
+    int c = 1;
+    while (val /= 10) c++;
+    return c;
+}
+
+bool TrainTimeEdit::atEndOfNonLastSection(int pos) const
+{
+    auto sec = positionToSection(pos);
+    if (sec == lastSection())
+        return false;
+    const QString& txt = lineEdit()->text();
+    int next_delim = txt.indexOf(':', pos);
+    if (next_delim < 0) next_delim = txt.size();
+    int last_delim = pos == 0 ? -1 : txt.lastIndexOf(':', pos - 1);
+
+    if (pos < last_delim)
+        return false;
+
+    // Now, the position is at the end of the current section
+
+    int curr_sec_length = next_delim - last_delim - 1;
+    int max_sec_length = sec == HourSection ? integer_digits_dec(m_maxHours) : 2;
+
+    return (curr_sec_length >= max_sec_length);
 }
 
 TrainTimeEdit::Section TrainTimeEdit::firstSection() const
@@ -123,7 +199,7 @@ void TrainTimeEdit::setTime(const TrainTime& tm)
     if (tm != m_time) {
         m_time = tm;
         updateTime();
-        emit timeChanged(m_time);
+        emit timeChanged(m_time);  // seems: updateTime() will NOT call onTextChanged() slot, and we should emit it here!
     }
 }
 
@@ -152,13 +228,27 @@ void TrainTimeEdit::updateTime()
 void TrainTimeEdit::onTextChanged()
 {
     QString t = lineEdit()->text();
+    auto pos = lineEdit()->cursorPosition();
     int p = 0;
     auto stat = validate(t, p);
     if (stat == QValidator::Acceptable) {
         // Indicate the input is valid
-        m_time = TrainTime::fromString(t);
+        auto tm = TrainTime::fromString(t);
+        if (tm != m_time) {
+            m_time = tm;
+			emit timeChanged(m_time);
+        }
     }
-    updateTime();
+    else {
+        updateTime();   // Update the text if we get invalid characters
+    }
+    //updateTime();
+    // selectCurrentSection();
+    lineEdit()->setCursorPosition(pos);
+
+    if (atEndOfNonLastSection(pos)) {
+        focusNextChild();
+    }
 }
 
 void TrainTimeEdit::selectCurrentSection()
@@ -196,27 +286,5 @@ void TrainTimeEdit::selectSection(Section section)
 
 TrainTimeEdit::Section TrainTimeEdit::currentSection() const
 {
-    int pos = lineEdit()->cursorPosition();
-    int tot_len = lineEdit()->text().length();
-
-    if (m_format == TrainTime::HMS) {
-        if (tot_len - pos < 2) {
-            return SecondSection;
-        }
-        else if (tot_len - pos < 5) {
-            return MinuteSection;
-        }
-        else {
-            return HourSection;
-        }
-    }
-    else {
-        // HM format
-        if (tot_len - pos < 2) {
-            return MinuteSection;
-        }
-        else {
-            return HourSection;
-        }
-    }
+	return positionToSection(lineEdit()->cursorPosition());
 }

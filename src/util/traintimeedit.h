@@ -52,9 +52,22 @@ protected:
 
     void focusInEvent(QFocusEvent* e)override;
 
+    void focusOutEvent(QFocusEvent* e)override;
+
 private:
     Section firstSection()const;
     Section lastSection()const;
+
+    Section positionToSection(int pos)const;
+
+    /**
+     * Tells that whether the current position is at the end of current section,
+     * with no more possible digits.
+     * If so, we should move to next section.
+     * But if current section is the last section, just return false,
+     * because we do not automatically focus on the next widget.
+     */
+    bool atEndOfNonLastSection(int pos)const;
 
 signals:
     void timeChanged(const TrainTime& time);
