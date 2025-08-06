@@ -30,7 +30,7 @@ GreedyPaintConfigModel::GreedyPaintConfigModel(const DiagramOptions& ops, QWidge
     QStandardItemModel(parent), _ops(ops)
 {
     setColumnCount(ColMAX);
-    setHorizontalHeaderLabels({ tr("站名"),tr("锚"),tr("起"),tr("止"),tr("停分"),tr("停秒"),tr("固定"),tr("股道"),
+    setHorizontalHeaderLabels({ tr("站名"),tr("锚"),tr("起"),tr("止"),tr("停分"),tr("停秒"),tr("固定"),tr("股道"),tr("调整"),
         tr("实停"),tr("到达时刻"),tr("出发时刻") });
     connect(this, &GreedyPaintConfigModel::dataChanged,
         this, &GreedyPaintConfigModel::onDataChanged);
@@ -104,6 +104,10 @@ void GreedyPaintConfigModel::refreshData()
 
         it = new SI;
         setItem(row, ColTrack, it);
+
+        it = new SI;
+        it->setData(0, Qt::EditRole);
+        setItem(row, ColAdjust, it);
 
         setItem(row, ColActualStop, makeReadonlyItem());
         setItem(row, ColArrive, makeReadonlyItem());
@@ -284,6 +288,10 @@ std::map<std::shared_ptr<const RailStation>, GreedyPaintStationConfigData>
         if (const auto& track = item(r, ColTrack)->text(); !track.isEmpty()) {
             res[st].track = track;
         }
+
+        if (int adjust_sec = item(r, ColAdjust)->data(Qt::EditRole).toInt()) {
+            res[st].adjustIntervalSecs = adjust_sec;
+        }
     }
     return res;
 }
@@ -408,6 +416,13 @@ void GreedyPaintConfigModel::onDataChanged(const QModelIndex& topLeft,
             }
         }
 
+        if (std::max(c1, (int)ColAdjust) <= std::min(c2, (int)ColAdjust)) {
+            // 2025.08.06: 区间标尺调整
+            if (roles.contains(Qt::EditRole)) {
+                emit adjustRulerChanged(row);
+            }
+        }
+
         if (roles.contains(Qt::CheckStateRole)) {
             // 三个勾选的变化了
             for (int c = c1; c <= c2; c++) {
@@ -508,6 +523,8 @@ GreedyPaintPagePaint::GreedyPaintPagePaint(Diagram &diagram_,
         this, &GreedyPaintPagePaint::onAnchorChanged);
     connect(_model, &GreedyPaintConfigModel::stopTimeChanged,
         this, &GreedyPaintPagePaint::paintTmpTrain);
+    connect(_model, &GreedyPaintConfigModel::adjustRulerChanged,
+        this, &GreedyPaintPagePaint::paintTmpTrain);
     connect(_model, &GreedyPaintConfigModel::fixedStationChanged,
         this, &GreedyPaintPagePaint::onFixedChanged);
 }
@@ -601,10 +618,12 @@ void GreedyPaintPagePaint::initUI()
     table->setItemDelegateForColumn(GreedyPaintConfigModel::ColDepart,tmdele);
     table->setItemDelegateForColumn(GreedyPaintConfigModel::ColActualStop,
         new TimeIntervalDelegate(this));
+    table->setItemDelegateForColumn(GreedyPaintConfigModel::ColAdjust,
+        new SteppedSpinDelegate(10, this));
     vlay->addWidget(table);
 
     int c = 0;
-    for (auto w : { 120,40,40,40,60,60,40,60,70,80,80 }) {
+    for (auto w : { 120,30,30,30,40,40,40,60,40,70,80,80 }) {
         table->setColumnWidth(c++, w);
     }
 

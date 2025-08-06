@@ -308,6 +308,10 @@ typename GreedyPainter::RecurseReport
 			// 本轮循环中后站尝试停车，因此带附加时分
 			int_secs += node->stop;
 		}
+		// 2025.08.06: adjust interval; we use the absolute latter station to load data; it is just *to* station in forward
+		if (to_cfg_itr != _stationConfigs.end()) {
+			int_secs += to_cfg_itr->second.adjustIntervalSecs;
+		}
 
 		// 区间天窗冲突
 		auto tm_to = ev_start.time.addSecs(int_secs, period_hours);
@@ -671,6 +675,11 @@ typename GreedyPainter::RecurseReport
 		if (next_stop || to_try_stop) {
 			// 本轮循环中后站尝试停车，因此带附加时分
 			int_secs += node->start;
+		}
+
+		// 2025.08.06: adjust interval; we use the absolute latter station to load data; it is just *from* station in backward
+		if (from_cfg_itr != _stationConfigs.end()) {
+			int_secs += from_cfg_itr->second.adjustIntervalSecs;
 		}
 
 		bool forbid_conf = false;

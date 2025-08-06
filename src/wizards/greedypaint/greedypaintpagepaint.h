@@ -45,6 +45,7 @@ public:
         ColSecond,
         ColFix,
         ColTrack,
+        ColAdjust,
         ColActualStop,
         ColArrive,
         ColDepart,
@@ -123,6 +124,7 @@ signals:
     void anchorStationChanged(std::shared_ptr<const RailStation>);
     void fixedStationChanged();
     void stopTimeChanged();
+    void adjustRulerChanged(int row);
 
 private slots:
 
