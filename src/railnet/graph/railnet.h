@@ -92,7 +92,7 @@ public:
     /**
      * 由所给边，按照当前线名向前追踪至线路终点，返回整个径路，包含起始。
      */
-    path_t railPathFrom(const std::shared_ptr<const edge>& start)const;
+    path_t railPathFrom(const std::shared_ptr<const edge>& start, int max_depth=400)const;
 
     /**
      * 根据指定线名、方向，查找始点至末点的路径。

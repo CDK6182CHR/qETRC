@@ -175,7 +175,7 @@ double RailNet::pathMile(const path_t &path)
     return mile;
 }
 
-RailNet::path_t RailNet::railPathFrom(const std::shared_ptr<const edge> &start) const
+RailNet::path_t RailNet::railPathFrom(const std::shared_ptr<const edge> &start, int max_depth) const
 {
     path_t res;
     auto e=start;
@@ -190,6 +190,10 @@ RailNet::path_t RailNet::railPathFrom(const std::shared_ptr<const edge> &start) 
                 flag=true;
                 break;
             }
+        }
+        if (res.size() >= max_depth) {
+            qWarning() << "RailNet::railPathFrom: reaches maximal depth " << max_depth << "; the source data may contain ring!";
+            flag = false;
         }
         if(!flag){
             break;

@@ -11,6 +11,9 @@
 #include "util/buttongroup.hpp"
 #include "default_options.h"
 
+#include <queue>
+
+#include <QFileInfo>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QMenu>
@@ -409,15 +412,35 @@ void RailDBNavi::actImportFromLib()
         tr("qETRC/pyETRC线路数据库文件 (*.pyetlib)\nJSON文件 (*.json)\n所有文件 (*)"));
     if (filename.isEmpty())return;
 
+    auto setValidNamesBFS = [this](std::shared_ptr<RailCategory> root_cat) {
+        std::queue<std::shared_ptr<RailCategory>> q;  
+        q.emplace(root_cat);
+
+        while (!q.empty()) {
+            auto cat = q.front();
+            cat->setName(_raildb->validCategoryNameRec(cat->name()));
+            q.pop();
+
+            foreach(auto p, cat->railways()) {
+                p->setName(_raildb->validRailwayNameRec(p->name()));
+            }
+
+            foreach(auto p, cat->subCategories()) {
+                q.push(p);
+            }
+        }
+        };
+
     RailDB subdb;
     bool flag = subdb.parseJson(filename);
     if (flag && ! subdb.isNull()) {
         // 直接移动给新的对象了
         auto cat = std::make_shared<RailCategory>(std::move(subdb));
-        cat->setName(_raildb->validCategoryNameRec(filename.split('.').front()));
-        foreach(auto p, cat->railways()) {
-            p->setName(_raildb->validRailwayNameRec(p->name()));
-        }
+        cat->setName(QFileInfo(filename).fileName().split(".").front());
+
+        // 2025.08.06: we have to use RECURSIVE method for re-naming!
+        setValidNamesBFS(cat);
+
         _undo->push(new qecmd::InsertCategory(cat, path, model));
     }
     else {
