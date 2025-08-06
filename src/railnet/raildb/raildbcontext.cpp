@@ -322,8 +322,15 @@ void RailDBContext::previewRail(std::shared_ptr<Railway> railway, const QString&
 void RailDBContext::actImportFromCurrent(const std::deque<int>& path, int path_count)
 {
     bool ok;
-    auto rails = SelectRailwaysTable::dlgGetRailways(mw, mw->diagram(), tr("选择线路"),
+    auto rails_orig = SelectRailwaysTable::dlgGetRailways(mw, mw->diagram(), tr("选择线路"),
         tr("请选择要导入到数据库的线路，可多选"), &ok);
+    
+    // 2025.08.06: we have to COPY the railway to prevent the change in DB from affecting current diagram!
+    decltype(rails_orig) rails;
+    for (auto p : rails_orig) {
+        rails.emplace_back(std::make_shared<Railway>())->operator=(*p);  // copy
+    }
+
     if (!ok)return;
     if (rails.empty()) {
         QMessageBox::warning(mw, tr("错误"), tr("没有选择线路。请选择至少一条线路来导入。"));

@@ -172,6 +172,9 @@ void AddPageDialog::initUI()
     vlay->addLayout(h);
 
     auto* hlay = new QHBoxLayout;
+    auto* cvlay = new QVBoxLayout;
+    auto* lab = new QLabel(tr("未选择线路："));
+    cvlay->addWidget(lab);
     tbUnsel = new QTableView;
     tbUnsel->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     tbUnsel->setModel(mdUnsel);
@@ -182,13 +185,17 @@ void AddPageDialog::initUI()
     for (int w : {120, 80, 80, 60, 60}) {
         tbUnsel->setColumnWidth(c++, w);
     }
-    hlay->addWidget(tbUnsel);
+    cvlay->addWidget(tbUnsel);
+    hlay->addLayout(cvlay);
 
     auto* btns = new ButtonGroup<2, QVBoxLayout>({ ">","<" });
     btns->connectAll(SIGNAL(clicked()), this, { SLOT(select()),SLOT(deselect()) });
     btns->setMaximumWidth(30);
     hlay->addLayout(btns);
 
+    cvlay = new QVBoxLayout;
+    lab = new QLabel(tr("已选择线路："));
+    cvlay->addWidget(lab);
     tbSel = new QTableView;
     tbSel->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     tbSel->setModel(mdSel);
@@ -201,7 +208,8 @@ void AddPageDialog::initUI()
         tbSel->setColumnWidth(c++, w);
     }
 
-    hlay->addWidget(tbSel);
+    cvlay->addWidget(tbSel);
+    hlay->addLayout(cvlay);
     vlay->addLayout(hlay);
 
     vlay->addWidget(new QLabel("备注: "));
@@ -235,7 +243,7 @@ void AddPageDialog::okClicked()
 {
     const QString& name = edName->text();
     if (name.isEmpty() || diagram.pageNameExisted(name, page)) {
-        QMessageBox::warning(this, tr("错误"), tr("运行图名称为空或已存在，请重新设置"));
+        QMessageBox::warning(this, tr("错误"), tr("运行图页面名称为空或已存在，请重新设置"));
         return;
     }
 
