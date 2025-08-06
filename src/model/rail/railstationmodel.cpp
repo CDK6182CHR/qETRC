@@ -341,15 +341,18 @@ int RailStationModel::fromCsv(const QString& filename, QString& report)
             st->counter = counter_mile;
         }
 
-        st->level = sp.at(CsvColLevel).toInt();
-        st->_show = (bool)sp.at(CsvColShow).toInt();
-        int dir_idx = sp.at(CsvColDirection).toInt();
+        st->level = sp.at(CsvColLevel).toInt(&ok);
+        if (!ok) st->level = 4;
+        st->_show = (bool)sp.at(CsvColShow).toInt(&ok);
+        if (!ok) st->_show = true;
+        int dir_idx = sp.at(CsvColDirection).toInt(&ok);
         if (dir_idx < 0 || dir_idx >= 4) {
             qWarning() << "Line: " << n << ": Invalid direction index: " << dir_idx;
             report += tr("第%1行：非法的“单向站”序号%2").arg(n).arg(dir_idx);
             continue;
         }
         st->direction = static_cast<PassedDirection>(dir_idx);
+        if (!ok)st->direction = PassedDirection::BothVia;
 
         st->prevSingle = (bool)sp.at(CsvColSingleLine).toInt();
         st->passenger = (bool)sp.at(CsvColPassenger).toInt();

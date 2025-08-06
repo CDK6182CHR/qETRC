@@ -1474,7 +1474,10 @@ void MainWindow::initToolbar()
 		auto* cat = ribbon->addContextCategory(tr(""));
 		contextRuler = new RulerContext(_diagram, cat, this);
 		connect(contextRuler, &RulerContext::ordinateRulerModified,
-			this, qOverload<std::shared_ptr<Railway>>(&MainWindow::updateRailwayDiagrams));
+			this, [this](std::shared_ptr<Railway> rail){
+				rail->calStationYCoeff();   // 2025.08.06: we have to re-calculate y-coeff at first!
+				updateRailwayDiagrams(rail);
+				});
 		connect(contextRuler, &RulerContext::focusOutRuler,
 			this, &MainWindow::focusOutRuler);
 		connect(contextRuler, &RulerContext::rulerNameChanged,
@@ -2209,6 +2212,8 @@ void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
 		this, &MainWindow::focusInRailway);
 	connect(w, &RailStationWidget::railNoteChanged,
 		contextRail, &RailContext::actUpdateRailNotes);
+	connect(w, &RailStationWidget::exportCsv,
+		contextRail, &RailContext::actExportRailwayCsv);
 	railStationWidgets.append(w);
 	railStationDocks.append(dock);
 
