@@ -270,21 +270,40 @@ std::shared_ptr<DiagramPage> DiagramPage::clone() const
 
 double DiagramPage::topLabelMaxHeight() const
 {
-    auto* first_station = _railways[0]->empty() ? nullptr: _railways[0]->stations().front().get();
-    //qDebug() << "topLabelMaxHeight first station " << first_station;
-    const auto& labels = first_station && _overLabels.contains(first_station) ? _overLabels[first_station] : label_map_t{};
-    auto link_itr = _overLinks.find(first_station);
-    const auto& links = first_station && link_itr != _overLinks.end() ? link_itr->second : RouteLinkLayerManager{};
-    return labelMaxHeight(labels, links);
+    // 2025.08.06  new impl: considering ALL stations
+    if (_railways.empty())
+        return 0;
+    auto rail = _railways.front();
+    double sol = 0;
+    foreach(auto st, rail->stations()) {
+        const auto& labels = _overLabels.contains(st.get()) ? _overLabels[st.get()] : label_map_t{};
+        auto link_itr = _overLinks.find(st.get());
+        const auto& links = link_itr != _overLinks.end() ? link_itr->second : RouteLinkLayerManager{};
+        double height = labelMaxHeight(labels, links);
+        double yval = rail->yValueFromCoeff(st->y_coeff.value_or(0), config());
+        sol = std::max(sol, height - yval);
+    }
+    return sol;
 }
 
 double DiagramPage::bottomLabelMaxHeight() const
 {
-    auto* last_station = _railways.back()->empty() ? nullptr : _railways.back()->stations().back().get();
-    const auto& labels = last_station && _belowLabels.contains(last_station) ? _belowLabels[last_station] : label_map_t{};
-    auto link_itr = _belowLinks.find(last_station);
-    const auto& links = last_station && link_itr != _belowLinks.end() ? link_itr->second : RouteLinkLayerManager{};
-    return labelMaxHeight(labels, links);
+    if (_railways.empty())
+        return 0;
+
+    auto rail = _railways.back();
+    double sol = 0;
+    double tot_height = rail->diagramHeight(config());
+    for (auto itr = rail->stations().crbegin(); itr != rail->stations().crend(); itr++) {
+        auto st = *itr;
+        const auto& labels = _belowLabels.contains(st.get()) ? _belowLabels[st.get()] : label_map_t{};
+        auto link_itr = _belowLinks.find(st.get());
+        const auto& links = link_itr != _belowLinks.end() ? link_itr->second : RouteLinkLayerManager{};
+        double height = labelMaxHeight(labels, links);
+        double yval = rail->yValueFromCoeff(st->y_coeff.value_or(0), config());
+        sol = std::max(sol, height - (tot_height - yval));
+    }
+    return sol;
 }
 
 double DiagramPage::labelMaxHeight(const label_map_t& labels, const RouteLinkLayerManager& links) const
