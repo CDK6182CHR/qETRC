@@ -48,26 +48,34 @@ class TrainItem : public QGraphicsItem
     QRectF _bounding;
 
     /**
-     * @brief linkItem1
-     * 采用交路连线时的连线对象。最多两个（考虑跨日）
-     */
-    QGraphicsPathItem* linkItem1 = nullptr, * linkItem2 = nullptr;
-    QGraphicsSimpleTextItem* linkLabelItem = nullptr;
-    QGraphicsRectItem* linkLabelRect = nullptr;
-
-    /**
      * 2024.03.01: this structure logs the information about one link line determined using the link-layer alg.
      */
     struct LinkLayerInfo {
         int layer = -1;
         double x_pre = -1, x_cur = -1;
     };
-    LinkLayerInfo linkLayer, startLayer, endLayer;
+    LinkLayerInfo startLayer, endLayer;
+
+    struct LinkLineItems {
+        LinkLayerInfo layerInfo;
+        QGraphicsPathItem* linkItem1 = nullptr, * linkItem2 = nullptr;
+        QGraphicsSimpleTextItem* linkLabelItem = nullptr;
+        QGraphicsRectItem* linkLabelRect = nullptr;
+
+        void setVisibility(bool on);
+
+        void deleteItems();
+    };
+
+    /**
+     * 2025.08.06  items baggaged for pre/post link lines
+     */
+    LinkLineItems preLinkItems, postLinkItems;
     
     /**
      * 2024.02.26  用于仅选中车次显示连线的情况。仅在第一次选中时尝试绘制，后面就不用再试了。
      */
-    bool hasLinkLine = true;
+    bool hasPreLinkLine = true, hasPostLinkLine = true;
 
     static constexpr const double LINK_LINE_WIDTH = 0.5;
 
@@ -308,7 +316,21 @@ private:
      * 添加与交路前序车次之间的连线
      * 2024.02.26: returns whether the link line is actually added.
      */
-    bool addLinkLine(const QString& trainName);
+    bool addPreLinkLine(const QString& trainName);
+
+    /**
+     * 2025.08.06  Experimental: add post link line to the train line.
+     * This is used only in a (somewhat) rare case: the post train in the routing exists, but not starts from
+     * current railway.
+     */
+    bool addPostLinkLine();
+    
+    /**
+     * 2025.08.06  Extracted from previous version of addLinkLine()
+     * Add link line from specified x, y data. Used for both starting and ending links.
+     */
+    LinkLineItems addLinkLine(std::shared_ptr<const RailStation> rst, const TrainTime& fromTime, const TrainTime& toTime,
+        const QString& labelText, bool isPostLink);
 
     void clearLinkLines();
 
@@ -319,7 +341,7 @@ private:
     /**
      * 2024.03.01  determine the layer number (0, 1, ...) of the link line.
      */
-    int linkLineLayer(const RailStation* rs, int xleft, int xright)const;
+    int linkLineLayer(const RailStation* rs, int xleft, int xright, bool isPostLink)const;
 
     /**
      * 2024.03.01  similar to linkLineLayer, but for end point. Actually, used for end label
@@ -333,14 +355,14 @@ private:
      * If floating link is not enabled. simply return 0.
      * Also, records the layer number of the current link line.
      */
-    double linkLineHeight(const RailStation* rs, int xlelft, int xright);
+    double linkLineHeight(const RailStation* rs, int xlelft, int xright, bool isPostLink);
 
     QColor linkLineColor()const;
 
     QColor labelColor()const;
 
     QGraphicsPathItem* drawLinkLine(double x1, double x2, double y, double height, 
-        bool left_start, bool right_end, bool hasLabel);
+        bool left_start, bool right_end, bool hasLabel, QGraphicsSimpleTextItem* labelItem, bool isPostLink);
 
     /**
      * Compute the distance between the time `tm` and the coord `x` along time axis.

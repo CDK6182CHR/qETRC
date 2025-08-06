@@ -453,6 +453,17 @@ public:
     const AdapterStation* boundStarting()const;
 
     /**
+     * 2025.08.06  Returns whether the first station in the timetable is the starting station.
+     */
+    bool hasStartingTime()const {
+        return empty() ? false : isStartingStation(timetable().front().name);
+    }
+
+    bool hasTerminalTime()const {
+        return empty() ? false : isTerminalStation(timetable().back().name);
+    }
+
+    /**
      * 2021.10.09  性能  
      * seealso: boundStarting
      * 区别是：只考虑在rail所示线路的。解决起点站也可能绑定到多条线路的情况。

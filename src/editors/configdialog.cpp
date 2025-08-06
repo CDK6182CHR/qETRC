@@ -489,6 +489,11 @@ void ConfigDialog::initUI(int period_hours)
         form->addRow(tr("交路连线颜色"), cb);
         cbLinkColor = cb;
 
+        ck = new QCheckBox(tr("显示与非本线列车之间的交路连线"));
+        ck->setToolTip(tr("是否显示本线列车与非本线列车之间的交路连线"));
+        form->addRow(tr("非本线连线"), ck);
+        ckShowNonLocalLink = ck;
+
         gb->setLayout(form);
         vlay->addWidget(gb);
     }
@@ -625,6 +630,7 @@ void ConfigDialog::refreshData()
     SET_VALUE(spLinkHeightStep, step_link_height);
     cbLinkLabelType->setCurrentIndex(static_cast<int>(_cfg.link_line_label_type));
     cbLinkColor->setCurrentIndex(static_cast<int>(_cfg.link_line_color));
+    ckShowNonLocalLink->setChecked(_cfg.show_non_local_link_lines);
 }
 
 #undef SET_VALUE
@@ -713,6 +719,7 @@ void ConfigDialog::actApply()
     GET_VALUE(spLinkHeightStep, step_link_height);
     cnew.link_line_label_type = static_cast<Config::LinkLineLabelType>(cbLinkLabelType->currentIndex());
     cnew.link_line_color = static_cast<Config::LinkLineColorOption>(cbLinkColor->currentIndex());
+    cnew.show_non_local_link_lines = ckShowNonLocalLink->isChecked();
 
     // check and warnings
     QString warns{};

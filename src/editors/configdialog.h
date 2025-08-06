@@ -42,7 +42,7 @@ class ConfigDialog : public QDialog
     QSpinBox* spBoldLevel, * spShowLevel;
     QComboBox* cbShowTimeMark, * cbVLineStyle, * cbShowLinkLine, * cbLinkLabelType, * cbLinkColor, * cbLabelColor;
     QComboBox* cbTrainNameMarkStyle,* cbSecondRoundOption;
-    QCheckBox* ckFullName, * ckEndLabel, * ckAvoidCollid, * ckFloatLinkLine;
+    QCheckBox* ckFullName, * ckEndLabel, * ckAvoidCollid, * ckFloatLinkLine, * ckShowNonLocalLink;
     QSpinBox* spLinkHeightBase, *spLinkHeightStep;
     QCheckBox* ckHideStartLabelStarting, * ckHideStartLabelNonStarting;
     QCheckBox* ckHideEndLabelTerminal, * ckHideEndLabelNonTerminal, * ckHideEndLabelLink;

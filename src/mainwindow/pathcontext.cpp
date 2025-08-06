@@ -392,7 +392,7 @@ void PathContext::actDuplicatePathRuler(std::shared_ptr<PathRuler> ruler)
     mw->getUndoStack()->push(new qecmd::AddPathRuler(this, std::move(newRuler)));
 }
 
-void PathContext::onPathRulerUpdated(std::shared_ptr<PathRuler> ruler)
+void PathContext::onPathRulerUpdated([[maybe_unused]] std::shared_ptr<PathRuler> ruler)
 {
     // Seems nothing to do for now
 }

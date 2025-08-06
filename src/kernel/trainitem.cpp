@@ -131,39 +131,47 @@ void TrainItem::highlight()
 
     //显示交路连线
     if (config().show_link_line == 1) {
-        if (hasLinkLine) {
-            if (linkItem1 || linkItem2) {
-                if (linkItem1) {
-                    linkItem1->setVisible(true);
-                }
-                if (linkItem2) {
-                    linkItem2->setVisible(true);
-                }
-                if (linkLabelItem) {
-                    linkLabelItem->setVisible(true);
-                }
+        if (hasPreLinkLine) {
+            if (preLinkItems.linkItem1 || preLinkItems.linkItem2) {
+                preLinkItems.setVisibility(true);
             }
             else {
                 // 连线没有铺画过。尝试一次绘制
-                hasLinkLine = addLinkLine(labelTrainName());
+                hasPreLinkLine = addPreLinkLine(labelTrainName());
+            }
+        }
+
+        if (hasPostLinkLine) {
+            if (postLinkItems.linkItem1 || postLinkItems.linkItem2) {
+                postLinkItems.setVisibility(true);
+            }
+            else {
+                hasPostLinkLine = addPostLinkLine();
             }
         }
     }
 
+    auto highlightLinkItem = [this, &rectPen, &brush](LinkLineItems& items) {
+        if (items.linkLabelItem) {
+            if (items.linkLabelRect) {
+                items.linkLabelRect->show();
+            }
+            else {
+                items.linkLabelRect = new QGraphicsRectItem(items.linkLabelItem->boundingRect(), this);
+                items.linkLabelRect->setPos(items.linkLabelItem->pos());
+                items.linkLabelRect->setZValue(5);
+                items.linkLabelRect->setPen(rectPen);
+                items.linkLabelRect->setBrush(brush);
+            }
+            items.linkLabelItem->setZValue(6);
+            items.linkLabelItem->setBrush(Qt::white);
+        }
+        };
+
     // 突出显示交路连线车次标记
-    if (config().train_name_mark_style == Config::TrainNameMarkStyle::Link && linkLabelItem) {
-        if (linkLabelRect) {
-            linkLabelRect->show();
-        }
-        else {
-            linkLabelRect = new QGraphicsRectItem(linkLabelItem->boundingRect(), this);
-            linkLabelRect->setPos(linkLabelItem->pos());
-            linkLabelRect->setZValue(5);
-            linkLabelRect->setPen(rectPen);
-            linkLabelRect->setBrush(brush);
-        }
-        linkLabelItem->setZValue(6);
-        linkLabelItem->setBrush(Qt::white);
+    if (config().train_name_mark_style == Config::TrainNameMarkStyle::Link) {
+        highlightLinkItem(preLinkItems);
+        highlightLinkItem(postLinkItems);
     }
 
     setZValue(10);
@@ -225,10 +233,16 @@ void TrainItem::unhighlight()
     hideStationPoints();
     hideLinkLine();
 
-    if (linkLabelRect) {
-        linkLabelRect->hide();
-        linkLabelItem->setZValue(0);
-        linkLabelItem->setBrush(labelColor);
+    if (preLinkItems.linkLabelRect) {
+        preLinkItems.linkLabelRect->hide();
+        preLinkItems.linkLabelItem->setZValue(0);
+        preLinkItems.linkLabelItem->setBrush(labelColor);
+    }
+
+    if (postLinkItems.linkLabelRect) {
+        postLinkItems.linkLabelRect->hide();
+        postLinkItems.linkLabelItem->setZValue(0);
+        postLinkItems.linkLabelItem->setBrush(labelColor);
     }
 
     _isHighlighted = false;
@@ -244,11 +258,19 @@ void TrainItem::highlightWithLink()
         }
         pen.setWidthF(LINK_LINE_WIDTH + 1);
         pen.setStyle(linkLineStyle());
-        if (linkItem1)
-            linkItem1->setPen(pen);
-        if (linkItem2) {
-            linkItem2->setPen(pen);
+
+        if (preLinkItems.linkItem1)
+            preLinkItems.linkItem1->setPen(pen);
+        if (preLinkItems.linkItem2) {
+            preLinkItems.linkItem2->setPen(pen);
         }
+
+        if (postLinkItems.linkItem1)
+            postLinkItems.linkItem1->setPen(pen);
+        if (postLinkItems.linkItem2) {
+            postLinkItems.linkItem2->setPen(pen);
+        }
+
         _linkHighlighted = true;
     }
 }
@@ -263,10 +285,16 @@ void TrainItem::unhighlightWithLink()
         }
         pen.setWidth(LINK_LINE_WIDTH);
         pen.setStyle(linkLineStyle());
-        if (linkItem1)
-            linkItem1->setPen(pen);
-        if (linkItem2)
-            linkItem2->setPen(pen);
+
+        if (preLinkItems.linkItem1)
+            preLinkItems.linkItem1->setPen(pen);
+        if (preLinkItems.linkItem2)
+            preLinkItems.linkItem2->setPen(pen);
+
+        if (postLinkItems.linkItem1)
+            postLinkItems.linkItem1->setPen(pen);
+        if (postLinkItems.linkItem2)
+            postLinkItems.linkItem2->setPen(pen);
         _linkHighlighted = false;
     }
 }
@@ -285,10 +313,17 @@ if(_item){\
 
 void TrainItem::repaintLinkLine()
 {
-    if (!hasLinkLine)
-        return;
-    clearLinkLines();
-    hasLinkLine = addLinkLine(labelTrainName());
+    if (hasPreLinkLine || hasPostLinkLine) {
+        clearLinkLines();
+    }
+
+    if (hasPreLinkLine) {
+        hasPreLinkLine = addPreLinkLine(labelTrainName());
+    }
+
+    if (hasPostLinkLine) {
+        hasPostLinkLine = addPostLinkLine();
+    }
 }
 
 TrainItem::~TrainItem() noexcept
@@ -301,10 +336,8 @@ TrainItem::~TrainItem() noexcept
     DELETE_SUB(endLabelText);
     DELETE_SUB(startRect);
     DELETE_SUB(endRect);
-    DELETE_SUB(linkItem1);
-    DELETE_SUB(linkItem2);
-    DELETE_SUB(linkLabelItem);
-    DELETE_SUB(linkLabelRect);
+    preLinkItems.deleteItems();
+    postLinkItems.deleteItems();
 
     for (auto p : spanItems) {
         delete p;
@@ -343,15 +376,17 @@ void TrainItem::clearLinkInfo()
     auto& linksStart = _page.dirLinks(_line->firstRailStation().get(), dir());
 
     // note: the layer >= 0 check is performed inside the function.
-    linksStart.delOccupation(linkLayer.layer, train().get(), linkLayer.x_pre, linkLayer.x_cur, 
-        config().fullWidth(_diagram.options().period_hours));
+    linksStart.delOccupation(preLinkItems.layerInfo.layer, train().get(), preLinkItems.layerInfo.x_pre,
+        preLinkItems.layerInfo.x_cur, config().fullWidth(_diagram.options().period_hours));
     linksStart.delOccupation(startLayer.layer, train().get(), startLayer.x_pre, startLayer.x_cur, 
         config().fullWidth(_diagram.options().period_hours));
 
-    if (endLayer.layer >= 0) {
+    if (endLayer.layer >= 0 || postLinkItems.layerInfo.layer >= 0) {
         auto& linksEnd = _page.dirLinks(_line->lastRailStation().get(), dir());
         linksEnd.delOccupation(endLayer.layer, train().get(), endLayer.x_pre, endLayer.x_cur, 
             config().fullWidth(_diagram.options().period_hours));
+        linksEnd.delOccupation(postLinkItems.layerInfo.layer, train().get(), postLinkItems.layerInfo.x_pre,
+            postLinkItems.layerInfo.x_cur, config().fullWidth(_diagram.options().period_hours));
     }
 }
 
@@ -575,13 +610,21 @@ void TrainItem::setLine()
         || (!_endAtThis && !config().hide_end_label_non_terminal));
 
     // 2024.02.28  for link line mode: we should determine the existence of linkLine BEFORE adding start item..
-    if (config().show_link_line == 2)
-        hasLinkLine = addLinkLine(trainName);
+    if (config().show_link_line == 2) {
+        hasPreLinkLine = addPreLinkLine(trainName);
+        hasPostLinkLine = addPostLinkLine();
+    }
     else {
         // 2025.05.28: we must init hasLinkLine in this case because this is used in setStart/EndItem function
         // (at the guard statements at the beginning)
         const auto& t = train();
-        hasLinkLine = t->hasRouting() && train()->routing().lock()->preLinkedOnRailway(*t, _railway);
+        hasPreLinkLine = t->hasRouting() && train()->routing().lock()->preLinkedOnRailway(*t, _railway, 
+            config().show_non_local_link_lines);
+
+        // The determination of hasPostLinkLine is somewhat complex; it is only true if the post train exists but not on current
+        // railway.
+        hasPostLinkLine = config().show_non_local_link_lines &&
+            t->hasRouting() && train()->routing().lock()->postLinkedOnRailwayNonLocal(*t, _railway);
     }
 
     if (glb_has_start_label && _line->startLabel() && startInRange) {
@@ -776,7 +819,7 @@ void TrainItem::setStartItem(const QString& text,const QPen& pen)
 {
     // 2024.02.28: for link
     if (config().train_name_mark_style == Config::TrainNameMarkStyle::Link) {
-        if (hasLinkLine)
+        if (hasPreLinkLine)
             return;
     }
 
@@ -831,6 +874,12 @@ void TrainItem::setStartItem(const QString& text,const QPen& pen)
 
 void TrainItem::setEndItem(const QString& text, const QPen& pen)
 {
+    // 2025.08.06: for non-local bouding
+    if (config().train_name_mark_style == Config::TrainNameMarkStyle::Link) {
+        if (hasPostLinkLine)
+            return;
+    }
+
     if (config().hide_end_label_link) {
         auto routw = train()->routing();
         if (!routw.expired()) {
@@ -992,7 +1041,7 @@ double TrainItem::determineStartLabelHeight()
         double left_marg = config().totalLeftMargin();
         startLayer.x_pre = std::max(x - wl - left_marg, 0.);
         startLayer.x_cur = std::min(x + wr - left_marg, width);
-        startLayer.layer = linkLineLayer(rst.get(), startLayer.x_pre, startLayer.x_cur);
+        startLayer.layer = linkLineLayer(rst.get(), startLayer.x_pre, startLayer.x_cur, false);
         //qDebug() << "start layer: " << startLayer.layer << ", " << startLayer.x_pre << ", " << startLayer.x_cur;
         return config().base_link_height + startLayer.layer * config().step_link_height;
     }
@@ -1155,12 +1204,8 @@ void TrainItem::hideLinkLine()
 {
     // 取消交路连线显示
     if (config().show_link_line == 1) {
-        if (linkItem1)
-            linkItem1->setVisible(false);
-        if (linkItem2)
-            linkItem2->setVisible(false);
-        if (linkLabelItem)
-            linkLabelItem->setVisible(false);
+        preLinkItems.setVisibility(false);
+        postLinkItems.setVisibility(false);
     }
 }
 
@@ -1203,12 +1248,15 @@ void TrainItem::markDepartTime(double x, double y, const TrainTime& tm)
     markLabels.append(item);
 }
 
-bool TrainItem::addLinkLine(const QString& trainName)
+bool TrainItem::addPreLinkLine(const QString& trainName)
 {
     if (!train()->hasRouting())
         return false;
     std::shared_ptr<Routing> rout = train()->routing().lock();
-    auto* pre = rout->preLinkedOnRailway(*train(), _railway);   // 这里已经保证first, last是同一个车站
+
+    // 这里已经保证first, last是同一个车站
+    // 2025.08.06: Try to allow non-local link lines
+    auto* pre = rout->preLinkedOnRailway(*train(), _railway, config().show_non_local_link_lines);
     if (!pre)
         return false;
     auto last = pre->train()->lastStation();
@@ -1222,49 +1270,95 @@ bool TrainItem::addLinkLine(const QString& trainName)
     // 到这里：已经判断好了绘制条件
     const TrainTime& last_tm = last->depart;
     const TrainTime& first_tm = first->arrive;
-    //2021.10.09修改：这里必须限制Railway。有可能始发站绑定到了多条线路。
+    auto label_text = linkLineLabelText(trainName, rout.get());
     auto rs = train()->boundStartingAtRail(_railway);
-    double xcur = calXFromStart(first_tm);
-    double xpre = calXFromStart(last_tm);
+
+    preLinkItems = addLinkLine(rs, last_tm, first_tm, label_text, false);
+    return true;
+}
+
+bool TrainItem::addPostLinkLine()
+{
+    if (!config().show_non_local_link_lines)
+        return false;
+    if (!train()->hasRouting())
+        return false;
+
+    std::shared_ptr<Routing> rout = train()->routing().lock();
+
+    auto* post = rout->postLinkedOnRailwayNonLocal(*train(), _railway);
+    if (!post)
+        return false;
+
+    auto curLast = train()->lastStation();
+    auto postFirst = post->train()->firstStation();
+    if (train()->isNullStation(curLast) || post->train()->isNullStation(postFirst))
+        return false;
+
+    if (curLast != _line->lastTrainStation()) {
+        // 2021.09.02补正  必须是本线的才绘制
+        return false;
+    }
+
+    // Now begin drawing
+    // In this case, we can use only full name, because we cannot determine the direction of post train first train line; 
+    // it could even have multiple choices!
+    QString nextTrainName = post->train()->trainName().full();
+    auto label_text = linkLineLabelText(nextTrainName, rout.get());
+    auto rs = train()->boundTerminalAtRail(_railway);
+
+    postLinkItems = addLinkLine(rs, curLast->depart, postFirst->arrive, label_text, true);
+    return true;
+}
+
+TrainItem::LinkLineItems TrainItem::addLinkLine(std::shared_ptr<const RailStation> rs,
+    const TrainTime& fromTime, const TrainTime& toTime, const QString& labelText, bool isPostLink)
+{
+    LinkLineItems res;
+
+    //2021.10.09修改：这里必须限制Railway。有可能始发站绑定到了多条线路。
+    double xcur = calXFromStart(toTime);
+    double xpre = calXFromStart(fromTime);
     double xpre_eff = xpre;     // For determining the starting of occupation. Mainly prepared for long text case.
-    linkLayer.x_pre = xpre;
-    linkLayer.x_cur = xcur;
+    res.layerInfo.x_pre = xpre;
+    res.layerInfo.x_cur = xcur;
 
     // 2024.02.26: add (optional) link label
-    auto label_text = linkLineLabelText(trainName, rout.get());
+    
 
     double width = config().diagramWidth(_diagram.options().period_hours);
 
     // 2025.02.22  add condition xpre <= width: do not create the label for the link lines out of the boundary.
-    if (!label_text.isEmpty() && xpre <= width) {
-        linkLabelItem = new QGraphicsSimpleTextItem(label_text, this);
-        linkLabelItem->setFont(config().train_font);
-        linkLabelItem->setBrush(labelColor());
+    if (!labelText.isEmpty() && xpre <= width) {
+        res.linkLabelItem = new QGraphicsSimpleTextItem(labelText, this);
+        res.linkLabelItem->setFont(config().train_font);
+        res.linkLabelItem->setBrush(labelColor());
 
         // 对于不跨界的连线，其有效范围由文字和连线中范围大的决定
         if (xpre <= xcur) {
-            xpre_eff = std::min(xpre, xcur - linkLabelItem->boundingRect().width());
+            xpre_eff = std::min(xpre, xcur - res.linkLabelItem->boundingRect().width());
         }
     }
 
     // 2024.02.22: determine the height of the link line
-    double height = linkLineHeight(rs.get(), xpre_eff, xcur);
+    double height = linkLineHeight(rs.get(), xpre_eff, xcur, isPostLink);
 
     double y = _railway.yValueFromCoeff(rs->y_coeff.value(), config()) + start_y;
     QPen pen = trainPen();
     pen.setColor(linkLineColor());
     pen.setWidth(LINK_LINE_WIDTH);
-    pen.setStyle(linkLineStyle()); 
+    pen.setStyle(linkLineStyle());
 
     if (xcur >= xpre) {
         //无需跨界
         if (xpre <= width) {
-            linkItem1 = drawLinkLine(xpre, std::min(width, xcur), y, height, true, xcur <= width, true);
+            res.linkItem1 = drawLinkLine(xpre, std::min(width, xcur), y, height, true,
+                xcur <= width, true, res.linkLabelItem, isPostLink);
             //linkItem1 = new QGraphicsLineItem(
             //    config().totalLeftMargin() + xpre, y, 
             //    config().totalLeftMargin() + std::min(width, xcur), y, this
             //);
-            linkItem1->setPen(pen);
+            res.linkItem1->setPen(pen);
         }
     }
     else {
@@ -1273,26 +1367,27 @@ bool TrainItem::addLinkLine(const QString& trainName)
         //linkItem1 = new QGraphicsLineItem(
         //    config().totalLeftMargin(), y, config().totalLeftMargin() + xcur, y, this
         //);
-        linkItem1 = drawLinkLine(0, xcur, y, height, false, true, true);
-        linkItem1->setPen(pen);
+        res.linkItem1 = drawLinkLine(0, xcur, y, height, false, true, true, 
+            res.linkLabelItem, isPostLink);
+        res.linkItem1->setPen(pen);
         //右边的
         if (xpre <= width) {
             //linkItem2 = new QGraphicsLineItem(
             //    config().totalLeftMargin() + xpre, y, 
             //    config().totalLeftMargin() + width, y, this
             //);
-            linkItem2 = drawLinkLine(xpre, width, y, height, true, false, false);
-            linkItem2->setPen(pen);
+            res.linkItem2 = drawLinkLine(xpre, width, y, height, true, false, false, 
+                res.linkLabelItem, isPostLink);
+            res.linkItem2->setPen(pen);
         }
     }
-    return true;
+    return res;
 }
 
 void TrainItem::clearLinkLines()
 {
-    DELETE_SUB(linkItem1);
-    DELETE_SUB(linkItem2);
-    DELETE_SUB(linkLabelItem);
+    preLinkItems.deleteItems();
+    postLinkItems.deleteItems();
     clearLinkInfo();
 }
 
@@ -1316,10 +1411,12 @@ QString TrainItem::linkLineLabelText(const QString& trainName, const Routing* ro
     return {};
 }
 
-int TrainItem::linkLineLayer(const RailStation* rs, int xleft, int xright)const
+int TrainItem::linkLineLayer(const RailStation* rs, int xleft, int xright, bool isPostLink)const
 {
     const double tot_width = config().fullWidth(_diagram.options().period_hours);
-    auto& labels = dir() == Direction::Down ? _page.overLinks(rs) : _page.belowLinks(rs);
+
+    // The over-link condition is down XOR postLink
+    auto& labels = ((dir() == Direction::Down) != isPostLink) ? _page.overLinks(rs) : _page.belowLinks(rs);
 
     return labels.addOccupation(RouteLinkOccupy(this->train().get(), xleft, xright), tot_width);
 }
@@ -1332,11 +1429,17 @@ int TrainItem::linkLineLayerEnd(const RailStation* rs, int xleft, int xright) co
     return labels.addOccupation(RouteLinkOccupy(this->train().get(), xleft, xright), tot_width);
 }
 
-double TrainItem::linkLineHeight(const RailStation* rs, int xleft, int xright)
+double TrainItem::linkLineHeight(const RailStation* rs, int xleft, int xright, bool isPostLink)
 {
     if (!config().floating_link_line) return 0;
-    this->linkLayer.layer = linkLineLayer(rs, xleft, xright);
-    return config().base_link_height + this->linkLayer.layer * config().step_link_height;
+    int layer = linkLineLayer(rs, xleft, xright, isPostLink);
+    if (isPostLink) {
+        postLinkItems.layerInfo.layer = layer;
+    }
+    else {
+        preLinkItems.layerInfo.layer = layer;
+    }
+    return config().base_link_height + layer * config().step_link_height;
 }
 
 QColor TrainItem::linkLineColor() const
@@ -1358,10 +1461,10 @@ QColor TrainItem::labelColor() const
 }
 
 QGraphicsPathItem* TrainItem::drawLinkLine(double x1, double x2, double y, double height, 
-    bool left_start, bool right_end, bool hasLabel)
+    bool left_start, bool right_end, bool hasLabel, QGraphicsSimpleTextItem* labelItem, bool isPostLink)
 {
     
-    int height_sig = dir() == Direction::Down ? -1 : 1;
+    int height_sig = (dir() == Direction::Down) != isPostLink ? -1 : 1;
     double left_mag = config().totalLeftMargin();
     double yh = y + height_sig * height;
 
@@ -1384,11 +1487,11 @@ QGraphicsPathItem* TrainItem::drawLinkLine(double x1, double x2, double y, doubl
     //stroker.setWidth(0.5);
     //QPainterPath path_s = stroker.createStroke(path);
 
-    if (hasLabel && linkLabelItem) {
+    if (hasLabel && labelItem) {
         // In this case, the funciton is responsible for placing the label item
-        const auto& rect = linkLabelItem->boundingRect();
-        double label_y = dir() == Direction::Down ? yh - rect.height() : yh;
-        linkLabelItem->setPos(left_mag + x2 - rect.width(), label_y);
+        const auto& rect = labelItem->boundingRect();
+        double label_y = (dir() == Direction::Down) != isPostLink ? yh - rect.height() : yh;
+        labelItem->setPos(left_mag + x2 - rect.width(), label_y);
     }
 
     return new QGraphicsPathItem(path.path(), this);
@@ -1426,4 +1529,20 @@ void TrainItem::doDragSingle(const TrainTime& tm)
         qDebug() << "TrainItem::doDrag: INVALID _dragPoint" << Qt::endl;
         break;
     }
+}
+
+void TrainItem::LinkLineItems::setVisibility(bool on)
+{
+    if (linkItem1) linkItem1->setVisible(on);
+    if (linkItem2) linkItem2->setVisible(on);
+    if (linkLabelItem) linkLabelItem->setVisible(on);
+    if (!on && linkLabelRect)
+        linkLabelRect->setVisible(false);
+}
+
+void TrainItem::LinkLineItems::deleteItems()
+{
+    DELETE_SUB(linkItem1);
+    DELETE_SUB(linkItem2);
+    DELETE_SUB(linkLabelItem);
 }

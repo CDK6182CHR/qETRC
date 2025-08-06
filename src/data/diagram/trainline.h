@@ -134,6 +134,10 @@ public:
         return _stations.front().trainStation;
     }
 
+    inline auto lastTrainStation() {
+        return _stations.back().trainStation;
+    }
+
     inline std::shared_ptr<RailStation>
         lastRailStation(){
         return _stations.back().railStation.lock();

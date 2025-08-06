@@ -119,6 +119,7 @@ struct Config
     int end_label_height = 15;
     int table_row_height = 20;
     int link_line_height = 10;
+    bool show_non_local_link_lines = true;
 
     bool auto_paint = true;
     bool show_full_train_name = false;

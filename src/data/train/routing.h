@@ -181,15 +181,32 @@ public:
      * 否则返回空
      * 2023.09.09: 此版本改为仅使用站名判断。对于实际铺画时需要的连线，采用preLinkedOnRailway()方法。
      * 原名  preLinked
+     * 2025.08.06: 取消前序列车必须铺画的限制；前序列车只需要有终到站时刻，且终到站与本次列车始发站相同即可。
      */
     RoutingNode* preLinkedByName(const Train& train);
 
     RoutingNode* postLinkedByName(const Train& train);
 
-    RoutingNode* preLinkedOnRailway(const Train& train, const Railway& railway);
+    /**
+     * 2025.08.06  Update. Returns the previous node if: 
+     * (1) Current train has first train line on given railway;
+     * (2) It is linked with previous node;
+     * (3.1) If allowNonLocalPre: previous train has same last station also on this railway;
+     * (3.2) Otherwise: prevous train has last station with the same name as the current train first station.
+     */
+    RoutingNode* preLinkedOnRailway(const Train& train, const Railway& railway, bool allowNonLocalPre);
 
     // 2024.03.01  add
     RoutingNode* postLinkedOnRailway(const Train& train, const Railway& railway);
+
+    /**
+     * 2025.08.06  Add: returns the next node if: 
+     * (1) it is linked with current node;
+     * (2) its first station does NOT bound to given railway;
+     * (3) current node has last station bound to given railway.
+     * This is provided for PRECISE calculation of post-link-line drawing (for non-local cases).
+     */
+    RoutingNode* postLinkedOnRailwayNonLocal(const Train& train, const Railway& railway);
 
     QString preOrderString(const Train& train);
 

@@ -532,10 +532,8 @@ RoutingNode* Routing::preLinkedByName(const Train& train)
     auto pre = std::prev(it);
     if (pre->isVirtual())
         return nullptr;
-    auto preend = pre->train()->boundTerminalRail();
     auto curstart = train.boundStartingRail();
-    //qDebug() << "preEnd: " << preend->name << "; curstart: " << curstart->name;
-    if (curstart && preend && preend->name.station() == curstart->name.station()) {
+    if (curstart && pre->train()->hasTerminalTime() && pre->train()->starting() == train.timetable().front().name) {
         return &(*pre);
     }
     return nullptr;
@@ -552,16 +550,17 @@ RoutingNode* Routing::postLinkedByName(const Train& train)
     if (post == _order.end() ||  post->isVirtual())
         return nullptr;
     auto curend = train.boundTerminalRail();
-    auto poststart = post->train()->boundStartingRail();
-    if (curend && poststart && curend->name.station() == poststart->name.station()) {
+    if (curend && post->train()->hasStartingTime() && post->train()->starting() == train.timetable().back().name) {
         return &(*post);
     }
     return nullptr;
 }
 
-RoutingNode* Routing::preLinkedOnRailway(const Train& train, const Railway& railway)
+RoutingNode* Routing::preLinkedOnRailway(const Train& train, const Railway& railway, bool allowNonLocalPre)
 {
     if (!train.hasRouting() || train.routing().lock().get() != this)
+        return nullptr;
+    if (!train.hasStartingTime())
         return nullptr;
     auto it = train.routingNode().value_or(_order.end());
     if (it == _order.begin() || it == _order.end())
@@ -569,16 +568,53 @@ RoutingNode* Routing::preLinkedOnRailway(const Train& train, const Railway& rail
     auto pre = std::prev(it);
     if (pre->isVirtual())
         return nullptr;
-    auto preend = pre->train()->boundTerminalAtRail(railway);
+    if (!pre->train()->hasTerminalTime())
+        return nullptr;
+    
     auto curstart = train.boundStartingAtRail(railway);
     //qDebug() << "preEnd: " << preend->name << "; curstart: " << curstart->name;
-    if (curstart && preend == curstart) {
-        return &(*pre);
+    if (allowNonLocalPre) {
+        if (curstart) {
+            if (!pre->train()->empty() && pre->train()->timetable().back().name == train.timetable().front().name) {
+                return &(*pre);
+            }
+        }
     }
+    else {
+        auto preend = pre->train()->boundTerminalAtRail(railway);
+        if (curstart && preend == curstart) {
+            return &(*pre);
+        }
+    }
+
     return nullptr;
 }
 
 RoutingNode* Routing::postLinkedOnRailway(const Train& train, const Railway& railway)
+{
+    if (!train.hasRouting() || train.routing().lock().get() != this)
+        return nullptr;
+    if (!train.hasTerminalTime())
+        return nullptr;
+    auto it = train.routingNode().value_or(_order.end());
+    if (it == _order.end()) {
+        return nullptr;
+    }
+    auto post = std::next(it);
+    if (post == _order.end() || post->isVirtual())
+        return nullptr;
+    if (!post->train()->hasStartingTime())
+        return nullptr;
+    auto prestart = post->train()->boundStartingAtRail(railway);
+    auto curend = train.boundTerminalAtRail(railway);
+    //qDebug() << "preEnd: " << preend->name << "; curstart: " << curstart->name;
+    if (curend && prestart == curend) {
+        return &(*post);
+    }
+    return nullptr;
+}
+
+RoutingNode* Routing::postLinkedOnRailwayNonLocal(const Train& train, const Railway& railway)
 {
     if (!train.hasRouting() || train.routing().lock().get() != this)
         return nullptr;
@@ -589,11 +625,15 @@ RoutingNode* Routing::postLinkedOnRailway(const Train& train, const Railway& rai
     auto post = std::next(it);
     if (post == _order.end() || post->isVirtual())
         return nullptr;
-    auto prestart = post->train()->boundStartingAtRail(railway);
+    auto poststart = post->train()->boundStartingAtRail(railway);
     auto curend = train.boundTerminalAtRail(railway);
     //qDebug() << "preEnd: " << preend->name << "; curstart: " << curstart->name;
-    if (curend && prestart == curend) {
-        return &(*post);
+    if (curend) {
+        if (poststart)
+            return nullptr;   // for current version, we do not allow purely LOCAL link lines
+        if (!post->train()->timetable().empty() && post->train()->timetable().front().name == train.timetable().back().name) {
+            return &(*post);
+        }
     }
     return nullptr;
 }

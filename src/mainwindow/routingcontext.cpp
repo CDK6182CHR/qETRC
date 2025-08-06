@@ -483,7 +483,7 @@ void RoutingContext::actRoutingOrderChange(std::shared_ptr<Routing> routing,
 }
 
 void RoutingContext::commitRoutingOrderChange(std::shared_ptr<Routing> routing,
-    QSet<std::shared_ptr<Train>> takenTrains)
+    [[maybe_unused]] QSet<std::shared_ptr<Train>> takenTrains)
 {
     // 2024.03.26: change to mainWindow call, for updating of trainContext if required.
     mw->repaintRoutingTrainLines(routing);
