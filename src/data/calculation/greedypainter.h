@@ -3,6 +3,8 @@
 #include "gapconstraints.h"
 #include "railwaystationeventaxis.h"
 #include "calculationlog.h"
+#include "greedypaintconfig.h"
+
 
 namespace _greedypaint_detail {
 	class RecurseLogger;
@@ -32,8 +34,10 @@ class GreedyPainter
 	bool _localStarting, _localTerminal, _anchorAsArrive;
 	Direction _dir;
 	TrainTime _anchorTime;
-	std::map<std::shared_ptr<const RailStation>, int> _settledStops;
-	std::set<const RailStation*> _fixedStations;
+
+	std::map<std::shared_ptr<const RailStation>, GreedyPaintStationConfigData> _stationConfigs;
+	//std::map<std::shared_ptr<const RailStation>, int> _settledStops;
+	//std::set<const RailStation*> _fixedStations;
 
 	friend class _greedypaint_detail::RecurseLogger;
 
@@ -75,10 +79,14 @@ public:
 	void setAnchorAsArrive(bool on) { _anchorAsArrive = on; }
 	auto& constraints() { return _constraints; }
 	const auto& constraints()const { return _constraints; }
-	auto& settledStops() { return _settledStops; }
-	const auto& settledStops()const { return _settledStops; }
-	auto& fixedStations() { return _fixedStations; }
-	const auto& fixedStations()const { return _fixedStations; }
+	//auto& settledStops() { return _settledStops; }
+	//const auto& settledStops()const { return _settledStops; }
+	//auto& fixedStations() { return _fixedStations; }
+	//const auto& fixedStations()const { return _fixedStations; }
+	void setStationConfigs(std::map<std::shared_ptr<const RailStation>, GreedyPaintStationConfigData> data) {
+		_stationConfigs = std::move(data); 
+	}
+	const auto& stationConfigs()const { return _stationConfigs; }
 	auto train() { return _train; }
 	auto& logs() { return _logs; }
 	auto& usedForbids() { return _usedForbids; }

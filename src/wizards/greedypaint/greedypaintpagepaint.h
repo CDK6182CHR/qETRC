@@ -5,6 +5,7 @@
 #include "util/buttongroup.hpp"
 #include "data/common/direction.h"
 #include "data/common/traintime.h"
+#include "data/calculation/greedypaintconfig.h"
 #include <set>
 #include <map>
 #include <QPointer>
@@ -43,6 +44,7 @@ public:
         ColMinute,
         ColSecond,
         ColFix,
+        ColTrack,
         ColActualStop,
         ColArrive,
         ColDepart,
@@ -83,6 +85,12 @@ public:
      * Return the fixed stations.
      */
     std::set<const RailStation*> fixedStations()const;
+
+    /**
+     * 2025.08.06  NEW API: station configuration data for each station, including previous stopSeconds and fixedStations()
+     */
+    std::map<std::shared_ptr<const RailStation>, GreedyPaintStationConfigData>
+        stationConfigs()const;
 
     // 2024.02.11: make public
     std::shared_ptr<const RailStation> stationForRow(int row)const;

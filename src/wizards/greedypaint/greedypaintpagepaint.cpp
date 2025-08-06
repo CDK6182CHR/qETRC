@@ -30,7 +30,7 @@ GreedyPaintConfigModel::GreedyPaintConfigModel(const DiagramOptions& ops, QWidge
     QStandardItemModel(parent), _ops(ops)
 {
     setColumnCount(ColMAX);
-    setHorizontalHeaderLabels({ tr("站名"),tr("锚"),tr("起"),tr("止"),tr("停分"),tr("停秒"),tr("固定"),
+    setHorizontalHeaderLabels({ tr("站名"),tr("锚"),tr("起"),tr("止"),tr("停分"),tr("停秒"),tr("固定"),tr("股道"),
         tr("实停"),tr("到达时刻"),tr("出发时刻") });
     connect(this, &GreedyPaintConfigModel::dataChanged,
         this, &GreedyPaintConfigModel::onDataChanged);
@@ -101,6 +101,9 @@ void GreedyPaintConfigModel::refreshData()
 
         it = makeCheckItem();
         setItem(row, ColFix, it);
+
+        it = new SI;
+        setItem(row, ColTrack, it);
 
         setItem(row, ColActualStop, makeReadonlyItem());
         setItem(row, ColArrive, makeReadonlyItem());
@@ -257,6 +260,29 @@ std::set<const RailStation*> GreedyPaintConfigModel::fixedStations() const
     for (int r = _availableFirstRow; r <= _availableLastRow; r++) {
         if (auto st = item(r, ColFix)->checkState(); st == Qt::Checked) {
             res.emplace(stationForRow(r).get());
+        }
+    }
+    return res;
+}
+
+std::map<std::shared_ptr<const RailStation>, GreedyPaintStationConfigData>
+    GreedyPaintConfigModel::stationConfigs()const
+{
+    std::map<std::shared_ptr<const RailStation>, GreedyPaintStationConfigData> res{};
+
+    for (int r = _availableFirstRow; r <= _availableLastRow; r++) {
+        auto st = stationForRow(r);
+        
+        if (int secs = stopSecsForRow(r)) {
+            res[st].settledStopSecs = secs;
+        }
+
+        if (auto stat = item(r, ColFix)->checkState(); stat == Qt::Checked) {
+            res[st].fixedStop = true;
+        }
+
+        if (const auto& track = item(r, ColTrack)->text(); !track.isEmpty()) {
+            res[st].track = track;
         }
     }
     return res;
@@ -578,7 +604,7 @@ void GreedyPaintPagePaint::initUI()
     vlay->addWidget(table);
 
     int c = 0;
-    for (auto w : { 120,40,40,40,60,60,40,70,80,80 }) {
+    for (auto w : { 120,40,40,40,60,60,40,60,70,80,80 }) {
         table->setColumnWidth(c++, w);
     }
 
@@ -633,8 +659,9 @@ std::shared_ptr<Train> GreedyPaintPagePaint::doPaintTrain()
     painter.setStart(_model->startStation());
     painter.setEnd(_model->endStation());
     painter.setAnchorAsArrive(gpAnchorRole->get(0)->isChecked());
-    painter.settledStops() = _model->stopSeconds();
-    painter.fixedStations() = _model->fixedStations();
+    //painter.settledStops() = _model->stopSeconds();
+    //painter.fixedStations() = _model->fixedStations();
+    painter.setStationConfigs(_model->stationConfigs());
 
     using namespace std::chrono_literals;
     auto tm_start = std::chrono::system_clock::now();
