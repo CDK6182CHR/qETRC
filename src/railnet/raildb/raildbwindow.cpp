@@ -60,7 +60,7 @@ void RailDBWindow::initUI()
 
     connect(editor, &RailStationWidget::railNameChanged,
         this, &RailDBWindow::onEditorRailNameChanged);
-    connect(editor->getModel(), &RailStationModel::actStationTableChanged,
+    connect(editor, &RailStationWidget::railStationsChanged,
         this, &RailDBWindow::onEditorStationChanged);
     connect(editor, &RailStationWidget::invalidApplyRequest,
         this, &RailDBWindow::onEditorInvalidApplied);

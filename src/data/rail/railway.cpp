@@ -48,6 +48,7 @@ Railway& Railway::operator=(const Railway& other)
 {
 	_name = other._name;
 	_notes = other._notes;
+	_startMilestone = other._startMilestone;
 	_diagramHeightCoeff = other._diagramHeightCoeff;
 	numberMapEnabled = false;
 	_stations.clear();
@@ -86,6 +87,7 @@ void Railway::fromJson(const QJsonObject& obj)
 
 	_name = obj.value("name").toString();
 	_notes.fromJson(obj.value("notes").toObject());
+	_startMilestone = obj.value("start_milestone").toDouble(0.0);
 	const QJsonArray& ar = obj.value("stations").toArray();
 	for (auto t = ar.cbegin(); t != ar.cend(); t++) {
 		appendStation(RailStation(t->toObject()));
@@ -110,6 +112,7 @@ QJsonObject Railway::toJson() const
 {
 	auto obj = QJsonObject({
 		 {"name",_name},
+		 {"start_milestone",_startMilestone},
 		 {"notes",_notes.toJson()}
 		});
 	QJsonArray ar;
@@ -268,11 +271,11 @@ void Railway::removeStation(int index)
 	removeMapInfo(name);
 }
 
-void Railway::adjustMileToZero()
+void Railway::adjustMileToFitStart()
 {
 	if (_stations.empty())
 		return;
-	double m0 = _stations[0]->mile;
+	double m0 = _stations[0]->mile - _startMilestone;
 	std::optional<double> c0 = _stations[0]->counter;
 	for (auto& t : _stations) {
 		t->mile -= m0;
@@ -280,7 +283,7 @@ void Railway::adjustMileToZero()
 	if (c0.has_value()) {
 		for (auto& t : _stations) {
 			if (t->counter.has_value()) {
-				t->counter.value() -= c0.value();
+				t->counter.value() -= c0.value() - _startMilestone;
 			}
 		}
 	}
@@ -1151,6 +1154,7 @@ void Railway::swapBaseWith(Railway& other)
 	std::swap(nameMap, other.nameMap);
 	std::swap(fieldMap, other.fieldMap);
 	std::swap(_diagramHeightCoeff, other._diagramHeightCoeff);
+	std::swap(_startMilestone, other._startMilestone);
 
 	// 2022.04.03：保证Ruler/Forbid中的头结点引用正确。
 	// 这里不需要考虑对方的，即要求调用的this指针是起作用的那个。
@@ -1181,6 +1185,7 @@ void Railway::swapBaseWith(Railway& other)
 std::shared_ptr<Railway> Railway::cloneBase() const
 {
 	auto res = std::make_shared<Railway>();
+	res->_startMilestone = _startMilestone;
 	for (auto p : _stations) {
 		res->appendStation(*p);
 	}
@@ -1728,7 +1733,7 @@ void Railway::symmetrize()
 double Railway::calStationYCoeffByMile()
 {
 	for (auto& p : _stations) {
-		p->y_coeff = p->mile;
+		p->y_coeff = p->mile - _startMilestone;   // 2025.08.07: subsract the start_milestone
 	}
 	if (!_stations.empty())
 		_diagramHeightCoeff = _stations.last()->y_coeff.value();

@@ -10,6 +10,8 @@ class RailStationModel;
 class QEControlledTable;
 struct RailInfoNote;
 class QPlainTextEdit;
+class QDoubleSpinBox;
+
 
 class RailNoteDialog :
     public QDialog
@@ -45,6 +47,7 @@ class RailStationWidget : public QWidget
     const bool commitInPlace;
     std::shared_ptr<Railway> railway;
     QLineEdit* edName;
+    QDoubleSpinBox* spStartMile;
     RailCategory& cat;
     bool _changed = false;
 public:
@@ -83,6 +86,7 @@ protected:
 private:
     void initUI();
    
+    void adjustStationMiles(double v);
 
 signals:
 
@@ -90,6 +94,9 @@ signals:
      * 此信号发送给railcontext来执行压栈
      */
     void railNameChanged(std::shared_ptr<Railway> railway, const QString& name);
+
+    void railStationsChanged(std::shared_ptr<Railway> railway, std::shared_ptr<Railway> newtable,
+        bool equiv);
 
     void focusInRailway(std::shared_ptr<Railway> rail);
 
@@ -109,6 +116,7 @@ private slots:
     void actNote();
     void actExportCsv();
     void actImportCsv();
+    void actAdjustMiles();
 };
 
 

@@ -2206,7 +2206,7 @@ void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
 	w->setRailway(rail);
 	connect(w, &RailStationWidget::railNameChanged,
 		contextRail, &RailContext::actChangeRailName);
-	connect(w->getModel(), &RailStationModel::actStationTableChanged,
+	connect(w, &RailStationWidget::railStationsChanged,
 		contextRail, &RailContext::actUpdateTimetable);
 	connect(w, &RailStationWidget::focusInRailway,
 		this, &MainWindow::focusInRailway);

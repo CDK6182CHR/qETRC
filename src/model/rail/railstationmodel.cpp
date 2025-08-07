@@ -200,18 +200,19 @@ bool RailStationModel::checkRailway(std::shared_ptr<Railway> rail)
     }
 
     auto first = rail->stations().first();
-    if (first->mile != 0 || first->counter.value_or(0) != 0) {
-        auto res = QMessageBox::question(par, tr("提示"), tr("本线首站里程或对里程不为0。"
-            "是否要调整所有站里程，以使得首站里程归零？"));
+    if (first->mile != rail->startMilestone() || first->counter.value_or(rail->startMilestone()) != rail->startMilestone()) {
+        auto res = QMessageBox::question(par, tr("提示"), tr("本线首站里程或对里程与起始里程标 [%1 km] 不一致。"
+            "是否要调整所有站里程，以使得首站里程与起始里程标一致？").arg(rail->startMilestone()));
         if (res == QMessageBox::Yes)
-            rail->adjustMileToZero();
+            rail->adjustMileToFitStart();
     }
     return true;
 }
 
-std::shared_ptr<Railway> RailStationModel::generateRailway() const
+std::shared_ptr<Railway> RailStationModel::generateRailway(double startMilestone) const
 {
     auto rail = std::make_shared<Railway>(railway->name());
+    rail->setStartMilestone(startMilestone);
     QWidget* p = qobject_cast<QWidget*>(parent());
     for (int i = 0; i < rowCount(); i++) {
         const auto& name_str = item(i, ColName)->text();
@@ -258,14 +259,14 @@ std::shared_ptr<const RailStation> RailStationModel::getRowStation(int row)
 
 //#include <data/rail/forbid.h>
 
-bool RailStationModel::applyChange()
+bool RailStationModel::applyChangeInplace(double startMile)
 {
-    auto rail = generateRailway();
+    auto rail = generateRailway(startMile);
     if (!rail)
         return false;
     if (!checkRailway(rail))
         return false;
-    bool equiv = rail->mergeIntervalData(*railway);
+    [[maybe_unused]] bool equiv = rail->mergeIntervalData(*railway);
 
     if (commitInPlace) {
         //不支持撤销，通常也不需要通告别人 
@@ -275,12 +276,24 @@ bool RailStationModel::applyChange()
     }
     else {
         //支持撤销，则交给Context处理
-        emit actStationTableChanged(railway, rail, equiv);
+        //emit actStationTableChanged(railway, rail, equiv);
+        // 2025.08.07: for this version, we do not allow this case!!
+        qCritical() << "RailStationModel::applyChangeInplace: called with !commitInPlace case, no operation done!!";
     }
     //qDebug() << "AFTER EMIT";
     //qDebug() << railway.get() << ", " << railway->forbids().at(0)->railway().get() << Qt::endl;
     //railway->getForbid(0)->_show();
     return true;
+}
+
+std::shared_ptr<Railway> RailStationModel::appliedData(double startMilestone)
+{
+    auto rail = generateRailway(startMilestone);
+    if (!rail)
+        return nullptr;
+    if (!checkRailway(rail))
+        return nullptr;
+    return rail;
 }
 
 #define CHECK_PARSE_SUCCESS(flag, field) if (! flag) { \
@@ -363,11 +376,6 @@ int RailStationModel::fromCsv(const QString& filename, QString& report)
         setStationRow(cnt-1, st);
     }
     return cnt;
-}
-
-void RailStationModel::actApply()
-{
-    applyChange();
 }
 
 void RailStationModel::actCancel()

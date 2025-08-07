@@ -44,6 +44,12 @@ class Railway:
     QList<std::shared_ptr<Forbid>> _forbids;
 
     /**
+     * 2025.08.07: Start milestone, meaning that all mileage values should SUBTRACT this value.
+     * The previous version is equivalent to this value always being zero.
+     */
+    double _startMilestone = 0;
+
+    /**
      * @brief _ordinate  排图标尺指针
      * 注意排图标尺现在改为Railway的性质，用以支持多条线路平铺。
      */
@@ -168,6 +174,9 @@ public:
      */
     bool containsGeneralStation(const StationName& name)const;
 
+    double startMilestone()const { return _startMilestone; }
+    void setStartMilestone(double v) { _startMilestone = v; }
+
     /**
      * 与pyETRC不同：暂定不存在的站返回-1
      */
@@ -183,8 +192,9 @@ public:
 
     /**
      * Line.adjustLichengTo0
+     * 2025.08.07  renamed: adjustMileToZero -> adjustMileToFitStart
      */
-    void adjustMileToZero();
+    void adjustMileToFitStart();
 
     /**
      * Line.isDownGap()

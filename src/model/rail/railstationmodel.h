@@ -69,7 +69,7 @@ public:
      * 按当前数据生成Railway对象。新对象只包含线路基础数据。
      * 可能会出错（例如，站名重复），此时返回空。
      */
-    std::shared_ptr<Railway> generateRailway()const;
+    std::shared_ptr<Railway> generateRailway(double startMilestone)const;
 
     /**
      * 站名列保存的站点指针信息。
@@ -80,8 +80,16 @@ public:
     /**
      * 修改并报告结果（是否成功）。
      * 不是slot。seealso `actApply`
+     * 2025.08.07  This is only available for commitInPlace case!
      */
-    bool applyChange();
+    bool applyChangeInplace(double startMile=0);
+
+    /**
+     * 2025.08.07  Generate railway data according to data stored here. Return nullptr,
+     * if the data is not valid.
+     * The data committing is now handled by the RailStationWidget, instead of the model.
+     */
+    std::shared_ptr<Railway> appliedData(double startMilestone);
 
     /**
      * 2025.05.26  Experimental: load data from CSV. Does NOT commit the data.
@@ -93,9 +101,10 @@ signals:
 
     /**
      * 将实际处理的权限交给RailContext
+     * 2025.08.07  Moved to RailStationWidget
      */
-    void actStationTableChanged(std::shared_ptr<Railway> railway,std::shared_ptr<Railway> newtable,
-        bool equiv);
+    //void actStationTableChanged(std::shared_ptr<Railway> railway,std::shared_ptr<Railway> newtable,
+    //    bool equiv);
 
     void dataSubmitted();
 
@@ -105,8 +114,9 @@ public slots:
      * 提交数据，即点击了确定
      * 注意不能用submit...这个会被自动Call
      * seealso `applyChange()`
+     * 2025.08.07: now the applying is handled by the parent widget
      */
-    void actApply();
+    //void actApply();
 
     /**
      * 撤销数据更改，即点击还原

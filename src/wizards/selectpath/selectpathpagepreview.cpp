@@ -104,7 +104,7 @@ bool SelectPathPagePreview::applyChange()
 {
     if(!railway) return false;
     railway->setName(edName->text());
-    return model->applyChange();
+    return model->applyChangeInplace();
 }
 
 void SelectPathPagePreview::actSave()

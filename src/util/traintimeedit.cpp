@@ -218,6 +218,10 @@ QSize TrainTimeEdit::sizeHint() const
 
 void TrainTimeEdit::updateTime()
 {
+    // 2025.08.07: we do not allow invalid time here
+    if (m_time.isNull()) {
+        m_time = TrainTime::fromSecondsSinceStart(0);
+    }
     int currrent_cursor_pos = lineEdit()->cursorPosition();
     const QString old = lineEdit()->text();
     lineEdit()->setText(m_time.toString(m_format));

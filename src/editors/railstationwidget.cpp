@@ -8,6 +8,7 @@
 #include "data/common/qesystem.h"
 #include "data/rail/railway.h"
 #include "data/rail/railcategory.h"
+#include "defines/icon_specs.h"
 
 #include <QFormLayout>
 #include <QLineEdit>
@@ -20,6 +21,9 @@
 #include <QScroller>
 #include <QAction>
 #include <QFileDialog>
+#include <QDoubleSpinBox>
+#include <QToolButton>
+#include <QInputDialog>
 
 
 RailStationWidget::RailStationWidget(RailCategory& cat_, bool inplace, QWidget* parent) :
@@ -47,16 +51,21 @@ void RailStationWidget::setRailway(std::shared_ptr<Railway> rail)
 
 void RailStationWidget::refreshBasicData()
 {
-	if (railway)
+	if (railway) {
 		edName->setText(railway->name());
-	else edName->clear();
+		spStartMile->setValue(railway->startMilestone());
+	}
+	else {
+		edName->clear();
+		spStartMile->setValue(0);
+	}
 }
 
 void RailStationWidget::refreshData()
 {
 	if (!railway)return;
 	model->refreshData();
-	edName->setText(railway->name());
+	refreshBasicData();
 	_changed = false;
 }
 
@@ -89,7 +98,44 @@ void RailStationWidget::initUI()
 
 	auto* form = new QFormLayout;
 	edName = new QLineEdit;
-	form->addRow(tr("线名"), edName);
+	form->addRow(tr("线路名称"), edName);
+
+	auto* hlay = new QHBoxLayout;
+	spStartMile = new QDoubleSpinBox();
+	spStartMile->setDecimals(3);
+	spStartMile->setRange(-1000000.0, 10000000.0);
+	spStartMile->setSingleStep(1);
+	spStartMile->setSuffix(" km");
+	hlay->addWidget(spStartMile);
+
+	auto* tbtn = new QToolButton;
+	tbtn->setIcon(QIcon(QEICN_rail_start_mile_info));
+	connect(tbtn, &QToolButton::triggered, [this]() {
+		QMessageBox::information(this, tr("起始里程"),
+			tr("起始里程设置本线车站里程标的起点，一般应与站表首站的里程标一致。运行图的绘制自此里程标开始。"
+				"所有车站的里程减去此里程标所得距离是其位置距离本线起点的距离。\n"
+				"此功能自1.8.2版本添加。此前的版本相当于起始里程固定为0。\n"
+				"非零的设置值可用于某线路的中间一段，并使得本程序中的里程标与线路上车站的实际里程标相一致。"));
+		});
+	hlay->addWidget(tbtn);
+
+	auto* btn = new QPushButton(tr("设为首站里程标"));
+	btn->setToolTip(tr("设置“起始里程”数值为首站的里程"));
+	connect(btn, &QPushButton::clicked, [this]() {
+		if (model->rowCount()) {
+			double v = model->item(0, model->ColMile)->data(Qt::EditRole).toDouble();
+			spStartMile->setValue(v);
+		}
+		});
+	hlay->addWidget(btn);
+	hlay->addStretch(1);
+
+	btn = new QPushButton(tr("平移所有车站里程标..."));
+	btn->setToolTip(tr("将所有车站的里程标平移给定的数值（不影响起始里程的设置）"));
+	connect(btn, &QPushButton::clicked, this, &RailStationWidget::actAdjustMiles);
+	hlay->addWidget(btn);
+	form->addRow(tr("起始里程"), hlay);
+
 	vlay->addLayout(form);
 
 	ctable = new QEControlledTable;
@@ -133,6 +179,26 @@ void RailStationWidget::initUI()
 	vlay->addLayout(g);
 	
 	setLayout(vlay);
+}
+
+void RailStationWidget::adjustStationMiles(double val)
+{
+	for (int row = 0; row < model->rowCount(); row++) {
+		auto* it = model->item(row, model->ColMile);
+		it->setData(
+			it->data(Qt::EditRole).toDouble() + val,
+			Qt::EditRole
+		);
+
+		it = model->item(row, model->ColCounter);
+		if (const QString& txt = it->text(); !txt.isEmpty()) {
+			bool txt_ok;
+			double counter_mile = txt.toDouble(&txt_ok);
+			if (txt_ok) {
+				it->setText(QString::number(counter_mile + val, 'f', 3));
+			}
+		}
+	}
 }
 
 void RailStationWidget::actCancel()
@@ -189,6 +255,19 @@ void RailStationWidget::actImportCsv()
 	}
 }
 
+void RailStationWidget::actAdjustMiles()
+{
+	bool ok;
+	double val = QInputDialog::getDouble(this, tr("调整里程"),
+		tr("请输入要平移里程的数值。将为所有车站的里程标（含对里程）加上所给数值。"),
+		0.0, -1000000, 10000000, 3, &ok
+	);
+	if (!ok)
+		return;
+
+	adjustStationMiles(val);
+}
+
 void RailStationWidget::actApply()
 {
 	if (!railway) {
@@ -211,7 +290,22 @@ void RailStationWidget::actApply()
 			emit railNameChanged(railway, name);
 		}
 	}
-	model->actApply();
+
+	auto railData = model->appliedData(spStartMile->value());
+	if (!railData)
+		return;
+
+	bool equiv = railData->mergeIntervalData(*railway);
+
+	if (commitInPlace) {
+		// Nothing to do for now!
+		railway->swapBaseWith(*railData);
+		refreshData();
+	}
+	else {
+		emit railStationsChanged(railway, railData, equiv);
+	}
+
 	_changed = false;
 }
 

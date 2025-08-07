@@ -73,7 +73,7 @@ void RailPreviewDialog::actConfirm()
         return;
     railway->setName(edName->text());
 
-    bool flag=model->applyChange();
+    bool flag=model->applyChangeInplace();
     if(flag){
         emit railConfirmed(railway);
         railway.reset();   // 放弃所有权，使得当前对象被删除
