@@ -183,7 +183,7 @@ void RailDBWindow::onEditorRailNoteChanged(std::shared_ptr<Railway> railway,
 void RailDBWindow::commitUpdateRailName(std::shared_ptr<Railway> railway, const std::deque<int>& path)
 {
     if (editor->getRailway() == railway) {
-        editor->refreshBasicData();
+        editor->refreshRailName();
     }
     navi->getModel()->onRailInfoChanged(railway, path);
 }

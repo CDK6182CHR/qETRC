@@ -60,6 +60,8 @@ public:
      */
     void refreshBasicData();
 
+    void refreshRailName();
+
     void refreshData();
 
     auto getRailway() { return railway; }

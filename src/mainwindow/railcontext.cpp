@@ -637,7 +637,7 @@ void RailContext::commitChangeRailName(std::shared_ptr<Railway> rail)
 	//更新打开的窗口标题
 	for (int i = 0; i < mw->railStationWidgets.size(); i++) {
 		auto w = mw->railStationWidgets.at(i);
-		w->refreshBasicData();
+		w->refreshRailName();
 		if (w->getRailway() == rail) {
 			mw->railStationDocks.at(i)->setWindowTitle(tr("基线编辑 - ") + rail->name());
 		}

@@ -63,6 +63,16 @@ void RailStationWidget::refreshBasicData()
 	}
 }
 
+void RailStationWidget::refreshRailName()
+{
+	if (railway) {
+		edName->setText(railway->name());
+	}
+	else {
+		edName->clear();
+	}
+}
+
 void RailStationWidget::refreshData()
 {
 	if (!railway)return;
