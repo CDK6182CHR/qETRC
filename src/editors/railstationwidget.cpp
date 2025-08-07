@@ -42,9 +42,11 @@ void RailStationWidget::setRailway(std::shared_ptr<Railway> rail)
 	model->setRailway(rail);
 	if (railway) {
 		edName->setText(railway->name());
+		spStartMile->setValue(railway->startMilestone());
 	}
 	else {
 		edName->clear();
+		spStartMile->setValue(0);
 	}
 	_changed = false;
 }
