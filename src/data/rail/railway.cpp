@@ -795,7 +795,23 @@ std::shared_ptr<const RailStation> Railway::firstDirStation(Direction dir) const
 	}
 }
 
+std::shared_ptr<RailStation> Railway::firstDownStationInList()
+{
+	for (auto p : _stations) {
+		if (p->isDownVia())
+			return p;
+	}
+	return nullptr;
+}
 
+std::shared_ptr<RailStation> Railway::firstUpStationInList()
+{
+	for (auto p : _stations) {
+		if (p->isUpVia())
+			return p;
+	}
+	return nullptr;
+}
 
 void Railway::showStations() const
 {
@@ -1033,9 +1049,92 @@ bool Railway::calStationYCoeff()
 	}
 	//标尺排图
 	auto ruler = ordinate();
-	double y = 0;
+
+	// 2025.08.08: EXPERIMENTAL: new algorithm that allows first/last stations to be single-directional.
+	// Brief: use previous algorithm between the first and last bidirectional stations, and new "open" algorithm 
+	// outside the bidirectional bound.
 
 	// 2025.08.08: EXPERIMENTAL: new algorithm that does not require the first and last station to be bidirectional
+	std::shared_ptr<RailStation> first_bidir_st, last_bidir_st;
+	for (int i = 0; i < _stations.size(); i++) {
+		if (_stations[i]->direction == PassedDirection::BothVia) {
+			first_bidir_st = _stations[i];
+			break;
+		}
+	}
+
+	if (first_bidir_st) {
+		// We have at least one Bidir station; first determine the y-coeffs inside the bidir bound
+		for (int i = _stations.size() - 1; i >= 0; i--) {
+			if (_stations[i]->direction == PassedDirection::BothVia) {
+				last_bidir_st = _stations[i];
+				break;
+			}
+		}
+
+		bool flag = calStationYCoeffInBidirBound(ruler, first_bidir_st, last_bidir_st);
+		if (!flag) {
+			resetOrdinate();
+			calStationYCoeffByMile();
+			return false;
+		}
+
+		// Open part: first the tail part
+		bool succ = false;
+		double min_y = 0;
+		do {
+			auto [flag1, max_y_down] = calStationYCoeffOpen(ruler, last_bidir_st, Direction::Down, last_bidir_st->y_coeff.value());
+			if (!flag1)	break;
+
+			auto [flag2, max_y_up] = calStationYCoeffOpenReverse(ruler, last_bidir_st, Direction::Up, last_bidir_st->y_coeff.value());
+			if (!flag2)	break;
+
+			auto [flag3, min_y_down] = calStationYCoeffOpenReverse(ruler, first_bidir_st, Direction::Down, 0);
+			if (!flag3) break;
+
+			auto [flag4, min_y_up] = calStationYCoeffOpen(ruler, first_bidir_st, Direction::Up, 0);
+			if (!flag4) break;
+
+			min_y = std::min(min_y_up, min_y_down);
+			_diagramHeightCoeff = std::max(max_y_down, max_y_up) - min_y;
+
+			succ = true;
+		} while (false);
+		
+		if (succ) {
+			shiftYCoeffs(-min_y);
+		}
+		else {
+			resetOrdinate();
+			calStationYCoeffByMile();
+			return false;
+		}
+	}
+	else {
+		// we do not have any bidirectional stations; just use open alg for both directions
+		bool succ = false;
+		do {
+			auto [flag1, max_y_down] = calStationYCoeffOpen(ruler, firstDownStationInList(), Direction::Down, 0);
+			if (!flag1) break;
+
+			auto [flag2, max_y_up] = calStationYCoeffOpenReverse(ruler, firstUpStationInList(), Direction::Up, 0);
+			if (!flag2) break;
+
+			_diagramHeightCoeff = std::max(max_y_down, max_y_up);
+			succ = true;
+		} while (false);
+
+		if (!succ) {
+			resetOrdinate();
+			calStationYCoeffByMile();
+			return false;
+		}
+	}
+	return true;
+
+#if 0
+	/////////////////////////////// LAST VERSION ////////////////////////////////
+
 	
 	std::shared_ptr<RailStation> st;
 	// Skip all non-passed stations if any (this should never happen in pricinple!)
@@ -1152,6 +1251,7 @@ bool Railway::calStationYCoeff()
 	}
 
 	return true;
+#endif
 }
 
 bool Railway::topoEquivalent(const Railway& another) const
@@ -1819,6 +1919,122 @@ double Railway::calStationYCoeffByMile()
 	if (!_stations.empty())
 		_diagramHeightCoeff = _stations.last()->y_coeff.value();
 	return _diagramHeightCoeff;
+}
+
+bool Railway::calStationYCoeffInBidirBound(std::shared_ptr<Ruler> ruler, 
+	std::shared_ptr<RailStation> first, std::shared_ptr<RailStation> last)
+{
+	assert(first && first->direction == PassedDirection::BothVia);
+	assert(last && last->direction == PassedDirection::BothVia);
+
+	// This special case is valid for calling this function, but we cannot safely get the next interval data, thus return here
+	first->y_coeff = 0;
+	if (first == last) {
+		return true;
+	}
+
+	// Down
+	double y = 0;
+	
+	for (auto node = first->dirNextInterval(Direction::Down)->getRulerNode(ruler); node; node = node->nextNode()) {
+		if (node->isNull()) {
+			qDebug() << "Railway::calStationYValueInBidirBound: WARNING: "
+				<< "Ruler [" << ruler->name() << "] not complete, cannot be used as"
+				<< "ordinate ruler. Interval: " << node->railInterval();
+			return false;
+		}
+
+		y += node->interval;
+		auto st_to = node->railInterval().toStation();
+		st_to->y_coeff = y;
+		if (st_to == last)
+			break;
+	}
+
+	// Up
+	for (auto node = last->dirNextInterval(Direction::Up)->getRulerNode(ruler); node; node = node->nextNode()) {
+		auto toStation = node->railInterval().toStation();
+		if (!toStation->y_coeff.has_value()) {
+			auto rboth = rightBothStation(toStation), lboth = leftBothStation(toStation);
+			//qDebug() << "determine-up: toStation " << toStation->name << ", rboth/lboth " << rboth->name << "/" << lboth->name;
+
+			// 2025.08.08: this must be valid because we only loop in the bidirectional bound!
+			assert(rboth && lboth);
+
+			int upLeft = ruler->totalInterval(toStation, lboth, Direction::Up);
+			int upRight = ruler->totalInterval(rboth, toStation, Direction::Up);
+
+			if (upLeft < 0 || upRight < 0) {
+				qDebug() << "Railway::calStationYValueInBidirBound: WARNING: "
+					<< "Ruler [" << ruler->name() << "] not complete, cannot be used as"
+					<< "ordinate ruler. Null interval found while locating up-via stations around " << toStation->name.toSingleLiteral();
+				return false;
+			}
+
+			double toty = rboth->y_coeff.value() - lboth->y_coeff.value();
+			y = rboth->y_coeff.value() - toty * upRight / (upLeft + upRight);
+			toStation->y_coeff = y;
+		}
+		if (toStation == first)
+			break;
+	}
+	return true;
+}
+
+std::pair<bool, double> Railway::calStationYCoeffOpen(std::shared_ptr<Ruler> ruler, std::shared_ptr<RailStation> from, 
+	Direction dir, double start_y_coeff)
+{
+	int sig = dir == Direction::Down ? 1 : -1;
+	double y = start_y_coeff;
+	from->y_coeff = y;
+
+	auto next_int = from->dirNextInterval(dir);
+	if (!next_int) {
+		return { true, y };
+	}
+
+	for (auto node = next_int->getRulerNode(ruler); node; node = node->nextNode()) {
+		if (node->isNull()) {
+			qDebug() << "Railway::calStationYCoeffOpen: invalid node encountered; int: " << node->railInterval();
+			return { false, y };
+		}
+		y += node->interval * sig;
+		node->railInterval().toStation()->y_coeff = y;
+	}
+	return { true, y };
+}
+
+std::pair<bool, double> Railway::calStationYCoeffOpenReverse(std::shared_ptr<Ruler> ruler, 
+	std::shared_ptr<RailStation> from, Direction dir, double start_y_coeff)
+{
+	int sig = dir == Direction::Down ? -1 : 1;
+	double y = start_y_coeff;
+	from->y_coeff = y;
+
+	auto prev_int = from->dirPrevInterval(dir);
+	if (!prev_int) {
+		return { true,y };
+	}
+
+	for (auto node = prev_int->getRulerNode(ruler); node; node = node->prevNode()) {
+		if (node->isNull()) {
+			qDebug() << "Railway::calStationYCoeffOpenReverse: invalid node encountered; int: " << node->railInterval();
+			return { false, y };
+		}
+
+		y += node->interval * sig;
+		node->railInterval().fromStation()->y_coeff = y;
+	}
+	return { true, y };
+}
+
+void Railway::shiftYCoeffs(double dy)
+{
+	foreach(auto p, _stations) {
+		if (p->y_coeff.has_value()) {
+			p->y_coeff = p->y_coeff.value() + dy;
+		}
+	}
 }
 
 void Railway::clearYValues()

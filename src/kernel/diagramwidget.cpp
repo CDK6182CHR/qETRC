@@ -1223,6 +1223,11 @@ void DiagramWidget::setHLines(int idx, std::shared_ptr<Railway> rail, double sta
     bool cumvalid = true;
     int maxpassen = 0, maxfreigh = 0;
 
+    // 2025.08.08: the lasty should actually be the first station y-value (mind the safety for null case)
+    if (auto first_down_st = rail->firstDownStation()) {
+        lasty += rail->yValueFromCoeff(first_down_st->y_coeff.value(), cfg);
+    }
+
     // 区间对数表
     Diagram::sec_cnt_t passencnt, freighcnt;
     if (cfg.show_count_bar) {
@@ -1253,7 +1258,7 @@ void DiagramWidget::setHLines(int idx, std::shared_ptr<Railway> rail, double sta
         //标注数据
         if (p == upFirst) {
             //方向转换，清理旧数据
-            lasty = start_y + height;
+            lasty = start_y + rail->yValueFromCoeff(p->fromStation()->y_coeff.value(), cfg);
             cummile = 0.0;
             cuminterval = 0;
         }
@@ -1306,27 +1311,39 @@ void DiagramWidget::setHLines(int idx, std::shared_ptr<Railway> rail, double sta
         
     }
     //补充起点的下行和终点的上行边界
-    if (cfg.show_ruler_bar) {
-        leftItems.append(scene()->addLine(
-            margins.left_white, start_y, margins.left_white + margins.ruler_label_width / 2.0, start_y,
-            defaultPen
-        ));
-        leftItems.append(scene()->addLine(
-            margins.left_white + margins.ruler_label_width / 2.0,
-            start_y + height, margins.left_white + margins.ruler_label_width, start_y + height, defaultPen
-        ));
+    
+
+    if (auto first_down_st = rail->firstDownStation()) {
+        double first_station_y = start_y + rail->yValueFromCoeff(first_down_st->y_coeff.value(), cfg);
+        if (cfg.show_ruler_bar) {
+            leftItems.append(scene()->addLine(
+                margins.left_white, first_station_y, margins.left_white + margins.ruler_label_width / 2.0, first_station_y,
+                defaultPen
+            ));
+        }
+        if (cfg.show_count_bar) {
+            leftItems.append(scene()->addLine(
+                margins.left_white, first_station_y, margins.left_white + margins.ruler_label_width / 2.0, first_station_y,
+                defaultPen
+            ));
+        }
     }
-    if (cfg.show_count_bar) {
-        rightItems.append(scene()->addLine(
-            scene()->width() - margins.right_white - margins.count_label_width, start_y,
-            scene()->width() - margins.right_white - margins.count_label_width / 2.0, start_y,
-            defaultPen
-        ));
-        rightItems.append(scene()->addLine(
-            scene()->width() - margins.right_white - margins.count_label_width / 2.0,
-            start_y + height,
-            scene()->width() - margins.right_white, start_y + height, defaultPen
-        ));
+
+    if (auto first_up_st = rail->firstUpStation()) {
+        double first_up_y = start_y + rail->yValueFromCoeff(first_up_st->y_coeff.value(), cfg);
+        if (cfg.show_ruler_bar) {
+            leftItems.append(scene()->addLine(
+                margins.left_white + margins.ruler_label_width / 2.0,
+                first_up_y, margins.left_white + margins.ruler_label_width, first_up_y, defaultPen
+            ));
+        }
+        if (cfg.show_count_bar) {
+            rightItems.append(scene()->addLine(
+                scene()->width() - margins.right_white - margins.count_label_width / 2.0,
+                first_up_y,
+                scene()->width() - margins.right_white, first_up_y, defaultPen
+            ));
+        }
     }
 }
 

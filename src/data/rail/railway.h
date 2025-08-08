@@ -399,6 +399,14 @@ public:
 
     std::shared_ptr<const RailStation> firstDirStation(Direction dir)const;
 
+    /**
+     * 2025.08.08  first down/up station in list: the first station (in the list from first to last).
+     * Same as firstDownStation(), but different from firstUpStation() because the later searches from the bottom...
+     */
+    std::shared_ptr<RailStation> firstDownStationInList();
+
+    std::shared_ptr<RailStation> firstUpStationInList();
+
     inline const QString& name()const{
         return _name;
     }
@@ -792,6 +800,37 @@ private:
      * 2021.10.08：取消Config依赖
      */
     double calStationYCoeffByMile();
+
+    /**
+     * 2025.08.08  Similar to previous calStationYCoeff. 
+     * Compute the station y-coefficients inside the so-called bidirectional bound, which is defined by the
+     * `first` and `last` station (in the arguments, both included). 
+     * The first and last stations are guaranteed to be BothVia and not-null.
+     * Returns: whether succeeded (using the ordinate ruler). Returns false if not, and calStationYCoeffByMile() will be needed
+     * (not called here!)
+     * The y_coefficients are automatically assigned from 0 for the first station.
+     */
+    bool calStationYCoeffInBidirBound(std::shared_ptr<Ruler> ruler,
+        std::shared_ptr<RailStation> first, std::shared_ptr<RailStation> last);
+
+    /**
+     * 2025.08.08 Compute the y-coeffs in an open range. The computation starts from given station `from` through given direction,
+     * ends only when the ending of the railway is encountered.
+     * Returns: succeed or not, and last assigned y-value
+     */
+    std::pair<bool, double> calStationYCoeffOpen(std::shared_ptr<Ruler> ruler, std::shared_ptr<RailStation> from,
+        Direction dir, double start_y_coeff);
+
+    /**
+     * 2025.08.08 Similar to calStationYCoeffOpen, but traverses with reversed direction.
+     */
+    std::pair<bool, double> calStationYCoeffOpenReverse(std::shared_ptr<Ruler> ruler, std::shared_ptr<RailStation> from,
+        Direction dir, double start_y_coeff);
+
+    /**
+     * 2025.08.08  Shift the y-values for all assigned stations. height not modified.
+     */
+    void shiftYCoeffs(double dy);
 
     /**
      * @brief clearYValues  清除所有y坐标数据
