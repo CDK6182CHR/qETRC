@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-set(qETRC_VERSION_MAJOR 1)
-set(qETRC_VERSION_MINOR 8)
-set(qETRC_VERSION_PATCH 2)
-#set(qETRC_RELEASE_CODE 40)
+include(qETRC_version.cmake)
 
 option(ENABLE_MSVC_PROFILE "Enable MSVC profiler" OFF)
 option(AUTO_INSTALL_SARibbon "Install SARibbon libraries" ON)

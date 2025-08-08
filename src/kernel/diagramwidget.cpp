@@ -1244,7 +1244,8 @@ void DiagramWidget::setHLines(int idx, std::shared_ptr<Railway> rail, double sta
         double xright = scene()->width() - margins.right_white - margins.count_label_width;
         if (!p->isDown())xright += margins.count_label_width / 2.0;
         double y = rail->yValueFromCoeff(p->toStation()->y_coeff.value(), cfg) + start_y;
-        if (p->toStation()->_show) {
+        if (p->toStation()->_show || !p->nextInterval()) {
+            // 2025.08.08: we always add interval information for the hiden first/last station
             if (cfg.show_ruler_bar)
                 leftItems.append(scene()->addLine(
                     x, y, x + margins.ruler_label_width / 2.0, y, defaultPen
@@ -1283,7 +1284,7 @@ void DiagramWidget::setHLines(int idx, std::shared_ptr<Railway> rail, double sta
         if (auto itr = freighcnt.find(p); itr != freighcnt.end()) {
             maxfreigh = std::max(itr->second, maxfreigh);
         }
-        if (p->toStation()->_show) {
+        if (p->toStation()->_show || !p->nextInterval()) {
             if (cfg.show_ruler_bar) {
                 const QString& text = ruler ?
                     cumvalid ? QString::asprintf("%d:%02d", cuminterval / 60, cuminterval % 60) : "NA" :
@@ -1322,8 +1323,9 @@ void DiagramWidget::setHLines(int idx, std::shared_ptr<Railway> rail, double sta
             ));
         }
         if (cfg.show_count_bar) {
-            leftItems.append(scene()->addLine(
-                margins.left_white, first_station_y, margins.left_white + margins.ruler_label_width / 2.0, first_station_y,
+            rightItems.append(scene()->addLine(
+                scene()->width() - margins.right_white - margins.count_label_width, first_station_y,
+                scene()->width() - margins.right_white - margins.count_label_width / 2.0, first_station_y,
                 defaultPen
             ));
         }
