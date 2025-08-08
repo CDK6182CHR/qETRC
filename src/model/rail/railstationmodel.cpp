@@ -146,11 +146,12 @@ bool RailStationModel::checkRailway(std::shared_ptr<Railway> rail)
 {
     auto* par = qobject_cast<QWidget*>(parent());
     if (rail->empty())return true;
-    else if (rail->stations().first()->direction != PassedDirection::BothVia ||
-        rail->stations().last()->direction != PassedDirection::BothVia)
+    else if (rail->stations().first()->direction == PassedDirection::NoVia ||
+        rail->stations().last()->direction == PassedDirection::NoVia)
     {
         QMessageBox::warning(par, tr("错误"),
-            tr("第一站和最后一站必须设置为“双向通过”，请重新设置！"));
+            tr("第一站和最后一站不能设置为“不通过”，请重新设置！\n" 
+                "注：在1.8.3以前的版本中，要求第一站和最后一站必须设置为双向通过，请注意数据兼容性。"));
         return false;
     }
 

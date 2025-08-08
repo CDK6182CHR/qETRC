@@ -1025,6 +1025,8 @@ int Railway::ordinateIndex() const
 bool Railway::calStationYCoeff()
 {
 	clearYValues();
+	if (empty())
+		return false;
 	if (!ordinate()) {
 		calStationYCoeffByMile();
 		return true;
@@ -1032,14 +1034,43 @@ bool Railway::calStationYCoeff()
 	//标尺排图
 	auto ruler = ordinate();
 	double y = 0;
-	auto p = ruler->firstDownNode();
-	p->railInterval().fromStation()->y_coeff = y;  //第一站
-	//下行
+
+	// 2025.08.08: EXPERIMENTAL: new algorithm that does not require the first and last station to be bidirectional
+	
+	std::shared_ptr<RailStation> st;
+	// Skip all non-passed stations if any (this should never happen in pricinple!)
+	for (int i = 0; i < _stations.size(); i++) {
+		if (_stations[i]->direction != PassedDirection::NoVia) {
+			st = _stations[i];
+			break;
+		}
+	}
+
+	if (!st) {
+		qCritical() << "calStationYCoeff: ERROR: no valid starting station!!";
+		return false;
+	}
+
+	// First: determine all stations (if any) at beginning that only up-passed
+	while (!st->isDownVia()) {
+		st->y_coeff = y;
+		auto railint = st->dirPrevInterval(Direction::Up);
+		auto node = railint->getRulerNode(ruler);
+		y += node->interval;
+		st = railint->from.lock();
+	}
+
+	// Now: st points to the first station that is down-via; this may not be BothVia (if the first station is DownVia)
+
+	auto p = st->dirNextInterval(Direction::Down)->getRulerNode(ruler);
+
+	st->y_coeff = y;   // First station in this down-loop
+	// All down-via stations
 	for (; p; p = p->nextNode()) {
 		if (p->isNull()) {
 			qDebug() << "Railway::calStationYValue: WARNING: "
-				<< "Ruler [" << ruler->name() << "] not complate, cannot be used as"
-				<< "ordinate ruler. Interval: " << p->railInterval() << Qt::endl;
+				<< "Ruler [" << ruler->name() << "] not complete, cannot be used as"
+				<< "ordinate ruler. Interval: " << p->railInterval();
 			resetOrdinate();
 			calStationYCoeffByMile();
 			return false;
@@ -1047,29 +1078,79 @@ bool Railway::calStationYCoeff()
 		y += p->interval;
 		p->railInterval().toStation()->y_coeff = y;
 	}
-	_diagramHeightCoeff = y;
-	//上行，仅补缺漏
-	//这里利用了最后一站必定是双向的条件！
-	for (p = ruler->firstUpNode(); p; p = p->nextNode()) {
+	double down_max_y_coeff = y;
+
+	// Now for up direction
+
+	// Pass the NoVia stations if any (this should never happen, but just for safety)
+	st.reset();
+	for (int i = _stations.size() - 1; i >= 0; i--) {
+		if (_stations[i]->direction != PassedDirection::NoVia) {
+			st = _stations[i];
+			break;
+		}
+	}
+
+	if (!st) {
+		qCritical() << "calStationYCoeff: ERROR: no valid ending station!!";
+		return false;
+	}
+	
+
+	// Now begin. First determine the stations (if any) at the end of the list that are only up-via
+	
+	bool any_tail_up_only_intervals = false;
+	while (!st->isDownVia()) {
+		auto railint = st->dirNextInterval(Direction::Up);
+		auto node = railint->getRulerNode(ruler);
+		st = railint->to.lock();
+		any_tail_up_only_intervals = true;
+	}
+	y = st->y_coeff.value();   // This must have valid value, as st is BothVia and have been filled in donw-loop
+
+	std::shared_ptr<RailStation> last_both_via_station = st;
+	assert(st->direction == PassedDirection::BothVia);
+
+	// Second loop, fill in the tail up-only interval
+	if (any_tail_up_only_intervals) {
+		// We need this `if` because dirPrevInterval() returns nullptr if we do not have such intervals!
+		p = st->dirPrevInterval(Direction::Up)->getRulerNode(ruler);
+		for (; p; p = p->prevNode()) {
+			y += p->interval;
+			p->railInterval().from.lock()->y_coeff = y;
+		}
+	}
+
+	// The diagram maximal height is the maximal value between down and up max coeffs
+	_diagramHeightCoeff = std::max(y, down_max_y_coeff);
+
+	// Now, for the up direction, before the last_both_via stations. Only fill in empty stations.
+	for (p = st->dirNextInterval(Direction::Up)->getRulerNode(ruler); p; p = p->nextNode()) {
 		auto toStation = p->railInterval().toStation();
 		if (!toStation->y_coeff.has_value()) {
-			if (p->isNull()) {
+			// We should determine the y_value_coeff of the station at this loop
+			//qDebug() << "determine-up: toStation " << toStation->name;
+			auto rboth = rightBothStation(toStation), lboth = leftBothStation(toStation);
+			//qDebug() << "determine-up: toStation " << toStation->name << ", rboth/lboth " << rboth->name << "/" << lboth->name;
+
+			int upLeft = ruler->totalInterval(toStation, lboth, Direction::Up);
+			int upRight = ruler->totalInterval(rboth, toStation, Direction::Up);
+
+			if (upLeft < 0 || upRight < 0) {
 				qDebug() << "Railway::calStationYValue: WARNING: "
-					<< "Ruler [" << ruler->name() << "] not complate, cannot be used as"
-					<< "ordinate ruler. Interval: " << p->railInterval() << Qt::endl;
+					<< "Ruler [" << ruler->name() << "] not complete, cannot be used as"
+					<< "ordinate ruler. Null interval found while locating up-via stations around " << toStation->name.toSingleLiteral();
 				resetOrdinate();
 				calStationYCoeffByMile();
 				return false;
 			}
-			auto rboth = rightBothStation(toStation), lboth = leftBothStation(toStation);
 
-			int upLeft = ruler->totalInterval(toStation, lboth, Direction::Up);
-			int upRight = ruler->totalInterval(rboth, toStation, Direction::Up);
 			double toty = rboth->y_coeff.value() - lboth->y_coeff.value();
 			y = rboth->y_coeff.value() - toty * upRight / (upLeft + upRight);
 			toStation->y_coeff = y;
 		}
 	}
+
 	return true;
 }
 
