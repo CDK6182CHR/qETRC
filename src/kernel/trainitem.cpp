@@ -1341,7 +1341,7 @@ TrainItem::LinkLineItems TrainItem::addLinkLine(std::shared_ptr<const RailStatio
     }
 
     // 2024.02.22: determine the height of the link line
-    double height = linkLineHeight(rs.get(), xpre_eff, xcur, isPostLink);
+    double height = linkLineHeight(rs.get(), xpre_eff, xcur, isPostLink, res.layerInfo);
 
     double y = _railway.yValueFromCoeff(rs->y_coeff.value(), config()) + start_y;
     QPen pen = trainPen();
@@ -1429,16 +1429,11 @@ int TrainItem::linkLineLayerEnd(const RailStation* rs, int xleft, int xright) co
     return labels.addOccupation(RouteLinkOccupy(this->train().get(), xleft, xright), tot_width);
 }
 
-double TrainItem::linkLineHeight(const RailStation* rs, int xleft, int xright, bool isPostLink)
+double TrainItem::linkLineHeight(const RailStation* rs, int xleft, int xright, bool isPostLink, LinkLayerInfo& layer_info)const
 {
     if (!config().floating_link_line) return 0;
     int layer = linkLineLayer(rs, xleft, xright, isPostLink);
-    if (isPostLink) {
-        postLinkItems.layerInfo.layer = layer;
-    }
-    else {
-        preLinkItems.layerInfo.layer = layer;
-    }
+    layer_info.layer = layer;
     return config().base_link_height + layer * config().step_link_height;
 }
 

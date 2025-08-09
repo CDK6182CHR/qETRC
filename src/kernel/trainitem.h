@@ -355,7 +355,7 @@ private:
      * If floating link is not enabled. simply return 0.
      * Also, records the layer number of the current link line.
      */
-    double linkLineHeight(const RailStation* rs, int xlelft, int xright, bool isPostLink);
+    double linkLineHeight(const RailStation* rs, int xlelft, int xright, bool isPostLink, LinkLayerInfo& layer_info)const;
 
     QColor linkLineColor()const;
 
