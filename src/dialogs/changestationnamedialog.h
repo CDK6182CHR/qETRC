@@ -8,6 +8,7 @@
 #include <QUndoCommand>
 #include <utility>
 #include <tuple>
+#include <set>
 
 #include "data/rail/railstation.h"
 #include "data/train/train.h"
@@ -15,10 +16,14 @@
 class Diagram;
 
 struct ChangeStationNameData{
+    Diagram& diagram;
     QString oldName, newName;   //主要是为了生成undo的text
     QList<std::tuple<std::shared_ptr<Railway>, std::shared_ptr<RailStation>,StationName>> railStations;
     QList<std::pair<Train::StationPtr,StationName>> trainStations;
     QList<std::pair<std::shared_ptr<Train>,StationName>> startings,terminals;
+    std::set<std::shared_ptr<Train>> trains;
+
+    ChangeStationNameData(Diagram& diagram_): diagram(diagram_) {}
 
     /**
      * 提交更改，undo/redo  操作是一样的

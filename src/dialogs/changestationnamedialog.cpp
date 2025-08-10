@@ -9,7 +9,7 @@
 #include "mainwindow/mainwindow.h"
 
 ChangeStationNameDialog::ChangeStationNameDialog(Diagram &diagram_, QWidget *parent):
-    QDialog(parent),diagram(diagram_)
+    QDialog(parent),diagram(diagram_),data(diagram)
 {
     setWindowTitle(tr("全局站名修改"));
     resize(400,300);
@@ -75,18 +75,25 @@ void ChangeStationNameDialog::onApplyClicked()
     }
 
     for(auto train:diagram.trains()){
+        bool affected = false;
         //始发终到
         if(train->starting().toSingleLiteral()==sold){
             data.startings.append(std::make_pair(train,snew));
+            affected = true;
         }
         if(train->terminal().toSingleLiteral()==sold){
             data.terminals.append(std::make_pair(train,snew));
+            affected = true;
         }
         //站名
         for(auto p=train->timetable().begin();p!=train->timetable().end();++p){
             if(p->name.toSingleLiteral() == sold){
                 data.trainStations.append(std::make_pair(p, snew));
+                affected = true;
             }
+        }
+        if (affected) {
+            data.trains.emplace(train);
         }
     }
 
@@ -108,6 +115,10 @@ void ChangeStationNameDialog::onApplyClicked()
     if (!data.terminals.isEmpty()) {
         flag = true;
         text += tr("\n%1个列车终到站站名").arg(data.terminals.size());
+    }
+    if (!data.trains.empty()) {
+        flag = true;
+        text += tr("共计%1个列车受到影响").arg(data.trains.size());
     }
     if (flag) {
         //只有有效更改才提交出去
@@ -135,6 +146,9 @@ void ChangeStationNameData::commit()
     for (auto& p : terminals) {
         std::swap(p.first->terminalRef(), p.second);
     }
+
+    // 2025.08.10: re-bind all trains because both rail-station and train-stations may be changed!
+    diagram.rebindAllTrains();
 }
 
 void qecmd::ChangeStationNameGlobal::undo()
