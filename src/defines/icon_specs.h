@@ -192,6 +192,7 @@
 
 #define QEICN_station_tracks QE_RSC_ICON(rail.png)   // 股道分析
 #define QEICN_rail_topo QE_RSC_ICON(diagram.png)  // 线路拓扑
+#define QEICN_rail_train_stat QE_RSC_ICON(clock.png)  // 线路（列车）运行统计
 #define QEICN_headway_list QE_RSC_ICON(h_expand.png)  // 列车间隔分析
 #define QEICN_headway_summary QE_RSC_ICON(adjust-2.png)  // 列车间隔汇总
 

@@ -40,6 +40,7 @@
 #include "navi/navitree.h"
 #include "mainwindow/pagecontext.h"
 #include "navi/addpagedialog.h"
+#include "viewers/stats/railtrainstatdialog.h"
 
 
 RailContext::RailContext(Diagram& diagram_, SARibbonContextCategory* context, 
@@ -236,6 +237,13 @@ void RailContext::initUI()
 	panel->addLargeAction(act);
 
 	panel->addSeparator();
+
+	act = mw->makeAction(QEICN_rail_train_stat, tr("运行统计"), tr("线路运行统计"));
+	connect(act, &QAction::triggered, this, &RailContext::actRailTrainStat);
+	act->setToolTip(tr("线路运行统计\n统计本线的各类运行数据，例如平均速度、技术速度、"
+		"铺画车站数等。"));
+	panel->addLargeAction(act);
+
 	act = mw->makeAction(QEICN_headway_list, tr("间隔分析"));
 	connect(act, &QAction::triggered, this, &RailContext::actShowTrainGap);
 	act->setToolTip(tr("列车间隔分析\n根据车站的列车事件表，分析相邻车次之间的间隔情况。"));
@@ -593,6 +601,14 @@ void RailContext::actRailTopo()
 {
 	auto* w = new RailTopoTable(railway, mw);
 	w->show();
+}
+
+void RailContext::actRailTrainStat()
+{
+	if (!railway)
+		return;
+	auto* dia = new RailTrainStatDialog(railway, diagram.trainCollection(), diagram.options(), mw);
+	dia->show();
 }
 
 void RailContext::actJointRail()
