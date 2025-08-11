@@ -4,15 +4,14 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.8.1";
-const std::string_view DATE = "20250807";
-const int RELEASE_CODE = 69;
+const std::string_view LAST_VERSION = "V1.8.2";
+const std::string_view DATE = "20250811";
+const int RELEASE_CODE = 70;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 支持非零的线路起始里程标。
-2. 新增非本线交路前序/后续车次的连线。
-3. 在贪心推线中，新增股道设置及区间标尺调整。
-4. 优化细节及问题修复，详见ReleaseNote。)";
+const std::string_view UPDATE_LOG = R"(1. 取消基线首末站必须为双向通过的限制。
+2. 新增线路的列车运行统计功能。
+3. 细节优化及修复已知问题。)";
 }
