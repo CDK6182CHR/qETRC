@@ -83,9 +83,7 @@ void LocateDialog::onRailwayChanged(std::shared_ptr<Railway> railway)
     cbPage->setRailway(railway);
     if(!railway) return;
     foreach(auto p,railway->stations()){
-        QVariant v;
-        v.setValue(p);
-        cbStation->addItem(p->name.toSingleLiteral(),v);
+        cbStation->addItem(p->name.toSingleLiteral(), QVariant::fromValue(p));
     }
 }
 

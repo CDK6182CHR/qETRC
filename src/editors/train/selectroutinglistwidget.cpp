@@ -44,9 +44,7 @@ void SelectRoutingListWidget::refreshRoutingsWithSelection(const res_t &_data)
         sel->select(model->index(0,0),QItemSelectionModel::Deselect);
     for(int i=0;i<coll.routingCount();i++){
         auto* it=new QStandardItem(coll.routingAt(i)->name());
-        QVariant v;
-        v.setValue(coll.routingAt(i));
-        it->setData(v,qeutil::RoutingRole);
+        it->setData(QVariant::fromValue(coll.routingAt(i)), qeutil::RoutingRole);
         model->setItem(i+1,it);
         if(_selected.contains(coll.routingAt(i))){
             sel->select(model->index(i+1,0),QItemSelectionModel::Select);

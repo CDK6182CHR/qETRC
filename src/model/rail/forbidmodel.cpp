@@ -29,8 +29,8 @@ std::shared_ptr<Railway> ForbidModel::appliedForbid()
     for (auto p = f->firstDownNode(); p; p = p->nextNodeCirc(),++row) {
         if (!checkRowInterval(p->railInterval(), row))
             continue;
-        p->beginTime = qvariant_cast<TrainTime>(item(row, ColStart)->data(Qt::EditRole));
-        p->endTime = qvariant_cast<TrainTime>(item(row, ColEnd)->data(Qt::EditRole));
+        p->beginTime = TrainTime::fromQVariant(item(row, ColStart)->data(Qt::EditRole));
+        p->endTime =   TrainTime::fromQVariant(item(row, ColEnd)->data(Qt::EditRole));
     }
     return nr;
 }
@@ -59,13 +59,13 @@ void ForbidModel::setupRow(int row, std::shared_ptr<RailInterval> railint)
     auto* it=new SI;
     auto tm = node->beginTime;
     if (tm.isNull())tm = TrainTime(0, 0);
-    it->setData(QVariant::fromValue(tm),Qt::EditRole);
+    it->setData(tm.toQVariant(), Qt::EditRole);
     setItem(row,ColStart,it);
 
     it=new SI;
     tm = node->endTime;
     if (tm.isNull())tm = TrainTime(0, 0);
-    it->setData(QVariant::fromValue(tm),Qt::EditRole);
+    it->setData(tm.toQVariant(), Qt::EditRole);
     setItem(row,ColEnd,it);
 
     it=new SI(qeutil::minsToStringHM(node->durationMin(_ops.period_hours)));

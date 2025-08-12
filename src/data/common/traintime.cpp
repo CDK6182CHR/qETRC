@@ -173,6 +173,16 @@ TrainTime::operator QTime() const
 }
 #endif
 
+QVariant TrainTime::toQVariant() const
+{
+    return QVariant(secondsSinceStart());
+}
+
+TrainTime TrainTime::fromQVariant(const QVariant& v)
+{
+    return fromSecondsSinceStart(v.toInt());
+}
+
 TrainTime::TrainTime(int secsSinceStart) :
     m_secs(secsSinceStart)
 {

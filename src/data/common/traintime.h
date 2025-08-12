@@ -3,6 +3,7 @@
 #include <QTime>
 #include <QString>
 #include <QMetaType>
+#include <QVariant>
 
 class TrainTime
 {
@@ -80,9 +81,22 @@ public:
     static TrainTime fromQTime(const QTime& t);
     //explicit TrainTime(const QTime& qtm);
 
+    /**
+     * 2025.08.12  Use new APIs for converting to/from QVariant.
+	 * We now use Integer type in QVariant, representing seconds since start, in QVairant storage.
+	 * This enables the automatical sorting of TrainTime in QStandardItemModel.
+     * We do not declare TrainTime as a metatype.
+     */
+    QVariant toQVariant()const;
+
+	static TrainTime fromQVariant(const QVariant& v);
+
 private:
     explicit TrainTime(int secsSinceStart);
     void getHMS(int& h, int& m, int& s)const;
 };
 
-Q_DECLARE_METATYPE(TrainTime)
+
+// 2025.08.12: we now use Integer type to store data in QVariant, and we do not declare TrainTime as a metatype.
+// See also documents for toQVariant.
+//Q_DECLARE_METATYPE(TrainTime)

@@ -79,26 +79,26 @@ std::list<TrainStation>::iterator TimetableQuickModel::trainStationForRow(int ro
 TrainTime TimetableQuickModel::arriveTimeForRow(int row) const
 {
     if (row % 2 != 0)row--;
-    return qvariant_cast<TrainTime>(item(row, ColTime)->data(qeutil::TimeDataRole));
+    return TrainTime::fromQVariant(item(row, ColTime)->data(qeutil::TimeDataRole));
 }
 
 TrainTime TimetableQuickModel::departTimeForRow(int row) const
 {
     if (row % 2 == 0)row++;
-    return qvariant_cast<TrainTime>(item(row, ColTime)->data(qeutil::TimeDataRole));
+    return TrainTime::fromQVariant(item(row, ColTime)->data(qeutil::TimeDataRole));
 }
 
 void TimetableQuickModel::setTimeItem(int row, const TrainTime &tm)
 {
     auto* it = new QStandardItem(tm.toString(TrainTime::HMS));
-    it->setData(QVariant::fromValue(tm), qeutil::TimeDataRole);
+    it->setData(tm.toQVariant(), qeutil::TimeDataRole);
     setItem(row,ColTime,it);
 }
 
 void TimetableQuickModel::setTimeItem(int row, const TrainTime& tm, const QString& text)
 {
     auto* it = new QStandardItem(text);
-    it->setData(QVariant::fromValue(tm), qeutil::TimeDataRole);
+    it->setData(tm.toQVariant(), qeutil::TimeDataRole);
     setItem(row, ColTime, it);
 }
 
@@ -255,7 +255,7 @@ void TimetableQuickEditableModel::onStationTimeChanged(int row)
     //st.arrive = item(row, ColTime)->data(qeutil::TimeDataRole).toTime();
     //st.depart = item(row + 1, ColTime)->data(qeutil::TimeDataRole).toTime();
     //st.updateStopFlag();
-    const auto& tm = qvariant_cast<TrainTime>(item(row, ColTime)->data(qeutil::TimeDataRole));
+    const auto& tm = TrainTime::fromQVariant(item(row, ColTime)->data(qeutil::TimeDataRole));
 
     //注意：如果编辑的是非停车站有数据的那个点，那么认为另一个点跟着动了。
     if (p->flag & TrainStation::Stopped) {

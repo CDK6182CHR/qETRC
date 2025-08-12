@@ -39,7 +39,7 @@ void RailSectionEventsModel::setY(double y)
 
 TrainTime RailSectionEventsModel::timeForRow(int row) const
 {
-    return qvariant_cast<TrainTime>(item(row, ColTime)->data(Qt::EditRole));
+    return TrainTime::fromQVariant(item(row, ColTime)->data(Qt::EditRole));
 }
 
 void RailSectionEventsModel::setupModel()
@@ -55,7 +55,7 @@ void RailSectionEventsModel::setupModel()
         auto train = line->train();
         setItem(i, ColTrainName, new SI(train->trainName().full()));
         auto* it = new SI;
-        it->setData(QVariant::fromValue(p.second), Qt::EditRole);
+        it->setData(p.second.toQVariant(), Qt::EditRole);
         setItem(i, ColTime, it);
         setItem(i, ColType, new SI(train->type()->name()));
         setItem(i, ColDir, new SI(DirFunc::dirToString(line->dir())));

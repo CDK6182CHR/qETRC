@@ -183,12 +183,12 @@ int GreedyPaintConfigModel::actualStopSecsForRow(int row) const
 
 TrainTime GreedyPaintConfigModel::arriveTimeForRow(int row) const
 {
-    return qvariant_cast<TrainTime>(item(row, ColArrive)->data(Qt::EditRole));
+    return TrainTime::fromQVariant(item(row, ColArrive)->data(Qt::EditRole));
 }
 
 TrainTime GreedyPaintConfigModel::departTimeForRow(int row) const
 {
-    return qvariant_cast<TrainTime>(item(row, ColDepart)->data(Qt::EditRole));
+    return TrainTime::fromQVariant(item(row, ColDepart)->data(Qt::EditRole));
 }
 
 bool GreedyPaintConfigModel::fixedForRow(int row) const
@@ -226,8 +226,8 @@ void GreedyPaintConfigModel::setTimetable(std::shared_ptr<Train> train)
     int row = rowForStation(train->timetable().front().name);
     for (const auto& st:train->timetable()) {
         item(row, ColActualStop)->setData(st.stopSec(_ops.period_hours), Qt::EditRole);
-        item(row, ColArrive)->setData(QVariant::fromValue(st.arrive), Qt::EditRole);
-        item(row, ColDepart)->setData(QVariant::fromValue(st.depart), Qt::EditRole);
+        item(row, ColArrive)->setData(st.arrive.toQVariant(), Qt::EditRole);
+        item(row, ColDepart)->setData(st.depart.toQVariant(), Qt::EditRole);
         row++;
     }
 }

@@ -189,16 +189,14 @@ void CorrectTimetableModel::setupModel()
     for (auto p = train->timetable().begin(); p != train->timetable().end(); ++p) {
         auto* it = new SI(p->name.toSingleLiteral());
         it->setCheckable(true);
-        QVariant v;
-        v.setValue(p);
-        it->setData(v, qeutil::TrainStationRole);
+        it->setData(QVariant::fromValue(p), qeutil::TrainStationRole);
         setItem(row, ColName, it);
 
         it = new SI;
-        it->setData(QVariant::fromValue(p->arrive), Qt::EditRole);
+        it->setData(p->arrive.toQVariant(), Qt::EditRole);
         setItem(row, ColArrive, it);
         it = new SI;
-        it->setData(QVariant::fromValue(p->depart), Qt::EditRole);
+        it->setData(p->depart.toQVariant(), Qt::EditRole);
         setItem(row, ColDepart, it);
 
         it=makeCheckItem();
@@ -241,12 +239,12 @@ void CorrectTimetableModel::calculateDurations(int row)
 
 TrainTime CorrectTimetableModel::rowArrive(int row) const
 {
-    return qvariant_cast<TrainTime>(item(row, ColArrive)->data(Qt::EditRole));
+    return TrainTime::fromQVariant(item(row, ColArrive)->data(Qt::EditRole));
 }
 
 TrainTime CorrectTimetableModel::rowDepart(int row) const
 {
-    return qvariant_cast<TrainTime>(item(row, ColDepart)->data(Qt::EditRole));
+    return TrainTime::fromQVariant(item(row, ColDepart)->data(Qt::EditRole));
 }
 
 void CorrectTimetableModel::calculateSelectedRows(const QBitArray &rows)

@@ -122,12 +122,12 @@ int RulerPaintModel::getStationRow(std::shared_ptr<const RailStation> st) const
 
 TrainTime RulerPaintModel::getRowArrive(int row) const
 {
-    return qvariant_cast<TrainTime>(item(row, ColArrive)->data(Qt::EditRole));
+    return TrainTime::fromQVariant(item(row, ColArrive)->data(Qt::EditRole));
 }
 
 TrainTime RulerPaintModel::getRowDepart(int row) const
 {
-    return qvariant_cast<TrainTime>(item(row, ColDepart)->data(Qt::EditRole));
+    return TrainTime::fromQVariant(item(row, ColDepart)->data(Qt::EditRole));
 }
 
 void RulerPaintModel::setStationStopSecs(const StationName& name, int secs)
@@ -161,12 +161,12 @@ void RulerPaintModel::initRow(int row, std::shared_ptr<const RailStation> st,
     setItem(row,ColSecond,it);
 
     it=new SI;
-    it->setData(QVariant::fromValue(page->anchorTime()),Qt::EditRole);   //时刻一律初始化为参考时刻
+    it->setData(page->anchorTime().toQVariant(), Qt::EditRole);   //时刻一律初始化为参考时刻
     it->setEditable(false);
     setItem(row,ColArrive,it);
 
     it=new SI;
-    it->setData(QVariant::fromValue(page->anchorTime()), Qt::EditRole);
+    it->setData(page->anchorTime().toQVariant(), Qt::EditRole);
     it->setEditable(false);
     setItem(row,ColDepart,it);
 
@@ -212,8 +212,8 @@ void RulerPaintModel::updateFromRow(int row)
     
     if (row == _anchorRow) {
         //如果起始站为anchor，假定到达时刻正确，调整出发时刻
-        const TrainTime& arr = qvariant_cast<TrainTime>(item(row, ColArrive)->data(Qt::EditRole));
-        item(row, ColDepart)->setData(QVariant::fromValue(arr.addSecs(getStopSecs(r), periodHours())), Qt::EditRole);
+        const TrainTime& arr = TrainTime::fromQVariant(item(row, ColArrive)->data(Qt::EditRole));
+        item(row, ColDepart)->setData(arr.addSecs(getStopSecs(r), periodHours()).toQVariant(), Qt::EditRole);
     }
     else {
         // 起始行非参考行，设置interval情况；当前的时刻要由上一区间来计算
@@ -221,7 +221,7 @@ void RulerPaintModel::updateFromRow(int row)
         int pr = r - dr;
         bool cu_stopped = bool(getStopSecs(r));
         bool pr_stopped = bool(getStopSecs(pr));
-        TrainTime tm = qvariant_cast<TrainTime>(dr == 1 ?
+        TrainTime tm = TrainTime::fromQVariant(dr == 1 ?
             item(pr, ColDepart)->data(Qt::EditRole) :
             item(pr, ColArrive)->data(Qt::EditRole)
             );
@@ -235,7 +235,7 @@ void RulerPaintModel::updateFromRow(int row)
     bool cur_stopped;
     
     //循环的上一站的那个时刻
-    TrainTime prev_time = qvariant_cast<TrainTime>(dr == 1 ?
+    TrainTime prev_time = TrainTime::fromQVariant(dr == 1 ?
         item(r, ColDepart)->data(Qt::EditRole) :
         item(r, ColArrive)->data(Qt::EditRole));
 
@@ -267,12 +267,12 @@ int RulerPaintModel::getStopSecs(int row) const
 
 TrainTime RulerPaintModel::getArrive(int row) const
 {
-    return qvariant_cast<TrainTime>(item(row, ColArrive)->data(Qt::EditRole));
+    return TrainTime::fromQVariant(item(row, ColArrive)->data(Qt::EditRole));
 }
 
 TrainTime RulerPaintModel::getDepart(int row) const
 {
-    return qvariant_cast<TrainTime>(item(row, ColDepart)->data(Qt::EditRole));
+    return TrainTime::fromQVariant(item(row, ColDepart)->data(Qt::EditRole));
 }
 
 void RulerPaintModel::setStopSecs(int row, int secs)
@@ -370,14 +370,14 @@ bool RulerPaintModel::calRowTime(int r, int dr, bool prev_stopped, bool cur_stop
     int col1 = (dr == 1 ? ColArrive : ColDepart);
     int col2 = (dr == 1 ? ColDepart : ColArrive);
 
-    flag1 = (qvariant_cast<TrainTime>( item(r, col1)->data(Qt::EditRole)) == tm);
+    flag1 = (TrainTime::fromQVariant( item(r, col1)->data(Qt::EditRole)) == tm);
     if (!flag1) {
-        item(r, col1)->setData(QVariant::fromValue(tm), Qt::EditRole);
+        item(r, col1)->setData(tm.toQVariant(), Qt::EditRole);
     }
     tm = tm.addSecs(dr * getStopSecs(r), page->getDiagram().options().period_hours);
-    flag2 = (qvariant_cast<TrainTime>(item(r, col2)->data(Qt::EditRole)) == tm);
+    flag2 = (TrainTime::fromQVariant(item(r, col2)->data(Qt::EditRole)) == tm);
     if (!flag2) {
-        item(r, col2)->setData(QVariant::fromValue(tm), Qt::EditRole);
+        item(r, col2)->setData(tm.toQVariant(), Qt::EditRole);
     }
     tm0 = tm;
 
@@ -390,8 +390,8 @@ std::shared_ptr<Train> RulerPaintModel::toTrain() const
     for(int r=startRow;r<=endRow;r++){
         t->appendStation(
             StationName::fromSingleLiteral(item(r, ColStation)->text()),
-            qvariant_cast<TrainTime>(item(r, ColArrive)->data(Qt::EditRole)),
-            qvariant_cast<TrainTime>(item(r, ColDepart)->data(Qt::EditRole))
+            TrainTime::fromQVariant(item(r, ColArrive)->data(Qt::EditRole)),
+            TrainTime::fromQVariant(item(r, ColDepart)->data(Qt::EditRole))
         );
     }
     if (page->startAtThis()) {
@@ -433,10 +433,10 @@ void RulerPaintModel::onEndChanged(int i)
 void RulerPaintModel::onAnchorTimeChanged(const TrainTime &tm)
 {
     if(page->anchorAsArrive()){
-        item(_anchorRow,ColArrive)->setData(QVariant::fromValue(tm), Qt::EditRole);
+        item(_anchorRow,ColArrive)->setData(tm.toQVariant(), Qt::EditRole);
     }else{
         item(_anchorRow, ColArrive)->setData(
-            QVariant::fromValue(tm.addSecs(-getStopSecs(_anchorRow), page->getDiagram().options().period_hours)),
+            tm.addSecs(-getStopSecs(_anchorRow), page->getDiagram().options().period_hours).toQVariant(),
             Qt::EditRole);
     }
     updateFromRow(_anchorRow);

@@ -56,7 +56,7 @@ bool TrainEventModel::exportToCsv(const QString& filename)
 
 TrainTime TrainEventModel::timeForRow(int row) const
 {
-	return qvariant_cast<TrainTime>(item(row, ColTime)->data(Qt::EditRole));
+	return TrainTime::fromQVariant(item(row, ColTime)->data(Qt::EditRole));
 }
 
 std::shared_ptr<Railway> TrainEventModel::railForRow(int row) const
@@ -150,7 +150,7 @@ void TrainEventModel::setStationRow(int row,std::shared_ptr<TrainAdapter> adp, c
 	setItem(row, ColRail, it);
 
 	it = new SI();
-	it->setData(QVariant::fromValue(t.time), Qt::EditRole);
+	it->setData(t.time.toQVariant(), Qt::EditRole);
 	setItem(row, ColTime, it);
 
 	auto rst = t.station.lock();
@@ -176,7 +176,7 @@ void TrainEventModel::setIntervalRow(int row, std::shared_ptr<TrainAdapter> adp,
 	it->setData(v, qeutil::RailwayRole);
 	setItem(row, ColRail, it);
 	it = new SI;
-	it->setData(QVariant::fromValue(t.time), Qt::EditRole);
+	it->setData(t.time.toQVariant(), Qt::EditRole);
 	setItem(row, ColTime, it);
 	setItem(row, ColPlace, new SI(tr("%1-%2")
         .arg(t.former->name.toSingleLiteral(),t.latter->name.toSingleLiteral())));

@@ -49,9 +49,7 @@ void VertexListModel::setupModel()
     for(auto p=net.vertices().begin();p!=net.vertices().end();++p){
         const auto& d=p->second->data;
         auto* it=new SI(d.name.toSingleLiteral());
-        QVariant v;
-        v.setValue(p->second);
-        it->setData(v,qeutil::GraphVertexRole);
+        it->setData(QVariant::fromValue(p->second), qeutil::GraphVertexRole);
         setItem(row,ColName,it);
 
         it=new SI;

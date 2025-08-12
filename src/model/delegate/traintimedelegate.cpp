@@ -26,7 +26,7 @@ void TrainTimeDelegate::setEditorData(QWidget* editor, const QModelIndex& index)
 {
     TrainTimeEdit* ed = static_cast<TrainTimeEdit*>(editor);
     //ed->setTime(index.data(Qt::EditRole).toTime());
-	ed->setTime(qvariant_cast<TrainTime>(index.data(Qt::EditRole)));
+	ed->setTime(TrainTime::fromQVariant(index.data(Qt::EditRole)));
 }
 
 void TrainTimeDelegate::setModelData(QWidget* editor,
@@ -34,15 +34,13 @@ void TrainTimeDelegate::setModelData(QWidget* editor,
     const QModelIndex& index) const
 {
     auto* ed = static_cast<TrainTimeEdit*>(editor);
-    QVariant v;
-    v.setValue(ed->time());
-    model->setData(index, v, Qt::EditRole);
+    model->setData(index, ed->time().toQVariant(), Qt::EditRole);
 }
 
 QString TrainTimeDelegate::displayText(const QVariant& value, const QLocale& locale) const
 {
     Q_UNUSED(locale);
-    return qvariant_cast<TrainTime>(value).toString(_format);
+    return TrainTime::fromQVariant(value).toString(_format);
 }
 
 void TrainTimeDelegate::setupEditor(TrainTimeEdit* ed) const
@@ -75,15 +73,13 @@ QWidget* TrainTimeQuickDelegate::createEditor(QWidget* parent, const QStyleOptio
 void TrainTimeQuickDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 {
     TrainTimeEdit* ed = static_cast<TrainTimeEdit*>(editor);
-    ed->setTime(qvariant_cast<TrainTime>(index.data(qeutil::TimeDataRole)));
+    ed->setTime(TrainTime::fromQVariant(index.data(qeutil::TimeDataRole)));
 }
 
 void TrainTimeQuickDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 {
     auto* ed = static_cast<TrainTimeEdit*>(editor);
-    QVariant v;
-    v.setValue(ed->time());
-    model->setData(index, v, qeutil::TimeDataRole);
+    model->setData(index, ed->time().toQVariant(), qeutil::TimeDataRole);
 }
 
 void TrainTimeQuickDelegate::setupEditor(TrainTimeEdit* ed) const

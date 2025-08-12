@@ -60,10 +60,10 @@ void ForbidNodesModel::setupModel(std::shared_ptr<RailNet::edge> ed)
     for(int i=0;i<rowCount();i++){
         const auto& n=ed->data.forbidNodes.at(i);
         auto* it=new SI;
-        it->setData(QVariant::fromValue(n.beginTime), Qt::EditRole);
+        it->setData(n.beginTime.toQVariant(), Qt::EditRole);
         setItem(i,ColBegin,it);
         it=new SI;
-        it->setData(QVariant::fromValue(n.endTime), Qt::EditRole);
+        it->setData(n.endTime.toQVariant(), Qt::EditRole);
         setItem(i,ColEnd,it);
         setItem(i,ColDuration,new SI(qeutil::minsToStringHM(
                     qeutil::secsTo(n.beginTime, n.endTime, _ops.period_hours)/60)));

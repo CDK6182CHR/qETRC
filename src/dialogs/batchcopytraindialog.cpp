@@ -29,7 +29,7 @@ void BatchCopyTrainModel::addRow(const QString& trainName, const TrainTime& time
     insertRow(row);
     setupNewRow(row);
     item(row, ColTrainName)->setText(trainName);
-    item(row, ColStartTime)->setData(QVariant::fromValue(time), Qt::EditRole);
+    item(row, ColStartTime)->setData(time.toQVariant(), Qt::EditRole);
 }
 
 void BatchCopyTrainModel::setupNewRow(int row)
@@ -151,7 +151,7 @@ void BatchCopyTrainDialog::onApply()
     for (int i = 0; i < model->rowCount(); i++) {
         const QString& name = model->item(i, BatchCopyTrainModel::ColTrainName)->text();
         if (coll.trainNameIsValid(name, {}) && !names.contains(name)) {
-            const TrainTime& tm = qvariant_cast<TrainTime>(model->item(i, BatchCopyTrainModel::ColStartTime)->
+            const TrainTime& tm = TrainTime::fromQVariant(model->item(i, BatchCopyTrainModel::ColStartTime)->
                 data(Qt::EditRole));
             auto nt = std::make_shared<Train>(train->translation(name,
                 qeutil::secsTo(reftime, tm, diagram.options().period_hours), diagram.options().period_hours));

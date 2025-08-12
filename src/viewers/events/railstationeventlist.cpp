@@ -54,7 +54,7 @@ void RailStationEventListModel::setupModel()
 		it->setData(v, qeutil::TrainRole);
 		setItem(i, ColTrainName, it);
 		it = new SI(ev.time.toString(TrainTime::HMS));
-		it->setData(QVariant::fromValue(ev.time), qeutil::TimeDataRole);
+		it->setData(ev.time.toQVariant(), qeutil::TimeDataRole);
 		setItem(i, ColTime, it);
 		setItem(i, ColEventType, new SI(qeutil::eventTypeString(ev.type)));
 		setItem(i, ColPos, new SI(ev.posString()));
@@ -83,7 +83,7 @@ std::shared_ptr<const Train> RailStationEventListModel::trainForRow(int row) con
 
 TrainTime RailStationEventListModel::timeForRow(int row) const
 {
-	return qvariant_cast<TrainTime>(item(row, ColTime)->data(qeutil::TimeDataRole));
+	return TrainTime::fromQVariant(item(row, ColTime)->data(qeutil::TimeDataRole));
 }
 
 RailStationEventListDialog::RailStationEventListDialog(Diagram& diagram, const std::shared_ptr<Railway>& rail, const std::shared_ptr<RailStation>& station, QWidget* parent) : QDialog(parent),

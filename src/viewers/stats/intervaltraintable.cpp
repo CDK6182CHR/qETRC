@@ -40,11 +40,11 @@ void IntervalTrainModel::setupModel()
         setItem(i, ColToStation, new SI(info.to->name.toSingleLiteral()));
 
         it = new SI;
-        it->setData(QVariant::fromValue(info.from->depart), Qt::EditRole);
+        it->setData(info.from->depart.toQVariant(), Qt::EditRole);
         setItem(i,ColFromTime,it);
         
         it = new SI;
-        it->setData(QVariant::fromValue(info.to->arrive), Qt::EditRole);
+        it->setData(info.to->arrive.toQVariant(), Qt::EditRole);
         setItem(i,ColToTime,it);
 
         int secs=qeutil::secsToStrict(info.from->depart,info.to->arrive,info.addDays, _ops.period_hours);
@@ -95,4 +95,6 @@ void IntervalTrainTable::initUI()
     setItemDelegateForColumn(IntervalTrainModel::ColFromTime, time_del);
     setItemDelegateForColumn(IntervalTrainModel::ColToTime, time_del);
     setItemDelegateForColumn(IntervalTrainModel::ColTime, new TimeIntervalDelegateHour(this));
+
+    horizontalHeader()->setSortIndicatorShown(true);
 }

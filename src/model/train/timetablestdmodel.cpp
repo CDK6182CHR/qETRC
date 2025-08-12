@@ -32,11 +32,11 @@ void TimetableStdModel::setupNewRow(int row)
     using SI=QStandardItem;
     setItem(row,ColName,new SI);
     auto* it=new SI;
-    it->setData(QVariant::fromValue(TrainTime{}), Qt::EditRole);
+    it->setData(TrainTime{}.toQVariant(), Qt::EditRole);
     setItem(row,ColArrive,it);
 
     it=new SI;
-    it->setData(QVariant::fromValue(TrainTime{}),Qt::EditRole);
+    it->setData(TrainTime{}.toQVariant(), Qt::EditRole);
     setItem(row,ColDepart,it);
 
     setItem(row,ColBusiness,makeCheckItem());
@@ -121,8 +121,8 @@ std::shared_ptr<Train> TimetableStdModel::getTimetableTrain()
         }
         t->appendStation(
             StationName::fromSingleLiteral(name),
-            qvariant_cast<TrainTime>(item(i, ColArrive)->data(Qt::EditRole)),
-            qvariant_cast<TrainTime>(item(i, ColDepart)->data(Qt::EditRole)),
+            TrainTime::fromQVariant(item(i, ColArrive)->data(Qt::EditRole)),
+            TrainTime::fromQVariant(item(i, ColDepart)->data(Qt::EditRole)),
             item(i, ColBusiness)->checkState() == Qt::Checked,
             item(i, ColTrack)->text(),
             item(i, ColNote)->text()
@@ -133,8 +133,8 @@ std::shared_ptr<Train> TimetableStdModel::getTimetableTrain()
 
 void TimetableStdModel::updateRowStopTime(int row)
 {
-    const TrainTime& arr = qvariant_cast<TrainTime>(item(row, ColArrive)->data(Qt::EditRole));
-    const TrainTime& dep = qvariant_cast<TrainTime>(item(row, ColDepart)->data(Qt::EditRole));
+    const TrainTime& arr = TrainTime::fromQVariant(item(row, ColArrive)->data(Qt::EditRole));
+    const TrainTime& dep = TrainTime::fromQVariant(item(row, ColDepart)->data(Qt::EditRole));
     auto* it = item(row, ColStopTime);
 
     if (arr != dep) {
