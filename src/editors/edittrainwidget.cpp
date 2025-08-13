@@ -95,6 +95,7 @@ void EditTrainWidget::refreshBasicData()
         btnToRouting->setEnabled(false);
     }
 
+    refreshTrainTags();
 }
 
 TimetableStdModel* EditTrainWidget::getModel()
@@ -105,6 +106,16 @@ TimetableStdModel* EditTrainWidget::getModel()
 bool EditTrainWidget::isSynchronized() const
 {
     return btnSync->isChecked();
+}
+
+void EditTrainWidget::refreshTrainTags()
+{
+    if (_train) {
+        edTags->setText(train()->tagString());
+    }
+    else {
+        edTags->clear();
+    }
 }
 
 void EditTrainWidget::initUI()
@@ -203,6 +214,18 @@ void EditTrainWidget::initUI()
     hlay->addWidget(btn);
     flay->addRow(tr("车底交路"),hlay);
     vlay->addLayout(flay);
+
+	hlay = new QHBoxLayout;
+    edTags = new QLineEdit;
+    edTags->setReadOnly(true);
+	hlay->addWidget(edTags);
+
+	btn = new QPushButton(tr("编辑标签"));
+    connect(btn, &QPushButton::clicked, [this]() {
+        emit editTrainTags(train());
+        });
+	hlay->addWidget(btn);
+	flay->addRow(tr("列车标签"), hlay);
 
     table=ctable->table();
     vlay->addWidget(ctable);

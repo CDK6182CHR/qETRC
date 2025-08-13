@@ -22,7 +22,7 @@ class TrainInfoWidget : public QScrollArea
     const DiagramOptions& _ops;
     std::shared_ptr<Train> train{};
 
-    QLineEdit* edName,*edNameDir,*edStartEnd,*edType,*edPassen;
+    QLineEdit* edName, * edNameDir, * edStartEnd, * edType, * edPassen, * edTags;
     QLineEdit* edStations, *edLines,*edMile,*edTime,*edSpeed;
     QLineEdit* edTechSpeed;
     QLineEdit* edRouting,*edModel,*edOwner,*edPre,*edPost;
@@ -40,6 +40,7 @@ signals:
     void editTimetable(std::shared_ptr<Train> train);
     void showTimetable(std::shared_ptr<Train> train);
     void switchToRouting(std::shared_ptr<Routing> routing);
+	void editTrainTags(std::shared_ptr<Train> train);
 
 private:
     void initUI();
@@ -51,6 +52,7 @@ public slots:
     void setTrain(std::shared_ptr<Train> train);
     void resetTrain();
     void refreshData();
+    void refreshTags();
     void clearData();
 
 private slots:

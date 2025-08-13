@@ -190,6 +190,23 @@ void TrainContext::initUI()
 		w->setObjectName(tr("车次交路面板"));
 		w->setWindowTitle(tr("交路"));
 		panel->addWidget(w, SARibbonPannelItem::Large);
+
+		panel = page->addPannel(tr("列车标签"));
+		w = new QWidget;
+		vlay = new QVBoxLayout(w);
+		edTags = new SARibbonLineEdit;
+		edTags->setReadOnly(true);
+		edTags->setAlignment(Qt::AlignCenter);
+		vlay->addWidget(edTags);
+		auto* btnTags = new SARibbonToolButton();
+		btnTags->setText(tr("编辑标签"));
+		btnTags->setIcon(QEICN_edit_train_tags_view);
+		vlay->addWidget(btnTags);
+		connect(btnTags, &SARibbonToolButton::clicked, [this]() {
+			if (train) openTagDialog(train);
+			});
+
+		panel->addWidget(w, SARibbonPannelItem::Large);
 	}
 
 	//编辑
@@ -401,12 +418,14 @@ void TrainContext::initUI()
 		panel->addLargeAction(act);
 		connect(act, &QAction::triggered, this, &TrainContext::actShowEditWidget);
 
+#if 0
 		act = mw->makeAction(QEICN_edit_train_tags, tr("标签"), tr("编辑列车标签"));
 		act->setToolTip(tr("编辑列车标签\n为当前列车添加或删除标签"));
 		panel->addLargeAction(act);
 		connect(act, &QAction::triggered, [this]() {
 			if (train) openTagDialog(train);
 			});
+#endif
 
 		act = mw->makeAction(QEICN_copy_train, tr("列车副本"));
 		act->setToolTip(tr("创建列车副本\n以新输入的全车次创建当前车次的副本。"));
@@ -1281,6 +1300,9 @@ void TrainContext::onTrainTagListUpdated()
 
 void TrainContext::onTrainTagChanged(std::shared_ptr<Train> train)
 {
+	if (!train)
+		return;
+
 	// Update the train tag dialogs and remove the expired dialogs
 	for (auto itr= tagDialogs.begin(); itr != tagDialogs.end();) {
 		if (itr->isNull()) {
@@ -1293,6 +1315,22 @@ void TrainContext::onTrainTagChanged(std::shared_ptr<Train> train)
 			}
 			++itr;
 		}
+	}
+
+	// Update the edit widgets
+	for (auto* w : editWidgets) {
+		if (w->train() == train) {
+			w->refreshTrainTags();
+		}
+	}
+
+	// Update the train info widget
+	if (mw->trainInfoWidget->getTrain() == train) {
+		mw->trainInfoWidget->refreshData();
+	}
+
+	if (this->train == train) {
+		edTags->setText(train->tagString());
 	}
 }
 
@@ -1370,6 +1408,8 @@ void TrainContext::showEditWidget(std::shared_ptr<Train> train)
 			mw, &MainWindow::focusInRouting);
 		connect(w, &EditTrainWidget::removeTrain,
 			this, &TrainContext::actRemoveTrainFromEdit);
+		connect(w, &EditTrainWidget::editTrainTags, 
+			this, &TrainContext::openTagDialog);
 		connect(w, &EditTrainWidget::synchronizationChanged, [this, w](bool on) {
 			if (on) {
 				syncEditors.insert(w);
@@ -1523,6 +1563,10 @@ void TrainContext::refreshData()
 			btnCreateRouting->setEnabled(true);
 			btnAddToRouting->setEnabled(true);
 		}
+
+		edTags->setText(train->tagString());
+		edTags->setToolTip(train->tagString());
+
 		refreshPath();
 		edNamem->setText(train->trainName().full());
 		edStartm->setText(train->starting().toSingleLiteral());

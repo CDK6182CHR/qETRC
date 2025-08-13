@@ -44,6 +44,7 @@ class EditTrainWidget : public QWidget
     PenStyleCombo* cbLs;
     QPushButton* btnColor;
     QLineEdit* edRouting;
+    QLineEdit* edTags;
 
     QPushButton* btnToRouting;
     QToolButton* btnSync;
@@ -64,6 +65,7 @@ public:
     void refreshBasicData();
     TimetableStdModel* getModel();
     bool isSynchronized()const;
+    void refreshTrainTags();
 
 private:
     void initUI();
@@ -74,6 +76,8 @@ signals:
     void switchToRouting(std::shared_ptr<Routing> routing);
     void removeTrain(std::shared_ptr<Train> train);
     void synchronizationChanged(bool on);
+	void editTrainTags(std::shared_ptr<Train> train);
+
 private slots:
     void actApply();
     void actCancel();

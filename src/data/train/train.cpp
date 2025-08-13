@@ -137,6 +137,17 @@ QJsonObject Train::toJson() const
     return obj;
 }
 
+QString Train::tagString() const
+{
+    if (_tags.empty())
+        return QObject::tr("(无标签)");
+	QString res = _tags.front()->name();
+    for (size_t i = 1; i < _tags.size(); i++) {
+		res.push_back(QString(" | %1").arg(_tags[i]->name()));
+    }
+    return res;
+}
+
 bool Train::getIsPassenger()const
 {
     switch (_passenger)

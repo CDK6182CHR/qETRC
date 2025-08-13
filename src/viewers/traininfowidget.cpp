@@ -41,6 +41,19 @@ void TrainInfoWidget::initUI()
     edStartEnd=makeLineEdit(tr("始发终到"));
     edType=makeLineEdit(tr("列车种类"));
     edPassen=makeLineEdit(tr("旅客列车"));
+
+	auto* hlay = new QHBoxLayout;
+	edTags = new QLineEdit;
+    edTags->setReadOnly(true);
+    hlay->addWidget(edTags);
+    auto* tb = new QToolButton(this);
+    tb->setIcon(QEICN_train_info_edit_tags);
+    hlay->addWidget(tb);
+	flay->addRow(tr("列车标签"), hlay);
+    connect(tb, &QToolButton::clicked, [this]() {
+        emit editTrainTags(train);
+		});
+
     edStations=makeLineEdit(tr("总/铺画站数"));
     edLines=makeLineEdit(tr("运行线情况"));
 
@@ -61,9 +74,9 @@ void TrainInfoWidget::initUI()
 
     edRouting = new QLineEdit;
     edRouting->setFocusPolicy(Qt::NoFocus);
-    auto* hlay = new QHBoxLayout;
+    hlay = new QHBoxLayout;
     hlay->addWidget(edRouting);
-    auto* tb = new QToolButton(this);
+    tb = new QToolButton(this);
     tb->setIcon(QEICN_train_info_to_routing);
     connect(tb, &QToolButton::clicked, this, &TrainInfoWidget::actSwitchToRouting);
     tb->setToolTip(tr("转到当前交路\n将当前列车所属的交路（如果存在）设置为“当前交路”，"
@@ -158,6 +171,9 @@ void TrainInfoWidget::refreshData()
         edPassen->setText(tr("指定 (%1)").arg(
                             train->passenger() == TrainPassenger::True?tr("是"):tr("否")));
     }
+
+	edTags->setText(train->tagString());
+
     edStations->setText(tr("%1 / %2").arg(train->stationCount())
                         .arg(train->adapterStationCount()));
     edLines->setText(tr("%1线路 | %2运行线").arg(train->adapters().size())
@@ -219,6 +235,16 @@ void TrainInfoWidget::refreshData()
         edPre->clear();
         edPost->clear();
         edOrder->clear();
+    }
+}
+
+void TrainInfoWidget::refreshTags()
+{
+    if (train) {
+        edTags->setText(train->tagString());
+    }
+    else {
+        edTags->clear();
     }
 }
 

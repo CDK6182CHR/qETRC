@@ -147,6 +147,8 @@ public:
     auto& tags() { return _tags; }
     auto& tags()const { return _tags; }
 
+    QString tagString()const;
+
     /**
      * 强制判断是否为客车；如果设置为自动，根据类型
      */

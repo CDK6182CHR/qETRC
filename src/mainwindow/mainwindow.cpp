@@ -1439,6 +1439,9 @@ void MainWindow::initToolbar()
 
 		connect(actMergeTrains, &QAction::triggered,
 			contextTrain, &TrainContext::actMergeTrains);
+
+		connect(trainInfoWidget, &TrainInfoWidget::editTrainTags,
+			contextTrain, &TrainContext::openTagDialog);
 	}
 
 	//context: rail 8

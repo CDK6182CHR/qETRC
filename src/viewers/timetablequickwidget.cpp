@@ -14,6 +14,7 @@
 #include "data/train/train.h"
 #include "dialogs/locatedialog.h"
 #include "model/delegate/traintimedelegate.h"
+#include "data/train/traintype.h"
 
 TimetableQuickWidget::TimetableQuickWidget(const DiagramOptions& ops, QUndoStack* undo_, QWidget *parent):
     QWidget(parent), _ops(ops),
@@ -166,9 +167,11 @@ void TimetableQuickWidget::refreshData()
         edName->clear();
         return;
     }
-    edName->setText(tr("%1 (%2->%3)").arg(train->trainName().full(),
-                                          train->starting().toSingleLiteral(),
-                                          train->terminal().toSingleLiteral()));
+    edName->setText(tr("%1 (%2->%3) [%4]").arg(
+        train->trainName().full(),
+        train->starting().toSingleLiteral(),
+        train->terminal().toSingleLiteral(),
+        train->type()->name()));
     edName->setCursorPosition(0);
     // 合并单元格
     for(int i=0;i<train->stationCount();i++){

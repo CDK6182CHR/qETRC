@@ -121,7 +121,7 @@ class TrainContext : public QObject
     QDoubleSpinBox* spWidth;
     QColor tmpColor;
 
-    SARibbonLineEdit* edPaths;
+    SARibbonLineEdit* edPaths, * edTags;
 
     QList<BasicTrainWidget*> basicWidgets;
     QList<EditTrainWidget*> editWidgets;

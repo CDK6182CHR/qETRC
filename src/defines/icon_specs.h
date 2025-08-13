@@ -151,6 +151,7 @@
 #define QEICN_train_to_routing QE_STD_ICON(ArrowRight)   // 转到交路
 #define QEICN_create_routing_train QE_RSC_ICON(new-file.png)   // 从列车创建交路
 #define QEICN_add_train_to_routing QE_RSC_ICON(add.png)   // 将列车添加到交路
+#define QEICN_edit_train_tags_view QE_RSC_ICON(edit.png)   // 编辑列车标签 (审阅页面)
 
 ///////// 工具栏 列车编辑 (7) /////////
 
@@ -270,6 +271,7 @@
 ////////////// 非工具栏图标 //////////////
 
 #define QEICN_diagram_page_title QE_RSC_ICON(diagram.png)   // 运行图页面标题栏图标
+#define QEICN_train_info_edit_tags QE_RSC_ICON(edit.png)   // 速览信息中 编辑列车标签
 #define QEICN_train_info_to_routing QE_STD_ICON(ArrowRight)   // 速览信息中 转到交路
 #define QEICN_train_filter_info QE_STD_ICON(MessageBoxInformation)   // 列车筛选器中 关于预设筛选器的信息
 #define QEICN_train_filter_info_widget QE_STD_ICON(MessageBoxInformation)  // 预设筛选器管理中 关于预设筛选器的信息

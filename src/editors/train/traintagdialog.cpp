@@ -101,7 +101,7 @@ void TrainTagDialog::actAddNewTag()
 		QMessageBox::warning(this, tr("无效的标签名"), tr("标签名不能为空，请重新输入。"));
 		return;
 	}
-
+	m_edNewTag->clear();
 	emit addTrainTag(m_train, name);
 }
 
