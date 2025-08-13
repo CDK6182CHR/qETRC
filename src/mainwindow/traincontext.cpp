@@ -22,9 +22,11 @@
 #include "data/diagram/trainadapter.h"
 #include "dialogs/splittraindialog.h"
 #include "dialogs/mergetrainsdialog.h"
+#include "editors/train/traintagdialog.h"
 
 #include <DockManager.h>
 
+#include <QDateTime>
 #include <QApplication>
 #include <QMessageBox>
 #include <QColorDialog>
@@ -398,6 +400,13 @@ void TrainContext::initUI()
 		act->setToolTip(tr("列车编辑\n显示（pyETRC风格的）完整列车编辑页面"));
 		panel->addLargeAction(act);
 		connect(act, &QAction::triggered, this, &TrainContext::actShowEditWidget);
+
+		act = mw->makeAction(QEICN_edit_train_tags, tr("标签"), tr("编辑列车标签"));
+		act->setToolTip(tr("编辑列车标签\n为当前列车添加或删除标签"));
+		panel->addLargeAction(act);
+		connect(act, &QAction::triggered, [this]() {
+			if (train) openTagDialog(train);
+			});
 
 		act = mw->makeAction(QEICN_copy_train, tr("列车副本"));
 		act->setToolTip(tr("创建列车副本\n以新输入的全车次创建当前车次的副本。"));
@@ -1252,6 +1261,41 @@ void TrainContext::afterTrainsReboundByPath(const std::vector<std::shared_ptr<Tr
 	}
 }
 
+void TrainContext::openTagDialog(std::shared_ptr<Train> train)
+{
+	if (!train)
+		return;
+	auto* dlg = new TrainTagDialog(diagram.trainCollection().tagManager(), train, mw);
+	
+	connect(dlg, &TrainTagDialog::addTrainTag, this, &TrainContext::actAddTrainTag);
+	connect(dlg, &TrainTagDialog::removeTrainTag, this, &TrainContext::actRemoveTrainTag);
+
+	tagDialogs.push_back(dlg);
+	dlg->show();
+}
+
+void TrainContext::onTrainTagListUpdated()
+{
+	// Nothing to do for now
+}
+
+void TrainContext::onTrainTagChanged(std::shared_ptr<Train> train)
+{
+	// Update the train tag dialogs and remove the expired dialogs
+	for (auto itr= tagDialogs.begin(); itr != tagDialogs.end();) {
+		if (itr->isNull()) {
+			itr = tagDialogs.erase(itr);
+		}
+		else {
+			auto* dlg = itr->data();
+			if (dlg->train() == train) {
+				dlg->refreshData();
+			}
+			++itr;
+		}
+	}
+}
+
 void TrainContext::actToggleTrainLineShown(bool checked)
 {
 	if (!train)
@@ -1826,6 +1870,31 @@ void TrainContext::actChangeTrain()
 	}
 }
 
+void TrainContext::actAddTrainTag(std::shared_ptr<Train> train, const QString& tagName)
+{
+	auto& man = diagram.trainCollection().tagManager();
+	if (!man.contains(tagName)) {
+		auto t = std::make_shared<TrainTag>(tagName, tr("自动创建于%1  车次%2").arg(
+			QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"), train->trainName().full()));
+		mw->undoStack->push(new qecmd::AddNewTrainTag(man, t, this));
+	}
+
+	auto tag = man.find(tagName);
+	assert(tag);
+	mw->undoStack->push(new qecmd::AppendTagToTrain(train, tag, this));
+}
+
+void TrainContext::actRemoveTrainTag(std::shared_ptr<Train> train, int index)
+{
+	if (index <  0 || index >= train->tags().size()) {
+		QMessageBox::warning(mw, tr("错误"), tr("内部错误：无法删除车次标签：索引越界！"));
+		return;
+	}
+
+	auto tag = train->tags().at(index);
+	mw->undoStack->push(new qecmd::RemoveTagFromTrain(train, index, tag, this));
+}
+
 void TrainContext::setTrain(std::shared_ptr<Train> train_)
 {
 	train = train_;
@@ -2375,6 +2444,74 @@ void qecmd::RebindTrainsByPaths::redo()
 	cont->afterTrainsReboundByPath(trains, adapters);
 }
 
+qecmd::AddNewTrainTag::AddNewTrainTag(TrainTagManager& manager_, std::shared_ptr<TrainTag> tag_,
+	TrainContext* cont, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("添加新列车标签: %1").arg(tag_->name()), parent), manager(manager_), tag(tag_), cont(cont)
+{
+}
 
+void qecmd::AddNewTrainTag::undo()
+{
+	manager.removeTag(tag->name());
+	cont->onTrainTagListUpdated();
+}
+
+void qecmd::AddNewTrainTag::redo()
+{
+	manager.addTag(tag);
+	cont->onTrainTagListUpdated();
+}
+
+
+qecmd::AppendTagToTrain::AppendTagToTrain(std::shared_ptr<Train> train_, std::shared_ptr<TrainTag> tag_, 
+	TrainContext* cont, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("添加列车标签 %1 至 %2").arg(tag_->name(), train_->trainName().full()), parent),
+	train(train_), tag(tag_), cont(cont)
+{
+}
+
+void qecmd::AppendTagToTrain::undo()
+{
+	if (train->tags().empty()) {
+		train->tags().pop_back();
+	}
+	else {
+		qCritical() << "AppendTagToTrain::undo: train tags empty";
+	}
+	cont->onTrainTagChanged(train);
+}
+
+void qecmd::AppendTagToTrain::redo()
+{
+	train->tags().push_back(tag);
+	cont->onTrainTagChanged(train);
+}
+
+qecmd::RemoveTagFromTrain::RemoveTagFromTrain(std::shared_ptr<Train> train_, int index_, 
+	std::shared_ptr<TrainTag> tag_, TrainContext* cont, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("从列车 %1 中移除标签 %2").arg(train_->trainName().full(), tag_->name()), parent),
+	train(train_), index(index_), tag(tag_), cont(cont)
+{
+}
+
+void qecmd::RemoveTagFromTrain::undo()
+{
+	if (index < 0 || index > train->tags().size()) {
+		qCritical() << "RemoveTagFromTrain::undo: index out of range";
+		return;
+	}
+	train->tags().insert(train->tags().begin() + index, tag);
+	cont->onTrainTagChanged(train);
+}
+
+void qecmd::RemoveTagFromTrain::redo()
+{
+	if (index < 0 || index >= train->tags().size()) {
+		qCritical() << "RemoveTagFromTrain::redo: index out of range";
+		return;
+	}
+	train->tags().erase(train->tags().begin() + index);
+	cont->onTrainTagChanged(train);
+}
 
 #endif

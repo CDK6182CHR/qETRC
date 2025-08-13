@@ -169,6 +169,7 @@
 
 #define QEICN_edit_timetable QE_RSC_ICON(timetable.png)   // 编辑时刻表
 #define QEICN_edit_train QE_RSC_ICON(edit.png)   // 编辑列车所有数据
+#define QEICN_edit_train_tags QE_RSC_ICON(electronic-clock.png)   // 编辑列车标签
 
 #define QEICN_copy_train QE_RSC_ICON(copy.png)   // 创建列车副本
 #define QEICN_del_train QE_STD_ICON(TrashIcon)   // 删除列车

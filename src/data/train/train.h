@@ -144,6 +144,9 @@ public:
     auto& paths() { return _paths; }
     auto& paths()const { return _paths; }
 
+    auto& tags() { return _tags; }
+    auto& tags()const { return _tags; }
+
     /**
      * 强制判断是否为客车；如果设置为自动，根据类型
      */

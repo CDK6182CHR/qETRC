@@ -7,6 +7,7 @@
 #include <deque>
 #include <QUndoCommand>
 #include <QSet>
+#include <QPointer>
 
 #include <data/train/train.h>
 
@@ -25,6 +26,8 @@ class TrainType;
 class TrainListModel;
 class TrainCollection;
 class DiagramNaviModel;
+class TrainTagDialog;
+class TrainTagManager;
 
 struct TrainStationBounding;
 namespace qecmd {
@@ -124,6 +127,7 @@ class TrainContext : public QObject
     QList<EditTrainWidget*> editWidgets;
     QList<ads::CDockWidget*> basicDocks, editDocks;
     QSet<EditTrainWidget*> syncEditors;
+    QList<QPointer<TrainTagDialog>> tagDialogs;
 
     LocateBoundingDialog* dlgLocate = nullptr;
 public:
@@ -426,6 +430,31 @@ public slots:
      */
     void updateTrainShownStatus(std::shared_ptr<Train> train);
 
+    /**
+	 * 2025.08.13  Open the tag dialog for the given train.
+     * The dialog will be stored in tagDialogs for further updating.
+	 * We do not check whether multiple dialogs for the same train are opened.
+     */
+	void openTagDialog(std::shared_ptr<Train> train);
+
+    /**
+     * Add a new train tag. The tag may have already existed or not.
+     */
+    void actAddTrainTag(std::shared_ptr<Train> train, const QString& tagName);
+
+	void actRemoveTrainTag(std::shared_ptr<Train> train, int index);
+
+    /**
+     * Call this after the train tag list is changed (add, remove, rename).
+     * Called by the commands.
+     */
+    void onTrainTagListUpdated();
+
+    /**
+     * Call this function when the tags for a train has changed.
+     */
+	void onTrainTagChanged(std::shared_ptr<Train> train);
+
 private slots:
     void showTrainEvents();
 
@@ -503,6 +532,7 @@ private slots:
     void actAddToRouting();
 
     void actChangeTrain();
+
 
 };
 
@@ -804,6 +834,49 @@ namespace qecmd {
 
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    /**
+	 * 2025.08.13  Add a new tag to the manager. The new tag must NOT exist before.
+     */
+    class AddNewTrainTag : public QUndoCommand
+    {
+        TrainTagManager& manager;
+        std::shared_ptr<TrainTag> tag;
+		TrainContext* const cont;
+
+    public:
+        AddNewTrainTag(TrainTagManager& manager_, std::shared_ptr<TrainTag> tag_, TrainContext* cont, QUndoCommand* parent=nullptr);
+
+		void undo()override;
+        void redo()override;
+    };
+
+    class AppendTagToTrain : public QUndoCommand
+    {
+        std::shared_ptr<Train> train;
+        std::shared_ptr<TrainTag> tag;
+        TrainContext* const cont;
+
+    public:
+		AppendTagToTrain(std::shared_ptr<Train> train_, std::shared_ptr<TrainTag> tag_, TrainContext* cont, QUndoCommand* parent = nullptr);
+
+		void undo()override;
+		void redo()override;
+    };
+
+    class RemoveTagFromTrain : public QUndoCommand
+    {
+        std::shared_ptr<Train> train;
+        int index;
+        std::shared_ptr<TrainTag> tag;
+        TrainContext* const cont;
+    public:
+        RemoveTagFromTrain(std::shared_ptr<Train> train_, int index_, 
+			std::shared_ptr<TrainTag> tag_, TrainContext* cont, QUndoCommand* parent = nullptr);
+
+		void undo()override;
+		void redo()override;
     };
 }
 

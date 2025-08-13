@@ -30,4 +30,10 @@ public:
 	 * Find a tag by name, or create a new tag if it does not exist.
 	 */
 	std::shared_ptr<TrainTag> findOrCreate(const QString& name);
+
+	bool contains(const QString& name);
+
+	void removeTag(const QString& name);
+
+	void addTag(std::shared_ptr<TrainTag> tag);
 };

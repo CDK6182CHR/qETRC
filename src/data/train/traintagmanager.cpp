@@ -1,6 +1,7 @@
 #include "traintagmanager.h"
 
 #include <QJsonArray>
+#include <QDebug>
 
 QJsonObject TrainTagManager::toJson() const
 {
@@ -48,4 +49,24 @@ std::shared_ptr<TrainTag> TrainTagManager::findOrCreate(const QString& name)
 	// Not found, create a new tag
 	const auto& res = m_tags.emplace(name, std::make_unique<TrainTag>(name));
 	return res.first->second;
+}
+
+bool TrainTagManager::contains(const QString& name)
+{
+	return m_tags.contains(name);
+}
+
+void TrainTagManager::removeTag(const QString& name)
+{
+	if (auto itr= m_tags.find(name); itr != m_tags.end()) {
+		m_tags.erase(itr);
+	}
+	else {
+		qWarning() << "TrainTagManager::removeTag: tag not found: " << name;
+	}
+}
+
+void TrainTagManager::addTag(std::shared_ptr<TrainTag> tag)
+{
+	m_tags[tag->name()] = tag;
 }
