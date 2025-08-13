@@ -25,27 +25,27 @@ void TrainTagManager::fromJson(const QJsonObject& obj)
 		if (tagValue.isObject()) {
 			TrainTag tag;
 			tag.fromJson(tagValue.toObject());
-			m_tags[tag.name()] = std::make_unique<TrainTag>(tag);
+			m_tags[tag.name()] = std::make_shared<TrainTag>(tag);
 		}
 	}
 }
 
-TrainTag* TrainTagManager::find(const QString& name) const
+std::shared_ptr<TrainTag> TrainTagManager::find(const QString& name) const
 {
 	auto it = m_tags.find(name);
 	if (it != m_tags.end()) {
-		return it->second.get();
+		return it->second;
 	}
 	return nullptr;
 }
 
-TrainTag* TrainTagManager::findOrCreate(const QString& name)
+std::shared_ptr<TrainTag> TrainTagManager::findOrCreate(const QString& name)
 {
 	auto it = m_tags.find(name);
 	if (it != m_tags.end()) {
-		return it->second.get();
+		return it->second;
 	}
 	// Not found, create a new tag
 	const auto& res = m_tags.emplace(name, std::make_unique<TrainTag>(name));
-	return res.first->second.get();
+	return res.first->second;
 }

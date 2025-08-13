@@ -91,7 +91,7 @@ class Train:
 
     std::vector<TrainPath*> _paths;
 
-    std::vector<TrainTag*> _tags;
+    std::vector<std::shared_ptr<TrainTag>> _tags;
 
 public:
     using StationPtr=std::list<TrainStation>::iterator;
