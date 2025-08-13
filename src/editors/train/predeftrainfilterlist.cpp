@@ -14,6 +14,13 @@ PredefTrainFilterList::PredefTrainFilterList(TrainCollection &coll, QWidget *par
     initUI();
 }
 
+PredefTrainFilterCore* PredefTrainFilterList::currentFilter() const
+{
+	auto idx = view->currentIndex();
+	if (!idx.isValid()) return nullptr;
+	return qvariant_cast<PredefTrainFilterCore*>(idx.data(qeutil::PredefTrainFilterPointerRole));
+}
+
 void PredefTrainFilterList::initUI()
 {
     auto* vlay=new QVBoxLayout(this);
@@ -66,5 +73,6 @@ void PredefTrainFilterList::refreshList()
     }
     if (model->rowCount() > 0 && !view->currentIndex().isValid()) {
         view->setCurrentIndex(model->index(0, 0));
+		//emit currentChanged(currentFilter());  // we should emit this manually??
     }
 }

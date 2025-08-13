@@ -8,6 +8,7 @@ PredefTrainFilterManager::PredefTrainFilterManager(TrainCollection &coll, QWidge
 {
     initUI();
     setWindowTitle(tr("预置列车筛选器"));
+    //refreshData();
 }
 
 void PredefTrainFilterManager::initUI()
@@ -55,6 +56,6 @@ void PredefTrainFilterManager::commitUpdateFilter(const PredefTrainFilterCore* f
 void PredefTrainFilterManager::refreshData()
 {
     lstWidget->refreshList();
-    editWidget->setCore(nullptr);
+	editWidget->setCore(lstWidget->currentFilter());
     editWidget->refreshData();
 }

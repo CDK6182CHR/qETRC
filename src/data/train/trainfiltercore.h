@@ -30,11 +30,13 @@ protected:
     bool useType=false, useInclude=false, useExclude=false;
     bool useStarting = false, useTerminal = false;
     bool useRouting=false, showOnly=false, useInverse=false;
+	bool useIncludeTag = false, useExcludeTag = false;
     TrainPassenger passengerType = TrainPassenger::Auto;
 
     QSet<std::shared_ptr<const TrainType>> types;
     QVector<QRegularExpression> includes, excludes;
     QVector<QRegularExpression> startings, terminals;
+	QVector<QString> includeTags, excludeTags;
     QSet<std::shared_ptr<const Routing>> routings;
     bool selNullRouting=false;
 
@@ -62,4 +64,6 @@ private:
     bool checkShow(std::shared_ptr<const Train> train)const;
     bool checkStarting(std::shared_ptr<const Train> train)const;
     bool checkTerminal(std::shared_ptr<const Train> train)const;
+	bool checkIncludeTag(std::shared_ptr<const Train> train) const;
+	bool checkExcludeTag(std::shared_ptr<const Train> train) const;
 };

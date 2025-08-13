@@ -17,6 +17,8 @@ class PredefTrainFilterList : public QWidget
 public:
     explicit PredefTrainFilterList(TrainCollection& coll, QWidget *parent = nullptr);
 
+	PredefTrainFilterCore* currentFilter() const;
+
 private:
     void initUI();
 

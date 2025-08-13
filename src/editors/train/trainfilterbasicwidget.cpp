@@ -4,6 +4,8 @@
 #include "trainnameregextable.h"
 #include "editors/rail/stationnameregextable.h"
 #include "selectroutinglistwidget.h"
+#include "traintagselecttable.h"
+#include "data/train/traincollection.h"
 
 #include <QCheckBox>
 #include <QFormLayout>
@@ -11,7 +13,7 @@
 #include <QMessageBox>
 #include <QTextBrowser>
 
-#include <util/qefoldwidget.h>
+#include "util/qefoldwidget.h"
 
 TrainFilterBasicWidget::TrainFilterBasicWidget(TrainCollection &coll,
                                                TrainFilterCore* core, QWidget *parent)
@@ -34,6 +36,15 @@ void TrainFilterBasicWidget::appliedData(TrainFilterCore* core)
     if (core->useExclude) {
         core->excludes = tabExclude->names();
     }
+	core->useIncludeTag = ckIncludeTag->isChecked();
+    if (core->useIncludeTag) {
+        core->includeTags = tabIncludeTag->selectedTags();
+    }
+	core->useExcludeTag = ckExcludeTag->isChecked();
+    if (core->useExcludeTag) {
+        core->excludeTags = tabExcludeTag->selectedTags();
+	}
+
     core->useRouting = ckRouting->isChecked();
     if (core->useRouting) {
         auto&& res = lstRouting->result();
@@ -79,6 +90,16 @@ void TrainFilterBasicWidget::initUI()
     tabExclude=new TrainNameRegexTable(coll);
     fold=new QEFoldWidget(ckExclude,tabExclude);
     vlay->addWidget(fold);
+
+	ckIncludeTag = new QCheckBox(tr("含有标签"));
+	tabIncludeTag = new TrainTagSelectTable(coll.tagManager());
+	fold = new QEFoldWidget(ckIncludeTag, tabIncludeTag);
+    vlay->addWidget(fold);
+
+	ckExcludeTag = new QCheckBox(tr("不含标签"));
+	tabExcludeTag = new TrainTagSelectTable(coll.tagManager());
+	fold = new QEFoldWidget(ckExcludeTag, tabExcludeTag);
+	vlay->addWidget(fold);
 
     ckRouting = new QCheckBox(tr("属于交路"));
     lstRouting = new SelectRoutingListWidget(coll);
@@ -130,6 +151,8 @@ void TrainFilterBasicWidget::clearNotChecked()
     ckType->setChecked(false);
     ckInclude->setChecked(false);
     ckExclude->setChecked(false);
+	ckIncludeTag->setChecked(false);
+    ckExcludeTag->setChecked(false);
     ckRouting->setChecked(false);
     ckShowOnly->setChecked(false);
     ckInverse->setChecked(false);
@@ -152,6 +175,8 @@ void TrainFilterBasicWidget::refreshDataWith(const TrainFilterCore *core)
     lstType->refreshTypesWithSelection(core->types);
     tabInclude->refreshData(core->includes);
     tabExclude->refreshData(core->excludes);
+	tabIncludeTag->refreshData(core->includeTags);
+	tabExcludeTag->refreshData(core->excludeTags);
     lstRouting->refreshRoutingsWithSelection(std::make_pair(core->routings, core->selNullRouting));
     tabStarting->refreshData(core->startings);
     tabTerminal->refreshData(core->terminals);
@@ -159,6 +184,8 @@ void TrainFilterBasicWidget::refreshDataWith(const TrainFilterCore *core)
     ckType->setChecked(core->useType);
     ckInclude->setChecked(core->useInclude);
     ckExclude->setChecked(core->useExclude);
+	ckIncludeTag->setChecked(core->useIncludeTag);
+	ckExcludeTag->setChecked(core->useExcludeTag);
     ckRouting->setChecked(core->useRouting);
     ckStarting->setChecked(core->useStarting);
     ckTerminal->setChecked(core->useTerminal);

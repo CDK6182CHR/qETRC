@@ -29,6 +29,8 @@ void PredefTrainFilterCore::fromJson(const QJsonObject &obj, const TrainCollecti
     LOAD_BOOL(selNullRouting);
     LOAD_BOOL(useStarting);
     LOAD_BOOL(useTerminal);
+	LOAD_BOOL(useIncludeTag);
+    LOAD_BOOL(useExcludeTag);
 
     passengerType=static_cast<TrainPassenger>(obj.value("passengerType").toInt(1));
 
@@ -65,6 +67,16 @@ void PredefTrainFilterCore::fromJson(const QJsonObject &obj, const TrainCollecti
         assert(rt);
         routings.insert(rt);
     }
+
+	const auto& arIncTags = obj.value("include_ags").toArray();
+    foreach(const auto& t, arIncTags) {
+		includeTags.push_back(t.toString());
+    }
+
+	const auto& arExcTags = obj.value("exclude_tags").toArray();
+    foreach(const auto& t, arExcTags) {
+		excludeTags.push_back(t.toString());
+    }
 }
 
 
@@ -87,6 +99,8 @@ QJsonObject PredefTrainFilterCore::toJson() const
     DUMP(selNullRouting);
     DUMP(useStarting);
     DUMP(useTerminal);
+    DUMP(useIncludeTag);
+    DUMP(useExcludeTag);
     res.insert("passengerType", static_cast<int>(passengerType));
 
     QJsonArray arTypes;
@@ -124,6 +138,18 @@ QJsonObject PredefTrainFilterCore::toJson() const
         arTerminal.append(reg.pattern());
     }
     res.insert("terminals", arTerminal);
+
+    QJsonArray arIncludeTags;
+    foreach(const auto& tag, includeTags) {
+		arIncludeTags.append(tag);  
+    }
+	res.insert("include_tags", arIncludeTags);
+
+	QJsonArray arExcludeTags;
+    foreach(const auto& tag, excludeTags) {
+        arExcludeTags.append(tag);
+    }
+	res.insert("exclude_tags", arExcludeTags);
 
     return res;
 }

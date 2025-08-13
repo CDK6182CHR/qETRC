@@ -3,6 +3,7 @@
 #include "traintype.h"
 #include "routing.h"
 #include "train.h"
+#include "traintag.h"
 
 
 bool TrainFilterCore::checkType(std::shared_ptr<const Train> train) const
@@ -88,12 +89,30 @@ bool TrainFilterCore::checkTerminal(std::shared_ptr<const Train> train) const
     return false;
 }
 
+bool TrainFilterCore::checkIncludeTag(std::shared_ptr<const Train> train) const
+{
+    if (!useIncludeTag) return true;
+    return std::ranges::find_first_of(train->tags(), includeTags, 
+        {}, [](const std::shared_ptr<TrainTag>& t) {return t->name(); }, {}
+		) != train->tags().end();
+}
+
+bool TrainFilterCore::checkExcludeTag(std::shared_ptr<const Train> train) const
+{
+    // Special for EXCLUDE checking (similar to checkExclude): return false if the train is EXCLUDED.
+    if (!useExcludeTag) return false;   // Special for EXCLUDE
+    return std::ranges::find_first_of(train->tags(), excludeTags,
+        {}, [](const std::shared_ptr<TrainTag>& t) {return t->name(); }, {}
+	) != train->tags().end();
+}
+
 bool TrainFilterCore::check(std::shared_ptr<const Train> train) const
 {
     bool res = (checkType(train)
         && checkRouting(train) && checkPassenger(train) && checkShow(train)
-        && checkStarting(train) && checkTerminal(train)
-        && !checkExclude(train)) || checkInclude(train);
+        && checkStarting(train) && checkTerminal(train) && checkIncludeTag(train)
+        && !checkExclude(train) && !checkExcludeTag(train)
+        ) || checkInclude(train);
     if (useInverse)return !res;
     return res;
 }
