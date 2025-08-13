@@ -88,10 +88,18 @@ bool TrainTimeEdit::focusNextPrevChild(bool next)
 void TrainTimeEdit::focusInEvent(QFocusEvent* e)
 {
     QAbstractSpinBox::focusInEvent(e);
-    if (e->reason() == Qt::TabFocusReason)
-        selectSection(firstSection());
-    else if (e->reason() == Qt::BacktabFocusReason)
+    
+    switch (e->reason()) {
+    case Qt::BacktabFocusReason:
         selectSection(lastSection());
+        break;
+    case Qt::TabFocusReason:
+    case Qt::OtherFocusReason:   // Activated in QTableView
+    case Qt::ActiveWindowFocusReason:
+    case Qt::ShortcutFocusReason:
+		selectSection(firstSection());
+        break;
+    }
 }
 
 void TrainTimeEdit::focusOutEvent(QFocusEvent* e)
