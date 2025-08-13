@@ -15,7 +15,8 @@ class QJsonObject;
 struct Config;
 struct DiagramOptions;
 class RailCategory;
-
+class TrainTagManager;
+class TrainTag;
 
 
 class TrainAdapter;
@@ -90,6 +91,8 @@ class Train:
 
     std::vector<TrainPath*> _paths;
 
+    std::vector<TrainTag*> _tags;
+
 public:
     using StationPtr=std::list<TrainStation>::iterator;
     using ConstStationPtr=std::list<TrainStation>::const_iterator;
@@ -98,7 +101,7 @@ public:
           const StationName& starting=StationName::nullName,
           const StationName& terminal=StationName::nullName,
           TrainPassenger passenger=TrainPassenger::Auto);
-    explicit Train(const QJsonObject& obj, TypeManager& manager);
+    explicit Train(const QJsonObject& obj, TypeManager& manager, TrainTagManager& tag_man);
 
     /**
      * std::list 默认的copy和move都是正确的
@@ -112,7 +115,7 @@ public:
     Train& operator=(const Train&) = delete;
     Train& operator=(Train&&)noexcept = delete;
 
-    void fromJson(const QJsonObject& obj, TypeManager& manager);
+    void fromJson(const QJsonObject& obj, TypeManager& manager, TrainTagManager& tag_man);
     QJsonObject toJson()const;
 
     inline const TrainName& trainName()const{return _trainName;}
@@ -156,6 +159,8 @@ public:
      * 设计用于读入数据时。
      */
     void setType(const QString& _typeName, TypeManager& manager);
+
+	void addTag(const QString& tagName, TrainTagManager& tagManager);
 
     /**
      * @brief pen

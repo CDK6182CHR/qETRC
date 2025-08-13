@@ -9,6 +9,7 @@
 #include <deque>
 
 #include "data/train/typemanager.h"
+#include "data/train/traintagmanager.h"
 #include "data/diagram/diadiff.h"
 #include "predeftrainfiltercore.h"   // not sure: is this neccesary?
 
@@ -47,6 +48,8 @@ class TrainCollection
 
     TypeManager _manager;
     QMap<std::shared_ptr<TrainType>, int> _typeCount;
+
+    TrainTagManager _tagManager;
 
 public:
     TrainCollection() = default;
@@ -149,6 +152,9 @@ public:
 
     auto& typeManager() { return _manager; }
     const auto& typeManager()const { return _manager; }
+
+	auto& tagManager() { return _tagManager; }
+	const auto& tagManager()const { return _tagManager; }
 
     inline auto size()const { return _trains.size(); }
 

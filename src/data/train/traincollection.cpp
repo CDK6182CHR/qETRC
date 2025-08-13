@@ -19,6 +19,7 @@ void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaul
 {
 	_trains.clear();
 	_manager.readForDiagram(obj.value("config").toObject(), defaultManager);
+	_tagManager.fromJson(obj.value("tag_manager").toObject());
 	_routings.clear();
 	//_groups.clear();
 	_filters.clear();
@@ -26,7 +27,7 @@ void TrainCollection::fromJson(const QJsonObject& obj, const TypeManager& defaul
 	//Train类型的正确设置依赖于TypeManager的正确初始化
 	const QJsonArray& artrains = obj.value("trains").toArray();
 	for (const auto& p : artrains) {
-		_trains.append(std::make_shared<Train>(p.toObject(), _manager));
+		_trains.append(std::make_shared<Train>(p.toObject(), _manager, _tagManager));
 	}
 	
 	resetMapInfo();
@@ -97,6 +98,7 @@ QJsonObject TrainCollection::toJson() const
 		{"trains",artrains},
 		{"circuits",arrouting},
         {"filters",arFilter},
+		{"tag_manager", _tagManager.toJson()},
 #if 0
 		{"groups",argroup}
 #endif

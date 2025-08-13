@@ -11,6 +11,7 @@
 #include "typemanager.h"
 #include "data/trainpath/trainpath.h"
 #include "log/IssueManager.h"
+#include "traintagmanager.h"
 #include <QFile>
 #include <QTextStream>
 
@@ -24,9 +25,9 @@ Train::Train(const TrainName &trainName,
 
 }
 
-Train::Train(const QJsonObject &obj, TypeManager& manager)
+Train::Train(const QJsonObject &obj, TypeManager& manager, TrainTagManager& tag_man)
 {
-    fromJson(obj, manager);
+    fromJson(obj, manager, tag_man);
 }
 
 Train::Train(const Train& another):
@@ -51,7 +52,7 @@ Train::Train(Train&& another) noexcept:
     //TrainAdapter not moved
 }
 
-void Train::fromJson(const QJsonObject &obj, TypeManager& manager)
+void Train::fromJson(const QJsonObject &obj, TypeManager& manager, TrainTagManager& tag_man)
 {
     const QJsonArray& archeci=obj.value("checi").toArray();
     _trainName.fromJson(archeci);
@@ -71,6 +72,15 @@ void Train::fromJson(const QJsonObject &obj, TypeManager& manager)
     for (auto p=artable.cbegin();p!=artable.cend();++p){
         _timetable.emplace_back(p->toObject());
     }
+
+    // 2025.08.13: TrainTag
+    if (obj.contains("tags")) {
+        const QJsonArray& arTags = obj.value("tags").toArray();
+        for (const auto& tag : arTags) {
+            addTag(tag.toString(), tag_man);
+        }
+    }
+
     const QJsonObject ui = obj.value("UI").toObject();
     if (!ui.isEmpty()) {
         QPen pen = QPen(QColor(ui.value("Color").toString()), 
@@ -90,6 +100,11 @@ QJsonObject Train::toJson() const
     for(const auto& p:_timetable){
         ar.append(p.toJson());
     }
+
+    QJsonArray artags;
+    for (const auto& tag : _tags) {
+        artags.append(tag->name());
+	}
     
     QJsonObject obj{
         {"checi",_trainName.toJson()},
@@ -99,6 +114,7 @@ QJsonObject Train::toJson() const
         {"shown",_show},
         {"passenger",static_cast<int>(_passenger)},
         {"timetable",ar},
+        {"tags", artags},
         {"autoItem",_autoLines}
     };
 
@@ -143,6 +159,11 @@ void Train::setLineShow(bool on)
 void Train::setType(const QString& _typeName, TypeManager& manager)
 {
     _type = manager.findOrCreate(_typeName);
+}
+
+void Train::addTag(const QString& tagName, TrainTagManager& tagManager)
+{
+    _tags.push_back(tagManager.findOrCreate(tagName));
 }
 
 const QPen& Train::pen() const
