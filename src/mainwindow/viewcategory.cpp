@@ -487,6 +487,11 @@ void ViewCategory::actApplyDefaultConfig()
 
 void ViewCategory::actSaveConfigAsDefault()
 {
+    if (auto flag = QMessageBox::question(mw, tr("提示"),
+        tr("此操作将修改全局默认显示设置，将默认应用于所有此后新建的运行图文件，是否确认？"));
+        flag != QMessageBox::Yes)
+        return;
+
     auto flag = QMessageBox::question(mw, tr("提示"), tr("保存当前设置为默认：将当前运行图"
         "的设置保存为系统默认设置。是否继续？"));
     if (flag == QMessageBox::Yes) {
@@ -669,6 +674,11 @@ void ViewCategory::actApplyDefaultTypeSetToColl()
 
 void ViewCategory::actApplyCollTypeSetToDefault()
 {
+    if (auto flag = QMessageBox::question(mw, tr("提示"),
+        tr("此操作将修改全局默认列车类型管理器，将默认应用于所有此后新建的运行图文件，是否确认？"));
+        flag != QMessageBox::Yes)
+        return;
+
     auto [data, modified] = diagram.defaultTypeManager().updateTypeSetTo(diagram.trainCollection().typeManager());
     actDefaultTypeSetChanged(diagram.defaultTypeManager(), data, modified);
 }
@@ -693,6 +703,10 @@ void ViewCategory::actApplyDefaultTypeRegexToColl()
 
 void ViewCategory::actApplyCollTypeRegexToDefault()
 {
+    if (auto flag = QMessageBox::question(mw, tr("提示"),
+        tr("此操作将修改全局默认列车类型规则，将默认应用于所有此后新建的运行图文件，是否确认？"));
+        flag != QMessageBox::Yes)
+        return;
     auto data = std::make_shared<TypeManager>();
     data->regexRef() = diagram.trainCollection().typeManager().regex();    // copy assign
     actDefaultTypeRegexChanged(diagram.defaultTypeManager(), std::move(data));
