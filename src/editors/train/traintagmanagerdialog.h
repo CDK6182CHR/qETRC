@@ -6,6 +6,8 @@
 class TrainTagManager;
 class TrainCollection;
 class TrainTag;
+class Train;
+struct DiagramOptions;
 
 /**
  * 2025.08.14 For train tag manager. Currently we just use abstract model form.
@@ -50,13 +52,14 @@ class QTableView;
 class TrainTagManagerDialog : public QDialog
 {
 	Q_OBJECT;
+	DiagramOptions& m_options;
 	TrainCollection& m_coll;
 	TrainTagManager& m_manager;
 	TrainTagManagerModel* m_model;
 	QTableView* m_table;
 
 public:
-	TrainTagManagerDialog(TrainCollection& coll, TrainTagManager& manager, QWidget* parent = nullptr);
+	TrainTagManagerDialog(DiagramOptions& options, TrainCollection& coll, TrainTagManager& manager, QWidget* parent = nullptr);
 
 private:
 	void initUI();
@@ -78,6 +81,8 @@ signals:
 	void tagAdded(std::shared_ptr<TrainTag> tag);
 
 	void removeTag(std::shared_ptr<TrainTag> tag);
+
+	void removeTagFromTrains(std::shared_ptr<TrainTag> tag, const std::vector<std::pair<std::shared_ptr<Train>, int>>&);
 	
 public slots:
 	void refreshData();

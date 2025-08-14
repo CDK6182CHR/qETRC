@@ -25,7 +25,6 @@ class PathTrainsDialog : public QDialog
     QTableView* table;
 public:
     PathTrainsDialog(const DiagramOptions& ops, TrainCollection& coll, TrainPath* path, QWidget* parent=nullptr);
-    void refreshData();
 
 private:
     void initUI();
@@ -38,5 +37,8 @@ signals:
 
 private slots:
     void actRemove();
+
+public slots:
+    void refreshData();
 };
 

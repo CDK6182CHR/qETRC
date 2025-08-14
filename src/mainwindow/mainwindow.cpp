@@ -1909,7 +1909,7 @@ void MainWindow::actTrainTagManager()
 		tagManagerDialog->refreshData();
 	}
 	else {
-		tagManagerDialog = new TrainTagManagerDialog(_diagram.trainCollection(), _diagram.trainCollection().tagManager(), this);
+		tagManagerDialog = new TrainTagManagerDialog(_diagram.options(), _diagram.trainCollection(), _diagram.trainCollection().tagManager(), this);
 		tagManagerDialog->refreshData();
 
 		connect(tagManagerDialog, &TrainTagManagerDialog::tagAdded,
@@ -1930,6 +1930,11 @@ void MainWindow::actTrainTagManager()
 		connect(tagManagerDialog, &TrainTagManagerDialog::removeTag,
 			[this](std::shared_ptr<TrainTag> tag) {
 				undoStack->push(new qecmd::DeleteTrainTag(tag, _diagram.trainCollection(), contextTrain));
+			});
+
+		connect(tagManagerDialog, &TrainTagManagerDialog::removeTagFromTrains,
+			[this](std::shared_ptr<TrainTag> tag, const std::vector<std::pair<std::shared_ptr<Train>, int>>& data) {
+				undoStack->push(new qecmd::BatchRemoveTagFromTrains(tag, data, contextTrain));
 			});
 	}
 	tagManagerDialog->show();

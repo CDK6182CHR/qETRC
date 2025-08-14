@@ -295,6 +295,11 @@ public:
      */
     void refineTimetables(int period_hours);
 
+    /**
+     * Returns a list of the trains that containing the given tag.
+     */
+    QList<std::shared_ptr<Train>> tagTrains(std::shared_ptr<TrainTag> tag);
+
 private:
     /**
      * @brief addMapInfo

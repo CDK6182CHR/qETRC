@@ -1339,7 +1339,7 @@ void TrainContext::onTrainTagRenamed(std::shared_ptr<TrainTag> tag)
 	onTrainTagListUpdated();
 
 	if (this->train && this->train->hasTag(tag)) {
-		edTags->setText(train->tagString());
+		refreshTags();
 	}
 
 	if (auto t = mw->trainInfoWidget->getTrain(); t && t->hasTag(tag)) {
@@ -1394,7 +1394,7 @@ void TrainContext::onTrainTagChanged(std::shared_ptr<Train> train)
 	}
 
 	if (this->train == train) {
-		edTags->setText(train->tagString());
+		refreshTags();
 	}
 }
 
@@ -1421,7 +1421,8 @@ void TrainContext::onTrainTagChangedBatch()
 		mw->trainInfoWidget->refreshData();
 	}
 
-	edTags->setText(train->tagString());
+	if (train)
+		refreshTags();
 }
 
 void TrainContext::actToggleTrainLineShown(bool checked)
@@ -1654,10 +1655,9 @@ void TrainContext::refreshData()
 			btnAddToRouting->setEnabled(true);
 		}
 
-		edTags->setText(train->tagString());
-		edTags->setToolTip(train->tagString());
-
+		refreshTags();
 		refreshPath();
+
 		edNamem->setText(train->trainName().full());
 		edStartm->setText(train->starting().toSingleLiteral());
 		edEndm->setText(train->terminal().toSingleLiteral());
@@ -1691,6 +1691,14 @@ void TrainContext::refreshPath()
 	}
 	else {
 		edPaths->setText(tr("%1 等%2项").arg(train->paths().front()->name()).arg(train->paths().size()));
+	}
+}
+
+void TrainContext::refreshTags()
+{
+	if (train) {
+		edTags->setText(train->tagString());
+		edTags->setToolTip(train->tagString());
 	}
 }
 

@@ -49,10 +49,10 @@ void PathTrainsDialog::initUI()
     }
     vlay->addWidget(table);
 
-    auto* g=new ButtonGroup<3>({"关闭", "删除选中", "新增.."});
+    auto* g=new ButtonGroup<4>({"关闭", "刷新", "删除选中", "新增.."});
     vlay->addLayout(g);
     g->connectAll(SIGNAL(clicked()), this,
-                  { SLOT(close()), SLOT(actRemove()), SIGNAL(actAdd())});
+                  { SLOT(close()), SLOT(refreshData()), SLOT(actRemove()), SIGNAL(actAdd())});
 }
 
 void PathTrainsDialog::actRemove()
@@ -63,6 +63,7 @@ void PathTrainsDialog::actRemove()
 
     // the dialog is in modal state, so just simply remove the rows are OK
     // the actual operations are done by emitting the signal above
+    // 2025.08.14  note: this is safe because we cannot undo/redo at this case due to the modality
     for(auto itr=rows.rbegin();itr!=rows.rend();++itr){
         model->removeTrainAt(*itr);
     }

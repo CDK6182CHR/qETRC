@@ -194,6 +194,8 @@ public slots:
      */
     void refreshPath();
 
+    void refreshTags();
+
     /**
      * 更新所有数据，包括自己的数据和下设的widget
      */

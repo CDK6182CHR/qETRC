@@ -10,7 +10,7 @@
 #include "data/common/qesystem.h"
 #include "util/buttongroup.hpp"
 #include "edittraintagdialog.h"
-
+#include "tagtrainsdialog.h"
 
 TrainTagManagerModel::TrainTagManagerModel(TrainTagManager& manager, QObject* parent):
 	QAbstractTableModel(parent), m_manager(manager)
@@ -89,8 +89,8 @@ void TrainTagManagerModel::refreshData()
 	endResetModel();
 }
 
-TrainTagManagerDialog::TrainTagManagerDialog(TrainCollection& coll, TrainTagManager& manager, QWidget* parent):
-	QDialog(parent), m_coll(coll), m_manager(manager)
+TrainTagManagerDialog::TrainTagManagerDialog(DiagramOptions& options, TrainCollection& coll, TrainTagManager& manager, QWidget* parent):
+	QDialog(parent), m_options(options), m_coll(coll), m_manager(manager)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	initUI();
@@ -124,7 +124,7 @@ void TrainTagManagerDialog::initUI()
 
 	auto* g = new ButtonGroup<5>({ "添加", "删除", "编辑", "查看列车", "关闭"});
 	g->connectAll(SIGNAL(clicked()), this,
-		{ SLOT(actAdd()), SLOT(actRemove()), SLOT(actEdit()), SLOT(viewTrains()), SLOT(close())});
+		{ SLOT(actAdd()), SLOT(actRemove()), SLOT(actEdit()), SLOT(actViewTrains()), SLOT(close())});
 	vlay->addLayout(g);
 }
 
@@ -175,4 +175,10 @@ void TrainTagManagerDialog::actEdit()
 
 void TrainTagManagerDialog::actViewTrains()
 {
+	auto tag = currentTag();
+	if (!tag) return;
+	auto* dlg = new TagTrainsDialog(m_options, m_coll, tag, this);
+	connect(dlg, &TagTrainsDialog::removeTrains,
+		this, &TrainTagManagerDialog::removeTagFromTrains);
+	dlg->open();
 }

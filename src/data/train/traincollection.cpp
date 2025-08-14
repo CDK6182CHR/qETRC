@@ -452,6 +452,17 @@ void TrainCollection::refineTimetables(int period_hours)
 	}
 }
 
+QList<std::shared_ptr<Train>> TrainCollection::tagTrains(std::shared_ptr<TrainTag> tag)
+{
+	QList<std::shared_ptr<Train>> res{};
+	std::ranges::for_each(_trains, [&res, &tag](const std::shared_ptr<Train> train) {
+		if (train->hasTag(tag)) {
+			res.emplace_back(train);
+		}
+		});
+	return res;
+}
+
 
 void TrainCollection::addMapInfo(const std::shared_ptr<Train>& t)
 {
