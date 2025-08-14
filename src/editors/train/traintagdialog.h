@@ -5,6 +5,7 @@
 
 class TrainTag;
 class Train;
+class TrainTagListDirectModel;
 
 /**
  * Model for train tags that belonging to a single train. 
@@ -40,12 +41,13 @@ class TrainTagDialog : public QDialog
 	QTableView* m_table;
 
 public:
-	TrainTagDialog(TrainTagManager& tagman, std::shared_ptr<Train> train, QWidget* parent = nullptr);
+	TrainTagDialog(TrainTagManager& tagman, TrainTagListDirectModel* completionModel, 
+		std::shared_ptr<Train> train, QWidget* parent = nullptr);
 
 	auto train() { return m_train; }
 
 private:
-	void initUI();
+	void initUI(TrainTagListDirectModel* completionModel);
 
 signals:
 

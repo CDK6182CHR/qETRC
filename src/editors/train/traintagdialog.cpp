@@ -9,11 +9,13 @@
 #include <QTableView>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QCompleter>
 
 #include "data/train/traintag.h"
 #include "data/train/train.h"
 #include "data/common/qesystem.h"
 #include "util/buttongroup.hpp"
+#include "model/train/traintaglistdirectmodel.h"
 
 
 TrainTagModel::TrainTagModel(QObject* parent):
@@ -40,15 +42,15 @@ void TrainTagModel::refreshData(const std::vector<std::shared_ptr<TrainTag>>& ta
 	}
 }
 
-TrainTagDialog::TrainTagDialog(TrainTagManager& tagman, std::shared_ptr<Train> train, QWidget* parent):
+TrainTagDialog::TrainTagDialog(TrainTagManager& tagman, TrainTagListDirectModel* completionModel, std::shared_ptr<Train> train, QWidget* parent):
 	QDialog(parent), m_tagMan(tagman), m_train(train)
 {
 	setAttribute(Qt::WA_DeleteOnClose, true);
-	initUI();
+	initUI(completionModel);
 	refreshData();
 }
 
-void TrainTagDialog::initUI()
+void TrainTagDialog::initUI(TrainTagListDirectModel* completionModel)
 {
 	setWindowTitle(tr("列车标签 - %1").arg(m_train->trainName().full()));
 	resize(600, 400);
@@ -66,6 +68,8 @@ void TrainTagDialog::initUI()
 	auto* hlay = new QHBoxLayout;
 	
 	m_edNewTag = new QLineEdit;
+	m_edNewTag->setPlaceholderText(tr("输入已有标签名或新建标签名以添加到车次"));
+	m_edNewTag->setCompleter(new QCompleter(completionModel, this));
 	hlay->addWidget(m_edNewTag);
 	auto* btnAdd = new QPushButton(tr("添加"));
 	connect(btnAdd, &QPushButton::clicked, this, &TrainTagDialog::actAddNewTag);

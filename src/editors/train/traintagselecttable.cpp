@@ -4,9 +4,10 @@
 #include <QHeaderView>
 #include "model/general/qemoveablemodel.h"
 #include "data/common/qesystem.h"
+#include "model/delegate/textcompletiondelegate.h"
 
-TrainTagSelectTable::TrainTagSelectTable(TrainTagManager& manager, QWidget* parent):
-	QEControlledTable(parent), m_manager(manager), m_model(new QEMoveableModel(this))
+TrainTagSelectTable::TrainTagSelectTable(TrainTagManager& manager, QCompleter* completer, QWidget* parent):
+	QEControlledTable(parent), m_manager(manager), m_completer(completer), m_model(new QEMoveableModel(this))
 {
 	initUI();
 }
@@ -32,6 +33,7 @@ void TrainTagSelectTable::initUI()
 	table()->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
 	table()->setEditTriggers(QTableView::AllEditTriggers);
 	table()->setModel(m_model);
+	table()->setItemDelegateForColumn(0, new TextCompletionDelegate(m_completer, this));
 	
 	table()->setColumnWidth(0, 200);
 }

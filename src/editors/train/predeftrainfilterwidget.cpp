@@ -104,6 +104,11 @@ void PredefTrainFilterWidget::clearNotChecked()
     edNote->clear();
 }
 
+void PredefTrainFilterWidget::refreshTagCompleter()
+{
+    basic->refreshTagCompleter();
+}
+
 void PredefTrainFilterWidget::informPredef()
 {
     QMessageBox::information(this,tr("提示"),

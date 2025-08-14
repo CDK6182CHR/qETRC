@@ -23,6 +23,7 @@
 #include "dialogs/splittraindialog.h"
 #include "dialogs/mergetrainsdialog.h"
 #include "editors/train/traintagdialog.h"
+#include "model/train/traintaglistdirectmodel.h"
 
 #include <DockManager.h>
 
@@ -523,6 +524,14 @@ void TrainContext::updateTrainWidgetTitles(std::shared_ptr<Train> t)
 	}
 }
 
+TrainTagListDirectModel* TrainContext::getTagCompletionModel()
+{
+	if (!_tagCompletionModel) {
+		_tagCompletionModel = new TrainTagListDirectModel(this);
+	}
+	return _tagCompletionModel;
+}
+
 void TrainContext::refreshAllData()
 {
 	refreshData();
@@ -661,6 +670,19 @@ void TrainContext::removeAllTrainWidgets()
 				d->deleteDockWidget();
 			}
 		}
+	}
+
+	// 2025.08.14: also remove the train tag dialogs
+	foreach(const auto& p, tagDialogs) {
+		if (p) {
+			p->deleteLater();
+		}
+	}
+	tagDialogs.clear();
+
+	// Update the tag completer (clear all data)
+	if (_tagCompletionModel) {
+		_tagCompletionModel->clear();
 	}
 	
 	//foreach(auto p, editDocks) {
@@ -1284,7 +1306,9 @@ void TrainContext::openTagDialog(std::shared_ptr<Train> train)
 {
 	if (!train)
 		return;
-	auto* dlg = new TrainTagDialog(diagram.trainCollection().tagManager(), train, mw);
+	auto* cm = getTagCompletionModel();
+	cm->refreshData(diagram.trainCollection().tagManager());
+	auto* dlg = new TrainTagDialog(diagram.trainCollection().tagManager(), cm, train, mw);
 	
 	connect(dlg, &TrainTagDialog::addTrainTag, this, &TrainContext::actAddTrainTag);
 	connect(dlg, &TrainTagDialog::removeTrainTag, this, &TrainContext::actRemoveTrainTag);
@@ -1295,7 +1319,11 @@ void TrainContext::openTagDialog(std::shared_ptr<Train> train)
 
 void TrainContext::onTrainTagListUpdated()
 {
-	// Nothing to do for now
+	// Update the completion model if required
+	if (_tagCompletionModel) {
+		_tagCompletionModel->refreshData(diagram.trainCollection().tagManager());
+	}
+	emit trainTagListUpdated();
 }
 
 void TrainContext::onTrainTagChanged(std::shared_ptr<Train> train)
@@ -2516,7 +2544,7 @@ qecmd::AppendTagToTrain::AppendTagToTrain(std::shared_ptr<Train> train_, std::sh
 
 void qecmd::AppendTagToTrain::undo()
 {
-	if (train->tags().empty()) {
+	if (!train->tags().empty()) {
 		train->tags().pop_back();
 	}
 	else {

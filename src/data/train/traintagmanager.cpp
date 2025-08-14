@@ -70,3 +70,8 @@ void TrainTagManager::addTag(std::shared_ptr<TrainTag> tag)
 {
 	m_tags[tag->name()] = tag;
 }
+
+void TrainTagManager::clear()
+{
+	m_tags.clear();
+}

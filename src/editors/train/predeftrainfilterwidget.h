@@ -42,6 +42,7 @@ public slots:
     void actApply();
     void actClear();
     void clearNotChecked();
+    void refreshTagCompleter();
 
 signals:
     void changeApplied(PredefTrainFilterCore* filter,

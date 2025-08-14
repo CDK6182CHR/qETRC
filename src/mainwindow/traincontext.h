@@ -28,6 +28,7 @@ class TrainCollection;
 class DiagramNaviModel;
 class TrainTagDialog;
 class TrainTagManager;
+class TrainTagListDirectModel;
 
 struct TrainStationBounding;
 namespace qecmd {
@@ -129,6 +130,8 @@ class TrainContext : public QObject
     QSet<EditTrainWidget*> syncEditors;
     QList<QPointer<TrainTagDialog>> tagDialogs;
 
+    TrainTagListDirectModel* _tagCompletionModel = nullptr;
+
     LocateBoundingDialog* dlgLocate = nullptr;
 public:
     TrainContext(Diagram& diagram_, SARibbonContextCategory* const context_, MainWindow* mw);
@@ -142,6 +145,7 @@ signals:
     //void actRemoveTrain(int index);
     void focusInRouting(std::shared_ptr<Routing>);
     void dulplicateTrain(std::shared_ptr<Train>);
+    void trainTagListUpdated();
     
 private:
     void initUI();
@@ -174,6 +178,11 @@ private:
      * 2021.10.17  加上EditWidget的基础信息刷新
      */
     void updateTrainWidgetTitles(std::shared_ptr<Train> t);
+
+    /**
+     * Return the model for tag completion; create it if not existed yet
+     */
+    TrainTagListDirectModel* getTagCompletionModel();
 
 public slots:
     void setTrain(std::shared_ptr<Train> train_);

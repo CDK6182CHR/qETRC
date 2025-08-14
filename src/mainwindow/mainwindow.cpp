@@ -1699,6 +1699,7 @@ void MainWindow::endResetGraph()
 	pathListWidget->refreshData();
 	catView->refreshTypeGroup();
 	catView->refreshFilters();
+	contextTrain->onTrainTagListUpdated();
 
 	spPassedStations->setValue(_diagram.options().max_passed_stations);
 
@@ -2651,7 +2652,7 @@ void MainWindow::actSearchTrain()
 void MainWindow::actEditFilters()
 {
 	if (!filterManager) {
-		filterManager = new PredefTrainFilterManager(_diagram.trainCollection());
+		filterManager = new PredefTrainFilterManager(_diagram.trainCollection(), this);
 		filterManager->setWindowFlag(Qt::Dialog);
 		filterManager->resize(800, 700);
 		filterManager->refreshData();
@@ -2662,6 +2663,8 @@ void MainWindow::actEditFilters()
 			catView, &ViewCategory::actRemoveFilter);
 		connect(filterManager, &PredefTrainFilterManager::updateFilter,
 			catView, &ViewCategory::actUpdateFilter, Qt::UniqueConnection);
+		connect(contextTrain, &TrainContext::trainTagListUpdated,
+			filterManager, &PredefTrainFilterManager::refreshTagCompleter);
 	}
 	filterManager->show();
 }

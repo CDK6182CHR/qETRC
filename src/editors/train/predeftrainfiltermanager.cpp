@@ -58,4 +58,10 @@ void PredefTrainFilterManager::refreshData()
     lstWidget->refreshList();
 	editWidget->setCore(lstWidget->currentFilter());
     editWidget->refreshData();
+    refreshTagCompleter();
+}
+
+void PredefTrainFilterManager::refreshTagCompleter()
+{
+    editWidget->refreshTagCompleter();
 }

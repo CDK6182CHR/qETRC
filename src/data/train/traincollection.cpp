@@ -188,6 +188,7 @@ void TrainCollection::clear(const TypeManager& defaultManager)
 	singleNameMap.clear();
 	_manager = defaultManager;
 	_manager.setTransparent(true);
+	_tagManager.clear();
 }
 
 void TrainCollection::clearTrains()

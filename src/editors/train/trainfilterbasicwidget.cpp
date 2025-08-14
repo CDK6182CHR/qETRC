@@ -1,4 +1,13 @@
 #include "trainfilterbasicwidget.h"
+
+#include <QCheckBox>
+#include <QFormLayout>
+#include <QListWidget>
+#include <QMessageBox>
+#include <QTextBrowser>
+#include <QCompleter>
+
+#include "util/qefoldwidget.h"
 #include "data/train/trainfiltercore.h"
 #include "selecttraintypelistwidget.h"
 #include "trainnameregextable.h"
@@ -6,14 +15,8 @@
 #include "selectroutinglistwidget.h"
 #include "traintagselecttable.h"
 #include "data/train/traincollection.h"
+#include "model/train/traintaglistdirectmodel.h"
 
-#include <QCheckBox>
-#include <QFormLayout>
-#include <QListWidget>
-#include <QMessageBox>
-#include <QTextBrowser>
-
-#include "util/qefoldwidget.h"
 
 TrainFilterBasicWidget::TrainFilterBasicWidget(TrainCollection &coll,
                                                TrainFilterCore* core, QWidget *parent)
@@ -75,6 +78,11 @@ void TrainFilterBasicWidget::initUI()
 {
     auto* vlay=new QVBoxLayout(this);
 
+    // Completers
+    tagCompletionModel = new TrainTagListDirectModel(this);
+    tagCompletionModel->refreshData(coll.tagManager());
+    tagCompleter = new QCompleter(tagCompletionModel, this);
+
     ckType=new QCheckBox(tr("列车种类"));
     lstType=new SelectTrainTypeListWidget(coll);
     auto* fold=new QEFoldWidget(ckType, lstType);
@@ -92,12 +100,12 @@ void TrainFilterBasicWidget::initUI()
     vlay->addWidget(fold);
 
 	ckIncludeTag = new QCheckBox(tr("含有标签"));
-	tabIncludeTag = new TrainTagSelectTable(coll.tagManager());
+	tabIncludeTag = new TrainTagSelectTable(coll.tagManager(), tagCompleter);
 	fold = new QEFoldWidget(ckIncludeTag, tabIncludeTag);
     vlay->addWidget(fold);
 
 	ckExcludeTag = new QCheckBox(tr("不含标签"));
-	tabExcludeTag = new TrainTagSelectTable(coll.tagManager());
+	tabExcludeTag = new TrainTagSelectTable(coll.tagManager(), tagCompleter);
 	fold = new QEFoldWidget(ckExcludeTag, tabExcludeTag);
 	vlay->addWidget(fold);
 
@@ -207,6 +215,11 @@ void TrainFilterBasicWidget::refreshDataWith(const TrainFilterCore *core)
         }
         gpPassen->get(passen_id)->setChecked(true);
     }
+}
+
+void TrainFilterBasicWidget::refreshTagCompleter()
+{
+    tagCompletionModel->refreshData(coll.tagManager());
 }
 
 

@@ -27,5 +27,6 @@ public slots:
     void commitRemoveFilter(int place, const PredefTrainFilterCore* filter);
     void commitUpdateFilter(const PredefTrainFilterCore* filter);
     void refreshData();
+    void refreshTagCompleter();
 };
 

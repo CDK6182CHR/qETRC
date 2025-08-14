@@ -12,6 +12,8 @@ class StationNameRegexTable;
 class TrainTagSelectTable;
 class QCheckBox;
 class TrainCollection;
+class TrainTagListDirectModel;
+class QCompleter;
 
 /**
  * @brief The TrainFilterBasic class
@@ -35,6 +37,10 @@ class TrainFilterBasicWidget : public QWidget
 	TrainTagSelectTable* tabIncludeTag = nullptr, * tabExcludeTag = nullptr;
     StationNameRegexTable* tabStarting = nullptr, * tabTerminal = nullptr;
     SelectRoutingListWidget* lstRouting=nullptr;
+
+    TrainTagListDirectModel* tagCompletionModel;
+    QCompleter* tagCompleter;
+
 public:
     explicit TrainFilterBasicWidget(TrainCollection& coll, TrainFilterCore* core, QWidget *parent = nullptr);
     auto* core(){return _core;}
@@ -66,5 +72,7 @@ public slots:
     void clearNotChecked();
     void refreshData();
     void refreshDataWith(const TrainFilterCore* core);
+
+    void refreshTagCompleter();
 };
 

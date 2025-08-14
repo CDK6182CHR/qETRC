@@ -4,6 +4,7 @@
 
 class QEMoveableModel;
 class TrainTagManager;
+class QCompleter;
 
 /**
  * 2025.08.13  Table for selecting the train tags, in train filter.
@@ -13,10 +14,11 @@ class TrainTagSelectTable : public QEControlledTable
 {
 	Q_OBJECT;
 	TrainTagManager& m_manager;
+	QCompleter* m_completer;
 	QEMoveableModel* m_model;
 
 public:
-	TrainTagSelectTable(TrainTagManager& manager, QWidget* parent = nullptr);
+	TrainTagSelectTable(TrainTagManager& manager, QCompleter* completer, QWidget* parent = nullptr);
 	QVector<QString> selectedTags() const;
 
 private:

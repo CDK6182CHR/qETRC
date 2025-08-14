@@ -21,6 +21,8 @@ public:
 	QJsonObject toJson() const;
 	void fromJson(const QJsonObject& obj);
 
+	auto& tags()const { return m_tags; }
+
 	/**
 	 * Find a tag by name; nullptr if not found.
 	 */
@@ -36,4 +38,6 @@ public:
 	void removeTag(const QString& name);
 
 	void addTag(std::shared_ptr<TrainTag> tag);
+
+	void clear();
 };
