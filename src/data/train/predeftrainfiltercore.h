@@ -32,7 +32,8 @@ public:
     QJsonObject toJson()const;
 
     enum SysFilterId {
-        PassengerTrains=0,
+        AllTrains=0,
+        PassengerTrains,
         ShownTrains,
         MAX_FILTERS
     };

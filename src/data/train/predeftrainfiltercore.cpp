@@ -68,7 +68,7 @@ void PredefTrainFilterCore::fromJson(const QJsonObject &obj, const TrainCollecti
         routings.insert(rt);
     }
 
-	const auto& arIncTags = obj.value("include_ags").toArray();
+	const auto& arIncTags = obj.value("include_tags").toArray();
     foreach(const auto& t, arIncTags) {
 		includeTags.push_back(t.toString());
     }
@@ -156,7 +156,7 @@ QJsonObject PredefTrainFilterCore::toJson() const
 
 std::array<std::unique_ptr<const PredefTrainFilterCore>, PredefTrainFilterCore::MAX_FILTERS> PredefTrainFilterCore::sysFilters{};
 std::array<QString, PredefTrainFilterCore::MAX_FILTERS> PredefTrainFilterCore::sysFilterNames{
-    QObject::tr("旅客列车"),QObject::tr("已显示列车")
+    QObject::tr("所有列车"), QObject::tr("旅客列车"), QObject::tr("已显示列车")
 };
 
 const PredefTrainFilterCore* PredefTrainFilterCore::getSysFilter(SysFilterId id)
@@ -184,6 +184,8 @@ std::unique_ptr<const PredefTrainFilterCore> PredefTrainFilterCore::makeSysFilte
     std::unique_ptr<PredefTrainFilterCore> res(new PredefTrainFilterCore);
     switch (id)
     {
+    case PredefTrainFilterCore::AllTrains:   // Just empty filter
+        break;
     case PredefTrainFilterCore::PassengerTrains: res->passengerType = TrainPassenger::True;
         break;
     case PredefTrainFilterCore::ShownTrains: res->showOnly = true;
