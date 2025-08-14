@@ -90,6 +90,7 @@
 #include "defines/icon_specs.h"
 #include "editors/ribbonconfigdialog.h"
 #include "editors/diagramoptiondialog.h"
+#include "editors/train/batchaddtraintagdialog.h"
 
 MainWindow::MainWindow(QWidget* parent)
 	: SARibbonMainWindow(parent, true),
@@ -1228,7 +1229,12 @@ void MainWindow::initToolbar()
 		act = makeAction(QEICN_train_tag_manager, tr("标签管理"), tr("列车标签管理"));
 		act->setToolTip(tr("列车标签管理\n查看或编辑本运行图文件中的所有列车标签"));
 		connect(act, &QAction::triggered, this, &MainWindow::actTrainTagManager);
-		panel->addLargeAction(act);
+
+		menu = new SARibbonMenu(this);
+		menu->addAction(tr("批量添加标签"), this, &MainWindow::actBatchAddTagToTrains);
+		act->setMenu(menu);
+
+		panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 		panel = cat->addPannel(tr("分析"));
 		act = makeAction(QEICN_compare_trains, tr("车次对照"));
@@ -1938,6 +1944,27 @@ void MainWindow::actTrainTagManager()
 			});
 	}
 	tagManagerDialog->show();
+}
+
+void MainWindow::actBatchAddTagToTrains()
+{
+	auto* dlg = new BatchAddTrainTagDialog(_diagram.trainCollection(), 
+		contextTrain->getTagCompletionModel(), this);
+
+	connect(dlg, &BatchAddTrainTagDialog::tagAdded,
+		[this](const QString& tagName, const std::vector<std::shared_ptr<Train>>& trains) {
+			auto& man = _diagram.trainCollection().tagManager();
+			auto tag = man.find(tagName);
+			if (!tag) {
+				tag = std::make_shared<TrainTag>(tagName,
+					tr("自动创建于%1  批量添加操作").arg(
+						QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")));
+				undoStack->push(new qecmd::AddNewTrainTag(man, tag, contextTrain));
+			}
+
+			undoStack->push(new qecmd::BatchAddTagToTrains(tag, trains, contextTrain));
+		});
+	dlg->open();
 }
 
 void MainWindow::actDiagnose()

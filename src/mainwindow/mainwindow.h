@@ -468,6 +468,8 @@ private slots:
 
     void actTrainTagManager();
 
+    void actBatchAddTagToTrains();
+
     void actDiagnose();
 
     void actToggleWeakenUnselected(bool on);

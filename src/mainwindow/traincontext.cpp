@@ -2760,4 +2760,32 @@ void qecmd::DeleteTrainTag::redo()
 	cont->onTrainTagListUpdated();
 }
 
+qecmd::BatchAddTagToTrains::BatchAddTagToTrains(std::shared_ptr<TrainTag> tag, std::vector<std::shared_ptr<Train>> trains, 
+	TrainContext* cont, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("添加标签%1至%2车次").arg(tag->name()).arg(trains.size()), parent),
+	tag(tag), trains(std::move(trains)), cont(cont)
+{
+}
+
+void qecmd::BatchAddTagToTrains::undo()
+{
+	for (auto t : trains) {
+		if (t->tags().empty()) {
+			qCritical() << "BatchAddTagToTrains::undo: INTERNAL ERROR: tags empty for train " << t->trainName().full();
+		}
+		else {
+			t->tags().pop_back();
+		}
+	}
+	cont->onTrainTagChangedBatch();
+}
+
+void qecmd::BatchAddTagToTrains::redo()
+{
+	for (auto t : trains) {
+		t->tags().emplace_back(tag);
+	}
+	cont->onTrainTagChangedBatch();
+}
+
 #endif

@@ -139,6 +139,11 @@ public:
     auto getTrain() { return train; }
     void resetTrain();
 
+    /**
+     * Return the model for tag completion; create it if not existed yet
+     */
+    TrainTagListDirectModel* getTagCompletionModel();
+
 signals:
     void highlightTrainLine(std::shared_ptr<Train> train);
     void timetableChanged(std::shared_ptr<Train> train);
@@ -178,11 +183,6 @@ private:
      * 2021.10.17  加上EditWidget的基础信息刷新
      */
     void updateTrainWidgetTitles(std::shared_ptr<Train> t);
-
-    /**
-     * Return the model for tag completion; create it if not existed yet
-     */
-    TrainTagListDirectModel* getTagCompletionModel();
 
 public slots:
     void setTrain(std::shared_ptr<Train> train_);
@@ -956,6 +956,18 @@ namespace qecmd {
     public:
         DeleteTrainTag(std::shared_ptr<TrainTag> tag, TrainCollection& coll, TrainContext* cont, QUndoCommand* parent = nullptr);
 
+        void undo()override;
+        void redo()override;
+    };
+
+    class BatchAddTagToTrains : public QUndoCommand
+    {
+        std::shared_ptr<TrainTag> tag;
+        std::vector<std::shared_ptr<Train>> trains;
+        TrainContext* const cont;
+    public:
+        BatchAddTagToTrains(std::shared_ptr<TrainTag> tag, std::vector<std::shared_ptr<Train>> trains,
+            TrainContext* cont, QUndoCommand* parent = nullptr);
         void undo()override;
         void redo()override;
     };

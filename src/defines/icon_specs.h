@@ -94,7 +94,7 @@
 #define QEICN_routing_edit QE_RSC_ICON(polyline.png)   // 交路编辑页面
 #define QEICN_routing_batch_parse QE_RSC_ICON(text.png)  // 批量解析交路
 #define QEICN_routing_batch_identify QE_RSC_ICON(identify.png)  // 批量识别交路中的车次
-#define QEICN_train_tag_manager QE_RSC_ICON(electronic-clock.png)   // 列车标签管理器
+#define QEICN_train_tag_manager QE_RSC_ICON(tag.png)   // 列车标签管理器
 
 #define QEICN_compare_trains QE_RSC_ICON(compare.png)   // 车次对照
 #define QEICN_timetable_diagon QE_RSC_ICON(identify.png)  // 时刻诊断
@@ -171,7 +171,7 @@
 
 #define QEICN_edit_timetable QE_RSC_ICON(timetable.png)   // 编辑时刻表
 #define QEICN_edit_train QE_RSC_ICON(edit.png)   // 编辑列车所有数据
-#define QEICN_edit_train_tags QE_RSC_ICON(electronic-clock.png)   // 编辑列车标签
+#define QEICN_edit_train_tags QE_RSC_ICON(tag.png)   // 编辑列车标签
 
 #define QEICN_copy_train QE_RSC_ICON(copy.png)   // 创建列车副本
 #define QEICN_del_train QE_STD_ICON(TrashIcon)   // 删除列车

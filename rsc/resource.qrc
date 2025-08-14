@@ -63,5 +63,6 @@
         <file>icons/mobile-icon.png</file>
         <file>icons/customize.svg</file>
         <file>icons/icon-transparent.png</file>
+        <file>icons/tag.png</file>
     </qresource>
 </RCC>

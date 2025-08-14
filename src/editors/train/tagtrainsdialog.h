@@ -31,7 +31,6 @@ private:
     void initUI();
 
 signals:
-    void actAdd();
 
     // the order of std::set is required
 

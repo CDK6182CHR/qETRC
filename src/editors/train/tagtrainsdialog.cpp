@@ -50,10 +50,10 @@ void TagTrainsDialog::initUI()
     }
     vlay->addWidget(m_table);
 
-    auto* g = new ButtonGroup<4>({ "关闭", "刷新", "删除选中", "新增.." });
+    auto* g = new ButtonGroup<3>({ "关闭", "刷新", "删除选中"});
     vlay->addLayout(g);
     g->connectAll(SIGNAL(clicked()), this,
-        { SLOT(close()), SLOT(refreshData()), SLOT(actRemove()), SIGNAL(actAdd()) });
+        { SLOT(close()), SLOT(refreshData()), SLOT(actRemove()) });
 }
 
 void TagTrainsDialog::actRemove()
@@ -74,7 +74,10 @@ void TagTrainsDialog::actRemove()
         }
     }
 
-    emit removeTrains(m_tag, remove_data);;
+    if (remove_data.empty())
+        return;
+
+    emit removeTrains(m_tag, remove_data);
 
     // the dialog is in modal state, so just simply remove the rows are OK
     // the actual operations are done by emitting the signal above
@@ -82,3 +85,4 @@ void TagTrainsDialog::actRemove()
         m_model->removeTrainAt(*itr);
     }
 }
+
