@@ -39,4 +39,6 @@ public:
 	}
 
 	bool operator<(const TrainTag& rhs)const;
+
+	void swapWith(TrainTag& other);
 };

@@ -149,6 +149,8 @@ public:
 
     QString tagString()const;
 
+    bool hasTag(std::shared_ptr<const TrainTag> tag)const;
+
     /**
      * 强制判断是否为客车；如果设置为自动，根据类型
      */

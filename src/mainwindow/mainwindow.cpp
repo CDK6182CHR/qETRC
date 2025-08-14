@@ -65,8 +65,9 @@
 
 #include "editors/railstationwidget.h"
 #include "editors/routing/routingwidget.h"
+#include "editors/train/traintagmanagerdialog.h"
 
-#include <dialogs/changestationnamedialog.h>
+#include "dialogs/changestationnamedialog.h"
 #include "data/train/routing.h"
 
 #include "model/rail/railstationmodel.h"
@@ -1223,6 +1224,12 @@ void MainWindow::initToolbar()
 		act->setToolTip(tr("批量识别车次\n对所有交路，尝试识别车次，使得虚拟车次转变为实体车次。"));
 		panel->addMediumAction(act);
 
+		panel = cat->addPannel(tr("标签"));
+		act = makeAction(QEICN_train_tag_manager, tr("标签管理"), tr("列车标签管理"));
+		act->setToolTip(tr("列车标签管理\n查看或编辑本运行图文件中的所有列车标签"));
+		connect(act, &QAction::triggered, this, &MainWindow::actTrainTagManager);
+		panel->addLargeAction(act);
+
 		panel = cat->addPannel(tr("分析"));
 		act = makeAction(QEICN_compare_trains, tr("车次对照"));
 		act->setToolTip(tr("两车次运行对照\n在指定线路上，对比两个选定车次的运行情况。"));
@@ -1670,6 +1677,10 @@ void MainWindow::clearDiagramUnchecked()
 
 	}
 
+	if (tagManagerDialog) {
+		tagManagerDialog->deleteLater();
+	}
+
 	//最后：清理数据
 	_diagram.clear();
 }
@@ -1706,6 +1717,10 @@ void MainWindow::endResetGraph()
 	// 2023.12.30  predef train filter
 	if (filterManager) {
 		filterManager->refreshData();
+	}
+
+	if (tagManagerDialog) {
+		tagManagerDialog->refreshData();
 	}
 
 	updateWindowTitle();
@@ -1886,6 +1901,33 @@ void MainWindow::actBatchDetectRouting()
 	connect(dialog, &BatchDetectRoutingDialog::detectApplied,
 		contextRouting, &RoutingContext::actBatchRoutingUpdate);
 	dialog->open();
+}
+
+void MainWindow::actTrainTagManager()
+{
+	if (tagManagerDialog) {
+		tagManagerDialog->refreshData();
+	}
+	else {
+		tagManagerDialog = new TrainTagManagerDialog(_diagram.trainCollection(), _diagram.trainCollection().tagManager(), this);
+		tagManagerDialog->refreshData();
+
+		connect(tagManagerDialog, &TrainTagManagerDialog::tagAdded,
+			[this](std::shared_ptr<TrainTag> tag) {
+				undoStack->push(new qecmd::AddNewTrainTag(_diagram.trainCollection().tagManager(), tag, contextTrain));
+			});
+
+		connect(tagManagerDialog, &TrainTagManagerDialog::tagNameChanged,
+			[this](std::shared_ptr<TrainTag> tag, std::shared_ptr<TrainTag> data) {
+				undoStack->push(new qecmd::ChangeTagName(_diagram.trainCollection().tagManager(), tag, data, contextTrain));
+			});
+
+		connect(tagManagerDialog, &TrainTagManagerDialog::tagNoteChanged,
+			[this](std::shared_ptr<TrainTag> tag, std::shared_ptr<TrainTag> data) {
+				undoStack->push(new qecmd::ChangeTagNote(_diagram.trainCollection().tagManager(), tag, data, contextTrain));
+			});
+	}
+	tagManagerDialog->show();
 }
 
 void MainWindow::actDiagnose()

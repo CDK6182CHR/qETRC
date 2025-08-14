@@ -40,4 +40,6 @@ public:
 	void addTag(std::shared_ptr<TrainTag> tag);
 
 	void clear();
+
+	bool tagNameIsValid(const QString& name, std::shared_ptr<TrainTag> ignoreTag)const;
 };

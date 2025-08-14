@@ -2,6 +2,7 @@
 
 #ifndef QETRC_MOBILE_2
 #include <QList>
+#include <QPointer>
 
 #include "kernel/diagramwidget.h"
 #include "SARibbonMainWindow.h"
@@ -41,6 +42,7 @@ class SARibbonActionsManager;
 class PredefTrainFilterManager;
 class QTextBrowser;
 class IssueWidget;
+class TrainTagManagerDialog;
 
 /**
  * @brief The MainWindow class
@@ -75,6 +77,7 @@ class MainWindow : public SARibbonMainWindow
     PredefTrainFilterManager* filterManager = nullptr;
     QTextBrowser* logWidget;
     IssueWidget* issueWidget;
+    QPointer<TrainTagManagerDialog> tagManagerDialog;
 
     PageContext* contextPage;
     TrainContext* contextTrain;
@@ -462,6 +465,8 @@ private slots:
     void actBatchParseRouting();
 
     void actBatchDetectRouting();
+
+    void actTrainTagManager();
 
     void actDiagnose();
 

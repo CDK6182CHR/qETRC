@@ -1,6 +1,22 @@
 ﻿#ifndef QETRC_MOBILE_2
 #include "traincontext.h"
 
+#include <QDateTime>
+#include <QApplication>
+#include <QMessageBox>
+#include <QColorDialog>
+#include <SARibbonContextCategory.h>
+#include <SARibbonLineEdit.h>
+#include <QLabel>
+#include <SARibbonComboBox.h>
+#include <SARibbonCheckBox.h>
+#include <SARibbonMenu.h>
+#include <QDoubleSpinBox>
+#include <QFileDialog>
+#include <chrono>
+
+#include <DockManager.h>
+
 #include "viewers/events/traineventdialog.h"
 #include "mainwindow.h"
 #include "viewcategory.h"
@@ -24,25 +40,10 @@
 #include "dialogs/mergetrainsdialog.h"
 #include "editors/train/traintagdialog.h"
 #include "model/train/traintaglistdirectmodel.h"
+#include "editors/train/traintagmanagerdialog.h"
 
-#include <DockManager.h>
-
-#include <QDateTime>
-#include <QApplication>
-#include <QMessageBox>
-#include <QColorDialog>
-#include <SARibbonContextCategory.h>
-#include <SARibbonLineEdit.h>
-#include <QLabel>
-#include <SARibbonComboBox.h>
-#include <SARibbonCheckBox.h>
-#include <SARibbonMenu.h>
-#include <QDoubleSpinBox>
-#include <QFileDialog>
-#include <util/linestylecombo.h>
-#include <util/utilfunc.h>
-#include <chrono>
-
+#include "util/linestylecombo.h"
+#include "util/utilfunc.h"
 #include "editors/basictrainwidget.h"
 #include "editors/edittrainwidget.h"
 #include "wizards/timeinterp/timeinterpwizard.h"
@@ -1323,7 +1324,42 @@ void TrainContext::onTrainTagListUpdated()
 	if (_tagCompletionModel) {
 		_tagCompletionModel->refreshData(diagram.trainCollection().tagManager());
 	}
+
+	// Update the manager dialog if it is opened
+	if (mw->tagManagerDialog) {
+		mw->tagManagerDialog->refreshData();
+	}
+
 	emit trainTagListUpdated();
+}
+
+void TrainContext::onTrainTagRenamed(std::shared_ptr<TrainTag> tag)
+{
+	// in this case, we should update the train tag list, and also all related train widgets if the train contains this tag
+	onTrainTagListUpdated();
+
+	if (this->train && this->train->hasTag(tag)) {
+		edTags->setText(train->tagString());
+	}
+
+	if (auto t = mw->trainInfoWidget->getTrain(); t && t->hasTag(tag)) {
+		mw->trainInfoWidget->refreshTags();
+	}
+
+	for (auto* w : editWidgets) {
+		if (auto t = w->train(); t && t->hasTag(tag)) {
+			w->refreshTrainTags();
+		}
+	}
+}
+
+void TrainContext::onTrainTagNoteChanged(std::shared_ptr<TrainTag> tag)
+{
+	Q_UNUSED(tag);
+	// For this case, we could just simply update the manager dialog
+	if (mw->tagManagerDialog) {
+		mw->tagManagerDialog->refreshData();
+	}
 }
 
 void TrainContext::onTrainTagChanged(std::shared_ptr<Train> train)
@@ -2584,6 +2620,55 @@ void qecmd::RemoveTagFromTrain::redo()
 	}
 	train->tags().erase(train->tags().begin() + index);
 	cont->onTrainTagChanged(train);
+}
+
+qecmd::ChangeTagName::ChangeTagName(TrainTagManager& manager_, std::shared_ptr<TrainTag> tag, 
+	std::shared_ptr<TrainTag> data, TrainContext* cont, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("编辑列车标签: %1 -> %2").arg(tag->name(), data->name()), parent),
+	manager(manager_), tag(tag), data(data), cont(cont)
+{
+}
+
+void qecmd::ChangeTagName::undo()
+{
+	commit();
+}
+
+void qecmd::ChangeTagName::redo()
+{
+	commit();
+}
+
+void qecmd::ChangeTagName::commit()
+{
+	manager.removeTag(tag->name());
+	tag->swapWith(*data);
+	manager.addTag(tag);
+	cont->onTrainTagRenamed(tag);
+}
+
+qecmd::ChangeTagNote::ChangeTagNote(TrainTagManager& manager_, std::shared_ptr<TrainTag> tag, 
+	std::shared_ptr<TrainTag> data, TrainContext* cont, QUndoCommand* parent) :
+	QUndoCommand(QObject::tr("编辑列车标签备注: %1").arg(tag->name()), parent),
+	manager(manager_), tag(tag), data(data), cont(cont)
+{
+	// For safety
+	if (data->name() != tag->name()) {
+		qCritical() << "ChangeTagNote: INTERNAL ERROR: the name changed!!";
+		data->setName(tag->name());
+	}
+}
+
+void qecmd::ChangeTagNote::undo()
+{
+	tag->swapWith(*data);
+	cont->onTrainTagNoteChanged(tag);
+}
+
+void qecmd::ChangeTagNote::redo()
+{
+	tag->swapWith(*data);
+	cont->onTrainTagNoteChanged(tag);
 }
 
 #endif

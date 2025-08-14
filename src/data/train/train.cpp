@@ -148,6 +148,11 @@ QString Train::tagString() const
     return res;
 }
 
+bool Train::hasTag(std::shared_ptr<const TrainTag> tag) const
+{
+    return std::ranges::find(_tags, tag) != _tags.end();
+}
+
 bool Train::getIsPassenger()const
 {
     switch (_passenger)

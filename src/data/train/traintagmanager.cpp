@@ -75,3 +75,14 @@ void TrainTagManager::clear()
 {
 	m_tags.clear();
 }
+
+bool TrainTagManager::tagNameIsValid(const QString& name, std::shared_ptr<TrainTag> ignoreTag) const
+{
+	if (name.isEmpty())
+		return false;
+	for (const auto& p : m_tags) {
+		if (p.first == name && p.second != ignoreTag)
+			return false;
+	}
+	return true;
+}

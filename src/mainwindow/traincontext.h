@@ -459,6 +459,10 @@ public slots:
      */
     void onTrainTagListUpdated();
 
+    void onTrainTagRenamed(std::shared_ptr<TrainTag> tag);
+
+    void onTrainTagNoteChanged(std::shared_ptr<TrainTag> tag);
+
     /**
      * Call this function when the tags for a train has changed.
      */
@@ -886,6 +890,34 @@ namespace qecmd {
 
 		void undo()override;
 		void redo()override;
+    };
+
+    class ChangeTagName : public QUndoCommand
+    {
+        TrainTagManager& manager;
+        std::shared_ptr<TrainTag> tag, data;
+        TrainContext* const cont;
+    public:
+        ChangeTagName(TrainTagManager& manager_, std::shared_ptr<TrainTag> tag, std::shared_ptr<TrainTag> data,
+            TrainContext* cont, QUndoCommand* parent = nullptr);
+
+        void undo()override;
+        void redo()override;
+    private:
+        void commit();
+    };
+
+    class ChangeTagNote : public QUndoCommand
+    {
+        TrainTagManager& manager;
+        std::shared_ptr<TrainTag> tag, data;
+        TrainContext* const cont;
+    public:
+        ChangeTagNote(TrainTagManager& manager_, std::shared_ptr<TrainTag> tag, std::shared_ptr<TrainTag> data,
+            TrainContext* cont, QUndoCommand* parent = nullptr);
+
+        void undo()override;
+        void redo()override;
     };
 }
 
