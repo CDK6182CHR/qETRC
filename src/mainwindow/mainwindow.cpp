@@ -1926,6 +1926,11 @@ void MainWindow::actTrainTagManager()
 			[this](std::shared_ptr<TrainTag> tag, std::shared_ptr<TrainTag> data) {
 				undoStack->push(new qecmd::ChangeTagNote(_diagram.trainCollection().tagManager(), tag, data, contextTrain));
 			});
+
+		connect(tagManagerDialog, &TrainTagManagerDialog::removeTag,
+			[this](std::shared_ptr<TrainTag> tag) {
+				undoStack->push(new qecmd::DeleteTrainTag(tag, _diagram.trainCollection(), contextTrain));
+			});
 	}
 	tagManagerDialog->show();
 }

@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
+#include <QMessageBox>
 
 #include "data/train/traintagmanager.h"
 #include "data/common/qesystem.h"
@@ -150,6 +151,14 @@ void TrainTagManagerDialog::actAdd()
 
 void TrainTagManagerDialog::actRemove()
 {
+	auto tag = currentTag();
+	if (!tag)
+		return;
+	if (QMessageBox::question(this, tr("删除标签"), 
+		tr("将此标签从管理器删除，同时从所有列车中删除此标签，是否确认？")) != QMessageBox::Yes)
+		return;
+
+	emit removeTag(tag);
 }
 
 void TrainTagManagerDialog::actEdit()

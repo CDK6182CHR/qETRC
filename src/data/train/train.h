@@ -152,6 +152,11 @@ public:
     bool hasTag(std::shared_ptr<const TrainTag> tag)const;
 
     /**
+     * Returns the index of the tag, in this train's tag list, or -1 if not existed.
+     */
+    int tagIndex(std::shared_ptr<const TrainTag> tag)const;
+
+    /**
      * 强制判断是否为客车；如果设置为自动，根据类型
      */
     bool getIsPassenger()const;

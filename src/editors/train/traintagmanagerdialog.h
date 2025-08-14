@@ -76,6 +76,8 @@ signals:
 
 	// New tag added
 	void tagAdded(std::shared_ptr<TrainTag> tag);
+
+	void removeTag(std::shared_ptr<TrainTag> tag);
 	
 public slots:
 	void refreshData();

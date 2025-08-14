@@ -1398,6 +1398,32 @@ void TrainContext::onTrainTagChanged(std::shared_ptr<Train> train)
 	}
 }
 
+void TrainContext::onTrainTagChangedBatch()
+{
+	for (auto itr = tagDialogs.begin(); itr != tagDialogs.end();) {
+		if (itr->isNull()) {
+			itr = tagDialogs.erase(itr);
+		}
+		else {
+			auto* dlg = itr->data();
+			dlg->refreshData();
+			++itr;
+		}
+	}
+
+	// Update the edit widgets
+	for (auto* w : editWidgets) {
+		w->refreshTrainTags();
+	}
+
+	// Update the train info widget
+	if (mw->trainInfoWidget->getTrain()) {
+		mw->trainInfoWidget->refreshData();
+	}
+
+	edTags->setText(train->tagString());
+}
+
 void TrainContext::actToggleTrainLineShown(bool checked)
 {
 	if (!train)
@@ -2669,6 +2695,61 @@ void qecmd::ChangeTagNote::redo()
 {
 	tag->swapWith(*data);
 	cont->onTrainTagNoteChanged(tag);
+}
+
+qecmd::BatchRemoveTagFromTrains::BatchRemoveTagFromTrains(std::shared_ptr<TrainTag> tag,
+	data_t data, TrainContext* cont, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("从%1车次中移除标签: %2").arg(data.size()).arg(tag->name()), parent), 
+	tag(tag), data(std::move(data)), cont(cont)
+{
+}
+
+void qecmd::BatchRemoveTagFromTrains::undo()
+{
+	for (auto& p : data) {
+		p.first->tags().insert(p.first->tags().begin() + p.second, tag);
+	}
+	cont->onTrainTagChangedBatch();
+}
+
+void qecmd::BatchRemoveTagFromTrains::redo()
+{
+	for (auto& p : data) {
+		p.first->tags().erase(p.first->tags().begin() + p.second);
+	}
+	cont->onTrainTagChangedBatch();
+}
+
+qecmd::DeleteTrainTag::DeleteTrainTag(std::shared_ptr<TrainTag> tag, TrainCollection& coll, TrainContext* cont, QUndoCommand* parent):
+	QUndoCommand(parent), tag(tag), coll(coll), cont(cont)
+{
+	// First loop over all trains to find this tag
+	BatchRemoveTagFromTrains::data_t data;
+	foreach(auto t, coll.trains()) {
+		if (int idx = t->tagIndex(tag); idx >= 0) {
+			data.emplace_back(t, idx);
+		}
+	}
+	setText(QObject::tr("删除标签: %1 影响%2车次").arg(tag->name()).arg(data.size()));
+	if (!data.empty()) {
+		new BatchRemoveTagFromTrains(tag, std::move(data), cont, this);
+	}
+}
+
+void qecmd::DeleteTrainTag::undo()
+{
+	auto& man = coll.tagManager();
+	man.addTag(tag);
+	cont->onTrainTagListUpdated();
+	QUndoCommand::undo();   // Add the tag to trains
+}
+
+void qecmd::DeleteTrainTag::redo()
+{
+	QUndoCommand::redo();   // Remove the tag from trains
+	auto& man = coll.tagManager();
+	man.removeTag(tag->name());
+	cont->onTrainTagListUpdated();
 }
 
 #endif

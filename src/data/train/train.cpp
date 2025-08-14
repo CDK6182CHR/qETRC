@@ -153,6 +153,14 @@ bool Train::hasTag(std::shared_ptr<const TrainTag> tag) const
     return std::ranges::find(_tags, tag) != _tags.end();
 }
 
+int Train::tagIndex(std::shared_ptr<const TrainTag> tag) const
+{
+    auto itr = std::ranges::find(_tags, tag);
+    if (itr == _tags.end())
+        return -1;
+    return std::distance(_tags.begin(), itr);
+}
+
 bool Train::getIsPassenger()const
 {
     switch (_passenger)

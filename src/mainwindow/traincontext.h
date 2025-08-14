@@ -468,6 +468,12 @@ public slots:
      */
 	void onTrainTagChanged(std::shared_ptr<Train> train);
 
+    /**
+     * Call this function when tags for a number of trains have been changed.
+     * Simply update all possible widgets without check for efficiency.
+     */
+    void onTrainTagChangedBatch();
+
 private slots:
     void showTrainEvents();
 
@@ -915,6 +921,38 @@ namespace qecmd {
     public:
         ChangeTagNote(TrainTagManager& manager_, std::shared_ptr<TrainTag> tag, std::shared_ptr<TrainTag> data,
             TrainContext* cont, QUndoCommand* parent = nullptr);
+
+        void undo()override;
+        void redo()override;
+    };
+
+    class BatchRemoveTagFromTrains : public QUndoCommand
+    {
+    public:
+        using data_t = std::vector<std::pair<std::shared_ptr<Train>, int>>;
+
+    private:
+        std::shared_ptr<TrainTag> tag;
+        data_t data;
+        TrainContext* const cont;
+
+    public:
+        BatchRemoveTagFromTrains(std::shared_ptr<TrainTag> tag, data_t data, TrainContext* cont, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
+    /**
+     * Delete the train tag from the manager. Also remove this tag from ALL trains.
+     * The later is implemented using sub-command.
+     */
+    class DeleteTrainTag : public QUndoCommand
+    {
+        TrainCollection& coll;
+        std::shared_ptr<TrainTag> tag;
+        TrainContext* const cont;
+    public:
+        DeleteTrainTag(std::shared_ptr<TrainTag> tag, TrainCollection& coll, TrainContext* cont, QUndoCommand* parent = nullptr);
 
         void undo()override;
         void redo()override;
