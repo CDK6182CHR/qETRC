@@ -95,6 +95,8 @@ signals:
     void batchChangePen(std::deque<std::shared_ptr<Train>> trains, std::optional<QPen> pen);
 
     void batchAutoCorrect(const QList<std::shared_ptr<Train>>&);
+
+    void autoAddNewType(std::shared_ptr<TrainType>);
         
 private slots:
     void searchTrain();

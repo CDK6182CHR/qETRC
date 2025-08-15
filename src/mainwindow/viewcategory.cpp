@@ -848,9 +848,28 @@ void qecmd::ChangeTypeSet::commit()
     foreach(auto & p, modified) {
         p.first->swap(*p.second);
     }
-    std::swap(manager.typesRef(), types);
+    std::swap(manager.typesRef(), types);   // This is safe because types is only a shallow copy of original data
     if (forDefault) cat->saveDefaultConfigs();
 }
+
+
+qecmd::AutoAddTrainType::AutoAddTrainType(TypeManager& manager, std::shared_ptr<TrainType> type, 
+    ViewCategory* cat, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("自动添加类型: %1").arg(type->name()), parent),
+    manager(manager), type(type), cat(cat)
+{
+}
+
+void qecmd::AutoAddTrainType::undo()
+{
+    manager.typesRef().remove(type->name());
+}
+
+void qecmd::AutoAddTrainType::redo()
+{
+    manager.typesRef().insert(type->name(), type);
+}
+
 
 qecmd::ChangeTypeRegex::ChangeTypeRegex(TypeManager& manager_,
     std::shared_ptr<TypeManager> data_, ViewCategory* cat_,

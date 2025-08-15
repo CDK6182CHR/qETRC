@@ -17,6 +17,7 @@ class TrainCollection;
 class TimetableWidget;
 class QToolButton;
 class RailCategory;
+class TrainType;
 struct DiagramOptions;
 
 /**
@@ -77,6 +78,7 @@ signals:
     void removeTrain(std::shared_ptr<Train> train);
     void synchronizationChanged(bool on);
 	void editTrainTags(std::shared_ptr<Train> train);
+    void autoAddType(std::shared_ptr<TrainType>);
 
 private slots:
     void actApply();

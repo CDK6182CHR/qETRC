@@ -165,8 +165,14 @@ void TrainListWidget::batchChange()
 	bool ok;
 	auto nty_s = QInputDialog::getItem(this, tr("批量设置类型"), tr("将选中的[%1]个车次类型设置为：").arg(rows.count()),
 		types, 0, true, &ok);
-	auto nty = coll.typeManager().findOrCreate(nty_s);
 	if (!ok)return;
+
+	auto nty = coll.typeManager().find(nty_s);
+	if (!nty) {
+		// 2025.08.15: we should create the type first, if it has not been created
+		nty = coll.typeManager().createType(nty_s);
+		emit autoAddNewType(nty);
+	}
 
 	//操作压栈
 	if (_undo) {

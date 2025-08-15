@@ -1512,6 +1512,10 @@ void TrainContext::showEditWidget(std::shared_ptr<Train> train)
 		connect(dock, &ads::CDockWidget::closed, this, &TrainContext::onEditDockClosed);
 		connect(w->getModel(), &TimetableStdModel::timetableChanged,
 			this, &TrainContext::onTrainTimetableChanged);
+		connect(w, &EditTrainWidget::autoAddType,
+			[this](std::shared_ptr<TrainType> type) {
+				mw->undoStack->push(new qecmd::AutoAddTrainType(diagram.trainCollection().typeManager(), type, mw->catView));
+			});
 		connect(w, &EditTrainWidget::trainInfoChanged,
 			this, &TrainContext::onTrainInfoChanged);
 		connect(w, &EditTrainWidget::switchToRouting,
@@ -1633,7 +1637,14 @@ void TrainContext::actApply()
 		tp = mana.fromRegex(name);
 	}
 	else {
-		tp = mana.findOrCreate(tps);
+		//tp = mana.findOrCreate(tps);
+		// 2025.08.15: the creation of new type should be controlled by the undo stack!
+		tp = mana.find(tps);
+		if (!tp) {
+			// Create a new type
+			tp = mana.createType(tps);
+			mw->undoStack->push(new qecmd::AutoAddTrainType(diagram.trainCollection().typeManager(), tp, mw->catView));
+		}
 	}
 	t->setType(tp);
 	t->setPassenger(static_cast<TrainPassenger>(checkPassen->checkState()));

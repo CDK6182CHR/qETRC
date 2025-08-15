@@ -258,7 +258,12 @@ void EditTrainWidget::actApply()
         tp = mana.fromRegex(name);
     }
     else {
-        tp = mana.findOrCreate(tps);
+        tp = mana.find(tps);
+        if (!tp) {
+            // 2025.08.15: operation for adding new type automatically
+            tp = mana.createType(tps);
+            emit autoAddType(tp); 
+        }
     }
     t->setType(tp);
     t->setPassenger(static_cast<TrainPassenger>(ckPassenger->checkState()));

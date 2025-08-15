@@ -1340,6 +1340,10 @@ void MainWindow::initToolbar()
 			catView, &ViewCategory::actChangeSingleTrainShow);
 		connect(actGlobalConfig, &QAction::triggered, catView,
 			&ViewCategory::actSystemJsonDialog);
+		connect(trainListWidget, &TrainListWidget::autoAddNewType,
+			[this](std::shared_ptr<TrainType> nty) {
+				undoStack->push(new qecmd::AutoAddTrainType(_diagram.trainCollection().typeManager(), nty, catView));
+			});
 	}
 
 	//context: page 5

@@ -111,6 +111,11 @@ public:
     std::shared_ptr<TrainType> findOrCreate(std::shared_ptr<TrainType> tp);
 
     /**
+     * Create a new type with given name, using default pen setting.
+     */
+    std::shared_ptr<TrainType> createType(const QString& name)const;
+
+    /**
      * 如果找不到，返回空
      */
     std::shared_ptr<TrainType> find(const QString& name)const { return _types.value(name); }

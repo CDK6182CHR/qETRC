@@ -348,6 +348,21 @@ namespace qecmd {
         void commit();
     };
 
+    /**
+     * 2025.08.15  Auto add train type, caused by setting a non-existed type to train(s).
+     */
+    class AutoAddTrainType : public QUndoCommand
+    {
+        TypeManager& manager;
+        std::shared_ptr<TrainType> type;
+        ViewCategory* const cat;
+
+    public:
+        AutoAddTrainType(TypeManager& manager, std::shared_ptr<TrainType> type, ViewCategory* cat, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
     class ChangeTypeRegex :public QUndoCommand {
         TypeManager& manager;
         std::shared_ptr<TypeManager> data;

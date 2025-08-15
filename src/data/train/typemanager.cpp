@@ -127,6 +127,13 @@ std::shared_ptr<TrainType> TypeManager::findOrCreate(std::shared_ptr<TrainType> 
     }
 }
 
+std::shared_ptr<TrainType> TypeManager::createType(const QString& name) const
+{
+    // 2025.08.15: we use the pen for defaultType by default, but not the defaultPen.
+    // Because the later cannot be configured by the user.
+    return std::make_shared<TrainType>(name, defaultType->pen());
+}
+
 void TypeManager::swapForRegex(TypeManager& other)
 {
     std::swap(_types, other._types);
