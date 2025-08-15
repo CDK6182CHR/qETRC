@@ -1,6 +1,8 @@
 #include <memory>
 #include <map>
 
+#include <QList>
+
 #include "traintag.h"
 
 /**
@@ -42,4 +44,6 @@ public:
 	void clear();
 
 	bool tagNameIsValid(const QString& name, std::shared_ptr<TrainTag> ignoreTag)const;
+
+	QList<QString> tagNames()const;
 };

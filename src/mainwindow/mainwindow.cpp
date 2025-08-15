@@ -1450,6 +1450,11 @@ void MainWindow::initToolbar()
 		connect(trainListWidget, &TrainListWidget::removeTrains,
 			contextTrain, &TrainContext::actRemoveTrains);
 
+		connect(trainListWidget, &TrainListWidget::batchAddTagApplied,
+			contextTrain, &TrainContext::actBatchAddTrainTag);
+		connect(trainListWidget, &TrainListWidget::batchRemoveTagApplied,
+			contextTrain, &TrainContext::actBatchRemoveTrainTag);
+
 		connect(actMergeTrains, &QAction::triggered,
 			contextTrain, &TrainContext::actMergeTrains);
 
@@ -1951,19 +1956,7 @@ void MainWindow::actBatchAddTagToTrains()
 	auto* dlg = new BatchAddTrainTagDialog(_diagram.trainCollection(), 
 		contextTrain->getTagCompletionModel(), this);
 
-	connect(dlg, &BatchAddTrainTagDialog::tagAdded,
-		[this](const QString& tagName, const std::vector<std::shared_ptr<Train>>& trains) {
-			auto& man = _diagram.trainCollection().tagManager();
-			auto tag = man.find(tagName);
-			if (!tag) {
-				tag = std::make_shared<TrainTag>(tagName,
-					tr("自动创建于%1  批量添加操作").arg(
-						QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")));
-				undoStack->push(new qecmd::AddNewTrainTag(man, tag, contextTrain));
-			}
-
-			undoStack->push(new qecmd::BatchAddTagToTrains(tag, trains, contextTrain));
-		});
+	connect(dlg, &BatchAddTrainTagDialog::tagAdded, contextTrain, &TrainContext::actBatchAddTrainTag);
 	dlg->open();
 }
 

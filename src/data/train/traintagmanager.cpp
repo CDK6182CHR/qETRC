@@ -86,3 +86,13 @@ bool TrainTagManager::tagNameIsValid(const QString& name, std::shared_ptr<TrainT
 	}
 	return true;
 }
+
+QList<QString> TrainTagManager::tagNames() const
+{
+	QList<QString> res;
+	std::ranges::transform(std::as_const(m_tags), std::back_inserter(res), 
+		[](const TagMap::value_type& t) {
+			return t.second->name();
+		});
+	return res;
+}

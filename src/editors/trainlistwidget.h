@@ -18,6 +18,7 @@ class TrainListModel;
 class QTableView;
 class QLineEdit;
 class TrainType;
+class TrainTag;
 struct DiagramOptions;
 
 /**
@@ -71,6 +72,9 @@ signals:
     void removeTrains(const QList<std::shared_ptr<Train>>& trains,
         const QList<int>& indexes);
 
+    void batchAddTagApplied(const QString& tagName, const std::vector<std::shared_ptr<Train>>& trains);
+    void batchRemoveTagApplied(std::shared_ptr<TrainTag> tag, const std::vector<std::pair<std::shared_ptr<Train>, int>>& data);
+
     /**
      * 列车发生排序，但没有增删改
      */
@@ -101,6 +105,17 @@ private slots:
      * 2022.02.06  实现为批量更改类型
      */
     void batchChange();
+
+    void batchAddTag(const QList<std::shared_ptr<Train>>& trains);
+
+    void batchRemoveTag(const QList<std::shared_ptr<Train>>& trains);
+
+    /**
+     * 2025.08.15  批量添加/删除指定的标签
+     */
+    void actBatchAddTagBat();
+
+    void actBatchRemoveTagBat();
 
     /**
      * 要做的事：

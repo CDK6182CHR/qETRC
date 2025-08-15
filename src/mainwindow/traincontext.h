@@ -476,6 +476,10 @@ public slots:
      */
     void onTrainTagChangedBatch();
 
+    void actBatchAddTrainTag(const QString& tagName, const std::vector<std::shared_ptr<Train>>& trains);
+
+    void actBatchRemoveTrainTag(std::shared_ptr<TrainTag>, const std::vector<std::pair<std::shared_ptr<Train>, int>>& data);
+
 private slots:
     void showTrainEvents();
 
@@ -553,7 +557,6 @@ private slots:
     void actAddToRouting();
 
     void actChangeTrain();
-
 
 };
 

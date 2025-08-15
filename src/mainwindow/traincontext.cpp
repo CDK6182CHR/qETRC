@@ -1425,6 +1425,25 @@ void TrainContext::onTrainTagChangedBatch()
 		refreshTags();
 }
 
+void TrainContext::actBatchAddTrainTag(const QString& tagName, const std::vector<std::shared_ptr<Train>>& trains)
+{
+	auto& man = diagram.trainCollection().tagManager();
+	auto tag = man.find(tagName);
+	if (!tag) {
+		tag = std::make_shared<TrainTag>(tagName,
+			tr("自动创建于%1  批量添加操作").arg(
+				QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")));
+		mw->undoStack->push(new qecmd::AddNewTrainTag(man, tag, this));
+	}
+
+	mw->undoStack->push(new qecmd::BatchAddTagToTrains(tag, trains, this));
+}
+
+void TrainContext::actBatchRemoveTrainTag(std::shared_ptr<TrainTag> tag, const std::vector<std::pair<std::shared_ptr<Train>, int>>& data)
+{
+	mw->undoStack->push(new qecmd::BatchRemoveTagFromTrains(tag, data, this));
+}
+
 void TrainContext::actToggleTrainLineShown(bool checked)
 {
 	if (!train)

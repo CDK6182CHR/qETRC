@@ -7,6 +7,8 @@
 #include "data/train/train.h"
 #include "data/train/traincollection.h"
 
+#include <ranges>
+
 #include <QLineEdit>
 #include <QTableView>
 #include <QHeaderView>
@@ -17,10 +19,10 @@
 #include <QFile>
 #include <QTextStream>
 
-#include <model/train/trainlistmodel.h>
-#include <mainwindow/traincontext.h>
-#include <data/diagram/trainline.h>
-#include <editors/train/trainpenwidget.h>
+#include "model/train/trainlistmodel.h"
+#include "mainwindow/traincontext.h"
+#include "data/diagram/trainline.h"
+#include "editors/train/trainpenwidget.h"
 
 TrainListWidget::TrainListWidget(const DiagramOptions& ops, TrainCollection& coll_, QUndoStack* undo, QWidget* parent):
     QWidget(parent), _ops(ops), coll(coll_),_undo(undo),
@@ -85,6 +87,8 @@ void TrainListWidget::initUI()
 	menu->addSeparator();
 
 	menu->addAction(tr("批量分类"), this, &TrainListWidget::batchChange);
+	menu->addAction(tr("批量添加标签"), this, &TrainListWidget::actBatchAddTagBat);
+	menu->addAction(tr("批量删除标签"), this, &TrainListWidget::actBatchRemoveTagBat);
 	menu->addAction(tr("批量设置运行线样式"), this, &TrainListWidget::actChangePenBat);
 	menu->addSeparator();
 	menu->addAction(tr("按时刻表重设始发终到"), this, &TrainListWidget::actResetStartingTerminalFromTimetableBat);
@@ -180,6 +184,92 @@ void TrainListWidget::batchChange()
 	}
 	QMessageBox::information(this, tr("提示"), tr("类型更新完毕。此功能不会自动重新铺画运行图，如果需要，"
 		"请手动重新铺画或刷新运行图。"));
+}
+
+void TrainListWidget::batchAddTag(const QList<std::shared_ptr<Train>>& trains)
+{
+	auto tagNames = coll.tagManager().tagNames();
+	bool ok;
+	auto ntag_s = QInputDialog::getItem(this, tr("批量设置标签"),
+		tr("为选中的[%1]个车次设置以下标签：").arg(trains.count()),
+		tagNames, 0, true, &ok);
+	if (!ok)
+		return;
+
+	std::vector<std::shared_ptr<Train>> trains_sel;
+	auto tag = coll.tagManager().find(ntag_s);  // possible null
+	std::ranges::move(std::ranges::views::filter(trains, [&tag](const std::shared_ptr<Train>& t) {
+		return !tag || !t->hasTag(tag);
+		}), std::back_inserter(trains_sel));
+
+	if (trains_sel.empty()) {
+		QMessageBox::information(this, tr("提示"), tr("所选列车均已含有所给标签，操作没有效果"));
+	}
+	else {
+		// Emit and let train context handle this
+		emit batchAddTagApplied(ntag_s, trains_sel);
+	}
+}
+
+void TrainListWidget::batchRemoveTag(const QList<std::shared_ptr<Train>>& trains)
+{
+	auto tagNames = coll.tagManager().tagNames();
+	bool ok;
+	auto ntag_s = QInputDialog::getItem(this, tr("批量设置标签"),
+		tr("为选中的[%1]个车次移除以下标签（如果含有）：").arg(trains.count()),
+		tagNames, 0, true, &ok);
+	if (!ok)
+		return;
+
+	auto tag = coll.tagManager().find(ntag_s);  // possible null
+	if (!tag) {
+		QMessageBox::information(this, tr("提示"), tr("所有选中车次皆不含所给标签，操作没有效果"));
+	}
+
+	std::vector<std::pair<std::shared_ptr<Train>, int>> remove_data;
+	for (auto t : trains) {
+		if (auto idx = t->tagIndex(tag); idx >= 0) {
+			remove_data.emplace_back(t, idx);
+		}
+	}
+
+	if (remove_data.empty()) {
+		QMessageBox::information(this, tr("提示"), tr("所选列车均不含有所给标签，操作没有效果"));
+	}
+	else {
+		// Emit and let train context handle this
+		emit batchRemoveTagApplied(tag, remove_data);
+	}
+}
+
+void TrainListWidget::actBatchAddTagBat()
+{
+	auto lst = table->selectionModel()->selectedRows();
+	QList<std::shared_ptr<Train>> trains;
+	foreach(const auto& t, lst) {
+		trains.push_back(coll.trainAt(t.row()));
+	}
+	if (trains.empty()) {
+		QMessageBox::warning(this, tr("错误"), tr("批量添加列车标签：请先选择至少一个车次！"));
+		return;
+	}
+
+	batchAddTag(trains);
+}
+
+void TrainListWidget::actBatchRemoveTagBat()
+{
+	auto lst = table->selectionModel()->selectedRows();
+	QList<std::shared_ptr<Train>> trains;
+	foreach(const auto& t, lst) {
+		trains.push_back(coll.trainAt(t.row()));
+	}
+	if (trains.empty()) {
+		QMessageBox::warning(this, tr("错误"), tr("批量移除列车标签：请先选择至少一个车次！"));
+		return;
+	}
+
+	batchRemoveTag(trains);
 }
 
 
