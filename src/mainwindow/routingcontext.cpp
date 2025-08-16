@@ -277,7 +277,7 @@ void RoutingContext::openRoutingDiagramWidget(std::shared_ptr<Routing> routing)
         return;
     }
     auto* d = new RoutingDiagramWidget(_diagram.options(), routing);
-    auto* dock = new ads::CDockWidget(d->windowTitle());
+    auto* dock = new ads::CDockWidget(mw->manager, d->windowTitle());
     dock->setWidget(d);
     diagramWidgets.push_back(d);
     diagramDocks.push_back(dock);
@@ -344,7 +344,7 @@ void RoutingContext::openRoutingEditWidget(std::shared_ptr<Routing> routing)
     int i = getRoutingWidgetIndex(routing);
     if (i == -1) {
         auto* w = new RoutingEdit(_diagram.options(), _diagram.trainCollection(), routing);
-        auto* dock = new ads::CDockWidget(tr("交路编辑 - %1").arg(routing->name()));
+        auto* dock = new ads::CDockWidget(mw->manager, tr("交路编辑 - %1").arg(routing->name()));
         dock->setWidget(w);
         connect(w, &RoutingEdit::closeDock, this, &RoutingContext::removeRoutingEdit);
         routingEdits.push_back(w);

@@ -23,7 +23,7 @@ cd ..\..\..
 if not exist out\build\%%c  md out\build\%%c
 cd out\build\%%c
 
-cmake ../../.. -DCMAKE_BUILD_TYPE=%%c -DQT_DIR=%QT_DIR% -DSARIBBON_USE_FRAMELESS_LIB=ON
+cmake ../../.. -DCMAKE_BUILD_TYPE=%%c -DQT_DIR=%QT_DIR% -DSARIBBON_USE_FRAMELESS_LIB=ON -DCMAKE_DEBUG_POSTFIX=d -DCMAKE_RELWITHDEBINFO_POSTFIX=rd
 cmake --build . --config %%c
 cmake --install . --config %%c
 

@@ -203,7 +203,7 @@ void PathContext::openPathEdit(TrainPath* path)
         //创建
         auto* pw = new PathEdit(diagram.railCategory(), diagram.pathCollection());
         pw->setPath(path);
-        auto* dock = new ads::CDockWidget(tr("列车径路 - %1").arg(path->name()));
+        auto* dock = new ads::CDockWidget(mw->manager, tr("列车径路 - %1").arg(path->name()));
         dock->setWidget(pw);
         pathEdits.append(pw);
         pathDocks.append(dock);

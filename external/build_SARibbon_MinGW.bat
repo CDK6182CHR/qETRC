@@ -23,7 +23,7 @@ cd ..\..\..
 if not exist out\build_MinGW\%%c  md out\build_MinGW\%%c
 cd out\build_MinGW\%%c
 
-cmake -G Ninja ../../.. -DCMAKE_BUILD_TYPE=%%c -DQT_DIR=%QT_DIR% -DSARIBBON_USE_FRAMELESS_LIB=ON
+cmake -G Ninja ../../.. -DCMAKE_BUILD_TYPE=%%c -DQT_DIR=%QT_DIR% -DSARIBBON_USE_FRAMELESS_LIB=ON -DCMAKE_DEBUG_POSTFIX=d -DCMAKE_RELWITHDEBINFO_POSTFIX=rd
 cmake --build . --config %%c
 cmake --install . --config %%c
 

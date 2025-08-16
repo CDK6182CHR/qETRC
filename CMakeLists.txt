@@ -95,6 +95,7 @@ if (NOT ANDROID)
     # 2024.03.28 trial: use find_package for SARibbon
     # add_subdirectory(external/SARibbon)
     find_package(SARibbonBar REQUIRED)
+    message(STATUS "Found SARibbonBar version ${SARibbonBar_VERSION}")
     
     # list(APPEND CMAKE_PREFIX_PATH "D:/codes/QtProjects/site-packages/Qt-Advanced-Docking-System/out/install/lib/cmake/qt5advanceddocking")
     # find_package(qt${QT_VERSION_MAJOR}advanceddocking CONFIG REQUIRED)
@@ -108,13 +109,13 @@ if (NOT ANDROID)
         ads
         # GIT_REPOSITORY ${CMAKE_SOURCE_DIR}/external/Qt-Advanced-Docking-System
         GIT_REPOSITORY ${ADS_REPO_URL}
-        GIT_TAG 4.3.1
+        GIT_TAG 4.4.0
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/ads
     )
     FetchContent_MakeAvailable(ads)
 
     target_link_libraries(qETRC PUBLIC SARibbonBar::SARibbonBar)
-    target_link_libraries(qETRC PRIVATE ads::qt${QT_VERSION_MAJOR}advanceddocking)
+    target_link_libraries(qETRC PRIVATE qtadvanceddocking-qt${QT_VERSION_MAJOR})
 
     if (AUTO_INSTALL_SARibbon)
         get_target_property(SARibbonBar_LIB_FILE SARibbonBar::SARibbonBar LOCATION_${CMAKE_BUILD_TYPE})

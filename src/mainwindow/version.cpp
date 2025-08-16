@@ -4,14 +4,15 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.8.2";
-const std::string_view DATE = "20250811";
-const int RELEASE_CODE = 70;
+const std::string_view LAST_VERSION = "V1.8.3";
+const std::string_view DATE = "20250816";
+const int RELEASE_CODE = 71;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 取消基线首末站必须为双向通过的限制。
-2. 新增线路的列车运行统计功能。
-3. 细节优化及修复已知问题。)";
+const std::string_view UPDATE_LOG = R"(1. 新增“列车标签”功能及相关的编辑操作支持。
+2. 在列车筛选器中支持按列车标签筛选。
+3. 一些细节优化。
+4. 升级支持库版本。)";
 }

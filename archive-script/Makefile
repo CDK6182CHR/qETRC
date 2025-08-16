@@ -30,7 +30,7 @@ PDB_ARCHIVE = qETRC-pdb-archive$(SUFFIX).7z
 SARIBBON_LIB = $(BUILD_DIR)\SARibbonBarrd.dll 
 QWK_CORE_LIB = $(BUILD_DIR)\QWKCorerd.dll 
 QWK_WIDGETS_LIB = $(BUILD_DIR)\QWKWidgetsrd.dll
-ADS_LIB = $(BUILD_DIR)\qt6advanceddocking.dll
+ADS_LIB = $(BUILD_DIR)\qtadvanceddocking-qt6.dll
 
 # Other files
 NOTE_FILE = ..\ReleaseNote.pdf

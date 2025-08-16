@@ -1471,7 +1471,7 @@ void TrainContext::showBasicWidget(std::shared_ptr<Train> train)
 		//创建
 		auto* w = new BasicTrainWidget(diagram.trainCollection(), diagram.railCategory(), diagram.options(), false);
 		w->setTrain(train);
-		auto* dock = new ads::CDockWidget(tr("时刻表编辑 - %1").arg(train->trainName().full()));
+		auto* dock = new ads::CDockWidget(mw->manager, tr("时刻表编辑 - %1").arg(train->trainName().full()));
 		dock->setWidget(w);
 		//dock->setAttribute(Qt::WA_DeleteOnClose);
 		connect(dock, SIGNAL(closed()), this, SLOT(onTrainDockClosed()));
@@ -1504,7 +1504,7 @@ void TrainContext::showEditWidget(std::shared_ptr<Train> train)
 	if (idx == -1) {
 		//创建
 		auto* w = new EditTrainWidget(diagram.trainCollection(), diagram.railCategory(), diagram.options(), train);
-		auto* dock = new ads::CDockWidget(tr("列车编辑 - %1").arg(train->trainName().full()));
+		auto* dock = new ads::CDockWidget(mw->manager, tr("列车编辑 - %1").arg(train->trainName().full()));
 		connect(w, &QWidget::windowTitleChanged, dock, &ads::CDockWidget::setWindowTitle);
 		w->setTrain(train);
 		dock->setWidget(w);

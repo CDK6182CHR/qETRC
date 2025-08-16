@@ -46,7 +46,7 @@ void RailDBContext::initUI()
 
     if constexpr (true) {
         // 这里同时初始化RailDBDock
-        dbDock = new ads::CDockWidget(tr("线路数据库"));
+        dbDock = new ads::CDockWidget(mw->manager, tr("线路数据库"));
         mw->getManager()->addDockWidgetTab(ads::CenterDockWidgetArea, dbDock);
         dbDock->setWidget(window);
         dbDock->closeDockWidget();
@@ -60,7 +60,7 @@ void RailDBContext::initUI()
     panel->addLargeAction(act);
 
     if constexpr (true) {
-        quickDock = new ads::CDockWidget(tr("快速切片"));
+        quickDock = new ads::CDockWidget(mw->manager, tr("快速切片"));
         mw->getManager()->addDockWidget(ads::LeftDockWidgetArea, quickDock);
         quickDock->closeDockWidget();    
         connect(quickDock, &ads::CDockWidget::viewToggled,

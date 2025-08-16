@@ -385,7 +385,7 @@ void RailContext::openRulerWidget(std::shared_ptr<Ruler> ruler)
 	if (i == -1) {
 		//创建
 		auto* rw = new RulerWidget(ruler, false);
-		auto* dock = new ads::CDockWidget(tr("标尺编辑 - %1 - %2").arg(ruler->name())
+		auto* dock = new ads::CDockWidget(mw->manager, tr("标尺编辑 - %1 - %2").arg(ruler->name())
 			.arg(ruler->railway()->name()));
 		dock->setWidget(rw);
 		rulerWidgets.append(rw);
@@ -418,7 +418,7 @@ ForbidTabWidget* RailContext::getOpenForbidWidget(std::shared_ptr<Railway> railw
 	if (i == -1) {
 		//创建
 		auto* rw = new ForbidTabWidget(diagram.options(), railway, false);
-		auto* dock = new ads::CDockWidget(tr("天窗编辑 - %1").arg(railway->name()));
+		auto* dock = new ads::CDockWidget(mw->manager, tr("天窗编辑 - %1").arg(railway->name()));
 		dock->setWidget(rw);
 		forbidWidgets.append(rw);
 		forbidDocks.append(dock);

@@ -93,7 +93,7 @@
 #include "editors/train/batchaddtraintagdialog.h"
 
 MainWindow::MainWindow(QWidget* parent)
-	: SARibbonMainWindow(parent, true),
+	: SARibbonMainWindow(parent),
 	undoStack(new QUndoStack(this)),
 	naviModel(new DiagramNaviModel(_diagram, this))
 {
@@ -525,7 +525,7 @@ void MainWindow::initDockWidgets()
 
 	// Central
 	if (SystemJson::instance.use_central_widget) {
-		dock = new ads::CDockWidget(tr("运行图窗口"));
+		dock = new ads::CDockWidget(manager, tr("运行图窗口"));
 		dock->setFeature(ads::CDockWidget::NoTab, true);
 		auto* w = new QWidget;
 		dock->setWidget(w);
@@ -540,7 +540,7 @@ void MainWindow::initDockWidgets()
 	if constexpr (true) {
 		auto* tree = new NaviTree(naviModel, undoStack);
 		naviView = tree;
-		dock = new ads::CDockWidget(QObject::tr("运行图资源管理器"));
+		dock = new ads::CDockWidget(manager, QObject::tr("运行图资源管理器"));
 		naviDock = dock;
 		dock->setWidget(tree);
 
@@ -598,7 +598,7 @@ void MainWindow::initDockWidgets()
 		QUndoView* view = new QUndoView(undoStack);
 		undoView = view;
 		view->setCleanIcon(QEICN_undo_stack_clean);
-		dock = new ads::CDockWidget(tr("历史记录"));
+		dock = new ads::CDockWidget(manager, tr("历史记录"));
 		dock->setWidget(view);
 		undoDock = dock;
 		//area = manager->addDockWidget(ads::BottomDockWidgetArea, dock, area);
@@ -614,7 +614,7 @@ void MainWindow::initDockWidgets()
 	//列车管理
 	if constexpr (true) {
 		auto* tw = new TrainListWidget(_diagram.options(), _diagram.trainCollection(), undoStack);
-		dock = new ads::CDockWidget(tr("列车管理"));
+		dock = new ads::CDockWidget(manager, tr("列车管理"));
 		trainListWidget = tw;
 		trainListDock = dock;
 		dock->setWidget(tw);
@@ -646,7 +646,7 @@ void MainWindow::initDockWidgets()
 	// 交路管理
 	if constexpr (true) {
 		auto* rw = new RoutingWidget(_diagram.trainCollection(), undoStack);
-		dock = new ads::CDockWidget(tr("交路管理"));
+		dock = new ads::CDockWidget(manager, tr("交路管理"));
 		dock->setWidget(rw);
 		manager->addDockWidget(ads::LeftDockWidgetArea, dock);
 		dock->closeDockWidget();
@@ -670,7 +670,7 @@ void MainWindow::initDockWidgets()
 	// TrainPath 列车径路
 	if constexpr (true) {
 		auto* w = new PathListWidget(_diagram.railCategory(), _diagram.pathCollection(), undoStack);
-		dock = new ads::CDockWidget(tr("列车径路管理"));
+		dock = new ads::CDockWidget(manager, tr("列车径路管理"));
 		dock->setWidget(w);
 		manager->addDockWidget(ads::LeftDockWidgetArea, dock);
 		dock->closeDockWidget();
@@ -697,7 +697,7 @@ void MainWindow::initDockWidgets()
 	// 速览信息
 	if constexpr (true) {
 		auto* w = new TrainInfoWidget(_diagram.options());
-		dock = new ads::CDockWidget(tr("速览信息"));
+		dock = new ads::CDockWidget(manager, tr("速览信息"));
 		dock->setWidget(w);
 		trainInfoWidget = w;
 		trainInfoDock = dock;
@@ -716,7 +716,7 @@ void MainWindow::initDockWidgets()
 	// 速览时刻
 	if constexpr (true) {
 		auto* w = new TimetableQuickWidget(_diagram.options(), undoStack);
-		dock = new ads::CDockWidget(tr("速览时刻"));
+		dock = new ads::CDockWidget(manager, tr("速览时刻"));
 		dock->setWidget(w);
 		timetableQuickWidget = w;
 		timetableQuickDock = dock;
@@ -730,7 +730,7 @@ void MainWindow::initDockWidgets()
 	// 输出窗口 (日志窗口)
 	if constexpr (true) {
 		auto* w = new QTextBrowser;
-		dock = new ads::CDockWidget(tr("输出"));
+		dock = new ads::CDockWidget(manager, tr("输出"));
 		dock->setWidget(w);
 		logDock = dock;
 		logWidget = w;
@@ -745,7 +745,7 @@ void MainWindow::initDockWidgets()
 	// 问题窗口
 	if constexpr (true) {
 		auto* w = new IssueWidget;
-		dock = new ads::CDockWidget(tr("问题"));
+		dock = new ads::CDockWidget(manager, tr("问题"));
 		dock->setWidget(w);
 		issueWidget = w;
 		issueDock = dock;
@@ -2279,7 +2279,7 @@ void MainWindow::actOpenRailStationWidget(std::shared_ptr<Railway> rail)
 	}
 	//创建
 	auto* w = new RailStationWidget(_diagram.railCategory(), false);
-	auto* dock = new ads::CDockWidget(tr("基线编辑 - %1").arg(rail->name()));
+	auto* dock = new ads::CDockWidget(manager, tr("基线编辑 - %1").arg(rail->name()));
 	auto* act = dock->toggleViewAction();
 	railMenu->addAction(act);
 	dock->setWidget(w);
@@ -2535,7 +2535,7 @@ void MainWindow::insertPageWidget(std::shared_ptr<DiagramPage> page, int index)
 	using namespace std::chrono_literals;
 	auto start = std::chrono::system_clock::now();
 	DiagramWidget* dw = new DiagramWidget(_diagram, page);
-	auto* dock = new ads::CDockWidget(page->name());
+	auto* dock = new ads::CDockWidget(manager, page->name());
 	dock->setIcon(QEICN_diagram_page_title);
 	dock->setWidget(dw);
 
