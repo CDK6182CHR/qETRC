@@ -15,12 +15,10 @@ SystemJson& SystemJson::get()
 
 void SystemJson::saveFile()
 {
-    static const QString filename = "system.json";
-	const QString full_name = qeutil::getSystemFileFullPath(filename);
-    QFile file(full_name);
+    QFile file(full_path);
     file.open(QFile::WriteOnly);
     if (!file.isOpen()) {
-        qDebug() << "SystemJson::saveFile: WARNING: open file " << full_name << " failed." << Qt::endl;
+        qDebug() << "SystemJson::saveFile: WARNING: open file " << full_path << " failed." << Qt::endl;
         return;
     }
     QJsonDocument doc(toJson());
@@ -46,6 +44,7 @@ SystemJson::SystemJson()
 {
     static const QString filename = "system.json";
     const QString full_name = qeutil::getSystemFileFullPath(filename);
+	this->full_path = full_name;
 	qDebug() << "SystemJson::SystemJson: reading system configuration file " << full_name << Qt::endl;
     QFile file(full_name);
     file.open(QFile::ReadOnly);

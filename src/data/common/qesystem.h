@@ -73,6 +73,9 @@ public:
     static SystemJson& get();
 
 private:
+
+    QString full_path;
+
     /**
      * 构造函数直接读文件
      */
