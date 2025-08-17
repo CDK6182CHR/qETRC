@@ -187,7 +187,7 @@ bool TypeManager::fromJson(const QJsonObject& obj, bool ignore_transparent)
         return false;
 
     transparent_types = obj.value("transparent_types").toBool(false);
-    if (transparent_types && SystemJson::instance.transparent_config && !ignore_transparent) {
+    if (transparent_types && SystemJson::get().transparent_config && !ignore_transparent) {
         return false;
     }
 
@@ -292,7 +292,7 @@ void TypeManager::initDefaultTypes()
 void TypeManager::toJson(QJsonObject& obj) const
 {
     obj.insert("transparent_types", transparent_types);
-    if (SystemJson::instance.transparent_config && transparent_types) {
+    if (SystemJson::get().transparent_config && transparent_types) {
         return;
     }
     //颜色

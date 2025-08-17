@@ -83,7 +83,7 @@ void SelectRailDirStationDialog::initUI(const QString& prompt)
 
 	m_model = new RailStationModel(false, this);
 	m_table = new QTableView;
-	m_table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+	m_table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
 	
 	m_table->setSelectionBehavior(QTableView::SelectRows);
 	m_table->setSelectionMode(QTableView::MultiSelection);

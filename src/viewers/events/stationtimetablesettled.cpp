@@ -99,7 +99,7 @@ void StationTimetableSettledDialog::initUI()
         &StationTimetableSettledDialog::onHidePassChanged);
     vlay->addWidget(ckHidePass);
     table=new QTableView;
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setModel(model);
     table->resizeColumnsToContents();
     vlay->addWidget(table);

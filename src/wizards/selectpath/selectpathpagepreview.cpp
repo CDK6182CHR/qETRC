@@ -77,7 +77,7 @@ void SelectPathPagePreview::initUI()
 
     ctable=new QEControlledTable;
     table=ctable->table();
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setEditTriggers(QTableView::AllEditTriggers);
     table->setModel(model);
     vlay->addWidget(ctable);

@@ -63,7 +63,7 @@ void BatchParseRoutingDialog::initUI()
         table->setColumnWidth(c++, w);
     }
 
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     hlay->addWidget(table);
 }
 

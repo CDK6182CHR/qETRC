@@ -137,7 +137,7 @@ void SystemJsonDialog::initUI()
 void SystemJsonDialog::setLanguageCombo()
 {
     // Currently, a brute-force implementation...
-    switch (SystemJson::instance.language) {
+    switch (SystemJson::get().language) {
     case QLocale::Chinese: cbLanguage->setCurrentIndex(0); break;
 #ifndef DISABLE_ENGLISH
     case QLocale::English: cbLanguage->setCurrentIndex(1); break;
@@ -148,7 +148,7 @@ void SystemJsonDialog::setLanguageCombo()
 
 void SystemJsonDialog::setData()
 {
-    const auto& t=SystemJson::instance;
+    const auto& t=SystemJson::get();
     spRowHeight->setValue(t.table_row_height);
     edDefaultFile->setText(t.default_file);
 #if 0
@@ -176,7 +176,7 @@ void SystemJsonDialog::setData()
 
 void SystemJsonDialog::actApply()
 {
-    auto& t=SystemJson::instance;
+    auto& t=SystemJson::get();
     t.language = qvariant_cast<QLocale::Language>(cbLanguage->currentData());
     t.table_row_height = spRowHeight->value();
     t.default_file = edDefaultFile->text();

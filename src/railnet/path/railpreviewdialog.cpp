@@ -48,7 +48,7 @@ void RailPreviewDialog::initUI()
     table=ctable->table();
     vlay->addWidget(ctable);
 
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setEditTriggers(QTableView::AllEditTriggers);
     table->setModel(model);
     table->setItemDelegateForColumn(RailStationModel::ColMile,

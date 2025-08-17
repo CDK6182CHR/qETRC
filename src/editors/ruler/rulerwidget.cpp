@@ -70,7 +70,7 @@ void RulerWidget::initUI()
     vlay->addLayout(form);
 
     table=new QTableView;
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setModel(model);
     //table->resizeColumnsToContents();
     table->setEditTriggers(QTableView::AllEditTriggers);

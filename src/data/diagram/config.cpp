@@ -73,7 +73,7 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
     if (obj.empty())
         return false;
     FROM_OBJ(transparent_config, Bool);
-    if (SystemJson::instance.transparent_config && transparent_config && !ignore_transparent) {
+    if (SystemJson::get().transparent_config && transparent_config && !ignore_transparent) {
         return false;
     }
     FROM_OBJ(seconds_per_pix, Double);
@@ -172,7 +172,7 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
 
 QJsonObject Config::toJson() const
 {
-    if (SystemJson::instance.transparent_config && transparent_config) {
+    if (SystemJson::get().transparent_config && transparent_config) {
         return QJsonObject{
             TO_OBJ(transparent_config)
         };

@@ -127,7 +127,7 @@ void ConflictDialog::initUI()
 
     table = new QTableView;
     table->setEditTriggers(QTableView::NoEditTriggers);
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->horizontalHeader()->setSortIndicatorShown(true);
     connect(table->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
         table, SLOT(sortByColumn(int, Qt::SortOrder)));

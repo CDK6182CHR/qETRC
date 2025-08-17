@@ -159,7 +159,7 @@ void RailStationWidget::initUI()
 	ctable->table()->setItemDelegateForColumn(RailStationModel::ColMile,
 		new GeneralDoubleSpinDelegate(this));
     ctable->table()->verticalHeader()->setDefaultSectionSize(
-                SystemJson::instance.table_row_height);
+                SystemJson::get().table_row_height);
     QScroller::grabGesture(ctable->table(),QScroller::TouchGesture);
 
 	ctable->table()->setContextMenuPolicy(Qt::ActionsContextMenu);

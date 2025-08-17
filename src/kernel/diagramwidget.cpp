@@ -494,7 +494,7 @@ void DiagramWidget::paintToFile(QPainter& painter, const QString& title, const Q
 
 void DiagramWidget::showWeakenItem()
 {
-    if (!SystemJson::instance.weaken_unselected)
+    if (!SystemJson::get().weaken_unselected)
         return;
     if (!weakItem) {
         //weakItem = new QGraphicsRectItem(margins().left, margins().up,
@@ -535,7 +535,7 @@ void DiagramWidget::showPosTip(const QPoint& pos, const QString& msg, const QStr
 
 void DiagramWidget::showTimeTooltip(const QPoint& pos_glb)
 {
-    if (!SystemJson::instance.show_train_tooltip)
+    if (!SystemJson::get().show_train_tooltip)
         return;
     auto pos = mapToScene(pos_glb);
     TrainItem* item = posTrainItem(pos);
@@ -655,8 +655,8 @@ void DiagramWidget::dragTimeFinish(const QPointF& pos)
             emit timeDraggedSingle(train, station_id, data, _dragMod);
         }
 
-        if (SystemJson::instance.inform_dragging) {
-            SystemJson::instance.inform_dragging = false;
+        if (SystemJson::get().inform_dragging) {
+            SystemJson::get().inform_dragging = false;
             QMessageBox::information(this, tr("提示"),
                 tr("你刚才使用了拖动调整时刻的功能。如果这是误触，可以撤销（Ctrl+Z）此操作。"
                     "在全局配置选项中，可以关闭拖动调整时刻功能。\n"
@@ -921,7 +921,7 @@ void DiagramWidget::mousePressEvent(QMouseEvent* e)
             }
             else {
                 // for drag here
-                if (SystemJson::instance.drag_time) {
+                if (SystemJson::get().drag_time) {
                     dragTimeBegin(pos, trainItem, pointItem, ctrl, alt, shift, e->modifiers());
                 }
             }

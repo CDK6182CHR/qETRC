@@ -84,7 +84,7 @@ void ReadRulerPagePreview::initUI()
     auto* vlay=new QVBoxLayout(this);
     table=new QTableView;
     table->setEditTriggers(QTableView::NoEditTriggers);
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setModel(model);
     vlay->addWidget(table);
 
@@ -102,7 +102,7 @@ void ReadRulerPagePreview::initUI()
     // detail
     mdDetail = new ReadRulerDetailModel(this);
     tbDetail = new QTableView;
-    tbDetail->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbDetail->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbDetail->setEditTriggers(QTableView::NoEditTriggers);
     tbDetail->setModel(mdDetail);
     dlgDetail = new DialogAdapter(tbDetail, this);
@@ -114,7 +114,7 @@ void ReadRulerPagePreview::initUI()
     //summary
     mdSummary = new ReadRulerSummaryModel(this);
     tbSummary = new QTableView;
-    tbSummary->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbSummary->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbSummary->setEditTriggers(QTableView::NoEditTriggers);
     tbSummary->setModel(mdSummary);
     dlgSummary = new DialogAdapter(tbSummary, this);

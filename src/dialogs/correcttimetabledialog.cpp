@@ -364,7 +364,7 @@ void CorrectTimetableDialog::initUI()
             this,&CorrectTimetableDialog::batchSelect);
 
     table=new QTableView;
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setModel(model);
     table->setEditTriggers(QTableView::NoEditTriggers);
     table->setSelectionMode(QTableView::ExtendedSelection);

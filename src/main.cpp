@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 
     // translation
     QTranslator trans;
-    bool res = trans.load(QLocale{ SystemJson::instance.language }, "./tr/", "qETRC_");
+    bool res = trans.load(QLocale{ SystemJson::get().language }, "./tr/", "qETRC_");
     if (!res) {
         qWarning() << "load translation file failed!";
     }
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     
     // translation of Qt
     QTranslator trans2;
-    bool res2 = trans2.load(QLocale{ SystemJson::instance.language }, "./translations/", "qt_");
+    bool res2 = trans2.load(QLocale{ SystemJson::get().language }, "./translations/", "qt_");
     if (!res2) {
         qWarning() << "load Qt translation file failed!";
     }

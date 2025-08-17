@@ -20,7 +20,7 @@ StartupPage::StartupPage():
 
 void StartupPage::onStartup()
 {
-    if (SystemJson::instance.show_start_page){
+    if (SystemJson::get().show_start_page){
         auto* page=new StartupPage;
         page->setAttribute(Qt::WA_DeleteOnClose);
         page->show();
@@ -119,6 +119,6 @@ void StartupPage::initUI()
 
 void StartupPage::closeEvent(QCloseEvent *ev)
 {
-    SystemJson::instance.show_start_page=!ckDoNotShow->isChecked();
+    SystemJson::get().show_start_page=!ckDoNotShow->isChecked();
     ev->accept();
 }

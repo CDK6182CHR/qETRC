@@ -81,7 +81,7 @@ void GreedyPaintPageConstraint::initUI()
     _mdForbid->setRailway(cbRuler->railway());
 
     table = new QTableView;
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setEditTriggers(QTableView::AllEditTriggers);
     table->setModel(_model);
     table->setItemDelegateForColumn(GapConstraintModel::ColLimit,

@@ -75,7 +75,7 @@ void SelectTrainStationsDialog::initUI()
     vlay->addWidget(lab);
 
     table=new QTableView;
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setModel(model);
     {
         int c = 0;

@@ -30,7 +30,7 @@ void TrainTagSelectTable::initUI()
 	m_model->setColumnCount(1);
 	m_model->setHorizontalHeaderLabels({tr("列车标签")});
 
-	table()->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+	table()->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
 	table()->setEditTriggers(QTableView::AllEditTriggers);
 	table()->setModel(m_model);
 	table()->setItemDelegateForColumn(0, new TextCompletionDelegate(m_completer, this));

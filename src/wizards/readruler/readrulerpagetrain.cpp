@@ -61,7 +61,7 @@ void ReadRulerPageTrain::initUI()
     auto* hlay=new QHBoxLayout;
     tbUnsel=new QTableView;
     mdUnsel=new TrainListReadModel(diagram.options(), coll.trains(), this);
-    tbUnsel->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbUnsel->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbUnsel->setModel(mdUnsel);
     hlay->addWidget(tbUnsel);
     tbUnsel->resizeColumnsToContents();
@@ -78,7 +78,7 @@ void ReadRulerPageTrain::initUI()
 
     tbSel=new QTableView;
     mdSel=new TrainListReadModel(diagram.options(), this);
-    tbSel->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbSel->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbSel->setModel(mdSel);
     tbSel->setSelectionBehavior(QTableView::SelectRows);
     tbSel->setSelectionMode(QTableView::MultiSelection);

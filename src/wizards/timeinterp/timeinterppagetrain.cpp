@@ -73,7 +73,7 @@ void TimeInterpPageTrain::initUI()
     table->setEditTriggers(QTableView::NoEditTriggers);
     table->setSelectionBehavior(QTableView::SelectRows);
     table->setSelectionMode(QTableView::MultiSelection);
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setModel(model);
     table->resizeColumnsToContents();
     vlay->addWidget(table);

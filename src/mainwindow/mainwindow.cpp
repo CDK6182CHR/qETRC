@@ -97,7 +97,7 @@ MainWindow::MainWindow(QWidget* parent)
 	undoStack(new QUndoStack(this)),
 	naviModel(new DiagramNaviModel(_diagram, this))
 {
-	qApp->setStyle(QStyleFactory::create(SystemJson::instance.app_style));
+	qApp->setStyle(QStyleFactory::create(SystemJson::get().app_style));
 	auto start = std::chrono::system_clock::now();
 	ads::CDockManager::setConfigFlag(ads::CDockManager::OpaqueSplitterResize, true);
 	ads::CDockManager::setConfigFlag(ads::CDockManager::XmlCompressionEnabled, false);
@@ -396,13 +396,13 @@ void MainWindow::showAboutDialog()
 void MainWindow::useWpsStyle()
 {
 	ribbonBar()->setRibbonStyle(SARibbonBar::WpsLiteStyle);
-	SystemJson::instance.ribbon_style = SARibbonBar::WpsLiteStyle;
+	SystemJson::get().ribbon_style = SARibbonBar::WpsLiteStyle;
 }
 
 void MainWindow::useOfficeStyle()
 {
 	ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);
-	SystemJson::instance.ribbon_style = SARibbonBar::OfficeStyle;
+	SystemJson::get().ribbon_style = SARibbonBar::OfficeStyle;
 }
 #endif
 
@@ -524,7 +524,7 @@ void MainWindow::initDockWidgets()
 	//manager->setConfigFlag(ads::CDockManager::FocusHighlighting, true);
 
 	// Central
-	if (SystemJson::instance.use_central_widget) {
+	if (SystemJson::get().use_central_widget) {
 		dock = new ads::CDockWidget(manager, tr("运行图窗口"));
 		dock->setFeature(ads::CDockWidget::NoTab, true);
 		auto* w = new QWidget;
@@ -1201,7 +1201,7 @@ void MainWindow::initToolbar()
 			"点击空白处取消选择则取消虚化。\n"
 			"若此功能出现问题，请刷新运行图。"));
 		act->setCheckable(true);
-		act->setChecked(SystemJson::instance.weaken_unselected);
+		act->setChecked(SystemJson::get().weaken_unselected);
 		connect(act, &QAction::triggered, this, &MainWindow::actToggleWeakenUnselected);
 		panel->addLargeAction(act);
 
@@ -1593,16 +1593,16 @@ void MainWindow::initToolbar()
 		SLOT(actPopupAppButton()));
 
 	ribbon->setRibbonStyle(
-		static_cast<SARibbonBar::RibbonStyles>(SystemJson::instance.ribbon_style));
+		static_cast<SARibbonBar::RibbonStyles>(SystemJson::get().ribbon_style));
 	// 2024.03.28: theme and align
-	ribbon->setRibbonAlignment(SystemJson::instance.ribbon_align_center ? 
+	ribbon->setRibbonAlignment(SystemJson::get().ribbon_align_center ? 
 		SARibbonAlignment::AlignCenter : SARibbonAlignment::AlignLeft);
 	
 	// 2024.10.19: according to SARibbon comment (see `setRibbonTheme`), avoid setting theme in constructor
 	QTimer::singleShot(0, this, [this]() {
-		this->setRibbonTheme(static_cast<SARibbonTheme>(SystemJson::instance.ribbon_theme)); });
+		this->setRibbonTheme(static_cast<SARibbonTheme>(SystemJson::get().ribbon_theme)); });
 	
-	//setRibbonTheme(static_cast<SARibbonTheme>(SystemJson::instance.ribbon_theme));
+	//setRibbonTheme(static_cast<SARibbonTheme>(SystemJson::get().ribbon_theme));
 
 
 
@@ -1633,9 +1633,9 @@ void MainWindow::loadInitDiagram(const QString& cmdFile)
 	do {
 		if (!cmdFile.isEmpty() && openGraph(cmdFile))
 			break;
-		if (openGraph(SystemJson::instance.last_file))
+		if (openGraph(SystemJson::get().last_file))
 			break;
-		if (openGraph(SystemJson::instance.default_file))
+		if (openGraph(SystemJson::get().default_file))
 			break;
 	} while (false);
 	markUnchanged();
@@ -1975,7 +1975,7 @@ void MainWindow::actDiagnose()
 
 void MainWindow::actToggleWeakenUnselected(bool on)
 {
-	SystemJson::instance.weaken_unselected = on;
+	SystemJson::get().weaken_unselected = on;
 }
 
 void MainWindow::showQuickTimetable(std::shared_ptr<Train> train)
@@ -2036,7 +2036,7 @@ void MainWindow::actRailDB()
 		"导入线路到运行图操作，请在右键菜单中完成。"
 	));
 	auto* window = new RailDBWindow(this);
-	window->getNavi()->openDB(SystemJson::instance.default_raildb_file);
+	window->getNavi()->openDB(SystemJson::get().default_raildb_file);
 	connect(window, &RailDBWindow::exportRailwayToDiagram,
 		naviView, &NaviTree::importRailwayFromDB);
 	window->show();
@@ -2063,7 +2063,7 @@ void MainWindow::actRibbonConfig()
 
 void MainWindow::onRibbonConfigChanged(bool theme_changed)
 {
-	const auto& d = SystemJson::instance;
+	const auto& d = SystemJson::get();
 	ribbonBar()->setRibbonStyle(static_cast<SARibbonBar::RibbonStyles>(d.ribbon_style));
 	ribbonBar()->setRibbonAlignment(
 		d.ribbon_align_center ? SARibbonAlignment::AlignCenter : SARibbonAlignment::AlignLeft);
@@ -2492,7 +2492,7 @@ void MainWindow::actPopupAppButton()
 
 void MainWindow::addRecentFile(const QString& filename)
 {
-	SystemJson::instance.addHistoryFile(filename);
+	SystemJson::get().addHistoryFile(filename);
 }
 
 void MainWindow::resetRecentActions()
@@ -2503,7 +2503,7 @@ void MainWindow::resetRecentActions()
 	actRecent.clear();
 
 	int i = 0;
-	for (const auto& p : SystemJson::instance.history) {
+	for (const auto& p : SystemJson::get().history) {
 		auto* act = new QAction(tr("%1. %2").arg(++i).arg(p), appMenu);
 		appMenu->addAction(act);
 		actRecent.append(act);
@@ -2539,7 +2539,7 @@ void MainWindow::insertPageWidget(std::shared_ptr<DiagramPage> page, int index)
 	dock->setIcon(QEICN_diagram_page_title);
 	dock->setWidget(dw);
 
-	if (SystemJson::instance.use_central_widget) {
+	if (SystemJson::get().use_central_widget) {
 		manager->addDockWidget(ads::CenterDockWidgetArea, dock, centralArea);
 	}
 	else {

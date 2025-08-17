@@ -62,7 +62,7 @@ void ExchangeIntervalDialog::initUI()
 
     table1=new QTableView;
     table1->setEditTriggers(QTableView::NoEditTriggers);
-    table1->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table1->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table1->setSelectionBehavior(QTableView::SelectRows);
     table1->setSelectionMode(QTableView::ContiguousSelection);
     model1->setTrain(train1);
@@ -72,7 +72,7 @@ void ExchangeIntervalDialog::initUI()
 
     table2=new QTableView;
     table2->setEditTriggers(QTableView::NoEditTriggers);
-    table2->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table2->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table2->setSelectionBehavior(QTableView::SelectRows);
     table2->setSelectionMode(QTableView::ContiguousSelection);
     table2->setModel(model2);

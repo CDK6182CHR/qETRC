@@ -59,7 +59,7 @@ void RibbonConfigDialog::initUI()
 
 void RibbonConfigDialog::refreshData()
 {
-    const auto& d = SystemJson::instance;
+    const auto& d = SystemJson::get();
     cbStyle->setCurrentIndex(cbStyle->findData(d.ribbon_style));
     cbTheme->setCurrentIndex(cbTheme->findData(d.ribbon_theme));
     ckCenter->setChecked(d.ribbon_align_center);
@@ -67,7 +67,7 @@ void RibbonConfigDialog::refreshData()
 
 void RibbonConfigDialog::actApply()
 {
-    auto& d = SystemJson::instance;
+    auto& d = SystemJson::get();
     bool theme_changed = d.ribbon_theme != cbTheme->currentData();
     d.ribbon_style = cbStyle->currentData().toInt();
     d.ribbon_theme = cbTheme->currentData().toInt();

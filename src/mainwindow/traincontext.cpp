@@ -2073,7 +2073,7 @@ void TrainContext::setTrain(std::shared_ptr<Train> train_)
 	refreshData();
 
 	// 2023.01.24: also show train line  
-	if (SystemJson::instance.auto_highlight_on_selected)
+	if (SystemJson::get().auto_highlight_on_selected)
 		actShowTrainLine();
 }
 

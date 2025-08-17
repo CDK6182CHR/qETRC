@@ -101,7 +101,7 @@ void RulerPaintPageStation::initUI()
 
     table=new QTableView;
     table->setEditTriggers(QTableView::NoEditTriggers);
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setSelectionBehavior(QTableView::SelectRows);
     table->setSelectionMode(QTableView::SingleSelection);
     table->setItemDelegateForColumn(RailStationModel::ColMile,

@@ -227,7 +227,7 @@ QTableView *PathSelectWidget::setupTable()
 {
     auto* tab=new QTableView;
     tab->setEditTriggers(QTableView::NoEditTriggers);
-    tab->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tab->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tab->setSelectionBehavior(QTableView::SelectRows);
     return tab;
 }

@@ -34,7 +34,7 @@ RailDBNavi::RailDBNavi(std::shared_ptr<RailDB> raildb, QWidget *parent):
     _undo=new QUndoStack(this);
     connect(_undo,&QUndoStack::indexChanged,this,
             &RailDBNavi::markChanged);
-    //openDB(SystemJson::instance.default_raildb_file);
+    //openDB(SystemJson::get().default_raildb_file);
 }
 
 bool RailDBNavi::deactivate()
@@ -364,7 +364,7 @@ void RailDBNavi::actSetAsDefaultFile()
             "不可设置为默认文件名。"));
     }
     else {
-        SystemJson::instance.default_raildb_file = _raildb->filename();
+        SystemJson::get().default_raildb_file = _raildb->filename();
         QMessageBox::information(this, tr("提示"), tr("已将当前文件名[%1]设置为默认的"
             "线路数据库文件名。\n"
             "此信息保存在system.json配置文件中。本次关闭主程序后，下次在主程序中使用"

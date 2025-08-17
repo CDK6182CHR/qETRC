@@ -13,7 +13,7 @@ SelectRailwaysTable::SelectRailwaysTable(Diagram& diagram, QWidget* parent) :
 	QTableView(parent), diagram(diagram), model(new RailTableModel(diagram, this))
 {
 	setEditTriggers(NoEditTriggers);
-	verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+	verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
 	setModel(model);
 	resizeColumnsToContents();
 	setSelectionBehavior(SelectRows);

@@ -65,7 +65,7 @@ void SectionCountDialog::initUI()
 	table = new QTableView;
 	table->setModel(model);
 	table->verticalHeader()->setDefaultSectionSize(
-		SystemJson::instance.table_row_height);
+		SystemJson::get().table_row_height);
 	table->resizeColumnsToContents();
 	table->setEditTriggers(QTableView::NoEditTriggers);
     QScroller::grabGesture(table,QScroller::TouchGesture);

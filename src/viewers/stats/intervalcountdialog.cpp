@@ -159,7 +159,7 @@ void IntervalCountDialog::initUI()
 
     table=new QTableView;
     table->setEditTriggers(QTableView::NoEditTriggers);
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setModel(model);
     connect(table,&QTableView::doubleClicked,
             this,&IntervalCountDialog::onDoubleClicked);

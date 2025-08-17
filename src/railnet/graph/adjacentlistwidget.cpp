@@ -30,7 +30,7 @@ void AdjacentListWidget::initUI()
     auto* vlay=new QVBoxLayout(this);
     vlay->addWidget(new QLabel(tr("邻接表 （出边表）: ")));
     tbOut=new QTableView;
-    tbOut->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbOut->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbOut->setEditTriggers(QTableView::NoEditTriggers);
     tbOut->setModel(mdOut);
     connect(tbOut->selectionModel(),&QItemSelectionModel::currentRowChanged,
@@ -38,7 +38,7 @@ void AdjacentListWidget::initUI()
     vlay->addWidget(tbOut,2);
 
     tbIn=new QTableView;
-    tbIn->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbIn->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbIn->setEditTriggers(QTableView::NoEditTriggers);
     tbIn->setModel(mdIn);
     connect(tbIn->selectionModel(),&QItemSelectionModel::currentRowChanged,
@@ -47,7 +47,7 @@ void AdjacentListWidget::initUI()
     vlay->addWidget(tbIn,2);
 
     tbRuler=new QTableView;
-    tbRuler->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbRuler->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbRuler->setEditTriggers(QTableView::NoEditTriggers);
     tbRuler->setModel(mdRuler);
     tbRuler->setItemDelegateForColumn(RulerNodesModel::ColSpeed,
@@ -61,7 +61,7 @@ void AdjacentListWidget::initUI()
     vlay->addWidget(tbRuler,1);
 
     tbForbid=new QTableView;
-    tbForbid->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbForbid->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbForbid->setEditTriggers(QTableView::NoEditTriggers);
     tbForbid->setModel(mdForbid);
     auto* dele2=new TrainTimeDelegate(defaultDiagramOptionsForDB, this, TrainTime::HM);

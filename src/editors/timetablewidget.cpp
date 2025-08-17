@@ -24,7 +24,7 @@ void TimetableWidget::initUI()
     table()->setModel(_model);
     table()->setEditTriggers(QTableView::AllEditTriggers);
     table()->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-    table()->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table()->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     auto* dele=new TrainTimeDelegate(_options, this);
     table()->setItemDelegateForColumn(TimetableStdModel::ColArrive,dele);
     table()->setItemDelegateForColumn(TimetableStdModel::ColDepart,dele);

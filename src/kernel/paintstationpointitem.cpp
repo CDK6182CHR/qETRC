@@ -1,7 +1,7 @@
 #include "paintstationpointitem.h"
 #include "data/common/qesystem.h"
 
-#define RADIUS SystemJson::instance.station_mark_radius
+#define RADIUS SystemJson::get().station_mark_radius
 
 PaintStationPointItem::PaintStationPointItem(StationPoint point, AdapterStation *station,
                                              double x, double y, QGraphicsItem *parent):

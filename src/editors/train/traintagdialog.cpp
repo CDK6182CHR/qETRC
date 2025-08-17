@@ -79,7 +79,7 @@ void TrainTagDialog::initUI(TrainTagListDirectModel* completionModel)
 
 	m_model = new TrainTagModel(this);
 	m_table = new QTableView;
-	m_table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+	m_table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
 	m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_table->setSelectionMode(QAbstractItemView::SingleSelection);

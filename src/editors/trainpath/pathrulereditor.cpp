@@ -93,7 +93,7 @@ void PathRulerEditor::initUI()
 	vlay->addLayout(flay);
 
 	m_table = new QTableView;
-	m_table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+	m_table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
 	m_table->setItemDelegateForColumn(PathRulerModel::ColRulerName, m_delRulerName);
 	m_table->setModel(m_model);
 	m_table->setEditTriggers(QTableView::AllEditTriggers);

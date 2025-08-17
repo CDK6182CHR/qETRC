@@ -163,7 +163,7 @@ void RulerPaintPageStart::initWidget3()
     table=new QTableView;
     table->setModel(model);
     table->setEditTriggers(QTableView::NoEditTriggers);
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setSelectionBehavior(QTableView::SelectRows);
     table->setSelectionMode(QTableView::ContiguousSelection);
     auto* dele = new TrainTimeDelegate(_ops, this, TrainTime::HMS);

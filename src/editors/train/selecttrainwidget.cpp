@@ -29,7 +29,7 @@ void SelectTrainWidget::initUI()
 	vlay->setContentsMargins(0, 0, 0, 0);
 	
 	m_table = new QTableView;
-	m_table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+	m_table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
 	m_table->setModel(m_model);
 
 	{

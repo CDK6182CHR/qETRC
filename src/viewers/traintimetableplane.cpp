@@ -10,7 +10,7 @@ TrainTimetablePlane::TrainTimetablePlane(const DiagramOptions& ops, QWidget *par
     QTableView(parent), _ops(ops), model(new TimetableConstModel(ops, this))
 {
     setModel(model);
-    verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     setEditTriggers(QTableView::NoEditTriggers);
     setItemDelegateForColumn(TimetableStdModel::ColArrive,
         new TrainTimeDelegate(_ops, this));

@@ -201,7 +201,7 @@ void TrainLineDialog::initUI()
     
     tbList = new QTableView;
     tbList->setModel(mdList);
-    tbList->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbList->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbList->setEditTriggers(QTableView::NoEditTriggers);
     tbList->setSelectionMode(QTableView::SingleSelection);
     tbList->setSelectionBehavior(QTableView::SelectRows);
@@ -213,7 +213,7 @@ void TrainLineDialog::initUI()
 
     tbDetail = new QTableView;
     tbDetail->setModel(mdDetail);
-    tbDetail->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbDetail->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbDetail->setEditTriggers(QTableView::NoEditTriggers);
     connect(mdList, &TrainLineListModel::currentTrainLineChanged,
         mdDetail, &TrainLineDetailModel::setLine);

@@ -77,7 +77,7 @@ void TrainGapStatDialog::initUI()
     lab->setWordWrap(true);
     vlay->addWidget(lab);
     table=new QTableView();
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setModel(model);
     table->resizeColumnsToContents();
     table->setEditTriggers(QTableView::NoEditTriggers);
@@ -242,7 +242,7 @@ void TrainGapSummaryDialog::initUI()
     vlay->addWidget(lab);
 
     table=new QTableView;
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setEditTriggers(QTableView::NoEditTriggers);
     table->setModel(model);
     vlay->addWidget(table);

@@ -10,7 +10,7 @@ DiagramPage::DiagramPage(const Config& config, const QList<std::shared_ptr<Railw
     const QString& name,const QString& note): _config(config),
     _railways(railways),_name(name),_note(note)
 {
-    _config.transparent_config = SystemJson::instance.transparent_config;
+    _config.transparent_config = SystemJson::get().transparent_config;
 }
 
 DiagramPage::DiagramPage(const QJsonObject& obj, Diagram& _diagram)

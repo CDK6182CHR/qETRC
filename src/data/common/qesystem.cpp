@@ -5,7 +5,13 @@
 
 #include "filepaths.h"
 
-SystemJson SystemJson::instance;   //默认构造
+//SystemJson SystemJson::get();   //默认构造
+
+SystemJson& SystemJson::get()
+{
+    static SystemJson instance;
+	return instance;
+}
 
 void SystemJson::saveFile()
 {

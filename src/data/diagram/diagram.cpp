@@ -1650,7 +1650,7 @@ void Diagram::clear()
     railways().clear();
     pathCollection().clear();
     _config = _defaultConfig;
-    _config.transparent_config = SystemJson::instance.transparent_config;
+    _config.transparent_config = SystemJson::get().transparent_config;
     _note = "";
     _version = "";
 }

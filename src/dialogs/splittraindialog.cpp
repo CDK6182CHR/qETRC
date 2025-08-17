@@ -221,7 +221,7 @@ void SplitTrainDialog::initUI()
     vlay->addWidget(m_ckCrossTerminal);
 
     m_table = new QTableView;
-    m_table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    m_table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     m_table->setModel(m_model);
     m_table->setEditTriggers(QTableView::AllEditTriggers);
 

@@ -81,7 +81,7 @@ void RoutingDiagramWidget::initUI()
     auto* vlay=new QVBoxLayout(w);
     ctab=new QEControlledTable;
     table=ctab->table();
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setModel(model);
     table->setItemDelegateForColumn(RoutingStationModel::ColYValue,
                                     new PostiveSpinDelegate(10,this));

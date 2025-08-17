@@ -77,7 +77,7 @@ IntervalTrainTable::IntervalTrainTable(const DiagramOptions& ops, QWidget *paren
 
 void IntervalTrainTable::initUI()
 {
-    verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     setEditTriggers(QTableView::NoEditTriggers);
     setModel(model);
     horizontalHeader()->setSectionsClickable(true);

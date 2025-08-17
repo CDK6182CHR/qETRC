@@ -17,7 +17,7 @@ void IssueWidget::initUI()
 	auto* vlay = new QVBoxLayout(this);
 
 	table = new QTableView;
-	table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+	table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
 	table->setModel(IssueManager::get());
 
 	{

@@ -75,7 +75,7 @@ void TypeConfigDialog::initUI()
     ctab=new QEControlledTable;
     table=ctab->table();
     table->setModel(model);
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
 
     int c=0;
     for(int t:{120,50,120,80,80}){

@@ -166,7 +166,7 @@ void RailTrainStatDialog::initUI()
 	vlay->addWidget(lab);
 
 	auto* table = new QTableView;
-	table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+	table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
 	m_table = table;
 
 	table->setModel(m_model);

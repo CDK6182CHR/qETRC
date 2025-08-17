@@ -57,7 +57,7 @@ void SelectRailStationDialog::initUI()
     table->setEditTriggers(QTableView::NoEditTriggers);
     table->resizeColumnsToContents();
     table->setSelectionBehavior(QTableView::SelectRows);
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     connect(table,&QTableView::doubleClicked,
             this,&SelectRailStationDialog::onItemDoubleClicked);
     vlay->addWidget(table);

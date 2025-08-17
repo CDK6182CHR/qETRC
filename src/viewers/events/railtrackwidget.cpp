@@ -61,7 +61,7 @@ void RailTrackSetupWidget::initUI()
     ctable=new QEControlledTable();
     table=ctable->table();
     model=new QEMoveableModel(this);
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     model->setColumnCount(1);
     model->setHorizontalHeaderLabels({tr("股道名称")});
     table->setModel(model);
@@ -303,7 +303,7 @@ void TrackAdjustDialog::initUI()
     vlay->addWidget(lab);
 
     table=new QTableView;
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setModel(model);
     table->setEditTriggers(QTableView::DoubleClicked);
     vlay->addWidget(table);

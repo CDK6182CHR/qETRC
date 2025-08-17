@@ -158,7 +158,7 @@ void RailTopoTable::initUI()
             table->setColumnWidth(c++,t);
         }
     }
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->verticalHeader()->hide();
     vlay->addWidget(table);
     auto* btn=new QPushButton(tr("关闭"));

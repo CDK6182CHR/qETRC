@@ -12,7 +12,7 @@
 class SystemJson {
 public:
     static constexpr int history_count = 20;
-    static SystemJson instance;
+    //static SystemJson instance;
 
     QLocale::Language language = QLocale::Chinese;
     QString last_file;
@@ -65,6 +65,12 @@ public:
     void addHistoryFile(const QString& name);
 
     ~SystemJson();
+
+    /**
+	 * 2025.08.17  We change to lazy initialization because the filename construction requires
+	 * QCoreApplication::applicationDirPath() to be initialized, which is not this case if we use global variable.
+     */
+    static SystemJson& get();
 
 private:
     /**

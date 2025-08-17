@@ -228,7 +228,7 @@ void RailDBContext::loadDB()
     if (!_active) {
         using namespace std::chrono_literals;
         auto start = std::chrono::system_clock::now();
-        window->getNavi()->openDB(SystemJson::instance.default_raildb_file);
+        window->getNavi()->openDB(SystemJson::get().default_raildb_file);
         _active = true;
         auto end = std::chrono::system_clock::now();
         int ms = (end - start) / 1ms;

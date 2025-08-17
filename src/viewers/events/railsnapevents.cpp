@@ -113,7 +113,7 @@ void RailSnapEventsDialog::initUI()
 
     table=new QTableView;
     table->setModel(model);
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->horizontalHeader()->setSortIndicatorShown(true);
     table->setEditTriggers(QTableView::NoEditTriggers);
     table->setItemDelegateForColumn(RailSnapEventsModel::ColMile,

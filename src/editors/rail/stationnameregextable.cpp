@@ -31,7 +31,7 @@ void StationNameRegexTable::initUI()
 	model->setColumnCount(1);
 	model->setHorizontalHeaderLabels({ tr("站名正则") });
 	
-	table()->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+	table()->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
 	table()->setEditTriggers(QTableView::AllEditTriggers);
 	table()->setModel(model);
 	table()->setColumnWidth(0, 300);

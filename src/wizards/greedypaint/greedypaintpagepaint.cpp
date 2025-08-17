@@ -606,7 +606,7 @@ void GreedyPaintPagePaint::initUI()
     vlay->addLayout(flay);
 
     table=new QTableView;
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setModel(_model);
     table->setEditTriggers(QTableView::AllEditTriggers);
     table->setItemDelegateForColumn(GreedyPaintConfigModel::ColMinute,

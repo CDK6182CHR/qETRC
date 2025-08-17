@@ -54,7 +54,7 @@ void TimetableQuickWidget::initUI()
     table=new QTableView;
     table->setEditTriggers(QTableView::NoEditTriggers);  
     table->setAlternatingRowColors(true);
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->verticalHeader()->hide();
     table->setModel(model);
     table->setItemDelegateForColumn(TimetableQuickModel::ColTime,

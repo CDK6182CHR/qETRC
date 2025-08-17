@@ -59,7 +59,7 @@ void QuickPathSelector::initUI()
     hlay=new QHBoxLayout;
     ctbDown=new QEControlledTable(this, true);
     tbDown=ctbDown->table();
-    tbDown->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbDown->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbDown->setEditTriggers(QTableView::AllEditTriggers);
     mdDown=new QEMoveableModel(this);
     mdDown->setColumnCount(1);
@@ -69,7 +69,7 @@ void QuickPathSelector::initUI()
 
     ctbUp=new QEControlledTable(this, true);
     tbUp=ctbUp->table();
-    tbUp->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbUp->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbUp->setEditTriggers(QTableView::AllEditTriggers);
     hlay->addWidget(ctbUp);
     ctbUp->setEnabled(false);

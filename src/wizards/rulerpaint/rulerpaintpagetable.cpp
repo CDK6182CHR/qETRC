@@ -655,7 +655,7 @@ void RulerPaintPageTable::initUI()
 
     table=new QTableView;
     table->setEditTriggers(QTableView::AllEditTriggers);
-    table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     table->setModel(model);
     connect(table, &QTableView::doubleClicked,this,
             &RulerPaintPageTable::onDoubleClicked);

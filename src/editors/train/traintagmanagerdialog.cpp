@@ -109,7 +109,7 @@ void TrainTagManagerDialog::initUI()
 
 	m_model = new TrainTagManagerModel(m_manager, this);
 	m_table = new QTableView;
-	m_table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+	m_table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
 	m_table->setEditTriggers(QTableView::NoEditTriggers);
 	m_table->setSelectionBehavior(QTableView::SelectRows);
 	m_table->setModel(m_model);

@@ -176,7 +176,7 @@ void AddPageDialog::initUI()
     auto* lab = new QLabel(tr("未选择线路："));
     cvlay->addWidget(lab);
     tbUnsel = new QTableView;
-    tbUnsel->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbUnsel->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbUnsel->setModel(mdUnsel);
     tbUnsel->setEditTriggers(QTableView::NoEditTriggers);
     tbUnsel->setSelectionBehavior(QTableView::SelectRows);
@@ -197,7 +197,7 @@ void AddPageDialog::initUI()
     lab = new QLabel(tr("已选择线路："));
     cvlay->addWidget(lab);
     tbSel = new QTableView;
-    tbSel->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
+    tbSel->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
     tbSel->setModel(mdSel);
     tbSel->setEditTriggers(QTableView::NoEditTriggers);
     tbSel->setSelectionBehavior(QTableView::SelectRows);
