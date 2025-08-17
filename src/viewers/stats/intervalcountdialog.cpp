@@ -250,7 +250,7 @@ void IntervalCountDialog::toCsv()
 {
     auto rail = cbStation->railway();
     if (!rail)return;
-    qeutil::exportTableToCsv(model, this,
+    qeutil::exportTableToCsv(model, table, this,
         tr("%1区间对数表").arg(rail->name()));
 }
 

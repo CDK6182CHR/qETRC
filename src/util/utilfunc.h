@@ -12,6 +12,7 @@ class QWidget;
 class QStandardItemModel;
 class QModelIndex;
 class QStandardItem;
+class QTableView;
 
 namespace qeutil{
 
@@ -79,12 +80,14 @@ QString secsDiffToString(int secs);
 /**
  * 将StandardItemModel中的所有文字搞到CSV里面去
  */
-bool tableToCsv(const QStandardItemModel* model, const QString& filename);
+bool tableToCsv(const QStandardItemModel* model, const QTableView* table, const QString& filename);
 
 /**
  * 先显示选择文件的对话框，然后再导出到CSV
+ * 2025.08.17: we should also accept a table in this function, because some tables may have
+ * delegates that controlling the displayText.
  */
-bool exportTableToCsv(const QStandardItemModel* model, QWidget* parent, const QString& initName);
+bool exportTableToCsv(const QStandardItemModel* model, const QTableView* table, QWidget* parent, const QString& initName);
 
 bool ltIndexRow(const QModelIndex& idx1,const QModelIndex& idx2);
 

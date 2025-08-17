@@ -142,7 +142,7 @@ void RailSnapEventsDialog::updateData()
 void RailSnapEventsDialog::toCsv()
 {
     QString s=tr("%1运行快照").arg(railway->name());
-    qeutil::exportTableToCsv(model,this,s);
+    qeutil::exportTableToCsv(model, table, this, s);
 }
 
 void RailSnapEventsDialog::actLocate()

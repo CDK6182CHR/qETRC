@@ -12,6 +12,7 @@
 #include "data/common/qesystem.h"
 #include "util/utilfunc.h"
 #include "data/train/train.h"
+#include "model/delegate/traintimedelegate.h"
 
 RulerPaintPageStart::RulerPaintPageStart(const DiagramOptions& ops, TrainCollection &coll_, QWidget *parent):
     QWizardPage(parent), _ops(ops), coll(coll_),model(new TimetableStdModel(_ops, false,this))
@@ -165,6 +166,10 @@ void RulerPaintPageStart::initWidget3()
     table->verticalHeader()->setDefaultSectionSize(SystemJson::instance.table_row_height);
     table->setSelectionBehavior(QTableView::SelectRows);
     table->setSelectionMode(QTableView::ContiguousSelection);
+    auto* dele = new TrainTimeDelegate(_ops, this, TrainTime::HMS);
+	table->setItemDelegateForColumn(TimetableStdModel::ColArrive, dele);
+	table->setItemDelegateForColumn(TimetableStdModel::ColDepart, dele);
+
     vlay->addWidget(table);
     w->setLayout(vlay);
     stack->addWidget(w);

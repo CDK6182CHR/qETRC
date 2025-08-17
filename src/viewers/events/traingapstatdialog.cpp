@@ -272,7 +272,7 @@ void TrainGapSummaryDialog::onDoubleClicked(const QModelIndex& idx)
 void TrainGapSummaryDialog::toCsv()
 {
     QString text = QString("%1_间隔汇总").arg(model->getRailway()->name());
-    qeutil::exportTableToCsv(model, this, text);
+    qeutil::exportTableToCsv(model, table, this, text);
 }
 
 void TrainGapSummaryDialog::refreshData()

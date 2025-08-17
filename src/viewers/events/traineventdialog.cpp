@@ -30,6 +30,7 @@ TrainEventModel::TrainEventModel(std::shared_ptr<Train> train_, Diagram& diagram
 	setupModel();
 }
 
+#if 0
 bool TrainEventModel::exportToCsv(const QString& filename)
 {
 	QFile file(filename);
@@ -53,6 +54,7 @@ bool TrainEventModel::exportToCsv(const QString& filename)
 	file.close();
 	return true;
 }
+#endif
 
 TrainTime TrainEventModel::timeForRow(int row) const
 {
@@ -286,19 +288,9 @@ void TrainEventDialog::exportExcel()
 
 void TrainEventDialog::exportCsv()
 {
-	QString f0 = tr("%1列车事件表").arg(train->trainName().full());
-	f0.replace('/', ',');
-	QString fn = QFileDialog::getSaveFileName(this, tr("导出列车事件表"), f0,
-		tr("逗号分隔文件 (*.csv)\n 所有文件 (*)"));
-	if (fn.isEmpty())return;
-	bool flag = model->exportToCsv(fn);
-	if (flag) {
-		QMessageBox::information(this, tr("提示"), tr("导出CSV文件成功"));
-	}
-	else {
-		QMessageBox::warning(this, tr("提示"), tr("导出CSV文件失败"));
-	}
-
+	QString fname = tr("%1列车事件表").arg(train->trainName().full());
+	fname.replace('/', ',');    // For filename safety
+	qeutil::exportTableToCsv(model, table, this, fname);
 }
 
 void TrainEventDialog::actLocate()

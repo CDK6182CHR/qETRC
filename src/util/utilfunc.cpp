@@ -9,6 +9,8 @@
 #include <QModelIndex>
 #include <QTime>
 #include <QStandardItem>
+#include <QTableView>
+#include <QStyledItemDelegate>
 
 //QTime qeutil::parseTime(const QString& tm)
 //{
@@ -109,7 +111,7 @@ QString qeutil::secsDiffToString(int secs)
 const QString qeutil::fileFilter =
 	QObject::tr("pyETRC运行图文件(*.pyetgr;*.json)\nETRC运行图文件(*.trc)\n所有文件(*.*)");
 
-bool qeutil::tableToCsv(const QStandardItemModel* model, const QString& filename)
+bool qeutil::tableToCsv(const QStandardItemModel* model, const QTableView* table, const QString& filename)
 {
 	QFile file(filename);
 	file.open(QFile::WriteOnly);
@@ -125,7 +127,13 @@ bool qeutil::tableToCsv(const QStandardItemModel* model, const QString& filename
 	//内容
 	for (int i = 0; i < model->rowCount(); i++) {
 		for (int j = 0; j < model->columnCount(); j++) {
-			s << model->item(i, j)->text() << ",";
+			auto* dele = table->itemDelegateForColumn(j);
+			if (auto* delest = qobject_cast<QStyledItemDelegate*>(dele)) {
+				s << delest->displayText(model->item(i, j)->data(Qt::DisplayRole), QLocale{}) << ",";
+			}
+			else {
+				s << model->item(i, j)->text() << ",";
+			}
 		}
 		s << Qt::endl;
 	}
@@ -133,12 +141,12 @@ bool qeutil::tableToCsv(const QStandardItemModel* model, const QString& filename
 	return true;
 }
 
-bool qeutil::exportTableToCsv(const QStandardItemModel* model, QWidget* parent, const QString& initName)
+bool qeutil::exportTableToCsv(const QStandardItemModel* model, const QTableView* table, QWidget* parent, const QString& initName)
 {
 	QString fn = QFileDialog::getSaveFileName(parent, QObject::tr("导出CSV数据"), initName,
 		QObject::tr("逗号分隔文件 (*.csv)\n 所有文件 (*)"));
 	if (fn.isEmpty())return false;
-	bool flag = tableToCsv(model, fn);
+	bool flag = tableToCsv(model, table, fn);
 	if (flag) {
 		QMessageBox::information(parent, QObject::tr("提示"), QObject::tr("导出CSV文件成功"));
 	}

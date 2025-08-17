@@ -106,7 +106,7 @@ void IntervalTrainDialog::updateData()
 
 void IntervalTrainDialog::toCsv()
 {
-    qeutil::exportTableToCsv(table->getModel(), this,
+    qeutil::exportTableToCsv(table->getModel(), table, this,
                              tr("区间车次表%1-%2").arg(edFrom->text(),
                                                   edTo->text()));
 }

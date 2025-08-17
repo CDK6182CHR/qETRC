@@ -50,7 +50,8 @@ public:
 
     const QString& etrc()const{return etrcReport;}
 
-    bool exportToCsv(const QString& filename);
+    // 2025.08.17: remove this function; use global utility function.
+    //bool exportToCsv(const QString& filename);
 
     TrainTime timeForRow(int row)const;
     std::shared_ptr<Railway> railForRow(int row)const;

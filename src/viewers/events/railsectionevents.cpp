@@ -188,7 +188,7 @@ void RailSectionEventsDialog::updateData()
 void RailSectionEventsDialog::toCsv()
 {
     QString r=tr("%1断面事件表").arg(railway->name());
-    qeutil::exportTableToCsv(model,this,r);
+    qeutil::exportTableToCsv(model, table, this, r);
 }
 
 void RailSectionEventsDialog::actLocate()

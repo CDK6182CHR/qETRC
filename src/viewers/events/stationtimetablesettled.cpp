@@ -132,5 +132,5 @@ void StationTimetableSettledDialog::onHidePassChanged(bool on)
 void StationTimetableSettledDialog::outputCsv()
 {
     QString iname = tr("%1图定时刻表.csv").arg(station->name.toSingleLiteral());
-    qeutil::exportTableToCsv(model, this, iname);
+    qeutil::exportTableToCsv(model, table, this, iname);
 }

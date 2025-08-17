@@ -237,7 +237,7 @@ void RailStationEventListDialog::onPosShowChanged()
 void RailStationEventListDialog::toCsv()
 {
 	QString s = QObject::tr("%1车站事件表.csv").arg(station->name.toSingleLiteral());
-	qeutil::exportTableToCsv(model, this, s);
+	qeutil::exportTableToCsv(model, table, this, s);
 }
 
 

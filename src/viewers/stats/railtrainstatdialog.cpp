@@ -202,5 +202,5 @@ void RailTrainStatDialog::refreshData()
 
 void RailTrainStatDialog::actExportCsv()
 {
-	qeutil::exportTableToCsv(m_model, this, tr("运行统计_%1").arg(m_railway->name()));
+	qeutil::exportTableToCsv(m_model, m_table, this, tr("运行统计_%1").arg(m_railway->name()));
 }

@@ -277,5 +277,5 @@ void StationTrainGapDialog::locateRight()
 void StationTrainGapDialog::actToCsv()
 {
     QString text=QString("%1_%2间隔分析").arg(railway->name(),station->name.toSingleLiteral());
-    qeutil::exportTableToCsv(model,this,text);
+    qeutil::exportTableToCsv(model, table, this, text);
 }
