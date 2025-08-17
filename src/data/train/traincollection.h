@@ -150,6 +150,13 @@ public:
     QList<std::shared_ptr<Train>>
         multiSearchTrain(const QString& name);
 
+    /**
+     * 2025.08.17  Similar to multiSearchTrain, but we put the fully-matched train first, followed by
+	 * the direction-matched trains, and then the rest.
+     */
+    QList<std::shared_ptr<Train>>
+        multiSearchTrainWithPriority(const QString& name);
+
     auto& typeManager() { return _manager; }
     const auto& typeManager()const { return _manager; }
 

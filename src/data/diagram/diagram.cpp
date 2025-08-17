@@ -9,6 +9,7 @@
 #include "mainwindow/version.h"
 #include "data/common/qesystem.h"
 #include "log/IssueManager.h"
+#include "data/common/filepaths.h"
 
 #include <QFile>
 #include <QJsonObject>
@@ -1349,10 +1350,11 @@ int readruler::IntervalReport::stdInterval(TrainLine::IntervalAttachType type)co
 
 bool Diagram::saveDefaultConfigs(const QString& filename) const
 {
-    QFile file(filename);
+	QString full_name = qeutil::getSystemFileFullPath(filename);
+    QFile file(full_name);
     file.open(QFile::WriteOnly);
     if (!file.isOpen()) {
-        qDebug() << "Diagram::saveDefaultConfigs: WARNING: open file " << filename 
+        qDebug() << "Diagram::saveDefaultConfigs: WARNING: open file " << full_name
             << " failed" << Qt::endl;
         return false;
     }
@@ -1366,7 +1368,10 @@ bool Diagram::saveDefaultConfigs(const QString& filename) const
 
 bool Diagram::readDefaultConfigs(const QString& filename)
 {
-    QFile file(filename);
+	// 2025.08.17: load the config.json file from the install path (executable directory)
+    QString fname = qeutil::getSystemFileFullPath(filename);
+	qDebug() << "Diagram::readDefaultConfigs: reading from " << fname;
+    QFile file(fname);
     file.open(QFile::ReadOnly);
     if (!file.isOpen()) {
         qWarning("Diagram::readDefaultConfigs: cannot open config file, will use built-in default.");

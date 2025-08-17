@@ -3,15 +3,18 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
+#include "filepaths.h"
+
 SystemJson SystemJson::instance;   //默认构造
 
 void SystemJson::saveFile()
 {
     static const QString filename = "system.json";
-    QFile file(filename);
+	const QString full_name = qeutil::getSystemFileFullPath(filename);
+    QFile file(full_name);
     file.open(QFile::WriteOnly);
     if (!file.isOpen()) {
-        qDebug() << "SystemJson::saveFile: WARNING: open file " << filename << " failed." << Qt::endl;
+        qDebug() << "SystemJson::saveFile: WARNING: open file " << full_name << " failed." << Qt::endl;
         return;
     }
     QJsonDocument doc(toJson());
@@ -36,10 +39,12 @@ SystemJson::~SystemJson()
 SystemJson::SystemJson()
 {
     static const QString filename = "system.json";
-    QFile file(filename);
+    const QString full_name = qeutil::getSystemFileFullPath(filename);
+	qDebug() << "SystemJson::SystemJson: reading system configuration file " << full_name << Qt::endl;
+    QFile file(full_name);
     file.open(QFile::ReadOnly);
     if (!file.isOpen()) {
-        qDebug() << "SystemJson::SystemJson: WARNING: system configuration file " << filename <<
+        qDebug() << "SystemJson::SystemJson: WARNING: system configuration file " << full_name <<
             " not read. Use default." << Qt::endl;
         return;
     }

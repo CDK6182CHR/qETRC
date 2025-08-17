@@ -180,6 +180,23 @@ QList<std::shared_ptr<Train>> TrainCollection::multiSearchTrain(const QString& n
 	return res;
 }
 
+QList<std::shared_ptr<Train>> TrainCollection::multiSearchTrainWithPriority(const QString& name)
+{
+	QList<std::shared_ptr<Train>> res_full, res_dir, res_other;
+	foreach (auto t, _trains) {
+		if (t->trainName().full() == name)
+			res_full.append(t);
+		else if (t->trainName().down() == name || t->trainName().up() == name)
+			res_dir.append(t);
+		else if (t->trainName().contains(name))
+			res_other.append(t);
+	}
+	res_full.reserve(res_full.size() + res_dir.size() + res_other.size());
+	std::move(res_dir.begin(), res_dir.end(), std::back_inserter(res_full));
+	std::move(res_other.begin(), res_other.end(), std::back_inserter(res_full));
+	return res_full;
+}
+
 void TrainCollection::clear(const TypeManager& defaultManager)
 {
 	_trains.clear();

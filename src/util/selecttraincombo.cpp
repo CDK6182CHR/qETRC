@@ -103,7 +103,7 @@ void SelectTrainCombo::onEditingFinished()
     if (text.isEmpty())
         matched = coll.trains();    //copy contruct!
     else
-        matched = coll.multiSearchTrain(text);
+        matched = coll.multiSearchTrainWithPriority(text);
     updateCombo();
 }
 
