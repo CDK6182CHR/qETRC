@@ -2,11 +2,6 @@
 
 #ifndef QETRC_MOBILE_2
 
-#include "util/buttongroup.hpp"
-
-#include "data/train/train.h"
-#include "data/train/traincollection.h"
-
 #include <ranges>
 
 #include <QLineEdit>
@@ -19,10 +14,14 @@
 #include <QFile>
 #include <QTextStream>
 
+#include "util/buttongroup.hpp"
+#include "data/train/train.h"
+#include "data/train/traincollection.h"
 #include "model/train/trainlistmodel.h"
 #include "mainwindow/traincontext.h"
 #include "data/diagram/trainline.h"
 #include "editors/train/trainpenwidget.h"
+#include "editors/train/trainfilterselector.h"
 
 TrainListWidget::TrainListWidget(const DiagramOptions& ops, TrainCollection& coll_, QUndoStack* undo, QWidget* parent):
     QWidget(parent), _ops(ops), coll(coll_),_undo(undo),
@@ -42,14 +41,19 @@ void TrainListWidget::initUI()
 {
 	auto* vlay = new QVBoxLayout;
 
+	filter = new TrainFilterSelector(coll);
+	vlay->addWidget(filter);
+	connect(filter, &TrainFilterSelector::filterChanged,
+		this, &TrainListWidget::onFilterChanged);
+
 	auto* hlay = new QHBoxLayout;
 	hlay->addWidget(editSearch);   //搜索行为改为filt
 	connect(editSearch, SIGNAL(editingFinished()), this, SLOT(searchTrain()));
-	auto* btn = new QPushButton(QObject::tr("筛选"));
+	auto* btn = new QPushButton(QObject::tr("搜索"));
 	btn->setMinimumWidth(50);
 	connect(btn, SIGNAL(clicked()), this, SLOT(searchTrain()));
 	hlay->addWidget(btn);
-	btn = new QPushButton(tr("清空筛选"));
+	btn = new QPushButton(tr("清空搜索"));
 	btn->setMinimumWidth(70);
 	connect(btn, SIGNAL(clicked()), this, SLOT(clearFilter()));
 	hlay->addWidget(btn);
@@ -124,22 +128,15 @@ QList<std::shared_ptr<Train>> TrainListWidget::batchOpSelectedTrains()
 void TrainListWidget::searchTrain()
 {
 	const QString& s = editSearch->text();
-	if (s.isEmpty()) {
-		clearFilter();
-		return;
-	}
-	for (int i = 0; i < coll.trainCount(); i++) {
-		const auto& t = coll.trainAt(i);
-		table->setRowHidden(i, !t->trainName().contains(s));
-	}
+	searchText = s;
+	onFilterChanged();
 }
 
 
 void TrainListWidget::clearFilter()
 {
-	for (int i = 0; i < coll.trainCount(); i++) {
-		table->setRowHidden(i, false);
-	}
+	searchText.clear();
+	onFilterChanged();
 }
 
 void TrainListWidget::editButtonClicked()
@@ -632,6 +629,24 @@ void TrainListWidget::selectInverse()
 	auto* sel = table->selectionModel();
 	sel->select(QItemSelection(model->index(0, 0),
 		model->index(coll.trainCount() - 1, TrainListModel::MAX_COLUMNS - 1)), QItemSelectionModel::Toggle);
+}
+
+void TrainListWidget::onFilterChanged()
+{
+	auto* f = filter->filter();
+	
+	// Update the filter data, also consider the search text
+	for (int i = 0; i < coll.trainCount(); i++) {
+		const auto& t = coll.trainAt(i);
+		bool selected = searchText.isEmpty() || t->trainName().contains(searchText);
+		if (selected) {
+			if (f && !f->check(t)) {
+				selected = false;
+			}
+		}
+
+		table->setRowHidden(i, !selected);
+	}
 }
 
 void TrainListWidget::actResetStartingTerminalFromTimetableAll()

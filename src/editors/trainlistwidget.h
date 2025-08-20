@@ -20,6 +20,7 @@ class QLineEdit;
 class TrainType;
 class TrainTag;
 struct DiagramOptions;
+class TrainFilterSelector;
 
 /**
  * @brief The TrainListWidget class
@@ -40,8 +41,10 @@ class TrainListWidget : public QWidget
     TrainCollection& coll;
     QUndoStack* const _undo;
     QTableView* table;
+    TrainFilterSelector* filter;
     QLineEdit* editSearch;
     TrainListModel* model;
+    QString searchText;
 
 public:
     explicit TrainListWidget(const DiagramOptions& ops,  TrainCollection& coll_, QUndoStack* undo, QWidget *parent_ = nullptr);
@@ -174,6 +177,8 @@ private slots:
     void deselectAll();
 
     void selectInverse();
+
+    void onFilterChanged();
 
 public slots:
 
