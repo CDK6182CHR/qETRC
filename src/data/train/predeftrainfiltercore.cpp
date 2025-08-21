@@ -64,8 +64,17 @@ void PredefTrainFilterCore::fromJson(const QJsonObject &obj, const TrainCollecti
     const auto& arRout=obj.value("routings").toArray();
     foreach(const auto& t,arRout){
         auto rt=coll.routingByName(t.toString());
-        assert(rt);
-        routings.insert(rt);
+
+        // 2025.08.21: This is a possible case. If the routing is deleted after added to some predefined filter,
+        // it is safe before closing the program because the routing is stored with shared_ptr.
+        // But when the program is restarted, the routing cannot be found again from the collection. It is safe to
+        // just ignore this routing, because this behavior exactly likes that before the program is closed. 
+        if (rt)
+            routings.insert(rt);
+        else {
+            qWarning() << "PredefTrainFilterCore::fromJson: "
+				<< "routing " << t.toString() << " not found in collection. It may have been deleted.";
+        }
     }
 
 	const auto& arIncTags = obj.value("include_tags").toArray();
