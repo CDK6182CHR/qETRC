@@ -17,8 +17,9 @@ void TrainTimeEdit::setFormat(TrainTime::TimeFormat f)
 {
     m_format = f;
     switch (f) {
-    case TrainTime::HMS: m_regex = QRegularExpression("^(\\d+):(\\d{1,2}):(\\d{1,2})$"); break;
-    case TrainTime::HM: m_regex = QRegularExpression("^(\\d+):(\\d{1,2})$"); break;
+        // 2025.08.25: we accept empty sections for intermediate state while editing.
+    case TrainTime::HMS: m_regex = QRegularExpression("^(\\d*):(\\d{0,2}):(\\d{0,2})$"); break;
+    case TrainTime::HM: m_regex = QRegularExpression("^(\\d*):(\\d{0,2})$"); break;
     }
 }
 
@@ -29,14 +30,27 @@ QValidator::State TrainTimeEdit::validate(QString& input, int& pos) const
     if (!res.hasMatch()) return QValidator::Invalid;
 
     bool ok;
-    int h = res.capturedView(1).toInt(&ok);
-    if (!ok) return QValidator::Invalid;
-    int m = res.capturedView(2).toInt(&ok);
-    if (!ok) return QValidator::Invalid;
+
+    // 2025.08.25 new version: empty sections are treated as zero, and is considered
+    // to be valid.
+    int h = 0;
+    if (const auto& rv = res.capturedView(1); !rv.empty()) {
+        h = rv.toInt(&ok);
+        if (!ok) return QValidator::Invalid;
+    }
+
+    int m = 0;
+    if (const auto& rv = res.capturedView(2); !rv.empty()) {
+        m = rv.toInt(&ok);
+        if (!ok) return QValidator::Invalid;
+    }
+
     int s = 0;
     if (m_format == TrainTime::HMS) {
-        s = res.capturedView(3).toInt(&ok);
-        if (!ok) return QValidator::Invalid;
+        if (const auto& rv = res.capturedView(3); !rv.empty()) {
+            s = rv.toInt(&ok);
+            if (!ok) return QValidator::Invalid;
+        }
     }
 
     return (h >= 0 && h < m_maxHours && m >= 0 && m < 60 && s >= 0 && s < 60) ?
@@ -182,9 +196,26 @@ bool TrainTimeEdit::atEndOfNonLastSection(int pos) const
     // Now, the position is at the end of the current section
 
     int curr_sec_length = next_delim - last_delim - 1;
-    int max_sec_length = sec == HourSection ? integer_digits_dec(m_maxHours) : 2;
 
-    return (curr_sec_length >= max_sec_length);
+    if (sec == HourSection) {
+        // Special processing for hour section: we move to next section if it is impossible to add another character after it
+		int max_sec_length = integer_digits_dec(m_maxHours);
+        if (curr_sec_length >= max_sec_length) {
+            return true;
+        }
+        else if (curr_sec_length + 1 == max_sec_length) {
+            // test whether we can add another digit; the hour section SHOULD starts from zero position
+			int hour_val = txt.left(next_delim).toInt();  // this should be safe because we have validated before
+            return (hour_val * 10 >= m_maxHours);
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        // For minute and second section, the maximal length is always 2
+        return curr_sec_length >= 2;
+    }
 }
 
 TrainTimeEdit::Section TrainTimeEdit::firstSection() const
