@@ -8,6 +8,7 @@ class TrainPath;
 class TrainCollection;
 class Train;
 struct DiagramOptions;
+class TrainNameSortProxyModel;
 
 /**
  * @brief The AddTrainsToPathDialog class
@@ -22,6 +23,7 @@ class AddTrainsToPathDialog : public QDialog
     TrainPath* path;
 
     TrainListReadModel* model;
+    TrainNameSortProxyModel* pmodel;
     QTableView* table;
 
 public:

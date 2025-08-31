@@ -382,7 +382,7 @@ void TrainItem::clearLinkInfo()
         config().fullWidth(_diagram.options().period_hours));
 
     if (endLayer.layer >= 0 || postLinkItems.layerInfo.layer >= 0) {
-        auto& linksEnd = _page.dirLinks(_line->lastRailStation().get(), dir());
+        auto& linksEnd = _page.dirLinks(_line->lastRailStation().get(), DirFunc::reverse(dir()));
         linksEnd.delOccupation(endLayer.layer, train().get(), endLayer.x_pre, endLayer.x_cur, 
             config().fullWidth(_diagram.options().period_hours));
         linksEnd.delOccupation(postLinkItems.layerInfo.layer, train().get(), postLinkItems.layerInfo.x_pre,

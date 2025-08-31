@@ -3,6 +3,7 @@
 #include "data/train/traincollection.h"
 #include "data/trainpath/trainpath.h"
 #include "model/train/trainlistreadmodel.h"
+#include "model/proxy/trainnamesortproxymodel.h"
 #include "util/buttongroup.hpp"
 
 #include <QLabel>
@@ -35,15 +36,23 @@ void AddTrainsToPathDialog::initUI()
     setWindowTitle(tr("添加列车到径路 - %1").arg(path->name()));
     resize(600, 600);
 
-    auto* vlay=new QVBoxLayout(this);
-    auto* lab=new QLabel(tr("请在下表选择要添加当前径路的列车，可多选。"));
+    auto* vlay = new QVBoxLayout(this);
+    auto* lab = new QLabel(tr("请在下表选择要添加当前径路的列车，可多选。"));
     vlay->addWidget(lab);
 
-    table=new QTableView;
+    table = new QTableView;
     table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
-    table->setModel(model);
+
+    pmodel = new TrainNameSortProxyModel({ (int)TrainListReadModel::ColTrainName }, this);
+    pmodel->setSourceModel(model);
+
+    table->setModel(pmodel);
     table->setSelectionBehavior(QTableView::SelectRows);
     table->setSelectionMode(QTableView::MultiSelection);
+
+    table->horizontalHeader()->setSortIndicatorShown(true);
+    connect(table->horizontalHeader(), &QHeaderView::sortIndicatorChanged,
+        table, &QTableView::sortByColumn);
 
     {
         int c=0;
@@ -64,7 +73,8 @@ void AddTrainsToPathDialog::accept()
     if (!lst.empty()){
         QList<std::shared_ptr<Train>> trains{};
         foreach (const auto& idx, lst){
-            trains.push_back(model->trains().at(idx.row()));
+            auto midx = pmodel->mapToSource(idx);
+            trains.push_back(model->trains().at(midx.row()));
         }
         emit trainsAdded(path, trains);
         QDialog::accept();
