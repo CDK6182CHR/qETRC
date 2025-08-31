@@ -1270,6 +1270,12 @@ bool TrainItem::addPreLinkLine(const QString& trainName)
     // 到这里：已经判断好了绘制条件
     const TrainTime& last_tm = last->depart;
     const TrainTime& first_tm = first->arrive;
+
+    // 2025.08.31: max duration constrain
+    if (config().max_link_line_duration && qeutil::secsTo(last_tm, first_tm, _diagram.options().period_hours) > config().max_link_line_duration * 60) {
+        return false;
+    }
+
     auto label_text = linkLineLabelText(trainName, rout.get());
     auto rs = train()->boundStartingAtRail(_railway);
 
@@ -1297,6 +1303,12 @@ bool TrainItem::addPostLinkLine()
 
     if (curLast != _line->lastTrainStation()) {
         // 2021.09.02补正  必须是本线的才绘制
+        return false;
+    }
+
+    // 2025.08.31: max duration constrain
+    if (config().max_link_line_duration && qeutil::secsTo(curLast->depart, postFirst->arrive, 
+        _diagram.options().period_hours) > config().max_link_line_duration * 60) {
         return false;
     }
 

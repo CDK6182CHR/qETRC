@@ -489,6 +489,13 @@ void ConfigDialog::initUI(int period_hours)
         form->addRow(tr("交路连线颜色"), cb);
         cbLinkColor = cb;
 
+        sp = new QSpinBox;
+        sp->setRange(0, 1000000);
+        sp->setToolTip(tr("最大连线跨度\n设置运行交路连线的跨越的最大时长，如果超过此时间将不绘制连线。0为不限制。"));
+        sp->setSuffix(tr(" 分钟 (min)"));
+        spLinkLineMaxDuration = sp;
+        form->addRow(tr("最大连线跨度"), sp);
+
         ck = new QCheckBox(tr("显示与非本线列车之间的交路连线"));
         ck->setToolTip(tr("是否显示本线列车与非本线列车之间的交路连线"));
         form->addRow(tr("非本线连线"), ck);
@@ -628,6 +635,7 @@ void ConfigDialog::refreshData()
     ckFloatLinkLine->setChecked(_cfg.floating_link_line);
     SET_VALUE(spLinkHeightBase, base_link_height);
     SET_VALUE(spLinkHeightStep, step_link_height);
+    SET_VALUE(spLinkLineMaxDuration, max_link_line_duration);
     cbLinkLabelType->setCurrentIndex(static_cast<int>(_cfg.link_line_label_type));
     cbLinkColor->setCurrentIndex(static_cast<int>(_cfg.link_line_color));
     ckShowNonLocalLink->setChecked(_cfg.show_non_local_link_lines);
@@ -717,6 +725,7 @@ void ConfigDialog::actApply()
     cnew.floating_link_line = ckFloatLinkLine->isChecked();
     GET_VALUE(spLinkHeightBase, base_link_height);
     GET_VALUE(spLinkHeightStep, step_link_height);
+    GET_VALUE(spLinkLineMaxDuration, max_link_line_duration);
     cnew.link_line_label_type = static_cast<Config::LinkLineLabelType>(cbLinkLabelType->currentIndex());
     cnew.link_line_color = static_cast<Config::LinkLineColorOption>(cbLinkColor->currentIndex());
     cnew.show_non_local_link_lines = ckShowNonLocalLink->isChecked();

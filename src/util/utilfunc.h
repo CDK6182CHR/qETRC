@@ -183,4 +183,9 @@ void inverseColorIf(QColor& color, bool on);
 QStandardItem* makeCheckItem();
 
 QStandardItem* makeReadOnlyItem(const QString& text);
+
+/**
+ * Compare train names with possibly two-part algorithm (according to global configuration). 
+ */
+bool trainNameLess(const QString& s1, const QString& s2);
 }

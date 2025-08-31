@@ -127,6 +127,12 @@ void SystemJsonDialog::initUI()
     ckTransparentConfig->setToolTip(tr("对新创建的运行图的显示设置、类型管理默认使用透明模式。"));
     flay->addRow(tr("透明设置"), ckTransparentConfig);
 
+    ckTwoPartCompareTrainNames = new QCheckBox(tr("分两部分比较车次名（可能降低排序速度）"));
+    ckTwoPartCompareTrainNames->setToolTip(tr("在部分支持车次名排序的场景下，分为前缀和数字两部分比较列车车次名，而不是"
+        "简单的按照字符串排序。其中，前缀部分是最多三位的大小写字母或字符0，数字部分是紧随前缀的所有连续数字字符。比较时，先"
+        "比较前缀（字符串比较），再比较数字（整数数值比较）。如果列车车次名不是这种格式，排序可能失效。"));
+    flay->addRow(tr("车次排序选项"), ckTwoPartCompareTrainNames);
+
     vlay->addLayout(flay);
 
     auto* g=new ButtonGroup<3>({"确定","还原", "关闭"});
@@ -171,6 +177,7 @@ void SystemJsonDialog::setData()
     cbSysStyle->setCurrentText(t.app_style);
     ckDrag->setChecked(t.drag_time);
     ckTransparentConfig->setChecked(t.transparent_config);
+    ckTwoPartCompareTrainNames->setChecked(t.two_part_compare_train_names);
     setLanguageCombo();
 }
 
@@ -195,6 +202,7 @@ void SystemJsonDialog::actApply()
     t.show_start_page = ckStartup->isChecked();
     t.drag_time = ckDrag->isChecked();
     t.transparent_config = ckTransparentConfig->isChecked();
+    t.two_part_compare_train_names = ckTwoPartCompareTrainNames->isChecked();
 }
 
 #endif

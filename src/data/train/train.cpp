@@ -1156,7 +1156,7 @@ void Train::clear()
 
 bool Train::ltName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
 {
-    return t1->trainName().full() < t2->trainName().full();
+    return qeutil::trainNameLess(t1->trainName().full(), t2->trainName().full());
 }
 
 bool Train::ltStarting(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)

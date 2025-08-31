@@ -21,7 +21,7 @@ class SystemJsonDialog : public QDialog
     //QComboBox* cbRibbonStyle;  // 2024.03.28: move to another dialog
     QComboBox* cbSysStyle;
     QCheckBox* ckWeaken, * ckTooltip, * ckCentral, * ckStartup, * ckAutoHighlight;
-    QCheckBox* ckDrag, * ckTransparentConfig;
+    QCheckBox* ckDrag, * ckTransparentConfig, * ckTwoPartCompareTrainNames;
 public:
     SystemJsonDialog(QWidget* parent=nullptr);
 private:

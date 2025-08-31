@@ -44,6 +44,11 @@ public:
      */
     bool transparent_config = true;
 
+    /**
+     * 2025.08.31  Experimental: comparing train names using two-part algorithm
+     */
+    bool two_part_compare_train_names = false;
+
     //todo: dock show..
 
     /**

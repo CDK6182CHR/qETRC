@@ -142,6 +142,7 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
     FROM_OBJ_ENUM(link_line_color);
     FROM_OBJ_ENUM(train_label_color);
     FROM_OBJ_ENUM(train_name_mark_style);
+    FROM_OBJ(max_link_line_duration, Int);
     
     FROM_OBJ(default_grid_width, Double);
     FROM_OBJ(bold_grid_width, Double);
@@ -219,6 +220,7 @@ QJsonObject Config::toJson() const
         TO_OBJ_ENUM(link_line_color)
         TO_OBJ_ENUM(train_label_color)
         TO_OBJ_ENUM(train_name_mark_style)
+        TO_OBJ(max_link_line_duration)
         TO_OBJ(default_grid_width)
         TO_OBJ(bold_grid_width)
         TO_OBJ(valid_width)

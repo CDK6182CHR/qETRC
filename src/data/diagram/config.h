@@ -150,6 +150,7 @@ struct Config
     LinkLineColorOption link_line_color = LinkLineColorOption::LineColor; 
     LinkLineColorOption train_label_color = LinkLineColorOption::LineColor;
     TrainNameMarkStyle train_name_mark_style = TrainNameMarkStyle::Label;
+    int max_link_line_duration = 0;
 
     double default_grid_width = 1.0;
     double bold_grid_width = 2.5;
