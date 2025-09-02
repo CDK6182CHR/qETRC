@@ -4,14 +4,15 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.9.0";
-const std::string_view DATE = "20250817";
-const int RELEASE_CODE = 72;
+const std::string_view LAST_VERSION = "V1.9.1";
+const std::string_view DATE = "20250902";
+const int RELEASE_CODE = 73;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 在软件可执行程序所在目录读取系统文件，使得双击运行图文件打开软件的操作变为安全的。
-2. 优化选择列车的下拉菜单控件。
-3. 修复与时刻导出和显示相关的问题。)";
+const std::string_view UPDATE_LOG = R"(1. 在列车管理面板中新增列车筛选器的支持。
+2. 新增适用于中国铁路的前缀-数字两段式车次排序算法选项。
+3. 新增绘图时的交路连线最大跨度选项。
+4. 优化时刻编辑器；修复一些已知问题。)";
 }
