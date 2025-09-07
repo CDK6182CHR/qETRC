@@ -35,5 +35,12 @@ signals:
 private slots:
     void onComboChanged(const PredefTrainFilterCore* core);
     void onDialogApplied();
+
+public slots:
+
+    /**
+     * 2025.09.07  Call this upon the (predefined) filters changed.
+     */
+    void refreshFilters();
 };
 

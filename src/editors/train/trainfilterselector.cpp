@@ -2,10 +2,11 @@
 #include "trainfiltercombo.h"
 #include "trainfilterselector.h"
 #include "data/train/predeftrainfiltercore.h"
+#include "defines/icon_specs.h"
 
 #include <QHBoxLayout>
 #include <QPushButton>
-
+#include <QToolButton>
 
 
 TrainFilterSelector::TrainFilterSelector(TrainCollection &coll, QWidget *parent):
@@ -29,6 +30,12 @@ void TrainFilterSelector::initUI()
     auto* btn=new QPushButton(tr("编辑筛选器"));
     btn->setToolTip(tr("编辑此处临时使用的列车筛选器，编辑的内容不会保存为预设。"));
     hlay->addWidget(btn);
+
+    auto* tb = new QToolButton();
+    tb->setIcon(QEICN_filter_selector_refresh);
+    tb->setToolTip(tr("刷新当前筛选器选择器状态，以更新任何可能的筛选器列表变化"));
+    connect(tb, &QToolButton::clicked, this, &TrainFilterSelector::refreshFilters);
+    hlay->addWidget(tb);
 
     dlg=new TrainFilterDialog(coll,this);
     selector._core = &dlg->getCore();
@@ -59,5 +66,11 @@ void TrainFilterSelector::onDialogApplied()
         // for idx0!=0, combo would change, and this signal would be emitted
         emit filterChanged(&dlg->getCore());
     }
+}
+
+void TrainFilterSelector::refreshFilters()
+{
+    combo->refreshData();
+    dlg->refreshData();
 }
 

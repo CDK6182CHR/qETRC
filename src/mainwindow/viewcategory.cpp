@@ -15,6 +15,7 @@
 #include "data/common/qesystem.h"
 #include "data/diagram/diagrampage.h"
 #include "editors/train/predeftrainfiltermanager.h"
+#include "editors/train/trainfilterselector.h"
 #include "editors/train/trainfiltercombo.h"
 #include "defines/icon_specs.h"
 
@@ -735,7 +736,7 @@ void ViewCategory::actUpdateFilter(PredefTrainFilterCore* f, std::unique_ptr<Pre
 
 void ViewCategory::commitAddFilter(int place, const PredefTrainFilterCore* f)
 {
-    setupTrainFilterMenu();
+    refreshFilters();
     if (mw->filterManager) {
         mw->filterManager->commitAddFilter(place, f);
     }
@@ -743,7 +744,7 @@ void ViewCategory::commitAddFilter(int place, const PredefTrainFilterCore* f)
 
 void ViewCategory::commitRemoveFilter(int id, const PredefTrainFilterCore* f)
 {
-    setupTrainFilterMenu();
+    refreshFilters();
     if (auto* a = mw->filterManager) {
         a->commitRemoveFilter(id, f);
     }
@@ -751,7 +752,7 @@ void ViewCategory::commitRemoveFilter(int id, const PredefTrainFilterCore* f)
 
 void ViewCategory::commitUpdateFilter(PredefTrainFilterCore* f)
 {
-    setupTrainFilterMenu();   // in cases where name may changed
+    refreshFilters();   // in cases where name may changed
     if (auto* a = mw->filterManager) {
         a->commitUpdateFilter(f);
     }

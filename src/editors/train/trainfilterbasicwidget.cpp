@@ -215,6 +215,9 @@ void TrainFilterBasicWidget::refreshDataWith(const TrainFilterCore *core)
         }
         gpPassen->get(passen_id)->setChecked(true);
     }
+
+    // 2025.09.07: also update the completer model
+    tagCompletionModel->refreshData(coll.tagManager());
 }
 
 void TrainFilterBasicWidget::refreshTagCompleter()

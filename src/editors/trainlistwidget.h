@@ -57,6 +57,8 @@ public:
 
     auto* getModel() { return model; }
 
+    auto* getFilter() { return filter; }
+
 private:
     void initUI();
 
