@@ -120,7 +120,14 @@ QList<std::shared_ptr<Train>> TrainListWidget::batchOpSelectedTrains()
 		res.push_back(coll.trainAt(t.row()));
 	}
 	if (res.empty()) {
-		QMessageBox::warning(this, tr("错误"), tr("批量操作：请先选择至少一个车次！"));
+		// 2025.09.09 CHANGE: add all shown rows if no selected
+		qInfo() << "batchOpSelectedTrains: select all shown rows";
+		for (int r = 0; r < model->rowCount({}); r++) {
+			if (!table->isRowHidden(r)) {
+				res.push_back(coll.trainAt(r));
+			}
+		}
+		//QMessageBox::warning(this, tr("错误"), tr("批量操作：请先选择至少一个车次！"));
 	}
 	return res;
 }
@@ -155,9 +162,20 @@ void TrainListWidget::batchChange()
 		rows.push_back(t.row());
 	}
 	if (rows.empty()) {
+		//QMessageBox::warning(this, tr("错误"), tr("批量设置列车类型：请先选择至少一个车次！"));
+		qInfo() << "batchChange: automatically select all shown rows";
+		for (int r = 0; r < model->rowCount({}); r++) {
+			if (!table->isRowHidden(r)) {
+				rows.push_back(r);
+			}
+		}
+	}
+
+	if (rows.empty()) {
 		QMessageBox::warning(this, tr("错误"), tr("批量设置列车类型：请先选择至少一个车次！"));
 		return;
 	}
+
 	auto types = coll.typeNames();
 	bool ok;
 	auto nty_s = QInputDialog::getItem(this, tr("批量设置类型"), tr("将选中的[%1]个车次类型设置为：").arg(rows.count()),
@@ -247,14 +265,9 @@ void TrainListWidget::batchRemoveTag(const QList<std::shared_ptr<Train>>& trains
 
 void TrainListWidget::actBatchAddTagBat()
 {
-	auto lst = table->selectionModel()->selectedRows();
-	QList<std::shared_ptr<Train>> trains;
-	foreach(const auto& t, lst) {
-		trains.push_back(coll.trainAt(t.row()));
-	}
+	auto trains = batchOpSelectedTrains();
 	if (trains.empty()) {
-		QMessageBox::warning(this, tr("错误"), tr("批量添加列车标签：请先选择至少一个车次！"));
-		return;
+		QMessageBox::warning(this, tr("错误"), tr("批量添加标签：未选择车次！"));
 	}
 
 	batchAddTag(trains);
@@ -262,11 +275,7 @@ void TrainListWidget::actBatchAddTagBat()
 
 void TrainListWidget::actBatchRemoveTagBat()
 {
-	auto lst = table->selectionModel()->selectedRows();
-	QList<std::shared_ptr<Train>> trains;
-	foreach(const auto& t, lst) {
-		trains.push_back(coll.trainAt(t.row()));
-	}
+	auto trains = batchOpSelectedTrains();
 	if (trains.empty()) {
 		QMessageBox::warning(this, tr("错误"), tr("批量移除列车标签：请先选择至少一个车次！"));
 		return;
