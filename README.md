@@ -14,7 +14,9 @@ Electronic Train Running Chart implemented with Qt
 
 ## 环境
 
-自2023年6月16日起，改为使用CMake构建，原基于qmake的构建流程作废。详见[build](doc/build.md)
+自2023年6月16日起，改为使用CMake构建，原基于qmake的构建流程作废。详见[build](doc/build.md)。
+
+2025年9月18日起新增MAC OS上的构建脚本，由[YQYQYQ123abc (Roean)](https://github.com/YQYQYQ123abc)提供。详见[build_on_mac](doc/build_on_mac.md)。
 
 
 
@@ -121,6 +123,12 @@ qETRC远期计划完全替代pyETRC，实现绝大多数的pyETRC既有功能，
   - `timeinterp` 时刻插值算法。
   - `rulerpaint` 标尺排图向导。
   - `greedypaint` 贪心推线向导。
+
+
+
+## 贡献者
+
+- [@YQYQYQ123abc (Roean)](https://github.com/YQYQYQ123abc) 提供了在MAC系统上构建本项目的脚本、说明和支持文件（Github PR #11）。
 
 
 
