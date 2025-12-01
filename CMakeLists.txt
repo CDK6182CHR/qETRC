@@ -118,9 +118,10 @@ if (NOT ANDROID)
     target_link_libraries(qETRC PRIVATE qtadvanceddocking-qt${QT_VERSION_MAJOR})
 
     if (AUTO_INSTALL_SARibbon)
-        get_target_property(SARibbonBar_LIB_FILE SARibbonBar::SARibbonBar LOCATION_${CMAKE_BUILD_TYPE})
+        # Use generator expression instead of get_target_property to avoid LOCATION property error
+        set(SARibbonBar_LIB_FILE "$<TARGET_FILE:SARibbonBar::SARibbonBar>")
         message(STATUS "SARibbon lib ${SARibbonBar_LIB_FILE}")
-        install(FILES ${SARibbonBar_LIB_FILE} DESTINATION ${CMAKE_INSTALL_BINDIR})
+        install(FILES ${SARibbonBar_LIB_FILE} DESTINATION ${CMAKE_INSTALL_LIBDIR})
     endif (AUTO_INSTALL_SARibbon)
 
     if (AUTO_INSTALL_QWK) 
@@ -130,10 +131,11 @@ if (NOT ANDROID)
 
         find_package(QWindowKit CONFIG)
         if (QWindowKit_FOUND)
-            get_target_property(QWK_CORE_FILE QWindowKit::Core LOCATION_${CMAKE_BUILD_TYPE})
-            get_target_property(QWK_WIDGETS_FILE QWindowKit::Widgets LOCATION_${CMAKE_BUILD_TYPE})
+            # Use generator expression instead of get_target_property to avoid LOCATION property error
+            set(QWK_CORE_FILE "$<TARGET_FILE:QWindowKit::Core>")
+            set(QWK_WIDGETS_FILE "$<TARGET_FILE:QWindowKit::Widgets>")
             message(STATUS "QWK lib ${QWK_CORE_FILE}")
-            install(FILES ${QWK_CORE_FILE} ${QWK_WIDGETS_FILE} DESTINATION ${CMAKE_INSTALL_BINDIR})
+            install(FILES ${QWK_CORE_FILE} ${QWK_WIDGETS_FILE} DESTINATION ${CMAKE_INSTALL_LIBDIR})
         else ()
             message(STATUS "QWK not found, install not performed")
         endif ()
