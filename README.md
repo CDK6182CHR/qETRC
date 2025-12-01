@@ -18,6 +18,8 @@ Electronic Train Running Chart implemented with Qt
 
 2025年9月18日起新增MAC OS上的构建脚本，由[YQYQYQ123abc (Roean)](https://github.com/YQYQYQ123abc)提供。详见[build_on_mac](doc/build_on_mac.md)。
 
+2025年12月1日起新增ArchLinux构建相关支持，由[ParadoxMoranis (Paradox.poole)](https://github.com/ParadoxMoranis)提供。详见[build_on_arch_linux](docs/build_on_arch_linux.md)。
+
 
 
 ## 与pyETRC的关系
@@ -128,7 +130,8 @@ qETRC远期计划完全替代pyETRC，实现绝大多数的pyETRC既有功能，
 
 ## 贡献者
 
-- [@YQYQYQ123abc (Roean)](https://github.com/YQYQYQ123abc) 提供了在MAC系统上构建本项目的脚本、说明和支持文件（Github PR #11）。
+- @YQYQYQ123abc [YQYQYQ123abc (Roean)](https://github.com/YQYQYQ123abc) 提供了在MAC系统上构建本项目的脚本、说明和支持文件（Github PR #10）。
+- @ParadoxMoranis [ParadoxMoranis (Paradox.poole)](https://github.com/ParadoxMoranis) 提供了在ArchLinux上构建的支持和说明文件（Github PR #11）
 
 
 

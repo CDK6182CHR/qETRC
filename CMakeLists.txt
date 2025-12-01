@@ -117,11 +117,19 @@ if (NOT ANDROID)
     target_link_libraries(qETRC PUBLIC SARibbonBar::SARibbonBar)
     target_link_libraries(qETRC PRIVATE qtadvanceddocking-qt${QT_VERSION_MAJOR})
 
+    # 2025.12.01: For compatiblity with Linux. This is a non-standard approach. We just want to
+    # install the DLL files to bin directory on Windows...
+    if (WIN32)
+        set(QETRC_AUTO_INSTALL_DEST ${CMAKE_INSTALL_BINDIR})
+    else ()
+        set(QETRC_AUTO_INSTALL_DEST ${CMAKE_INSTALL_LIBDIR})
+    endif ()
+
     if (AUTO_INSTALL_SARibbon)
         # Use generator expression instead of get_target_property to avoid LOCATION property error
         set(SARibbonBar_LIB_FILE "$<TARGET_FILE:SARibbonBar::SARibbonBar>")
         message(STATUS "SARibbon lib ${SARibbonBar_LIB_FILE}")
-        install(FILES ${SARibbonBar_LIB_FILE} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+        install(FILES ${SARibbonBar_LIB_FILE} DESTINATION ${QETRC_AUTO_INSTALL_DEST})
     endif (AUTO_INSTALL_SARibbon)
 
     if (AUTO_INSTALL_QWK) 
@@ -135,7 +143,7 @@ if (NOT ANDROID)
             set(QWK_CORE_FILE "$<TARGET_FILE:QWindowKit::Core>")
             set(QWK_WIDGETS_FILE "$<TARGET_FILE:QWindowKit::Widgets>")
             message(STATUS "QWK lib ${QWK_CORE_FILE}")
-            install(FILES ${QWK_CORE_FILE} ${QWK_WIDGETS_FILE} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+            install(FILES ${QWK_CORE_FILE} ${QWK_WIDGETS_FILE} DESTINATION ${QETRC_AUTO_INSTALL_DEST})
         else ()
             message(STATUS "QWK not found, install not performed")
         endif ()
