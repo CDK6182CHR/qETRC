@@ -2318,6 +2318,7 @@ void MainWindow::refreshAll()
 	//直接由Main管理的子页面
 	naviModel->resetModel();
 	trainListWidget->refreshData();
+	routingWidget->refreshData();   //2025.09.21 fix
 	pathListWidget->refreshData();
 	for (auto p : railStationWidgets) {
 		p->refreshData();

@@ -21,6 +21,8 @@ void TrainTimeEdit::setFormat(TrainTime::TimeFormat f)
     case TrainTime::HMS: m_regex = QRegularExpression("^(\\d*):(\\d{0,2}):(\\d{0,2})$"); break;
     case TrainTime::HM: m_regex = QRegularExpression("^(\\d*):(\\d{0,2})$"); break;
     }
+    // 2025.09.21: we should update the text
+    updateTime();
 }
 
 QValidator::State TrainTimeEdit::validate(QString& input, int& pos) const
