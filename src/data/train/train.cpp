@@ -1196,7 +1196,7 @@ bool Train::ltType(const std::shared_ptr<const Train>& t1, const std::shared_ptr
 
 bool Train::gtName(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)
 {
-    return t1->trainName().full() > t2->trainName().full();
+	return qeutil::trainNameGreater(t1->trainName().full(), t2->trainName().full());
 }
 
 bool Train::gtStarting(const std::shared_ptr<const Train>& t1, const std::shared_ptr<const Train>& t2)

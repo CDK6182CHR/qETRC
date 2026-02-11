@@ -381,3 +381,23 @@ bool qeutil::trainNameLess(const QString& s1, const QString& s2)
 		return s1 < s2;
 	}
 }
+
+bool qeutil::trainNameGreater(const QString& s1, const QString& s2)
+{
+	if (SystemJson::get().two_part_compare_train_names) {
+		static QRegularExpression reg(R"(^([0a-zA-Z]{0,3})(\d+))");
+		auto m1 = reg.match(s1);
+		auto m2 = reg.match(s2);
+		if (m1.hasMatch() && m2.hasMatch()) {
+			return std::make_pair(m1.capturedView(1), m1.capturedView(2).toInt()) >
+				std::make_pair(m2.capturedView(1), m2.capturedView(2).toInt());
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		// Direct comparison
+		return s1 > s2;
+	}
+}

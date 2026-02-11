@@ -188,4 +188,10 @@ QStandardItem* makeReadOnlyItem(const QString& text);
  * Compare train names with possibly two-part algorithm (according to global configuration). 
  */
 bool trainNameLess(const QString& s1, const QString& s2);
+
+/**
+ * 2026.02.11: Similar to trainNameLess, but for greater-than comparison.
+ * Use two-part algorithm if required.
+ */
+bool trainNameGreater(const QString& s1, const QString& s2);
 }
