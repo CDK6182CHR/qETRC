@@ -2,6 +2,7 @@
 #include "data/train/train.h"
 #include "util/utilfunc.h"
 #include "data/diagram/diagramoptions.h"
+#include "data/analysis/inttrains/intervaltraininfo.h"
 
 #include <QObject>
 
@@ -29,6 +30,37 @@ TrainIntervalStatResult TrainIntervalStat::compute()
     TrainIntervalStatResult res;
     computeTrainPart(res);  // this is responsible for initializing _startIter
     computeRailPart(res);
+    return res;
+}
+
+std::vector<TrainIntervalStatResult> TrainIntervalStat::computeFromIntervalInfo(
+    const DiagramOptions& ops, const std::vector<IntervalTrainInfo>& infoList, bool include_ends)
+{
+    std::vector<TrainIntervalStatResult> res;
+
+    for (const auto& info : infoList) {
+        TrainIntervalStat stat{ ops, info.train };
+        stat.setIncludeEnds(include_ends);
+        int startIndex = -1, endIndex = -1;
+        // find the index of from and to by a traversing
+
+        int dis = 0;
+        for (auto itr = info.train->timetable().begin(); itr != info.train->timetable().end(); ++itr, ++dis) {
+            if (&*itr == info.from)
+                startIndex = dis;
+            if (&*itr == info.to)
+                endIndex = dis;
+		}
+        if (startIndex == -1 || endIndex == -1) {
+            qWarning() << "TrainIntervalStat::computeFromIntervalInfo: from or to station not found in train timetable";
+        }
+        else {
+            stat.setRange(startIndex, endIndex);
+        }
+        
+        // We always need to compute the data, in order to align the data...
+        res.emplace_back(stat.compute());
+	}
     return res;
 }
 

@@ -2,7 +2,8 @@
 
 #include <QTableView>
 #include <QStandardItemModel>
-#include <data/analysis/inttrains/intervaltraininfo.h>
+#include "data/analysis/inttrains/intervaltraininfo.h"
+#include "data/analysis/runstat/trainintervalstatresult.h"
 
 
 class QTableView;
@@ -11,11 +12,17 @@ class QLineEdit;
 class Diagram;
 struct DiagramOptions;
 
+
+/**
+ * 2026.02.12: Add the information for total mile and speeds.
+ * The corresponding data will be computed when the model is updated.
+ */
 class IntervalTrainModel: public QStandardItemModel
 {
     Q_OBJECT;
     const DiagramOptions& _ops;
     IntervalTrainList _data;
+	std::vector<TrainIntervalStatResult> _statData;
 public:
     enum {
         ColTrainName=0,
@@ -27,6 +34,9 @@ public:
         ColTime,
         ColStarting,
         ColTerminal,
+        ColTotalMile,
+        ColTravSpeed,
+        ColTechSpeed,
         ColMAX
     };
     IntervalTrainModel(const DiagramOptions& ops, QWidget* parent=nullptr);
@@ -35,6 +45,9 @@ public:
     void resetData(IntervalTrainList&& data_);
     void resetData(const IntervalTrainList& data_);
     const auto& getData()const{return _data;}
+
+private:
+    void updateTrainStatData();
 };
 
 

@@ -1255,7 +1255,7 @@ void MainWindow::initToolbar()
 		panel->addLargeAction(act);
 
 		act = makeAction(QEICN_section_count, tr("区间对数表"));
-		act->setToolTip(tr("区间车次表\n查询指定线路从指定站出发（到达指定站）的列车对数。"));
+		act->setToolTip(tr("区间对数表\n查询指定线路从指定站出发（到达指定站）的列车对数。"));
 		connect(act, &QAction::triggered, this, &MainWindow::actIntervalCount);
 		panel->addMediumAction(act);
 
@@ -1883,7 +1883,7 @@ void MainWindow::actIntervalTrains()
 void MainWindow::actIntervalCount()
 {
 	auto* dlg = new IntervalCountDialog(_diagram, this);
-	dlg->show();
+	dlg->open();
 }
 
 void MainWindow::actTrainIntervalStat()

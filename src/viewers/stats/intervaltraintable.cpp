@@ -7,7 +7,9 @@
 #include "data/train/traintype.h"
 #include "model/delegate/timeintervaldelegate.h"
 #include "model/delegate/traintimedelegate.h"
+#include "model/delegate/generaldoublespindelegate.h"
 #include "data/diagram/diagramoptions.h"
+#include "data/analysis/runstat/trainintervalstat.h"
 
 
 IntervalTrainModel::IntervalTrainModel(const DiagramOptions& ops, QWidget *parent):
@@ -16,7 +18,8 @@ IntervalTrainModel::IntervalTrainModel(const DiagramOptions& ops, QWidget *paren
     setColumnCount(ColMAX);
     setHorizontalHeaderLabels({
        tr("车次"),tr("类型"),tr("发站"),tr("发时"),tr("到站"),tr("到时"),
-                                  tr("历时"),tr("始发"),tr("终到")
+                                  tr("历时"),tr("始发"),tr("终到"), 
+								  tr("里程"), tr("旅速"), tr("技速")
                               });
 }
 
@@ -31,6 +34,7 @@ void IntervalTrainModel::setupModel()
     setRowCount(_data.size());
     for(size_t i=0;i<_data.size();i++){
         const auto& info=_data[i];
+		const auto& stat = _statData[i];
 
         auto* it=new SI(info.train->trainName().full());
         setItem(i,ColTrainName,it);
@@ -53,24 +57,56 @@ void IntervalTrainModel::setupModel()
         setItem(i, ColTime, it);
         setItem(i,ColStarting,new SI(info.train->starting().toSingleLiteral()));
         setItem(i,ColTerminal,new SI(info.train->terminal().toSingleLiteral()));
+
+        // 2026.02.12: Mile and speed if available
+        if (stat.railResults.isValid) {
+            it = new SI;
+			it->setData(stat.railResults.totalMiles, Qt::EditRole);
+            setItem(i, ColTotalMile, it);
+			it = new SI;
+			it->setData(stat.railResults.travelSpeed, Qt::EditRole);
+			setItem(i, ColTravSpeed, it);
+			it = new SI;
+			it->setData(stat.railResults.techSpeed, Qt::EditRole);
+            setItem(i, ColTechSpeed, it);
+        }
+        else {
+            it = new SI;
+            it->setData(NAN, Qt::EditRole);
+            setItem(i, ColTotalMile, it);
+
+            it = new SI;
+            it->setData(NAN, Qt::EditRole);
+            setItem(i, ColTravSpeed, it);
+
+            it = new SI;
+            it->setData(NAN, Qt::EditRole);
+            setItem(i, ColTechSpeed, it);
+        }
     }
 }
 
 void IntervalTrainModel::resetData(IntervalTrainList &&data_)
 {
     _data=std::move(data_);
+	updateTrainStatData();
     setupModel();
 }
 
 void IntervalTrainModel::resetData(const IntervalTrainList& data_)
 {
     _data = data_;
+	updateTrainStatData();
     setupModel();
 }
 
+void IntervalTrainModel::updateTrainStatData()
+{
+    _statData = TrainIntervalStat::computeFromIntervalInfo(_ops, _data, false);
+}
 
 IntervalTrainTable::IntervalTrainTable(const DiagramOptions& ops, QWidget *parent):
-    _ops(ops), model(new IntervalTrainModel(_ops, parent))
+    QTableView(parent), _ops(ops), model(new IntervalTrainModel(_ops, parent))
 {
     initUI();
 }
@@ -86,7 +122,7 @@ void IntervalTrainTable::initUI()
 
     {
         int c=0;
-        for(int w:{80, 60, 110, 90, 110, 90, 120, 80, 80}){
+        for(int w:{80, 60, 110, 90, 110, 90, 120, 80, 80, 80, 80, 80}){
             setColumnWidth(c++,w);
         }
     }
@@ -95,6 +131,11 @@ void IntervalTrainTable::initUI()
     setItemDelegateForColumn(IntervalTrainModel::ColFromTime, time_del);
     setItemDelegateForColumn(IntervalTrainModel::ColToTime, time_del);
     setItemDelegateForColumn(IntervalTrainModel::ColTime, new TimeIntervalDelegateHour(this));
+
+    auto* num_del = new GeneralDoubleSpinDelegate(this);
+	setItemDelegateForColumn(IntervalTrainModel::ColTotalMile, num_del);
+	setItemDelegateForColumn(IntervalTrainModel::ColTravSpeed, num_del);
+	setItemDelegateForColumn(IntervalTrainModel::ColTechSpeed, num_del);
 
     horizontalHeader()->setSortIndicatorShown(true);
 }

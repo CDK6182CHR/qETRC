@@ -9,6 +9,7 @@ class RailCategory;
 class Train;
 class TrainStation;
 struct DiagramOptions;
+struct IntervalTrainInfo;
 
 /**
  * @brief The TrainIntervalStat class
@@ -47,6 +48,13 @@ public:
      * setTrain(), setRange() must be called before.
      */
     TrainIntervalStatResult compute();
+
+    /**
+     * 2026.02.12  Compute the statistical result from the interval info.
+     * Used in interval train dialog.
+     */
+    static std::vector<TrainIntervalStatResult> computeFromIntervalInfo(
+		const DiagramOptions& ops, const std::vector<IntervalTrainInfo>& infoList, bool include_ends = false);
 
 private:
     void updateDigraph();
