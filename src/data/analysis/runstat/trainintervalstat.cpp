@@ -19,6 +19,12 @@ void TrainIntervalStat::setRange(int start, int end)
 
 TrainIntervalStatResult TrainIntervalStat::compute()
 {
+    // 2026.02.12: By default, include all stations
+    if (!train)
+        return {};
+    if (_endIndex == -1)
+        _endIndex = train->stationCount() - 1;
+
     updateDigraph();
     TrainIntervalStatResult res;
     computeTrainPart(res);  // this is responsible for initializing _startIter

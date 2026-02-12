@@ -25,7 +25,7 @@ class TrainIntervalStat
 
     std::shared_ptr<const Train> train;
     // for computation temporary:
-    int _startIndex,_endIndex;
+    int _startIndex = 0,_endIndex = -1;
     std::list<TrainStation>::const_iterator _startIter,_endIter;
     bool _include_ends = false;   // 2024.05.03: whether to include stop time of first and last station
 public:
