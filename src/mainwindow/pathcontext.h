@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QUndoCommand>
 
-class SARibbonLineEdit;
+class QLineEdit;
 class Train;
 class TrainPath;
 class MainWindow;
@@ -31,7 +31,7 @@ class PathContext : public QObject
     MainWindow* const mw;
     TrainPath* path=nullptr;
 
-    SARibbonLineEdit* edName;
+    QLineEdit* edName;
 
     //2023.08.14: trainPaths
     QList<PathEdit*> pathEdits;

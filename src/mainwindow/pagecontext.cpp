@@ -57,7 +57,7 @@ void PageContext::refreshAllData()
 void PageContext::initUI()
 {
     auto* page = cont->addCategoryPage(tr("运行图(&5)"));
-    auto* panel = page->addPannel(tr(""));
+    auto* panel = page->addPanel(tr(""));
 
     //基本信息部分
     if constexpr (true) {
@@ -85,10 +85,10 @@ void PageContext::initUI()
         w->setLayout(vlay);
         w->setWindowTitle(tr("运行图页面名"));
         w->setObjectName(tr("页面名面板"));
-        panel->addWidget(w, SARibbonPannelItem::Large);
+        panel->addWidget(w, SARibbonPanelItem::Large);
     }
 
-    panel = page->addPannel(tr("基本"));
+    panel = page->addPanel(tr("基本"));
 
     auto* act = mw->makeAction(QEICN_edit_page, tr("编辑"), tr("编辑运行图页面"));
     connect(act, SIGNAL(triggered()), this, SLOT(actEdit()));
@@ -120,7 +120,7 @@ void PageContext::initUI()
 
     act->setToolTip(tr("显示设置\n设置当前运行图页面的显示参数，不影响其他运行图页面。"));
 
-    panel = page->addPannel("导航");
+    panel = page->addPanel("导航");
 
     act = mw->makeAction(QEICN_switch_to_page, tr("转到..."), tr("转到页面"));
     act->setToolTip(tr("转到运行图页面\n打开或者切换到当前运行图页面。"));
@@ -137,7 +137,7 @@ void PageContext::initUI()
     panel->addLargeAction(act, QToolButton::MenuButtonPopup);
     //btn->setMinimumWidth(80);
 
-    panel = page->addPannel(tr("比例控制"));
+    panel = page->addPanel(tr("比例控制"));
     act = mw->makeAction(QEICN_h_expand, tr("水平放大"));
     panel->addMediumAction(act);
     connect(act, &QAction::triggered, this, &PageContext::hExpand);
@@ -154,7 +154,7 @@ void PageContext::initUI()
     panel->addMediumAction(act);
     connect(act, &QAction::triggered, this, &PageContext::vShrink);
 
-    panel = page->addPannel("");
+    panel = page->addPanel("");
 
     act = mw->makeAction(QEICN_page_copy, tr("副本"), tr("页面副本"));
     act->setToolTip(tr("创建运行图页面副本\n创建当前运行图页面的副本。注意页面中的基线并不会被复制。"));

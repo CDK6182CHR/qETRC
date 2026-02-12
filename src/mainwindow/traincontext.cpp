@@ -6,10 +6,9 @@
 #include <QMessageBox>
 #include <QColorDialog>
 #include <SARibbonContextCategory.h>
-#include <SARibbonLineEdit.h>
 #include <QLabel>
-#include <SARibbonComboBox.h>
-#include <SARibbonCheckBox.h>
+#include <QCheckBox>
+#include <QComboBox>
 #include <SARibbonMenu.h>
 #include <QDoubleSpinBox>
 #include <QFileDialog>
@@ -78,14 +77,14 @@ void TrainContext::initUI()
 	if constexpr (true) {
 		auto* page = cont->addCategoryPage(tr("列车审阅(&6)"));
 
-		auto* panel = page->addPannel(tr("基本信息"));
+		auto* panel = page->addPanel(tr("基本信息"));
 
 		//基本信息：车次，始发终到 代码有点多
 		if constexpr (true) {
 			QWidget* w = new QWidget;
 			auto* vlay = new QVBoxLayout;
 			auto* hlay = new QHBoxLayout;
-			edName = new SARibbonLineEdit;
+			edName = new QLineEdit;
 			edName->setAlignment(Qt::AlignCenter);
 			edName->setFocusPolicy(Qt::NoFocus);
 			hlay->addWidget(edName);
@@ -96,12 +95,12 @@ void TrainContext::initUI()
 			vlay->addLayout(hlay);
 
 			hlay = new QHBoxLayout;
-			edStart = new SARibbonLineEdit;
+			edStart = new QLineEdit;
 			edStart->setFocusPolicy(Qt::NoFocus);
 			edStart->setAlignment(Qt::AlignCenter);
 			hlay->addWidget(edStart);
 			hlay->addWidget(new QLabel("->"));
-			edEnd = new SARibbonLineEdit;
+			edEnd = new QLineEdit;
 			edEnd->setFocusPolicy(Qt::NoFocus);
 			edEnd->setAlignment(Qt::AlignCenter);
 			hlay->addWidget(edEnd);
@@ -110,7 +109,7 @@ void TrainContext::initUI()
 			w->setMaximumWidth(200);
 			w->setObjectName(tr("车次信息面板-只读"));
 			w->setWindowTitle(tr("车次信息-只读"));
-			panel->addWidget(w, SARibbonPannelItem::Large);
+			panel->addWidget(w, SARibbonPanelItem::Large);
 		}
 
 		auto* act = mw->makeAction(QEICN_show_train_line, tr("显示运行线"), tr("显示列车运行线"));
@@ -125,7 +124,7 @@ void TrainContext::initUI()
 		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actShowTrainLine()));
 
-		panel = page->addPannel(tr("分析"));
+		panel = page->addPanel(tr("分析"));
 
 		act = mw->makeAction(QEICN_train_events, tr("事件表"), tr("列车事件表"));
 		connect(act, SIGNAL(triggered()), this, SLOT(showTrainEvents()));
@@ -150,8 +149,8 @@ void TrainContext::initUI()
 		connect(act, &QAction::triggered, this, &TrainContext::actDiagnose);
 		panel->addLargeAction(act);
 
-		panel = page->addPannel(tr("交路"));
-		edRouting = new SARibbonLineEdit;
+		panel = page->addPanel(tr("交路"));
+		edRouting = new QLineEdit;
 		edRouting->setAlignment(Qt::AlignCenter);
 		edRouting->setFocusPolicy(Qt::NoFocus);
 		edRouting->setFixedWidth(100);
@@ -191,12 +190,12 @@ void TrainContext::initUI()
 		vlay->addLayout(hlay);
 		w->setObjectName(tr("车次交路面板"));
 		w->setWindowTitle(tr("交路"));
-		panel->addWidget(w, SARibbonPannelItem::Large);
+		panel->addWidget(w, SARibbonPanelItem::Large);
 
-		panel = page->addPannel(tr("列车标签"));
+		panel = page->addPanel(tr("列车标签"));
 		w = new QWidget;
 		vlay = new QVBoxLayout(w);
-		edTags = new SARibbonLineEdit;
+		edTags = new QLineEdit;
 		edTags->setReadOnly(true);
 		edTags->setAlignment(Qt::AlignCenter);
 		vlay->addWidget(edTags);
@@ -208,18 +207,18 @@ void TrainContext::initUI()
 			if (train) openTagDialog(train);
 			});
 
-		panel->addWidget(w, SARibbonPannelItem::Large);
+		panel->addWidget(w, SARibbonPanelItem::Large);
 	}
 
 	//编辑
 	if constexpr (true) {
 		auto* page = cont->addCategoryPage(tr("列车编辑(&7)"));
-		auto* panel = page->addPannel(tr("基本信息"));
+		auto* panel = page->addPanel(tr("基本信息"));
 
 		auto* w = new QWidget;
 		auto* vlay = new QVBoxLayout;
 		auto* hlay = new QHBoxLayout;
-		edNamem = new SARibbonLineEdit;
+		edNamem = new QLineEdit;
 		edNamem->setAlignment(Qt::AlignCenter);
 		edNamem->setToolTip(tr("列车全车次\n用以唯一识别列车，不能与其他车次重复"));
 		hlay->addWidget(edNamem);
@@ -231,12 +230,12 @@ void TrainContext::initUI()
 		vlay->addLayout(hlay);
 
 		hlay = new QHBoxLayout;
-		edNameDown = new SARibbonLineEdit;
+		edNameDown = new QLineEdit;
 		edNameDown->setAlignment(Qt::AlignCenter);
 		edNameDown->setToolTip(tr("下行车次"));
 		hlay->addWidget(edNameDown);
 		hlay->addWidget(new QLabel("/"));
-		edNameUp = new SARibbonLineEdit;
+		edNameUp = new QLineEdit;
 		edNameUp->setToolTip(tr("上行车次"));
 		edNameUp->setAlignment(Qt::AlignCenter);
 		hlay->addWidget(edNameUp);
@@ -245,7 +244,7 @@ void TrainContext::initUI()
 		w->setFixedWidth(200);
 		w->setObjectName(tr("车次信息面板-编辑"));
 		w->setWindowTitle(tr("车次信息编辑"));
-		panel->addWidget(w, SARibbonPannelItem::Large);
+		panel->addWidget(w, SARibbonPanelItem::Large);
 		connect(edNamem, SIGNAL(editingFinished()), this,
 			SLOT(onFullNameChanged()));
 
@@ -254,24 +253,24 @@ void TrainContext::initUI()
 		w = new QWidget;
 		vlay = new QVBoxLayout;
 		hlay = new QHBoxLayout;
-		edStartm = new SARibbonLineEdit;
+		edStartm = new QLineEdit;
 		edStartm->setAlignment(Qt::AlignCenter);
 		edStartm->setToolTip(tr("始发站"));
 		hlay->addWidget(edStartm);
 		hlay->addWidget(new QLabel("-"));
-		edEndm = new SARibbonLineEdit;
+		edEndm = new QLineEdit;
 		edEndm->setAlignment(Qt::AlignCenter);
 		edEndm->setToolTip(tr("终到站"));
 		hlay->addWidget(edEndm);
 		vlay->addLayout(hlay);
 
 		hlay = new QHBoxLayout;
-		comboType = new SARibbonComboBox;
+		comboType = new QComboBox;
 		comboType->setEditable(true);
 		comboType->setToolTip(tr("列车类型\n下拉列表给出运行图目前存在的列车类型。"
 			"允许编辑，如果新类型不存在，将自动添加。如果留空，则按车次判定类型。"));
 		hlay->addWidget(comboType);
-		checkPassen = new SARibbonCheckBox();
+		checkPassen = new QCheckBox();
 		checkPassen->setText(tr("旅客列车"));
 		checkPassen->setTristate(true);
 		checkPassen->setToolTip(tr("是否为旅客列车\n如果为半选中状态，则由列车种类判定"));
@@ -282,7 +281,7 @@ void TrainContext::initUI()
 		w->setFixedWidth(200);
 		w->setObjectName(tr("列车类型面板"));
 		w->setWindowTitle(tr("始发终到/类型"));
-		panel->addWidget(w, SARibbonPannelItem::Large);
+		panel->addWidget(w, SARibbonPanelItem::Large);
 
 		panel->addSeparator();
 
@@ -315,7 +314,7 @@ void TrainContext::initUI()
 		w->setFixedWidth(120);
 		w->setObjectName(tr("运行线样式面板"));
 		w->setWindowTitle(tr("运行线样式面板"));
-		panel->addWidget(w, SARibbonPannelItem::Large);
+		panel->addWidget(w, SARibbonPanelItem::Large);
 
 		act = mw->makeAction(QEICN_apply_train_info, tr("应用"), tr("应用列车信息"));
 		panel->addLargeAction(act);
@@ -326,11 +325,11 @@ void TrainContext::initUI()
 		connect(act, SIGNAL(triggered()), this, SLOT(refreshData()));
 
 		if constexpr (true) {
-			panel = page->addPannel(tr("列车径路"));
+			panel = page->addPanel(tr("列车径路"));
 			auto* w1 = new QWidget;
 			auto* hlay1 = new QHBoxLayout(w1);
 			hlay1->setContentsMargins(0, 0, 0, 0);
-			edPaths = new SARibbonLineEdit;
+			edPaths = new QLineEdit;
 			edPaths->setAlignment(Qt::AlignCenter);
 			edPaths->setReadOnly(true);
 			hlay1->addWidget(edPaths);
@@ -342,7 +341,7 @@ void TrainContext::initUI()
 			w1->setObjectName(tr("列车_径路信息"));
 			w1->setWindowTitle(tr("径路信息"));
 
-			panel->addWidget(w1, SARibbonPannelItem::Medium);
+			panel->addWidget(w1, SARibbonPanelItem::Medium);
 
 			btn = new SARibbonToolButton();
 			btn->setIcon(QEICN_add_path_to_train);
@@ -367,11 +366,11 @@ void TrainContext::initUI()
 			hlay->addWidget(btn);
 			w->setObjectName(tr("列车_径路设置"));
 			w->setWindowTitle(tr("径路设置"));
-			panel->addWidget(w, SARibbonPannelItem::Medium);
+			panel->addWidget(w, SARibbonPanelItem::Medium);
 
 		}
 
-		panel = page->addPannel(tr("调整"));
+		panel = page->addPanel(tr("调整"));
 		act = mw->makeAction(QEICN_interval_exchange, tr("区间换线"));
 		act->setToolTip(tr("区间换线\n交换本次列车和另一列车在所选区间的运行线"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actExchangeInterval()));
@@ -407,7 +406,7 @@ void TrainContext::initUI()
 		connect(act, &QAction::triggered, this, &TrainContext::actMergeTrains);
 		panel->addMediumAction(act);
 
-		panel = page->addPannel(tr(""));
+		panel = page->addPanel(tr(""));
 
 
 		act = mw->makeAction(QEICN_edit_timetable, tr("时刻表"));

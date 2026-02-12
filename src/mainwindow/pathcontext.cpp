@@ -9,7 +9,6 @@
 #include <QMessageBox>
 
 #include <SARibbonContextCategory.h>
-#include <SARibbonLineEdit.h>
 #include <SARibbonMenu.h>
 #include <DockWidget.h>
 #include <DockManager.h>
@@ -53,10 +52,10 @@ void PathContext::refreshData()
 void PathContext::initUI()
 {
     auto* page=cont->addCategoryPage(tr("列车径路(&A)"));
-    auto* panel=page->addPannel(tr(""));
+    auto* panel=page->addPanel(tr(""));
 
     if constexpr (true) {
-        auto* ed = new SARibbonLineEdit;
+        auto* ed = new QLineEdit;
         edName = ed;
 
         QWidget* w = new QWidget;
@@ -81,22 +80,22 @@ void PathContext::initUI()
         w->setLayout(vlay);
         w->setObjectName(tr("径路名面板"));
         w->setWindowTitle(tr("径路名称"));
-        panel->addWidget(w, SARibbonPannelItem::Large);
+        panel->addWidget(w, SARibbonPanelItem::Large);
     }
 
-    panel=page->addPannel(tr("编辑"));
+    panel=page->addPanel(tr("编辑"));
 
     auto* act = mw->makeAction(QEICN_edit_path, tr("编辑"), tr("编辑径路"));
     connect(act,&QAction::triggered, this, &PathContext::actEditPath);
     panel->addLargeAction(act);
 
-    panel = page->addPannel(tr("径路标尺"));
+    panel = page->addPanel(tr("径路标尺"));
     act = mw->makeAction(QEICN_add_path_ruler, tr("新建标尺"), tr("新建径路标尺"));
     act->setToolTip(tr("新建径路标尺\n通过手动选择各段线路的标尺，来新建列车径路标尺"));
     connect(act, &QAction::triggered, this, &PathContext::actAddPathRuler);
     panel->addLargeAction(act);
 
-    panel = page->addPannel(tr("列车"));
+    panel = page->addPanel(tr("列车"));
 
     act = mw->makeAction(QEICN_path_trains, tr("列车表"), tr("径路列车表"));
     connect(act, &QAction::triggered, this, &PathContext::actShowTrains);
@@ -110,7 +109,7 @@ void PathContext::initUI()
     connect(act, &QAction::triggered, this, &PathContext::actClearTrains);
     panel->addLargeAction(act);
 
-    panel=page->addPannel(tr(""));
+    panel=page->addPanel(tr(""));
     act = mw->makeAction(QEICN_del_path, tr("删除径路"));
     act->setToolTip(tr("删除径路\n删除当前列车径路"));
     panel->addLargeAction(act);

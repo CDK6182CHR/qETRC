@@ -42,7 +42,7 @@ void RailDBContext::initUI()
     auto* page=cont->addCategoryPage(tr("路网管理"));
     QAction* act;
 
-    auto* panel = page->addPannel(tr("功能"));
+    auto* panel = page->addPanel(tr("功能"));
 
     if constexpr (true) {
         // 这里同时初始化RailDBDock
@@ -79,13 +79,13 @@ void RailDBContext::initUI()
         "弹出向导，从线网中手动选择径路，生成线路及其运行图。"));
     panel->addLargeAction(act);
 
-    panel = page->addPannel(tr("查看"));
+    panel = page->addPanel(tr("查看"));
     act = mw->makeAction(QEICN_adjacent_list, tr("邻接表"));
     panel->addLargeAction(act);
     act->setToolTip(tr("查看邻接表\n查看当前数据库的有向图模型邻接表"));
     connect(act, &QAction::triggered, this, &RailDBContext::actShowAdj);
 
-    panel = page->addPannel(tr("调整"));
+    panel = page->addPanel(tr("调整"));
 
     act = mw->addAction(QEICN_raildb_include_diagram, tr("运行图线路"));
     act->setCheckable(true);
@@ -109,7 +109,7 @@ void RailDBContext::initUI()
     act->setToolTip(tr("刷新线网\n从当前线路数据库中重新读取有向图模型。"));
 
 
-    panel = page->addPannel(tr("线路"));
+    panel = page->addPanel(tr("线路"));
     act = mw->makeAction(QEICN_export_rail_to_diagram, tr("导出运行图"));
     act->setToolTip(tr("导出到运行图\n将数据库中当前所选线路导出至当前打开的运行图。"));
     panel->addLargeAction(act);
@@ -136,7 +136,7 @@ void RailDBContext::initUI()
     connect(act, &QAction::triggered, getNavi(), &RailDBNavi::actForbid);
 
 
-    panel = page->addPannel(tr(""));
+    panel = page->addPanel(tr(""));
     act = mw->makeAction(QEICN_close_db_context, tr("关闭"), tr("关闭路网模块"));
     act->setToolTip(tr("关闭线路数据库\n关闭线路数据库面板，关闭打开的文件，清空数据。\n"
         "下次打开时，需要重新读取文件。"));

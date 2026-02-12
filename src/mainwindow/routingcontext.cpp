@@ -33,7 +33,7 @@ void RoutingContext::initUI()
 {
     auto* page=cont->addCategoryPage(tr("交路编辑(&0)"));
 
-    auto* panel=page->addPannel(tr("基本信息"));
+    auto* panel=page->addPanel(tr("基本信息"));
 
     auto* w = new QWidget;
     auto* vlay = new QVBoxLayout(w);
@@ -56,7 +56,7 @@ void RoutingContext::initUI()
     vlay->addWidget(edName);
     w->setObjectName(tr("交路名面板"));
     w->setWindowTitle(tr("交路名"));
-    panel->addWidget(w, SARibbonPannelItem::Large);
+    panel->addWidget(w, SARibbonPanelItem::Large);
 
     auto* act = mw->makeAction(QEICN_highlight_routing, tr("高亮显示"), tr("高亮显示交路"));
     act->setCheckable(true);
@@ -64,7 +64,7 @@ void RoutingContext::initUI()
     panel->addLargeAction(act);
     btnHighlight = panel->actionToRibbonToolButton(act);
 
-    panel=page->addPannel(tr("编辑"));
+    panel=page->addPanel(tr("编辑"));
     act=mw->makeAction(QEICN_edit_routing,tr("交路编辑"));
     connect(act,SIGNAL(triggered()),this,SLOT(actEdit()));
     panel->addLargeAction(act);
@@ -89,7 +89,7 @@ void RoutingContext::initUI()
     connect(act, &QAction::triggered, this, &RoutingContext::actRemoveRouting);
     panel->addLargeAction(act);
 
-    panel = page->addPannel(tr("工具"));
+    panel = page->addPanel(tr("工具"));
     act = mw->makeAction(QEICN_routing_diagram, tr("交路图"));
     act->setToolTip(tr("交路图\n显示当前交路的（“中国动车组交路查询”风格的）示意图"));
     connect(act, &QAction::triggered, this, &RoutingContext::actRoutingDiagram);
@@ -117,7 +117,7 @@ void RoutingContext::initUI()
 
     panel->addMediumAction(act);
 
-    panel = page->addPannel("");
+    panel = page->addPanel("");
     act = mw->makeAction(QEICN_close_routing_context, tr("关闭面板"));
     act->setToolTip(tr("关闭面板\n关闭当前的交路编辑上下文工具栏面板。"));
     connect(act, &QAction::triggered, mw, &MainWindow::focusOutRouting);

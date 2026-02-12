@@ -78,7 +78,7 @@ void ViewCategory::commitTypeShow(const QList<std::shared_ptr<TrainLine>>& lines
 
 void ViewCategory::initUI()
 {
-    auto* panel = cat->addPannel(tr("行别显示控制"));
+    auto* panel = cat->addPanel(tr("行别显示控制"));
 
     rdDirType = new RadioButtonGroup<2, QVBoxLayout>({ "使用入图行别","使用出图行别" }, cat);
     rdDirType->get(0)->setChecked(true);
@@ -86,7 +86,7 @@ void ViewCategory::initUI()
     w->setLayout(rdDirType);
     w->setObjectName(tr("入图/出图行别面板"));
     w->setWindowTitle(tr("入图/出图行别面板"));
-    panel->addWidget(w, SARibbonPannelItem::Large);
+    panel->addWidget(w, SARibbonPanelItem::Large);
 
     QAction* act = mw->makeAction(QEICN_line_level_hide, tr("运行线级别控制"));
     act->setCheckable(true);
@@ -112,7 +112,7 @@ void ViewCategory::initUI()
     panel->addMediumAction(act);
 
     //类型显示控制
-    panel = cat->addPannel(tr("类型显示控制"));
+    panel = cat->addPanel(tr("类型显示控制"));
 
     act = mw->makeAction(QEICN_refresh_type_list, tr("刷新类型表"));
     panel->addLargeAction(act);
@@ -167,7 +167,7 @@ void ViewCategory::initUI()
     panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 
-    panel = cat->addPannel(tr("设置"));
+    panel = cat->addPanel(tr("设置"));
     act = mw->makeAction(QEICN_appearance_config_diagram, tr("显示设置"), tr("运行图文件显示设置"));
     connect(act, SIGNAL(triggered()), this, SLOT(actShowConfig()));
 

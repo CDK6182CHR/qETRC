@@ -47,7 +47,7 @@ void RulerContext::refreshAllData()
 void RulerContext::initUI()
 {
     auto* page = cont->addCategoryPage(tr("标尺管理(&9)"));
-    auto* panel = page->addPannel(tr("当前标尺"));
+    auto* panel = page->addPanel(tr("当前标尺"));
 
     auto* w = new QWidget;
     auto* hlay = new QHBoxLayout(w);
@@ -67,7 +67,7 @@ void RulerContext::initUI()
 
     w->setObjectName(tr("标尺名称-只读"));
     w->setWindowTitle(tr("标尺名称"));
-    panel->addWidget(w, SARibbonPannelItem::Medium);
+    panel->addWidget(w, SARibbonPanelItem::Medium);
 
     ed = new QLineEdit;
     ed->setFocusPolicy(Qt::NoFocus);
@@ -77,9 +77,9 @@ void RulerContext::initUI()
     ed->setFixedWidth(150);
     ed->setObjectName(tr("标尺线路名称"));
     ed->setWindowTitle(tr("标尺线路名称"));
-    panel->addWidget(ed, SARibbonPannelItem::Medium);
+    panel->addWidget(ed, SARibbonPanelItem::Medium);
 
-    panel = page->addPannel(tr("编辑"));
+    panel = page->addPanel(tr("编辑"));
     auto* act = mw->makeAction(QEICN_edit_ruler, tr("编辑"), tr("编辑标尺"));
     act->setToolTip(tr("标尺编辑面板\n显示当前标尺的编辑面板，编辑标尺名称和数据。"));
     connect(act, SIGNAL(triggered()), this, SLOT(actShowEditWidget()));
@@ -102,7 +102,7 @@ void RulerContext::initUI()
     connect(act, &QAction::triggered, this, &RulerContext::mergeCurrent);
     panel->addMediumAction(act);
 
-    panel = page->addPannel(tr("导入导出"));
+    panel = page->addPanel(tr("导入导出"));
     act = mw->makeAction(QEICN_import_ruler_csv, tr("导入"), tr("导入标尺"));
     act->setToolTip(tr("导入标尺 (csv)\n"
         "从逗号分隔 (csv) 格式的数据文件中读取标尺数据，并覆盖到当前标尺中"));
@@ -114,7 +114,7 @@ void RulerContext::initUI()
     panel->addLargeAction(act);
     connect(act, &QAction::triggered, this, &RulerContext::actExportCsv);
 
-    panel = page->addPannel(tr("设置"));
+    panel = page->addPanel(tr("设置"));
     act = mw->makeAction(QEICN_ordinate_ruler, tr("排图标尺"));
     act->setToolTip(tr("设为排图标尺\n将当前标尺设置为本线的排图标尺，即作为纵坐标标度"));
     panel->addLargeAction(act);

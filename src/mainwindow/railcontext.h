@@ -10,8 +10,8 @@
 
 class RulerWidget;
 class SARibbonMenu;
-class SARibbonComboBox;
-class SARibbonLineEdit;
+class QComboBox;
+class QLineEdit;
 class Railway;
 class SARibbonContextCategory;
 class Diagram;
@@ -40,8 +40,8 @@ class RailContext : public QObject
     SARibbonContextCategory*const cont;
     MainWindow* const mw;
     std::shared_ptr<Railway> railway;
-    SARibbonLineEdit* edName;
-    SARibbonComboBox* cbRulers;
+    QLineEdit* edName;
+    QComboBox* cbRulers;
     bool updating = false;
 
     SARibbonMenu* meRulerWidgets;

@@ -29,8 +29,6 @@
 #include <QInputDialog>
 #include <QFileDialog>
 #include "model/diagram/diagramnavimodel.h"
-#include <SARibbonLineEdit.h>
-#include <SARibbonComboBox.h>
 #include <SARibbonMenu.h>
 #include "editors/ruler/rulerwidget.h"
 #include "model/rail/rulermodel.h"
@@ -95,10 +93,10 @@ void RailContext::initUI()
 {
 	auto* page = cont->addCategoryPage(tr("线路工具(&8)"));
 
-	auto* panel = page->addPannel(tr(""));
+	auto* panel = page->addPanel(tr(""));
 
 	if constexpr (true) {
-		auto* ed = new SARibbonLineEdit;
+		auto* ed = new QLineEdit;
 		edName = ed;
 
 		QWidget* w = new QWidget;
@@ -128,16 +126,16 @@ void RailContext::initUI()
 		w->setLayout(vlay);
 		w->setObjectName(tr("当前线路信息"));
 		w->setWindowTitle(tr("当前线路"));
-		panel->addWidget(w, SARibbonPannelItem::Large);
+		panel->addWidget(w, SARibbonPanelItem::Large);
 	}
 
-	panel = page->addPannel(tr("纵坐标标尺"));
+	panel = page->addPanel(tr("纵坐标标尺"));
 
 	if constexpr (true) {
 		auto* w = new QWidget;
 		auto* vlay = new QVBoxLayout;
 
-		auto* cb = new SARibbonComboBox;
+		auto* cb = new QComboBox;
 		cbRulers = cb;
 		cb->setEditable(false);
 		cb->setMinimumWidth(120);
@@ -156,10 +154,10 @@ void RailContext::initUI()
 		w->setObjectName(tr("纵坐标标尺面板"));
 		w->setWindowTitle(tr("纵坐标标尺"));
 
-		panel->addWidget(w, SARibbonPannelItem::Large);
+		panel->addWidget(w, SARibbonPanelItem::Large);
 	}
 
-	panel = page->addPannel(tr("编辑"));
+	panel = page->addPanel(tr("编辑"));
 
 	QAction* act;
 	act = mw->makeAction(QEICN_edit_rail, tr("基线编辑"), tr("当前基线编辑"));
@@ -172,7 +170,7 @@ void RailContext::initUI()
 	act->setMenu(mw->forbidMenu);
 	panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
-	panel = page->addPannel(tr("标尺"));
+	panel = page->addPanel(tr("标尺"));
 	act = mw->makeAction(QEICN_edit_ruler_rail, tr("标尺"));
     auto* me = new SARibbonMenu(mw);
 	act->setToolTip(tr("标尺编辑\n创建或者导航到本线标尺编辑的面板"));
@@ -186,7 +184,7 @@ void RailContext::initUI()
 	connect(act, SIGNAL(triggered()), this, SLOT(actAddNewRuler()));
 	panel->addLargeAction(act);
 
-	panel = page->addPannel(tr("调整"));
+	panel = page->addPanel(tr("调整"));
 	act = mw->makeAction(QEICN_reverse_rail, tr("线路反排"));
 	connect(act, SIGNAL(triggered()), this, SLOT(actInverseRail()));
 	panel->addMediumAction(act);
@@ -195,7 +193,7 @@ void RailContext::initUI()
 	connect(act, &QAction::triggered, this, &RailContext::actJointRail);
 	panel->addMediumAction(act);
 
-	panel = page->addPannel(tr("分析"));
+	panel = page->addPanel(tr("分析"));
 
 	act = mw->makeAction(QEICN_section_count, tr("断面对数"));
 	connect(act, SIGNAL(triggered()), this, SLOT(showSectionCount()));
@@ -255,7 +253,7 @@ void RailContext::initUI()
 		"可能有较大的计算代价。"));
 	panel->addMediumAction(act);
 
-	panel = page->addPannel("");
+	panel = page->addPanel("");
 	act = mw->makeAction(QEICN_create_page_from_rail, tr("快速创建"), tr("创建单线路页面"));
 	connect(act, &QAction::triggered, this, & RailContext::actCreatePage);
 	act->setToolTip(tr("快速创建单线路运行图\n一键创建新的运行图页面，新运行图页面\n"

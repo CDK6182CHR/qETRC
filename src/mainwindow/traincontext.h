@@ -12,9 +12,9 @@
 #include <data/train/train.h>
 
 class SARibbonContextCategory;
-class SARibbonLineEdit;
-class SARibbonComboBox;
-class SARibbonCheckBox;
+class QLineEdit;
+class QComboBox;
+class QCheckBox;
 class SARibbonToolButton;
 class QDoubleSpinBox;
 class Diagram;
@@ -109,20 +109,20 @@ class TrainContext : public QObject
     SARibbonContextCategory* const cont;
     MainWindow* const mw;
 
-    SARibbonLineEdit* edName, * edStart, * edEnd, * edRouting;
+    QLineEdit* edName, * edStart, * edEnd, * edRouting;
     SARibbonToolButton* btnShown;
 
     //后缀m表示可修改的控件
-    SARibbonLineEdit *edNamem,*edStartm,*edEndm;
-    SARibbonLineEdit *edNameDown,*edNameUp;
-    SARibbonComboBox* comboType;
+    QLineEdit *edNamem,*edStartm,*edEndm;
+    QLineEdit *edNameDown,*edNameUp;
+    QComboBox* comboType;
     PenStyleCombo* comboLs;
-    SARibbonCheckBox *checkPassen;
+    QCheckBox *checkPassen;
     SARibbonToolButton* btnColor, * btnAutoUI, * btnToRouting, * btnCreateRouting, * btnAddToRouting;
     QDoubleSpinBox* spWidth;
     QColor tmpColor;
 
-    SARibbonLineEdit* edPaths, * edTags;
+    QLineEdit* edPaths, * edTags;
 
     QList<BasicTrainWidget*> basicWidgets;
     QList<EditTrainWidget*> editWidgets;
