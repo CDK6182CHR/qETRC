@@ -1289,7 +1289,7 @@ void MainWindow::initToolbar()
 		act = makeAction(QEICN_batch_copy_trains, tr("批量复制"));
 		act->setToolTip(tr("批量复制运行线\n"
 			"将指定车次的运行线按照其起始时刻复制若干个（车次不同的）副本。"));
-		connect(act, SIGNAL(triggered()), this, SLOT(actBatchCopyTrain()));
+		connect(act, &QAction::triggered, this, &MainWindow::actBatchCopyTrain);
 		diaActions.batchCopy = act;
 		panel->addMediumAction(act);
 
@@ -1422,6 +1422,10 @@ void MainWindow::initToolbar()
 
 		connect(contextTrain, &TrainContext::dulplicateTrain,
 			naviView, &NaviTree::actDulplicateTrain);
+		connect(naviView, &NaviTree::addPathsToTrain,
+			contextTrain, [this](std::shared_ptr<Train> train, std::vector<TrainPath*> paths) {
+				undoStack->push(new qecmd::AssignPathsToTrain(train, std::move(paths), contextTrain));
+			}, Qt::DirectConnection);
 
 		connect(trainListWidget->getModel(), &TrainListModel::onTypeBatchChanged,
 			contextTrain, &TrainContext::refreshData);
@@ -1835,8 +1839,22 @@ void MainWindow::actBatchCopyTrain()
 {
 	auto* dialog = new BatchCopyTrainDialog(_diagram,
 		contextTrain->getTrain(), this);
+	//connect(dialog, &BatchCopyTrainDialog::applied,
+	//	naviView, &NaviTree::actBatchAddTrains);
+
 	connect(dialog, &BatchCopyTrainDialog::applied,
-		naviView, &NaviTree::actBatchAddTrains);
+		this, [this](std::shared_ptr<Train> original, const QVector<std::shared_ptr<Train>>& trains) {
+			if (!original)
+				return;
+
+			undoStack->beginMacro(tr("批量复制列车").arg(trains.size()));
+			naviView->actBatchAddTrains(trains);
+			if (!original->paths().empty()) {
+				undoStack->push(new qecmd::AssignPathsToTrainsBatch(original->paths(), trains, contextPath));
+			}
+			undoStack->endMacro();
+		});
+
 	dialog->show();
 }
 

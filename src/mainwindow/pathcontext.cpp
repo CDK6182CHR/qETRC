@@ -524,6 +524,39 @@ void qecmd::AddTrainsToPath::redo()
     cont->afterPathTrainsChanged(path, trains);
 }
 
+qecmd::AssignPathsToTrainsBatch::AssignPathsToTrainsBatch(std::vector<TrainPath*> paths,
+    QVector<std::shared_ptr<Train>> trains, PathContext* cont, QUndoCommand* parent) :
+    QUndoCommand(QObject::tr("批量添加径路至车次"), parent),
+    paths(std::move(paths)), trains(std::move(trains)), cont(cont)
+{
+}
+
+void qecmd::AssignPathsToTrainsBatch::redo()
+{
+    if (paths.empty())
+        return;
+    for (auto& p : paths) {
+        foreach(auto t, trains) {
+            p->addTrain(t);
+        }
+    }
+
+    // This is exactly the same as the single-path operation for now
+    cont->afterPathTrainsChanged(paths.front(), trains);
+}
+
+void qecmd::AssignPathsToTrainsBatch::undo()
+{
+    if (paths.empty())
+        return;
+    for (auto pit = paths.rbegin(); pit != paths.rend(); ++pit) {
+        for (auto tit = trains.crbegin(); tit != trains.crend(); ++tit) {
+            (*pit)->removeTrainFromBack(*tit);
+        }
+    }
+    cont->afterPathTrainsChanged(paths.front(), trains);
+}
+
 qecmd::AddPathRuler::AddPathRuler(PathContext* context, std::shared_ptr<PathRuler> ruler, QUndoCommand* parent):
     QUndoCommand(QObject::tr("新增径路标尺: %1").arg(ruler->name()), parent),
     m_cont(context), m_ruler(std::move(ruler)),

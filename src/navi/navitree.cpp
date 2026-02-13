@@ -546,7 +546,15 @@ void NaviTree::actDulplicateTrain(std::shared_ptr<Train> origin)
     train->setTrainName(TrainName(name));
     auto& dia = _model->diagram();
     dia.updateTrain(train);
+
+    _undo->beginMacro(tr("列车副本: %1 -> %2").arg(origin->trainName().full(), train->trainName().full()));
     _undo->push(new qecmd::AddNewTrain(_model, train));
+
+    // 2026.02.13: Copy the paths (handled by trainContext)
+    if (!origin->paths().empty()) {
+        emit addPathsToTrain(train, origin->paths());
+    }
+    _undo->endMacro();
 }
 
 void NaviTree::actDulplicatePage(std::shared_ptr<DiagramPage> origin)

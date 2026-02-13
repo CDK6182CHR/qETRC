@@ -189,6 +189,21 @@ namespace qecmd {
         virtual void redo()override;
     };
 
+    /**
+     * 2026.02.13: For the path adding operation AFTER batch-copying. Mainly used in the macros.
+     * Add a set of paths to given trains. This is basically equivalent to repeating AddTrainsToPath for several times.
+     */
+    class AssignPathsToTrainsBatch : public QUndoCommand {
+        std::vector<TrainPath*> paths;
+        QVector<std::shared_ptr<Train>> trains;
+        PathContext* const cont;
+    public:
+        AssignPathsToTrainsBatch(std::vector<TrainPath*> paths, QVector<std::shared_ptr<Train>> trains,
+            PathContext* cont, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
+    };
+
     class AddPathRuler : public QUndoCommand {
         PathContext* m_cont;
         std::shared_ptr<PathRuler> m_ruler;

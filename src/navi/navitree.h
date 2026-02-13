@@ -130,6 +130,11 @@ signals:
     void exportForbidToCsv(std::shared_ptr<Forbid>);
     void importForbidFromCsv(std::shared_ptr<Forbid>);
 
+    /**
+     * 2026.02.13: Add paths to train, upon train copied. This must be handled by trainContext.
+     */
+    void addPathsToTrain(std::shared_ptr<Train>, const std::vector<TrainPath*> paths);
+
 private slots:
     void showContextMenu(const QPoint& pos);
     

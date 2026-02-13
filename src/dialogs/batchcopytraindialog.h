@@ -65,7 +65,7 @@ signals:
      * 参考导入线路ImportTrain的操作
      * seealso: qecmd::addNewTrain 操作流程
      */
-    void applied(const QVector<std::shared_ptr<Train>>& trains);
+    void applied(std::shared_ptr<Train> original, const QVector<std::shared_ptr<Train>>& trains);
 private slots:
     void setTrain(std::shared_ptr<Train> train);
     void onApply();

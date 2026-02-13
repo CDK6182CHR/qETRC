@@ -178,7 +178,7 @@ void BatchCopyTrainDialog::onApply()
             + invalidReport);
     }
     else {
-        emit applied(trains);
+        emit applied(train, trains);
         QMessageBox::information(this, tr("信息"), tr("成功添加%1个车次%2")
             .arg(trains.size()).arg(invalidReport));
     }

@@ -107,6 +107,7 @@ public:
      * std::list 默认的copy和move都是正确的
      * 但Adapter的复制行为是不对的，因此必须重写
      * 暂定都不复制（移动）Adapter部分
+     * 2026.02.13 批注：列车径路也是不复制的。这是正确的行为。
      */
     Train(const Train& another);
     Train(Train&& another) noexcept;
