@@ -4,14 +4,14 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.9.2";
-const std::string_view DATE = "20250909";
-const int RELEASE_CODE = 74;
+const std::string_view LAST_VERSION = "V1.9.3";
+const std::string_view DATE = "20260213";
+const int RELEASE_CODE = 75;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 在列车管理面板中，允许未选择车次情况下执行批量操作，操作对象为当前显示在表中的所有车次。
-2. 修复预置筛选器更新后，某些地方的筛选器下拉菜单没有随之更新的问题。
-3. 在选择筛选器的控件内新增手动刷新筛选器列表的按钮。)";
+const std::string_view UPDATE_LOG = R"(1. 复制列车操作中，新增列车径路的复制。
+2. 区间车次表中增加区间里程及均速数据（如果可计算）。
+3. 升级支持库版本、细节修复。)";
 }
