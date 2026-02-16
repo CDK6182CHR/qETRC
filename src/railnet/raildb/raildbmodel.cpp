@@ -2,9 +2,9 @@
 #include "raildb.h"
 #include "data/rail/railway.h"
 
-RailDBModel::RailDBModel(std::shared_ptr<RailDB> raildb, QObject *parent) :
+RailDBModel::RailDBModel(std::shared_ptr<RailDB> raildb, bool category_only, QObject *parent) :
     QAbstractItemModel(parent), _raildb(raildb),
-    _root(std::make_unique<navi::RailCategoryItem>(raildb,0,nullptr))
+    _root(std::make_unique<navi::RailCategoryItem>(raildb,0,nullptr,category_only))
 {
 
 }
@@ -86,6 +86,15 @@ RailDBModel::pACI RailDBModel::getItem(const QModelIndex &idx) const
     if(idx.isValid())
         return static_cast<pACI>(idx.internalPointer());
     else return nullptr;
+}
+
+RailDBModel::pACI RailDBModel::itemByPath(const std::deque<int>& path) const
+{
+    // Special treatment for the root (empty path)
+    if (path.empty())
+        return _root.get();
+    else
+		return _root->itemByPath(path);
 }
 
 QModelIndex RailDBModel::indexByPath(const std::deque<int> &path)
@@ -332,6 +341,6 @@ void RailDBModel::commitRemoveCategoryAt(std::shared_ptr<RailCategory> cat,
 void RailDBModel::resetModel()
 {
     beginResetModel();
-    _root=std::make_unique<navi::RailCategoryItem>(_raildb,0,nullptr);
+    _root = std::make_unique<navi::RailCategoryItem>(_raildb, 0, nullptr, false);
     endResetModel();
 }

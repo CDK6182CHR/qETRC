@@ -16,7 +16,7 @@ class RailDBModel : public QAbstractItemModel
     using pACI=ACI*;
 
 public:
-    explicit RailDBModel(std::shared_ptr<RailDB> raildb, QObject *parent = nullptr);
+    explicit RailDBModel(std::shared_ptr<RailDB> raildb, bool category_only, QObject *parent);
 
     // QAbstractItemModel interface
 public:
@@ -28,6 +28,11 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     auto* root()const { return _root.get(); }
     pACI getItem(const QModelIndex& idx)const;
+
+    /**
+	 * 2026.02.16: Returns the item specified by the path. Empty path means root.
+     */
+	pACI itemByPath(const std::deque<int>& path)const;
     QModelIndex indexByPath(const std::deque<int>& path);
 
     /**

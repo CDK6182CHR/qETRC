@@ -142,6 +142,7 @@ public slots:
     void actRemoveRail();
     void actRuler();
     void actForbid();
+    void actMoveRailway();
     void actExportToDiagram();
     void actExportRailToFile();
     void actExportCategoryToDiagramFile();
@@ -199,6 +200,18 @@ namespace qecmd {
             RailDBModel* model_, QUndoCommand* parent = nullptr);
         void undo()override;
         void redo()override;
+    };
+
+    /**
+     * 2026.02.16: Move railway to a given category.
+     * Parameters: the railway to move, the old and new path for the railway.
+     * Currently, this is simply implemented by calling the Remove and Insert commands.
+     */
+    class MoveRailDB : public QUndoCommand
+    {
+    public:
+        MoveRailDB(std::shared_ptr<Railway> railway, const std::deque<int>& oldPath,
+			const std::deque<int>& newPath, RailDBModel* model, QUndoCommand* parent = nullptr);
     };
 
     class InsertCategory :public QUndoCommand

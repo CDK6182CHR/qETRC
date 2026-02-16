@@ -467,6 +467,16 @@ typename navi::AbstractComponentItem*
     return p;
 }
 
+bool navi::AbstractComponentItem::isChildOf(const AbstractComponentItem* item) const
+{
+    const auto* it = this;
+    for (; it; it = it->_parent) {
+        if (it == item)
+            return true;
+    }
+    return false;
+}
+
 navi::PathListItem::PathListItem(TrainPathCollection& pathcoll, DiagramItem* parent) :
     AbstractComponentItem(4, parent), pathcoll(pathcoll), _paths()
 {

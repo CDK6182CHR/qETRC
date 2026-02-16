@@ -3,15 +3,18 @@
 #include "data/rail/railway.h"
 
 navi::RailCategoryItem::RailCategoryItem(std::shared_ptr<RailCategory> cat,
-                                         int row, RailCategoryItem *parent):
+                                         int row, RailCategoryItem *parent, 
+    bool category_only):
     navi::AbstractComponentItem(row,parent), _category(cat)
 {
     int r=0;
     foreach(auto p, cat->subCategories()){
-        _subcats.emplace_back(std::make_unique<RailCategoryItem>(p,r++,this));
+        _subcats.emplace_back(std::make_unique<RailCategoryItem>(p,r++,this,category_only));
     }
-    foreach(auto p,cat->railways()){
-        _railways.emplace_back(std::make_unique<RailwayItemDB>(p,r++,this));
+    if (!category_only) {
+        foreach(auto p, cat->railways()) {
+            _railways.emplace_back(std::make_unique<RailwayItemDB>(p, r++, this));
+        }
     }
 }
 
@@ -102,7 +105,7 @@ void navi::RailCategoryItem::insertCategoryAt(std::shared_ptr<RailCategory> cat,
 {
     _category->subCategories().insert(i, cat);
     auto p = _subcats.begin(); std::advance(p, i);
-    p = _subcats.insert(p, std::make_unique<RailCategoryItem>(cat, i, this));
+    p = _subcats.insert(p, std::make_unique<RailCategoryItem>(cat, i, this, false));
     for (++p; p != _subcats.end(); ++p) {
         (*p)->setRow((*p)->row() + 1);
     }

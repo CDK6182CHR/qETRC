@@ -86,6 +86,11 @@ namespace navi {
          */
         AbstractComponentItem* itemByPath(const path_t& path);
 
+		/**
+		 * 2026.02.16: Returns whether *this is a child of the given item, by finding the parents
+		 */
+		bool isChildOf(const AbstractComponentItem* item)const;
+
         virtual ~AbstractComponentItem()=default;
 	};
 

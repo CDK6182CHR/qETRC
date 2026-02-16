@@ -10,6 +10,7 @@
 #include "data/diagram/diagram.h"
 #include "util/buttongroup.hpp"
 #include "default_options.h"
+#include "selectcategorydialog.h"
 
 #include <queue>
 
@@ -27,7 +28,7 @@
 //}while(false)
 
 RailDBNavi::RailDBNavi(std::shared_ptr<RailDB> raildb, QWidget *parent):
-    QWidget(parent), _raildb(raildb), model(new RailDBModel(raildb, this))
+    QWidget(parent), _raildb(raildb), model(new RailDBModel(raildb, false, this))
 {
     initUI();
     initContext();
@@ -117,11 +118,14 @@ void RailDBNavi::initContext()
     connect(act,&QAction::triggered,this,&RailDBNavi::actEditRail);
     act=meRail->addAction(tr("删除"));
     connect(act,&QAction::triggered,this,&RailDBNavi::actRemoveRail);
+    meRail->addAction(tr("移动到分类..."), this, &RailDBNavi::actMoveRailway);
+    meRail->addSeparator();
     act=meRail->addAction(tr("编辑标尺"));
     connect(act,&QAction::triggered,this,&RailDBNavi::actRuler);
     act=meRail->addAction(tr("编辑天窗"));
     connect(act,&QAction::triggered,this,&RailDBNavi::actForbid);
     meRail->addSeparator();
+
     act=meRail->addAction(tr("导出到运行图"));
     connect(act,&QAction::triggered,this,&RailDBNavi::actExportToDiagram);
     meRail->addAction(tr("导出为独立运行图文件"), this, &RailDBNavi::actExportRailToFile);
@@ -284,6 +288,31 @@ void RailDBNavi::actForbid()
     connect(w, &ForbidTabWidget::forbidChanged,
         this, &RailDBNavi::actChangeForbid);
     w->show();
+}
+
+void RailDBNavi::actMoveRailway()
+{
+    auto* cur_item = currentItem();
+    if (!cur_item)
+        return;
+    const auto& old_path = cur_item->path();
+    auto cur_rail = currentRailway();
+
+    auto res = SelectCategoryDialog::getCategory(_raildb, tr("请选择要移动到的目标分类"), this);
+    if (!res.accepted)
+        return;
+
+	auto target_path = res.path;   // Copy construct; may be empty (for root)
+	auto* target_item = model->itemByPath(target_path);
+    if (cur_item->parent() == target_item) {
+        QMessageBox::information(this, tr("提示"), tr("目标分类与当前分类相同，无需移动。"));
+        return;
+    }
+
+    auto npath = target_item->path();
+    npath.push_back(target_item->childCount());
+
+    _undo->push(new qecmd::MoveRailDB(cur_rail, old_path, npath, model));
 }
 
 void RailDBNavi::actExportToDiagram()
@@ -756,6 +785,15 @@ void qecmd::InsertRailDB::redo()
 {
     model->commitInsertRailwayAt(railway, path);
 }
+
+qecmd::MoveRailDB::MoveRailDB(std::shared_ptr<Railway> railway, const std::deque<int>& oldPath,
+    const std::deque<int>& newPath, RailDBModel* model, QUndoCommand* parent) :
+    QUndoCommand(QObject::tr("移动线路 %1").arg(railway->name()), parent)
+{
+    new RemoveRailDB(railway, oldPath, model, this);
+    new InsertRailDB(railway, newPath, model, this);
+}
+
 
 qecmd::UpdateForbidDB::UpdateForbidDB(std::shared_ptr<Forbid> forbid, 
     std::shared_ptr<Railway> data, QUndoCommand* parent):

@@ -12,6 +12,8 @@ namespace navi {
      * @brief The RailCategoryItem class
      * 用于线路数据库的Item。与RailListItem的区别是支持sub-cat。以及列数规定的不同。
      * 暂不确定是否要取消RailListItem。
+     * 2026.02.16: Add the flag category_only. If set, only items for categories are created (i.e., items
+     * for railways are not created). This feature is applied recursively.
      */
     class RailCategoryItem : public navi::AbstractComponentItem
     {
@@ -20,9 +22,10 @@ namespace navi {
         std::deque<std::unique_ptr<RailwayItemDB>> _railways;
     public:
         enum {Type=20};
-        RailCategoryItem(std::shared_ptr<RailCategory> category,
-                         int row,
-                         RailCategoryItem* parent);
+		RailCategoryItem(std::shared_ptr<RailCategory> category,
+			int row,
+			RailCategoryItem* parent,
+			bool category_only);
         auto category(){return _category;}
 
     public:
