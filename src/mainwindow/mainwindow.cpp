@@ -1060,7 +1060,7 @@ void MainWindow::initToolbar()
 		actSelector = act;
 	}
 
-	QAction* actRemoveInterp, * actAutoBusiness, * actImportTimetableCsv, * actImportTrainTrf,
+	QAction* actRemoveInterp, * actAutoBusiness, *actUnique, * actImportTimetableCsv, * actImportTrainTrf,
 		* actAutoCorrection, * actRemoveNonBound, * actRemoveNonBoundTrains, * actRemoveEmptyTrains,
 		* actAutoPen, *actManualPen, * actMergeTrains;
 	//列车
@@ -1103,6 +1103,7 @@ void MainWindow::initToolbar()
 
 		actAutoBusiness = menu->addAction(tr("自动设置所有营业站"));
 		actAutoCorrection = menu->addAction(tr("自动更正时刻表 (测试)"));
+		actUnique = menu->addAction(tr("删除时刻表中的连续重出站"));
 
 		menu->addSeparator();
 		actRemoveNonBound = menu->addAction(tr("删除未铺画车站"));
@@ -1407,6 +1408,8 @@ void MainWindow::initToolbar()
 			contextTrain, &TrainContext::actManualPenAll);
 		connect(actAutoCorrection, &QAction::triggered,
 			contextTrain, &TrainContext::actAutoCorrectionAll);
+		connect(actUnique, &QAction::triggered,
+			contextTrain, &TrainContext::actUniqueAll);
 		connect(actRemoveNonBound, &QAction::triggered,
 			contextTrain, &TrainContext::actRemoveNonBound);
 		connect(actRemoveNonBoundTrains, &QAction::triggered,
@@ -1454,6 +1457,9 @@ void MainWindow::initToolbar()
 
 		connect(trainListWidget, &TrainListWidget::batchAutoCorrect,
 			contextTrain, &TrainContext::actAutoCorrectionBat, Qt::DirectConnection);
+
+		connect(trainListWidget, &TrainListWidget::batchUnique,
+			contextTrain, &TrainContext::actUniqueBat);
 
 		connect(trainListWidget, &TrainListWidget::removeTrains,
 			contextTrain, &TrainContext::actRemoveTrains);

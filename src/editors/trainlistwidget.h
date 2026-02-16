@@ -101,6 +101,8 @@ signals:
 
     void batchAutoCorrect(const QList<std::shared_ptr<Train>>&);
 
+    void batchUnique(const QList<std::shared_ptr<Train>>&);
+
     void autoAddNewType(std::shared_ptr<TrainType>);
         
 private slots:
@@ -173,6 +175,12 @@ private slots:
      * 参照AutoBusiness的路径来实现。
      */
     void actAutoCorrectionBat();
+
+    /**
+     * 2026.02.16: Remove *adjacent* duplicate stations in timetable.
+     * Equivalent to call std::unique to timetable, which is named after.
+     */
+    void actUniqueBat();
 
     void selectAll();
 

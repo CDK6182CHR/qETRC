@@ -345,6 +345,10 @@ public slots:
 
     void actAutoCorrectionBat(const QList<std::shared_ptr<Train>>& trainRange);
 
+    void actUniqueAll();
+
+    void actUniqueBat(const QList<std::shared_ptr<Train>>& trainRange);
+
     void actRemoveNonBound();
 
     void actRemoveNonBoundTrains();

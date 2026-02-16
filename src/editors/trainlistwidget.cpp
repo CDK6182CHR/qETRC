@@ -103,6 +103,7 @@ void TrainListWidget::initUI()
 	menu->addAction(tr("取消自动运行线样式"), this, &TrainListWidget::actManualTrainPenBat);
 	menu->addAction(tr("自动设置营业站"), this, &TrainListWidget::actAutoBusinessBat);
 	menu->addAction(tr("自动更正时刻表 (测试)"), this, &TrainListWidget::actAutoCorrectionBat);
+	menu->addAction(tr("删除时刻表中的连续重出站"), this, &TrainListWidget::actAutoCorrectionBat);
 	menu->addSeparator();
 	menu->addAction(tr("导出事件表 (csv)"), this, &TrainListWidget::actExportTrainEventListBat);
 	menu->addAction(tr("导出时刻表 (csv)"), this, &TrainListWidget::actExportTrainTimetableBat);
@@ -616,6 +617,14 @@ void TrainListWidget::actAutoCorrectionBat()
 	auto lst = batchOpSelectedTrains();
 	if (!lst.empty()) {
 		emit batchAutoCorrect(lst);
+	}
+}
+
+void TrainListWidget::actUniqueBat()
+{
+	auto lst = batchOpSelectedTrains();
+	if (!lst.empty()) {
+		emit batchUnique(lst);
 	}
 }
 

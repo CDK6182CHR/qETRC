@@ -927,6 +927,35 @@ void TrainContext::actAutoCorrectionBat(const QList<std::shared_ptr<Train>>& tra
 	}
 }
 
+void TrainContext::actUniqueAll()
+{
+	actUniqueBat(diagram.trains());
+}
+
+void TrainContext::actUniqueBat(const QList<std::shared_ptr<Train>>& trainRange)
+{
+	QVector<std::shared_ptr<Train>> trains, data;
+	foreach (auto train, trainRange) {
+		auto d = std::make_shared<Train>(*train);
+		if (auto itr = std::unique(d->timetable().begin(), d->timetable().end()); itr != d->timetable().end()) {
+			// Some correction happened
+			d->timetable().erase(itr, d->timetable().end());
+			trains.push_back(train);
+			data.push_back(d);
+		}
+	}
+
+	if (trains.empty()) {
+		QMessageBox::information(mw, tr("提示"), tr("删除时刻表中连续重出站：应用完成，没有更改被执行"));
+	}
+	else {
+		int sz = trains.size();
+		mw->getUndoStack()->push(new qecmd::BatchAutoCorrection(std::move(trains), std::move(data),
+			this));
+		QMessageBox::information(mw, tr("提示"), tr("删除时刻表中连续重出站：应用完成，共%1个车次受到影响。").arg(sz));
+	}
+}
+
 void TrainContext::actRemoveNonBound()
 {
 	auto res = QMessageBox::question(mw, tr("删除未铺画车站"),
