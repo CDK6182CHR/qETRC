@@ -318,6 +318,13 @@ public slots:
         const QVector<std::shared_ptr<Train>>& data);
 
     /**
+     * 2026.02.16: For all changes that involves timetable and starting/terminal stations.
+     * Similar to commitInterpolation, but with some other operations from autoStartingTerminal.
+     */
+    void commitTimetableAndStartingTerminalChange(const QVector<std::shared_ptr<Train>>& trains,
+		const QVector<std::shared_ptr<Train>>& data);
+
+    /**
      * 撤销所有推定结果，直接从Toolbar调用。
      * 推定和撤销推定的commit操作实际上是完全一样的
      */
@@ -704,6 +711,28 @@ namespace qecmd {
         void redo()override;
     private:
         void commit();
+    };
+
+    /**
+     * 2026.02.16: Import data from CSV file. 
+     * Previously, we just use TimeInterpolation for this. But now we may have starting/terminal
+     * stations updated, thus we need some other post-processings. 
+     * The operations are mainly a combination of AutoStartingTerminal and TimetableInterpolation.
+     */
+    class ImportTimetableCsv : public QUndoCommand 
+    {
+        QVector<std::shared_ptr<Train>> trains, data;
+        TrainContext* const cont;
+    public:
+        ImportTimetableCsv(const QVector<std::shared_ptr<Train>>& trains,
+            const QVector<std::shared_ptr<Train>>& data,
+            TrainContext* context, QUndoCommand* parent = nullptr) :
+            QUndoCommand(QObject::tr("从CSV导入时刻数据"), parent),
+            trains(trains), data(data), cont(context) 
+        {
+        }
+        void undo()override;
+		void redo()override;
     };
 
     /**

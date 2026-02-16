@@ -591,13 +591,20 @@ void TrainListWidget::exportTrainTimetable(const QList<std::shared_ptr<Train>>& 
 
 	foreach (const auto& train, trains) {
 		// 车次，站名，到点，开点，股道，备注
+		bool first = true;
 		for (const auto& st : train->timetable()) {
 			sout << train->trainName().full() << ',' <<
 				st.name.toSingleLiteral() << ',' <<
 				st.arrive.toString(TrainTime::HMS) << ',' <<
 				st.depart.toString(TrainTime::HMS) << ',' <<
 				st.track << ',' <<
-				st.note << '\n';
+				st.note;
+			if (first) {
+				sout << ',' << train->starting().toSingleLiteral() 
+					<< ',' << train->terminal().toSingleLiteral();
+				first = false;
+			}
+			sout << '\n';
 		}
 	}
 

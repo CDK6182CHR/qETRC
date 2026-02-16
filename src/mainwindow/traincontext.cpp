@@ -778,6 +778,21 @@ void TrainContext::commitInterpolation(const QVector<std::shared_ptr<Train>>& tr
 	refreshCurrentTrainWidgets();
 }
 
+void TrainContext::commitTimetableAndStartingTerminalChange(
+	const QVector<std::shared_ptr<Train>>& trains, const QVector<std::shared_ptr<Train>>& data)
+{
+	for (int i = 0; i < trains.size(); i++) {
+		auto train = trains.at(i);
+		train->swapTimetable(*data.at(i));
+		QVector<std::shared_ptr<TrainAdapter>> adps = std::move(train->adapters());
+		diagram.updateTrain(train);
+		mw->updateTrainLines(train, std::move(adps));
+	}
+	mw->trainListWidget->getModel()->updateAllMileSpeed();
+	mw->trainListWidget->getModel()->updateAllTrainStartingTerminal();
+	refreshCurrentTrainWidgets();
+}
+
 void TrainContext::actRemoveInterpolation()
 {
 	auto flag = QMessageBox::question(mw, tr("提示"), tr("撤销所有推定结果：此功能删除"
@@ -1071,10 +1086,13 @@ void TrainContext::commitAutoCorrection(const QVector<std::shared_ptr<Train>>& t
 void TrainContext::actImportTrainFromCsv()
 {
 	auto flag = QMessageBox::question(mw, tr("导入CSV时刻表"), tr("此功能提供从CSV（逗号分隔值）"
-		"格式导入时刻表。所给文件应当有4至6列，分别为车次、站名、到达时刻、出发时刻、"
-		"股道（可选）、备注（可选），不需要表头；文件应当采用UTF-8编码。\n"
+		"格式导入时刻表。所给文件应当有4至8列，分别为车次、站名、到达时刻、出发时刻、"
+		"股道（可选）、备注（可选）、始发（可选）、终到（可选），不需要表头；文件应当采用UTF-8编码。\n"
 		"每行视为一个时刻数据。对既有车次，无条件、按顺序追加到原有时刻表之后；对新增车次，"
-		"以所给时刻数据创建新车次。是否确认？"));
+		"以所给时刻数据创建新车次。\n"
+		"如果有非空的始发/终到站数据提供，则原车次（如果存在）始发/终到数据被无条件覆盖；如果同一车次"
+		"在多个不同行提供了始发/终到数据，则所用数据可能是其中的任何一个。\n"
+		"是否确认？"));
 	if (flag != QMessageBox::Yes)return;
 	QString filename = QFileDialog::getOpenFileName(mw, tr("从CSV导入时刻表"), {},
 		tr("逗号分隔值 (*.csv)\n所有文件 (*)"));
@@ -1126,6 +1144,7 @@ void TrainContext::actImportTrainFromCsv()
 
 		// 现在：新读取的时刻添加到toAddTrain所示对象中
 		QString stationName = splitted.at(1);
+		QString starting, terminal;
 		TrainTime arrive = qeutil::parseTrainTime(splitted.at(2));
 		TrainTime depart = qeutil::parseTrainTime(splitted.at(3));
 		if (arrive.isNull() || depart.isNull())
@@ -1135,7 +1154,20 @@ void TrainContext::actImportTrainFromCsv()
 			track = splitted.at(4);
 		if (splitted.size() >= 6)
 			note = splitted.at(5);
+		if (splitted.size() >= 7)
+			starting = splitted.at(6);
+		if (splitted.size() >= 8)
+			terminal = splitted.at(7);
 		toAddTrain->appendStation(stationName, arrive, depart, true, track, note);
+
+		// 2026.02.16: Processing starting/terminal if available.
+		// The applied starting/terminal data is unspecified if there are multiple rows provided with different data.
+		if (!starting.isEmpty()) {
+			toAddTrain->setStarting(starting);
+		}
+		if (!terminal.isEmpty()) {
+			toAddTrain->setTerminal(terminal);
+		}
 		valid++;
 	}
 
@@ -1155,7 +1187,7 @@ void TrainContext::actImportTrainFromCsv()
 			mw->naviView->actBatchAddTrains(newTrains);
 		// 修订的
 		if (!modifiedTrains.empty()) {
-			auto* cmd = new qecmd::TimetableInterpolation(modifiedTrains, modifiedData, this);
+			auto* cmd = new qecmd::ImportTimetableCsv(modifiedTrains, modifiedData, this);
 			cmd->setText(tr("批量修改列车时刻表"));
 			mw->getUndoStack()->push(cmd);
 		}
@@ -2323,6 +2355,16 @@ void qecmd::BatchAutoCorrection::commit()
 	//	train->swapTimetableWithAdapters(*d);
 	//}
 	//cont->commitAutoCorrection(trains);
+}
+
+void qecmd::ImportTimetableCsv::undo()
+{
+	cont->commitTimetableAndStartingTerminalChange(trains, data);
+}
+
+void qecmd::ImportTimetableCsv::redo()
+{
+	cont->commitTimetableAndStartingTerminalChange(trains, data);
 }
 
 qecmd::TimetableInterpolationSimple::TimetableInterpolationSimple(std::shared_ptr<Train> train,
