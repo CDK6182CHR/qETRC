@@ -103,6 +103,7 @@ void RailDBNavi::initContext()
     act=meCat->addAction(tr("新建平级分类"));
     connect(act,&QAction::triggered,this,&RailDBNavi::actNewParallelCat);
     meCat->addAction(tr("删除分类"), this, &RailDBNavi::actRemoveCategory);
+    meCat->addAction(tr("移动分类到..."), this, &RailDBNavi::actMoveCategory);
     meCat->addSeparator();
     meCat->addAction(tr("导出为qETRC多线路运行图文件"), this,
         &RailDBNavi::actExportCategoryToDiagramFile);
@@ -232,6 +233,42 @@ void RailDBNavi::actRemoveCategory()
     auto cat = static_cast<navi::RailCategoryItem*>(it)->category();
 
     _undo->push(new qecmd::RemoveCategory(cat, path, model));
+}
+
+void RailDBNavi::actMoveCategory()
+{
+    auto it = currentItem();
+    if (!it) return;
+    if (it->type() == navi::RailwayItemDB::Type) it = it->parent();
+    const auto& path = it->path();
+    auto cat = static_cast<navi::RailCategoryItem*>(it)->category();
+
+	auto res = SelectCategoryDialog::getCategory(_raildb, tr("请选择要移动到的目标分类"), this);
+    if (!res.accepted)
+        return;
+
+    auto* nit = model->itemByPath(res.path);
+    auto npath = res.path;
+
+    assert(nit->type() == navi::RailCategoryItem::Type);
+    auto* target_it = static_cast<navi::RailCategoryItem*>(nit);
+
+    if (target_it->isChildOf(it)) {
+        QMessageBox::warning(this, tr("提示"), tr("非法的移动操作：请不要尝试将分类移动到其子分类下！"));
+        return;
+    }
+    if (it == target_it) {
+        QMessageBox::warning(this, tr("提示"), tr("目标分类与当前分类相同，无需移动。"));
+        return;
+	}
+	if (it->parent() == target_it) {
+        QMessageBox::warning(this, tr("提示"), tr("目标分类与当前分类相同，无需移动。"));
+        return;
+	}
+
+    npath.push_back(target_it->category()->subCategories().size());
+
+	_undo->push(new qecmd::MoveCategory(cat, path, npath, model));
 }
 
 void RailDBNavi::actEditRail()
@@ -957,4 +994,12 @@ void qecmd::UpdateCategoryNameDB::redo()
 {
     std::swap(cat->nameRef(), name);
     model->onCategoryInfoChanged(cat, path);
+}
+
+qecmd::MoveCategory::MoveCategory(std::shared_ptr<RailCategory> cat, const std::deque<int>& oldPath, 
+    const std::deque<int>& newPath, RailDBModel* model, QUndoCommand* parent):
+	QUndoCommand(QObject::tr("移动分类: %1").arg(cat->name()), parent)
+{
+    new RemoveCategory(cat, oldPath, model, this);
+	new InsertCategory(cat, newPath, model, this);
 }

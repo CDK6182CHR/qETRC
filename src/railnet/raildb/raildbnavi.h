@@ -132,6 +132,7 @@ public slots:
     void actNewSubcat();
     void actNewParallelCat();
     void actRemoveCategory();
+    void actMoveCategory();
 
     /**
      * 在item所示的分类下新增分类。
@@ -235,6 +236,16 @@ namespace qecmd {
             RailDBModel* model, QUndoCommand* parent = nullptr);
         void undo()override;
         void redo()override;
+    };
+
+    /**
+     * 2026.02.16: Move category to another one. The moving operation is guaranteed to be valid.
+     * Currently, just by calling Remove and Insert commands.
+     */
+    class MoveCategory : public QUndoCommand {
+    public:
+        MoveCategory(std::shared_ptr<RailCategory> cat, const std::deque<int>& oldPath,
+            const std::deque<int>& newPath, RailDBModel* model, QUndoCommand* parent = nullptr);
     };
 
     class ImportRailsDB : public QUndoCommand
