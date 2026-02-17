@@ -40,6 +40,7 @@
 #include "viewers/diagnosisdialog.h"
 #include "viewers/timetablequickwidget.h"
 #include "viewers/traininfowidget.h"
+#include "viewers/stats/trainsummarydialog.h"
 #include "model/train/timetablequickmodel.h"
 
 #include "traincontext.h"
@@ -1270,6 +1271,12 @@ void MainWindow::initToolbar()
 		connect(act, &QAction::triggered, this, &MainWindow::actTrainIntervalStat);
 		panel->addLargeAction(act);
 
+		act = makeAction(QEICN_train_summary_info, tr("信息汇总"));
+		act->setToolTip(tr("列车信息汇总\n汇总指定车次的时刻表、运行线、标签、交路等信息，可输出CSV。" 
+			"若运行图列车数较多，计算可能比较耗时。"));
+		connect(act, &QAction::triggered, this, &MainWindow::actTrainInfoSummary);
+		panel->addLargeAction(act);
+
 		panel = cat->addPanel(tr("调整"));
 		act = makeAction(QEICN_merge_trains, tr("合并车次"));
 		act->setToolTip(tr("合并车次\n将多个车次按顺序合并为新建车次"));
@@ -1913,6 +1920,12 @@ void MainWindow::actIntervalCount()
 void MainWindow::actTrainIntervalStat()
 {
 	auto* dlg = new TrainIntervalStatDialog(_diagram, this);
+	dlg->show();
+}
+
+void MainWindow::actTrainInfoSummary()
+{
+	auto* dlg = new TrainSummaryDialog(_diagram.options(), _diagram.trainCollection(), this);
 	dlg->show();
 }
 

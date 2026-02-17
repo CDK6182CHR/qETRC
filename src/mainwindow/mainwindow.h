@@ -460,6 +460,8 @@ private slots:
 
     void actTrainIntervalStat();
 
+    void actTrainInfoSummary();
+
     void actReadRulerWizard();
 
     void actBatchParseRouting();

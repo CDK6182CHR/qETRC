@@ -102,6 +102,7 @@
 #define QEICN_section_count QE_RSC_ICON(counter.png)   // 区间对数表
 #define QEICN_section_trains QE_RSC_ICON(train.png)   // 区间车次表
 #define QEICN_interval_stat QE_RSC_ICON(data.png)   // 列车区间运行统计
+#define QEICN_train_summary_info QE_RSC_ICON(clock.png)  // 列车信息汇总
 
 #define QEICN_ruler_paint QE_RSC_ICON(ruler_pen.png)   // 标尺排图
 #define QEICN_batch_copy_trains QE_RSC_ICON(copy.png)   // 批量复制车次
