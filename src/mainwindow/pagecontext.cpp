@@ -204,7 +204,7 @@ void PageContext::actConfig()
     auto* dlg = new ConfigDialog(page->configRef(), diagram.options().period_hours, page, mw);
     connect(dlg, &ConfigDialog::onPageConfigApplied,
         mw->getViewCategory(), &ViewCategory::onActPageConfigApplied);
-    dlg->show();
+    dlg->open();
 }
 
 void PageContext::actActivatePage()

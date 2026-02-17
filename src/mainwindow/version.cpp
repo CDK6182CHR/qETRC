@@ -4,14 +4,16 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.9.3";
-const std::string_view DATE = "20260213";
-const int RELEASE_CODE = 75;
+const std::string_view LAST_VERSION = "V1.9.4";
+const std::string_view DATE = "20260217";
+const int RELEASE_CODE = 76;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 复制列车操作中，新增列车径路的复制。
-2. 区间车次表中增加区间里程及均速数据（如果可计算）。
-3. 升级支持库版本、细节修复。)";
+const std::string_view UPDATE_LOG = R"(1. 新增列车信息汇总功能。
+2. 新增列车批量操作：删除时刻表中连续的重出站。
+3. 自CSV导入列车时刻表时支持读取始发终到站。
+4. 线路数据库中新增移动线路、分类。
+5. 其他细节。)";
 }
