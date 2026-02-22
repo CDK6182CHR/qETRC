@@ -18,10 +18,21 @@ class RailStation;
 struct IssueInfo {
 	enum IssueType {
 		NoIssueType,
-		// insert new issue type here
-		// ...
+
+		
+
+
 		WithdrawFirstBounding,
 		InvalidPath,
+
+		// 2026.02.22: issues for binding using paths
+		PathBindSingleStation,
+		PathBindSkipped,
+		PathBindLateStart,
+		PathBindEarlyStop,
+
+		// insert new issue type here
+		// ...
 		OtherIssueType,
 	};
 

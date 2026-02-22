@@ -12,7 +12,11 @@ QString IssueInfo::issueTypeToString(IssueType type)
 	switch (type) {
 	case WithdrawFirstBounding: return QObject::tr("撤销首站绑定");
 	case InvalidPath: return QObject::tr("径路不可用");
-	default: return "Invalid IssueType";
+	case PathBindSingleStation: return QObject::tr("径路段单站");
+	case PathBindSkipped: return QObject::tr("径路段跳过");
+	case PathBindLateStart: return QObject::tr("径路段首缺失");
+	case PathBindEarlyStop: return QObject::tr("径路段尾缺失");
+	default: return QObject::tr("Invalid IssueType: %1").arg(static_cast<int>(type));
 	}
 }
 

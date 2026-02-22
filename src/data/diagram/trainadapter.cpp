@@ -54,6 +54,8 @@ void TrainAdapter::bindTrainByPath(std::shared_ptr<Train> train, const TrainPath
 
 	std::map<Railway*, std::shared_ptr<TrainAdapter>> adp_map;
 	
+	bool first_matched_encountered = false;
+	bool has_any_match_before_this_line = false;
 	StationName start_station = path->startStation();
 	auto tit_last_bind = train->timetable().begin();
 	for (const auto& seg : path->segments()) {
@@ -97,6 +99,7 @@ void TrainAdapter::bindTrainByPath(std::shared_ptr<Train> train, const TrainPath
 			else {  // ipos == 0, to be bound
 				line->addStation(tit, rst);
 				tit_last_bind = tit;
+				first_matched_encountered = true;
 			}
 
 			if (rst->name == seg.end_station) {
@@ -120,13 +123,57 @@ void TrainAdapter::bindTrainByPath(std::shared_ptr<Train> train, const TrainPath
 					line->_startLabel = false;
 				}
 			}
+
+			// 2026.02.22: detect the possible lost of information at the endings
+			if (has_any_match_before_this_line) {
+				// Possible lost at the BEGINNING of this segment
+				auto line_start_rst = line->stations().front().railStation.lock();
+				if ( line_start_rst != rst_start) {
+					qeIssueWarning(IssueInfo(IssueInfo::PathBindLateStart, train, rail, line_start_rst,
+						QObject::tr("根据列车径路铺画运行线时，本段列车径路[%1-%2]的可用时刻表首站为[%3]，"
+							"可能造成运行线部分缺失。请考虑补充节点站[%1]时刻信息。")
+						.arg(start_station.toSingleLiteral(), seg.end_station.toSingleLiteral(),
+								line_start_rst->name.toSingleLiteral())));
+				}
+			}
+
+			if (line->stations().back().trainStation != std::prev(train->timetable().end())) {
+				// Possible lost at the ENDING of this segment
+				auto line_end_rst = line->stations().back().railStation.lock();
+				if (line_end_rst != rst_end) {
+					qeIssueWarning(IssueInfo(IssueInfo::PathBindEarlyStop, train, rail, line_end_rst,
+						QObject::tr("根据列车径路铺画运行线时，本段列车径路[%1-%2]的可用时刻表末站为[%3]，"
+							"可能造成运行线部分缺失。请考虑补充节点站[%2]时刻信息。")
+						.arg(start_station.toSingleLiteral(), seg.end_station.toSingleLiteral(),
+							line_end_rst->name.toSingleLiteral())));
+				}
+			}
+			
 		}
 		else if (line->count() == 1) {
 			// 2024.03.20: for this case, restore tit_last_bind, since the previous bind is withdrawn
 			tit_last_bind = tit_last_bind_before_loop;
+			qeIssueWarning(IssueInfo(IssueInfo::PathBindSingleStation, train, rail,
+				line->stations().front().railStation.lock(),
+				QObject::tr("根据列车径路铺画运行线时，本段列车径路[%1-%2]仅有一个铺画站，无法铺画本段运行线，可能造成运行线缺失")
+				.arg(start_station.toSingleLiteral(), seg.end_station.toSingleLiteral())));
+		}
+		else {
+			// 2026.02.22: for this case, no binding at all.
+			if (first_matched_encountered) {
+				qeIssueWarning(IssueInfo(IssueInfo::PathBindSkipped, train, rail,
+					rst_start,
+					QObject::tr("根据列车径路铺画运行线时，本段列车径路[%1-%2]无铺画站，无法铺画本段运行线，可能造成运行线缺失")
+					.arg(start_station.toSingleLiteral(), seg.end_station.toSingleLiteral())));
+			}
 		}
 
 		start_station = seg.end_station;
+		if (first_matched_encountered) {
+			// We set this key for the later checking of starting station of the next segment.
+			// Currently, we consider the path starts after any matching (even a discarded one in the single-matching case).
+			has_any_match_before_this_line = true;
+		}
 	}
 
 	for (auto itr = adp_map.begin(); itr != adp_map.end(); ++itr) {
