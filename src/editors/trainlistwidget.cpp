@@ -120,7 +120,10 @@ QList<std::shared_ptr<Train>> TrainListWidget::batchOpSelectedTrains()
 	auto lst = table->selectionModel()->selectedRows();
 	QList<std::shared_ptr<Train>> res;
 	foreach(const auto & t, lst) {
-		res.push_back(coll.trainAt(t.row()));
+		// 2026.02.22: Hidden rows are never selected
+		if (!table->isRowHidden(t.row())) {
+			res.push_back(coll.trainAt(t.row()));
+		}
 	}
 	if (res.empty()) {
 		// 2025.09.09 CHANGE: add all shown rows if no selected
@@ -162,7 +165,9 @@ void TrainListWidget::batchChange()
 	auto lst = table->selectionModel()->selectedRows();
 	QVector<int> rows;
 	foreach (const auto& t , lst) {
-		rows.push_back(t.row());
+		if (!table->isRowHidden(t.row())) {
+			rows.push_back(t.row());
+		}
 	}
 	if (rows.empty()) {
 		//QMessageBox::warning(this, tr("错误"), tr("批量设置列车类型：请先选择至少一个车次！"));
@@ -319,7 +324,9 @@ void TrainListWidget::actRemoveTrains()
 	QList<int> rows;
 	rows.reserve(lst.size());
 	for (const auto& p : lst) {
-		rows.append(p.row());
+		if (!table->isRowHidden(p.row())) {
+			rows.append(p.row());
+		}
 	}
 
 	std::sort(rows.begin(), rows.end());

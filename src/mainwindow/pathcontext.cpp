@@ -490,7 +490,7 @@ qecmd::ClearPathsFromTrainBatch::ClearPathsFromTrainBatch(QList<std::shared_ptr<
     m_trains(std::move(trains)), m_train_paths(m_trains.size(), {}),
     m_cont(cont)
 {
-    for (const auto& train : trains) {
+    for (const auto& train : m_trains) {
         for (auto p : train->paths()) {
             int idx = p->getTrainIndex(train);
             if (idx >= 0) {
