@@ -1713,6 +1713,9 @@ void MainWindow::clearDiagramUnchecked()
 		tagManagerDialog->deleteLater();
 	}
 
+	// 2026.02.22: 清理“问题”窗口的信息
+	IssueManager::get()->clear();
+
 	//最后：清理数据
 	_diagram.clear();
 }
