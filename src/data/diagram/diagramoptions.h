@@ -31,4 +31,6 @@ struct DiagramOptions
 	 */
 	bool fromJson(const QJsonObject& obj);
 	QJsonObject toJson()const;
+
+	bool allow_auto_bind()const { return max_passed_stations >= 0; }
 };

@@ -18,13 +18,21 @@
 #include <cmath>
 
 
+#define WARN_EMPTY_PATH(train) \
+qWarning() << QObject::tr("列车%1没有径路信息，运行线无法铺画。请考虑提供径路信息，或将“最大跨越站数”设为非负数。") \
+.arg(train->trainName().full());
+
+
 void Diagram::addRailway(std::shared_ptr<Railway> rail)
 {
     railways().append(rail);
     // 2023.08.21: for path
     _pathcoll.checkValidForRailway(_railcat, rail.get());
-    foreach(auto p, trains()) {
-        p->bindToRailway(rail, _options);
+
+    if (_options.allow_auto_bind()) {
+        foreach(auto p, trains()) {
+            p->bindToRailway(rail, _options);
+        }
     }
 }
 
@@ -39,8 +47,10 @@ void Diagram::insertRailwayAt(int i, std::shared_ptr<Railway> rail)
     // 2023.08.21 for path
     _pathcoll.checkValidForRailway(_railcat, rail.get());
 
-    foreach(auto p, trains()) {
-        p->bindToRailway(rail, _options);
+    if (_options.allow_auto_bind()) {
+        foreach(auto p, trains()) {
+            p->bindToRailway(rail, _options);
+        }
     }
 }
 
@@ -72,8 +82,10 @@ void Diagram::updateRailway(std::shared_ptr<Railway> r)
             p->checkIsValid();
         }
     }
-    foreach (const auto& p, _trainCollection.trains()){
-        p->updateBoundRailway(r, _options);
+    if (_options.allow_auto_bind()) {
+        foreach(const auto& p, _trainCollection.trains()) {
+            p->updateBoundRailway(r, _options);
+        }
     }
 }
 
@@ -81,8 +93,13 @@ void Diagram::updateTrain(std::shared_ptr<Train> t)
 {
     IssueManager::get()->clearIssuesForTrain(t.get());
     if (t->paths().empty()) {
-        foreach(const auto & r, railways()) {
-            t->updateBoundRailway(r, _options);
+        if (_options.allow_auto_bind()) {
+            foreach(const auto& r, railways()) {
+                t->updateBoundRailway(r, _options);
+            }
+        }
+        else {
+            WARN_EMPTY_PATH(t);
         }
     }
     else {
@@ -192,17 +209,25 @@ QString Diagram::validRailwayName(const QString& prefix) const
 
 void Diagram::applyBindOn(TrainCollection& coll)
 {
-    foreach (auto p , railways()) {
-        for (auto t : coll.trains()) {
-            t->bindToRailway(p, _options);
-        }
+    foreach (auto t, coll.trains()) {
+        applyBindOn(t);
     }
 }
 
 void Diagram::applyBindOn(std::shared_ptr<Train> train)
 {
-    foreach (auto p, railways()) {
-        train->bindToRailway(p, _options);
+    if (train->paths().empty()) {
+        if (_options.allow_auto_bind()) {
+            foreach(auto p, railways()) {
+                train->bindToRailway(p, _options);
+            }
+        }
+        else {
+            WARN_EMPTY_PATH(train);
+        }
+    }
+    else {
+        train->bindWithPath();
     }
 }
 
@@ -261,8 +286,14 @@ void Diagram::rebindAllTrains()
     foreach (auto t , _trainCollection.trains()) {
         if (t->paths().empty()) {
             t->clearBoundRailways();
-            foreach(auto p, railways()) {
-                t->bindToRailway(p, _options);
+
+            if (_options.allow_auto_bind()) {
+                foreach(auto p, railways()) {
+                    t->bindToRailway(p, _options);
+                }
+            }
+            else {
+                WARN_EMPTY_PATH(t);
             }
         }
         else {
@@ -836,9 +867,16 @@ void Diagram::bindAllTrains()
 {
     foreach(auto t, _trainCollection.trains()) {
         if (t->paths().empty()) {
-            foreach(auto p, railways()) {
-                t->bindToRailway(p, _options);
+
+            if (_options.allow_auto_bind()) {
+                foreach(auto p, railways()) {
+                    t->bindToRailway(p, _options);
+                }
             }
+            else {
+                WARN_EMPTY_PATH(t);
+            }
+
         }
         else {
             t->bindWithPath();

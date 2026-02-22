@@ -35,6 +35,7 @@ void TimeInterpWizard::accept()
         auto t = std::make_shared<Train>(*train);   // copy construct
         auto rail = pgTrain->cbRuler->railway();
         auto ruler = pgTrain->cbRuler->ruler();
+        // vvv 2026.02.22: seems we do not need to change this; the path-binding will be called at undo/redo.
         t->bindToRailway(rail,diagram.options());
         auto adp = t->adapterFor(*rail);
         if (adp) {

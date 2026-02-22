@@ -1178,9 +1178,10 @@ void MainWindow::initToolbar()
 		if constexpr (true) {
 			auto* sp = new QSpinBox;
 			spPassedStations = sp;
-			sp->setRange(0, 10000000);
+			sp->setRange(-1, 10000000);
 			sp->setToolTip(tr("最大跨越站数\n设置连续运行线段允许跨越的最大站数。"
-				"如果区间跨越站数超过指定数值，将被拆分成两段运行线。"));
+				"如果区间跨越站数超过指定数值，将被拆分成两段运行线。\n" 
+				"如果设置为负数，则所有列车运行线铺画都必须依据列车径路，无径路的列车不会被铺画。"));
 
 			auto* w = new QWidget;
 			auto* vlay = new QVBoxLayout;
