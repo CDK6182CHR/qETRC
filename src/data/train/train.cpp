@@ -322,7 +322,7 @@ bool Train::pathsContainRailway(std::shared_ptr<const Railway> rail) const
 void Train::bindWithPath()
 {
     qDebug() << "bindWithPath " << _trainName.full();
-    IssueManager::get()->clearIssuesForTrain(this);
+    //IssueManager::get()->clearIssuesForTrain(this);
     _adapters.clear();
     for (const auto& p : _paths) {
         TrainAdapter::bindTrainByPath(shared_from_this(), p);

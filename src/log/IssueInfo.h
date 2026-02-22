@@ -19,9 +19,6 @@ struct IssueInfo {
 	enum IssueType {
 		NoIssueType,
 
-		
-
-
 		WithdrawFirstBounding,
 		InvalidPath,
 
@@ -60,6 +57,19 @@ struct IssueInfo {
 	QString toString()const;
 
 	QString posString()const;
+
+	static constexpr bool is_binding_issue(IssueType type) {
+		switch (type) {
+		case WithdrawFirstBounding:
+		case InvalidPath:
+		case PathBindSingleStation:
+		case PathBindSkipped:
+		case PathBindLateStart:
+		case PathBindEarlyStop:
+			return true;
+		}
+		return false;
+	}
 };
 
 
