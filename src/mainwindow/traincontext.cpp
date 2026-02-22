@@ -1281,6 +1281,7 @@ void TrainContext::actSimpleInterpolation()
 	auto adp = train->adapterFor(*rail);
 	if (adp) {
 		auto tab = std::make_shared<Train>(*train);
+		tab->paths() = train->paths();   // copy; 2026.02.22: make sure the path is provided.
 		diagram.updateTrain(tab);
 		auto nadp = tab->adapterFor(*rail);
 

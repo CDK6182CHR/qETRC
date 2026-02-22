@@ -5,6 +5,8 @@
 
 #include "PaintIssue.h"
 
+class TrainName;
+
 /**
  * 2023.08.14  Global singeleton for managing issues (mainly generated from painting).
  * The manager is basically a deque of Issue's. The adding operation automatically generates
@@ -43,6 +45,8 @@ public:
 	void emplaceIssue(QtMsgType type, const IssueInfo& info);
 
 	void clearIssuesForTrain(const Train* train);
+
+	void clearIssuesForTrainName(const TrainName& name);
 
 private:
 	IssueManager() = default;

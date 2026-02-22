@@ -91,7 +91,7 @@ void Diagram::updateRailway(std::shared_ptr<Railway> r)
 
 void Diagram::updateTrain(std::shared_ptr<Train> t)
 {
-    IssueManager::get()->clearIssuesForTrain(t.get());
+    IssueManager::get()->clearIssuesForTrainName(t->trainName());
     if (t->paths().empty()) {
         if (_options.allow_auto_bind()) {
             foreach(const auto& r, railways()) {

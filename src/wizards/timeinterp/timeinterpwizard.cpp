@@ -35,8 +35,22 @@ void TimeInterpWizard::accept()
         auto t = std::make_shared<Train>(*train);   // copy construct
         auto rail = pgTrain->cbRuler->railway();
         auto ruler = pgTrain->cbRuler->ruler();
-        // vvv 2026.02.22: seems we do not need to change this; the path-binding will be called at undo/redo.
-        t->bindToRailway(rail,diagram.options());
+        // 2026.02.22: we need to bind the trains with paths if available
+        if (train->paths().empty()) {
+            if (diagram.options().allow_auto_bind()) {
+                t->bindToRailway(rail, diagram.options());
+            }
+            else {
+                // This train will never be bind
+                continue;
+            }
+        }
+        else {
+            // Bind by path
+            t->paths() = train->paths();   // copy assign
+            t->bindWithPath();
+        }
+        
         auto adp = t->adapterFor(*rail);
         if (adp) {
             adp->timetableInterpolation(ruler, pgTrain->ckToStart->isChecked(),

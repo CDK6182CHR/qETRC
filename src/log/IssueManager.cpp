@@ -100,6 +100,15 @@ void IssueManager::clearIssuesForTrain(const Train* train)
 	}
 }
 
+void IssueManager::clearIssuesForTrainName(const TrainName& name)
+{
+	for (int i = _issues.size() - 1; i >= 0; --i) {
+		if (_issues.at(i).info.train->trainName() == name) {
+			removeIssueAt(i);
+		}
+	}
+}
+
 void IssueManager::removeIssueAt(int index)
 {
 	beginRemoveRows({}, index, index);
