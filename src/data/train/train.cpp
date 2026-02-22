@@ -309,6 +309,11 @@ int Train::getPathIndex(const TrainPath* path) const
     return -1;
 }
 
+bool Train::hasPath(const TrainPath* path) const
+{
+    return getPathIndex(path) >= 0;
+}
+
 bool Train::pathsContainRailway(std::shared_ptr<const Railway> rail) const
 {
     for (auto* p : _paths) {

@@ -1578,6 +1578,10 @@ void MainWindow::initToolbar()
 			contextPath, &PathContext::actRemovePathRuler);
 		connect(naviView, &NaviTree::duplicatePathRulerNavi,
 			contextPath, &PathContext::actDuplicatePathRuler);
+		connect(trainListWidget, &TrainListWidget::batchAssignPath,
+			contextPath, &PathContext::actBatchAssignPath);
+		connect(trainListWidget, &TrainListWidget::batchClearPaths,
+			contextPath, &PathContext::actBatchClearPaths);
 	}
 
 	// context: DB

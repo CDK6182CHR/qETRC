@@ -103,6 +103,14 @@ signals:
 
     void batchUnique(const QList<std::shared_ptr<Train>>&);
 
+    /**
+     * 2026.02.22: assign/clear paths. This will be handled by PathContext.
+     * We cannot handle it here, because we do not have access to PathCollection here.
+     */
+    void batchAssignPath(const QList<std::shared_ptr<Train>>&);
+
+    void batchClearPaths(const QList<std::shared_ptr<Train>>&);
+
     void autoAddNewType(std::shared_ptr<TrainType>);
         
 private slots:
@@ -125,6 +133,10 @@ private slots:
     void actBatchAddTagBat();
 
     void actBatchRemoveTagBat();
+
+    void actBatchAssignPathBat();
+
+    void actBatchClearPathsBat();
 
     /**
      * 要做的事：

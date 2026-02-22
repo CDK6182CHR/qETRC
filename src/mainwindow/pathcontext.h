@@ -116,6 +116,10 @@ public slots:
      * Called after the PathRuler is updated (this is actually performed in the cmd)
      */
     void onPathRulerUpdated(std::shared_ptr<PathRuler> ruler);
+
+    void actBatchAssignPath(QList<std::shared_ptr<Train>> trains);
+
+    void actBatchClearPaths(QList<std::shared_ptr<Train>> trains);
 };
 
 namespace qecmd {
@@ -139,6 +143,21 @@ namespace qecmd {
         ClearTrainsFromPath(TrainPath* path, PathContext* cont, QUndoCommand* parent = nullptr);
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    /**
+     * 2026.02.22: Batch version of ClearPathsFromTrain.
+     */
+    class ClearPathsFromTrainBatch : public QUndoCommand {
+        QList<std::shared_ptr<Train>> m_trains;
+        std::vector<std::vector<TrainPath*>> m_train_paths;
+        std::map<TrainPath*, std::multimap<int, std::shared_ptr<Train>>> m_indexes_in_path;
+        PathContext* const m_cont;
+
+    public:
+        ClearPathsFromTrainBatch(QList<std::shared_ptr<Train>>&& trains, PathContext*cont, QUndoCommand* parent = nullptr);
+        void undo()override;
+        void redo()override;
     };
 
     /**

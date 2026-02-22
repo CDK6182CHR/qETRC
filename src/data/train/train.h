@@ -253,6 +253,8 @@ public:
      */
     int getPathIndex(const TrainPath* path)const;
 
+    bool hasPath(const TrainPath* path)const;
+
     /**
      * Returns whether at least one path contain the required railway.
      * For no-path case, returns false.

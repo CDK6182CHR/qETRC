@@ -93,6 +93,8 @@ void TrainListWidget::initUI()
 	menu->addAction(tr("批量分类"), this, &TrainListWidget::batchChange);
 	menu->addAction(tr("批量添加标签"), this, &TrainListWidget::actBatchAddTagBat);
 	menu->addAction(tr("批量删除标签"), this, &TrainListWidget::actBatchRemoveTagBat);
+	menu->addAction(tr("批量指定径路"), this, &TrainListWidget::actBatchAssignPathBat);
+	menu->addAction(tr("批量清空径路"), this, &TrainListWidget::actBatchClearPathsBat);
 	menu->addAction(tr("批量设置运行线样式"), this, &TrainListWidget::actChangePenBat);
 	menu->addSeparator();
 	menu->addAction(tr("按时刻表重设始发终到"), this, &TrainListWidget::actResetStartingTerminalFromTimetableBat);
@@ -283,6 +285,28 @@ void TrainListWidget::actBatchRemoveTagBat()
 	}
 
 	batchRemoveTag(trains);
+}
+
+void TrainListWidget::actBatchAssignPathBat()
+{
+	auto trains = batchOpSelectedTrains();
+	if (trains.empty()) {
+		QMessageBox::warning(this, tr("错误"), tr("批量指定列车径路：请先选择至少一个车次！"));
+		return;
+	}
+
+	emit batchAssignPath(trains);
+}
+
+void TrainListWidget::actBatchClearPathsBat()
+{
+	auto trains = batchOpSelectedTrains();
+	if (trains.empty()) {
+		QMessageBox::warning(this, tr("错误"), tr("批量清除列车径路：请先选择至少一个车次！"));
+		return;
+	}
+
+	emit batchClearPaths(trains);
 }
 
 

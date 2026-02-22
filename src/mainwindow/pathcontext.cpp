@@ -2,6 +2,7 @@
 
 #ifndef QETRC_MOBILE_2
 
+#include <algorithm>
 #include <QLabel>
 #include <QApplication>
 #include <QStyle>
@@ -396,6 +397,38 @@ void PathContext::onPathRulerUpdated([[maybe_unused]] std::shared_ptr<PathRuler>
     // Seems nothing to do for now
 }
 
+void PathContext::actBatchAssignPath(QList<std::shared_ptr<Train>> trains)
+{
+    auto paths = SelectPathDialog::getPaths(mw, tr("请选择要添加到所选列车的径路"),
+        diagram.pathCollection().pathPointers(), true);
+    if (paths.empty())
+        return;
+    auto p = paths.front();
+
+    // avoid adding duplicate ones
+    trains.erase(std::remove_if(trains.begin(), trains.end(), [p](const std::shared_ptr<Train>& t) -> bool {
+        return t->hasPath(p);
+        }), trains.end());
+    if (trains.empty()) {
+        QMessageBox::information(mw, tr("提示"), tr("所选列车为空，或所选列车皆已经包含所选径路，无需操作"));
+        return;
+    }
+
+    mw->getUndoStack()->push(new qecmd::AddTrainsToPath(p, std::move(trains), this));
+}
+
+void PathContext::actBatchClearPaths(QList<std::shared_ptr<Train>> trains)
+{
+    trains.erase(std::remove_if(trains.begin(), trains.end(), [](const std::shared_ptr<Train>& t) -> bool {
+        return t->paths().empty();
+        }), trains.end());
+    if (trains.empty()) {
+        QMessageBox::information(mw, tr("提示"), tr("所选列车为空，或所选列车皆不含任何径路，无需操作"));
+        return;
+    }
+
+    mw->getUndoStack()->push(new qecmd::ClearPathsFromTrainBatch(std::move(trains), this));
+}
 
 
 qecmd::UpdatePath::UpdatePath(TrainPath* path, std::unique_ptr<TrainPath>&& data_,
@@ -449,6 +482,59 @@ void qecmd::ClearTrainsFromPath::redo()
         train->paths().erase(train->paths().begin() + idx);
     }
     cont->afterPathTrainsChanged(path, trains);
+}
+
+qecmd::ClearPathsFromTrainBatch::ClearPathsFromTrainBatch(QList<std::shared_ptr<Train>>&& trains,
+    PathContext* cont, QUndoCommand* parent):
+    QUndoCommand(QObject::tr("批量清除%1列车的径路").arg(trains.size()), parent),
+    m_trains(std::move(trains)), m_train_paths(m_trains.size(), {}),
+    m_cont(cont)
+{
+    for (const auto& train : trains) {
+        for (auto p : train->paths()) {
+            int idx = p->getTrainIndex(train);
+            if (idx >= 0) {
+                m_indexes_in_path[p].emplace(idx, train);
+            }
+        }
+    }
+}
+
+void qecmd::ClearPathsFromTrainBatch::undo()
+{
+    assert(m_trains.size() == m_train_paths.size());
+    for (int n = 0; n < m_trains.size(); n++) {
+        std::swap(m_trains.at(n)->paths(), m_train_paths.at(n));
+    }
+
+    for (const auto& itr : m_indexes_in_path) {
+        auto* p = itr.first;
+        const auto& path_indexes_map = itr.second;
+
+        // The ORDER b.first is guaranteed!
+        for (const auto& b : path_indexes_map) {
+            p->trains().insert(p->trains().begin() + b.first, b.second);
+        }
+    }
+}
+
+void qecmd::ClearPathsFromTrainBatch::redo()
+{
+    assert(m_trains.size() == m_train_paths.size());
+    for (int n = 0; n < m_trains.size(); n++) {
+        std::swap(m_trains.at(n)->paths(), m_train_paths.at(n));
+    }
+
+    // Now, remove the trains from path data
+    for (const auto& itr : m_indexes_in_path) {
+        auto* p = itr.first;
+        const auto& path_indexes_map = itr.second;
+
+        // The ORDER b.first is guaranteed!
+        for (auto a = path_indexes_map.rbegin(); a != path_indexes_map.rend(); ++a) {
+            p->trains().erase(p->trains().begin() + a->first);
+        }
+    }
 }
 
 
