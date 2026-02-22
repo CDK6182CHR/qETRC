@@ -309,7 +309,7 @@ void PathContext::afterPathTrainsChanged([[maybe_unused]] TrainPath* path, const
     // update path data (nothing to do for now)
 }
 
-void PathContext::afterPathTrainsChanged([[maybe_unused]] TrainPath* path, const QList<std::shared_ptr<Train>>& trains)
+void PathContext::afterPathTrainsChanged(const QList<std::shared_ptr<Train>>& trains)
 {
     // rebind and repaint trains
     auto* c = mw->getTrainContext();
@@ -496,6 +496,10 @@ qecmd::ClearPathsFromTrainBatch::ClearPathsFromTrainBatch(QList<std::shared_ptr<
             if (idx >= 0) {
                 m_indexes_in_path[p].emplace(idx, train);
             }
+            else {
+                qWarning() << "ClearPathsFromTrainBatch: train " << train->trainName().full() << " not found in path "
+                    << p->name();
+            }
         }
     }
 }
@@ -516,6 +520,8 @@ void qecmd::ClearPathsFromTrainBatch::undo()
             p->trains().insert(p->trains().begin() + b.first, b.second);
         }
     }
+
+    m_cont->afterPathTrainsChanged(m_trains);
 }
 
 void qecmd::ClearPathsFromTrainBatch::redo()
@@ -535,6 +541,8 @@ void qecmd::ClearPathsFromTrainBatch::redo()
             p->trains().erase(p->trains().begin() + a->first);
         }
     }
+
+    m_cont->afterPathTrainsChanged(m_trains);
 }
 
 
@@ -599,7 +607,7 @@ void qecmd::AddTrainsToPath::undo()
     for (auto itr = trains.crbegin(); itr != trains.crend(); ++itr) {
         path->removeTrainFromBack(*itr);
     }
-    cont->afterPathTrainsChanged(path, trains);
+    cont->afterPathTrainsChanged(trains);
 }
 
 void qecmd::AddTrainsToPath::redo()
@@ -607,7 +615,7 @@ void qecmd::AddTrainsToPath::redo()
     foreach (auto t , trains) {
         path->addTrain(t);
     }
-    cont->afterPathTrainsChanged(path, trains);
+    cont->afterPathTrainsChanged(trains);
 }
 
 qecmd::AssignPathsToTrainsBatch::AssignPathsToTrainsBatch(std::vector<TrainPath*> paths,
@@ -628,7 +636,7 @@ void qecmd::AssignPathsToTrainsBatch::redo()
     }
 
     // This is exactly the same as the single-path operation for now
-    cont->afterPathTrainsChanged(paths.front(), trains);
+    cont->afterPathTrainsChanged(trains);
 }
 
 void qecmd::AssignPathsToTrainsBatch::undo()
@@ -640,7 +648,7 @@ void qecmd::AssignPathsToTrainsBatch::undo()
             (*pit)->removeTrainFromBack(*tit);
         }
     }
-    cont->afterPathTrainsChanged(paths.front(), trains);
+    cont->afterPathTrainsChanged(trains);
 }
 
 qecmd::AddPathRuler::AddPathRuler(PathContext* context, std::shared_ptr<PathRuler> ruler, QUndoCommand* parent):

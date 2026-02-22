@@ -92,7 +92,7 @@ public slots:
 
     void afterPathTrainsChanged(TrainPath* path, const std::vector<qecmd::TrainInfoInPath>& trains);
 
-    void afterPathTrainsChanged(TrainPath* path, const QList<std::shared_ptr<Train>>& trains);
+    void afterPathTrainsChanged(const QList<std::shared_ptr<Train>>& trains);
 
     void removePath(int idx);
 
