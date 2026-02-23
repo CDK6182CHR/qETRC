@@ -207,17 +207,45 @@ PathAdapter PathAdapter::bind(std::shared_ptr<Train> train, TrainPath* path)
 int PathAdapter::timetableInterpolationSimple(int period_hours)
 {
 	int tot_count = 0;
+	auto train = m_train.lock();
 
 	double seg_start_mile = 0;
+
+	int start_seg_index = -1;
+	Train::StationPtr last_station = train->timetable().begin();  // This is invalid BEFORE line_started
+
+	// Current interval for extra polation
+	double cur_interval_mile = -1;
+	int cur_interval_secs = -1;
+
+	double last_station_interval_mile = -1;
+	int last_station_interval_secs = -1;
+
 	for (int iseg = 0; iseg < (int)m_segments.size(); iseg++) {
 		auto& seg_adp = m_segments.at(iseg);
 		auto& seg = m_path->segments().at(seg_adp.segIndex());
 		assert(seg_adp.segIndex() == iseg);
 
+		if (start_seg_index < 0 && seg_adp.type() != PathSegAdapter::EmptyBind) {
+			start_seg_index = 0;
+		}
+
+		if (start_seg_index < 0)
+			continue;
+		else
+			start_seg_index++;
+
+		if (start_seg_index > 1) {
+			// TODO: EXTRApolation at the beginning of the segment, if required
+		}
+
 		if (seg_adp.line()) {
 			// Has line; first do INTRA interpolation
 			tot_count += seg_adp.line()->timetableInterpolationSimple(period_hours);
 		}
+
+		// TODO: find next station after this line to do extrapolation
+		// remember to update last_station and related data
 
 		seg_start_mile += seg.mile;
 	}
