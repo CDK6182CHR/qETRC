@@ -8,6 +8,7 @@
 #include "data/diagram/trainadapter.h"
 #include "data/diagram/trainline.h"
 #include "log/IssueManager.h"
+#include "util/utilfunc.h"
 
 PathAdapter::PathAdapter(std::weak_ptr<Train> train, TrainPath* path, std::vector<PathSegAdapter> segments):
 	m_train(train), m_path(path), m_segments(std::move(segments)), m_valid(true)
@@ -204,6 +205,53 @@ PathAdapter PathAdapter::bind(std::shared_ptr<Train> train, TrainPath* path)
 	return PathAdapter(train, path, std::move(segments));
 }
 
+namespace {
+
+	struct SkippedInterval {
+		bool found = false;
+		int seg_index = -1;
+		int secs = -1;
+		double mile = -1;
+	};
+
+	/**
+	 * Find the next station that is bound AFTER the given segment.
+	 * Return the information.
+	 */
+	SkippedInterval find_next_bind_station_after_segment(
+		std::shared_ptr<Train> train, TrainPath* path, const std::vector<PathSegAdapter>& seg_adps,
+		int start_seg_index, const AdapterStation& last_bind_st, int period_hours
+	) {
+		const auto& start_seg_adp = seg_adps.at(start_seg_index);
+		const auto& start_seg = path->segments().at(start_seg_index);
+		auto start_seg_rail = start_seg.railway.lock();
+		double mile_between = start_seg_rail->mileBetween(
+			last_bind_st.railStation.lock(), start_seg_rail->stationByName(start_seg.end_station));
+
+		StationName seg_start_st = start_seg.end_station;
+		for (int i = start_seg_index + 1; i < (int)seg_adps.size(); i++) {
+			auto& seg_adp = seg_adps.at(i);
+			auto& seg = path->segments().at(seg_adp.segIndex());
+			auto seg_rail = seg.railway.lock();
+			if (seg_adp.type() != PathSegAdapter::EmptyBind) {
+				const auto& adp = seg_adp.firstAdapterStation();
+				mile_between += seg_rail->mileBetween(seg_rail->stationByName(seg_start_st), adp.railStation.lock());
+				int secs = qeutil::secsTo(last_bind_st.trainStation->depart, adp.trainStation->arrive, period_hours);
+				return SkippedInterval{
+					.found = true, .seg_index = i,
+					.secs = secs,
+					.mile = mile_between,
+				};
+			}
+			else {
+				mile_between += seg.mile;  // <- This mile is valid after calling checkIsValid().
+			}
+			seg_start_st = seg.end_station;
+		}
+		return SkippedInterval{ .found = false };
+	}
+}
+
 int PathAdapter::timetableInterpolationSimple(int period_hours)
 {
 	int tot_count = 0;
@@ -221,9 +269,18 @@ int PathAdapter::timetableInterpolationSimple(int period_hours)
 	double last_station_interval_mile = -1;
 	int last_station_interval_secs = -1;
 
+	std::shared_ptr<RailStation> seg_start_rst;
+
 	for (int iseg = 0; iseg < (int)m_segments.size(); iseg++) {
 		auto& seg_adp = m_segments.at(iseg);
 		auto& seg = m_path->segments().at(seg_adp.segIndex());
+		auto rail = seg.railway.lock();
+
+		if (iseg == 0) {
+			seg_start_rst = rail->stationByName(m_path->startStation());
+		}
+		auto seg_end_rst = rail->stationByName(seg.end_station);
+
 		assert(seg_adp.segIndex() == iseg);
 
 		if (start_seg_index < 0 && seg_adp.type() != PathSegAdapter::EmptyBind) {
@@ -246,8 +303,31 @@ int PathAdapter::timetableInterpolationSimple(int period_hours)
 
 		// TODO: find next station after this line to do extrapolation
 		// remember to update last_station and related data
+		// For empty-bind case, this is processed at the beginning of the iteration. 
+		// Here we only process the other two cases.
+		if (seg_adp.type() != PathSegAdapter::EmptyBind) {
+			auto& last_bind_st = seg_adp.lastAdapterStation();
+			auto last_bind_rst = last_bind_st.railStation.lock();
+			if (last_bind_rst != seg_end_rst) {
+				// We need to do extrapolation for the last station
+				auto skip_info = find_next_bind_station_after_segment(
+					train, m_path, m_segments, iseg, last_bind_st, period_hours
+				);
+				if (!skip_info.found) {
+					// No next unbound station, finish here!
+					break;
+				}
+				cur_interval_mile = skip_info.mile;
+				cur_interval_secs = skip_info.secs;
+				last_station_interval_mile = 0;
+				last_station_interval_secs = 0;
+
+				// TODO: compute the extrapolation stations!
+			}
+		}
 
 		seg_start_mile += seg.mile;
+		seg_start_rst = std::move(seg_end_rst);
 	}
 	return tot_count;
 }

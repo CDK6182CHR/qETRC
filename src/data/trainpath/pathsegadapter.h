@@ -50,4 +50,7 @@ public:
 
 	auto type()const { return m_type; }
 	auto& singleAdapterStation()const { return m_single_adp_station; }
+
+	const AdapterStation& firstAdapterStation()const;
+	const AdapterStation& lastAdapterStation()const;
 };
