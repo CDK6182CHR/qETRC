@@ -8,6 +8,8 @@
 #include "trainstation.h"
 #include "data/common/qeglobal.h"
 #include "trainpassenger.h"
+#include "data/trainpath/pathadapter.h"
+
 
 class RailStation;
 class Railway;
@@ -75,6 +77,12 @@ class Train:
      * 注意：仅考虑数量很少的情况，因此一切查找皆为线性
      */
     QVector<std::shared_ptr<TrainAdapter>> _adapters;
+
+    /**
+     * 2026.02.23  TrainPathAdapter; only filled when paths given.
+     * No JSON I/O provided.
+     */
+    std::vector<PathAdapter> _pathAdapters;
 
     std::weak_ptr<Routing> _routing;
     std::optional<std::list<RoutingNode>::iterator> _routingNode;
@@ -144,6 +152,9 @@ public:
      */
     auto& paths() { return _paths; }
     auto& paths()const { return _paths; }
+
+    auto& pathAdapters() { return _pathAdapters; }
+    auto& pathAdapters()const { return _pathAdapters; }
 
     auto& tags() { return _tags; }
     auto& tags()const { return _tags; }

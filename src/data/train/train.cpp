@@ -329,8 +329,9 @@ void Train::bindWithPath()
     qDebug() << "bindWithPath " << _trainName.full();
     //IssueManager::get()->clearIssuesForTrain(this);
     _adapters.clear();
+    _pathAdapters.clear();
     for (const auto& p : _paths) {
-        TrainAdapter::bindTrainByPath(shared_from_this(), p);
+        _pathAdapters.emplace_back(PathAdapter::bind(shared_from_this(), p));
     }
     invalidateTempData();
 }

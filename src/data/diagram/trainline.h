@@ -18,6 +18,7 @@ class StationName;
 class TrainStation;
 class Train;
 class TrainTime;
+class PathAdapter;
 
 
 /**
@@ -53,6 +54,7 @@ class TrainLine:
     public std::enable_shared_from_this<TrainLine>
 {
     friend class TrainAdapter;
+    friend class PathAdapter;
     TrainAdapter& _adapter;
 
     /**

@@ -34,6 +34,8 @@ class TrainAdapter
      */
     TrainAdapter(std::weak_ptr<Train> train, std::weak_ptr<Railway> railway);
 
+    friend class PathAdapter;
+
 public:
 
     /**
@@ -81,8 +83,9 @@ public:
 
     /**
      * 2023.08.22  New core implementation for binding train with the help of TrainPath.
+     * 2026.02.23  Moved to TrainPathAdapter
      */
-    static void bindTrainByPath(std::shared_ptr<Train> train, const TrainPath* path);
+    //static void bindTrainByPath(std::shared_ptr<Train> train, const TrainPath* path);
 
     /**
      * @brief listAdapterEvents 列出本次列车在本线的事件表
@@ -176,7 +179,7 @@ private:
      * Here, before/after is in the view of the train running direction.
      * Mind: how to process the counter mile?
      */
-    static int stationInSegment(double mile_start, double mile_end, Direction dir, const RailStation& st);
+    //static int stationInSegment(double mile_start, double mile_end, Direction dir, const RailStation& st);
 };
 
 
