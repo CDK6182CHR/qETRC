@@ -94,7 +94,7 @@ public:
     struct SharedActions {
         QAction* refreshAll;
         QAction* search,* rulerRef, * trainRef, * eventList;
-        QAction* timeAdjust, * batchCopy, * intervalExchange, * simpleInterp;
+        QAction* timeAdjust, * batchCopy, * intervalExchange, * simpleInterpLocal, * simpleInterpGlobal;
         QAction* addTrain, * rulerPaint, * greedyPaint;
         SharedActions() = default;
         SharedActions(const SharedActions&) = delete;

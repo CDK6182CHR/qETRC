@@ -166,7 +166,8 @@
 #define QEICN_interval_exchange QE_RSC_ICON(exchange.png)   // 区间换线
 #define QEICN_timetable_adjust QE_RSC_ICON(adjust.png)   // 时刻平移
 #define QEICN_timetable_correction QE_RSC_ICON(settings.png)  // 时刻修正
-#define QEICN_timetable_simple_interp QE_RSC_ICON(add.png)   // 快速推定通过站时刻
+#define QEICN_timetable_simple_interp_local QE_RSC_ICON(add.png)   // 快速推定通过站时刻（本线）
+#define QEICN_timetable_simple_interp_global QE_RSC_ICON(add.png)   // 快速推定通过站时刻（全局）
 #define QEICN_split_train QE_RSC_ICON(copy.png)   // 拆分车次
 #define QEICN_merge_trains QE_RSC_ICON(joint.png)   // 合并车次
 

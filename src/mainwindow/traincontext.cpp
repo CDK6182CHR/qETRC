@@ -389,12 +389,30 @@ void TrainContext::initUI()
 		connect(act, &QAction::triggered, this, &TrainContext::actCorrection);
 		panel->addLargeAction(act);
 
-		act = mw->makeAction(QEICN_timetable_simple_interp, tr("快速推定"));
-		act->setToolTip(tr("快速推定通过站时刻\n根据里程信息，快速推定本次列车在当前线路的通过站时刻，"
+		act = mw->makeAction(QEICN_timetable_simple_interp_global, tr("快速推定"));
+		act->setToolTip(tr("快速推定（全局）\n"
+			"根据里程信息，快速推定本次列车在所有线路上的通过站时刻。如果有列车径路信息，则利用径路信息。\n"
+			"本功能不考虑起停附加时分，不做时刻外插（列车径路各段之间的除外）。"));
+		connect(act, &QAction::triggered, this, &TrainContext::actSimpleInterpolationGlobal);
+
+		auto* menu = new SARibbonMenu(mw);
+
+		// Use this sub-act in the context menu, to avoid two-level menu.
+		auto* subact = mw->makeAction(QEICN_timetable_simple_interp_global, tr("快速推定（全局）"));
+		subact->setToolTip(act->toolTip());
+		connect(subact, &QAction::triggered, this, &TrainContext::actSimpleInterpolationGlobal);
+		mw->diaActions.simpleInterpGlobal = subact;
+		menu->addAction(subact);
+		
+		subact = mw->makeAction(QEICN_timetable_simple_interp_local, tr("快速推定（当前线路）"));
+		subact->setToolTip(tr("快速推定通过站时刻（当前线路）\n根据里程信息，快速推定本次列车在当前线路的通过站时刻，"
 			"不做外插且不考虑起停附加时分。"));
-		connect(act, &QAction::triggered, this, &TrainContext::actSimpleInterpolation);
-		panel->addLargeAction(act);
-		mw->diaActions.simpleInterp = act;
+		connect(subact, &QAction::triggered, this, &TrainContext::actSimpleInterpolation);
+		menu->addAction(subact);
+		mw->diaActions.simpleInterpLocal = subact;
+
+		act->setMenu(menu);
+		panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
 		act = mw->makeAction(QEICN_split_train, tr("拆分车次"));
 		act->setToolTip(tr("拆分车次\n将所选车次分段拆分为若干新车次"));
@@ -1303,7 +1321,46 @@ void TrainContext::actSimpleInterpolation()
 	}
 }
 
-void TrainContext::actDragTimeSingle(std::shared_ptr<Train> train, int station_id, const TrainStation& data, 
+void TrainContext::actSimpleInterpolationGlobal()
+{
+	if (!train) {
+		QMessageBox::warning(mw, tr("快速推定"), tr("错误：当前没有选中车次！"));
+		return;
+	}
+
+	if (train->adapters().empty()) {
+		QMessageBox::warning(mw, tr("快速推定（全局）"), tr("当前列车没有铺画运行线，无法推定！"));
+		return;
+	}
+
+	auto tab = std::make_shared<Train>(*train);
+	tab->paths() = train->paths();   // copy
+	int tot_cnt = 0;
+
+	// Below: the algorithm for non-path-bound trains; the case for paths is reserved
+	if (true) {
+		diagram.updateTrain(tab);
+
+		foreach (auto adp, tab->adapters()) {
+			int cnt = adp->timetableInterpolationSimple(diagram.options().period_hours);
+			tot_cnt += cnt;
+		}
+	}
+	else {
+		// TODO: for path-binding
+	}
+
+	if (tot_cnt) {
+		mw->getUndoStack()->push(new qecmd::TimetableInterpolationSimpleGlobal(train, tab, this));
+		mw->showStatus(tr("快速推定列车[%1]的通过站时刻 添加%2个时刻信息").arg(train->trainName().full(),
+			QString::number(tot_cnt)));
+	}
+	else {
+		mw->showStatus(tr("快速推定: 列车[%1]在线路[%2]上没有需要推定的车站").arg(train->trainName().full()));
+	}
+}
+
+void TrainContext::actDragTimeSingle(std::shared_ptr<Train> train, int station_id, const TrainStation& data,
 	Qt::KeyboardModifiers mod)
 {
 	mw->getUndoStack()->push(new qecmd::DragTrainStationTime(train, station_id, mod, data, this));
@@ -2373,6 +2430,13 @@ qecmd::TimetableInterpolationSimple::TimetableInterpolationSimple(std::shared_pt
 	ChangeTimetable(train,newtable,context,parent)
 {
 	setText(QObject::tr("快速推定: %1 @ %2").arg(train->trainName().full(), rail->name()));
+}
+
+qecmd::TimetableInterpolationSimpleGlobal::TimetableInterpolationSimpleGlobal(std::shared_ptr<Train> train,
+	std::shared_ptr<Train> newtable, TrainContext* context, QUndoCommand* parent) :
+	ChangeTimetable(train, newtable, context, parent)
+{
+	setText(QObject::tr("全局快速推定: %1").arg(train->trainName().full()));
 }
 
 qecmd::DragTrainStationTime::DragTrainStationTime(std::shared_ptr<Train> train, int station_id,

@@ -210,3 +210,23 @@ PathAdapter PathAdapter::bind(std::shared_ptr<Train> train, TrainPath* path)
 
 	return PathAdapter(train, path, std::move(segments));
 }
+
+int PathAdapter::timetableInterpolationSimple(int period_hours)
+{
+	int tot_count = 0;
+
+	double seg_start_mile = 0;
+	for (int iseg = 0; iseg < (int)m_segments.size(); iseg++) {
+		auto& seg_adp = m_segments.at(iseg);
+		auto& seg = m_path->segments().at(seg_adp.segIndex());
+		assert(seg_adp.segIndex() == iseg);
+
+		if (seg_adp.line()) {
+			// Has line; first do INTRA interpolation
+			tot_count += seg_adp.line()->timetableInterpolationSimple(period_hours);
+		}
+
+		seg_start_mile += seg.mile;
+	}
+	return tot_count;
+}

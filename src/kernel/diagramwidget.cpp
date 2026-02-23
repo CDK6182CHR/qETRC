@@ -848,7 +848,8 @@ void DiagramWidget::setupMenu(const SharedActions& actions)
         m->addAction(actions.timeAdjust);
         m->addAction(actions.batchCopy);
         m->addAction(actions.intervalExchange);
-        m->addAction(actions.simpleInterp);
+        m->addAction(actions.simpleInterpGlobal);
+        m->addAction(actions.simpleInterpLocal);
         m->addSeparator();
         m->addAction(actions.addTrain);
         m->addAction(actions.rulerPaint);

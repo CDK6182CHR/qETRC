@@ -50,4 +50,15 @@ public:
 	 */
 	bool isValid()const { return m_valid; }
 
+	/**
+	 * 2026.02.23  Global simple interpolation using this adapter.
+	 * Requires the adapter (including all lines) to be consistent with the path, the train, etc.
+	 * For segments with lines, the INTERpolation is implemented using the alg in TrainLine, which may use the information
+	 * of ruler (actually, the y-coeff); 
+	 * for early-stop or late-start segments, or segments w/o line, the EXTRApolation is implemented using the linear-interp
+	 * using the mile information.
+	 * returns: number of interpolated stations.
+	 */
+	int timetableInterpolationSimple(int period_hours);
+
 };

@@ -411,6 +411,11 @@ public slots:
      */
     void actSimpleInterpolation();
 
+    /**
+     * 2026.02.23  Similar to actSimpleInterpolation, but call for ALL adapters with current train.
+     */
+    void actSimpleInterpolationGlobal();
+
     void actDragTimeSingle(std::shared_ptr<Train> train, int station_id, const TrainStation& data, 
         Qt::KeyboardModifiers mod);
 
@@ -743,6 +748,15 @@ namespace qecmd {
     public:
         TimetableInterpolationSimple(std::shared_ptr<Train> train, std::shared_ptr<Train> newtable,
             TrainContext* context, const Railway* rail, QUndoCommand* parent = nullptr);
+    };
+
+    /**
+     * 2026.02.23: 全局版本，即对所有线路都推定。
+     */
+    class TimetableInterpolationSimpleGlobal : public ChangeTimetable {
+    public:
+        TimetableInterpolationSimpleGlobal(std::shared_ptr<Train> train, std::shared_ptr<Train> newtable,
+            TrainContext* context, QUndoCommand* parent = nullptr);
     };
 
     /**
