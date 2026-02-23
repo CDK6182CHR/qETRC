@@ -9,6 +9,7 @@
 #include <QList>
 
 #include "trainevents.h"
+#include "trainadapterstation.h"
 #include "data/calculation/stationeventaxis.h"
 #include "data/common/direction.h"
 
@@ -19,27 +20,6 @@ class TrainStation;
 class Train;
 class TrainTime;
 class PathAdapter;
-
-
-/**
- * @brief The AdapterNode struct
- * 一个铺画的车站
- */
-struct AdapterStation{
-    std::list<TrainStation>::iterator trainStation;
-    std::weak_ptr<RailStation> railStation;
-    AdapterStation(std::list<TrainStation>::iterator trainStation_,
-        std::weak_ptr<RailStation> railStation_):
-        trainStation(trainStation_),railStation(railStation_){}
-    bool operator==(const AdapterStation& other)const;
-    bool operator<(double y)const;
-    double yCoeff()const;
-};
-
-bool operator<(double y, const AdapterStation& adp);
-
-
-
 class TrainCollection;
 
 

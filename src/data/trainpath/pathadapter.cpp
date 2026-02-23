@@ -164,7 +164,7 @@ PathAdapter PathAdapter::bind(std::shared_ptr<Train> train, TrainPath* path)
 							line_end_rst->name.toSingleLiteral())));
 				}
 			}
-
+			segments.emplace_back(iseg, line);
 		}
 		else if (line->count() == 1) {
 			// 2024.03.20: for this case, restore tit_last_bind, since the previous bind is withdrawn
@@ -173,6 +173,7 @@ PathAdapter PathAdapter::bind(std::shared_ptr<Train> train, TrainPath* path)
 				line->stations().front().railStation.lock(),
 				QObject::tr("根据列车径路铺画运行线时，本段列车径路[%1-%2]仅有一个铺画站，无法铺画本段运行线，可能造成运行线缺失")
 				.arg(start_station.toSingleLiteral(), seg.end_station.toSingleLiteral())));
+			segments.emplace_back(iseg, line->stations().front());
 		}
 		else {
 			// 2026.02.22: for this case, no binding at all.
@@ -182,14 +183,6 @@ PathAdapter PathAdapter::bind(std::shared_ptr<Train> train, TrainPath* path)
 					QObject::tr("根据列车径路铺画运行线时，本段列车径路[%1-%2]无铺画站，无法铺画本段运行线，可能造成运行线缺失")
 					.arg(start_station.toSingleLiteral(), seg.end_station.toSingleLiteral())));
 			}
-		}
-
-		if (line->stations().size() > 1) {
-			// Add to the path adapter
-			segments.emplace_back(iseg, line);
-		}
-		else {
-			// No line for this case
 			segments.emplace_back(iseg);
 		}
 
