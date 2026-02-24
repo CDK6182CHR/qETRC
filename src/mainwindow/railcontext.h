@@ -133,7 +133,6 @@ private slots:
      */
     void actAddNewRuler();
 
-
     /**
      * 更新天窗面板的显示部分
      */
@@ -320,6 +319,9 @@ public slots:
     void actExportCurrentRailwayCsv();
 
     void actExportRailwayCsv(std::shared_ptr<Railway> rail = {});
+
+    // 2026.02.24: For adding ruler from navi-view.
+    void actAddNewRulerFor(std::shared_ptr<Railway> railway);
 };
 
 

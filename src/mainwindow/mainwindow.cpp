@@ -1369,6 +1369,8 @@ void MainWindow::initToolbar()
 			contextPage, &PageContext::actSwitchToRailway);
 		connect(contextPage, &PageContext::dulplicatePage,
 			naviView, &NaviTree::actDulplicatePage);
+		connect(naviView, &NaviTree::resetDiagramPage,
+			contextPage, &PageContext::actResetPageFor);
 	}
 
 	//context: train 6 7
@@ -1510,6 +1512,8 @@ void MainWindow::initToolbar()
 			contextRail, &RailContext::actExportForbidCsv);
 		connect(naviView, &NaviTree::importForbidFromCsv,
 			contextRail, &RailContext::actImportForbidCsv);
+		connect(naviView, &NaviTree::addNewRulerForRailway,
+			contextRail, &RailContext::actAddNewRulerFor);
 	}
 
 	//context: ruler 9

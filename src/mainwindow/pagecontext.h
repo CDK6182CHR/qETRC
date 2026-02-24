@@ -101,6 +101,8 @@ public slots:
      */
     void actAutoTopDownMargin();
 
+    void actResetPageFor(std::shared_ptr<DiagramPage> page);
+
 signals:
     void pageRemoved(int i);
     void pageNameChanged(int index);

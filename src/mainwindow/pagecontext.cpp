@@ -270,6 +270,11 @@ void PageContext::actAutoTopDownMargin()
 
 void PageContext::actResetPage()
 {
+    actResetPageFor(page);
+}
+
+void PageContext::actResetPageFor(std::shared_ptr<DiagramPage> page)
+{
     if (!page)return;
     auto* dlg = new AddPageDialog(diagram, page, mw);
     connect(dlg, &AddPageDialog::modificationDone,

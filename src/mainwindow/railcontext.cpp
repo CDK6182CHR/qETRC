@@ -507,6 +507,11 @@ void RailContext::actSnapEvents()
 
 void RailContext::actAddNewRuler()
 {
+	actAddNewRulerFor(railway);
+}
+
+void RailContext::actAddNewRulerFor(std::shared_ptr<Railway> railway)
+{
 	mw->getUndoStack()->push(new qecmd::AddNewRuler(railway->validRulerName(tr("新标尺")),
 		railway, this));
 }

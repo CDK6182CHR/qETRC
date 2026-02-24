@@ -88,6 +88,7 @@ void NaviTree::initContextMenus()
     mePage->addAction(tr("切换到运行图"), this, &NaviTree::onActivatePageContext);
     act = mePage->addAction(tr("删除运行图"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemovePageContext()));
+    mePage->addAction(tr("重设运行图页面"), this, &NaviTree::onResetDiagramPageContext);
     mePage->addAction(tr("创建运行图页面副本"), this, &NaviTree::onDulplicatePageContext);
     mePage->addSeparator();
     mePage->addAction(tr("编辑包含的线路"), this, &NaviTree::onEditRailwayFromPageContext);
@@ -109,6 +110,8 @@ void NaviTree::initContextMenus()
     act = meRailway->addAction(tr("删除基线"));
     connect(act, SIGNAL(triggered()), this, SLOT(onRemoveRailwayContext()));
     meRailway->addAction(tr("创建基线副本"), this, &NaviTree::onDulplicateRailwayContext);
+    meRailway->addSeparator();
+    meRailway->addAction(tr("新建标尺"), this, &NaviTree::onRailwayAddRulerContext);
     meRailway->addSeparator();
     meRailway->addAction(tr("快速创建单线路运行图"), this, &NaviTree::onCreatePageByRailContext);
 
@@ -219,6 +222,16 @@ void NaviTree::onDulplicateRailwayContext()
     if (item && item->type() == navi::RailwayItem::Type) {
         auto rail = static_cast<navi::RailwayItem*>(item)->railway();
         actDulplicateRailway(rail);
+    }
+}
+
+void NaviTree::onRailwayAddRulerContext()
+{
+    auto idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::RailwayItem::Type) {
+        auto rail = static_cast<navi::RailwayItem*>(item)->railway();
+        emit addNewRulerForRailway(rail);
     }
 }
 
@@ -359,6 +372,16 @@ void NaviTree::onActivatePageContext()
     ACI* item = getItem(idx);
     if (item && item->type() == navi::PageItem::Type) {
         emit activatePageAt(item->row());
+    }
+}
+
+void NaviTree::onResetDiagramPageContext()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::PageItem::Type) {
+        auto page = static_cast<navi::PageItem*>(item)->page();
+        emit resetDiagramPage(page);
     }
 }
 

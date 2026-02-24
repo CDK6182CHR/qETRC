@@ -135,6 +135,10 @@ signals:
      */
     void addPathsToTrain(std::shared_ptr<Train>, const std::vector<TrainPath*> paths);
 
+    void addNewRulerForRailway(std::shared_ptr<Railway>);
+
+    void resetDiagramPage(std::shared_ptr<DiagramPage> page);
+
 private slots:
     void showContextMenu(const QPoint& pos);
     
@@ -147,6 +151,8 @@ private slots:
     void onRemoveRailwayContext();
 
     void onDulplicateRailwayContext();
+
+    void onRailwayAddRulerContext();
 
     void onDulplicateTrainContext();
 
@@ -177,6 +183,8 @@ private slots:
     void onEditRoutingContext();
 
     void onActivatePageContext();
+
+    void onResetDiagramPageContext();
 
     void onCreatePageByRailContext();
 
