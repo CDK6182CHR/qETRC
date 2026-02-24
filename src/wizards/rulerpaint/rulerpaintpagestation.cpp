@@ -108,6 +108,13 @@ void RulerPaintPageStation::initUI()
         new GeneralDoubleSpinDelegate(this));
     table->setModel(model);
 
+    {
+        int c = 0;
+        for (int w : {120, 80, 80, 30, 30, 50, 30, 30, 30}) {
+            table->setColumnWidth(c++, w);
+        }
+    }
+
     //2023.08.27: do not set default railway at the beginning; detect possible railway first.
     //onRailwayChanged(cbRuler->railway());     //此操作触发初始化表格！
 
@@ -119,7 +126,7 @@ void RulerPaintPageStation::onRailwayChanged(std::shared_ptr<Railway> railway)
     _railway=railway;
     if(railway){
         model->setRailwayForDir(_railway,getDir());
-        table->resizeColumnsToContents();
+        //table->resizeColumnsToContents();
         emit railwayChanged(railway);
     }
 }
@@ -127,5 +134,5 @@ void RulerPaintPageStation::onRailwayChanged(std::shared_ptr<Railway> railway)
 void RulerPaintPageStation::onDirChanged()
 {
     model->setRailwayForDir(_railway,getDir());
-    table->resizeColumnsToContents();
+    //table->resizeColumnsToContents();
 }

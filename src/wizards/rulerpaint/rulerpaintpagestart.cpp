@@ -170,6 +170,13 @@ void RulerPaintPageStart::initWidget3()
 	table->setItemDelegateForColumn(TimetableStdModel::ColArrive, dele);
 	table->setItemDelegateForColumn(TimetableStdModel::ColDepart, dele);
 
+    {
+        int c = 0;
+        for (int wd : {120, 80, 80, 30, 30, 60, 60}) {
+            table->setColumnWidth(c++, wd);
+        }
+    }
+
     vlay->addWidget(table);
     w->setLayout(vlay);
     stack->addWidget(w);

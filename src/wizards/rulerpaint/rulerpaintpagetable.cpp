@@ -537,7 +537,7 @@ void RulerPaintPageTable::initializePage()
     auto st=pgStation->anchorStation();
 
     model->setupModel(railway,ruler,dir,st);
-    table->resizeColumnsToContents();
+    //table->resizeColumnsToContents();
 
     anchorRow=model->anchorRow();
 
@@ -682,6 +682,13 @@ void RulerPaintPageTable::initUI()
     act->setShortcut(Qt::ALT | Qt::Key_Y);
     table->addAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(showTimetable()));
+
+    {
+        int c = 0;
+        for (int w : {120, 40, 40, 80, 80, 40, 40, 60}) {
+            table->setColumnWidth(c++, w);
+        }
+    }
 
     vlay->addWidget(table);
 
