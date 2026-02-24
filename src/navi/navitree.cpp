@@ -152,6 +152,7 @@ void NaviTree::initContextMenus()
     mePath->addAction(tr("编辑列车径路"), this, &NaviTree::onEditPathContext);
     mePath->addAction(tr("删除列车径路"), this, &NaviTree::onRemovePathContext);
     mePath->addAction(tr("创建列车径路副本"), this, &NaviTree::onDuplicatePathContext);
+    mePath->addAction(tr("创建反向列车径路"), this, &NaviTree::onCreateReversePath);
 
     //PathRuler
     mePathRuler->addAction(tr("编辑列车径路标尺"), this, &NaviTree::onEditPathRuler);
@@ -468,6 +469,16 @@ void NaviTree::onDuplicatePathRuler()
     if (item && item->type() == navi::PathRulerItem::Type) {
         auto* it = static_cast<navi::PathRulerItem*>(item);
         emit duplicatePathRulerNavi(it->ruler());
+    }
+}
+
+void NaviTree::onCreateReversePath()
+{
+    auto&& idx = tree->currentIndex();
+    ACI* item = getItem(idx);
+    if (item && item->type() == navi::PathItem::Type) {
+        auto* path = static_cast<navi::PathItem*>(item)->getPath();
+        emit addReversePath(path);
     }
 }
 

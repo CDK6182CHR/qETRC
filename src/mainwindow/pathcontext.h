@@ -120,6 +120,8 @@ public slots:
     void actBatchAssignPath(QList<std::shared_ptr<Train>> trains);
 
     void actBatchClearPaths(QList<std::shared_ptr<Train>> trains);
+
+    void actAddReversePathFor(const TrainPath* path);
 };
 
 namespace qecmd {

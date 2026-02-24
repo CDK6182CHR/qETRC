@@ -139,6 +139,8 @@ signals:
 
     void resetDiagramPage(std::shared_ptr<DiagramPage> page);
 
+    void addReversePath(const TrainPath*);
+
 private slots:
     void showContextMenu(const QPoint& pos);
     
@@ -201,6 +203,8 @@ private slots:
     void onRemovePathRuler();
 
     void onDuplicatePathRuler();
+
+    void onCreateReversePath();
 
     void onCurrentChanged(const QModelIndex& cur, const QModelIndex& prev);
 

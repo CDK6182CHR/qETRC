@@ -242,6 +242,7 @@
 
 #define QEICN_change_path QE_RSC_ICON(exchange.png)   // 切换列车径路
 #define QEICN_edit_path QE_RSC_ICON(edit.png)   // 编辑 列车径路
+#define QEICN_add_reverse_path QE_RSC_ICON(reverse.png)   // 添加反向列车径路
 
 #define QEICN_edit_path_ruler QE_RSC_ICON(ruler.png)  // 编辑 列车径路标尺
 #define QEICN_add_path_ruler QE_RSC_ICON(add.png)     // 新建 列车径路标尺

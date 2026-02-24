@@ -1587,6 +1587,8 @@ void MainWindow::initToolbar()
 			contextPath, &PathContext::actBatchAssignPath);
 		connect(trainListWidget, &TrainListWidget::batchClearPaths,
 			contextPath, &PathContext::actBatchClearPaths);
+		connect(naviView, &NaviTree::addReversePath,
+			contextPath, &PathContext::actAddReversePathFor);
 	}
 
 	// context: DB

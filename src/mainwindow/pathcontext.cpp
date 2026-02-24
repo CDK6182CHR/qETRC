@@ -25,7 +25,7 @@
 #include "editors/trainpath/selectpathdialog.h"
 #include "editors/trainpath/pathrulereditor.h"
 #include "model/diagram/diagramnavimodel.h"
-
+#include "data/rail/railway.h"
 
 PathContext::PathContext(Diagram &diagram, SARibbonContextCategory *cont,
                            MainWindow *mw, QObject *parent):
@@ -88,6 +88,10 @@ void PathContext::initUI()
 
     auto* act = mw->makeAction(QEICN_edit_path, tr("编辑"), tr("编辑径路"));
     connect(act,&QAction::triggered, this, &PathContext::actEditPath);
+    panel->addLargeAction(act);
+
+    act = mw->makeAction(QEICN_add_reverse_path, tr("添加反向径路"));
+    connect(act, &QAction::triggered, this, [this]() { actAddReversePathFor(this->getPath()); });
     panel->addLargeAction(act);
 
     panel = page->addPanel(tr("径路标尺"));
@@ -428,6 +432,45 @@ void PathContext::actBatchClearPaths(QList<std::shared_ptr<Train>> trains)
     }
 
     mw->getUndoStack()->push(new qecmd::ClearPathsFromTrainBatch(std::move(trains), this));
+}
+
+void PathContext::actAddReversePathFor(const TrainPath* path)
+{
+    bool ok;
+    QString name = QInputDialog::getText(mw, tr("创建反向径路"), tr("请输入反向径路名称"),
+        QLineEdit::Normal, QObject::tr("%1_反向").arg(path->name()), &ok);
+    if (!ok)
+        return;
+    auto rev = std::make_unique<TrainPath>(
+        diagram.pathCollection().validNewPathName(name)
+    );
+    rev->setStartStation(path->endStation());
+
+    for (auto itr = path->segments().rbegin(); itr != path->segments().rend(); ++itr) {
+        auto rail = itr->railway.lock();
+        auto itnext = std::next(itr);
+        const StationName& next_station = itnext == path->segments().rend() ? path->startStation() : itnext->end_station;
+        auto rst_start = rail->stationByName(itr->end_station);
+        auto rst_end = rail->stationByName(next_station);
+
+        if (rst_start->direction != PassedDirection::BothVia) {
+            QMessageBox::warning(mw, tr("错误"), tr("列车径路节点站%1为单向站，无法创建反向径路").arg(rst_start->name.toSingleLiteral()));
+            return;
+        }
+        if (rst_end->direction != PassedDirection::BothVia) {
+            QMessageBox::warning(mw, tr("错误"), tr("列车径路节点站%1为单向站，无法创建反向径路").arg(rst_end->name.toSingleLiteral()));
+            return;
+        }
+
+        rev->segments().emplace_back(
+            rail, rst_end->name.toSingleLiteral(), DirFunc::reverse(itr->dir), rail->mileBetween(rst_start, rst_end));
+    }
+    if (!rev->checkIsValid()) {
+        QMessageBox::warning(mw, tr("错误"), tr("内部错误：反向列车径路非法，无法添加"));
+        return;
+    }
+
+    mw->getUndoStack()->push(new qecmd::AddTrainPath(std::move(rev), mw->pathListWidget));
 }
 
 
