@@ -175,12 +175,7 @@ PathAdapter PathAdapter::bind(std::shared_ptr<Train> train, TrainPath* path)
 		}
 		else {
 			// 2026.02.22: for this case, no binding at all.
-			if (first_matched_encountered) {
-				qeIssueWarning(IssueInfo(IssueInfo::PathBindSkipped, train, rail,
-					rst_start,
-					QObject::tr("根据列车径路铺画运行线时，本段列车径路[%1-%2]无铺画站，无法铺画本段运行线，可能造成运行线缺失")
-					.arg(start_station.toSingleLiteral(), seg.end_station.toSingleLiteral())));
-			}
+			// 2026.02.24: warning moved to later loop
 			segments.emplace_back(iseg);
 		}
 
@@ -202,9 +197,10 @@ PathAdapter PathAdapter::bind(std::shared_ptr<Train> train, TrainPath* path)
 	StationName seg_start_st = path->startStation();
 	for (const auto& seg_adp : segments) {
 		auto& seg = path->segments().at(seg_adp.segIndex());
+		auto rail = seg.railway.lock();
+		bool in_range_cond = (start_seg_idx <= seg_adp.segIndex() && seg_adp.segIndex() <= end_seg_idx);
 		if (seg_adp.type() == PathSegAdapter::SingleBind) {
-			auto rail = seg.railway.lock();
-			bool need_warning = (start_seg_idx <= seg_adp.segIndex() && seg_adp.segIndex() <= end_seg_idx);
+			bool need_warning = in_range_cond;
 			// Special cases: first segment, end station; last segment, first station, and not single-segment
 			if (start_seg_idx != end_seg_idx) {
 				if (seg_adp.segIndex() == start_seg_idx) {
@@ -226,7 +222,14 @@ PathAdapter PathAdapter::bind(std::shared_ptr<Train> train, TrainPath* path)
 					.arg(start_station.toSingleLiteral(), seg.end_station.toSingleLiteral(), 
 						seg_adp.lastAdapterStation().trainStation->name.toSingleLiteral())));
 			}
-
+		}
+		else if (seg_adp.type() == PathSegAdapter::EmptyBind) {
+			if (in_range_cond) {
+				qeIssueWarning(IssueInfo(IssueInfo::PathBindSkipped, train, rail,
+					rail->stationByName(start_station),
+					QObject::tr("根据列车径路铺画运行线时，本段列车径路[%1-%2]无铺画站，无法铺画本段运行线，可能造成运行线缺失")
+					.arg(start_station.toSingleLiteral(), seg.end_station.toSingleLiteral())));
+			}
 		}
 		seg_start_st = seg.end_station;
 	}
