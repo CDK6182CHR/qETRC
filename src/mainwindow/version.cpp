@@ -4,16 +4,16 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.9.4";
-const std::string_view DATE = "20260217";
-const int RELEASE_CODE = 76;
+const std::string_view LAST_VERSION = "V1.9.5";
+const std::string_view DATE = "20260224";
+const int RELEASE_CODE = 77;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 新增列车信息汇总功能。
-2. 新增列车批量操作：删除时刻表中连续的重出站。
-3. 自CSV导入列车时刻表时支持读取始发终到站。
-4. 线路数据库中新增移动线路、分类。
-5. 其他细节。)";
+const std::string_view UPDATE_LOG = R"(1. 新增基于列车径路的缺失运行线（片段）检测和警告。
+2. 新增快速推定（全局）功能。
+3. 新增创建反向列车径路功能。
+4. 允许设置最大跨越站数为-1以禁用自动运行线铺画。
+5. 新增部分批量操作等细节。)";
 }
