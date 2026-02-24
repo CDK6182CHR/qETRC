@@ -1328,7 +1328,7 @@ void TrainContext::actSimpleInterpolationGlobal()
 		return;
 	}
 
-	if (train->adapters().empty()) {
+	if (train->adapters().empty() && train->paths().empty()) {
 		QMessageBox::warning(mw, tr("快速推定（全局）"), tr("当前列车没有铺画运行线，无法推定！"));
 		return;
 	}
@@ -1338,7 +1338,7 @@ void TrainContext::actSimpleInterpolationGlobal()
 	int tot_cnt = 0;
 
 	// Below: the algorithm for non-path-bound trains; the case for paths is reserved
-	if (true) {
+	if (train->paths().empty()) {
 		diagram.updateTrain(tab);
 
 		foreach (auto adp, tab->adapters()) {
@@ -1347,7 +1347,11 @@ void TrainContext::actSimpleInterpolationGlobal()
 		}
 	}
 	else {
-		// TODO: for path-binding
+		diagram.updateTrain(tab);
+		for (auto& adp : tab->pathAdapters()) {
+			tot_cnt += adp.timetableInterpolationSimple(diagram.options().period_hours);
+		}
+		diagram.updateTrain(tab);
 	}
 
 	if (tot_cnt) {
@@ -1356,7 +1360,7 @@ void TrainContext::actSimpleInterpolationGlobal()
 			QString::number(tot_cnt)));
 	}
 	else {
-		mw->showStatus(tr("快速推定: 列车[%1]在线路[%2]上没有需要推定的车站").arg(train->trainName().full()));
+		mw->showStatus(tr("快速推定: 列车[%1]上没有需要推定的车站").arg(train->trainName().full()));
 	}
 }
 

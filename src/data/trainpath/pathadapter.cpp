@@ -219,10 +219,10 @@ namespace {
 	 * Return the information.
 	 */
 	SkippedInterval find_next_bind_station_after_segment(
-		std::shared_ptr<Train> train, TrainPath* path, const std::vector<PathSegAdapter>& seg_adps,
+		[[maybe_unused]] std::shared_ptr<Train> train, TrainPath* path, const std::vector<PathSegAdapter>& seg_adps,
 		int start_seg_index, const AdapterStation& last_bind_st, int period_hours
 	) {
-		const auto& start_seg_adp = seg_adps.at(start_seg_index);
+		//const auto& start_seg_adp = seg_adps.at(start_seg_index);
 		const auto& start_seg = path->segments().at(start_seg_index);
 		auto start_seg_rail = start_seg.railway.lock();
 		double mile_between = start_seg_rail->mileBetween(
@@ -260,7 +260,8 @@ int PathAdapter::timetableInterpolationSimple(int period_hours)
 	double seg_start_mile = 0;
 
 	int start_seg_index = -1;
-	Train::StationPtr last_station = train->timetable().begin();  // This is invalid BEFORE line_started
+	Train::StationPtr last_bind_tst = train->timetable().begin();  // This is invalid BEFORE line_started
+	Train::StationPtr interp_pos = train->timetable().begin();  // invalid before line_started
 
 	// Current interval for extra polation
 	double cur_interval_mile = -1;
@@ -269,16 +270,14 @@ int PathAdapter::timetableInterpolationSimple(int period_hours)
 	double last_station_interval_mile = -1;
 	int last_station_interval_secs = -1;
 
-	std::shared_ptr<RailStation> seg_start_rst;
+	StationName seg_start_rst_name = m_path->startStation();
 
 	for (int iseg = 0; iseg < (int)m_segments.size(); iseg++) {
 		auto& seg_adp = m_segments.at(iseg);
 		auto& seg = m_path->segments().at(seg_adp.segIndex());
 		auto rail = seg.railway.lock();
 
-		if (iseg == 0) {
-			seg_start_rst = rail->stationByName(m_path->startStation());
-		}
+		auto seg_start_rst = rail->stationByName(seg_start_rst_name);
 		auto seg_end_rst = rail->stationByName(seg.end_station);
 
 		assert(seg_adp.segIndex() == iseg);
@@ -287,13 +286,41 @@ int PathAdapter::timetableInterpolationSimple(int period_hours)
 			start_seg_index = 0;
 		}
 
-		if (start_seg_index < 0)
+		if (start_seg_index < 0) {
+			seg_start_rst_name = seg.end_station;
 			continue;
+		}
 		else
 			start_seg_index++;
 
 		if (start_seg_index > 1) {
-			// TODO: EXTRApolation at the beginning of the segment, if required
+			auto extrap_end_rst = seg_adp.type() == PathSegAdapter::EmptyBind ? 
+				seg_end_rst : seg_adp.firstAdapterStation().railStation.lock();
+			if (extrap_end_rst != seg_start_rst) {
+				// We need to do extrapolation here; the first station is guaranteed to be added by the last segment.
+				auto rint = seg_start_rst->dirNextInterval(seg.dir);
+				for (; rint; rint = rint->nextInterval()) {
+					auto rst = rint->toStation();
+					if (seg_adp.type() != PathSegAdapter::EmptyBind && rst == extrap_end_rst) {
+						break;
+					}
+
+					last_station_interval_mile += rint->mile();
+					last_station_interval_secs = static_cast<int>(std::round(
+						last_station_interval_mile / cur_interval_mile * cur_interval_secs
+					));
+					TrainTime tm_interp = last_bind_tst->depart.addSecs(last_station_interval_secs, period_hours);
+					interp_pos = train->timetable().insert(std::next(interp_pos), TrainStation(
+						rst->name, tm_interp, tm_interp, false, "", QObject::tr("推定")
+					));
+					//qDebug() << "Extrapolation (head): " << rst->name.toSingleLiteral();
+					tot_count++;
+
+					if (seg_adp.type() == PathSegAdapter::EmptyBind && rst == extrap_end_rst) {
+						break;
+					}
+				}
+			}
 		}
 
 		if (seg_adp.line()) {
@@ -301,8 +328,6 @@ int PathAdapter::timetableInterpolationSimple(int period_hours)
 			tot_count += seg_adp.line()->timetableInterpolationSimple(period_hours);
 		}
 
-		// TODO: find next station after this line to do extrapolation
-		// remember to update last_station and related data
 		// For empty-bind case, this is processed at the beginning of the iteration. 
 		// Here we only process the other two cases.
 		if (seg_adp.type() != PathSegAdapter::EmptyBind) {
@@ -321,13 +346,42 @@ int PathAdapter::timetableInterpolationSimple(int period_hours)
 				cur_interval_secs = skip_info.secs;
 				last_station_interval_mile = 0;
 				last_station_interval_secs = 0;
+				last_bind_tst = last_bind_st.trainStation;
 
-				// TODO: compute the extrapolation stations!
+				if (cur_interval_mile == 0) {
+					qWarning() << "zero interval mile encountered: last_bind_st " << last_bind_st.trainStation->name.toSingleLiteral();
+					cur_interval_mile = 1;
+				}
+
+				auto rint = last_bind_rst->dirNextInterval(seg.dir);
+				interp_pos = last_bind_tst;
+				for (; rint; rint = rint->nextInterval()) {
+					// Each loop process the LATTER station of the interval.
+					auto rst = rint->toStation();
+					last_station_interval_mile += rint->mile();
+					last_station_interval_secs = static_cast<int>(std::round(
+						last_station_interval_mile / cur_interval_mile * cur_interval_secs));
+					TrainTime tm_interp = last_bind_tst->depart.addSecs(
+						last_station_interval_secs, period_hours
+					);
+					interp_pos = train->timetable().insert(std::next(interp_pos), TrainStation(
+						rst->name, tm_interp, tm_interp,
+						false, "", QObject::tr("推定"))
+					);
+					//qDebug() << "Extrapolation (tail): " << rst->name.toSingleLiteral();
+					tot_count++;
+					if (rst == seg_end_rst) {
+						break;
+					}
+				}
+				if (!rint) {
+					qDebug() << "Extrapolation-tail WARNING: exceed range. Segment end " << seg.end_station.toSingleLiteral();
+				}
 			}
 		}
 
 		seg_start_mile += seg.mile;
-		seg_start_rst = std::move(seg_end_rst);
+		seg_start_rst_name = seg.end_station;
 	}
 	return tot_count;
 }
