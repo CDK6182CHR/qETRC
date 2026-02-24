@@ -73,7 +73,7 @@ PathAdapter PathAdapter::bind(std::shared_ptr<Train> train, TrainPath* path)
 	StationName start_station = path->startStation();
 	auto tit_last_bind = train->timetable().begin();
 
-
+	int start_seg_idx = -1, end_seg_idx = -1;
 	for (int iseg = 0; iseg < (int) path->segments().size(); iseg++) {
 		auto& seg = path->segments().at(iseg);
 		auto rail = seg.railway.lock();
@@ -170,10 +170,7 @@ PathAdapter PathAdapter::bind(std::shared_ptr<Train> train, TrainPath* path)
 		else if (line->count() == 1) {
 			// 2024.03.20: for this case, restore tit_last_bind, since the previous bind is withdrawn
 			tit_last_bind = tit_last_bind_before_loop;
-			qeIssueWarning(IssueInfo(IssueInfo::PathBindSingleStation, train, rail,
-				line->stations().front().railStation.lock(),
-				QObject::tr("根据列车径路铺画运行线时，本段列车径路[%1-%2]仅有一个铺画站，无法铺画本段运行线，可能造成运行线缺失")
-				.arg(start_station.toSingleLiteral(), seg.end_station.toSingleLiteral())));
+			// The warning will be generated with another loop
 			segments.emplace_back(iseg, line->stations().front());
 		}
 		else {
@@ -187,12 +184,51 @@ PathAdapter PathAdapter::bind(std::shared_ptr<Train> train, TrainPath* path)
 			segments.emplace_back(iseg);
 		}
 
+		if (!line->stations().empty()) {
+			end_seg_idx = iseg;
+			if (start_seg_idx == -1)
+				start_seg_idx = iseg;
+		}
+
 		start_station = seg.end_station;
 		if (first_matched_encountered) {
 			// We set this key for the later checking of starting station of the next segment.
 			// Currently, we consider the path starts after any matching (even a discarded one in the single-matching case).
 			has_any_match_before_this_line = true;
 		}
+	}
+
+	// We need another loop to check the single-bind cases
+	StationName seg_start_st = path->startStation();
+	for (const auto& seg_adp : segments) {
+		auto& seg = path->segments().at(seg_adp.segIndex());
+		if (seg_adp.type() == PathSegAdapter::SingleBind) {
+			auto rail = seg.railway.lock();
+			bool need_warning = (start_seg_idx <= seg_adp.segIndex() && seg_adp.segIndex() <= end_seg_idx);
+			// Special cases: first segment, end station; last segment, first station, and not single-segment
+			if (start_seg_idx != end_seg_idx) {
+				if (seg_adp.segIndex() == start_seg_idx) {
+					if (seg_adp.lastAdapterStation().railStation.lock()->name == seg.end_station) {
+						need_warning = false;
+					}
+				}
+				if (seg_adp.segIndex() == end_seg_idx) {
+					if (seg_adp.firstAdapterStation().railStation.lock()->name == seg_start_st) {
+						need_warning = false;
+					}
+				}
+			}
+
+			if (need_warning) {
+				qeIssueWarning(IssueInfo(IssueInfo::PathBindSingleStation, train, rail,
+					seg_adp.lastAdapterStation().railStation.lock(),
+					QObject::tr("根据列车径路铺画运行线时，本段列车径路[%1-%2]仅有一个铺画站[%3]，无法铺画本段运行线，可能造成运行线缺失")
+					.arg(start_station.toSingleLiteral(), seg.end_station.toSingleLiteral(), 
+						seg_adp.lastAdapterStation().trainStation->name.toSingleLiteral())));
+			}
+
+		}
+		seg_start_st = seg.end_station;
 	}
 
 	for (auto itr = adp_map.begin(); itr != adp_map.end(); ++itr) {
