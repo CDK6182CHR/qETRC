@@ -4,16 +4,14 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.9.5";
-const std::string_view DATE = "20260224";
-const int RELEASE_CODE = 77;
+const std::string_view LAST_VERSION = "V1.9.6";
+const std::string_view DATE = "20260305";
+const int RELEASE_CODE = 78;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 新增基于列车径路的缺失运行线（片段）检测和警告。
-2. 新增快速推定（全局）功能。
-3. 新增创建反向列车径路功能。
-4. 允许设置最大跨越站数为-1以禁用自动运行线铺画。
-5. 新增部分批量操作等细节。)";
+const std::string_view UPDATE_LOG = R"(1. 优化列车径路铺画相关警告的逻辑。
+2. 修复删除所有列车径路时导致的错误。
+3. 优化标尺排图表格列宽等细节。)";
 }
