@@ -86,6 +86,8 @@ void PathListWidget::editPathByModelIndex(const QModelIndex& idx)
 
 void PathListWidget::onCurrentChanged(const QModelIndex& idx)
 {
+    if (!idx.isValid())
+        return;
     emit focusInPath(pathcoll.at(idx.row()));
 }
 
