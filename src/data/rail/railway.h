@@ -391,6 +391,7 @@ public:
      * otherwise firstUpInterval().
      */
     std::shared_ptr<RailInterval> firstCircInterval();
+    std::shared_ptr<const RailInterval> firstCircInterval()const;
 
     std::shared_ptr<const RailInterval> firstUpInterval()const;
     std::shared_ptr<RailInterval> firstUpInterval();

@@ -413,7 +413,7 @@ void Railway::removeRuler(std::shared_ptr<Ruler> ruler)
 		_rulers[i]->_index--;
 	}
 	//遍历interval  只需要删掉结点元素
-	auto p = firstDownInterval();
+	auto p = firstCircInterval();
 	for (; p; p = nextIntervalCirc(p)) {
 		p->_rulerNodes.removeAt(index);
 	}
@@ -437,8 +437,8 @@ void Railway::undoRemoveRuler(std::shared_ptr<Ruler> ruler, std::shared_ptr<Rail
 		_rulers.at(i)->_index++;
 	}
 	auto r = data->getRuler(0);
-	auto p = firstDownInterval();
-	auto n = r->firstDownNode();
+	auto p = firstCircInterval();
+	auto n = r->firstCircNode();
 	for (; p && n; p = nextIntervalCirc(p), n = n->nextNodeCirc()) {
 		//qDebug() << "addRulerFrom: "<<*p<<'\t' << p->_rulerNodes.last().get() << " @ " << p.get();
 		p->_rulerNodes.insert(idx,
@@ -452,7 +452,7 @@ void Railway::undoRemoveRuler(std::shared_ptr<Ruler> ruler, std::shared_ptr<Rail
 void Railway::clearRulers()
 {
 	//先去清理结点数据，免得Ruler对象被析构引起引用的危险
-	for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
+	for (auto p = firstCircInterval(); p; p = nextIntervalCirc(p)) {
 		p->_rulerNodes.clear();
 	}
 	std::ranges::for_each(_rulers, [](auto pruler) {pruler->setValid(false); });
@@ -462,7 +462,7 @@ void Railway::clearRulers()
 void Railway::clearForbids()
 {
 	//先去清理结点数据，免得Ruler对象被析构引起引用的危险
-	for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
+	for (auto p = firstCircInterval(); p; p = nextIntervalCirc(p)) {
 		p->_forbidNodes.clear();
 	}
 	std::ranges::for_each(_forbids, [](auto pforbid) {pforbid->setValid(false); });
@@ -740,6 +740,13 @@ std::shared_ptr<RailInterval> Railway::firstCircInterval()
 	return firstUpInterval();
 }
 
+std::shared_ptr<const RailInterval> Railway::firstCircInterval() const
+{
+	if (auto p = firstDownInterval())
+		return p;
+	return firstUpInterval();
+}
+
 std::shared_ptr<const RailInterval> Railway::firstUpInterval() const
 {
 	for (int i = stationCount() - 1; i >= 0; i--) {
@@ -875,8 +882,8 @@ std::shared_ptr<Ruler> Railway::addRulerFrom(const Ruler& r)
 	int idx = _rulers.count();
 	auto ruler = std::shared_ptr<Ruler>(new Ruler(weak_from_this(), r.name(), r.different(), idx));
 	_rulers.append(ruler);
-	auto p = firstDownInterval();
-	auto n = r.firstDownNode();
+	auto p = firstCircInterval();
+	auto n = r.firstCircNode();
 	for (; p && n; p = nextIntervalCirc(p), n = n->nextNodeCirc()) {
 		//qDebug() << "addRulerFrom: "<<*p<<'\t' << p->_rulerNodes.last().get() << " @ " << p.get();
 		p->_rulerNodes.append(std::make_shared<RulerNode>(*ruler, *p, n->interval, n->start, n->stop));
@@ -891,8 +898,8 @@ std::shared_ptr<Ruler> Railway::restoreRulerFrom(std::shared_ptr<Ruler> head, co
 {
 	auto ruler = head;
 	_rulers.append(ruler);
-	auto p = firstDownInterval();
-	auto n = data.firstDownNode();
+	auto p = firstCircInterval();
+	auto n = data.firstCircNode();
 	for (; p && n; p = nextIntervalCirc(p), n = n->nextNodeCirc()) {
 		//qDebug() << "addRulerFrom: "<<*p<<'\t' << p->_rulerNodes.last().get() << " @ " << p.get();
 		p->_rulerNodes.append(std::make_shared<RulerNode>(*ruler, *p, n->interval, n->start, n->stop));
@@ -1315,7 +1322,7 @@ void Railway::mergeIntervalDataInequiv(const Railway& other)
 	for (auto f : other._forbids) {
 		addEmptyForbid(f->different());
 	}
-	for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
+	for (auto p = firstCircInterval(); p; p = nextIntervalCirc(p)) {
 		auto it = other.findInterval(p->fromStation()->name, p->toStation()->name);
 		if (it) {
 			//!! 不能直接赋值或者std::copy，这是对shared_ptr的操作！！
@@ -1868,8 +1875,8 @@ std::shared_ptr<Forbid> Railway::addForbidFrom(const Forbid& other)
 	forbid->downShow = other.downShow;
 	forbid->upShow = other.upShow;
 	_forbids.append(forbid);
-	auto p = firstDownInterval();
-	auto n = other.firstDownNode();
+	auto p = firstCircInterval();
+	auto n = other.firstCircNode();
 	for (; p && n; p = nextIntervalCirc(p), n = n->nextNodeCirc()) {
 		p->_forbidNodes.append(std::make_shared<ForbidNode>(*forbid, *p, n->beginTime, n->endTime));
 	}
@@ -1878,7 +1885,7 @@ std::shared_ptr<Forbid> Railway::addForbidFrom(const Forbid& other)
 
 std::shared_ptr<RailInterval> Railway::intervalCircByIndex(int index)
 {
-	auto p = firstDownInterval();
+	auto p = firstCircInterval();
 	for (int i = 0; i < index; i++) {
 		p = nextIntervalCirc(p);
 		if (!p) {
@@ -2054,7 +2061,7 @@ void Railway::clearYValues()
 
 void Railway::setupIntervalNodeDatas()
 {
-	for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
+	for (auto p = firstCircInterval(); p; p = nextIntervalCirc(p)) {
 		// Ruler
 		for (int i = 0; i < _rulers.size(); i++) {
 			p->rulerNodeAt(i)->setDataNode(std::ref(*(_rulers.at(i))));
@@ -2073,7 +2080,7 @@ bool Railway::isMileSorted() const
 
 std::shared_ptr<const RailInterval> Railway::firstNonPositiveInterval() const
 {
-	for (auto p = firstDownInterval(); p; p = nextIntervalCirc(p)) {
+	for (auto p = firstCircInterval(); p; p = nextIntervalCirc(p)) {
 		if (p->mile() <= 0) {
 			return p;
 		}

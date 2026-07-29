@@ -29,7 +29,7 @@ void SectionCountModel::setupModel()
 	setColumnCount(ColMAX);
 
 	int row = 0;
-	for (auto p = railway->firstDownInterval(); p;
+	for (auto p = railway->firstCircInterval(); p;
 		p = railway->nextIntervalCirc(p), row++)
 	{
 		setItem(row, ColDir, new SI(DirFunc::dirToString(p->direction())));

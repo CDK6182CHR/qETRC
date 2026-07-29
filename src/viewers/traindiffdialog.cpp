@@ -43,7 +43,7 @@ void TrainDiffModel::setupModel()
     beginResetModel();
     setRowCount(0);
     int row = 0;
-    for (auto p = railway->firstDownInterval(); p; p = railway->nextIntervalCirc(p)) {
+    for (auto p = railway->firstCircInterval(); p; p = railway->nextIntervalCirc(p)) {
         intermap_t::const_iterator itr1, itr2;
         bool flag1 = ((itr1 = map1.find(p)) != map1.cend());
         bool flag2 = ((itr2 = map2.find(p)) != map2.cend());

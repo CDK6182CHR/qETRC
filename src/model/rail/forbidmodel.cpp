@@ -26,7 +26,7 @@ std::shared_ptr<Railway> ForbidModel::appliedForbid()
     auto nr = forbid->clone();
     auto f = nr->getForbid(0);
     int row = 0;
-    for (auto p = f->firstDownNode(); p; p = p->nextNodeCirc(),++row) {
+    for (auto p = f->firstCircNode(); p; p = p->nextNodeCirc(),++row) {
         if (!checkRowInterval(p->railInterval(), row))
             continue;
         p->beginTime = TrainTime::fromQVariant(item(row, ColStart)->data(Qt::EditRole));

@@ -357,7 +357,7 @@ QString RailNet::intervalPathToString(std::shared_ptr<const vertex> pre,
 void RailNet::addRailway(const Railway* railway)
 {
 	std::shared_ptr<vertex> pre{};
-	for (auto p = railway->firstDownInterval(); p; p = railway->nextIntervalCirc(p)) {
+	for (auto p = railway->firstCircInterval(); p; p = railway->nextIntervalCirc(p)) {
 		if (!pre) {
 			pre = emplace_vertex(p->fromStation()->name, *(p->fromStation()));
 		}

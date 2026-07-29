@@ -114,7 +114,7 @@ void IntervalDataModel::updateRailIntervals(std::shared_ptr<Railway> railway, bo
         return;
     if (equiv) {
         int row = 0;
-        for (auto p = railway->firstDownInterval(); 
+        for (auto p = railway->firstCircInterval(); 
             p; p = railway->nextIntervalCirc(p)) {
             updateEquivRailIntRow(row++, p);
         }

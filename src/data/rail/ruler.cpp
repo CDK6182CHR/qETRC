@@ -25,7 +25,7 @@ QJsonObject Ruler::toJson() const
         {"different",different()}
         });
     QJsonArray nodes;
-    auto p = firstDownNode();
+    auto p = firstCircNode();
     for (; p; p = p->nextNodeCirc()) {
         nodes.append(p->toJson());
     }
@@ -44,7 +44,7 @@ bool Ruler::toCsv(const QString& filename) const
     QTextStream sout(&file);
 
     // 发站，到站，通通，起，停
-    for (auto it = firstDownNode(); it; it = it->nextNodeCirc()) {
+    for (auto it = firstCircNode(); it; it = it->nextNodeCirc()) {
         sout << it->fromStationName().toSingleLiteral() << ","
             << it->toStationName().toSingleLiteral() << ","
             << it->interval << ","
@@ -104,7 +104,7 @@ int Ruler::fromCsv(const QString& filename)
 void Ruler::show() const
 {
     qDebug()<<"Ruler "<<_name<<", diff: "<<different()<<  Qt::endl;
-    auto p=firstDownNode();
+    auto p=firstCircNode();
     for(;p;p=p->nextNodeCirc()){
         qDebug() << p->fromStationName() << "->" << p->toStationName() << '\t'
             << p->interval << ", " << p->start << ", " << p->stop << '\t'

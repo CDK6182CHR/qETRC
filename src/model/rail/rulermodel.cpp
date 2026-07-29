@@ -31,7 +31,7 @@ std::shared_ptr<Railway> RulerModel::appliedRuler()
 	auto res = ruler->clone();
 	auto nr = res->getRuler(0);
 	int row = 0;
-	for (auto p = nr->firstDownNode(); p; p = p->nextNodeDiffCirc(),row++) {
+	for (auto p = nr->firstCircNode(); p; p = p->nextNodeDiffCirc(),row++) {
 		if (row >= rowCount()) {
 			qDebug() << "RulerModel::appliedRuler: WARNING: " <<
 				"number of rows FEWER than number of intervals. row=" <<

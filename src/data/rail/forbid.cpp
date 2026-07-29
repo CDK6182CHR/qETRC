@@ -35,7 +35,7 @@ QJsonObject Forbid::toJson() const
         {"upShow",upShow}
     };
     QJsonArray ar;
-    for (auto p = firstDownNode(); p; p = p->nextNodeCirc()) {
+    for (auto p = firstCircNode(); p; p = p->nextNodeCirc()) {
         if (!p->isNull())
             ar.append(p->toJson());
     }
@@ -46,7 +46,7 @@ QJsonObject Forbid::toJson() const
 void Forbid::_show() const
 {
     qDebug() << "Forbid index " << index() << Qt::endl;
-    for (auto p = firstDownNode(); p; p = p->nextNodeCirc()) {
+    for (auto p = firstCircNode(); p; p = p->nextNodeCirc()) {
         qDebug() << p->railInterval() << '\t' <<
             p->beginTime.toString(TrainTime::HM) << " -- " <<
             p->endTime.toString(TrainTime::HM) <<
@@ -66,7 +66,7 @@ bool Forbid::toCsv(const QString& filename) const
     QTextStream sout(&file);
 
     // 发站，到站，起始，结束
-    for (auto it = firstDownNode(); it; it = it->nextNodeCirc()) {
+    for (auto it = firstCircNode(); it; it = it->nextNodeCirc()) {
         sout << it->fromStationName().toSingleLiteral() << ","
             << it->toStationName().toSingleLiteral() << ","
             << it->beginTime.toString(TrainTime::HM) << ","

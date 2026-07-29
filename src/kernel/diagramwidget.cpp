@@ -1238,7 +1238,7 @@ void DiagramWidget::setHLines(int idx, std::shared_ptr<Railway> rail, double sta
     }
 
     //标注区间数据  每个区间标注带上区间【终点】的界限
-    for (auto p = rail->firstDownInterval(); p; p = rail->nextIntervalCirc(p)) {
+    for (auto p = rail->firstCircInterval(); p; p = rail->nextIntervalCirc(p)) {
         //标注区间终点分划线
         double x = margins.left_white;
         if (!p->isDown()) x += margins.ruler_label_width / 2.0;
