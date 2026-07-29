@@ -13,7 +13,7 @@ void IntervalDataModel::setupModel()
     auto rail=railway();
     setRowCount(rail->stationCount()*2);
     int row=0;
-    for(auto p=rail->firstDownInterval();p;p=rail->nextIntervalCirc(p)){
+    for(auto p=rail->firstCircInterval();p;p=rail->nextIntervalCirc(p)){
         setupRow(row++,p);
     }
     setRowCount(row);

@@ -12,11 +12,11 @@ class Railway;
  * 2021年7月4日 将引用改为Reference_wrapper，方便交换操作。
  * 2021年9月28日 进一步将Railway的引用方式改为weak_ptr
  */
-template <typename _Node, typename _Data>
+template <typename Node, typename Data>
 class RailIntervalData{
-//    static_assert (std::is_base_of_v<RailIntervalNode<_Node,_Data>,_Node>,
+//    static_assert (std::is_base_of_v<RailIntervalNode<Node,Data>,Node>,
 //    "Invalid type argument");
-//    static_assert (std::is_base_of_v<RailIntervalData<_Node,_Data>,_Data >,
+//    static_assert (std::is_base_of_v<RailIntervalData<Node,Data>,Data >,
 //    "Invalid Data type");
 
 protected:
@@ -70,8 +70,8 @@ public:
         for (auto p = railway()->firstUpInterval(); p; p = p->nextInterval()) {
             auto pinv = p->inverseInterval();
             if (pinv) {
-                auto d = p->template getDataAt<_Node>(_index);
-                auto dinv = pinv->template getDataAt<_Node>(_index);
+                auto d = p->template getDataAt<Node>(_index);
+                auto dinv = pinv->template getDataAt<Node>(_index);
                 d->operator=(*dinv);
             }
             else {
@@ -85,8 +85,8 @@ public:
         for (auto p = railway()->firstDownInterval(); p; p = p->nextInterval()) {
             auto pinv = p->inverseInterval();
             if (pinv) {
-                auto d = p->template getDataAt<_Node>(_index);
-                auto dinv = pinv->template getDataAt<_Node>(_index);
+                auto d = p->template getDataAt<Node>(_index);
+                auto dinv = pinv->template getDataAt<Node>(_index);
                 d->operator=(*dinv);
             }
             else {
@@ -96,41 +96,53 @@ public:
         }
     }
 
-    inline std::shared_ptr<_Node> firstDownNode() {
+    inline std::shared_ptr<Node> firstDownNode() {
         auto t = railway()->firstDownInterval();
         if (t) {
-            return t->template getDataAt<_Node>(_index);
+            return t->template getDataAt<Node>(_index);
         }
         else {
-            return std::shared_ptr<_Node>();
+            return std::shared_ptr<Node>();
         }
     }
-    inline std::shared_ptr<const _Node> firstDownNode()const{
+    inline std::shared_ptr<const Node> firstDownNode()const{
         auto t= railway()->firstDownInterval();
         if(t){
-            return t->template getDataAt<_Node>(_index);
+            return t->template getDataAt<Node>(_index);
         }else{
-            return std::shared_ptr<_Node>();
+            return std::shared_ptr<Node>();
         }
     }
-    inline std::shared_ptr<_Node> firstUpNode(){
+    inline std::shared_ptr<Node> firstUpNode(){
         auto t= railway()->firstUpInterval();
         if(t){
-            return t->template getDataAt<_Node>(_index);
+            return t->template getDataAt<Node>(_index);
         }else{
-            return std::shared_ptr<_Node>();
+            return std::shared_ptr<Node>();
         }
     }
-    inline std::shared_ptr<const _Node> firstUpNode()const{
+    inline std::shared_ptr<const Node> firstUpNode()const{
         auto t= railway()->firstUpInterval();
         if(t){
-            return t->template getDataAt<_Node>(_index);
+            return t->template getDataAt<Node>(_index);
         }else{
-            return std::shared_ptr<_Node>();
+            return std::shared_ptr<Node>();
         }
     }
 
-    inline std::shared_ptr<_Node> firstDirNode(Direction dir) {
+    inline std::shared_ptr<Node> firstCircNode() {
+        if (auto p = firstDownNode())
+            return p;
+        return firstUpNode();
+    }
+
+    inline std::shared_ptr<const Node> firstCircNode()const {
+        if (auto p = firstDownNode())
+            return p;
+        return firstUpNode();
+    }
+
+    inline std::shared_ptr<Node> firstDirNode(Direction dir) {
         switch (dir) {
         case Direction::Down:return firstDownNode();
         case Direction::Up:return firstUpNode();
@@ -138,79 +150,79 @@ public:
         }
     }
 
-    inline std::shared_ptr<const _Node> firstDirNode(Direction dir)const {
+    inline std::shared_ptr<const Node> firstDirNode(Direction dir)const {
         return const_cast<RailIntervalData*>(this)->firstDirNode(dir);
     }
 
     /**
      * 仅考虑近邻区间，获取数据
      */
-    inline std::shared_ptr<_Node>
+    inline std::shared_ptr<Node>
         getNode(const StationName& from,const StationName& to){
         auto t= railway()->findInterval(from,to);
         if(!t&&!_different){
             t= railway()->findInterval(to,from);
         }
         if(t)
-            return t->template getDataAt<_Node>(_index);
+            return t->template getDataAt<Node>(_index);
         else
-            return std::shared_ptr<_Node>();
+            return std::shared_ptr<Node>();
     }
 
-    inline std::shared_ptr<const _Node>
+    inline std::shared_ptr<const Node>
         getNode(const StationName& from,const StationName& to)const{
         auto t= railway()->findInterval(from,to);
         if(!t&&!_different){
             t= railway()->findInterval(to,from);
         }
         if(t)
-            return t->template getDataAt<_Node>(_index);
+            return t->template getDataAt<Node>(_index);
         else
-            return std::shared_ptr<_Node>();
+            return std::shared_ptr<Node>();
     }
 
     /**
      * 2021.08.09  返回指定车站沿指定方向上一近邻区间的数据
      */
-    inline std::shared_ptr<_Node>
+    inline std::shared_ptr<Node>
         dirPrevNode(std::shared_ptr<RailStation> st, Direction dir)
     {
         auto t = st->dirPrevInterval(dir);
         if (t) {
-            return t->template getDataAt<_Node>(_index);
+            return t->template getDataAt<Node>(_index);
         }
         else
             return {};
     }
 
-    inline std::shared_ptr<_Node>
+    inline std::shared_ptr<Node>
         dirNextNode(std::shared_ptr<RailStation> st, Direction dir)
     {
         auto t = st->dirNextInterval(dir);
         if (t) {
-            return t->template getDataAt<_Node>(_index);
+            return t->template getDataAt<Node>(_index);
         }
         else
             return {};
     }
 
-    inline std::shared_ptr<const _Node>
+    inline std::shared_ptr<const Node>
         dirPrevNode(std::shared_ptr<const RailStation> st, Direction dir)const
     {
         auto t = st->dirPrevInterval(dir);
         if (t) {
-            return t->template getDataAt<_Node>(_index);
+            return t->template getDataAt<Node>(_index);
         }
         else
             return {};
     }
 
-    inline std::shared_ptr<const _Node>
+    inline std::shared_ptr<const Node>
         dirNextNode(std::shared_ptr<const RailStation> st, Direction dir)const
     {
         auto t = st->dirNextInterval(dir);
         if (t) {
-            return t->template getDataAt<_Node>(_index);
+            return t->template getDataAt<Node>(_index);
         }
         else
             return {};
@@ -225,7 +237,7 @@ public:
      * 不要求跟自己属于同一线路。
      * cover: 如果冲突，是否用对方的覆盖自己的
      */
-    void mergeWith(RailIntervalData<_Node, _Data>& other, bool cover) {
+    void mergeWith(RailIntervalData<Node, Data>& other, bool cover) {
         for (auto n1 = firstDownNode(), n2 = other.firstDownNode();
             n1 && n2; n1 = n1->nextNodeCirc(), n2 = n2->nextNodeCirc())
         {
@@ -234,7 +246,7 @@ public:
     }
 
 protected:
-    void swap(RailIntervalData<_Node, _Data>& other) {
+    void swap(RailIntervalData<Node, Data>& other) {
         std::swap(_different, other._different);
         for (auto n1 = firstDownNode(), n2 = other.firstDownNode();
             n1 && n2; n1 = n1->nextNodeCirc(), n2 = n2->nextNodeCirc())

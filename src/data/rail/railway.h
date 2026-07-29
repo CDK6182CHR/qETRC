@@ -385,6 +385,13 @@ public:
     std::shared_ptr<const RailInterval> firstDownInterval()const;
     std::shared_ptr<RailInterval> firstDownInterval();
 
+    /**
+     * 2026.07.29: Special treatment for railways with only UP stations. 
+     * The returning value is equivalent to firstDownInterval() if there is at least one down interval,
+     * otherwise firstUpInterval().
+     */
+    std::shared_ptr<RailInterval> firstCircInterval();
+
     std::shared_ptr<const RailInterval> firstUpInterval()const;
     std::shared_ptr<RailInterval> firstUpInterval();
 

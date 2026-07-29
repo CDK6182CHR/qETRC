@@ -12,9 +12,9 @@
 #include <QTableView>
 #include <QHeaderView>
 
-#include <data/common/qesystem.h>
-#include <data/rail/ruler.h>
-#include <model/rail/rulermodel.h>
+#include "data/common/qesystem.h"
+#include "data/rail/ruler.h"
+#include "model/rail/rulermodel.h"
 
 
 RulerFromSpeedDialog::RulerFromSpeedDialog(std::shared_ptr<Ruler> ruler,

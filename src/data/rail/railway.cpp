@@ -733,6 +733,13 @@ std::shared_ptr<RailInterval> Railway::firstDownInterval()
     return std::shared_ptr<RailInterval>();
 }
 
+std::shared_ptr<RailInterval> Railway::firstCircInterval()
+{
+	if (auto p = firstDownInterval())
+		return p;
+	return firstUpInterval();
+}
+
 std::shared_ptr<const RailInterval> Railway::firstUpInterval() const
 {
 	for (int i = stationCount() - 1; i >= 0; i--) {

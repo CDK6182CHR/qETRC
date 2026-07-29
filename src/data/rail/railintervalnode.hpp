@@ -9,19 +9,19 @@
 
 #include "railstation.h"
 
-template <typename _Node, typename _Data>
+template <typename Node, typename Data>
 class RailIntervalData;
 
-template <typename _Node, typename _Data>
+template <typename Node, typename Data>
 class RailIntervalNode{
-//    static_assert (std::is_base_of_v<RailIntervalNode<_Node,_Data>,_Node>,
+//    static_assert (std::is_base_of_v<RailIntervalNode<Node,Data>,Node>,
 //    "Invalid type argument");
-//    static_assert (std::is_base_of_v<RailIntervalData<_Node,_Data>,_Data >,
+//    static_assert (std::is_base_of_v<RailIntervalData<Node,Data>,Data >,
 //    "Invalid Data type");
 
 protected:
-    using NodeType=_Node;
-    using DataType=_Data;
+    using NodeType=Node;
+    using DataType=Data;
 
     /**
      * 2022.04.03：Railway::swapBase()交换结点时，需要交换对头节点的引用。
@@ -51,45 +51,45 @@ public:
     const RailInterval& railInterval()const{return _railint;}
     RailInterval& railInterval(){return _railint;}
 
-    inline std::shared_ptr<_Node> nextNode() {
+    inline std::shared_ptr<Node> nextNode() {
         auto t = _railint.nextInterval();
         if (t) {
-            return t->template getDataAt<_Node>(data().index());
+            return t->template getDataAt<Node>(data().index());
         }
         else {
-            return std::shared_ptr<_Node>();
+            return std::shared_ptr<Node>();
         }
     }
-    inline std::shared_ptr<const _Node> nextNode()const{
+    inline std::shared_ptr<const Node> nextNode()const{
         auto t=_railint.nextInterval();
         if(t){
-            return t->template getDataAt<_Node>(data().index());
+            return t->template getDataAt<Node>(data().index());
         }else{
-            return std::shared_ptr<_Node>();
+            return std::shared_ptr<Node>();
         }
     }
 
-    inline std::shared_ptr<_Node> prevNode() {
+    inline std::shared_ptr<Node> prevNode() {
         auto t = _railint.prevInterval();
         if (t) {
-            return t->template getDataAt<_Node>(data().index());
+            return t->template getDataAt<Node>(data().index());
         }
         else {
-            return std::shared_ptr<_Node>();
+            return std::shared_ptr<Node>();
         }
     }
 
-    inline std::shared_ptr<const _Node> prevNode()const {
+    inline std::shared_ptr<const Node> prevNode()const {
         auto t = _railint.prevInterval();
         if (t) {
-            return t->template getDataAt<_Node>(data().index());
+            return t->template getDataAt<Node>(data().index());
         }
         else {
-            return std::shared_ptr<_Node>();
+            return std::shared_ptr<Node>();
         }
     }
 
-    inline std::shared_ptr<_Node> nextNodeCirc(){
+    inline std::shared_ptr<Node> nextNodeCirc(){
         auto t=nextNode();
         if(!t&&isDownInterval()){
             return data().firstUpNode();
@@ -98,7 +98,7 @@ public:
         }
     }
 
-    inline std::shared_ptr<const _Node> nextNodeCirc()const{
+    inline std::shared_ptr<const Node> nextNodeCirc()const{
         auto t=nextNode();
         if(!t&&isDownInterval()){
             return data().firstUpNode();
@@ -110,7 +110,7 @@ public:
     /**
      * 仅在different时才循环的版本
      */
-    inline std::shared_ptr<_Node> nextNodeDiffCirc(){
+    inline std::shared_ptr<Node> nextNodeDiffCirc(){
         auto t=nextNode();
         if(!t&&isDownInterval()&& data().different()){
             return data().firstUpNode();
@@ -119,7 +119,7 @@ public:
         }
     }
 
-    inline std::shared_ptr<const _Node> nextNodeDiffCirc()const{
+    inline std::shared_ptr<const Node> nextNodeDiffCirc()const{
         auto t=nextNode();
         if(!t&&isDownInterval()&& data().different()){
             return data().firstUpNode();
@@ -146,8 +146,8 @@ public:
 };
 
 
-template<typename _Node, typename _Data>
-RailIntervalNode<_Node, _Data>::RailIntervalNode(RailIntervalNode::DataType &data_,
+template<typename Node, typename Data>
+RailIntervalNode<Node, Data>::RailIntervalNode(RailIntervalNode::DataType &data_,
                                                  RailInterval &railint):
     _data(std::ref(data_)),_railint(railint)
 {

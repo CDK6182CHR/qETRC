@@ -185,7 +185,7 @@ void Ruler::fromSpeed(double speed, int start, int stop, bool asmax, int prec,
     std::vector<bool>& selrow)
 {
     int i = 0;
-    for (auto n = firstDownNode(); n; n = n->nextNodeCirc()) {
+    for (auto n = firstCircNode(); n; n = n->nextNodeCirc()) {
         if (!selrow.at(i++))continue;
         double mile = n->railInterval().mile();
         double secs_f = mile / speed * 3600;
@@ -205,7 +205,7 @@ void Ruler::fromSpeed(double speed, int start, int stop, bool asmax, int prec,
 int Ruler::validNodeCount() const
 {
     int cnt = 0;
-    for (auto n = firstDownNode(); n; n = n->nextNodeCirc()) {
+    for (auto n = firstCircNode(); n; n = n->nextNodeCirc()) {
         if (!n->isNull())cnt++;
     }
     return cnt;
