@@ -1061,7 +1061,7 @@ void MainWindow::initToolbar()
 		actSelector = act;
 	}
 
-	QAction* actRemoveInterp, * actAutoBusiness, *actUnique, * actImportTimetableCsv, * actImportTrainTrf,
+	QAction* actRemoveInterp, * actAutoBusiness, *actUnique, * actImportTimetableCsv, * actImportTrainInfoCsv, * actImportTrainTrf,
 		* actAutoCorrection, * actRemoveNonBound, * actRemoveNonBoundTrains, * actRemoveEmptyTrains,
 		* actAutoPen, *actManualPen, * actMergeTrains;
 	//列车
@@ -1130,6 +1130,7 @@ void MainWindow::initToolbar()
 
 		menu = new SARibbonMenu(this);
 		actImportTimetableCsv = menu->addAction(tr("导入时刻表 (CSV)"));
+		actImportTrainInfoCsv = menu->addAction(tr("导入列车基本信息表 (CSV)"));
 		actImportTrainTrf = menu->addAction(tr("批量导入车次 (trf)"));
 		act->setMenu(menu);
 		panel->addLargeAction(act, QToolButton::MenuButtonPopup);
@@ -1431,6 +1432,8 @@ void MainWindow::initToolbar()
 
 		connect(actImportTimetableCsv, &QAction::triggered,
 			contextTrain, &TrainContext::actImportTrainFromCsv);
+		connect(actImportTrainInfoCsv, &QAction::triggered,
+			contextTrain, &TrainContext::actImportTrainInfoCsv);
 
 		connect(actImportTrainTrf, &QAction::triggered,
 			contextTrain, &TrainContext::actImportTrainFromTrf);
@@ -2376,6 +2379,11 @@ void MainWindow::refreshAll()
 	for (auto p : railStationWidgets) {
 		p->refreshData();
 	}
+
+	// 2026.07.29: quick timetable/info
+	timetableQuickWidget->refreshData();
+	trainInfoWidget->refreshData();
+
 	catView->refreshTypeGroup();
 	catView->refreshFilters();
 	//更新各个context，由context负责更新自己管理的widget的数据
@@ -2762,6 +2770,13 @@ void MainWindow::repaintRoutingTrainLines(std::shared_ptr<Routing> routing)
 	}
 }
 void MainWindow::repaintTrainLines(const QSet<std::shared_ptr<Train>> trains)
+{
+	foreach(auto p, trains) {
+		repaintTrainLines(p);
+	}
+}
+
+void MainWindow::repaintTrainLines(const QVector<std::shared_ptr<Train>> trains)
 {
 	foreach(auto p, trains) {
 		repaintTrainLines(p);

@@ -568,6 +568,8 @@ public slots:
      */
     void repaintTrainLines(const QSet<std::shared_ptr<Train>> trains);
 
+    void repaintTrainLines(const QVector<std::shared_ptr<Train>> trains);
+
     /**
      * 弹出对话框搜索车次
      */

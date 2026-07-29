@@ -239,6 +239,11 @@ public slots:
     void commitTraininfoChange(std::shared_ptr<Train> train, std::shared_ptr<Train> info);
 
     /**
+     * 2026.07.29: Batch version of TrainInfoChange; but train names are always not updated
+     */
+    void commitBatchTraininfoChange(QVector<std::shared_ptr<Train>>& trains, QVector<std::shared_ptr<Train>>& infos);
+
+    /**
      * 显示或者创建当前车次的基本编辑面板。
      */
     void actShowBasicWidget();
@@ -392,6 +397,12 @@ public slots:
      * 导入列车时刻表，代理MainWindow处理。
      */
     void actImportTrainFromCsv();
+
+    /**
+     * 2026.07.29 导入列车基本信息表（列车类型、始发终到）。
+     * 不存在的列车将创建。不存在的类型将创建。
+     */
+    void actImportTrainInfoCsv();
 
     /**
      * 2022.05.14
@@ -605,6 +616,28 @@ namespace qecmd {
         }
         virtual void redo()override {
             cont->commitTraininfoChange(train, info);
+        }
+    };
+
+    /**
+     * 2026.07.29: The batch version of UpdateTrainInfo.
+     */
+    class BatchUpdateTrainInfo : public QUndoCommand {
+        QVector<std::shared_ptr<Train>> m_trains, m_datas;
+        TrainContext* const m_cont;
+    public:
+        BatchUpdateTrainInfo(
+            QVector<std::shared_ptr<Train>> trains, QVector<std::shared_ptr<Train>> datas, 
+            TrainContext* cont, QUndoCommand* parent=nullptr):
+            QUndoCommand(QObject::tr("批量更新%1列车信息").arg(trains.size()), parent),
+            m_trains(std::move(trains)), m_datas(std::move(datas)),
+            m_cont(cont)
+        { }
+        void undo()override {
+            m_cont->commitBatchTraininfoChange(m_trains, m_datas);
+        }
+        void redo()override {
+            m_cont->commitBatchTraininfoChange(m_trains, m_datas);
         }
     };
 

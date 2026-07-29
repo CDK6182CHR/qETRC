@@ -661,6 +661,19 @@ void TrainContext::commitTraininfoChange(std::shared_ptr<Train> train, std::shar
 	emit timetableChanged(train);
 }
 
+void TrainContext::commitBatchTraininfoChange(QVector<std::shared_ptr<Train>>& trains, QVector<std::shared_ptr<Train>>& infos)
+{
+	assert(trains.size() == infos.size());
+	for (int i = 0; i < trains.size(); i++) {
+		trains.at(i)->swapBaseInfo(*infos.at(i));
+		diagram.trainCollection().updateTrainInfo(trains.at(i), infos.at(i));
+	}
+
+	refreshAllData();
+	mw->repaintTrainLines(trains);
+	mw->trainListWidget->getModel()->refreshData();
+}
+
 void TrainContext::removeAllTrainWidgets()
 {
 	foreach (auto p , basicDocks) {
@@ -1213,6 +1226,129 @@ void TrainContext::actImportTrainFromCsv()
 	}
 	else {
 		QMessageBox::information(mw, tr("导入CSV时刻表"), tr("无有效数据导入。"));
+	}
+}
+
+void TrainContext::actImportTrainInfoCsv()
+{
+	auto flag = QMessageBox::question(mw, tr("导入CSV列车信息表"), tr("此功能提供从CSV（逗号分隔值）"
+		"格式列车基本信息表。所给文件应当有4列，分别为车次、始发站、终到站、列车种类，"
+		"不需要表头；文件应当采用UTF-8编码。\n"
+		"每行视为一个时刻数据。对既有车次，直接修改为读取到的信息；"
+		"对新车次，以所给信息创建新车次（新车次时刻表为空）。\n"
+		"如果所给的列车种类不存在，则以所给的类型名创建新的列车类型。\n"
+		"车次仅依据全车次名识别。若同一车次在导入的列表中出现超过一次，则结果可能为其中的任一个。"
+		"若始发站、终到站、列车种类栏目所给信息为空字符串，则相关车次的对应信息不会被更新。"
+		"是否确认？"));
+	if (flag != QMessageBox::Yes)return;
+	QString filename = QFileDialog::getOpenFileName(mw, tr("从CSV导入列车基本信息"), {},
+		tr("逗号分隔值 (*.csv)\n所有文件 (*)"));
+	if (filename.isEmpty()) return;
+
+	QFile file(filename);
+	file.open(QFile::ReadOnly);
+	if (!file.isOpen()) {
+		QMessageBox::warning(mw, tr("错误"), tr("打开文件失败"));
+		return;
+	}
+	QTextStream ts(&file);
+	//ts.setCodec("utf-8");
+
+	QVector<std::shared_ptr<Train>> newTrains, modifiedTrains, modifiedData;
+	std::set<QString> trainNames;   // 识别到的列车名（重复的直接忽略）
+	std::set<QString> newTypeNames;
+
+	auto& coll = diagram.trainCollection();
+
+	mw->undoStack->beginMacro(tr("导入列车基本信息"));
+	int valid = 0;
+	while (!ts.atEnd()) {
+		QString line = ts.readLine();
+		if (line.isEmpty()) continue;
+		auto splitted = line.split(',');
+		if (splitted.size() < 1)
+			continue;
+		QString trainName = splitted.at(0);
+
+		if (auto itr = trainNames.find(trainName); itr != trainNames.end()) {
+			qWarning() << "Duplicated trainName found during importing train info CSV: " << *itr << "; ignored";
+			continue;
+		}
+
+		valid++;
+
+		auto train = coll.findFullName(trainName);
+		bool isNewTrain = !train;
+
+		std::shared_ptr<Train> trainMod;
+
+		if (isNewTrain) {
+			train = std::make_shared<Train>(trainName);
+			newTrains.append(train);
+		}
+
+		bool isModified = false;
+
+		// Closure function: returns the train object to be modified
+		auto modified_train = [&trainMod, &isModified, isNewTrain, train]() {
+			if (isNewTrain) {
+				return train;
+			}
+			else {
+				isModified = true;
+				if (!trainMod) {
+					// We create a new type with only basic information copied. We do not need timetable to be copied here.
+					trainMod = std::make_shared<Train>(train->trainName(), train->starting(), train->terminal(), train->passenger()); 
+					trainMod->setType(train->type());
+				}
+				return trainMod;
+			}
+			};
+
+		// Starting, terminal
+		if (splitted.size() >= 2 && !splitted.at(1).isEmpty()) {
+			modified_train()->setStarting(splitted.at(1));
+		}
+		if (splitted.size() >= 3 && !splitted.at(2).isEmpty()) {
+			modified_train()->setTerminal(splitted.at(2));
+		}
+		// Train type
+		if (splitted.size() >= 4 && !splitted.at(3).isEmpty()) {
+			auto tp = coll.typeManager().find(splitted.at(3));
+			if (!tp) {
+				tp = coll.typeManager().createType(splitted.at(3));
+				mw->getUndoStack()->push(new qecmd::AutoAddTrainType(coll.typeManager(), tp, mw->catView));
+			}
+			modified_train()->setType(tp);
+		}
+
+		if (isModified) {
+			modifiedTrains.append(train);
+			modifiedData.append(trainMod);
+		}
+	}
+
+	int newTrainCount = newTrains.size();
+	int modifiedTrainCount = modifiedTrains.size();
+
+	if (valid) {
+		// 新增的
+		if (!newTrains.empty())
+			mw->naviView->actBatchAddTrains(newTrains);
+		// 修订的
+		if (!modifiedTrains.empty()) {
+			mw->getUndoStack()->push(new qecmd::BatchUpdateTrainInfo(std::move(modifiedTrains), std::move(modifiedData), this));
+		}
+
+	}
+	mw->getUndoStack()->endMacro();
+
+	if (valid) {
+		QMessageBox::information(mw, tr("导入列车基本信息"),
+			tr("已为%1既有车次更新信息，并创建%2个新车次").arg(modifiedTrainCount).arg(newTrainCount));
+	}
+	else {
+		QMessageBox::information(mw, tr("导入列车基本信息"), tr("无有效数据导入"));
 	}
 }
 
