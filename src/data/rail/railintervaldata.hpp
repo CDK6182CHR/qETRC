@@ -248,7 +248,7 @@ public:
 protected:
     void swap(RailIntervalData<Node, Data>& other) {
         std::swap(_different, other._different);
-        for (auto n1 = firstCircNode(), n2 = other.firstDownNode();
+        for (auto n1 = firstCircNode(), n2 = other.firstCircNode();
             n1 && n2; n1 = n1->nextNodeCirc(), n2 = n2->nextNodeCirc())
         {
             n1->swap(*n2);

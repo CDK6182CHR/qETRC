@@ -65,6 +65,12 @@ public:
     void refreshData();
     void setDir(Direction dir) { _dir = dir; }
 
+    /**
+     * 2026.07.29: Returns whether current object is properly prepared for comming painting tasks.
+     * Thi requires this ruler, the railway are valid, and the table is not empty.
+     */
+    bool isPrepared()const;
+
     void updateSettledStops(const std::map<std::shared_ptr<const RailStation>, int>& secs);
 
     /**

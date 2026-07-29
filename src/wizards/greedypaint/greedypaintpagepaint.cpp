@@ -120,8 +120,17 @@ void GreedyPaintConfigModel::refreshData()
 
     _anchorRow = _startRow = _endRow = -1;
 
-    setAnchorRowNoSignal(0);
+    if (row != 0) {
+        // 2026.07.29: For some special cases, we may have no valid stations along the selected direction.
+        // In this case, avoid doing so. Warning message will be given outside.
+        setAnchorRowNoSignal(0);
+    }
 
+}
+
+bool GreedyPaintConfigModel::isPrepared() const
+{
+    return _ruler && _ruler->railway() && rowCount() > 0;
 }
 
 void GreedyPaintConfigModel::updateSettledStops(const std::map<std::shared_ptr<const RailStation>, int>& secs)
@@ -744,6 +753,13 @@ void GreedyPaintPagePaint::onDirChanged(bool down)
 {
     _model->setDir(DirFunc::fromIsDown(down));
     _model->refreshData();
+
+    if (_model->rowCount() == 0) {
+        // 2026.07.29: For some very special case, we may have no valid intervals at all, for the selected direction.
+        // e.g., all stations are UP-only. In this case, avoid setting anchor row, and raise warning message directly
+        QMessageBox::information(this, tr("提示"), tr("当前所选的线路、标尺、方向下无可用排图区间，贪心推线不可用。"
+            "可能是当前线路不包含所选方向（上下行）通过的车站/区间。"));
+    }
 }
 
 void GreedyPaintPagePaint::paintTmpTrain()
@@ -752,7 +768,7 @@ void GreedyPaintPagePaint::paintTmpTrain()
         return;
     if (!painter.ruler()) {
         // 终止条件，或许不止这个
-        QMessageBox::warning(this, tr("错误"), tr("无效标尺！"));
+        QMessageBox::warning(this, tr("错误"), tr("无效标尺！\n提示：请先在“排图参数”页面配置数据并点击“确定”后再进入“铺画”页面！"));
         return;
     }
 
@@ -781,9 +797,9 @@ void GreedyPaintPagePaint::paintTmpTrain()
 
 void GreedyPaintPagePaint::onApply()
 {
-    if (!painter.ruler()) {
+    if (!painter.ruler() || !model()->isPrepared()) {
         // 终止条件，或许不止这个
-        QMessageBox::warning(this, tr("错误"), tr("无效标尺！"));
+        QMessageBox::warning(this, tr("错误"), tr("无效标尺或配置！"));
         return;
     }
 
@@ -962,7 +978,7 @@ void GreedyPaintPagePaint::clearInfoWidgets()
 void GreedyPaintPagePaint::setupStationLabels()
 {
     // 2024.04.07: for empty rail, just return
-    if (model()->ruler()->railway()->empty())
+    if (!model()->isPrepared())
         return;
     edStart->setText(_model->startStation()->name.toSingleLiteral());
     edEnd->setText(_model->endStation()->name.toSingleLiteral());
