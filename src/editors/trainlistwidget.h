@@ -173,7 +173,14 @@ private slots:
 
     void actExportTrainTimetableBat();
 
+    void actExportTrainInfoListBat();
+
     void exportTrainTimetable(const QList<std::shared_ptr<Train>>& trains);
+
+    /**
+     * 2026.07.29  Export train basic information to CSV.
+     */
+    void exportTrainInfoCsv(const QList<std::shared_ptr<Train>>& trains);
 
     /**
      * 2022.05.14  批量设置自动营业站
@@ -215,7 +222,9 @@ public slots:
 
     void actAutoTrainTypeAll();
 
-    void actExportTrainEventListAll();
+    void actExportTrainTimetableAll();
+
+    void actExportTrainInfoListAll();
 
 };
 

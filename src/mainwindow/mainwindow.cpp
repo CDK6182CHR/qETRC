@@ -1116,7 +1116,9 @@ void MainWindow::initToolbar()
 		menu->addAction(tr("批量导出列车事件表 (csv)"),this,
 			&MainWindow::actBatchExportTrainEventsAll);
 		menu->addAction(tr("批量导出列车时刻表 (csv)"), trainListWidget,
-			&TrainListWidget::actExportTrainEventListAll);
+			&TrainListWidget::actExportTrainTimetableAll);
+		menu->addAction(tr("批量导出列车基本信息表 (csv)"), trainListWidget,
+			&TrainListWidget::actExportTrainInfoListAll);
 
 		panel->addLargeAction(act);
 		

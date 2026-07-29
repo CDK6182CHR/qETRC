@@ -16,6 +16,7 @@
 
 #include "util/buttongroup.hpp"
 #include "data/train/train.h"
+#include "data/train/traintype.h"
 #include "data/train/traincollection.h"
 #include "model/train/trainlistmodel.h"
 #include "mainwindow/traincontext.h"
@@ -109,6 +110,7 @@ void TrainListWidget::initUI()
 	menu->addSeparator();
 	menu->addAction(tr("导出事件表 (csv)"), this, &TrainListWidget::actExportTrainEventListBat);
 	menu->addAction(tr("导出时刻表 (csv)"), this, &TrainListWidget::actExportTrainTimetableBat);
+	menu->addAction(tr("导出列车基本信息表 (csv)"), this, &TrainListWidget::actExportTrainInfoListBat);
 
 	g->get(3)->setMenu(menu);
 
@@ -603,6 +605,14 @@ void TrainListWidget::actExportTrainTimetableBat()
 	}
 }
 
+void TrainListWidget::actExportTrainInfoListBat()
+{
+	auto lst = batchOpSelectedTrains();
+	if (!lst.empty()) {
+		exportTrainInfoCsv(lst);
+	}
+}
+
 void TrainListWidget::exportTrainTimetable(const QList<std::shared_ptr<Train>>& trains)
 {
 	auto res = QMessageBox::question(this, tr("导出时刻表"),
@@ -637,6 +647,34 @@ void TrainListWidget::exportTrainTimetable(const QList<std::shared_ptr<Train>>& 
 			}
 			sout << '\n';
 		}
+	}
+
+	file.close();
+}
+
+void TrainListWidget::exportTrainInfoCsv(const QList<std::shared_ptr<Train>>& trains)
+{
+	auto res = QMessageBox::question(this, tr("导出列车基本信息表"),
+		tr("此操作将所选列车基本信息（始发终到站、列车类型）导出为CSV表格，所有数据导出至同一个文件。是否继续？"));
+	if (res != QMessageBox::Yes)
+		return;
+
+	auto filename = QFileDialog::getSaveFileName(this,
+		tr("导出列车基本信息表"), {}, tr("CSV文件 (*.csv)\n所有文件 (*)"));
+	if (filename.isEmpty())return;
+
+	QFile file(filename);
+	file.open(QFile::WriteOnly);
+	if (!file.isOpen())
+		return;
+	QTextStream sout(&file);
+
+	foreach(const auto& train, trains) {
+		// 车次，始发，终到，类型
+		sout << train->trainName().full() << ',' <<
+			train->starting().toSingleLiteral() << ',' <<
+			train->terminal().toSingleLiteral() << ',' <<
+			train->type()->name() << '\n';
 	}
 
 	file.close();
@@ -725,9 +763,14 @@ void TrainListWidget::actAutoTrainTypeAll()
 	autoTrainType(coll.trains());
 }
 
-void TrainListWidget::actExportTrainEventListAll()
+void TrainListWidget::actExportTrainTimetableAll()
 {
 	exportTrainTimetable(coll.trains());
+}
+
+void TrainListWidget::actExportTrainInfoListAll()
+{
+	exportTrainInfoCsv(coll.trains());
 }
 
 
