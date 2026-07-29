@@ -77,6 +77,7 @@ void SystemJson::fromJson(const QJsonObject& obj)
     use_central_widget = obj.value("use_central_widget").toBool(true);
     auto_highlight_on_selected = obj.value("auto_highlight_on_selected").toBool(true);
     show_start_page = obj.value("show_start_page").toBool(true);
+    drag_time = obj.value("drag_time").toBool(true);    // 2026.07.29  FIX
     transparent_config = obj.value("transparent_config").toBool(true);
     two_part_compare_train_names = obj.value("two_part_compare_train_names").toBool(false);
     inform_dragging = obj.value("inform_dragging").toBool(true);
@@ -103,6 +104,7 @@ QJsonObject SystemJson::toJson() const
         {"history",ar},
         {"table_row_height",table_row_height},
         {"show_train_tooltip",show_train_tooltip},
+        {"drag_time", drag_time},
         {"weaken_unselected",weaken_unselected},
         {"use_central_widget",use_central_widget},
         {"auto_highlight_on_selected",auto_highlight_on_selected},
