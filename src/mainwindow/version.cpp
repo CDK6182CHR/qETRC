@@ -4,14 +4,14 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.9.6";
-const std::string_view DATE = "20260305";
-const int RELEASE_CODE = 78;
+const std::string_view LAST_VERSION = "V1.9.7";
+const std::string_view DATE = "20260730";
+const int RELEASE_CODE = 79;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 优化列车径路铺画相关警告的逻辑。
-2. 修复删除所有列车径路时导致的错误。
-3. 优化标尺排图表格列宽等细节。)";
+const std::string_view UPDATE_LOG = R"(1. 新增运行图显示设置、类型管理导出到JSON及从JSON文件导入。
+2. 新增列车基本信息导出到CSV及从CSV导入。
+3. 修复已知问题。)";
 }
