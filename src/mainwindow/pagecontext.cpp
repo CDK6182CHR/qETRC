@@ -1,7 +1,20 @@
 ﻿#ifndef QETRC_MOBILE_2
 #include "pagecontext.h"
-#include "mainwindow.h"
 
+#include <QLabel>
+#include <QApplication>
+#include <QFormLayout>
+#include <QDialogButtonBox>
+#include <QMessageBox>
+#include <QLineEdit>
+#include <QTextEdit>
+#include <QFileDialog>
+
+#include <DockWidget.h>
+#include <SARibbonContextCategory.h>
+#include <SARibbonMenu.h>
+
+#include "mainwindow.h"
 #include "dialogs/printdiagramdialog.h"
 #include "data/diagram/diagrampage.h"
 #include "editors/configdialog.h"
@@ -11,16 +24,6 @@
 #include "defines/icon_specs.h"
 #include "util/combos/selectpagecombo.h"
 
-#include <DockWidget.h>
-#include <QLabel>
-#include <QApplication>
-#include <QFormLayout>
-#include <QDialogButtonBox>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <SARibbonContextCategory.h>
-#include <SARibbonMenu.h>
-#include <QTextEdit>
 
 
 PageContext::PageContext(Diagram &diagram_, SARibbonContextCategory *context,
@@ -110,6 +113,11 @@ void PageContext::initUI()
     me = new SARibbonMenu(mw);
     me->addAction(tr("将运行图显示设置应用到当前页面"), this,
         &PageContext::actUseDiagramConfig);
+
+    me->addSeparator();
+    me->addAction(tr("运行图页面显示设置另存为..."), this, &PageContext::actSaveConfigToFile);
+    me->addAction(tr("从文件读取显示设置到页面"), this, &PageContext::actReadConfigFromFile);
+
     act->setMenu(me);
     panel->addLargeAction(act, QToolButton::MenuButtonPopup);
     //btn->setMinimumWidth(80);
@@ -205,6 +213,49 @@ void PageContext::actConfig()
     connect(dlg, &ConfigDialog::onPageConfigApplied,
         mw->getViewCategory(), &ViewCategory::onActPageConfigApplied);
     dlg->open();
+}
+
+void PageContext::actSaveConfigToFile()
+{
+    auto flag = QMessageBox::question(mw, tr("提示"),
+        tr("保存显示设置到文件：将【当前运行图页面】的显示设置保存到指定文件，可用于后续读取。\n"
+            "保存的数据不包括类型管理的数据。保存显示设置文件时将忽略“透明设置”的选项。\n是否确认？"));
+    if (flag != QMessageBox::Yes)
+        return;
+
+    QString filename = QFileDialog::getSaveFileName(mw, tr("显示设置另存为..."), "view_config", tr("JSON文件(*.json)\n所有文件(*)"));
+    if (filename.isEmpty())
+        return;
+
+    bool ret = page->config().toJsonFile(filename);
+    if (ret)
+        mw->showStatus(tr("保存显示设置到文件成功"));
+    else
+        QMessageBox::warning(mw, tr("错误"), tr("无法保存到文件%1，可能因为文件占用或无权限写入。").arg(filename));
+}
+
+void PageContext::actReadConfigFromFile()
+{
+    auto flag = QMessageBox::question(mw, tr("提示"),
+        tr("从指定文件读取运行图显示设置到【当前运行图页面】。\n"
+            "当前运行图页面的显示设置将被覆盖，且设为非透明状态。读取的数据不包含类型管理。\n是否继续？"));
+    if (flag != QMessageBox::Yes)
+        return;
+
+    QString filename = QFileDialog::getOpenFileName(mw, tr("读取显示设置"), {}, tr("JSON文件(*.json)\n所有文件(*)"));
+    if (filename.isEmpty())
+        return;
+
+    Config config_new = page->config();   // Copy
+    bool ret = config_new.fromJsonFile(filename);
+
+    if (ret) {
+        mw->getUndoStack()->push(new qecmd::ChangePageConfig(page->configRef(), config_new, true, page, mw->catView));
+        mw->showStatus(tr("从文件读取显示设置成功"));
+    }
+    else {
+        QMessageBox::information(mw, tr("提示"), tr("文件读取失败，或文件不包含有效的显示设置信息。显示设置没有更新。"));
+    }
 }
 
 void PageContext::actActivatePage()

@@ -1,5 +1,8 @@
 ﻿#include "config.h"
 #include <QJsonArray>
+#include <QFile>
+#include <QJsonDocument>
+
 #include "data/common/qesystem.h"
 #include "util/utilfunc.h"
 
@@ -171,9 +174,9 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
     return true;
 }
 
-QJsonObject Config::toJson() const
+QJsonObject Config::toJson(bool ignore_transparent) const
 {
-    if (SystemJson::get().transparent_config && transparent_config) {
+    if (SystemJson::get().transparent_config && transparent_config && !ignore_transparent) {
         return QJsonObject{
             TO_OBJ(transparent_config)
         };
@@ -249,6 +252,38 @@ QJsonObject Config::toJson() const
     }
     obj.insert("not_show_types", ns);
     return obj;
+}
+
+bool Config::fromJsonFile(const QString& filename)
+{
+    QFile f(filename);
+    f.open(QFile::ReadOnly);
+    if (!f.isOpen()) {
+        qDebug() << "Config::fromJson: ERROR: open file " << filename << " failed. " << Qt::endl;
+        return false;
+    }
+    auto contents = f.readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(contents);
+    bool flag = fromJson(doc.object(), true);
+    if (flag)
+        transparent_config = false;
+    return flag;
+}
+
+bool Config::toJsonFile(const QString& filename) const
+{
+    QJsonObject obj = toJson(true);
+    QFile file(filename);
+    file.open(QFile::WriteOnly);
+    if (!file.isOpen()) {
+        qDebug() << "Config::toJsonFile: WARNING: open file " << filename
+            << " failed" << Qt::endl;
+        return false;
+    }
+    QJsonDocument doc(obj);
+    file.write(doc.toJson());
+    file.close();
+    return true;
 }
 
 void Config::refineHours(int period_hours)

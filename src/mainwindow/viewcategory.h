@@ -144,6 +144,13 @@ private slots:
      */
     void actSaveConfigAsDefault();
     
+    void actSaveConfigToFile();
+
+    void actSaveDefaultConfigToFile();
+
+    void actReadConfigFromFile();
+
+    void actReadDefaultConfigFromFile();
 
     /**
      * 采用高级筛选器修改列车显示。

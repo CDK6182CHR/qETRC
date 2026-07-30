@@ -19,12 +19,14 @@
 #include "editors/train/trainfiltercombo.h"
 #include "defines/icon_specs.h"
 
-#include <SARibbonPannelItem.h>
-#include <SARibbonGallery.h>
-#include <SARibbonGalleryGroup.h>
 #include <QApplication>
 #include <QStyle>
 #include <QMessageBox>
+#include <QFileDialog>
+
+#include <SARibbonPannelItem.h>
+#include <SARibbonGallery.h>
+#include <SARibbonGalleryGroup.h>
 #include <SARibbonMenu.h>
 #include <SARibbonCategory.h>
 
@@ -183,6 +185,14 @@ void ViewCategory::initUI()
 
     m->addSeparator();
     m->addAction(tr("将显示设置应用到所有运行图页面"), this, &ViewCategory::actApplyConfigToPages);
+
+    m->addSeparator();
+    m->addAction(tr("运行图显示设置另存为..."), this, &ViewCategory::actSaveConfigToFile);
+    m->addAction(tr("系统默认显示设置另存为..."), this, &ViewCategory::actSaveDefaultConfigToFile);
+
+    m->addSeparator();
+    m->addAction(tr("从文件读取显示设置到运行图文件"), this, &ViewCategory::actReadConfigFromFile);
+    m->addAction(tr("从文件读取显示设置到默认设置"), this, &ViewCategory::actReadDefaultConfigFromFile);
 
     m->addSeparator();
     ma = m->addAction(tr("全局配置选项"));
@@ -498,6 +508,92 @@ void ViewCategory::actSaveConfigAsDefault()
     if (flag == QMessageBox::Yes) {
         mw->getUndoStack()->push(new qecmd::ChangeConfig(diagram.defaultConfig(),
             diagram.config(), false, true, this));
+    }
+}
+
+void ViewCategory::actSaveConfigToFile()
+{
+    auto flag = QMessageBox::question(mw, tr("提示"),
+        tr("保存显示设置到文件：将【当前运行图文件】的显示设置保存到指定文件，可用于后续读取。\n"
+            "保存的数据不包括类型管理的数据。保存显示设置文件时将忽略“透明设置”的选项。\n是否确认？"));
+    if (flag != QMessageBox::Yes)
+        return;
+
+    QString filename = QFileDialog::getSaveFileName(mw, tr("显示设置另存为..."), "view_config", tr("JSON文件(*.json)\n所有文件(*)"));
+    if (filename.isEmpty())
+        return;
+
+    bool ret = diagram.config().toJsonFile(filename);
+    if (ret)
+        mw->showStatus(tr("保存显示设置到文件成功"));
+    else
+        QMessageBox::warning(mw, tr("错误"), tr("无法保存到文件%1，可能因为文件占用或无权限写入。").arg(filename));
+}
+
+void ViewCategory::actSaveDefaultConfigToFile()
+{
+    auto flag = QMessageBox::question(mw, tr("提示"),
+        tr("保存显示设置到文件：将【系统默认】的显示设置保存到指定文件，可用于后续读取。\n"
+            "保存的数据不包括类型管理的数据。\n是否确认？"));
+    if (flag != QMessageBox::Yes)
+        return;
+
+    QString filename = QFileDialog::getSaveFileName(mw, tr("显示设置另存为..."), "view_config", tr("JSON文件(*.json)\n所有文件(*)"));
+    if (filename.isEmpty())
+        return;
+
+    bool ret = diagram.defaultConfig().toJsonFile(filename);
+    if (ret)
+        mw->showStatus(tr("保存显示设置到文件成功"));
+    else
+        QMessageBox::warning(mw, tr("错误"), tr("无法保存到文件%1，可能因为文件占用或无权限写入。").arg(filename));
+}
+
+void ViewCategory::actReadConfigFromFile()
+{
+    auto flag = QMessageBox::question(mw, tr("提示"),
+        tr("从指定文件读取运行图显示设置到【当前运行图文件】。\n"
+            "当前运行图文件的显示设置将被覆盖，且设为非透明状态。读取的数据不包含类型管理。\n是否继续？"));
+    if (flag != QMessageBox::Yes)
+        return;
+
+    QString filename = QFileDialog::getOpenFileName(mw, tr("读取显示设置"), {}, tr("JSON文件(*.json)\n所有文件(*)"));
+    if (filename.isEmpty())
+        return;
+
+    Config config_new = diagram.config();   // Copy
+    bool ret = config_new.fromJsonFile(filename);
+
+    if (ret) {
+        mw->getUndoStack()->push(new qecmd::ChangeConfig(diagram.config(), config_new, true, false, this));
+        mw->showStatus(tr("从文件读取显示设置成功"));
+    }
+    else {
+        QMessageBox::information(mw, tr("提示"), tr("文件读取失败，或文件不包含有效的显示设置信息。显示设置没有更新。"));
+    }
+}
+
+void ViewCategory::actReadDefaultConfigFromFile()
+{
+    auto flag = QMessageBox::question(mw, tr("提示"),
+        tr("从指定文件读取运行图显示设置到【系统默认显示设置】。\n"
+            "系统默认显示设置将被覆盖。读取的数据不包含类型管理。\n是否继续？"));
+    if (flag != QMessageBox::Yes)
+        return;
+
+    QString filename = QFileDialog::getOpenFileName(mw, tr("读取显示设置"), {}, tr("JSON文件(*.json)\n所有文件(*)"));
+    if (filename.isEmpty())
+        return;
+
+    Config config_new = diagram.defaultConfig();   // Copy
+    bool ret = config_new.fromJsonFile(filename);
+
+    if (ret) {
+        mw->getUndoStack()->push(new qecmd::ChangeConfig(diagram.defaultConfig(), config_new, false, true, this));
+        mw->showStatus(tr("从文件读取显示设置成功"));
+    }
+    else {
+        QMessageBox::information(mw, tr("提示"), tr("文件读取失败，或文件不包含有效的显示设置信息。显示设置没有更新。"));
     }
 }
 

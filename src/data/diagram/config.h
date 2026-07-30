@@ -183,7 +183,20 @@ struct Config
     QSet<QString> not_show_types;
 
     bool fromJson(const QJsonObject& obj, bool ignore_transparent);
-    QJsonObject toJson()const;
+    QJsonObject toJson(bool ignore_transparent=false)const;
+
+    /**
+     * 2026.07.30: Load configs from given file. We always ignore transparent and set the transparent status to false.
+     * Returns: whether new data loaded.
+     */
+    bool fromJsonFile(const QString& filename);
+
+    /**
+     * 2026.07.30: Write to a new JSON file containing only the configuration data.
+     * Similar to the config.json file but contains only data from this class, w/o data from TypeManager.
+     * Always ignore transparent config and write all data.
+     */
+    bool toJsonFile(const QString& filename)const;
 
     void refineHours(int period_hours);
 

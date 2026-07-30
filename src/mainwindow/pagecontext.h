@@ -56,6 +56,10 @@ private slots:
 
     void actConfig();
 
+    void actSaveConfigToFile();
+
+    void actReadConfigFromFile();
+
     void actActivatePage();
 
     // 使用当前运行图的Config，操作压栈
