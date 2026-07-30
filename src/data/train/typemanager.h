@@ -74,7 +74,11 @@ public:
     /**
      * obj所示为具有Config格式的对象。
      */
-    void toJson(QJsonObject& obj)const;
+    void toJson(QJsonObject& obj, bool ignore_transparent=false)const;
+
+    bool fromJsonFile(const QString& filename);
+
+    bool toJsonFile(const QString& filename)const;
 
     /**
      * @brief 添加新的类型

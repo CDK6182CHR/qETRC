@@ -103,6 +103,12 @@ private:
      */
     void onTrainShowChanged();
 
+    /**
+     * 2026.07.30: Call this function on type manager loaded from file.
+     * We need to use the previous alg to handle this change, which is not trivial.
+     */
+    void onTypeManagerLoaded(TypeManager& manager, TypeManager data, bool for_default);
+
 signals:
 
 private slots:
@@ -151,6 +157,14 @@ private slots:
     void actReadConfigFromFile();
 
     void actReadDefaultConfigFromFile();
+
+    void actSaveTypeManagerToFile();
+
+    void actSaveDefaultTypeManagerToFile();
+
+    void actReadTypeManagerFromFile();
+
+    void actReadDefaultTypeManagerFromFile();
 
     /**
      * 采用高级筛选器修改列车显示。

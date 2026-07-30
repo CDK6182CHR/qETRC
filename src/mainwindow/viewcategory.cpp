@@ -214,6 +214,15 @@ void ViewCategory::initUI()
     m->addSeparator();
     m->addAction(tr("应用默认类型管理到当前运行图"), this, &ViewCategory::actApplyDefaultTypeSetToColl);
     m->addAction(tr("保存当前运行图类型管理为默认"), this, &ViewCategory::actApplyCollTypeSetToDefault);
+
+    m->addSeparator();
+    m->addAction(tr("当前运行图类型管理另存为..."), this, &ViewCategory::actSaveTypeManagerToFile);
+    m->addAction(tr("默认类型管理另存为..."), this, &ViewCategory::actSaveDefaultTypeManagerToFile);
+
+    m->addSeparator();
+    m->addAction(tr("从文件读取类型管理到当前运行图文件"), this, &ViewCategory::actReadTypeManagerFromFile);
+    m->addAction(tr("从文件读取类型管理到默认设置"), this, &ViewCategory::actReadDefaultTypeManagerFromFile);
+
     act->setMenu(m);
     panel->addMediumAction(act, QToolButton::MenuButtonPopup);
 
@@ -311,6 +320,55 @@ bool ViewCategory::typeIsShow(std::shared_ptr<Train> train) const
 void ViewCategory::onTrainShowChanged()
 {
     mw->trainListWidget->getModel()->updateAllTrainShow();
+}
+
+void ViewCategory::onTypeManagerLoaded(TypeManager& manager, TypeManager data, bool for_default)
+{
+    // This is the data for the new type manager. We use all OBJECTS (based on name) from old manager where possible.
+    QMap<QString, std::shared_ptr<TrainType>> newTypes; 
+    QVector<QPair<std::shared_ptr<TrainType>, std::shared_ptr<TrainType>>>  modified;
+
+    // The type set
+    for (auto itr = data.types().cbegin(); itr != data.types().cend(); ++itr) {
+        if (auto lit = manager.types().find(itr.key()); lit != manager.types().end()) {
+            // The type with the same name exists, use the old object, and check if it is changede
+            newTypes.insert(itr.key(), lit.value());
+            if (itr.value()->operator!=(*lit.value())) {
+                // modified
+                modified.append(qMakePair(itr.value(), lit.value()));
+            }
+        }
+        else {
+            // The required type does not exist, create it with the object from the new manager
+            newTypes.insert(itr.key(), itr.value());
+        }
+    }
+
+    if (for_default) {
+        mw->getUndoStack()->beginMacro(tr("从文件读取类型管理到默认设置"));
+        actDefaultTypeSetChanged(manager, newTypes, modified);
+    }
+    else {
+        mw->getUndoStack()->beginMacro(tr("从文件读取类型管理到当前运行图文件"));
+        actCollTypeSetChanged(manager, newTypes, modified);
+    }
+
+    // Now process the type regex changes
+    // see bool TypeRegexModel::appliedData(TypeManager& data)
+    std::shared_ptr<TypeManager> dataForRegex = std::make_shared<TypeManager>();
+    dataForRegex->typesRef() = manager.types();   // This should be the UPDATED type manager after TypeSet changed
+
+    foreach(auto p, data.regex()) {
+        dataForRegex->regexRef().append(qMakePair(p.first, dataForRegex->findOrCreate(p.second->name())));
+    }
+
+    if (for_default) {
+        actDefaultTypeRegexChanged(manager, dataForRegex);
+    }
+    else {
+        actCollTypeRegexChanged(manager, dataForRegex);
+    }
+    mw->getUndoStack()->endMacro();
 }
 
 void ViewCategory::showDown()
@@ -594,6 +652,96 @@ void ViewCategory::actReadDefaultConfigFromFile()
     }
     else {
         QMessageBox::information(mw, tr("提示"), tr("文件读取失败，或文件不包含有效的显示设置信息。显示设置没有更新。"));
+    }
+}
+
+void ViewCategory::actSaveTypeManagerToFile()
+{
+    auto flag = QMessageBox::question(mw, tr("提示"),
+        tr("将【当前运行图文件】类型管理设置（包含类型管理器和类型判定规则）写入指定的文件，可用于后续读取。\n"
+            "透明类型设置将被忽略。\n是否继续？"));
+    if (flag != QMessageBox::Yes)
+        return;
+
+    QString filename = QFileDialog::getSaveFileName(mw, tr("类型设置另存为..."), "type_config", tr("JSON文件(*.json)\n所有文件(*)"));
+    if (filename.isEmpty())
+        return;
+
+    bool ret = diagram.trainCollection().typeManager().toJsonFile(filename);
+    if (ret) {
+        mw->showStatus(tr("类型管理设置写入文件成功"));
+    }
+    else {
+        QMessageBox::warning(mw, tr("提示"), tr("写入文件失败，可能是文件占用或无权限写入。"));
+    }
+}
+
+void ViewCategory::actSaveDefaultTypeManagerToFile()
+{
+    auto flag = QMessageBox::question(mw, tr("提示"),
+        tr("将【系统默认】类型管理设置（包含类型管理器和类型判定规则）写入指定的文件，可用于后续读取。\n"
+            "透明类型设置将被忽略。\n是否继续？"));
+    if (flag != QMessageBox::Yes)
+        return;
+
+    QString filename = QFileDialog::getSaveFileName(mw, tr("类型设置另存为..."), "type_config", tr("JSON文件(*.json)\n所有文件(*)"));
+    if (filename.isEmpty())
+        return;
+
+    bool ret = diagram.defaultTypeManager().toJsonFile(filename);
+    if (ret) {
+        mw->showStatus(tr("类型管理设置写入文件成功"));
+    }
+    else {
+        QMessageBox::warning(mw, tr("提示"), tr("写入文件失败，可能是文件占用或无权限写入。"));
+    }
+}
+
+void ViewCategory::actReadTypeManagerFromFile()
+{
+    auto flag = QMessageBox::question(mw, tr("提示"),
+        tr("从指定文件读取类型管理信息到【当前运行图文件】设置。\n"
+            "数据包含类型管理和类型判定规则，不包含显示设置。透明类型设置将被忽略。\n是否继续？"));
+    if (flag != QMessageBox::Yes)
+        return;
+
+    QString filename = QFileDialog::getOpenFileName(mw, tr("读取类型设置"), {}, tr("JSON文件(*.json)\n所有文件(*)"));
+    if (filename.isEmpty())
+        return;
+
+    TypeManager mana_new;
+    bool ret = mana_new.fromJsonFile(filename);
+
+    if (ret) {
+        onTypeManagerLoaded(diagram.trainCollection().typeManager(), std::move(mana_new), false);
+        mw->showStatus(tr("从文件读取类型设置成功"));
+    }
+    else {
+        QMessageBox::information(mw, tr("提示"), tr("类型信息没有更新，可能是文件读取失败，或文件不包含有效的类型配置信息。"));
+    }
+}
+
+void ViewCategory::actReadDefaultTypeManagerFromFile()
+{
+    auto flag = QMessageBox::question(mw, tr("提示"),
+        tr("从指定文件读取类型管理信息到【系统默认】设置。\n"
+            "数据包含类型管理和类型判定规则，不包含显示设置。\n是否继续？"));
+    if (flag != QMessageBox::Yes)
+        return;
+
+    QString filename = QFileDialog::getOpenFileName(mw, tr("读取类型设置"), {}, tr("JSON文件(*.json)\n所有文件(*)"));
+    if (filename.isEmpty())
+        return;
+
+    TypeManager mana_new;
+    bool ret = mana_new.fromJsonFile(filename);
+
+    if (ret) {
+        onTypeManagerLoaded(diagram.defaultTypeManager(), std::move(mana_new), true);
+        mw->showStatus(tr("从文件读取类型设置成功"));
+    }
+    else {
+        QMessageBox::information(mw, tr("提示"), tr("类型信息没有更新，可能是文件读取失败，或文件不包含有效的类型配置信息。"));
     }
 }
 

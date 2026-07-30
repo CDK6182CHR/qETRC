@@ -1,8 +1,13 @@
 ﻿#include "typemanager.h"
+
+#include <QJsonObject>
+#include <QFileDialog>
+#include <QJsonDocument>
+
 #include "traintype.h"
 #include "trainname.h"
 #include "data/common/qesystem.h"
-#include <QJsonObject>
+
 
 TypeManager::TypeManager():
     defaultPen(QColor(0,128,0),1.0), defaultPenPassenger(QColor(0,128,0),1.5),
@@ -289,10 +294,10 @@ void TypeManager::initDefaultTypes()
     appendRegex(QRegularExpression(R"(^55\d{3})"), QObject::tr("试运转"), false);
 }
 
-void TypeManager::toJson(QJsonObject& obj) const
+void TypeManager::toJson(QJsonObject& obj, bool ignore_transparent) const
 {
     obj.insert("transparent_types", transparent_types);
-    if (SystemJson::get().transparent_config && transparent_types) {
+    if (SystemJson::get().transparent_config && transparent_types && !ignore_transparent) {
         return;
     }
     //颜色
@@ -323,4 +328,38 @@ void TypeManager::toJson(QJsonObject& obj) const
             QJsonArray{ p->second->name(), p->first.pattern(),p->second->isPassenger() });
     }
     obj.insert("type_regex", arreg);
+}
+
+bool TypeManager::fromJsonFile(const QString& filename)
+{
+    QFile f(filename);
+    f.open(QFile::ReadOnly);
+    if (!f.isOpen()) {
+        qDebug() << "TypeManager::fromJson: ERROR: open file " << filename << " failed. " << Qt::endl;
+        return false;
+    }
+    auto contents = f.readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(contents);
+    bool flag = fromJson(doc.object(), true);
+    if (flag)
+        transparent_types = false;
+    return flag;
+}
+
+bool TypeManager::toJsonFile(const QString& filename)const
+{
+    QJsonObject obj;
+    toJson(obj, true);
+
+    QFile file(filename);
+    file.open(QFile::WriteOnly);
+    if (!file.isOpen()) {
+        qDebug() << "TypeManager::toJsonFile: WARNING: open file " << filename
+            << " failed" << Qt::endl;
+        return false;
+    }
+    QJsonDocument doc(obj);
+    file.write(doc.toJson());
+    file.close();
+    return true;
 }
