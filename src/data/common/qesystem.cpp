@@ -68,6 +68,7 @@ void SystemJson::fromJson(const QJsonObject& obj)
     table_row_height = obj.value("table_row_height").toInt(table_row_height);
     show_train_tooltip = obj.value("show_train_tooltip").toBool(show_train_tooltip);
     ribbon_style = obj.value("ribbon_style").toInt(18);
+    app_style = obj.value("app_style").toString(app_style);
     // 2024.03.28: for old version
     if (ribbon_style == 0) ribbon_style = 17;
     else if (ribbon_style == 1) ribbon_style = 18;
@@ -98,6 +99,7 @@ QJsonObject SystemJson::toJson() const
         {"last_file",last_file},
         {"default_file",default_file},
         {"default_raildb_file",default_raildb_file},
+        {"app_style",app_style},
         {"ribbon_style",ribbon_style},
         {"ribbon_theme",ribbon_theme},
         {"ribbon_align_center", ribbon_align_center},
