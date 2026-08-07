@@ -112,6 +112,8 @@ signals:
     void batchClearPaths(const QList<std::shared_ptr<Train>>&);
 
     void autoAddNewType(std::shared_ptr<TrainType>);
+
+    void batchShiftTime(const QVector<std::shared_ptr<Train>> trains, int shiftSecs);
         
 private slots:
     void searchTrain();
@@ -163,6 +165,7 @@ private slots:
     void actAutoTrainPenBat();
     void actManualTrainPenBat();
     void actChangePenBat();
+    void actShiftTimeBat();
 
     /**
      * 2022.05.14

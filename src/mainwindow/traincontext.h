@@ -507,6 +507,8 @@ public slots:
 
     void actBatchRemoveTrainTag(std::shared_ptr<TrainTag>, const std::vector<std::pair<std::shared_ptr<Train>, int>>& data);
 
+    void actBatchShift(const QVector<std::shared_ptr<Train>>& trains, int shiftSecs);
+
 private slots:
     void showTrainEvents();
 
@@ -699,6 +701,22 @@ namespace qecmd {
             trains(trains),data(data),cont(context){}
         virtual void undo()override;
         virtual void redo()override;
+    };
+
+    /**
+     * Batch update timetable, mainly for timetable shifting.
+     * Currently, same as TimetableInterpolation and BatchAutoCorrection.
+     */
+    class BatchChangeTimetable : public TimetableInterpolation
+    {
+    public:
+        BatchChangeTimetable(const QVector<std::shared_ptr<Train>>& trains,
+            const QVector<std::shared_ptr<Train>>& data,
+            TrainContext* context, QUndoCommand* parent = nullptr) :
+            TimetableInterpolation(trains, data, context, parent)
+        {
+			setText(QObject::tr("批量调整时刻表"));
+        }
     };
 
     /**

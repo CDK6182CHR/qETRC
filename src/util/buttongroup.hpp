@@ -133,16 +133,16 @@ inline void ButtonGroup<_Num, _Layout, _Button>::connectFront_impl(int start, Ty
  * 增加添加到QButtonGroup的逻辑。
  * 2022.03.14：增加group()接口；且其中Button的ID保证从0开始。
  */
-template <size_t _Num, typename _Layout = QHBoxLayout, typename _Button = QRadioButton>
+template <size_t Num, typename Layout = QHBoxLayout, typename _Button = QRadioButton>
 class RadioButtonGroup :
-    public ButtonGroup<_Num, _Layout, _Button>
+    public ButtonGroup<Num, Layout, _Button>
 {
     QButtonGroup* _group;
 public:
-    RadioButtonGroup(const std::array<const char*, _Num>& labels, QWidget* parent) :
-        ButtonGroup<_Num,_Layout,_Button>(labels), _group(new QButtonGroup(parent))
+    RadioButtonGroup(const std::array<const char*, Num>& labels, QWidget* parent) :
+        ButtonGroup<Num,Layout,_Button>(labels), _group(new QButtonGroup(parent))
     {
-        for (size_t i = 0; i < _Num; i++) {
+        for (size_t i = 0; i < Num; i++) {
             _group->addButton(this->buttons[i], i);
         }
     }

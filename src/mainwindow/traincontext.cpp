@@ -1702,6 +1702,16 @@ void TrainContext::actBatchRemoveTrainTag(std::shared_ptr<TrainTag> tag, const s
 	mw->undoStack->push(new qecmd::BatchRemoveTagFromTrains(tag, data, this));
 }
 
+void TrainContext::actBatchShift(const QVector<std::shared_ptr<Train>>& trains, int shiftSecs)
+{
+	QVector<std::shared_ptr<Train>> data;
+	for (auto t : trains) {
+		auto train_shift = t->translation(t->trainName(), shiftSecs, diagram.options().period_hours);
+		data.emplace_back(std::make_shared<Train>(std::move(train_shift)));   // move emplace construct
+	}
+	mw->undoStack->push(new qecmd::BatchChangeTimetable(trains, data, this));
+}
+
 void TrainContext::actToggleTrainLineShown(bool checked)
 {
 	if (!train)

@@ -1489,6 +1489,9 @@ void MainWindow::initToolbar()
 
 		connect(trainInfoWidget, &TrainInfoWidget::editTrainTags,
 			contextTrain, &TrainContext::openTagDialog);
+
+		connect(trainListWidget, &TrainListWidget::batchShiftTime,
+			contextTrain, &TrainContext::actBatchShift);
 	}
 
 	//context: rail 8

@@ -15,6 +15,7 @@
 #include <QTextStream>
 
 #include "util/buttongroup.hpp"
+#include "util/shifttimewidget.h"
 #include "data/train/train.h"
 #include "data/train/traintype.h"
 #include "data/train/traincollection.h"
@@ -97,6 +98,7 @@ void TrainListWidget::initUI()
 	menu->addAction(tr("批量指定径路"), this, &TrainListWidget::actBatchAssignPathBat);
 	menu->addAction(tr("批量清空径路"), this, &TrainListWidget::actBatchClearPathsBat);
 	menu->addAction(tr("批量设置运行线样式"), this, &TrainListWidget::actChangePenBat);
+	menu->addAction(tr("批量平移时刻"), this, &TrainListWidget::actShiftTimeBat);
 	menu->addSeparator();
 	menu->addAction(tr("按时刻表重设始发终到"), this, &TrainListWidget::actResetStartingTerminalFromTimetableBat);
 	menu->addAction(tr("自动始发终到站适配"), this, &TrainListWidget::actAutoStartingTerminalBat);
@@ -586,6 +588,19 @@ void TrainListWidget::actChangePenBat()
 		if (!res.accepted)
 			return;
 		emit batchChangePen(std::move(trains), res.pen);
+	}
+}
+
+void TrainListWidget::actShiftTimeBat()
+{
+	auto lst = batchOpSelectedTrains();
+	if (!lst.empty()) {
+		bool ok;
+		int secs = ShiftTimeWidget::dlgGetShiftSeconds(this, 
+			tr("批量平移时刻"), tr("请为所选的车次设置平移的方向和时长。所选列车时刻表内的所有车站时刻均将被平移。"), &ok);
+		if (secs == 0 || !ok)
+			return;
+		emit batchShiftTime(lst.toVector(), secs);
 	}
 }
 
