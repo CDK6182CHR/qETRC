@@ -56,7 +56,7 @@
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
 #include "SARibbonMenu.h"
-#include "SARibbonPannel.h"
+#include "SARibbonPanel.h"
 #include "SARibbonQuickAccessBar.h"
 #include <SARibbonToolButton.h>
 
