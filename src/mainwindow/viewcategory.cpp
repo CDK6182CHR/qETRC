@@ -24,7 +24,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 
-#include <SARibbonPannelItem.h>
+#include <SARibbonPanelItem.h>
 #include <SARibbonGallery.h>
 #include <SARibbonGalleryGroup.h>
 #include <SARibbonMenu.h>

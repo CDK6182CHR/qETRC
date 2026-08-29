@@ -530,7 +530,7 @@ void qecmd::ClearTrainsFromPath::redo()
 qecmd::ClearPathsFromTrainBatch::ClearPathsFromTrainBatch(QList<std::shared_ptr<Train>>&& trains,
     PathContext* cont, QUndoCommand* parent):
     QUndoCommand(QObject::tr("批量清除%1列车的径路").arg(trains.size()), parent),
-    m_trains(std::move(trains)), m_train_paths(m_trains.size(), {}),
+    m_trains(std::move(trains)), m_train_paths(m_trains.size()),
     m_cont(cont)
 {
     for (const auto& train : m_trains) {
