@@ -18,7 +18,17 @@ project(qETRC LANGUAGES CXX VERSION ${qETRC_VERSION})
 #list(PREPEND CMAKE_PREFIX_PATH $ENV{QTDIR}/lib/cmake)
 #message(STATUS "env QTDIR $ENV{QTDIR}")
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
-find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS Core Gui GuiPrivate Widgets LinguistTools REQUIRED)
+
+set(QETRC_REQUIRED_QT_COMPONENTS Core Gui Widgets LinguistTools)
+
+# 2026.08.29: Find this because this is required by ads. We use the same condition as ads.
+if(UNIX AND NOT APPLE
+   AND QT_VERSION_MAJOR STREQUAL "6"
+   AND QT_VERSION_MINOR GREATER_EQUAL 9)
+    list(APPEND QETRC_REQUIRED_QT_COMPONENTS GuiPrivate)
+endif()
+
+find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS ${QETRC_REQUIRED_QT_COMPONENTS} REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS PrintSupport)
 
 ################## main ##################
@@ -109,7 +119,7 @@ if (NOT ANDROID)
         ads
         # GIT_REPOSITORY ${CMAKE_SOURCE_DIR}/external/Qt-Advanced-Docking-System
         GIT_REPOSITORY ${ADS_REPO_URL}
-        GIT_TAG 4.4.1
+        GIT_TAG v5.1.1
         # SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/ads
     )
     FetchContent_MakeAvailable(ads)
