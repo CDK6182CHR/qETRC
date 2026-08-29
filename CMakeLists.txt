@@ -18,7 +18,7 @@ project(qETRC LANGUAGES CXX VERSION ${qETRC_VERSION})
 #list(PREPEND CMAKE_PREFIX_PATH $ENV{QTDIR}/lib/cmake)
 #message(STATUS "env QTDIR $ENV{QTDIR}")
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
-find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS Core Gui Widgets LinguistTools REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS Core Gui GuiPrivate Widgets LinguistTools REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.11 COMPONENTS PrintSupport)
 
 ################## main ##################

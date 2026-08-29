@@ -40,7 +40,11 @@
 DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page, QWidget* parent):
     QGraphicsView(parent), _page(page),_diagram(diagram),startTime(page->config().start_hour,0,0)
 {
+    // macOS trackpads already provide phase-aware wheel events. Registering a
+    // touch scroller as well can leave QScroller dragging with the viewport in overshoot.
+#if !defined(Q_OS_MACOS)
     QScroller::grabGesture(this, QScroller::TouchGesture);
+#endif
     setRenderHint(QPainter::Antialiasing, true);
     setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
@@ -48,7 +52,9 @@ DiagramWidget::DiagramWidget(Diagram& diagram, std::shared_ptr<DiagramPage> page
     paintGraph();
 
     setMouseTracking(true);
+#if !defined(Q_OS_MACOS)
     setAttribute(Qt::WA_AcceptTouchEvents);
+#endif
 }
 
 DiagramWidget::~DiagramWidget() noexcept

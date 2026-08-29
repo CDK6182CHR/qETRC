@@ -127,7 +127,7 @@ void TrainInfoSummaryModel::setupModel()
 	setRowCount(r);
 	auto tm_end = std::chrono::steady_clock::now();
 	qInfo() << "TrainInfoSummaryModel::setupModel() completed in "
-		<< (tm_end - tm_start) / 1.0ms << " ms";
+		<< std::chrono::duration_cast<std::chrono::milliseconds>(tm_end - tm_start).count() << " ms";
 }
 
 void TrainInfoSummaryModel::refreshData()
