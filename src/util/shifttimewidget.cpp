@@ -14,7 +14,7 @@ ShiftTimeWidget::ShiftTimeWidget(QWidget* parent):
 
 int ShiftTimeWidget::shiftSeconds() const
 {
-	return m_spMin->value() * 60 + m_spSec->value() * (m_radioGroup->get(0)->isChecked() ? -1 : 1);
+	return (m_spMin->value() * 60 + m_spSec->value()) * (m_radioGroup->get(0)->isChecked() ? -1 : 1);
 }
 
 int ShiftTimeWidget::dlgGetShiftSeconds(QWidget* parent, const QString& title, const QString& prompt, bool* ok)
