@@ -533,7 +533,8 @@ RoutingNode* Routing::preLinkedByName(const Train& train)
     if (pre->isVirtual())
         return nullptr;
     auto curstart = train.boundStartingRail();
-    if (curstart && pre->train()->hasTerminalTime() && pre->train()->starting() == train.timetable().front().name) {
+    // 2026.09.05  FIX condition
+    if (curstart && pre->train()->hasTerminalTime() && pre->train()->terminal() == train.timetable().front().name) {
         return &(*pre);
     }
     return nullptr;
