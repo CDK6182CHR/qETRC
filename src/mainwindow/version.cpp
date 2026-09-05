@@ -4,12 +4,14 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.9.8";
-const std::string_view DATE = "20260807";
-const int RELEASE_CODE = 80;
+const std::string_view LAST_VERSION = "V1.9.9";
+const std::string_view DATE = "20260905";
+const int RELEASE_CODE = 81;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(新增批量平移列车运行线功能。)";
+const std::string_view UPDATE_LOG = R"(1. 修复股道分析中与交路接续相关的问题。
+2. 修复批量平移运行线的方向问题。
+3. 修复构建相关问题及更新依赖库。)";
 }
