@@ -16,7 +16,7 @@
 #include <QMessageBox>
 #include "defines/icon_specs.h"
 
-#define DISABLE_ENGLISH
+// #define DISABLE_ENGLISH
 
 SystemJsonDialog::SystemJsonDialog(QWidget *parent):
     QDialog(parent)
