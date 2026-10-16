@@ -9,6 +9,7 @@
 #include "data/common/qeglobal.h"
 #include "trainpassenger.h"
 #include "data/trainpath/pathadapter.h"
+#include "trainlinestyle.h"
 
 
 class RailStation;
@@ -51,7 +52,7 @@ class Train:
      * 整个运行过程中，应当保证非空
      */
     std::shared_ptr<TrainType> _type;
-    std::optional<QPen> _pen;
+    std::optional<TrainLineStyle> _lineStyle;   // 2026.10.16 change: QPen -> TrainLineStyle
     TrainPassenger _passenger;
 
     bool _show;
@@ -190,25 +191,25 @@ public:
      * @brief pen
      * 返回非空指针。如果_pen为空（采用默认设置），返回类型默认值
      */
-    const QPen& pen()const;
+    const TrainLineStyle& lineStyle()const;
 
-    auto& penRaw()const { return _pen; }
+    auto& styleRaw()const { return _lineStyle; }
 
-    auto& penRawRef() { return _pen; }
+    auto& styleRawRef() { return _lineStyle; }
 
     /**
      * 是否采用自动UI （类型设置的UI）
      */
-    bool autoPen()const;
+    bool autoStyle()const;
 
     /**
      * 清空Pen信息，即使用自动的
      */
-    void resetPen();
+    void resetStyle();
 
-    void setPen(const QPen& pen);
+    void setStyle(const TrainLineStyle& style);
 
-    void setPenRaw(std::optional<QPen> pen);
+    void setStyleRaw(std::optional<TrainLineStyle> pen);
 
     inline ConstStationPtr nullStation()const { return _timetable.cend(); }
     inline StationPtr nullStation(){return _timetable.end();}

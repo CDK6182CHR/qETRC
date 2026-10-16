@@ -79,8 +79,9 @@ void EditTrainWidget::refreshBasicData()
     cbType->setCurrentText(_train->type()->name());
     ckPassenger->setCheckState(static_cast<Qt::CheckState>(_train->passenger()));
 
-    ckAutoPen->setChecked(_train->autoPen());   // 注意这个触发后续操作
-    const auto& pen=_train->pen();
+    ckAutoPen->setChecked(_train->autoStyle());   // 注意这个触发后续操作
+    const auto& style=_train->lineStyle();
+    const auto& pen = style.line_pen();
     tmpColor=pen.color();
     btnColor->setText(tmpColor.name());
 
@@ -270,15 +271,17 @@ void EditTrainWidget::actApply()
 
     bool autopen = ckAutoPen->isChecked();
     if (autopen) {
-        t->resetPen();
+        t->resetStyle();
     }
     else {
         QColor color = tmpColor;
         if (!color.isValid())
-            color = _train->pen().color();
+            color = _train->lineStyle().line_pen().color();
         QPen pen = QPen(color, spWidth->value(),
                         static_cast<Qt::PenStyle>(cbLs->currentIndex()));
-        t->setPen(pen);
+
+        // TODO: update marker in GUI
+        t->setStyle(TrainLineStyle(std::move(pen), t->lineStyle().marker()));
     }
     emit trainInfoChanged(_train,t);
 

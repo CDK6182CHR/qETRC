@@ -18,15 +18,18 @@ TrainItem::TrainItem(Diagram& diagram, std::shared_ptr<TrainLine> line,
     QGraphicsItem(parent),
     _line(line),_diagram(diagram),_page(page),_railway(railway),
     startTime(page.config().start_hour,0,0),
+    lineStyle(line->train()->lineStyle()),
+    pen(lineStyle.line_pen()),
     start_x(page.config().totalLeftMargin()),start_y(startY)
 {
     _startAtThis = train()->isStartingStation(_line->firstStationName());
     _endAtThis = train()->isTerminalStation(_line->lastStationName());
     startLabelInfo = _page.startingNullLabel(_line->firstRailStation().get(),_line->dir());
     endLabelInfo = _page.terminalNullLabel(_line->lastRailStation().get(), _line->dir());
-    pen = line->train()->pen();
+
     if (config().inverse_color) {
-        pen.setColor(qeutil::inversedColor(pen.color()));
+		lineStyle.line_pen().setColor(qeutil::inversedColor(lineStyle.line_pen().color()));
+        lineStyle.marker().pen().setColor(qeutil::inversedColor(pen.color()));
     }
 
     // 如果这里报QtGui.dll的错误，考虑trainType()是不是空！

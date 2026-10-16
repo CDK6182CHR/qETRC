@@ -1066,9 +1066,9 @@ bool Diagram::fromTrc(QTextStream& fin)
             if (t.size() == 4) {
                 auto trainc = _trainCollection.findFullName(t.at(0));
                 if (trainc) {
-                    QPen pen = trainc->pen();
+                    QPen pen = trainc->lineStyle().line_pen();
                     pen.setColor(QColor(t.at(1).toInt(), t.at(2).toInt(), t.at(3).toInt()));
-                    trainc->setPen(pen);
+                    trainc->setStyle(TrainLineStyle(std::move(pen), LineMarkerStyle::no_marker()));
                 }
                 else {
                     TRC_WARNING << "Train not found for color: " << t.at(0) << Qt::endl;
@@ -1631,7 +1631,7 @@ bool Diagram::toTrc(const QString& filename, std::shared_ptr<Railway> rail, bool
     fout << SPLIT_COLOR << Qt::endl;
     for (auto train : _trainCollection.trains()) {
         if (localOnly && !train->adapterFor(*rail))continue;
-        const auto& color = train->pen().color();
+        const auto& color = train->lineStyle().line_pen().color();
         fout << train->trainName().full() << "," << color.red() << "," << color.green() << ","
             << color.blue() << Qt::endl;
     }
@@ -1639,7 +1639,7 @@ bool Diagram::toTrc(const QString& filename, std::shared_ptr<Railway> rail, bool
     for (auto train : _trainCollection.trains()) {
         if (localOnly && !train->adapterFor(*rail))continue;
         // LineStyle 暂时不知道怎么转换，只管粗细
-        fout << train->trainName().full() << ",0," << train->pen().widthF() << Qt::endl;
+        fout << train->trainName().full() << ",0," << train->lineStyle().line_pen().widthF() << Qt::endl;
     }
     file.close();
     return true;

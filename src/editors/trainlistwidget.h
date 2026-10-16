@@ -6,7 +6,7 @@
 #include <QUndoCommand>
 #include <QList>
 #include <deque>
-
+#include <optional>
 
 namespace qecmd {
     struct  StartingTerminalData;
@@ -21,6 +21,7 @@ class TrainType;
 class TrainTag;
 struct DiagramOptions;
 class TrainFilterSelector;
+class TrainLineStyle;
 
 /**
  * @brief The TrainListWidget class
@@ -97,7 +98,7 @@ signals:
 
     void batchManualPen(std::deque<std::shared_ptr<Train>>);
 
-    void batchChangePen(std::deque<std::shared_ptr<Train>> trains, std::optional<QPen> pen);
+    void batchChangePen(std::deque<std::shared_ptr<Train>> trains, std::optional<TrainLineStyle> style);
 
     void batchAutoCorrect(const QList<std::shared_ptr<Train>>&);
 

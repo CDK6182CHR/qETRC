@@ -9,7 +9,7 @@
 #include <QSet>
 #include <QPointer>
 
-#include <data/train/train.h>
+#include "data/train/train.h"
 
 class SARibbonContextCategory;
 class QLineEdit;
@@ -58,7 +58,7 @@ namespace qecmd {
 
     class AutoTrainPen : public QUndoCommand {
         std::deque<std::shared_ptr<Train>> _trains;
-        std::deque<QPen> _pens;
+        std::deque<TrainLineStyle> _styles;
         TrainContext* const cont;
     public:
         AutoTrainPen(std::deque<std::shared_ptr<Train>>&& trains,
@@ -69,7 +69,7 @@ namespace qecmd {
 
     class ManualTrainPen : public QUndoCommand {
         std::deque<std::shared_ptr<Train>> _trains;
-        std::deque<QPen> _pens;
+        std::deque<TrainLineStyle> _styles;
         TrainContext* const cont;
 
     public:
@@ -80,10 +80,10 @@ namespace qecmd {
 
     class ChangeTrainPen : public QUndoCommand {
         std::deque<std::shared_ptr<Train>> _trains;
-        std::deque<std::optional<QPen>> _pens;
+        std::deque<std::optional<TrainLineStyle>> _styles;
         TrainContext* const cont;
     public:
-        ChangeTrainPen(std::deque<std::shared_ptr<Train>>&& trains, std::optional<QPen> pen, TrainContext* context,
+        ChangeTrainPen(std::deque<std::shared_ptr<Train>>&& trains, std::optional<TrainLineStyle> style, TrainContext* context,
             QUndoCommand* parent = nullptr);
         void undo()override;
         void redo()override;
@@ -291,7 +291,7 @@ public slots:
     /**
      * 2025.02.01  批量设置运行线类型  操作压栈 
      */
-    void batchChangeTrainPen(std::deque<std::shared_ptr<Train>> trains, std::optional<QPen> pen);
+    void batchChangeTrainPen(std::deque<std::shared_ptr<Train>> trains, std::optional<TrainLineStyle> pen);
 
     // 2024.03.17：操作压栈。MainWindow的全部车次操作。
     void actAutoPenAll();

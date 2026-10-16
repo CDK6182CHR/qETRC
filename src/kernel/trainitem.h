@@ -110,7 +110,8 @@ class TrainItem : public QGraphicsItem
      * 2024.06.27 update: use this for the *actual* pen for drawing train lines.
      * This may be different from train->pen(), if inverse_color is configured.
      */
-    QPen pen;
+    TrainLineStyle lineStyle;
+    const QPen& pen;
 
     const double start_x, start_y;
 

@@ -20,23 +20,24 @@ TrainPenWidget::TrainPenWidget(QWidget* parent):
 TrainPenWidget::TrainPenWidget(std::shared_ptr<Train> train, QWidget* parent):
     TrainPenWidget(parent)
 {
-    setPen(train);
+    setStyle(train);
 }
 
-void TrainPenWidget::setPen(std::shared_ptr<Train> train)
+void TrainPenWidget::setStyle(std::shared_ptr<Train> train)
 {
-    setPen(train->autoPen(), train->pen());
+    setStyle(train->autoStyle(), train->lineStyle());
 }
 
-void TrainPenWidget::setPen(bool isAuto, const QPen& pen)
+void TrainPenWidget::setStyle(bool isAuto, const TrainLineStyle& style)
 {
+    auto& pen = style.line_pen();
     m_ckAuto->setChecked(isAuto);
     m_btnColor->setText(pen.color().name());
     m_spWidth->setValue(pen.widthF());
     m_cbStyle->setCurrentIndex(static_cast<int>(pen.style()));
 }
 
-std::optional<QPen> TrainPenWidget::pen() const
+std::optional<TrainLineStyle> TrainPenWidget::lineStyle() const
 {
     if (m_ckAuto->isChecked()) {
         return std::nullopt;
@@ -46,11 +47,12 @@ std::optional<QPen> TrainPenWidget::pen() const
         p.setColor(m_color);
         p.setWidthF(m_spWidth->value());
         p.setStyle(static_cast<Qt::PenStyle>(m_cbStyle->currentIndex()));
-        return p;
+		// TODO: marker style
+		return TrainLineStyle(p, LineMarkerStyle::no_marker());
     }
 }
 
-TrainPenWidget::GetPenReturnType TrainPenWidget::getPen(QWidget* parent, std::shared_ptr<Train> initPenTrain, 
+TrainPenWidget::GetPenReturnType TrainPenWidget::getLineStyle(QWidget* parent, std::shared_ptr<Train> initPenTrain, 
     const QString& title, const QString& prompt)
 {
     QDialog* dlg = new QDialog(parent);
@@ -76,7 +78,7 @@ TrainPenWidget::GetPenReturnType TrainPenWidget::getPen(QWidget* parent, std::sh
     if (flag) {
         // accepted
         res.accepted = true;
-        res.pen = w->pen();
+        res.lineStyle = w->lineStyle();
     }
     else {
         res.accepted = false;

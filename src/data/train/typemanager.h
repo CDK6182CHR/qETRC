@@ -4,6 +4,8 @@
 #include <QString>
 #include <QVector>
 
+#include "trainlinestyle.h"
+
 class TrainName;
 class TrainType;
 class QJsonObject;
@@ -34,8 +36,9 @@ class TypeManager{
     /**
      * 默认的版本。注意这个不应该是static，因为系统Config和默认Config指定的默认颜色可能不同。
      * 2021.08.13  增加一个默认客车用的pen。如果能确定是客车，就先用这个
+     * 2026.10.16  Change into TrainLineStyle objects
      */
-    QPen defaultPen, defaultPenPassenger;
+    TrainLineStyle defaultStyle, defaultStylePassenger;
     std::shared_ptr<TrainType> defaultType;
 
     bool transparent_types;
@@ -126,7 +129,7 @@ public:
 
     inline bool isNull()const { return _types.isEmpty(); }
 
-    const QPen& getDefaultPen()const{return defaultPen;}
+    const TrainLineStyle& getDefaultStyle()const{return defaultStyle;}
 
     auto getDefaultType()const{return defaultType;}
 

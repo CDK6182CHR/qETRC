@@ -102,14 +102,14 @@ void TypeConfigModel::setupNewRow(int row)
     using SI=QStandardItem;
     setItem(row,ColName,new SI);
     setItem(row,ColPassenger,makeCheckItem());
-    setColorItem(row, manager.getDefaultPen().color());
+    setColorItem(row, manager.getDefaultStyle().line_pen().color());
 
     auto* it=new SI;
-    it->setData(manager.getDefaultPen().widthF(),Qt::EditRole);
+    it->setData(manager.getDefaultStyle().line_pen().widthF(),Qt::EditRole);
     setItem(row,ColWidth,it);
 
     it=new SI;
-    it->setData(static_cast<int>(manager.getDefaultPen().style()),Qt::EditRole);
+    it->setData(static_cast<int>(manager.getDefaultStyle().line_pen().style()),Qt::EditRole);
     setItem(row,ColLineStyle,it);
 }
 

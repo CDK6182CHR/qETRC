@@ -10,8 +10,9 @@
 
 
 TypeManager::TypeManager():
-    defaultPen(QColor(0,128,0),1.0), defaultPenPassenger(QColor(0,128,0),1.5),
-    defaultType(std::make_shared<TrainType>(QObject::tr("其他_"),defaultPen))
+    defaultStyle(QPen(QColor(0,128,0),1.0), LineMarkerStyle::no_marker()), 
+    defaultStylePassenger(QPen(QColor(0,128,0),1.5), LineMarkerStyle::no_marker()),
+    defaultType(std::make_shared<TrainType>(QObject::tr("其他_"), defaultStyle))
 {
 }
 
@@ -30,7 +31,8 @@ TypeManager& TypeManager::operator=(const TypeManager& another)
     for (const auto& p : another._regs) {
         _regs.append(qMakePair(p.first, findOrCreate(p.second->name())));
     }
-    defaultPen = another.defaultPen;
+    defaultStyle = another.defaultStyle;
+	defaultStylePassenger = another.defaultStylePassenger;
     //defaultType = std::make_shared<TrainType>(*(another.defaultType));   // 2023.12.24  moved above!
     //qDebug() << "========== After copy assign show ==========";
     //show();
@@ -95,7 +97,7 @@ std::shared_ptr<TrainType> TypeManager::findOrCreate(const QString& name)
     if (_types.contains(name))
         return _types.value(name);
     else {
-        auto t = std::make_shared<TrainType>(name, defaultPen);
+        auto t = std::make_shared<TrainType>(name, defaultStyle);
         //qDebug() << "TypeManager::findOrCreate(QString): create type " << name << " @ " << t.get();
         _types.insert(name, t);
         return t;
@@ -112,7 +114,7 @@ std::shared_ptr<TrainType> TypeManager::findOrCreate(const QString& name, bool p
 
     else {
         auto t = std::make_shared<TrainType>(name, passenger ?
-            defaultPenPassenger : defaultPen, passenger);
+            defaultStylePassenger : defaultStyle, passenger);
         //qDebug() << "TypeManager::findOrCreate(QString, bool): create type " << name <<
         //    " @ " << t.get();
         _types.insert(name, t);
@@ -204,20 +206,20 @@ bool TypeManager::fromJson(const QJsonObject& obj, bool ignore_transparent)
         const QJsonArray tp = p.toArray();
         auto t = appendRegex(QRegularExpression(tp.at(1).toString()), tp.at(0).toString(), tp.at(2).toBool());
         if (t->isPassenger())
-            t->pen().setWidthF(pw);
+            t->line_style().line_pen().setWidthF(pw);
         else
-            t->pen().setWidthF(fw);
+            t->line_style().line_pen().setWidthF(fw);
     }
 
     //读取颜色
     const QJsonObject& obcolor = obj.value("default_colors").toObject();
     for (auto p = obcolor.begin(); p != obcolor.end(); ++p) {
         if (p.key() == "default") {
-            defaultType->pen().setColor(QColor(p.value().toString()));
+            defaultType->line_style().line_pen().setColor(QColor(p.value().toString()));
         }
         else {
             auto tp = findOrCreate(p.key());
-            tp->pen().setColor(QColor(p.value().toString()));
+            tp->line_style().line_pen().setColor(QColor(p.value().toString()));
         }
     }
 
@@ -226,13 +228,25 @@ bool TypeManager::fromJson(const QJsonObject& obj, bool ignore_transparent)
     for (auto p = ls.begin(); p != ls.end(); ++p) {
         const QJsonArray& arsub = p.value().toArray();
         if (p.key() == "default") {
-            defaultType->pen().setStyle(static_cast<Qt::PenStyle>(arsub.at(0).toInt()));
-            defaultType->pen().setWidthF(arsub.at(1).toDouble());
+            defaultType->line_style().line_pen().setStyle(static_cast<Qt::PenStyle>(arsub.at(0).toInt()));
+            defaultType->line_style().line_pen().setWidthF(arsub.at(1).toDouble());
         }
         else {
             auto tp = findOrCreate(p.key());
-            tp->pen().setStyle(static_cast<Qt::PenStyle>(arsub.at(0).toInt()));
-            tp->pen().setWidthF(arsub.at(1).toDouble());
+            tp->line_style().line_pen().setStyle(static_cast<Qt::PenStyle>(arsub.at(0).toInt()));
+            tp->line_style().line_pen().setWidthF(arsub.at(1).toDouble());
+        }
+    }
+
+    // 2026.10.16: for marker styles
+	const QJsonObject& ms = obj.value("marker_styles").toObject();
+    for (auto p = ms.begin(); p != ms.end(); ++p) {
+        if (p.key() == "default") {
+			defaultType->line_style().setMarker(LineMarkerStyle::fromJson(p.value().toObject()));
+        }
+        else {
+            auto tp = findOrCreate(p.key());
+			tp->line_style().setMarker(LineMarkerStyle::fromJson(p.value().toObject()));
         }
     }
 
@@ -304,6 +318,7 @@ void TypeManager::toJson(QJsonObject& obj, bool ignore_transparent) const
     QJsonObject objcolor;
     //LineStype二元组：线型，粗细。新增
     QJsonObject ls;
+    QJsonObject markers;   // 2026.10.16  experimental
     for (auto p = _types.begin(); p != _types.end(); ++p) {
         if (p.value() == defaultType) {
             continue;
@@ -313,14 +328,19 @@ void TypeManager::toJson(QJsonObject& obj, bool ignore_transparent) const
             objcolor.insert(p.key(), p.value()->pen().color().name());
             ls.insert(p.key(),
                 QJsonArray{(int) p.value()->pen().style(),p.value()->pen().widthF() });
+            markers.insert(p.key(), p.value()->line_style().marker().toJson());
         }
     }
     // 保证default必须有，否则pyETRC会崩
     objcolor.insert("default", defaultType->pen().color().name());
     ls.insert("default", QJsonArray{ (int)defaultType->pen().style(),
         defaultType->pen().widthF() });
+	markers.insert("default", defaultType->line_style().marker().toJson());
+
     obj.insert("default_colors", objcolor);
     obj.insert("line_styles", ls);
+	obj.insert("marker_styles", markers);
+
     //正则
     QJsonArray arreg;
     for (auto p = _regs.begin(); p != _regs.end(); ++p) {

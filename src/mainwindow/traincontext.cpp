@@ -1876,7 +1876,7 @@ void TrainContext::actSelectColor()
 {
 	QColor color(tmpColor);
 	if (!color.isValid() && train)
-		color = train->pen().color();
+		color = train->lineStyle().line_pen().color();
 	color = QColorDialog::getColor(color, mw, tr("选择运行线颜色"));
 	if (color.isValid()) {
 		tmpColor = color;
@@ -1919,14 +1919,15 @@ void TrainContext::actApply()
 
 	bool autopen = btnAutoUI->isChecked();
 	if (autopen) {
-		t->resetPen();
+		t->resetStyle();
 	}
 	else {
 		QColor color = tmpColor;
 		if (!color.isValid())
-			color = train->pen().color();
+			color = train->lineStyle().line_pen().color();
 		QPen pen = QPen(color, spWidth->value(), static_cast<Qt::PenStyle>(comboLs->currentIndex()));
-		t->setPen(pen);
+		// TODO: marker
+		t->setStyle(TrainLineStyle(pen, train->lineStyle().marker()));
 	}
 	mw->getUndoStack()->push(new qecmd::UpdateTrainInfo(train, t, this));
 }
@@ -1964,9 +1965,10 @@ void TrainContext::refreshData()
 		setupTypeCombo();
 		comboType->setCurrentText(train->type()->name());
 		checkPassen->setCheckState(static_cast<Qt::CheckState>(train->passenger()));
-		btnAutoUI->setChecked(train->autoPen());
-		onAutoUIChanged(train->autoPen());
-		const QPen& pen = train->pen();
+		btnAutoUI->setChecked(train->autoStyle());
+		onAutoUIChanged(train->autoStyle());
+		const auto& ls = train->lineStyle();
+		const QPen& pen = ls.line_pen();
 		btnColor->setText(pen.color().name());
 		spWidth->setValue(pen.widthF());
 		comboLs->setCurrentIndex(static_cast<int>(pen.style()));
@@ -2049,16 +2051,16 @@ void TrainContext::actExchangeInterval()
 	dialog->open();
 }
 
-void TrainContext::batchChangeTrainPen(std::deque<std::shared_ptr<Train>> trains, std::optional<QPen> pen)
+void TrainContext::batchChangeTrainPen(std::deque<std::shared_ptr<Train>> trains, std::optional<TrainLineStyle> style)
 {
-	mw->getUndoStack()->push(new qecmd::ChangeTrainPen(std::move(trains), pen, this));
+	mw->getUndoStack()->push(new qecmd::ChangeTrainPen(std::move(trains), style, this));
 }
 
 void TrainContext::actAutoPenAll()
 {
 	std::deque<std::shared_ptr<Train>> trains{};
 	foreach(auto t, diagram.trainCollection().trains()) {
-		if (!t->autoPen()) {
+		if (!t->autoStyle()) {
 			trains.emplace_back(t);
 		}
 	}
@@ -2069,7 +2071,7 @@ void TrainContext::actManualPenAll()
 {
 	std::deque<std::shared_ptr<Train>> trains{};
 	foreach(auto t, diagram.trainCollection().trains()) {
-		if (t->autoPen()) {
+		if (t->autoStyle()) {
 			trains.emplace_back(t);
 		}
 	}
@@ -2429,18 +2431,18 @@ void qecmd::AutoTrainType::commit()
 qecmd::AutoTrainPen::AutoTrainPen(std::deque<std::shared_ptr<Train>>&& trains, 
 	TrainContext* context, QUndoCommand* parent):
 	QUndoCommand(QObject::tr("自动设置运行线"), parent), _trains(std::move(trains)),
-	_pens(), cont(context)
+	_styles(), cont(context)
 {
 	for (const auto& t : _trains) {
 		assert(!t->autoPen());
-		_pens.emplace_back(t->pen());
+		_styles.emplace_back(t->lineStyle());
 	}
 }
 
 void qecmd::AutoTrainPen::undo()
 {
 	for (size_t i = 0; i < _trains.size(); i++) {
-		_trains.at(i)->setPen(_pens.at(i));
+		_trains.at(i)->setStyle(_styles.at(i));
 	}
 	cont->commitAutoPenOrUndo(_trains);
 }
@@ -2448,7 +2450,7 @@ void qecmd::AutoTrainPen::undo()
 void qecmd::AutoTrainPen::redo()
 {
 	for (size_t i = 0; i < _trains.size(); i++) {
-		_trains.at(i)->resetPen();
+		_trains.at(i)->resetStyle();
 	}
 	cont->commitAutoPenOrUndo(_trains);
 }
@@ -2460,14 +2462,14 @@ qecmd::ManualTrainPen::ManualTrainPen(std::deque<std::shared_ptr<Train>>&& train
 {
 	// Copy the data
 	for (auto p : _trains) {
-		_pens.emplace_back(p->pen());
+		_styles.emplace_back(p->lineStyle());
 	}
 }
 
 void qecmd::ManualTrainPen::undo()
 {
 	for (auto p : _trains) {
-		p->resetPen();
+		p->resetStyle();
 	}
 	cont->commitAutoPenOrUndo(_trains);
 }
@@ -2475,14 +2477,14 @@ void qecmd::ManualTrainPen::undo()
 void qecmd::ManualTrainPen::redo()
 {
 	for (size_t i = 0; i < _trains.size(); i++) {
-		_trains.at(i)->setPen(_pens.at(i));
+		_trains.at(i)->setStyle(_styles.at(i));
 	}
 	cont->commitAutoPenOrUndo(_trains);
 }
 
-qecmd::ChangeTrainPen::ChangeTrainPen(std::deque<std::shared_ptr<Train>>&& trains, std::optional<QPen> pen, TrainContext* context, QUndoCommand* parent) :
+qecmd::ChangeTrainPen::ChangeTrainPen(std::deque<std::shared_ptr<Train>>&& trains, std::optional<TrainLineStyle> style, TrainContext* context, QUndoCommand* parent) :
 	QUndoCommand(QObject::tr("批量设置运行线样式: 影响%1车次").arg(trains.size()), parent),
-	_trains(std::move(trains)), _pens(_trains.size(), pen), cont(context)
+	_trains(std::move(trains)), _styles(_trains.size(), style), cont(context)
 {
 }
 
@@ -2499,7 +2501,7 @@ void qecmd::ChangeTrainPen::redo()
 void qecmd::ChangeTrainPen::commit()
 {
 	for (size_t i = 0; i < _trains.size(); i++) {
-		std::swap(_trains.at(i)->penRawRef(), _pens.at(i));
+		std::swap(_trains.at(i)->styleRawRef(), _styles.at(i));
 	}
 	cont->commitBatchChangeTrainPen(_trains);
 }

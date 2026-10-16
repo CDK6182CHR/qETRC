@@ -33,7 +33,7 @@ Train::Train(const QJsonObject &obj, TypeManager& manager, TrainTagManager& tag_
 Train::Train(const Train& another):
     std::enable_shared_from_this<Train>(another),
     _trainName(another._trainName),_starting(another._starting),_terminal(another._terminal),
-    _type(another._type),_pen(another._pen),
+    _type(another._type),_lineStyle(another._lineStyle),
     _passenger(another._passenger),_show(another._show),
     _timetable(another._timetable),
     _autoLines(another._autoLines)
@@ -44,7 +44,7 @@ Train::Train(const Train& another):
 Train::Train(Train&& another) noexcept:
     _trainName(std::move(another._trainName)), _starting(std::move(another._starting)),
     _terminal(std::move(another._terminal)),
-    _type(std::move(another._type)), _pen(std::move(another._pen)),
+    _type(std::move(another._type)), _lineStyle(std::move(another._lineStyle)),
     _passenger(another._passenger), _show(another._show),
     _timetable(std::move(another._timetable)),
     _autoLines(another._autoLines)
@@ -90,7 +90,9 @@ void Train::fromJson(const QJsonObject &obj, TypeManager& manager, TrainTagManag
             //线宽为0表示采用默认
             pen.setWidthF(_type->pen().widthF());
         }
-        _pen = pen;
+		auto marker = LineMarkerStyle::fromJson(ui.value("marker").toObject());
+
+        _lineStyle = TrainLineStyle(std::move(pen), std::move(marker));
     }
 }
 
@@ -119,11 +121,15 @@ QJsonObject Train::toJson() const
     };
 
     QJsonObject ui;
-    if (_pen.has_value()) {
-        const auto& p = _pen.value();
+    if (_lineStyle.has_value()) {
+        const auto& ls = _lineStyle.value();
+        auto& p = ls.line_pen();
         ui.insert("Color", p.color().name());
         ui.insert("LineWidth", p.widthF());
         ui.insert("LineStyle", p.style());   //新增
+
+        // 2026.10.16: marker
+        ui.insert("marker", ls.marker().toJson());
     }
     obj.insert("UI", ui);
     
@@ -190,18 +196,18 @@ void Train::addTag(const QString& tagName, TrainTagManager& tagManager)
     _tags.push_back(tagManager.findOrCreate(tagName));
 }
 
-const QPen& Train::pen() const
+const TrainLineStyle& Train::lineStyle() const
 {
     //注意不能用value_or，因为返回的是值类型。
-    if (_pen.has_value())
-        return _pen.value();
+    if (_lineStyle.has_value())
+        return _lineStyle.value();
     else
-        return type()->pen();
+        return type()->line_style();
 }
 
-bool Train::autoPen() const
+bool Train::autoStyle() const
 {
-    return !_pen.has_value();
+    return !_lineStyle.has_value();
 }
 
 void Train::appendStation(const StationName &name,
@@ -211,19 +217,19 @@ void Train::appendStation(const StationName &name,
     _timetable.emplace_back(name, arrive, depart, business, track, note);
 }
 
-void Train::setPen(const QPen& pen)
+void Train::setStyle(const TrainLineStyle& style)
 {
-    _pen = pen;
+    _lineStyle = style;
 }
 
-void Train::setPenRaw(std::optional<QPen> pen)
+void Train::setStyleRaw(std::optional<TrainLineStyle> style)
 {
-    _pen = std::move(pen);
+    _lineStyle = std::move(style);
 }
 
-void Train::resetPen()
+void Train::resetStyle()
 {
-    _pen.reset();
+    _lineStyle.reset();
 }
 
 void Train::prependStation(const StationName& name, 
@@ -934,7 +940,7 @@ void Train::swapBaseInfo(Train& other)
     std::swap(_terminal, other._terminal);
     SWAP(_type);
     SWAP(_passenger);
-    SWAP(_pen);
+    SWAP(_lineStyle);
 }
 
 #if 0

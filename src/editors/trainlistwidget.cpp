@@ -555,7 +555,7 @@ void TrainListWidget::actAutoTrainPenBat()
 	const auto& lst = batchOpSelectedTrains();
 	std::deque<std::shared_ptr<Train>> trains;
 	foreach(auto t, lst) {
-		if (!t->autoPen()) {
+		if (!t->autoStyle()) {
 			trains.emplace_back(t);
 		}
 	}
@@ -569,7 +569,7 @@ void TrainListWidget::actManualTrainPenBat()
 	const auto& lst = batchOpSelectedTrains();
 	std::deque<std::shared_ptr<Train>> trains;
 	foreach(auto t, lst) {
-		if (t->autoPen()) {
+		if (t->autoStyle()) {
 			trains.emplace_back(t);
 		}
 	}
@@ -583,11 +583,11 @@ void TrainListWidget::actChangePenBat()
 	auto lst = batchOpSelectedTrains();
 	std::deque<std::shared_ptr<Train>> trains(std::make_move_iterator(lst.begin()), std::make_move_iterator(lst.end()));
 	if (!trains.empty()) {
-		auto res = TrainPenWidget::getPen(this, trains.front(), tr("批量设置运行线"),
+		auto res = TrainPenWidget::getLineStyle(this, trains.front(), tr("批量设置运行线"),
 			tr("请为所选的车次设置运行线样式"));
 		if (!res.accepted)
 			return;
-		emit batchChangePen(std::move(trains), res.pen);
+		emit batchChangePen(std::move(trains), res.lineStyle);
 	}
 }
 
