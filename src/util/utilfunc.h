@@ -13,6 +13,7 @@ class QStandardItemModel;
 class QModelIndex;
 class QStandardItem;
 class QTableView;
+class QPointF;
 
 namespace qeutil{
 
@@ -194,4 +195,10 @@ bool trainNameLess(const QString& s1, const QString& s2);
  * Use two-part algorithm if required.
  */
 bool trainNameGreater(const QString& s1, const QString& s2);
+
+/**
+ * Returns the (Cartesian) distance between two given points.
+ */
+double distanceBetween(const QPointF& p1, const QPointF& p2);
+
 }

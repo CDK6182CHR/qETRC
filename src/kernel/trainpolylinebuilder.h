@@ -4,6 +4,7 @@
 #include <QPointF>
 
 #include "qemultilinepath.h"
+#include "marker_builders.h"
 #include "data/train/trainlinestyle.h"
 
 
@@ -19,7 +20,13 @@ class TrainPolyLineBuilder
 	const Config& m_config;
 	TrainLineStyle m_style;
 	QEMultiLinePath m_mlpath;
+	std::unique_ptr<AbstractMarkerBuilder> m_markerBuilder;
 	QVector<QPointF> m_markerCenters;
+
+	/**
+	 * Accumulated running line lengths for determining the markers.
+	 */
+	double m_accRunningLength = 0;
 
 public:
 	TrainPolyLineBuilder(const Config& config, TrainLineStyle style);

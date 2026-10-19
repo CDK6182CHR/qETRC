@@ -401,3 +401,10 @@ bool qeutil::trainNameGreater(const QString& s1, const QString& s2)
 		return s1 > s2;
 	}
 }
+
+double qeutil::distanceBetween(const QPointF& p1, const QPointF& p2)
+{
+	double dx = p1.x() - p2.x();
+	double dy = p1.y() - p2.y();
+	return std::sqrt(dx * dx + dy * dy);
+}

@@ -22,6 +22,8 @@ public:
 	auto& marker()const { return m_marker; }
 	auto& marker() { return m_marker; }
 
+	bool hasMarker()const;
+
 	void setMarker(LineMarkerStyle marker) { m_marker = std::move(marker); }
 
 	bool operator==(const TrainLineStyle& rhs)const;
