@@ -99,3 +99,11 @@ void TrainPolyLineBuilder::runLineTo(const QPointF& p)
 	m_accRunningLength += cur_length;
 }
 
+void TrainPolyLineBuilder::generalLineTo(const QPointF& p, bool is_running)
+{
+	if (is_running)
+		return runLineTo(p);
+	else
+		return lineTo(p);
+}
+

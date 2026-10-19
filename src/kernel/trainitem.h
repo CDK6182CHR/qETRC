@@ -15,6 +15,7 @@ class Railway;
 class QPointF;
 class PaintStationPointItem;
 class QEMultiLinePath;
+class TrainPolyLineBuilder;
 class Routing;
 
 /**
@@ -256,10 +257,12 @@ private:
      * @brief 出图操作  运行线右越界
      * 铺画越界边界，以及越界标签。注意所给参数都是直接算出的  i.e.正值
      * 返回跨界点纵坐标
+     * ---------
+     * 2026.10.19  新增：is_running标记。若是运行部分（非站内）则为true。运行部分需考虑marker.
      */
-    double getOutGraph(double xin, double yin, double xout, double yout, QEMultiLinePath& path);
+    double getOutGraph(double xin, double yin, double xout, double yout, TrainPolyLineBuilder& builder, bool is_running);
 
-    double getInGraph(double xout, double yout, double xin, double yin, QEMultiLinePath& path);
+    double getInGraph(double xout, double yout, double xin, double yin, TrainPolyLineBuilder& builder);
 
     /**
      * @brief 封装查询列车绘制图形的方法

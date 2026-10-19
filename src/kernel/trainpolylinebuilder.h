@@ -50,4 +50,6 @@ public:
 	 * We add markers in a required interval.
 	 */
 	void runLineTo(const QPointF& p);
+
+	void generalLineTo(const QPointF& p, bool is_running);
 };

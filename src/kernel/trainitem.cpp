@@ -7,6 +7,7 @@
 #include "paintstationpointitem.h"
 #include "data/common/qesystem.h"
 #include "qemultilinepath.h"
+#include "trainpolylinebuilder.h"
 #include "util/utilfunc.h"
 
 #include <QPointF>
@@ -651,7 +652,8 @@ void TrainItem::setPathItem(const QString& trainName)
     bool mark = (config().show_time_mark == 2);
 
     //QPainterPath path;
-    QEMultiLinePath path;
+    //QEMultiLinePath path;
+    TrainPolyLineBuilder builder(config(), lineStyle);
 
     QList<double> spanLeft, spanRight;   //跨界点纵坐标
 
@@ -672,7 +674,7 @@ void TrainItem::setPathItem(const QString& trainName)
                     //表示这就是第一个站，p==begin()
                     startPoint = parr;
                 }
-                path.moveTo(parr);
+                builder.moveTo(parr);
                 started = true;
             }
             // else  // 2024.02.15: no-else; for the first paining point may not be the actual first?
@@ -681,14 +683,14 @@ void TrainItem::setPathItem(const QString& trainName)
                     //横坐标数值减小，表明出现左入图情况（跨界）
                     if (inlast) {
                         //上一个点在界内，就还要补充右出图的情况
-                        spanRight.append(getOutGraph(xlast, ylast, xarr, ycur, path));
+                        spanRight.append(getOutGraph(xlast, ylast, xarr, ycur, builder, true));
                     }
                     //现在：左入图操作
-                    spanLeft.append(getInGraph(xlast, ylast, xarr, ycur, path));
-                    path.lineTo(parr);
+                    spanLeft.append(getInGraph(xlast, ylast, xarr, ycur, builder));
+                    builder.runLineTo(parr);
                 }
                 else {
-                    path.lineTo(parr);
+                    builder.runLineTo(parr);
                 }
             }
             if (mark && ts->isStopped()) {
@@ -705,7 +707,7 @@ void TrainItem::setPathItem(const QString& trainName)
                 //补充右出图情况
                 //qDebug() << "Out of graph: " << train()->trainName().full() << " "
                 //    << xlast << ", " << ylast << ", " << xarr << ", " << ycur;
-                spanRight.append(getOutGraph(xlast, ylast, xarr, ycur, path));
+                spanRight.append(getOutGraph(xlast, ylast, xarr, ycur, builder, true));
             }
         }
 
@@ -721,20 +723,20 @@ void TrainItem::setPathItem(const QString& trainName)
                     //站内越界
                     if (xarr <= width) {
                         //到达点也在界内，先补充右出界
-                        spanRight.append(getOutGraph(xarr, ycur, xdep, ycur, path));
+                        spanRight.append(getOutGraph(xarr, ycur, xdep, ycur, builder, false));
                     }
                     //左入界
-                    spanLeft.append(getInGraph(xarr, ycur, xdep, ycur, path));
+                    spanLeft.append(getInGraph(xarr, ycur, xdep, ycur, builder));
                 }
                 if (config().show_line_in_station)
-                    path.lineTo(pdep);
+                    builder.lineTo(pdep);
                 else
-                    path.moveTo(pdep);
+                    builder.moveTo(pdep);
             }
             else {
                 //界外
                 if (xarr <= width) {
-                    spanRight.append(getOutGraph(xarr, ycur, xdep, ycur, path));
+                    spanRight.append(getOutGraph(xarr, ycur, xdep, ycur, builder, false));
                 }
             }
         }
@@ -758,7 +760,7 @@ void TrainItem::setPathItem(const QString& trainName)
     //最后一个站，以及终止点
     endInRange = inlast;
     if (endInRange) {
-        endPoint = path.currentPosition();
+        endPoint = builder.path().currentPosition();
     }
     QPen pen = trainPen();
 
@@ -766,11 +768,11 @@ void TrainItem::setPathItem(const QString& trainName)
     //stroker.setWidth(0.5);
     //auto outpath = stroker.createStroke(path);
 
-    pathItem = new QGraphicsPathItem(path.path(), this);
+    pathItem = new QGraphicsPathItem(builder.path().path(), this);
     pathItem->setPen(pen);
     if (config().valid_width > 1) {
         QPen expen(Qt::transparent, pen.width() * config().valid_width);
-        expandItem = new QGraphicsPathItem(path.path(), this);
+        expandItem = new QGraphicsPathItem(builder.path().path(), this);
         expandItem->setPen(expen);
         //_bounding = expandItem->boundingRect();
     }
@@ -986,7 +988,7 @@ TrainTime TrainItem::calTimeByXFromStart(double x_from_start) const
 }
 
 double TrainItem::getOutGraph(double xin, double yin, double xout, double yout, 
-    QEMultiLinePath& path)
+    TrainPolyLineBuilder& builder, bool is_running)
 {
     // Note, that xout may be out of graph or actually in graph (in this case, xout < xin)
     double fullwidth = config().fullWidth(_diagram.options().period_hours);
@@ -994,17 +996,17 @@ double TrainItem::getOutGraph(double xin, double yin, double xout, double yout,
     double xright = xout < xin ? xout + fullwidth: xout;
     double yp = yin + (width - xin) * (yout - yin) / (xright - xin);
     QPointF pout(start_x + width, start_y + yp);
-    path.lineTo(pout);
+    builder.generalLineTo(pout, is_running);
     return yp;
 }
 
-double TrainItem::getInGraph(double xout, double yout, double xin, double yin, QEMultiLinePath& path)
+double TrainItem::getInGraph(double xout, double yout, double xin, double yin, TrainPolyLineBuilder& builder)
 {
     double fullwidth = config().fullWidth(_diagram.options().period_hours);
     double xleft = xout - fullwidth;
     double yp = yout - xleft * (yin - yout) / (xin - xleft);  //入图点纵坐标
     QPointF pin(start_x, yp + start_y);
-    path.moveTo(pin);
+    builder.moveTo(pin);
     return yp;
 }
 
