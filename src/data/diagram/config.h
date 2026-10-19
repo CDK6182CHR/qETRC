@@ -176,6 +176,11 @@ struct Config
         show_count_bar = true;
     bool hide_non_first_side_header = true;
 
+    /**
+     * 2026.10.19  Experimental: distances between markers, in the lines requiring markers.
+     */
+    double marker_distance = 10;
+
     MarginConfig margins{};
 
     //排图标尺，现在改为Railway的性质

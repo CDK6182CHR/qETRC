@@ -164,6 +164,8 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
     FROM_OBJ(show_count_bar, Bool);
     FROM_OBJ(hide_non_first_side_header, Bool);
 
+    FROM_OBJ(marker_distance, Double);
+
     margins.fromJson(obj.value("margins").toObject());
 
     not_show_types.clear();
@@ -238,6 +240,7 @@ QJsonObject Config::toJson(bool ignore_transparent) const
         TO_OBJ(show_count_bar)
         TO_OBJ(hide_non_first_side_header)
         TO_OBJ(transparent_config)
+        TO_OBJ(marker_distance)
     };
     obj.insert("grid_color", grid_color.name());
     obj.insert("text_color", text_color.name());
