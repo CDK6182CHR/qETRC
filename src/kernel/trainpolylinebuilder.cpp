@@ -32,6 +32,7 @@ void TrainPolyLineBuilder::lineTo(qreal x, qreal y)
 void TrainPolyLineBuilder::runLineTo(const QPointF& p)
 {
 	double cur_length = qeutil::distanceBetween(m_mlpath.currentPosition(), p);
+	//qDebug() << "cur_length " << cur_length << ", acc: " << m_accRunningLength;
 	if (!m_style.hasMarker()) {
 		m_accRunningLength += cur_length;
 		return lineTo(p);
@@ -69,12 +70,12 @@ void TrainPolyLineBuilder::runLineTo(const QPointF& p)
 		};
 
 	double marker_center_length = cur_idx * m_config.marker_distance;
-	for (int idx = cur_idx; idx <= expected_idx; idx++, marker_center_length += m_config.marker_distance) {
+	for (int idx = cur_idx; idx < expected_idx; idx++, marker_center_length += m_config.marker_distance) {
 		if (idx == cur_idx && m_accRunningLength - marker_center_length <= marker_occ / 2) {
 			// Skip the first marker because we do not have enough space
 			continue;
 		}
-		if (idx == expected_idx && next_length - marker_center_length <= marker_occ / 2) {
+		if (idx == expected_idx - 1 && next_length - marker_center_length <= marker_occ / 2) {
 			// Skip the final marker, because we do not have enough space.
 			// Currently we choose to just omit it (without drawing it later)
 			continue;
