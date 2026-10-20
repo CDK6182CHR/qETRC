@@ -6,9 +6,10 @@
 #include "qemultilinepath.h"
 #include "marker_builders.h"
 #include "data/train/trainlinestyle.h"
-
+#include "marker_info.h"
 
 struct Config;
+
 
 /**
  * 2026.10.19: The builder for the train polyline (prevously the QPainterPath for the TrainItem::pathItem).
@@ -21,7 +22,7 @@ class TrainPolyLineBuilder
 	TrainLineStyle m_style;
 	QEMultiLinePath m_mlpath;
 	std::unique_ptr<AbstractMarkerBuilder> m_markerBuilder;
-	QVector<QPointF> m_markerCenters;
+	QVector<MarkerInfo> m_markerInfos;
 
 	/**
 	 * Accumulated running line lengths for determining the markers.
@@ -33,6 +34,12 @@ public:
 
 	auto& path()const { return m_mlpath; }
 	auto& path() { return m_mlpath; }
+
+	auto& style()const { return m_style; }
+	auto& config()const { return m_config; }
+
+	auto* markerBuilder() { return m_markerBuilder.get(); }
+	auto& markerInfos()const { return m_markerInfos; }
 
 	/**
 	 * The simple moveTo() and lineTo() functions just pass the call directly to the mlpath.

@@ -8,6 +8,7 @@
 #include "data/common/qesystem.h"
 #include "qemultilinepath.h"
 #include "trainpolylinebuilder.h"
+#include "trainpolylineitem.h"
 #include "util/utilfunc.h"
 
 #include <QPointF>
@@ -332,8 +333,7 @@ void TrainItem::repaintLinkLine()
 
 TrainItem::~TrainItem() noexcept
 {
-    DELETE_SUB(pathItem);
-    DELETE_SUB(expandItem);
+    DELETE_SUB(polylineItem);
     DELETE_SUB(startLabelItem);
     DELETE_SUB(startLabelText);
     DELETE_SUB(endLabelItem);
@@ -768,17 +768,11 @@ void TrainItem::setPathItem(const QString& trainName)
     //stroker.setWidth(0.5);
     //auto outpath = stroker.createStroke(path);
 
-    pathItem = new QGraphicsPathItem(builder.path().path(), this);
-    pathItem->setPen(pen);
-    if (config().valid_width > 1) {
-        QPen expen(Qt::transparent, pen.width() * config().valid_width);
-        expandItem = new QGraphicsPathItem(builder.path().path(), this);
-        expandItem->setPen(expen);
-        //_bounding = expandItem->boundingRect();
-    }
-    else {
-        //_bounding = pathItem->boundingRect();
-    }
+    polylineItem = new TrainPolyLineItem(this);
+    polylineItem->buildItem(builder);
+
+    pathItem = polylineItem->pathItem();
+    expandItem = polylineItem->expandItem();
 
     //跨界点标记
     QFont font = config().train_font;

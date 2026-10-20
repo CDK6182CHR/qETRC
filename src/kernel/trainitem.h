@@ -16,6 +16,7 @@ class QPointF;
 class PaintStationPointItem;
 class QEMultiLinePath;
 class TrainPolyLineBuilder;
+class TrainPolyLineItem;
 class Routing;
 
 /**
@@ -36,6 +37,9 @@ class TrainItem : public QGraphicsItem
     DiagramPage& _page;
     Railway& _railway;
 
+    // 2026.10.20: this holds the object for the polyline item. pathItem and expandItem are only pointers to the data
+    // therein, for convenience and compatibility with previous codes.
+    TrainPolyLineItem* polylineItem = nullptr;
     QGraphicsPathItem* pathItem = nullptr, * expandItem = nullptr;
     QGraphicsPathItem* startLabelItem = nullptr, * endLabelItem = nullptr;
     QGraphicsSimpleTextItem* startLabelText = nullptr, * endLabelText = nullptr;
