@@ -6,6 +6,7 @@
 
 
 class QGraphicsItem;
+class QAbstractGraphicsShapeItem;
 class QPen;
 struct MarkerInfo;
 
@@ -34,7 +35,7 @@ public:
 	 * Core function. Builds and returns the marker item.
 	 * Return nullptr if the marker is not valid, or should not be built. The nullptr should be ignored by caller.
 	 */
-	virtual QGraphicsItem* build_marker(const MarkerInfo& info, double size, const QPen& pen, QGraphicsItem* parent=nullptr) = 0;
+	virtual QAbstractGraphicsShapeItem* build_marker(const MarkerInfo& info, double size, const QPen& pen, QGraphicsItem* parent=nullptr) = 0;
 
 protected:
 	AbstractMarkerBuilder() = default;
@@ -47,12 +48,12 @@ class NullMarkerBuilder : public AbstractMarkerBuilder
 {
 public:
 	double occupied_length(double s)const override;
-	QGraphicsItem* build_marker(const MarkerInfo& info, double size, const QPen& pen, QGraphicsItem* parent)override;
+	QAbstractGraphicsShapeItem* build_marker(const MarkerInfo& info, double size, const QPen& pen, QGraphicsItem* parent)override;
 };
 
 class SquareMarkerBuilder : public AbstractMarkerBuilder
 {
 public:
 	double occupied_length(double s)const override;
-	QGraphicsItem* build_marker(const MarkerInfo& info, double size, const QPen& pen, QGraphicsItem* parent)override;
+	QAbstractGraphicsShapeItem* build_marker(const MarkerInfo& info, double size, const QPen& pen, QGraphicsItem* parent)override;
 };

@@ -24,7 +24,7 @@ double NullMarkerBuilder::occupied_length([[maybe_unused]] double s) const
 	return 0.0;
 }
 
-QGraphicsItem* NullMarkerBuilder::build_marker(const MarkerInfo& info, double size, const QPen& pen, QGraphicsItem* parent)
+QAbstractGraphicsShapeItem* NullMarkerBuilder::build_marker(const MarkerInfo& info, double size, const QPen& pen, QGraphicsItem* parent)
 {
 	Q_UNUSED(info);
 	Q_UNUSED(size);
@@ -38,7 +38,7 @@ double SquareMarkerBuilder::occupied_length(double s) const
 	return s;
 }
 
-QGraphicsItem* SquareMarkerBuilder::build_marker(const MarkerInfo& info, double size, const QPen& pen, QGraphicsItem* parent)
+QAbstractGraphicsShapeItem* SquareMarkerBuilder::build_marker(const MarkerInfo& info, double size, const QPen& pen, QGraphicsItem* parent)
 {
 	// normalized vector for the line: [dx, dy]; vertical one: [-dy, dx]
 	QList<QPointF> points;

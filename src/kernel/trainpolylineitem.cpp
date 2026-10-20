@@ -41,3 +41,39 @@ void TrainPolyLineItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     Q_UNUSED(option);
     Q_UNUSED(widget);
 }
+
+void TrainPolyLineItem::highlight(const TrainLineStyle& style)
+{
+    if (!m_pathItem)
+        return;
+    QPen pen(style.line_pen());
+    pen.setWidthF(pen.widthF() + 1);
+    
+    if (m_pathItem) {
+        m_pathItem->setPen(pen);
+    }
+
+    if (!m_markers.empty()) {
+        QPen markerPen(style.marker().pen());
+        markerPen.setWidthF(markerPen.widthF() + 1);
+        foreach(auto* p, m_markers) {
+            p->setPen(markerPen);
+        }
+    }
+}
+
+void TrainPolyLineItem::unhighlight(const TrainLineStyle& style)
+{
+    if (!m_pathItem)
+        return;
+
+    if (m_pathItem) {
+        m_pathItem->setPen(style.line_pen());
+    }
+
+    if (!m_markers.empty()) {
+        foreach(auto* p, m_markers) {
+            p->setPen(style.marker().pen());
+        }
+    }
+}

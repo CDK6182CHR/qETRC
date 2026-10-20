@@ -6,6 +6,7 @@
 class QGraphicsPathItem;
 class QGraphicsItem;
 class TrainPolyLineBuilder;
+class TrainLineStyle;
 
 /**
  * 2026.10.19  Experimental: train polyline item for train-line, part of TrainItem.
@@ -18,7 +19,7 @@ class TrainPolyLineItem: public QGraphicsItem
 {
 	QGraphicsPathItem* m_pathItem = nullptr;
 	QGraphicsPathItem* m_expandItem = nullptr;
-	QVector<QGraphicsItem*> m_markers;
+	QVector<QAbstractGraphicsShapeItem*> m_markers;
 
 public:
 	TrainPolyLineItem(QGraphicsItem* parent);
@@ -37,4 +38,7 @@ public:
 
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 		QWidget* widget = nullptr)override;
+
+	void highlight(const TrainLineStyle& style);
+	void unhighlight(const TrainLineStyle& style);
 };

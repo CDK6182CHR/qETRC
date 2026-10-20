@@ -72,8 +72,8 @@ void TrainItem::highlight()
     QPen pen = path->pen();
     pen.setWidthF(pen.widthF() + 1);
 
-    path->setPen(pen);
-    path->setZValue(2);
+    polylineItem->highlight(lineStyle);
+    polylineItem->setZValue(2);
     QBrush brush(pen.color());
     if (config().train_label_color == Config::LinkLineColorOption::TextColor) {
         brush.setColor(config().text_color_masked());
@@ -199,8 +199,8 @@ void TrainItem::unhighlight()
     }
     pen.setWidthF(pen.widthF() - 1);
 
-    path->setPen(pen);
-    path->setZValue(0);
+    polylineItem->unhighlight(lineStyle);
+    polylineItem->setZValue(0);
 
     if (startLabelText) {
         //pen.setWidth(1);
