@@ -48,14 +48,18 @@ void TrainPolyLineBuilder::runLineTo(const QPointF& p)
 		return lineTo(p);
 	}
 
-	// 50  -> 0
-	// 150 -> 1  draw one
-
 	double marker_occ = m_markerBuilder->occupied_length(m_style.marker().marker_size());
-	int cur_idx = static_cast<int>(std::floor(m_accRunningLength / m_config.marker_distance));
-	int expected_idx = static_cast<int>(std::floor((m_accRunningLength + cur_length) / m_config.marker_distance));
-	double next_length = m_accRunningLength + cur_length;
+	if (cur_length < marker_occ) {
+		// the total length is not enough for even one marker. Thus just ignore the marker.
+		return lineTo(p);
+	}
 
+	// 2026.10.20  we determine the positions of the markers in each section (call of this function) separately.
+	// the markers are put in the center when possible.
+
+	int marker_interval_count = static_cast<int>(std::floor((cur_length - marker_occ - m_config.marker_distance/2)
+		/ m_config.marker_distance));
+	double marker_dist = (cur_length - marker_interval_count * m_config.marker_distance) / 2;
 	QPointF cur_sec_start = m_mlpath.currentPosition();
 
 	/**
@@ -69,30 +73,14 @@ void TrainPolyLineBuilder::runLineTo(const QPointF& p)
 		return QPointF(cur_sec_start.x() + dx * scale, cur_sec_start.y() + dy * scale);
 		};
 
-	double marker_center_length = cur_idx * m_config.marker_distance;
-	for (int idx = cur_idx; idx < expected_idx; idx++, marker_center_length += m_config.marker_distance) {
-		if (idx == cur_idx && m_accRunningLength - marker_center_length <= marker_occ / 2) {
-			// Skip the first marker because we do not have enough space
-			continue;
-		}
-		if (idx == expected_idx - 1 && next_length - marker_center_length <= marker_occ / 2) {
-			// Skip the final marker, because we do not have enough space.
-			// Currently we choose to just omit it (without drawing it later)
-			continue;
-		}
+	// Each iteration processes the LEFT marker for the interval. We have (marker_interval_count + 1) markers.
+	for (int idx = 0; idx <= marker_interval_count; idx++) {
+		m_markerCenters.push_back(get_position_with_distance(marker_dist));
+		m_mlpath.lineTo(get_position_with_distance(marker_dist - marker_occ / 2));
+		m_mlpath.moveTo(get_position_with_distance(marker_dist + marker_occ / 2));
 
-		// Now: we have a marker at current position
-		double center_dist_to_start = marker_center_length + m_config.marker_distance - m_accRunningLength;
-		assert(center_dist_to_start >= 0);
-
-		// Add the center position
-		m_markerCenters.push_back(get_position_with_distance(center_dist_to_start));
-
-		// Make the path (currently we choose to draw only the lines for showing)
-		m_mlpath.lineTo(get_position_with_distance(center_dist_to_start - marker_occ / 2));
-		m_mlpath.moveTo(get_position_with_distance(center_dist_to_start + marker_occ / 2));
+		marker_dist += m_config.marker_distance;
 	}
-
 	// The final section
 	m_mlpath.lineTo(p);
 
