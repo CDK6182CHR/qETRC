@@ -8,9 +8,10 @@
 struct MarkerInfo {
 	QPointF center;
 	double dx, dy;
+	int index;
 
-	MarkerInfo(const QPointF& center, double dx, double dy) :
-		center(center), dx(dx), dy(dy)
+	MarkerInfo(const QPointF& center, double dx, double dy, int index) :
+		center(center), dx(dx), dy(dy), index(index)
 	{
 	}
 };

@@ -27,7 +27,7 @@ class TrainPolyLineBuilder
 	/**
 	 * Accumulated running line lengths for determining the markers.
 	 */
-	double m_accRunningLength = 0;
+	int m_numMarkers = 0;
 
 public:
 	TrainPolyLineBuilder(const Config& config, TrainLineStyle style);

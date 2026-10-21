@@ -19,7 +19,12 @@ std::unique_ptr<AbstractMarkerBuilder> AbstractMarkerBuilder::creeate(LineMarker
 	}
 }
 
-double NullMarkerBuilder::occupied_length([[maybe_unused]] double s) const
+double AbstractMarkerBuilder::occupied_length(double size, [[maybe_unused]] int index)const
+{
+	return max_occupied_length(size);
+}
+
+double NullMarkerBuilder::max_occupied_length([[maybe_unused]] double s) const
 {
 	return 0.0;
 }
@@ -33,7 +38,7 @@ QAbstractGraphicsShapeItem* NullMarkerBuilder::build_marker(const MarkerInfo& in
 	return nullptr;
 }
 
-double SquareMarkerBuilder::occupied_length(double s) const
+double SquareMarkerBuilder::max_occupied_length(double s) const
 {
 	return s;
 }

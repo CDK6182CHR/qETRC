@@ -28,8 +28,15 @@ public:
 	/**
 	 * Returns occupied length of one marker, along the running line direction.
 	 * @param s: the configured size.
+	 * The default implementation returns the max_occupied_length. The sub classes may reimplement this, for 
+	 * cases there may be different markers depending on the index.
 	 */
-	virtual double occupied_length(double s)const = 0;
+	virtual double occupied_length(double s, int index)const;
+	
+	/**
+	 * The maximal possible occupied length, regardless of the index.
+	 */
+	virtual double max_occupied_length(double s)const = 0;
 
 	/**
 	 * Core function. Builds and returns the marker item.
@@ -47,13 +54,13 @@ protected:
 class NullMarkerBuilder : public AbstractMarkerBuilder
 {
 public:
-	double occupied_length(double s)const override;
+	double max_occupied_length(double s)const override;
 	QAbstractGraphicsShapeItem* build_marker(const MarkerInfo& info, double size, const QPen& pen, QGraphicsItem* parent)override;
 };
 
 class SquareMarkerBuilder : public AbstractMarkerBuilder
 {
 public:
-	double occupied_length(double s)const override;
+	double max_occupied_length(double s)const override;
 	QAbstractGraphicsShapeItem* build_marker(const MarkerInfo& info, double size, const QPen& pen, QGraphicsItem* parent)override;
 };

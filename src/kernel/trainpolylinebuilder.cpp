@@ -34,7 +34,6 @@ void TrainPolyLineBuilder::runLineTo(const QPointF& p)
 	double cur_length = qeutil::distanceBetween(m_mlpath.currentPosition(), p);
 	//qDebug() << "cur_length " << cur_length << ", acc: " << m_accRunningLength;
 	if (!m_style.hasMarker()) {
-		m_accRunningLength += cur_length;
 		return lineTo(p);
 	}
 
@@ -48,8 +47,9 @@ void TrainPolyLineBuilder::runLineTo(const QPointF& p)
 		return lineTo(p);
 	}
 
-	double marker_occ = m_markerBuilder->occupied_length(m_style.marker().marker_size());
-	if (cur_length < marker_occ) {
+	// The marker size is dependent on the index. This is only a reference.
+	double marker_occ_max = m_markerBuilder->max_occupied_length(m_style.marker().marker_size());
+	if (cur_length < marker_occ_max) {
 		// the total length is not enough for even one marker. Thus just ignore the marker.
 		return lineTo(p);
 	}
@@ -57,7 +57,7 @@ void TrainPolyLineBuilder::runLineTo(const QPointF& p)
 	// 2026.10.20  we determine the positions of the markers in each section (call of this function) separately.
 	// the markers are put in the center when possible.
 
-	int marker_interval_count = static_cast<int>(std::floor((cur_length - marker_occ) / m_config.marker_distance));
+	int marker_interval_count = static_cast<int>(std::floor((cur_length - marker_occ_max) / m_config.marker_distance));
 	if (marker_interval_count > 0 && cur_length - marker_interval_count * m_config.marker_distance < m_config.marker_distance / 2) {
 		// Avoid two markers that are too close the the ending point, which seems to be very strange.
 		// the threshold, m_config.marker_distance / 2, is adjustable.
@@ -84,17 +84,16 @@ void TrainPolyLineBuilder::runLineTo(const QPointF& p)
 
 	// Each iteration processes the LEFT marker for the interval. We have (marker_interval_count + 1) markers.
 	for (int idx = 0; idx <= marker_interval_count; idx++) {
-		m_markerInfos.emplace_back(get_position_with_distance(marker_dist), dxnorm, dynorm);
+		double marker_occ = m_markerBuilder->occupied_length(m_style.marker().marker_size(), m_numMarkers);
+		m_markerInfos.emplace_back(get_position_with_distance(marker_dist), dxnorm, dynorm, m_numMarkers);
 		m_mlpath.lineTo(get_position_with_distance(marker_dist - marker_occ / 2));
 		m_mlpath.moveTo(get_position_with_distance(marker_dist + marker_occ / 2));
+		m_numMarkers++;
 
 		marker_dist += m_config.marker_distance;
 	}
 	// The final section
 	m_mlpath.lineTo(p);
-
-	// Finalizing: remember the total length.
-	m_accRunningLength += cur_length;
 }
 
 void TrainPolyLineBuilder::generalLineTo(const QPointF& p, bool is_running)
