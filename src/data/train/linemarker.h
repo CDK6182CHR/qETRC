@@ -14,6 +14,7 @@ enum class LineMarkerType {
 	Triangle,
 	Circle,
 	Cross,
+	AddLine,   // special: + | for even and odd
 };
 
 /**

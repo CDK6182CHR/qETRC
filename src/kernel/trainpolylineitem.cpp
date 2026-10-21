@@ -22,9 +22,9 @@ void TrainPolyLineItem::buildItem(TrainPolyLineBuilder& builder)
 
     // Draw the markers
     foreach(const auto& minfo, builder.markerInfos()) {
-        auto* p = builder.markerBuilder()->build_marker(minfo, builder.style().marker().marker_size(), 
-            builder.style().marker().pen(), this);
+        auto* p = builder.markerBuilder()->build_marker(minfo, builder.style().marker().marker_size(), this);
         if (p) {
+            p->setPen(builder.style().marker().pen());
             m_markers.push_back(p);
         }
     }
