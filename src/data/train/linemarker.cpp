@@ -1,4 +1,14 @@
-#include "linemarker.h"
+﻿#include "linemarker.h"
+
+std::array<QString, static_cast<int>(LineMarkerType::MAX)> line_marker_type_names{
+	QObject::tr("无标记"),
+	QObject::tr("方框"),
+	QObject::tr("双杠"),
+	QObject::tr("三角"),
+	QObject::tr("圆圈"),
+	QObject::tr("X"),
+	QObject::tr("+|交替"),
+};
 
 QJsonObject LineMarkerStyle::toJson() const
 {

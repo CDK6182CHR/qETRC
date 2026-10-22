@@ -1,7 +1,9 @@
 #pragma once
 
+#include <array>
 #include <QPen>
 #include <QJsonObject>
+#include <QString>
 
 /**
  * 2026.10.16: Train marker in the line.
@@ -15,7 +17,10 @@ enum class LineMarkerType {
 	Circle,
 	Cross,
 	AddLine,   // special: + | for even and odd
+	MAX,
 };
+
+extern std::array<QString, static_cast<int>(LineMarkerType::MAX)> line_marker_type_names;
 
 /**
  * The data class holding the line marker style.
