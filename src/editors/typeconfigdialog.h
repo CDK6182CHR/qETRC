@@ -49,6 +49,7 @@ signals:
 private slots:
     void actApply();
     void onDoubleClicked(const QModelIndex& idx);
+    void actSetStyleForSelected();
     void informTransparent();
 public slots:
     void refreshData();

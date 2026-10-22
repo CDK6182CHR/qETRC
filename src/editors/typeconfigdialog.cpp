@@ -7,6 +7,8 @@
 #include "model/delegate/combodelegate.h"
 #include "data/train/traintype.h"
 #include "data/train/typemanager.h"
+#include "data/train/train.h"
+#include "editors/train/trainpenwidget.h"
 #include "mainwindow/version.h"
 #include "defines/icon_specs.h"
 #include <model/delegate/linestyledelegate.h>
@@ -20,9 +22,66 @@
 #include <QColorDialog>
 #include <QCheckBox>
 #include <QToolButton>
+#include <QAction>
+#include <QSet>
 #include <QApplication>
 #include <QStyle>
 #include <QDesktopServices>
+#include <algorithm>
+
+namespace {
+/**
+ * Build the line style represented by the given model row.
+ */
+TrainLineStyle lineStyleFromRow(TypeConfigModel* model, int row)
+{
+    QPen pen(model->item(row, TypeConfigModel::ColColor)->background().color(),
+        model->item(row, TypeConfigModel::ColWidth)->data(Qt::EditRole).toDouble(),
+        static_cast<Qt::PenStyle>(
+            model->item(row, TypeConfigModel::ColLineStyle)->data(Qt::EditRole).toInt()));
+
+    auto markerType = static_cast<LineMarkerType>(
+        model->item(row, TypeConfigModel::ColMarkerType)->data(Qt::EditRole).toInt());
+    LineMarkerStyle marker = LineMarkerStyle::no_marker();
+    if (markerType != LineMarkerType::None) {
+        QPen markerPen = pen;
+        markerPen.setColor(
+            model->item(row, TypeConfigModel::ColMarkerColor)->background().color());
+        marker = LineMarkerStyle(markerType, markerPen,
+            model->item(row, TypeConfigModel::ColMarkerSize)
+                ->data(Qt::EditRole).toDouble());
+    }
+    return TrainLineStyle(pen, std::move(marker));
+}
+
+/**
+ * Fill the given model row with the line style.
+ */
+void setRowLineStyle(TypeConfigModel* model, int row, const TrainLineStyle& style)
+{
+    const auto& pen = style.line_pen();
+    auto* colorItem = model->item(row, TypeConfigModel::ColColor);
+    colorItem->setText(pen.color().name().toUpper());
+    colorItem->setBackground(pen.color());
+
+    model->item(row, TypeConfigModel::ColWidth)->setData(pen.widthF(), Qt::EditRole);
+    model->item(row, TypeConfigModel::ColLineStyle)
+        ->setData(static_cast<int>(pen.style()), Qt::EditRole);
+
+    const auto& marker = style.marker();
+    model->item(row, TypeConfigModel::ColMarkerType)
+        ->setData(static_cast<int>(marker.type()), Qt::EditRole);
+    model->item(row, TypeConfigModel::ColMarkerSize)->setData(
+        marker.type() != LineMarkerType::None ? marker.marker_size() : 6.0, Qt::EditRole);
+
+    QColor markerColor = marker.pen().color();
+    if (marker.type() == LineMarkerType::None || !markerColor.isValid())
+        markerColor = pen.color();
+    auto* markerColorItem = model->item(row, TypeConfigModel::ColMarkerColor);
+    markerColorItem->setText(markerColor.name().toUpper());
+    markerColorItem->setBackground(markerColor);
+}
+}
 
 TypeConfigDialog::TypeConfigDialog(TypeManager &manager_, bool forDefault_, QWidget *parent):
     QDialog(parent), manager(manager_),
@@ -96,6 +155,14 @@ void TypeConfigDialog::initUI()
                                     new ComboDelegate(markerTypes, this));
     table->setItemDelegateForColumn(TypeConfigModel::ColMarkerSize,
                                     new GeneralDoubleSpinDelegate(this,1));
+
+    auto* actSetStyle = new QAction(tr("批量设置运行线样式"), this);
+    actSetStyle->setToolTip(tr("对所选类型的运行线样式进行批量设置"));
+    connect(actSetStyle, &QAction::triggered,
+        this, &TypeConfigDialog::actSetStyleForSelected);
+    table->setContextMenuPolicy(Qt::ActionsContextMenu);
+    table->addAction(actSetStyle);
+
     connect(table,&QTableView::doubleClicked,this,&TypeConfigDialog::onDoubleClicked);
 
     vlay->addWidget(ctab);
@@ -133,6 +200,33 @@ void TypeConfigDialog::onDoubleClicked(const QModelIndex &idx)
             it->setBackground(color);
         }
     }
+}
+
+void TypeConfigDialog::actSetStyleForSelected()
+{
+    QSet<int> rows;
+    if (table->selectionModel()) {
+        for (const auto& idx : table->selectionModel()->selectedIndexes())
+            rows.insert(idx.row());
+    }
+    if (rows.isEmpty()) {
+        QMessageBox::information(this, tr("提示"), tr("请先在表中选择要设置的类型。"));
+        return;
+    }
+
+    const int firstRow = *std::min_element(rows.begin(), rows.end());
+    auto train = std::make_shared<Train>(
+        TrainName(model->item(firstRow, TypeConfigModel::ColName)->text()));
+    train->setStyle(lineStyleFromRow(model, firstRow));
+
+    auto res = TrainPenWidget::getLineStyle(this, train,
+        tr("批量设置运行线样式"),
+        tr("请设置所选类型的运行线样式。注意，这些类型的运行线样式设置将被覆盖。"));
+    if (!res.accepted || !res.lineStyle)
+        return;
+
+    for (int row : rows)
+        setRowLineStyle(model, row, *res.lineStyle);
 }
 
 void TypeConfigDialog::informTransparent()
