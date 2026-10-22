@@ -38,7 +38,7 @@ class ConfigDialog : public QDialog
     QSpinBox *spValidWidth,*spStartLabelHeight,*spEndLabelHeight,
             *spBaseHeight,*spStepHeight;
     QDoubleSpinBox* sdScaleX, * sdSlimWidth, * sdBoldWidth, *sdScaleYdist,
-            *sdScaleYsec;
+            *sdScaleYsec, *sdMarkerDistance;
     QSpinBox* spBoldLevel, * spShowLevel;
     QComboBox* cbShowTimeMark, * cbVLineStyle, * cbShowLinkLine, * cbLinkLabelType, * cbLinkColor, * cbLabelColor;
     QComboBox* cbTrainNameMarkStyle,* cbSecondRoundOption;

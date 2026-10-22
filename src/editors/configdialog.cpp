@@ -219,6 +219,13 @@ void ConfigDialog::initUI(int period_hours)
         form->addRow(tr("有效选择宽度"), sp);
         spValidWidth = sp;
 
+        sd = new QDoubleSpinBox;
+        sd->setRange(0, 10000);
+        sd->setSingleStep(1);
+        sd->setToolTip(tr("运行线标记间隔\n含有标记的运行线中相邻两个标记之间的距离"));
+        form->addRow(tr("标记间隔"), sd);
+        sdMarkerDistance = sd;
+
         auto* cb = new QComboBox;
         cb->addItems({ tr("不显示"),tr("仅选中车次显示"),tr("全部显示") });
         cb->setToolTip(tr("是否在运行线侧显示图定时刻的分钟个位数。此功能可能带来一定的效率问题。"));
@@ -620,6 +627,7 @@ void ConfigDialog::refreshData()
     ckHideEndLabelTerminal->setChecked(_cfg.hide_end_label_terminal);
     ckHideEndLabelNonTerminal->setChecked(_cfg.hide_end_label_non_terminal);
     ckHideEndLabelLink->setChecked(_cfg.hide_end_label_link);
+    SET_VALUE(sdMarkerDistance, marker_distance);
 
     //标签控制
     cbTrainNameMarkStyle->setCurrentIndex(static_cast<int>(_cfg.train_name_mark_style));
@@ -711,6 +719,7 @@ void ConfigDialog::actApply()
     cnew.hide_end_label_terminal = ckHideEndLabelTerminal->isChecked();
     cnew.hide_end_label_non_terminal = ckHideEndLabelNonTerminal->isChecked();
     cnew.hide_end_label_link = ckHideEndLabelLink->isChecked();
+    GET_VALUE(sdMarkerDistance, marker_distance);
 
     //标签高度
     cnew.train_name_mark_style = static_cast<Config::TrainNameMarkStyle>(cbTrainNameMarkStyle->currentIndex());

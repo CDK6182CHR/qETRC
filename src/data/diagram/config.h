@@ -179,7 +179,7 @@ struct Config
     /**
      * 2026.10.19  Experimental: distances between markers, in the lines requiring markers.
      */
-    double marker_distance = 10;
+    double marker_distance = 50;
 
     MarginConfig margins{};
 
