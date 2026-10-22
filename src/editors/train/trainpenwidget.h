@@ -10,6 +10,7 @@ class PenStyleCombo;
 class QDoubleSpinBox;
 class QCheckBox;
 class QPushButton;
+class QComboBox;
 class QPen;
 class Train;
 class TrainLineStyle;
@@ -26,7 +27,12 @@ class TrainPenWidget : public QWidget
 	PenStyleCombo* m_cbStyle;
 	QPushButton* m_btnColor;
 
+	QComboBox* m_cbMarker;
+	QPushButton* m_btnMarkerColor;
+	QDoubleSpinBox* m_spMarkerSize;
+
 	QColor m_color;
+	QColor m_markerColor;
 
 public:
 	TrainPenWidget(QWidget* parent = nullptr);
@@ -47,4 +53,5 @@ public:
 
 private:
 	void initUI();
+	void updateEnabled();
 };
