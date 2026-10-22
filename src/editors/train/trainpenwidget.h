@@ -38,6 +38,9 @@ public:
 	TrainPenWidget(QWidget* parent = nullptr);
 	TrainPenWidget(std::shared_ptr<Train> train, QWidget* parent = nullptr);
 
+	// 2026.10.22: Use this version for initializing only for styles. We do not allow auto in this case.
+	TrainPenWidget(const TrainLineStyle& style, QWidget* parent = nullptr);
+
 	void setStyle(std::shared_ptr<Train> train);
 	void setStyle(bool isAuto, const TrainLineStyle& style);
 

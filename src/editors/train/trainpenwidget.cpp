@@ -24,6 +24,13 @@ TrainPenWidget::TrainPenWidget(std::shared_ptr<Train> train, QWidget* parent):
     setStyle(train);
 }
 
+TrainPenWidget::TrainPenWidget(const TrainLineStyle& style, QWidget* parent):
+    TrainPenWidget(parent)
+{
+    setStyle(false, style);
+    m_ckAuto->setEnabled(false);
+}
+
 void TrainPenWidget::setStyle(std::shared_ptr<Train> train)
 {
     setStyle(train->autoStyle(), train->lineStyle());
