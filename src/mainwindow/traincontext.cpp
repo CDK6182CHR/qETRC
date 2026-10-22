@@ -316,6 +316,53 @@ void TrainContext::initUI()
 		w->setWindowTitle(tr("运行线样式面板"));
 		panel->addWidget(w, SARibbonPanelItem::Large);
 
+		// 运行线标记设置：两行布局以压缩空间
+		w = new QWidget;
+		vlay = new QVBoxLayout;
+		vlay->setContentsMargins(0, 0, 0, 0);
+		vlay->setSpacing(1);
+
+		comboMarker = new QComboBox;
+		comboMarker->setToolTip(tr("运行线标记\n设置运行线上标记的类型"));
+		for (int i = 0; i < static_cast<int>(LineMarkerType::MAX); ++i) {
+			comboMarker->addItem(line_marker_type_names.at(i), i);
+		}
+
+		hlay = new QHBoxLayout;
+		hlay->setContentsMargins(0, 0, 0, 0);
+		hlay->setSpacing(2);
+		hlay->addWidget(new QLabel(tr("标记类型")));
+		hlay->addWidget(comboMarker, 1);
+		vlay->addLayout(hlay);
+
+		hlay = new QHBoxLayout;
+		hlay->setContentsMargins(0, 0, 0, 0);
+		hlay->setSpacing(2);
+		btnMarkerColor = new QPushButton;
+		btnMarkerColor->setMinimumWidth(58);
+		btnMarkerColor->setToolTip(tr("标记颜色"));
+		hlay->addWidget(btnMarkerColor);
+
+		spMarkerSize = new QDoubleSpinBox;
+		spMarkerSize->setPrefix(tr("尺寸 "));
+		spMarkerSize->setToolTip(tr("标记尺寸"));
+		spMarkerSize->setSingleStep(1);
+		spMarkerSize->setRange(0, 100);
+		spMarkerSize->setDecimals(1);
+		spMarkerSize->setValue(6.0);
+		hlay->addWidget(spMarkerSize);
+		vlay->addLayout(hlay);
+
+		connect(btnMarkerColor, &SARibbonToolButton::clicked, this, &TrainContext::actSelectMarkerColor);
+		connect(comboMarker, QOverload<int>::of(&QComboBox::currentIndexChanged),
+			this, [this](int) { onAutoUIChanged(btnAutoUI->isChecked()); });
+
+		w->setLayout(vlay);
+		w->setFixedWidth(160);
+		w->setObjectName(tr("运行线标记面板"));
+		w->setWindowTitle(tr("运行线标记面板"));
+		panel->addWidget(w, SARibbonPanelItem::Large);
+
 		act = mw->makeAction(QEICN_apply_train_info, tr("应用"), tr("应用列车信息"));
 		panel->addLargeAction(act);
 		connect(act, SIGNAL(triggered()), this, SLOT(actApply()));
@@ -1870,6 +1917,12 @@ void TrainContext::onAutoUIChanged(bool on)
 	btnColor->setEnabled(!on);
 	comboLs->setEnabled(!on);
 	spWidth->setEnabled(!on);
+	comboMarker->setEnabled(!on);
+
+	const bool hasMarker = !on &&
+		static_cast<LineMarkerType>(comboMarker->currentData().toInt()) != LineMarkerType::None;
+	btnMarkerColor->setEnabled(hasMarker);
+	spMarkerSize->setEnabled(hasMarker);
 }
 
 void TrainContext::actSelectColor()
@@ -1881,6 +1934,20 @@ void TrainContext::actSelectColor()
 	if (color.isValid()) {
 		tmpColor = color;
 		btnColor->setText(tmpColor.name());
+	}
+}
+
+void TrainContext::actSelectMarkerColor()
+{
+	QColor color(tmpMarkerColor);
+	if (!color.isValid() && train)
+		color = train->lineStyle().marker().pen().color();
+	if (!color.isValid())
+		color = Qt::black;
+	color = QColorDialog::getColor(color, mw, tr("选择标记颜色"));
+	if (color.isValid()) {
+		tmpMarkerColor = color;
+		btnMarkerColor->setText(tmpMarkerColor.name());
 	}
 }
 
@@ -1926,8 +1993,18 @@ void TrainContext::actApply()
 		if (!color.isValid())
 			color = train->lineStyle().line_pen().color();
 		QPen pen = QPen(color, spWidth->value(), static_cast<Qt::PenStyle>(comboLs->currentIndex()));
-		// TODO: marker
-		t->setStyle(TrainLineStyle(pen, train->lineStyle().marker()));
+
+		auto markerType = static_cast<LineMarkerType>(comboMarker->currentData().toInt());
+		LineMarkerStyle marker = LineMarkerStyle::no_marker();
+		if (markerType != LineMarkerType::None) {
+			QColor markerColor = tmpMarkerColor;
+			if (!markerColor.isValid())
+				markerColor = color;
+			QPen markerPen = pen;
+			markerPen.setColor(markerColor);
+			marker = LineMarkerStyle(markerType, markerPen, spMarkerSize->value());
+		}
+		t->setStyle(TrainLineStyle(pen, std::move(marker)));
 	}
 	mw->getUndoStack()->push(new qecmd::UpdateTrainInfo(train, t, this));
 }
@@ -1972,6 +2049,16 @@ void TrainContext::refreshData()
 		btnColor->setText(pen.color().name());
 		spWidth->setValue(pen.widthF());
 		comboLs->setCurrentIndex(static_cast<int>(pen.style()));
+
+		const auto& marker = ls.marker();
+		comboMarker->setCurrentIndex(static_cast<int>(marker.type()));
+		tmpMarkerColor = marker.pen().color();
+		if (marker.type() == LineMarkerType::None || !tmpMarkerColor.isValid())
+			tmpMarkerColor = pen.color();
+		btnMarkerColor->setText(tmpMarkerColor.name());
+		if (marker.marker_size() > 0)
+			spMarkerSize->setValue(marker.marker_size());
+		onAutoUIChanged(train->autoStyle());
 
 		// 2024.04.15: update the syncrhonized editors
 		foreach(auto p, syncEditors) {
@@ -2434,7 +2521,7 @@ qecmd::AutoTrainPen::AutoTrainPen(std::deque<std::shared_ptr<Train>>&& trains,
 	_styles(), cont(context)
 {
 	for (const auto& t : _trains) {
-		assert(!t->autoPen());
+		assert(!t->autoStyle());
 		_styles.emplace_back(t->lineStyle());
 	}
 }

@@ -29,6 +29,7 @@ class DiagramNaviModel;
 class TrainTagDialog;
 class TrainTagManager;
 class TrainTagListDirectModel;
+class QPushButton;
 
 struct TrainStationBounding;
 namespace qecmd {
@@ -121,6 +122,11 @@ class TrainContext : public QObject
     SARibbonToolButton* btnColor, * btnAutoUI, * btnToRouting, * btnCreateRouting, * btnAddToRouting;
     QDoubleSpinBox* spWidth;
     QColor tmpColor;
+
+    QComboBox* comboMarker;
+    QPushButton* btnMarkerColor;
+    QDoubleSpinBox* spMarkerSize;
+    QColor tmpMarkerColor;
 
     QLineEdit* edPaths, * edTags;
 
@@ -529,6 +535,8 @@ private slots:
     void onAutoUIChanged(bool on);
 
     void actSelectColor();
+
+    void actSelectMarkerColor();
 
     void actApply();
 
