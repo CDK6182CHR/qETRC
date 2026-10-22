@@ -88,6 +88,16 @@ void EditTrainWidget::refreshBasicData()
     spWidth->setValue(pen.widthF());
     cbLs->setCurrentIndex(static_cast<int>(pen.style()));
 
+    const auto& marker = style.marker();
+    cbMarker->setCurrentIndex(static_cast<int>(marker.type()));
+    tmpMarkerColor = marker.pen().color();
+    if (marker.type() == LineMarkerType::None || !tmpMarkerColor.isValid())
+        tmpMarkerColor = tmpColor;
+    btnMarkerColor->setText(tmpMarkerColor.name());
+    if (marker.marker_size() > 0)
+        spMarkerSize->setValue(marker.marker_size());
+    updateMarkerEnabled();
+
     // 交路部分
     if (auto rt=_train->routing().lock()){
         edRouting->setText(rt->name());
@@ -186,23 +196,54 @@ void EditTrainWidget::initUI()
     flay->addRow(tr("列车种类"),hlay);
 
     hlay=new QHBoxLayout;
+    hlay->setContentsMargins(0, 0, 0, 0);
+    hlay->setSpacing(2);
     ckAutoPen=new QCheckBox(tr("自动"));
     hlay->addWidget(ckAutoPen);
     connect(ckAutoPen,&QCheckBox::toggled,this,&EditTrainWidget::onAutoPenToggled);
 
     btnColor=new QPushButton;
+    btnColor->setMaximumWidth(70);
+    btnColor->setToolTip(tr("运行线颜色"));
     hlay->addWidget(btnColor);
     connect(btnColor, &QPushButton::clicked,this,&EditTrainWidget::setLineColor);
 
     spWidth=new QDoubleSpinBox;
-    spWidth->setPrefix(tr("宽度 "));
+    spWidth->setPrefix(tr("宽 "));
     spWidth->setSingleStep(0.5);
     spWidth->setRange(0,100);
     spWidth->setDecimals(2);
+    spWidth->setMaximumWidth(70);
     hlay->addWidget(spWidth);
 
     cbLs=new PenStyleCombo;
+    cbLs->setFixedWidth(64);
     hlay->addWidget(cbLs);
+
+    cbMarker=new QComboBox;
+    cbMarker->setMaximumWidth(90);
+    cbMarker->setToolTip(tr("运行线标记类型"));
+    for (int i = 0; i < static_cast<int>(LineMarkerType::MAX); ++i) {
+        cbMarker->addItem(line_marker_type_names.at(i), i);
+    }
+    hlay->addWidget(cbMarker);
+
+    spMarkerSize=new QDoubleSpinBox;
+    spMarkerSize->setPrefix(tr("尺寸 "));
+    spMarkerSize->setSingleStep(1);
+    spMarkerSize->setRange(0,100);
+    spMarkerSize->setDecimals(1);
+    spMarkerSize->setValue(6.0);
+    spMarkerSize->setMaximumWidth(78);
+    hlay->addWidget(spMarkerSize);
+
+    btnMarkerColor=new QPushButton;
+    btnMarkerColor->setMaximumWidth(70);
+    btnMarkerColor->setToolTip(tr("标记颜色"));
+    hlay->addWidget(btnMarkerColor);
+    connect(btnMarkerColor, &QPushButton::clicked, this, &EditTrainWidget::setMarkerColor);
+    connect(cbMarker, QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this, [this](int) { updateMarkerEnabled(); });
     flay->addRow(tr("运行线设置"),hlay);
 
     hlay=new QHBoxLayout;
@@ -280,8 +321,17 @@ void EditTrainWidget::actApply()
         QPen pen = QPen(color, spWidth->value(),
                         static_cast<Qt::PenStyle>(cbLs->currentIndex()));
 
-        // TODO: update marker in GUI
-        t->setStyle(TrainLineStyle(std::move(pen), t->lineStyle().marker()));
+        auto markerType = static_cast<LineMarkerType>(cbMarker->currentData().toInt());
+        LineMarkerStyle marker = LineMarkerStyle::no_marker();
+        if (markerType != LineMarkerType::None) {
+            QColor markerColor = tmpMarkerColor;
+            if (!markerColor.isValid())
+                markerColor = color;
+            QPen markerPen = pen;
+            markerPen.setColor(markerColor);
+            marker = LineMarkerStyle(markerType, markerPen, spMarkerSize->value());
+        }
+        t->setStyle(TrainLineStyle(std::move(pen), std::move(marker)));
     }
     emit trainInfoChanged(_train,t);
 
@@ -304,6 +354,16 @@ void EditTrainWidget::onAutoPenToggled(bool on)
     btnColor->setEnabled(!on);
     spWidth->setEnabled(!on);
     cbLs->setEnabled(!on);
+    cbMarker->setEnabled(!on);
+    updateMarkerEnabled();
+}
+
+void EditTrainWidget::updateMarkerEnabled()
+{
+    const bool hasMarker = !ckAutoPen->isChecked() &&
+        static_cast<LineMarkerType>(cbMarker->currentData().toInt()) != LineMarkerType::None;
+    btnMarkerColor->setEnabled(hasMarker);
+    spMarkerSize->setEnabled(hasMarker);
 }
 
 void EditTrainWidget::setLineColor()
@@ -312,6 +372,15 @@ void EditTrainWidget::setLineColor()
     if(color.isValid()){
         tmpColor=color;
         btnColor->setText(tmpColor.name());
+    }
+}
+
+void EditTrainWidget::setMarkerColor()
+{
+    auto color = QColorDialog::getColor(tmpMarkerColor, this, tr("标记颜色"));
+    if (color.isValid()) {
+        tmpMarkerColor = color;
+        btnMarkerColor->setText(tmpMarkerColor.name());
     }
 }
 

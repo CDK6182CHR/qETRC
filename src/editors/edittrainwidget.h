@@ -44,6 +44,11 @@ class EditTrainWidget : public QWidget
     QDoubleSpinBox* spWidth;
     PenStyleCombo* cbLs;
     QPushButton* btnColor;
+
+    QComboBox* cbMarker;
+    QDoubleSpinBox* spMarkerSize;
+    QPushButton* btnMarkerColor;
+
     QLineEdit* edRouting;
     QLineEdit* edTags;
 
@@ -54,6 +59,7 @@ class EditTrainWidget : public QWidget
     QTableView* table;
 
     QColor tmpColor;
+    QColor tmpMarkerColor;
 public:
 
 	// 2025.07.10: add RailCategory reference (test only), for importing rail stations
@@ -70,6 +76,7 @@ public:
 
 private:
     void initUI();
+    void updateMarkerEnabled();
 
 signals:
     void trainInfoChanged(std::shared_ptr<Train> train,
@@ -87,6 +94,7 @@ private slots:
 
     void onAutoPenToggled(bool on);
     void setLineColor();
+    void setMarkerColor();
     void actSwitchToRouting();
 
     void setupTypeCombo();
