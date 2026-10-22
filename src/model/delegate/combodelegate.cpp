@@ -30,3 +30,12 @@ void ComboDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, con
 	auto* combo = static_cast<QComboBox*>(editor);
 	model->setData(index, combo->currentIndex(), Qt::EditRole);
 }
+
+QString ComboDelegate::displayText(const QVariant& value, const QLocale& locale) const
+{
+	bool ok = false;
+	const int index = value.toInt(&ok);
+	if (ok && index >= 0 && index < texts.size())
+		return texts.at(index);
+	return QStyledItemDelegate::displayText(value, locale);
+}

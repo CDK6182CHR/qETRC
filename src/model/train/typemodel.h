@@ -26,6 +26,9 @@ public:
         ColColor,
         ColWidth,
         ColLineStyle,
+        ColMarkerType,
+        ColMarkerSize,
+        ColMarkerColor,
         ColMAX
     };
     explicit TypeConfigModel(TypeManager& manager_, QObject *parent = nullptr);
@@ -39,6 +42,7 @@ public:
 private:
     void setupModel();
     void setColorItem(int row, const QColor& color);
+    void setMarkerColorItem(int row, const QColor& color);
     void setupType(int row, std::shared_ptr<TrainType> type);
 
 protected:

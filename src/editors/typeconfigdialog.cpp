@@ -4,6 +4,7 @@
 #include "data/common/qesystem.h"
 #include "util/buttongroup.hpp"
 #include "model/delegate/generaldoublespindelegate.h"
+#include "model/delegate/combodelegate.h"
 #include "data/train/traintype.h"
 #include "data/train/typemanager.h"
 #include "mainwindow/version.h"
@@ -27,7 +28,7 @@ TypeConfigDialog::TypeConfigDialog(TypeManager &manager_, bool forDefault_, QWid
     QDialog(parent), manager(manager_),
     model(new TypeConfigModel(manager_,this)),forDefault(forDefault_)
 {
-    resize(600,600);
+    resize(800,600);
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("类型管理"));
     initUI();
@@ -78,7 +79,7 @@ void TypeConfigDialog::initUI()
     table->verticalHeader()->setDefaultSectionSize(SystemJson::get().table_row_height);
 
     int c=0;
-    for(int t:{120,50,120,80,80}){
+    for(int t:{110,50,100,70,70,100,80,100}){
         table->setColumnWidth(c++,t);
     }
 
@@ -87,6 +88,14 @@ void TypeConfigDialog::initUI()
                                     new GeneralDoubleSpinDelegate(this,2));
     table->setItemDelegateForColumn(TypeConfigModel::ColLineStyle,
                                     new LineStyleDelegate(this));
+    QStringList markerTypes;
+    for (int i = 0; i < static_cast<int>(LineMarkerType::MAX); ++i) {
+        markerTypes.append(line_marker_type_names.at(i));
+    }
+    table->setItemDelegateForColumn(TypeConfigModel::ColMarkerType,
+                                    new ComboDelegate(markerTypes, this));
+    table->setItemDelegateForColumn(TypeConfigModel::ColMarkerSize,
+                                    new GeneralDoubleSpinDelegate(this,1));
     connect(table,&QTableView::doubleClicked,this,&TypeConfigDialog::onDoubleClicked);
 
     vlay->addWidget(ctab);
@@ -112,10 +121,13 @@ void TypeConfigDialog::actApply()
 
 void TypeConfigDialog::onDoubleClicked(const QModelIndex &idx)
 {
-    if(idx.column() == TypeConfigModel::ColColor){
+    if(idx.column() == TypeConfigModel::ColColor ||
+        idx.column() == TypeConfigModel::ColMarkerColor){
         auto* it=model->item(idx.row(),idx.column());
+        const bool isMarker = idx.column() == TypeConfigModel::ColMarkerColor;
         auto color=QColorDialog::getColor(it->background().color(),this,
-            tr("类型颜色 - %1").arg(model->item(idx.row(),TypeConfigModel::ColName)->text()));
+            (isMarker ? tr("标记颜色 - %1") : tr("类型颜色 - %1"))
+                .arg(model->item(idx.row(),TypeConfigModel::ColName)->text()));
         if(color.isValid()){
             it->setText(color.name().toUpper());
             it->setBackground(color);

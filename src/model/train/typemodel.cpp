@@ -13,7 +13,8 @@ TypeConfigModel::TypeConfigModel(TypeManager &manager_, QObject *parent):
     QEMoveableModel(parent),manager(manager_)
 {
     setColumnCount(ColMAX);
-    setHorizontalHeaderLabels({tr("类型名"),tr("客车"),tr("颜色"), tr("线宽"),tr("线型")});
+    setHorizontalHeaderLabels({tr("类型名"),tr("客车"),tr("颜色"), tr("线宽"),tr("线型"),
+        tr("标记类型"),tr("标记尺寸"),tr("标记颜色")});
     setupModel();
 }
 
@@ -36,7 +37,20 @@ std::pair<QMap<QString, std::shared_ptr<TrainType> >,
             QPen pen(item(i,ColColor)->background(),
                      item(i,ColWidth)->data(Qt::EditRole).toDouble(),
                      static_cast<Qt::PenStyle>(item(i,ColLineStyle)->data(Qt::EditRole).toInt()));
-            auto np=std::make_shared<TrainType>(item(i,ColName)->text(),pen,
+
+            auto markerType = static_cast<LineMarkerType>(
+                item(i, ColMarkerType)->data(Qt::EditRole).toInt());
+            LineMarkerStyle marker = LineMarkerStyle::no_marker();
+            if (markerType != LineMarkerType::None) {
+                // The marker uses the line width and style, but has its own color.
+                QPen markerPen = pen;
+                markerPen.setColor(item(i, ColMarkerColor)->background().color());
+                marker = LineMarkerStyle(markerType, markerPen,
+                    item(i, ColMarkerSize)->data(Qt::EditRole).toDouble());
+            }
+
+            auto np=std::make_shared<TrainType>(item(i,ColName)->text(),
+                    TrainLineStyle(pen, std::move(marker)),
                     item(i,ColPassenger)->checkState()==Qt::Checked );
             data.insert(np->name(), ptr?ptr:np);
             if(ptr && ptr->operator!=(*np)){
@@ -73,6 +87,14 @@ void TypeConfigModel::setColorItem(int row, const QColor &color)
     setItem(row,ColColor,it);
 }
 
+void TypeConfigModel::setMarkerColorItem(int row, const QColor& color)
+{
+    auto* it = new QStandardItem(color.name().toUpper());
+    it->setBackground(color);
+    it->setEditable(false);
+    setItem(row, ColMarkerColor, it);
+}
+
 void TypeConfigModel::setupType(int row, std::shared_ptr<TrainType> type)
 {
     using SI=QStandardItem;
@@ -95,6 +117,21 @@ void TypeConfigModel::setupType(int row, std::shared_ptr<TrainType> type)
     it=new SI;
     it->setData(static_cast<int>(type->pen().style()),Qt::EditRole);
     setItem(row,ColLineStyle,it);
+
+    const auto& marker = type->line_style().marker();
+    it = new SI;
+    it->setData(static_cast<int>(marker.type()), Qt::EditRole);
+    setItem(row, ColMarkerType, it);
+
+    it = new SI;
+    it->setData(marker.type() != LineMarkerType::None ? marker.marker_size() : 6.0,
+        Qt::EditRole);
+    setItem(row, ColMarkerSize, it);
+
+    QColor markerColor = marker.pen().color();
+    if (marker.type() == LineMarkerType::None || !markerColor.isValid())
+        markerColor = type->pen().color();
+    setMarkerColorItem(row, markerColor);
 }
 
 void TypeConfigModel::setupNewRow(int row)
@@ -111,6 +148,21 @@ void TypeConfigModel::setupNewRow(int row)
     it=new SI;
     it->setData(static_cast<int>(manager.getDefaultStyle().line_pen().style()),Qt::EditRole);
     setItem(row,ColLineStyle,it);
+
+    const auto& defaultStyle = manager.getDefaultStyle();
+    const auto& marker = defaultStyle.marker();
+    it = new SI;
+    it->setData(static_cast<int>(marker.type()), Qt::EditRole);
+    setItem(row, ColMarkerType, it);
+
+    it = new SI;
+    it->setData(6.0, Qt::EditRole);
+    setItem(row, ColMarkerSize, it);
+
+    QColor markerColor = marker.pen().color();
+    if (marker.type() == LineMarkerType::None || !markerColor.isValid())
+        markerColor = defaultStyle.line_pen().color();
+    setMarkerColorItem(row, markerColor);
 }
 
 

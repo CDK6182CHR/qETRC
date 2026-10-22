@@ -17,4 +17,5 @@ public:
     void setModelData(QWidget *editor, QAbstractItemModel *model,
                       const QModelIndex &index) const override;
 
+    QString displayText(const QVariant &value, const QLocale &locale) const override;
 };
