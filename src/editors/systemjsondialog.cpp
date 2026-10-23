@@ -83,13 +83,16 @@ void SystemJsonDialog::initUI()
     sdDashLineLength->setPrefix(tr("线段 "));
     sdDashLineLength->setRange(0, 1000);
     sdDashLineLength->setSingleStep(1);
+    sdDashLineLength->setToolTip(tr("自定义断线（虚线）运行线的每个线段长度。仅用于运行线线型为CustomDashLine (6)时。"));
     hlay->addWidget(sdDashLineLength);
     sdDashLineSpace = new QDoubleSpinBox;
     sdDashLineSpace->setPrefix(tr("间隔 "));
     sdDashLineSpace->setRange(0, 1000);
     sdDashLineSpace->setSingleStep(1);
+    sdDashLineSpace->setToolTip(tr("自定义断线（虚线）运行线的每个间隔长度。仅用于运行线线型为CustomDashLine (6)时。"));
     hlay->addWidget(sdDashLineSpace);
-    flay->addRow(tr("断线长度"), hlay);
+    hlay->addWidget(new QLabel(tr("重启软件生效")));
+    flay->addRow(tr("自定义断线长度"), hlay);
 
     ckWeaken=new QCheckBox(tr("启用"));
     ckWeaken->setToolTip(tr("虚化非选择运行线\n在选择运行线时，是否虚化其他的未显示运行线。"));
