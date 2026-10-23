@@ -69,10 +69,11 @@ QAbstractGraphicsShapeItem* DoubleLineMarkerBuilder::build_marker(const MarkerIn
 	QPainterPath path;
 	path.moveTo(QPointF(info.center.x() + (-info.dx / 2 - info.dy) * size / 2, info.center.y() + (-info.dy / 2 + info.dx) * size / 2));
 	path.lineTo(QPointF(info.center.x() + (-info.dx / 2 + info.dy) * size / 2, info.center.y() + (-info.dy / 2 - info.dx) * size / 2));
-	path.closeSubpath();
+	//path.closeSubpath();
 
 	path.moveTo(QPointF(info.center.x() + (+info.dx / 2 + info.dy) * size / 2, info.center.y() + (+info.dy / 2 - info.dx) * size / 2));
 	path.lineTo(QPointF(info.center.x() + (+info.dx / 2 - info.dy) * size / 2, info.center.y() + (+info.dy / 2 + info.dx) * size / 2));
+	//path.closeSubpath();
 
 	return new QGraphicsPathItem(path, parent);
 }
@@ -115,7 +116,7 @@ QAbstractGraphicsShapeItem* CrossMarkerBuilder::build_marker(const MarkerInfo& i
 	path.moveTo(QPointF(info.center.x() + (-info.dx - info.dy) * size / 2, info.center.y() + (-info.dy + info.dx) * size / 2));
 	path.lineTo(QPointF(info.center.x() + (+info.dx + info.dy) * size / 2, info.center.y() + (+info.dy - info.dx) * size / 2));
 
-	path.closeSubpath();
+	//path.closeSubpath();
 
 	path.moveTo(QPointF(info.center.x() + (+info.dx - info.dy) * size / 2, info.center.y() + (+info.dy + info.dx) * size / 2));
 	path.lineTo(QPointF(info.center.x() + (-info.dx + info.dy) * size / 2, info.center.y() + (-info.dy - info.dx) * size / 2));
@@ -140,7 +141,7 @@ QAbstractGraphicsShapeItem* AddLineMarkerBuilder::build_marker(const MarkerInfo&
 		QPainterPath path;
 		path.moveTo(info.center.x() - info.dx * size / 2, info.center.y() - info.dy * size / 2);
 		path.lineTo(info.center.x() + info.dx * size / 2, info.center.y() + info.dy * size / 2);
-		path.closeSubpath();
+		//path.closeSubpath();
 
 		path.moveTo(info.center.x() + info.dy * size / 2, info.center.y() - info.dx * size / 2);
 		path.lineTo(info.center.x() - info.dy * size / 2, info.center.y() + info.dx * size / 2);
