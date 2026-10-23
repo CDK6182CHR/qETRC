@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
 #include <QVBoxLayout>
 #include "util/buttongroup.hpp"
 #include <data/common/qesystem.h>
@@ -76,6 +77,19 @@ void SystemJsonDialog::initUI()
     cbSysStyle->setToolTip(tr("界面风格\n选择程序采用的界面风格。这里列出当前系统所支持的风格。"));
     cbSysStyle->addItems(QStyleFactory::keys());
     flay->addRow(tr("界面风格"), cbSysStyle);
+
+    hlay = new QHBoxLayout;
+    sdDashLineLength = new QDoubleSpinBox;
+    sdDashLineLength->setPrefix(tr("线段 "));
+    sdDashLineLength->setRange(0, 1000);
+    sdDashLineLength->setSingleStep(1);
+    hlay->addWidget(sdDashLineLength);
+    sdDashLineSpace = new QDoubleSpinBox;
+    sdDashLineSpace->setPrefix(tr("间隔 "));
+    sdDashLineSpace->setRange(0, 1000);
+    sdDashLineSpace->setSingleStep(1);
+    hlay->addWidget(sdDashLineSpace);
+    flay->addRow(tr("断线长度"), hlay);
 
     ckWeaken=new QCheckBox(tr("启用"));
     ckWeaken->setToolTip(tr("虚化非选择运行线\n在选择运行线时，是否虚化其他的未显示运行线。"));
@@ -157,6 +171,8 @@ void SystemJsonDialog::setData()
     const auto& t=SystemJson::get();
     spRowHeight->setValue(t.table_row_height);
     edDefaultFile->setText(t.default_file);
+    sdDashLineLength->setValue(t.dash_line_length);
+    sdDashLineSpace->setValue(t.dash_line_space);
 #if 0
     {
         int ribbon_sty_idx = 0;
@@ -187,6 +203,8 @@ void SystemJsonDialog::actApply()
     t.language = qvariant_cast<QLocale::Language>(cbLanguage->currentData());
     t.table_row_height = spRowHeight->value();
     t.default_file = edDefaultFile->text();
+    t.dash_line_length = sdDashLineLength->value();
+    t.dash_line_space = sdDashLineSpace->value();
 #if 0
     t.ribbon_style = qvariant_cast<SARibbonBar::RibbonStyles>(cbRibbonStyle->currentData());
 #endif

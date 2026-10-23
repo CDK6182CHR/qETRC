@@ -6,6 +6,7 @@
 #include "data/diagram/trainline.h"
 #include "data/diagram/trainadapter.h"
 #include "data/train/traintype.h"
+#include "data/common/qesystem.h"
 #include "routing.h"
 #include "util/utilfunc.h"
 #include "typemanager.h"
@@ -89,6 +90,9 @@ void Train::fromJson(const QJsonObject &obj, TypeManager& manager, TrainTagManag
         if (pen.width() == 0) {
             //线宽为0表示采用默认
             pen.setWidthF(_type->pen().widthF());
+        }
+        if (pen.style() == Qt::CustomDashLine) {
+            pen.setDashPattern(SystemJson::get().dash_line_pattern());
         }
 		auto marker = LineMarkerStyle::fromJson(ui.value("marker").toObject());
 

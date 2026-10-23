@@ -1,5 +1,7 @@
 ﻿#include "linemarker.h"
 
+#include "data/common/qesystem.h"
+
 std::array<QString, static_cast<int>(LineMarkerType::MAX)> line_marker_type_names{
 	QObject::tr("无标记"),
 	QObject::tr("方框"),
@@ -32,5 +34,8 @@ LineMarkerStyle LineMarkerStyle::fromJson(const QJsonObject& obj)
 	double width = penObj["width"].toDouble();
 	Qt::PenStyle style = static_cast<Qt::PenStyle>(penObj["style"].toInt());
 	QPen pen(color, width, style);
+	if (pen.style() == Qt::CustomDashLine) {
+		pen.setDashPattern(SystemJson::get().dash_line_pattern());
+	}
 	return LineMarkerStyle(type, pen, marker_size);
 }

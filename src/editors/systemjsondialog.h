@@ -7,6 +7,7 @@ class QCheckBox;
 class QComboBox;
 class QLineEdit;
 class QSpinBox;
+class QDoubleSpinBox;
 
 /**
  * @brief The SystemJsonDialog class
@@ -18,6 +19,7 @@ class SystemJsonDialog : public QDialog
     QComboBox* cbLanguage;
     QSpinBox* spRowHeight;
     QLineEdit* edDefaultFile;
+    QDoubleSpinBox* sdDashLineLength, * sdDashLineSpace;
     //QComboBox* cbRibbonStyle;  // 2024.03.28: move to another dialog
     QComboBox* cbSysStyle;
     QCheckBox* ckWeaken, * ckTooltip, * ckCentral, * ckStartup, * ckAutoHighlight;

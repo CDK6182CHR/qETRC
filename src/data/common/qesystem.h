@@ -22,7 +22,7 @@ public:
     int table_row_height = 20;
     
     // 2026.10.23: dash line pattern
-    double dash_line_length = 8, dash_line_space = 2;
+    double dash_line_length = 15, dash_line_space = 5;
 
     bool show_train_tooltip = true;
 

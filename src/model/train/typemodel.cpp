@@ -3,6 +3,7 @@
 #include "data/train/traintype.h"
 #include "model/delegate/qedelegate.h"
 #include "data/train/typemanager.h"
+#include "data/common/qesystem.h"
 
 #include <QWidget>
 #include <QMessageBox>
@@ -37,6 +38,9 @@ std::pair<QMap<QString, std::shared_ptr<TrainType> >,
             QPen pen(item(i,ColColor)->background(),
                      item(i,ColWidth)->data(Qt::EditRole).toDouble(),
                      static_cast<Qt::PenStyle>(item(i,ColLineStyle)->data(Qt::EditRole).toInt()));
+            if (pen.style() == Qt::CustomDashLine) {
+                pen.setDashPattern(SystemJson::get().dash_line_pattern());
+            }
 
             auto markerType = static_cast<LineMarkerType>(
                 item(i, ColMarkerType)->data(Qt::EditRole).toInt());

@@ -227,14 +227,18 @@ bool TypeManager::fromJson(const QJsonObject& obj, bool ignore_transparent)
     const QJsonObject& ls = obj.value("line_styles").toObject();
     for (auto p = ls.begin(); p != ls.end(); ++p) {
         const QJsonArray& arsub = p.value().toArray();
+        QPen* pen = nullptr;
         if (p.key() == "default") {
-            defaultType->line_style().line_pen().setStyle(static_cast<Qt::PenStyle>(arsub.at(0).toInt()));
-            defaultType->line_style().line_pen().setWidthF(arsub.at(1).toDouble());
+            pen = &defaultType->line_style().line_pen();
         }
         else {
             auto tp = findOrCreate(p.key());
-            tp->line_style().line_pen().setStyle(static_cast<Qt::PenStyle>(arsub.at(0).toInt()));
-            tp->line_style().line_pen().setWidthF(arsub.at(1).toDouble());
+            pen = &tp->line_style().line_pen();
+        }
+        pen->setStyle(static_cast<Qt::PenStyle>(arsub.at(0).toInt()));
+        pen->setWidthF(arsub.at(1).toDouble());
+        if (pen->style() == Qt::CustomDashLine) {
+            pen->setDashPattern(SystemJson::get().dash_line_pattern());
         }
     }
 
