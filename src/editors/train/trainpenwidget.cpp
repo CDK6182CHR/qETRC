@@ -11,6 +11,7 @@
 
 #include "util/linestylecombo.h"
 #include "data/train/train.h"
+#include "data/common/qesystem.h"
 
 TrainPenWidget::TrainPenWidget(QWidget* parent):
     QWidget(parent)
@@ -67,6 +68,10 @@ std::optional<TrainLineStyle> TrainPenWidget::lineStyle() const
         p.setColor(m_color);
         p.setWidthF(m_spWidth->value());
         p.setStyle(static_cast<Qt::PenStyle>(m_cbStyle->currentIndex()));
+
+        if (p.style() == Qt::CustomDashLine) {
+            p.setDashPattern(SystemJson::get().dash_line_pattern());
+        }
 
         auto type = static_cast<LineMarkerType>(m_cbMarker->currentData().toInt());
         LineMarkerStyle marker = LineMarkerStyle::no_marker();

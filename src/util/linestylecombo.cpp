@@ -96,7 +96,7 @@ PenStyleCombo::PenStyleCombo(QWidget* parent /*= Q_NULLPTR*/)
     setLineEdit(m_pPenEdit);
     setModel(m_pListWidget->model());
     setView(m_pListWidget);
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i <= 6; i++)   // 2026.10.23: include 6 (custom)
         appendItem(i);
 }
 

@@ -20,6 +20,9 @@ public:
     QString default_raildb_file = "CRPassengerMileage.pyetlib";
     QString app_style = "windowsvista";
     int table_row_height = 20;
+    
+    // 2026.10.23: dash line pattern
+    double dash_line_length = 8, dash_line_space = 2;
 
     bool show_train_tooltip = true;
 
@@ -68,6 +71,8 @@ public:
      * 添加历史记录文件；同时记录为上一次的文件
      */
     void addHistoryFile(const QString& name);
+
+    QList<qreal> dash_line_pattern()const;
 
     ~SystemJson();
 

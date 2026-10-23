@@ -1993,6 +1993,9 @@ void TrainContext::actApply()
 		if (!color.isValid())
 			color = train->lineStyle().line_pen().color();
 		QPen pen = QPen(color, spWidth->value(), static_cast<Qt::PenStyle>(comboLs->currentIndex()));
+		if (pen.style() == Qt::CustomDashLine) {
+			pen.setDashPattern(SystemJson::get().dash_line_pattern());
+		}
 
 		auto markerType = static_cast<LineMarkerType>(comboMarker->currentData().toInt());
 		LineMarkerStyle marker = LineMarkerStyle::no_marker();

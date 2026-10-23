@@ -320,6 +320,9 @@ void EditTrainWidget::actApply()
             color = _train->lineStyle().line_pen().color();
         QPen pen = QPen(color, spWidth->value(),
                         static_cast<Qt::PenStyle>(cbLs->currentIndex()));
+        if (pen.style() == Qt::CustomDashLine) {
+            pen.setDashPattern(SystemJson::get().dash_line_pattern());
+        }
 
         auto markerType = static_cast<LineMarkerType>(cbMarker->currentData().toInt());
         LineMarkerStyle marker = LineMarkerStyle::no_marker();

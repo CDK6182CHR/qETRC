@@ -40,6 +40,10 @@ TrainLineStyle lineStyleFromRow(TypeConfigModel* model, int row)
         static_cast<Qt::PenStyle>(
             model->item(row, TypeConfigModel::ColLineStyle)->data(Qt::EditRole).toInt()));
 
+    if (pen.style() == Qt::CustomDashLine) {
+        pen.setDashPattern(SystemJson::get().dash_line_pattern());
+    }
+
     auto markerType = static_cast<LineMarkerType>(
         model->item(row, TypeConfigModel::ColMarkerType)->data(Qt::EditRole).toInt());
     LineMarkerStyle marker = LineMarkerStyle::no_marker();

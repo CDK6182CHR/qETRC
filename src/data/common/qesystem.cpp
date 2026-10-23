@@ -35,6 +35,11 @@ void SystemJson::addHistoryFile(const QString& name)
     last_file = name;
 }
 
+QList<qreal> SystemJson::dash_line_pattern() const
+{
+    return QList<qreal>{dash_line_length, dash_line_space};
+}
+
 SystemJson::~SystemJson()
 {
     saveFile();
@@ -66,6 +71,8 @@ void SystemJson::fromJson(const QJsonObject& obj)
     default_raildb_file = obj.value("default_raildb_file")
             .toString(default_raildb_file);
     table_row_height = obj.value("table_row_height").toInt(table_row_height);
+    dash_line_length = obj.value("dash_line_length").toDouble(dash_line_length);
+    dash_line_space = obj.value("dash_line_space").toDouble(dash_line_space);
     show_train_tooltip = obj.value("show_train_tooltip").toBool(show_train_tooltip);
     ribbon_style = obj.value("ribbon_style").toInt(18);
     app_style = obj.value("app_style").toString(app_style);
@@ -105,6 +112,8 @@ QJsonObject SystemJson::toJson() const
         {"ribbon_align_center", ribbon_align_center},
         {"history",ar},
         {"table_row_height",table_row_height},
+        {"dash_line_length",dash_line_length},
+        {"dash_line_space",dash_line_space},
         {"show_train_tooltip",show_train_tooltip},
         {"drag_time", drag_time},
         {"weaken_unselected",weaken_unselected},
