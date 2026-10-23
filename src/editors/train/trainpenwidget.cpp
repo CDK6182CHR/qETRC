@@ -78,6 +78,7 @@ std::optional<TrainLineStyle> TrainPenWidget::lineStyle() const
         if (type != LineMarkerType::None) {
             // The marker uses the line width and style, but has its own color.
             QPen markerPen = p;
+            markerPen.setStyle(Qt::SolidLine);
             markerPen.setColor(m_markerColor);
             marker = LineMarkerStyle(type, markerPen, m_spMarkerSize->value());
         }

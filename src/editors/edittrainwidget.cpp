@@ -331,6 +331,7 @@ void EditTrainWidget::actApply()
             if (!markerColor.isValid())
                 markerColor = color;
             QPen markerPen = pen;
+            markerPen.setStyle(Qt::SolidLine);
             markerPen.setColor(markerColor);
             marker = LineMarkerStyle(markerType, markerPen, spMarkerSize->value());
         }

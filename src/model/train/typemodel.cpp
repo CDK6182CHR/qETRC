@@ -48,6 +48,7 @@ std::pair<QMap<QString, std::shared_ptr<TrainType> >,
             if (markerType != LineMarkerType::None) {
                 // The marker uses the line width and style, but has its own color.
                 QPen markerPen = pen;
+                markerPen.setStyle(Qt::SolidLine);
                 markerPen.setColor(item(i, ColMarkerColor)->background().color());
                 marker = LineMarkerStyle(markerType, markerPen,
                     item(i, ColMarkerSize)->data(Qt::EditRole).toDouble());

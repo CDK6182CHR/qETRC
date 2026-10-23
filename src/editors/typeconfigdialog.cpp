@@ -49,6 +49,7 @@ TrainLineStyle lineStyleFromRow(TypeConfigModel* model, int row)
     LineMarkerStyle marker = LineMarkerStyle::no_marker();
     if (markerType != LineMarkerType::None) {
         QPen markerPen = pen;
+        markerPen.setStyle(Qt::SolidLine);
         markerPen.setColor(
             model->item(row, TypeConfigModel::ColMarkerColor)->background().color());
         marker = LineMarkerStyle(markerType, markerPen,
