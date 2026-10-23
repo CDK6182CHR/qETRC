@@ -1228,9 +1228,10 @@ void TrainItem::markArriveTime(double x, double y, const TrainTime& tm)
     // 2024.03.27: options for different round strategies
 
     double cx = x + start_x, cy = y + start_y;  // center position, including margins
+    int m_mark = config().show_full_minute ? m : m % 10;
     if (show_second(tm, config())) {
         // 2026.10.23  experimental: also show the second
-        auto* item_m = new QGraphicsSimpleTextItem(QString("%1.").arg(m%10), this);
+        auto* item_m = new QGraphicsSimpleTextItem(QString("%1.").arg(m_mark), this);
         item_m->setFont(config().train_font);
         item_m->setBrush(pen.color());
         double mw = item_m->boundingRect().width();
@@ -1253,7 +1254,7 @@ void TrainItem::markArriveTime(double x, double y, const TrainTime& tm)
         if (config().second_round_option == Config::SecondRoundOption::Round &&
             tm.second() >= 30)
             m++;
-        auto* item = new QGraphicsSimpleTextItem(QString::number(m % 10), this);
+        auto* item = new QGraphicsSimpleTextItem(QString::number(m_mark), this);
         item->setFont(config().train_font);
         item->setBrush(pen.color());
         double h = item->boundingRect().height();
@@ -1271,10 +1272,11 @@ void TrainItem::markDepartTime(double x, double y, const TrainTime& tm)
 {
     //出发时刻 下行标左下，上行标左上
     int m = tm.minute();
+    int m_mark = config().show_full_minute ? m : m % 10;
     double cx = x + start_x, cy = y + start_y;  // center position, including margins
     if (show_second(tm, config())) {
         // 2026.10.23  experimental: also show the second
-        auto* item_m = new QGraphicsSimpleTextItem(QString("%1.").arg(m % 10), this);
+        auto* item_m = new QGraphicsSimpleTextItem(QString("%1.").arg(m_mark), this);
         item_m->setFont(config().train_font);
         item_m->setBrush(pen.color());
         double mw = item_m->boundingRect().width();
@@ -1304,7 +1306,7 @@ void TrainItem::markDepartTime(double x, double y, const TrainTime& tm)
     else {
         if (config().second_round_option == Config::SecondRoundOption::Round && tm.second() >= 30)
             m++;
-        auto* item = new QGraphicsSimpleTextItem(QString::number(m % 10), this);
+        auto* item = new QGraphicsSimpleTextItem(QString::number(m_mark), this);
         item->setFont(config().train_font);
         item->setBrush(pen.color());
         const auto& t = item->boundingRect();

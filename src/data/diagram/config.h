@@ -139,6 +139,9 @@ struct Config
     int show_time_mark = 1;
     SecondRoundOption second_round_option = SecondRoundOption::Round;
 
+    // 2026.10.23: show full minute (instead of only the last digit)
+    bool show_full_minute = false;
+
     /**
      * 自动安排TrainItem配置时，最多允许间隔的站数。超过将分成两个Item
      * 2025.03.05: moved to DiagramOptions

@@ -45,6 +45,7 @@ class ConfigDialog : public QDialog
     QCheckBox* ckFullName, * ckEndLabel, * ckAvoidCollid, * ckFloatLinkLine, * ckShowNonLocalLink;
     QSpinBox* spLinkHeightBase, * spLinkHeightStep, * spLinkLineMaxDuration;
     QCheckBox* ckHideStartLabelStarting, * ckHideStartLabelNonStarting;
+    QCheckBox* ckShowFullMinute;
     QCheckBox* ckHideEndLabelTerminal, * ckHideEndLabelNonTerminal, * ckHideEndLabelLink;
     QCheckBox* ckShowRuler, * ckShowMile, * ckShowCount, * ckHideNonFirstSideHeader;
     QCheckBox* ckTransparent, * ckInverseColor;

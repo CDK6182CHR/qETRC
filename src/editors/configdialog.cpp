@@ -244,6 +244,11 @@ void ConfigDialog::initUI(int period_hours)
         cbLabelColor = cb;
 
         auto* ck = new QCheckBox;
+        ck->setToolTip(tr("若选中，则在图中的时刻上显示完整分钟数，否则只显示分钟数的末位"));
+        form->addRow(tr("显示完整分钟数"), ck);
+        ckShowFullMinute = ck;
+
+        ck = new QCheckBox;
         ck->setToolTip(tr("是否在运行线结束标签显示车次"));
         form->addRow(tr("结束标签车次"), ck);
         ckEndLabel = ck;
@@ -626,6 +631,7 @@ void ConfigDialog::refreshData()
     cbShowTimeMark->setCurrentIndex(_cfg.show_time_mark);
     cbSecondRoundOption->setCurrentIndex(static_cast<int>(_cfg.second_round_option));
     cbLabelColor->setCurrentIndex(static_cast<int>(_cfg.train_label_color));
+    SET_CHECK(ckShowFullMinute, show_full_minute);
     ckEndLabel->setChecked(_cfg.end_label_name);
     ckFullName->setChecked(_cfg.show_full_train_name);
     ckHideStartLabelStarting->setChecked(_cfg.hide_start_label_starting);
@@ -719,6 +725,7 @@ void ConfigDialog::actApply()
     cnew.show_time_mark = cbShowTimeMark->currentIndex();
     cnew.second_round_option = static_cast<Config::SecondRoundOption>(cbSecondRoundOption->currentIndex());
     cnew.train_label_color = static_cast<Config::LinkLineColorOption>(cbLabelColor->currentIndex());
+    cnew.show_full_minute = ckShowFullMinute->isChecked();
     cnew.end_label_name = ckEndLabel->isChecked();
     cnew.show_full_train_name = ckFullName->isChecked();
     cnew.hide_start_label_starting = ckHideStartLabelStarting->isChecked();

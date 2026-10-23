@@ -135,6 +135,7 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
     FROM_OBJ_NAME(show_full_train_name, showFullCheci, Bool);
 
     FROM_OBJ(show_time_mark, Int);
+    FROM_OBJ(show_full_minute, Bool);
     FROM_OBJ_ENUM(second_round_option);
 
     FROM_OBJ(avoid_cover, Bool);
@@ -217,6 +218,7 @@ QJsonObject Config::toJson(bool ignore_transparent) const
         TO_OBJ_NAME(show_full_train_name,
             showFullCheci)
         TO_OBJ(show_time_mark)
+        TO_OBJ(show_full_minute)
         TO_OBJ_ENUM(second_round_option)
         TO_OBJ(avoid_cover)
         TO_OBJ(base_label_height)
