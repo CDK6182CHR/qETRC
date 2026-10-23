@@ -233,9 +233,9 @@ void ConfigDialog::initUI(int period_hours)
         cbShowTimeMark = cb;
 
         cb = new QComboBox;
-        cb->addItems({ tr("修约至最近分钟数"), tr("舍弃秒尾数") });
+        cb->addItems({ tr("修约至最近分钟数"), tr("舍弃秒尾数"), tr("显示非零秒数"), tr("显示全部秒数")});
         cb->setToolTip(tr("设置在运行图中显示图定时刻的分钟个位数时，遇有秒数条件下的舍入规则。"));
-        form->addRow(tr("秒数修约选项"), cb);
+        form->addRow(tr("秒数显示选项"), cb);
         cbSecondRoundOption = cb;
 
         cb = new QComboBox;

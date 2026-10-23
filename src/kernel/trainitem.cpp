@@ -1208,24 +1208,63 @@ void TrainItem::hideLinkLine()
     }
 }
 
+namespace {
+    bool show_second(const TrainTime& tm, const Config& config) {
+        switch (config.second_round_option) {
+        case Config::SecondRoundOption::ShowAll:
+            return true;
+        case Config::SecondRoundOption::ShowNonZero:
+            return tm.second() != 0;
+        default:
+            return false;
+        }
+    }
+}
+
 void TrainItem::markArriveTime(double x, double y, const TrainTime& tm)
 {
     //到达时刻：下行标右上，下行标右下
     int m = tm.minute();
     // 2024.03.27: options for different round strategies
-    if (config().second_round_option == Config::SecondRoundOption::Round &&
-        tm.second() >= 30)
-        m++;
-    auto* item = new QGraphicsSimpleTextItem(QString::number(m % 10), this);
-    item->setBrush(pen.color());
-    double h = item->boundingRect().height();
-    if (dir() == Direction::Down) {
-        item->setPos(x + start_x, y - h + start_y);
+
+    double cx = x + start_x, cy = y + start_y;  // center position, including margins
+    if (show_second(tm, config())) {
+        // 2026.10.23  experimental: also show the second
+        auto* item_m = new QGraphicsSimpleTextItem(QString("%1.").arg(m%10), this);
+        item_m->setFont(config().train_font);
+        item_m->setBrush(pen.color());
+        double mw = item_m->boundingRect().width();
+        double mh = item_m->boundingRect().height();
+        auto* item_s = new QGraphicsSimpleTextItem(QString("%1").arg(tm.second(), 2, 10, QChar('0')), this);
+        item_s->setFont(config().train_small_font);
+        item_s->setBrush(pen.color());
+        if (dir() == Direction::Down) {
+            item_m->setPos(cx, cy - mh);
+            item_s->setPos(cx + mw, cy - mh);
+        }
+        else {
+            item_m->setPos(cx, cy);
+            item_s->setPos(cx + mw, cy);
+        }
+        markLabels.append(item_m);
+        markLabels.append(item_s);
     }
     else {
-        item->setPos(x + start_x, y + start_y);
+        if (config().second_round_option == Config::SecondRoundOption::Round &&
+            tm.second() >= 30)
+            m++;
+        auto* item = new QGraphicsSimpleTextItem(QString::number(m % 10), this);
+        item->setFont(config().train_font);
+        item->setBrush(pen.color());
+        double h = item->boundingRect().height();
+        if (dir() == Direction::Down) {
+            item->setPos(x + start_x, y - h + start_y);
+        }
+        else {
+            item->setPos(x + start_x, y + start_y);
+        }
+        markLabels.append(item);
     }
-    markLabels.append(item);
 }
 
 void TrainItem::markDepartTime(double x, double y, const TrainTime& tm)
@@ -1235,6 +1274,7 @@ void TrainItem::markDepartTime(double x, double y, const TrainTime& tm)
     if (config().second_round_option == Config::SecondRoundOption::Round && tm.second() >= 30)
         m++;
     auto* item = new QGraphicsSimpleTextItem(QString::number(m % 10), this);
+    item->setFont(config().train_font);
     item->setBrush(pen.color());
     const auto& t = item->boundingRect();
     double w = t.width(), h = t.height();

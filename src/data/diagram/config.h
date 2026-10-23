@@ -10,6 +10,10 @@
 #include <memory>
 //#include "data/rail/ruler.h"
 
+namespace qeutil {
+    QFont default_small_font();
+}
+
 
 struct MarginConfig {
     int
@@ -70,10 +74,13 @@ struct Config
     /**
      * For the round of seconds when showing time in the diagram, 
      * where only the minute is shown.
+     * 2026.10.23  Experimental: Add second showing.
      */
     enum class SecondRoundOption {
         Round = 0,
         Floor,
+        ShowNonZero,
+        ShowAll,
     };
 
     static QFont default_font_double_size();
@@ -94,6 +101,7 @@ struct Config
         text_color=QColor(0,0,255);      // #0000FF
     QColor background_color = QColor(255, 255, 255);   // 2024.06.24 experimental
     QFont rail_font = QFont{}, train_font = QFont{}, time_font = default_font_double_size();
+    QFont train_small_font = qeutil::default_small_font();
     bool inverse_color = false;   // inverse ALL specified colors
     
     // 默认客车和货车线宽，好像也没用了

@@ -2,6 +2,7 @@
 #include <QJsonArray>
 #include <QFile>
 #include <QJsonDocument>
+#include <QGUIApplication>
 
 #include "data/common/qesystem.h"
 #include "util/utilfunc.h"
@@ -92,6 +93,9 @@ bool Config::fromJson(const QJsonObject& obj, bool ignore_transparent)
     }
     if (obj.contains("train_font")) {
         train_font.fromString(obj.value("train_font").toString());
+    }
+    if (obj.contains("train_small_font")) {
+        train_small_font.fromString(obj.value("train_small_font").toString());
     }
 
     // time font: default size to be 2 times of the rail_font
@@ -247,6 +251,7 @@ QJsonObject Config::toJson(bool ignore_transparent) const
     obj.insert("background_color", background_color.name());
     obj.insert("rail_font", rail_font.toString());
     obj.insert("train_font", train_font.toString());
+    obj.insert("train_small_font", train_small_font.toString());
     obj.insert("time_font", time_font.toString());
     obj.insert("margins", margins.toJson());
     QJsonArray ns;
@@ -369,3 +374,9 @@ double Config::leftStationBarX() const
     return res;
 }
 
+QFont qeutil::default_small_font()
+{
+    auto font = QGuiApplication::font();
+    font.setPointSize(static_cast<int>(std::round(font.pointSize() * 0.75)));
+    return font;
+}
