@@ -1271,20 +1271,53 @@ void TrainItem::markDepartTime(double x, double y, const TrainTime& tm)
 {
     //出发时刻 下行标左下，上行标左上
     int m = tm.minute();
-    if (config().second_round_option == Config::SecondRoundOption::Round && tm.second() >= 30)
-        m++;
-    auto* item = new QGraphicsSimpleTextItem(QString::number(m % 10), this);
-    item->setFont(config().train_font);
-    item->setBrush(pen.color());
-    const auto& t = item->boundingRect();
-    double w = t.width(), h = t.height();
-    if (dir() == Direction::Down) {
-        item->setPos(x - w + start_x, y + start_y);
+    double cx = x + start_x, cy = y + start_y;  // center position, including margins
+    if (show_second(tm, config())) {
+        // 2026.10.23  experimental: also show the second
+        auto* item_m = new QGraphicsSimpleTextItem(QString("%1.").arg(m % 10), this);
+        item_m->setFont(config().train_font);
+        item_m->setBrush(pen.color());
+        double mw = item_m->boundingRect().width();
+        double mh = item_m->boundingRect().height();
+        auto* item_s = new QGraphicsSimpleTextItem(QString("%1").arg(tm.second(), 2, 10, QChar('0')), this);
+        item_s->setFont(config().train_small_font);
+        double sw = item_s->boundingRect().width();
+
+        item_s->setBrush(pen.color());
+        if (dir() == Direction::Down) {
+            item_m->setPos(cx - mw - sw, cy);
+            item_s->setPos(cx - sw, cy);
+        }
+        else {
+            item_m->setPos(cx - mw - sw, cy - mh);
+            item_s->setPos(cx - sw, cy - mh);
+        }
+        markLabels.append(item_m);
+        markLabels.append(item_s);
+
+        // DEBUG
+        //auto* rm = new QGraphicsRectItem(item_m->boundingRect(), this);
+        //auto* rs = new QGraphicsRectItem(item_s->boundingRect(), this);
+        //rm->setPen(pen); rm->setPos(item_m->pos());
+        //rs->setPen(pen); rs->setPos(item_s->pos());
     }
     else {
-        item->setPos(x - w + start_x, y - h + start_y);
+        if (config().second_round_option == Config::SecondRoundOption::Round && tm.second() >= 30)
+            m++;
+        auto* item = new QGraphicsSimpleTextItem(QString::number(m % 10), this);
+        item->setFont(config().train_font);
+        item->setBrush(pen.color());
+        const auto& t = item->boundingRect();
+        double w = t.width(), h = t.height();
+        if (dir() == Direction::Down) {
+            item->setPos(x - w + start_x, y + start_y);
+        }
+        else {
+            item->setPos(x - w + start_x, y - h + start_y);
+        }
+        markLabels.append(item);
     }
-    markLabels.append(item);
+
 }
 
 bool TrainItem::addPreLinkLine(const QString& trainName)

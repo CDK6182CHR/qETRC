@@ -451,6 +451,11 @@ void ConfigDialog::initUI(int period_hours)
         form->addRow(tr("标签字体"), btnTrainFont);
         connect(btnTrainFont, &QPushButton::clicked, this, &ConfigDialog::actTrainFont);
 
+        btnTrainSmallFont = new QPushButton(tr("设置字体"));
+        form->addRow(tr("秒数标记字体"), btnTrainSmallFont);
+        connect(btnTrainSmallFont, &QPushButton::clicked,
+            this, &ConfigDialog::actTrainSmallFont);
+
         gb->setLayout(form);
         vlay->addWidget(gb);
     }
@@ -599,6 +604,7 @@ void ConfigDialog::refreshData()
     trainFont = _cfg.train_font;
     railFont = _cfg.rail_font;
     timeFont = _cfg.time_font;
+    trainSmallFont = _cfg.train_small_font;
 
     //空间轴
     SET_VALUE(sdScaleYdist, pixels_per_km);
@@ -696,6 +702,7 @@ void ConfigDialog::actApply()
     cnew.rail_font = railFont;
     cnew.train_font = trainFont;
     cnew.time_font = timeFont;
+    cnew.train_small_font = trainSmallFont;
 
     //空间轴
     GET_VALUE(sdScaleYdist, pixels_per_km);
@@ -834,6 +841,15 @@ void ConfigDialog::actTrainFont()
     if (!ok)
         return;
     trainFont = font;
+}
+
+void ConfigDialog::actTrainSmallFont()
+{
+    bool ok;
+    auto font = QFontDialog::getFont(&ok, trainSmallFont, this, tr("秒数标记字体"));
+    if (!ok)
+        return;
+    trainSmallFont = font;
 }
 
 void ConfigDialog::actTimeFont()
