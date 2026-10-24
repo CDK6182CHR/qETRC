@@ -58,6 +58,7 @@ win64: win64_dir win64_tr
 	$(COPY) $(QWK_WIDGETS_LIB) $(WIN64_DIR)
 	$(COPY) $(ADS_LIB) $(WIN64_DIR)
 	$(COPY) $(QETRC_ROOT)\tr\*.qm $(WIN64_DIR)\tr
+	$(XCOPY) $(QETRC_ROOT)\preset_configs $(WIN64_DIR)\preset_configs /s /i /y
 	$(QT_PROMPT_SCRIPT) && cd /d $(WIN64_DIR) && cd && windeployqt $(BIN_FILE)
 	cd $(OUTPUT_ROOT) && $(ZIP) $(WIN64_ARCHIVE) $(WIN64_DIR)
 

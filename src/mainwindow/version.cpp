@@ -4,14 +4,15 @@
 namespace qespec {
 
 const std::string_view VERSION = QETRC_VERSION;
-const std::string_view LAST_VERSION = "V1.9.9";
-const std::string_view DATE = "20260905";
-const int RELEASE_CODE = 81;
+const std::string_view LAST_VERSION = "V1.9.10";
+const std::string_view DATE = "20261024";
+const int RELEASE_CODE = 82;
 
 const std::string_view DOC_URL = "https://qetrc.readthedocs.io";
 const std::string_view DOC_URL_PREFIX = "https://qetrc.readthedocs.io/zh_CN/latest";
 
-const std::string_view UPDATE_LOG = R"(1. 修复股道分析中与交路接续相关的问题。
-2. 修复批量平移运行线的方向问题。
-3. 修复构建相关问题及更新依赖库。)";
+const std::string_view UPDATE_LOG = R"(1. 新增运行线中的方框、圆圈、双杠等标记。
+2. 新增图中显示时刻的完整分钟数、秒数选项。
+3. 在类型管理中，新增批量更改运行线样式功能。
+4. 发行包中新增预设的类型管理文件。)";
 }
